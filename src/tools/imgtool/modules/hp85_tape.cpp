@@ -67,20 +67,20 @@ static constexpr uint8_t FT_HIDDEN_MASK = 0x01;     // Hidden file
 /********************************************************************************
  * Directory entries
  ********************************************************************************/
-typedef struct {
+struct dir_entry_85 {
 	uint8_t filename[ CHARS_PER_FNAME ];  // Filename (left justified, space-padded on the right)
 	file_no_t file_no;  // File #
 	uint8_t filetype;   // File type
 	uint16_t n_recs;    // Physical records
 	uint16_t record_len;    // Length of logical records
-} dir_entry_85_t;
+};
 
 /********************************************************************************
  * Tape image
  ********************************************************************************/
-class tape_image_85_t {
+class tape_image_85 {
 public:
-	tape_image_85_t(void);
+	tape_image_85(void);
 
 	bool is_dirty(void) const { return dirty; }
 
@@ -92,12 +92,12 @@ public:
 	bool load_sif_file(file_no_t file_no , sif_file_t& out);
 	imgtoolerr_t save_to_file(imgtool::stream *stream);
 
-	bool get_dir_entry(unsigned idx , const dir_entry_85_t*& entry) const;
+	bool get_dir_entry(unsigned idx , const dir_entry_85*& entry) const;
 	bool find_file(const char *filename , bool ignore_ext , unsigned& idx) const;
-	bool alloc_new_file(dir_entry_85_t*& entry , sif_file_ptr_t&& file_data);
+	bool alloc_new_file(dir_entry_85*& entry , sif_file_ptr_t&& file_data);
 	bool delete_dir_entry(unsigned idx);
 	bool finalize_allocation();
-	static void get_filename_and_ext(const dir_entry_85_t& ent , bool inc_ext , char *out);
+	static void get_filename_and_ext(const dir_entry_85& ent , bool inc_ext , char *out);
 	static void split_filename_and_ext(const char *filename , char *fname , char *ext);
 
 private:
@@ -105,7 +105,7 @@ private:
 	hti_format_t image;
 	bool dirty;
 	// Directory
-	std::vector<dir_entry_85_t> dir;
+	std::vector<dir_entry_85> dir;
 	// Content
 	std::vector<sif_file_ptr_t> content;
 	// First file on track 1
@@ -129,7 +129,7 @@ private:
  ********************************************************************************/
 typedef struct {
 	imgtool::stream *stream;
-	tape_image_85_t *img;
+	tape_image_85 *img;
 } tape_state_t;
 
 /********************************************************************************
@@ -142,12 +142,12 @@ typedef struct {
 /********************************************************************************
  * Internal functions
  ********************************************************************************/
-tape_image_85_t::tape_image_85_t(void)
+tape_image_85::tape_image_85(void)
 	: dirty(false)
 {
 }
 
-void tape_image_85_t::format_img(void)
+void tape_image_85::format_img(void)
 {
 	// Create an empty directory
 	dir.clear();
@@ -157,37 +157,39 @@ void tape_image_85_t::format_img(void)
 	finalize_allocation();
 }
 
-static int my_seekproc(void *file, int64_t offset, int whence)
-{
-	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
-	return 0;
+namespace {
+	int my_seekproc(void *file, int64_t offset, int whence)
+	{
+		reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
+		return 0;
+	}
+
+	size_t my_readproc(void *file, void *buffer, size_t length)
+	{
+		return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
+	}
+
+	size_t my_writeproc(void *file, const void *buffer, size_t length)
+	{
+		reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
+		return length;
+	}
+
+	uint64_t my_filesizeproc(void *file)
+	{
+		return reinterpret_cast<imgtool::stream *>(file)->size();
+	}
+
+	const struct io_procs my_stream_procs = {
+		nullptr,
+		my_seekproc,
+		my_readproc,
+		my_writeproc,
+		my_filesizeproc
+	};
 }
 
-static size_t my_readproc(void *file, void *buffer, size_t length)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
-}
-
-static size_t my_writeproc(void *file, const void *buffer, size_t length)
-{
-	reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
-	return length;
-}
-
-static uint64_t my_filesizeproc(void *file)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->size();
-}
-
-static const struct io_procs my_stream_procs = {
-	nullptr,
-	my_seekproc,
-	my_readproc,
-	my_writeproc,
-	my_filesizeproc
-};
-
-imgtoolerr_t tape_image_85_t::load_from_file(imgtool::stream *stream)
+imgtoolerr_t tape_image_85::load_from_file(imgtool::stream *stream)
 {
 	io_generic io;
 	io.file = (void *)stream;
@@ -216,7 +218,7 @@ imgtoolerr_t tape_image_85_t::load_from_file(imgtool::stream *stream)
 	return IMGTOOLERR_SUCCESS;
 }
 
-bool tape_image_85_t::load_sif_file(file_no_t file_no , sif_file_t& out)
+bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 {
 	unsigned track;
 	unsigned gaps_to_go;
@@ -338,7 +340,7 @@ bool tape_image_85_t::load_sif_file(file_no_t file_no , sif_file_t& out)
 	return expected_rec_no != 0;
 }
 
-bool tape_image_85_t::load_whole_tape()
+bool tape_image_85::load_whole_tape()
 {
 	content.clear();
 
@@ -356,7 +358,7 @@ bool tape_image_85_t::load_whole_tape()
 	return true;
 }
 
-bool tape_image_85_t::dec_rec_header(const tape_word_t *hdr , file_no_t& file_no , uint16_t& rec_no , bool& has_body , unsigned& body_len)
+bool tape_image_85::dec_rec_header(const tape_word_t *hdr , file_no_t& file_no , uint16_t& rec_no , bool& has_body , unsigned& body_len)
 {
 	if ((hdr[ 0 ] & 0x6000) != 0x2000 ||
 		(hdr[ 0 ] & 0x07ff) > MAX_FILE_NO ||
@@ -387,7 +389,7 @@ bool tape_image_85_t::dec_rec_header(const tape_word_t *hdr , file_no_t& file_no
 	return true;
 }
 
-tape_word_t tape_image_85_t::checksum(const tape_word_t *block , unsigned block_len)
+tape_word_t tape_image_85::checksum(const tape_word_t *block , unsigned block_len)
 {
 	tape_word_t csum = 0;
 	for (unsigned i = 0; i < block_len; i++) {
@@ -396,7 +398,7 @@ tape_word_t tape_image_85_t::checksum(const tape_word_t *block , unsigned block_
 	return csum & 0xffff;
 }
 
-imgtoolerr_t tape_image_85_t::save_to_file(imgtool::stream *stream)
+imgtoolerr_t tape_image_85::save_to_file(imgtool::stream *stream)
 {
 	sif_file_t file_0;
 
@@ -428,7 +430,7 @@ imgtoolerr_t tape_image_85_t::save_to_file(imgtool::stream *stream)
 	return IMGTOOLERR_SUCCESS;
 }
 
-bool tape_image_85_t::get_dir_entry(unsigned idx , const dir_entry_85_t*& entry) const
+bool tape_image_85::get_dir_entry(unsigned idx , const dir_entry_85*& entry) const
 {
 	if (idx >= dir.size()) {
 		return false;
@@ -438,7 +440,7 @@ bool tape_image_85_t::get_dir_entry(unsigned idx , const dir_entry_85_t*& entry)
 	}
 }
 
-bool tape_image_85_t::find_file(const char *filename , bool ignore_ext , unsigned& idx) const
+bool tape_image_85::find_file(const char *filename , bool ignore_ext , unsigned& idx) const
 {
 	if (strcmp(filename , NULL_FILENAME) == 0) {
 		return false;
@@ -473,7 +475,7 @@ bool tape_image_85_t::find_file(const char *filename , bool ignore_ext , unsigne
 	return false;
 }
 
-bool tape_image_85_t::alloc_new_file(dir_entry_85_t*& entry , sif_file_ptr_t&& file_data)
+bool tape_image_85::alloc_new_file(dir_entry_85*& entry , sif_file_ptr_t&& file_data)
 {
 	if (file_data->size() > MAX_N_RECORDS * MAX_RECORD_SIZE) {
 		// File bigger than tape capacity
@@ -484,7 +486,7 @@ bool tape_image_85_t::alloc_new_file(dir_entry_85_t*& entry , sif_file_ptr_t&& f
 		return false;
 	}
 
-	dir_entry_85_t new_entry;
+	dir_entry_85 new_entry;
 	memset(&new_entry , 0 , sizeof(new_entry));
 
 	unsigned idx = MAX_FILE_NO;
@@ -511,7 +513,7 @@ bool tape_image_85_t::alloc_new_file(dir_entry_85_t*& entry , sif_file_ptr_t&& f
 	return true;
 }
 
-bool tape_image_85_t::delete_dir_entry(unsigned idx)
+bool tape_image_85::delete_dir_entry(unsigned idx)
 {
 	if (idx < dir.size()) {
 		dir[ idx ].filetype = FT_NULL_FILE_MASK;
@@ -521,7 +523,7 @@ bool tape_image_85_t::delete_dir_entry(unsigned idx)
 	}
 }
 
-bool tape_image_85_t::finalize_allocation()
+bool tape_image_85::finalize_allocation()
 {
 	tape_pos_t hole_pos = hti_format_t::next_hole(TRACK_START , true);
 
@@ -591,7 +593,7 @@ static const file_attr_t filetype_table[] = {
 	{ FT_BPGM_MASK , "BPGM" }
 };
 
-void tape_image_85_t::get_filename_and_ext(const dir_entry_85_t& ent , bool inc_ext , char *out)
+void tape_image_85::get_filename_and_ext(const dir_entry_85& ent , bool inc_ext , char *out)
 {
 	if (ent.filetype & FT_NULL_FILE_MASK) {
 		// Empty directory slot
@@ -620,7 +622,7 @@ void tape_image_85_t::get_filename_and_ext(const dir_entry_85_t& ent , bool inc_
 	}
 }
 
-void tape_image_85_t::split_filename_and_ext(const char *filename , char *fname , char *ext)
+void tape_image_85::split_filename_and_ext(const char *filename , char *fname , char *ext)
 {
 	char *fname_fence = fname + CHARS_PER_FNAME;
 
@@ -643,7 +645,7 @@ void tape_image_85_t::split_filename_and_ext(const char *filename , char *fname 
 	}
 }
 
-bool tape_image_85_t::decode_dir(const sif_file_t& file_0)
+bool tape_image_85::decode_dir(const sif_file_t& file_0)
 {
 	if (file_0.size() != DIR_RECORDS * MAX_RECORD_SIZE) {
 		return false;
@@ -674,7 +676,7 @@ bool tape_image_85_t::decode_dir(const sif_file_t& file_0)
 			i = 0x100;
 		}
 		const uint8_t *p = file_0.data() + i;
-		dir_entry_85_t new_entry;
+		dir_entry_85 new_entry;
 
 		// File type
 		new_entry.filetype = p[ 7 ];
@@ -708,7 +710,7 @@ bool tape_image_85_t::decode_dir(const sif_file_t& file_0)
 	return true;
 }
 
-void tape_image_85_t::encode_dir(sif_file_t& file_0) const
+void tape_image_85::encode_dir(sif_file_t& file_0) const
 {
 	file_0.clear();
 	file_0.resize(DIR_RECORDS * MAX_RECORD_SIZE , 0);
@@ -748,7 +750,7 @@ void tape_image_85_t::encode_dir(sif_file_t& file_0) const
 	memcpy(file_0.data() + (DIR_RECORDS / 2) * MAX_RECORD_SIZE , file_0.data() , (DIR_RECORDS / 2) * MAX_RECORD_SIZE);
 }
 
-void tape_image_85_t::save_words(unsigned track , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
+void tape_image_85::save_words(unsigned track , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
 {
 	tape_pos_t length;
 	for (unsigned i = 0; i < block_len; i++) {
@@ -757,7 +759,7 @@ void tape_image_85_t::save_words(unsigned track , tape_pos_t& pos , const tape_w
 	}
 }
 
-void tape_image_85_t::save_sif_file(unsigned& track , tape_pos_t& pos , file_no_t file_no , const sif_file_t& in)
+void tape_image_85::save_sif_file(unsigned& track , tape_pos_t& pos , file_no_t file_no , const sif_file_t& in)
 {
 	unsigned rec_no = 0;
 	unsigned bytes_to_go = in.size();
@@ -824,13 +826,13 @@ void tape_image_85_t::save_sif_file(unsigned& track , tape_pos_t& pos , file_no_
 	} while (bytes_to_go > 0);
 }
 
-bool tape_image_85_t::filename_char_check(uint8_t c)
+bool tape_image_85::filename_char_check(uint8_t c)
 {
 	// Quotation marks are forbidden in file names
 	return 0x20 < c && c < 0x7f && c != '"';
 }
 
-bool tape_image_85_t::filename_check(const uint8_t *filename)
+bool tape_image_85::filename_check(const uint8_t *filename)
 {
 	bool ended = false;
 
@@ -851,261 +853,263 @@ bool tape_image_85_t::filename_check(const uint8_t *filename)
 	return true;
 }
 
-static tape_state_t& get_tape_state(imgtool::image &img)
-{
-	tape_state_t *ts = (tape_state_t*)img.extra_bytes();
+namespace {
+	tape_state_t& get_tape_state(imgtool::image &img)
+	{
+		tape_state_t *ts = (tape_state_t*)img.extra_bytes();
 
-	return *ts;
-}
-
-static tape_image_85_t& get_tape_image(tape_state_t& ts)
-{
-	if (ts.img == nullptr) {
-		ts.img = global_alloc(tape_image_85_t);
+		return *ts;
 	}
 
-	return *(ts.img);
-}
+	tape_image_85& get_tape_image(tape_state_t& ts)
+	{
+		if (ts.img == nullptr) {
+			ts.img = global_alloc(tape_image_85);
+		}
 
+		return *(ts.img);
+	}
+}
 /********************************************************************************
  * Imgtool functions
  ********************************************************************************/
-static imgtoolerr_t hp85_tape_open(imgtool::image &image, imgtool::stream::ptr &&stream)
-{
-	tape_state_t& state = get_tape_state(image);
+namespace {
+	imgtoolerr_t hp85_tape_open(imgtool::image &image, imgtool::stream::ptr &&stream)
+	{
+		tape_state_t& state = get_tape_state(image);
 
-	state.stream = stream.release();
+		state.stream = stream.release();
 
-	tape_image_85_t& tape_image = get_tape_image(state);
+		tape_image_85& tape_image = get_tape_image(state);
 
-	imgtoolerr_t err = tape_image.load_from_file(state.stream);
-	if (err)
-		return err;
+		imgtoolerr_t err = tape_image.load_from_file(state.stream);
+		if (err)
+			return err;
 
-	return IMGTOOLERR_SUCCESS;
-}
-
-static imgtoolerr_t hp85_tape_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
-{
-	tape_state_t& state = get_tape_state(image);
-
-	state.stream = stream.release();
-
-	tape_image_85_t& tape_image = get_tape_image(state);
-
-	tape_image.format_img();
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-static void hp85_tape_close(imgtool::image &image)
-{
-	tape_state_t& state = get_tape_state(image);
-	tape_image_85_t& tape_image = get_tape_image(state);
-
-	if (tape_image.is_dirty()) {
-		(void)tape_image.save_to_file(state.stream);
-	}
-
-	delete state.stream;
-
-	// Free tape_image
-	global_free(&tape_image);
-}
-
-static imgtoolerr_t hp85_tape_begin_enum (imgtool::directory &enumeration, const char *path)
-{
-	dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
-
-	ds->dir_idx = 0;
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-static imgtoolerr_t hp85_tape_next_enum (imgtool::directory &enumeration, imgtool_dirent &ent)
-{
-	tape_state_t& state = get_tape_state(enumeration.image());
-	tape_image_85_t& tape_image = get_tape_image(state);
-	dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
-
-	const dir_entry_85_t *entry = nullptr;
-
-	if (!tape_image.get_dir_entry(ds->dir_idx, entry)) {
-		ent.eof = 1;
-	} else {
-		ds->dir_idx++;
-
-		unsigned filesize = entry->n_recs * MAX_RECORD_SIZE;
-
-		if (entry->filetype & FT_NULL_FILE_MASK) {
-			ent.filesize = 0;
-		} else {
-			ent.filesize = filesize;
-		}
-
-		tape_image_85_t::get_filename_and_ext(*entry, true, ent.filename);
-		snprintf(ent.attr , sizeof(ent.attr) , "%u %u %u %c%c" , entry->record_len , filesize / entry->record_len , entry->file_no , (entry->filetype & FT_WP_MASK) ? 'W' : ' ' , (entry->filetype & FT_HIDDEN_MASK) ? 'H' : ' ');
-	}
-
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-static imgtoolerr_t hp85_tape_free_space(imgtool::partition &partition, uint64_t *size)
-{
-	tape_state_t& state = get_tape_state(partition.image());
-	tape_image_85_t& tape_image = get_tape_image(state);
-	unsigned used_recs = 0;
-
-	const dir_entry_85_t *entry = nullptr;
-
-	for (unsigned i = 0; i < MAX_FILE_NO; i++) {
-		if (!tape_image.get_dir_entry(i, entry)) {
-			break;
-		}
-		// Ignore erased files
-		if (entry->filetype & FT_NULL_FILE_MASK) {
-			continue;
-		}
-		used_recs += entry->n_recs;
-	}
-
-	if (used_recs >= MAX_N_RECORDS) {
-		*size = 0;
-	} else {
-		*size = (MAX_N_RECORDS - used_recs) * MAX_RECORD_SIZE;
-	}
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-static imgtoolerr_t hp85_tape_read_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
-{
-	tape_state_t& state = get_tape_state(partition.image());
-	tape_image_85_t& tape_image = get_tape_image(state);
-
-	unsigned idx;
-
-	if (!tape_image.find_file(filename , false , idx)) {
-		return IMGTOOLERR_FILENOTFOUND;
-	}
-
-	const dir_entry_85_t *ent = nullptr;
-
-	tape_image.get_dir_entry(idx, ent);
-
-	tape_image_85_t::sif_file_t file_data;
-
-	if (!tape_image.load_sif_file(ent->file_no , file_data)) {
-		return IMGTOOLERR_READERROR;
-	}
-
-	destf.write(file_data.data() , file_data.size());
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-static imgtoolerr_t hp85_tape_write_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
-{
-	tape_state_t& state = get_tape_state(partition.image());
-	tape_image_85_t& tape_image = get_tape_image(state);
-
-	unsigned idx;
-
-	if (tape_image.find_file(filename , true , idx)) {
-		// When overwriting a file, delete its old version first
-		tape_image.delete_dir_entry(idx);
-	}
-
-	unsigned file_size = sourcef.size();
-
-	if (!file_size) {
 		return IMGTOOLERR_SUCCESS;
 	}
-	if (file_size > (MAX_N_RECORDS * MAX_RECORD_SIZE)) {
-		return IMGTOOLERR_NOSPACE;
+
+	imgtoolerr_t hp85_tape_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
+	{
+		tape_state_t& state = get_tape_state(image);
+
+		state.stream = stream.release();
+
+		tape_image_85& tape_image = get_tape_image(state);
+
+		tape_image.format_img();
+
+		return IMGTOOLERR_SUCCESS;
 	}
 
-	auto p_in_file = std::make_unique<tape_image_85_t::sif_file_t>();
+	void hp85_tape_close(imgtool::image &image)
+	{
+		tape_state_t& state = get_tape_state(image);
+		tape_image_85& tape_image = get_tape_image(state);
 
-	p_in_file->resize(file_size);
+		if (tape_image.is_dirty()) {
+			(void)tape_image.save_to_file(state.stream);
+		}
 
-	if (sourcef.read(p_in_file->data() , file_size) != file_size) {
-		return IMGTOOLERR_READERROR;
+		delete state.stream;
+
+		// Free tape_image
+		global_free(&tape_image);
 	}
 
-	dir_entry_85_t *ent = nullptr;
+	imgtoolerr_t hp85_tape_begin_enum (imgtool::directory &enumeration, const char *path)
+	{
+		dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
 
-	if (!tape_image.alloc_new_file(ent , std::move(p_in_file))) {
-		return IMGTOOLERR_NOSPACE;
+		ds->dir_idx = 0;
+
+		return IMGTOOLERR_SUCCESS;
 	}
 
-	char fname[ CHARS_PER_FNAME + 1 ];
-	char ext[ CHARS_PER_EXT + 1 ];
+	imgtoolerr_t hp85_tape_next_enum (imgtool::directory &enumeration, imgtool_dirent &ent)
+	{
+		tape_state_t& state = get_tape_state(enumeration.image());
+		tape_image_85& tape_image = get_tape_image(state);
+		dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
 
-	tape_image_85_t::split_filename_and_ext(filename, fname, ext);
+		const dir_entry_85 *entry = nullptr;
 
-	char *dest = (char *)&ent->filename[ 0 ];
-	char *dest0 = dest;
-	char *src = &fname[ 0 ];
+		if (!tape_image.get_dir_entry(ds->dir_idx, entry)) {
+			ent.eof = 1;
+		} else {
+			ds->dir_idx++;
 
-	while ((dest - dest0) < CHARS_PER_FNAME && *src != '\0') {
-		*dest++ = *src++;
+			unsigned filesize = entry->n_recs * MAX_RECORD_SIZE;
+
+			if (entry->filetype & FT_NULL_FILE_MASK) {
+				ent.filesize = 0;
+			} else {
+				ent.filesize = filesize;
+			}
+
+			tape_image_85::get_filename_and_ext(*entry, true, ent.filename);
+			snprintf(ent.attr , sizeof(ent.attr) , "%u %u %u %c%c" , entry->record_len , filesize / entry->record_len , entry->file_no , (entry->filetype & FT_WP_MASK) ? 'W' : ' ' , (entry->filetype & FT_HIDDEN_MASK) ? 'H' : ' ');
+		}
+
+
+		return IMGTOOLERR_SUCCESS;
 	}
-	while ((dest - dest0) < CHARS_PER_FNAME) {
-		*dest++ = ' ';
-	}
 
-	int bpr = opts->lookup_int('B');
-	if (bpr < 4) {
-		bpr = MAX_RECORD_SIZE;
-	} else if (bpr > file_size) {
-		util::stream_format(std::wcerr, L"BPR value too large, using %u\n", MAX_RECORD_SIZE);
-		bpr = MAX_RECORD_SIZE;
-	}
-	ent->record_len = (uint16_t)bpr;
+	imgtoolerr_t hp85_tape_free_space(imgtool::partition &partition, uint64_t *size)
+	{
+		tape_state_t& state = get_tape_state(partition.image());
+		tape_image_85& tape_image = get_tape_image(state);
+		unsigned used_recs = 0;
 
-	if (opts->lookup_int('T') == 0) {
-		// File type defaults to DATA if no extension is given or extension is invalid
-		ent->filetype = FT_DATA_MASK;
-		for (const auto& i : filetype_table) {
-			if (strcmp(i.ext , ext) == 0) {
-				ent->filetype = i.filetype_mask;
+		const dir_entry_85 *entry = nullptr;
+
+		for (unsigned i = 0; i < MAX_FILE_NO; i++) {
+			if (!tape_image.get_dir_entry(i, entry)) {
 				break;
 			}
+			// Ignore erased files
+			if (entry->filetype & FT_NULL_FILE_MASK) {
+				continue;
+			}
+			used_recs += entry->n_recs;
 		}
-	} else {
-		ent->filetype = filetype_table[ opts->lookup_int('T') - 1 ].filetype_mask;
+
+		if (used_recs >= MAX_N_RECORDS) {
+			*size = 0;
+		} else {
+			*size = (MAX_N_RECORDS - used_recs) * MAX_RECORD_SIZE;
+		}
+
+		return IMGTOOLERR_SUCCESS;
 	}
 
-	if (!tape_image.finalize_allocation()) {
-		return IMGTOOLERR_NOSPACE;
+	imgtoolerr_t hp85_tape_read_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
+	{
+		tape_state_t& state = get_tape_state(partition.image());
+		tape_image_85& tape_image = get_tape_image(state);
+
+		unsigned idx;
+
+		if (!tape_image.find_file(filename , false , idx)) {
+			return IMGTOOLERR_FILENOTFOUND;
+		}
+
+		const dir_entry_85 *ent = nullptr;
+
+		tape_image.get_dir_entry(idx, ent);
+
+		tape_image_85::sif_file_t file_data;
+
+		if (!tape_image.load_sif_file(ent->file_no , file_data)) {
+			return IMGTOOLERR_READERROR;
+		}
+
+		destf.write(file_data.data() , file_data.size());
+
+		return IMGTOOLERR_SUCCESS;
 	}
 
-	return IMGTOOLERR_SUCCESS;
+	imgtoolerr_t hp85_tape_write_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
+	{
+		tape_state_t& state = get_tape_state(partition.image());
+		tape_image_85& tape_image = get_tape_image(state);
+
+		unsigned idx;
+
+		if (tape_image.find_file(filename , true , idx)) {
+			// When overwriting a file, delete its old version first
+			tape_image.delete_dir_entry(idx);
+		}
+
+		unsigned file_size = sourcef.size();
+
+		if (!file_size) {
+			return IMGTOOLERR_SUCCESS;
+		}
+		if (file_size > (MAX_N_RECORDS * MAX_RECORD_SIZE)) {
+			return IMGTOOLERR_NOSPACE;
+		}
+
+		auto p_in_file = std::make_unique<tape_image_85::sif_file_t>();
+
+		p_in_file->resize(file_size);
+
+		if (sourcef.read(p_in_file->data() , file_size) != file_size) {
+			return IMGTOOLERR_READERROR;
+		}
+
+		dir_entry_85 *ent = nullptr;
+
+		if (!tape_image.alloc_new_file(ent , std::move(p_in_file))) {
+			return IMGTOOLERR_NOSPACE;
+		}
+
+		char fname[ CHARS_PER_FNAME + 1 ];
+		char ext[ CHARS_PER_EXT + 1 ];
+
+		tape_image_85::split_filename_and_ext(filename, fname, ext);
+
+		char *dest = (char *)&ent->filename[ 0 ];
+		char *dest0 = dest;
+		char *src = &fname[ 0 ];
+
+		while ((dest - dest0) < CHARS_PER_FNAME && *src != '\0') {
+			*dest++ = *src++;
+		}
+		while ((dest - dest0) < CHARS_PER_FNAME) {
+			*dest++ = ' ';
+		}
+
+		int bpr = opts->lookup_int('B');
+		if (bpr < 4) {
+			bpr = MAX_RECORD_SIZE;
+		} else if (bpr > file_size) {
+			util::stream_format(std::wcerr, L"BPR value too large, using %u\n", MAX_RECORD_SIZE);
+			bpr = MAX_RECORD_SIZE;
+		}
+		ent->record_len = (uint16_t)bpr;
+
+		if (opts->lookup_int('T') == 0) {
+			// File type defaults to DATA if no extension is given or extension is invalid
+			ent->filetype = FT_DATA_MASK;
+			for (const auto& i : filetype_table) {
+				if (strcmp(i.ext , ext) == 0) {
+					ent->filetype = i.filetype_mask;
+					break;
+				}
+			}
+		} else {
+			ent->filetype = filetype_table[ opts->lookup_int('T') - 1 ].filetype_mask;
+		}
+
+		if (!tape_image.finalize_allocation()) {
+			return IMGTOOLERR_NOSPACE;
+		}
+
+		return IMGTOOLERR_SUCCESS;
+	}
+
+	imgtoolerr_t hp85_tape_delete_file(imgtool::partition &partition, const char *filename)
+	{
+		tape_state_t& state = get_tape_state(partition.image());
+		tape_image_85& tape_image = get_tape_image(state);
+
+		unsigned idx;
+
+		if (!tape_image.find_file(filename , true , idx)) {
+			return IMGTOOLERR_FILENOTFOUND;
+		}
+
+		if (!tape_image.delete_dir_entry(idx)) {
+			return IMGTOOLERR_READERROR;
+		}
+		if (!tape_image.finalize_allocation()) {
+			return IMGTOOLERR_NOSPACE;
+		}
+
+		return IMGTOOLERR_SUCCESS;
+	}
 }
-
-static imgtoolerr_t hp85_tape_delete_file(imgtool::partition &partition, const char *filename)
-{
-	tape_state_t& state = get_tape_state(partition.image());
-	tape_image_85_t& tape_image = get_tape_image(state);
-
-	unsigned idx;
-
-	if (!tape_image.find_file(filename , true , idx)) {
-		return IMGTOOLERR_FILENOTFOUND;
-	}
-
-	if (!tape_image.delete_dir_entry(idx)) {
-		return IMGTOOLERR_READERROR;
-	}
-	if (!tape_image.finalize_allocation()) {
-		return IMGTOOLERR_NOSPACE;
-	}
-
-	return IMGTOOLERR_SUCCESS;
-}
-
 #define HP85_WRITEFILE_OPTSPEC    "B[0]-32767;T[0]-3"
 
 OPTION_GUIDE_START(hp85_write_optguide)
