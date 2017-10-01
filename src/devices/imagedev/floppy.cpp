@@ -359,7 +359,7 @@ void floppy_image_device::device_reset()
 	revolution_count = 0;
 	mon = 1;
 	set_ready(true);
-	if(motor_always_on)
+	if(motor_always_on && image)
 		mon_w(0);
 }
 
