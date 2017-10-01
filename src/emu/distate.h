@@ -131,9 +131,9 @@ public:
 
 protected:
 	// device_state_entry overrides
-	virtual void *entry_baseptr() const { return &m_data; }
-	virtual u64 entry_value() const { return m_data; }
-	virtual void entry_set_value(u64 value) const { m_data = value; }
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return m_data; }
+	virtual void entry_set_value(u64 value) const override { m_data = value; }
 
 private:
 	ItemType &              m_data;                 // reference to where the data lives
@@ -166,8 +166,8 @@ public:
 
 protected:
 	// device_state_entry overrides
-	virtual u64 entry_value() const { return m_getter(); }
-	virtual void entry_set_value(u64 value) const { m_setter(value); }
+	virtual u64 entry_value() const override { return m_getter(); }
+	virtual void entry_set_value(u64 value) const override { m_setter(value); }
 
 private:
 	getter_func             m_getter;               // function to retrieve the data
