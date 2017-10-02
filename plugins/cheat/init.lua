@@ -650,7 +650,7 @@ function cheat.startplugin()
 		end
 		if event == "up" or event == "down" or event == "comment" then
 			if cheat.comment then
-				manager:machine():popmessage(_("Cheat Comment:\n") .. cheat.comment)
+				manager:machine():popmessage(string.format(_("Cheat Comment:\n%s"), cheat.comment))
 			end
 		elseif event == "left" then
 			if cheat.parameter then
@@ -717,10 +717,10 @@ function cheat.startplugin()
 					else
 						subtext = cheat.parameter.value
 					end
-					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc .. " = " .. subtext)
+					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, subtext))
 				elseif not cheat.parameter and cheat.script.on then
 					cheat.script.on()
-					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
+					manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 				end
 			end
 		end
@@ -778,16 +778,16 @@ function cheat.startplugin()
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
-							manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 						elseif not cheat.enabled then
 							cheat.enabled = true
 							run_if(cheat, cheat.script.on)
-							manager:machine():popmessage(_("Enabled") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Enabled: %s"), cheat.desc))
 						else
 							cheat.enabled = false
 							run_if(cheat, cheat.script.off)
 							bwpclr(cheat)
-							manager:machine():popmessage(_("Disabled") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Disabled: %s"), cheat.desc))
 						end
 					end
 					cheat.hotkeys.pressed = true
@@ -846,7 +846,7 @@ function cheat.startplugin()
 	function ce.inject(newcheat)
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
-		manager:machine():popmessage(newcheat.desc .. _(" added"))
+		manager:machine():popmessage(string.format(_("%s added"), newcheat.desc))
 	end
 
 	function ce.get(index)
