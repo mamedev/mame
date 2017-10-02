@@ -427,7 +427,7 @@ test1f diagnostic hacks:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "imagedev/chd_cd.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"

@@ -74,7 +74,7 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "debugger.h"
 #include "includes/segasp.h"
 #include "machine/naomim4.h"

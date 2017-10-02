@@ -149,7 +149,7 @@ NEP-16
 #include "emu.h"
 #include "includes/suprnova.h"
 
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"

@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 
 class sh4robot_state : public driver_device
 {
