@@ -90,12 +90,11 @@
 			<dataarea name="cass" size="3260004">
 				<rom name="applesoft ][ floating point basic (1978)(apple computer).wav" size="3260004" crc="9e4fa8e5" sha1="cedcd667a787567add8814d6aa76e5b78c621d92" offset="0" />
 			</dataarea>
-
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="label" value="Floating Point BASIC Demo (APPLESOFT LOADED) ]Load 16K" />
 			<dataarea name="cass" size="1984556">
-				<rom name="checkbook (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
+				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +230,7 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="label" value="Breakout" />
 			<dataarea name="cass" size="1127548">
-				<rom name="color Graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c" offset="0" />
+				<rom name="color graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
