@@ -40,8 +40,7 @@
 		<part name="cass2" interface="apple2_cass">
 			<feature name="label" value="SAMPLER >HIMEM:16384" />
 			<dataarea name="cass" size="3583788">
-				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />
-			</dataarea>
+				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />			</dataarea>
 		</part>
 	</software>
 
