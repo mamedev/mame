@@ -30,6 +30,14 @@ static ADDRESS_MAP_START(tube_z80_mem, AS_PROGRAM, 8, bbc_tube_z80_device)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
+//  ADDRESS_MAP( tube_z80_fetch )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START(tube_z80_fetch, AS_OPCODES, 8, bbc_tube_z80_device)
+	AM_RANGE(0x000, 0xffff) AM_READ(opcode_r)
+ADDRESS_MAP_END
+
+//-------------------------------------------------
 //  ADDRESS_MAP( tube_z80_io )
 //-------------------------------------------------
 
@@ -53,6 +61,7 @@ ROM_END
 MACHINE_CONFIG_MEMBER( bbc_tube_z80_device::device_add_mconfig )
 	MCFG_CPU_ADD("z80", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tube_z80_mem)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(tube_z80_fetch)
 	MCFG_CPU_IO_MAP(tube_z80_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
 
@@ -134,13 +143,22 @@ WRITE8_MEMBER(bbc_tube_z80_device::host_w)
 }
 
 
+READ8_MEMBER(bbc_tube_z80_device::opcode_r)
+{
+	if (!machine().side_effect_disabled())
+	{
+		if (offset == 0x0066 && m_z80->input_state(INPUT_LINE_NMI))
+			m_rom_enabled = true;
+		else if (offset >= 0x8000)
+			m_rom_enabled = false;
+	}
+	return m_z80->space(AS_PROGRAM).read_byte(offset);
+}
+
+
 READ8_MEMBER(bbc_tube_z80_device::mem_r)
 {
 	uint8_t data;
-
-	//if (!machine().side_effect_disabled() && m_nmiserv && offset == 0x0066) m_rom_enabled = true;
-	if (!machine().side_effect_disabled() && offset == 0x0066) m_rom_enabled = true;
-	if (!machine().side_effect_disabled() && offset >= 0x8000) m_rom_enabled = false;
 
 	if (m_rom_enabled && (offset < 0x1000))
 		data = m_rom->base()[offset & 0xfff];
@@ -158,9 +176,6 @@ WRITE8_MEMBER(bbc_tube_z80_device::mem_w)
 
 READ8_MEMBER(bbc_tube_z80_device::io_r)
 {
-	if (!machine().side_effect_disabled() && (offset == 2)) m_rom_enabled = true;
-	if (!machine().side_effect_disabled() && (offset == 6)) m_rom_enabled = false;
-
 	return m_ula->parasite_r(space, offset);
 }
 
@@ -172,7 +187,6 @@ WRITE8_MEMBER(bbc_tube_z80_device::io_w)
 
 WRITE_LINE_MEMBER(bbc_tube_z80_device::nmi_w)
 {
-	//m_nmiserv = state;
 	m_z80->set_input_line(INPUT_LINE_NMI, state);
 }
 
