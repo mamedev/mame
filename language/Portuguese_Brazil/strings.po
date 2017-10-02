@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-28 09:22-0500\n"
-"PO-Revision-Date: 2017-08-19 12:55+0100\n"
+"PO-Revision-Date: 2017-10-01 12:55+0100\n"
 "Last-Translator: Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -20,11 +20,11 @@ msgstr ""
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Selecione a tecla de atalho para os truques"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Pressione o botão para a tecla de atalho ou aguarde para liberar"
 
 #: plugins/cheat/init.lua:476 src/frontend/mame/ui/simpleselgame.cpp:347
 msgid "None"
@@ -32,11 +32,11 @@ msgstr "Sem"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Feito"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
-msgstr ""
+msgstr "Marcar"
 
 #: plugins/cheat/init.lua:499 plugins/cheatfind/init.lua:589
 #: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
@@ -55,7 +55,7 @@ msgstr "Desligado"
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Marcar teclas de atalho"
 
 #: plugins/cheat/init.lua:529 src/frontend/mame/ui/cheatopt.cpp:157
 msgid "Reset All"
@@ -67,12 +67,12 @@ msgstr "Recarregar Tudo"
 
 #: plugins/cheat/init.lua:601
 msgid "Cheat Comment:\n"
-msgstr ""
+msgstr "Comentário do Truque:\n"
 
 #: plugins/cheat/init.lua:668 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:729
 msgid "Activated"
-msgstr ""
+msgstr "Ativado"
 
 #: plugins/cheat/init.lua:683 src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Cheat"
@@ -94,206 +94,208 @@ msgstr "Desativado"
 
 #: plugins/cheat/init.lua:776
 msgid " added"
-msgstr ""
+msgstr " adicionado"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Salvar Truque"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
-msgstr ""
+msgstr "Nome do Truque"
 
 #: plugins/cheatfind/init.lua:354 plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "Nome padrão é "
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
-msgstr ""
+msgstr "Jogador"
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Salvo"
 
 #: plugins/cheatfind/init.lua:399
 msgid "Cheat written to "
-msgstr ""
+msgstr "Truque escrito para "
 
 #: plugins/cheatfind/init.lua:399
 msgid " and added to cheat.simple"
-msgstr ""
+msgstr " e adicionado para truque.simples"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Truque adicionado para truque.simples"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
 "Unable to write file\n"
 "Check cheatpath dir exists"
 msgstr ""
+"Incapaz de gravar arquivo\n"
+"Verifique se o caminho do diretório de truques existe"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Cancela"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "CPU ou RAM"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Mudanças para isto somente serão afetadas quando \"Começar nova busca\" for selecionado""
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Dados limpos e estado atual salvo"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Começar nova busca"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Estado atual salvo"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Salva atual -- #"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
-msgstr ""
+msgstr " total de partidas encontradas"
 
 #: plugins/cheatfind/init.lua:513
 msgid "Compare"
-msgstr ""
+msgstr "Comparar"
 
 #: plugins/cheatfind/init.lua:516
 msgid "Left operand"
-msgstr ""
+msgstr "Operador Esquerdo"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Current"
-msgstr ""
+msgstr "Atual"
 
 #: plugins/cheatfind/init.lua:524
 msgid "Operator"
-msgstr ""
+msgstr "Operador"
 
 #: plugins/cheatfind/init.lua:531
 msgid "Left less than right, value is difference"
-msgstr ""
+msgstr "Esquerdo menor que direito, valor é diferente"
 
 #: plugins/cheatfind/init.lua:533
 msgid "Left greater than right, value is difference"
-msgstr ""
+msgstr "Esquerdo maior que direito, valor é diferente"
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Esquerdo igual ao direito"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
-msgstr ""
+msgstr "Esquerdo não igual ao direito, valor é diferente"
 
 #: plugins/cheatfind/init.lua:539
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Esquerdo igual ao direito com máscara de bits"
 
 #: plugins/cheatfind/init.lua:541
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Esquerdo não igual ao direito com máscara de bits"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Esquerdo menor que valor"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
-msgstr ""
+msgstr "Esquerdo maior que valor"
 
 #: plugins/cheatfind/init.lua:547
 msgid "Left equal to value"
-msgstr ""
+msgstr "Esquerdo igual a valor"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Esquedo não igual a valor"
 
 #: plugins/cheatfind/init.lua:560
 msgid "Right operand"
-msgstr ""
+msgstr "Operador direito"
 
 #: plugins/cheatfind/init.lua:568
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: plugins/cheatfind/init.lua:572
 msgid "Any"
-msgstr ""
+msgstr "Qualquer"
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Formato do Dado"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Desfazer última busca"
 
 #: plugins/cheatfind/init.lua:606
 msgid "Match block"
-msgstr ""
+msgstr "Bloco igual"
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
 msgid "Test cheat at addr %08X"
-msgstr ""
+msgstr "Testar truque no endereço %08X"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Motor de truques não disponível"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
-msgstr ""
+msgstr "Teste"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Escrever"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
-msgstr ""
+msgstr "Assistir"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Páginar"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"
-msgstr ""
+msgstr "Limpar Assistidas"
 
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
-msgstr ""
+msgstr "Localizador de Truques"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -341,34 +343,34 @@ msgstr "Sysinfo"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Tempo atual"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Tempo total"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
-msgstr ""
+msgstr "Contador de Jogadas"
 
 #: plugins/timer/init.lua:106
 msgid "Timer"
-msgstr ""
+msgstr "Temporizador"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "Auditoria de ROMS para %1$u máquinas marcadas como indisponíveis?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "Auditoria de ROMS para todas %1$u máquinas?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(resultados serão salvos para %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -376,10 +378,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Auditoria de ROMs para máquinas %2$u de %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Iniciar Auditoria"
 
 #: src/frontend/mame/ui/barcode.cpp:74
 msgid "New Barcode:"
