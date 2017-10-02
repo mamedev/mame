@@ -40,8 +40,7 @@
 		<part name="cass2" interface="apple2_cass">
 			<feature name="label" value="SAMPLER >HIMEM:16384" />
 			<dataarea name="cass" size="3583788">
-				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />
-			</dataarea>
+				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />			</dataarea>
 		</part>
 	</software>
 
@@ -90,12 +89,11 @@
 			<dataarea name="cass" size="3260004">
 				<rom name="applesoft ][ floating point basic (1978)(apple computer).wav" size="3260004" crc="9e4fa8e5" sha1="cedcd667a787567add8814d6aa76e5b78c621d92" offset="0" />
 			</dataarea>
-
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="label" value="Floating Point BASIC Demo (APPLESOFT LOADED) ]Load 16K" />
 			<dataarea name="cass" size="1984556">
-				<rom name="checkbook (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
+				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
