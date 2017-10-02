@@ -173,8 +173,8 @@ Blitter Timing
 
 #include "emu.h"
 
-#include "cpu/sh4/sh3comn.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/superh/sh3comn.h"
+#include "cpu/superh/sh4.h"
 #include "machine/rtc9701.h"
 #include "machine/serflash.h"
 #include "sound/ymz770.h"

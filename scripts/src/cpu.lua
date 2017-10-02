@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
+if (CPUS["SUPERH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
@@ -636,54 +636,42 @@ if (CPUS["HMCS40"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Hitachi SH1/SH2
---@src/devices/cpu/sh2/sh2.h,CPUS["SH2"] = true
+-- Hitachi SuperH series (SH1/SH2/SH3/SH4)
+--@src/devices/cpu/superh/sh2.h,CPUS["SUPERH"] = true
+--@src/devices/cpu/superh/sh4.h,CPUS["SUPERH"] = true
 --------------------------------------------------
 
-if (CPUS["SH2"]~=null) then
+if (CPUS["SUPERH"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/sh2/sh2.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh2.h",
-		MAME_DIR .. "src/devices/cpu/sh2/sh2comn.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh2comn.h",
-		MAME_DIR .. "src/devices/cpu/sh2/sh2fe.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_bus.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_bus.h",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_sci.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_sci.h",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_wdt.cpp",
-		MAME_DIR .. "src/devices/cpu/sh2/sh7604_wdt.h",
-		--MAME_DIR .. "src/devices/cpu/sh2/sh2drc.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh2.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh2.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh2comn.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh2comn.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh2fe.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_bus.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_bus.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_sci.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_wdt.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh7604_wdt.h",
+		--MAME_DIR .. "src/devices/cpu/superh/sh2drc.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh4.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh4.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh4comn.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh4comn.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh3comn.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh3comn.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh4tmu.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh4tmu.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh4dmac.cpp",
+		MAME_DIR .. "src/devices/cpu/superh/sh4dmac.h",
+		MAME_DIR .. "src/devices/cpu/superh/sh4regs.h",		
 	}
 end
 
-if (CPUS["SH2"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh2/sh2dasm.cpp")
-end
-
---------------------------------------------------
--- Hitachi SH4
---@src/devices/cpu/sh4/sh4.h,CPUS["SH4"] = true
---------------------------------------------------
-
-if (CPUS["SH4"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/cpu/sh4/sh4.cpp",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4.h",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4comn.cpp",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4comn.h",
-		MAME_DIR .. "src/devices/cpu/sh4/sh3comn.cpp",
-		MAME_DIR .. "src/devices/cpu/sh4/sh3comn.h",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4tmu.cpp",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4tmu.h",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4dmac.cpp",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4dmac.h",
-		MAME_DIR .. "src/devices/cpu/sh4/sh4regs.h",
-	}
-end
-
-if (CPUS["SH4"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh4/sh4dasm.cpp")
+if (CPUS["SUPERH"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superh/sh2dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superh/sh4dasm.cpp")
 end
 
 --------------------------------------------------
@@ -948,7 +936,7 @@ if (CPUS["I86"]~=null) then
 	}
 end
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["SUPERH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.h")
 end

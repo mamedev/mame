@@ -382,7 +382,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/superh/sh4.h"
 #include "screen.h"
 
 
