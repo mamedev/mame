@@ -20,6 +20,7 @@
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 

@@ -11,6 +11,7 @@
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
 #include "machine/m2comm.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class model2_renderer;

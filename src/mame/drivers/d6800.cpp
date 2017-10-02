@@ -43,6 +43,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "screen.h"

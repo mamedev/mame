@@ -62,6 +62,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80dart.h"
 
 #define I80186_TAG      "ic1"

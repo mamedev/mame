@@ -163,6 +163,7 @@ B0000x-xxxxxx: see V7, -800000
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 

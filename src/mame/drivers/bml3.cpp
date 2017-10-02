@@ -20,6 +20,7 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"

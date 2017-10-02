@@ -103,6 +103,7 @@
 #include "machine/nvram.h"
 #include "machine/st0016.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "speaker.h"

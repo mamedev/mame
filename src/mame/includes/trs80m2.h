@@ -14,6 +14,7 @@
 #include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/trs80m2kb.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"

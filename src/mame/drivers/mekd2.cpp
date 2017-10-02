@@ -79,6 +79,7 @@ TODO
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
 #include "speaker.h"
 

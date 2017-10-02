@@ -17,6 +17,7 @@
 #include "machine/adc0808.h"
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 
 

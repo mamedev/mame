@@ -40,6 +40,7 @@
 
 #include "bus/hp_optroms/hp_optrom.h"
 #include "bus/hp9845_io/hp9845_io.h"
+#include "machine/timer.h"
 
 #include "render.h"
 #include "softlist.h"

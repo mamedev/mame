@@ -81,6 +81,7 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
+#include "machine/timer.h"
 #include "chesstrv.lh"
 #include "borisdpl.lh"
 

@@ -29,6 +29,7 @@ ToDo:
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "softlist.h"
 
 class ampro_state : public driver_device

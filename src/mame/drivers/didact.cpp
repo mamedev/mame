@@ -53,6 +53,7 @@
 #include "machine/74145.h"   // For the md6802 and e100
 #include "machine/clock.h"   // For candela
 #include "machine/ram.h"     // For candela
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"  // For candela
 #include "video/dm9368.h"    // For the mp68a
 #include "video/mc6845.h"    // For candela

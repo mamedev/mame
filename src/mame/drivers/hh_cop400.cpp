@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/cop400/cop400.h"
 
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

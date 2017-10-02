@@ -65,6 +65,7 @@ D.9B         [f99cac4b] /
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

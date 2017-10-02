@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 #include "machine/k053252.h"
+#include "machine/timer.h"
 
 class hexion_state : public driver_device
 {

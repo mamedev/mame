@@ -168,6 +168,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/cbm_snqk.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 

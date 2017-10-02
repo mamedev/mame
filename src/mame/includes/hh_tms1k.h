@@ -18,6 +18,7 @@
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 

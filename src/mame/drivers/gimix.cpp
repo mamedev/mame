@@ -33,6 +33,7 @@
 #include "machine/terminal.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "formats/flex_dsk.h"
 #include "softlist.h"
 

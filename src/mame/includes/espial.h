@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 
 class espial_state : public driver_device
 {

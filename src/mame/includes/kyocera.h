@@ -14,6 +14,7 @@
 #include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "sound/spkrdev.h"
 #include "video/hd44102.h"

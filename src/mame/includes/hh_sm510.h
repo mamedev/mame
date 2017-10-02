@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 

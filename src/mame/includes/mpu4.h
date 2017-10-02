@@ -4,6 +4,7 @@
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"

@@ -44,6 +44,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 
 #include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "imagedev/flopdrv.h"
 
 #include "bus/a2bus/a2alfam2.h"

@@ -53,6 +53,7 @@
 #include "machine/mc14411.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
 
 #include "bus/rs232/rs232.h"

@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
 

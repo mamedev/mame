@@ -15,6 +15,7 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/tandy2kb.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/crt9007.h"

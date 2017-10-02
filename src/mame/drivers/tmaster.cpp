@@ -96,6 +96,7 @@ Chips:
 #include "machine/mc68681.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"

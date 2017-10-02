@@ -55,6 +55,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/timer.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"

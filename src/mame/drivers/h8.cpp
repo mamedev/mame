@@ -51,6 +51,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"

@@ -12,6 +12,7 @@
 #include "cpu/arm/arm.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/timer.h"
 #include "video/hd44780.h"
 #include "screen.h"
 #include "speaker.h"

@@ -21,6 +21,7 @@ ToDo:
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/s14001a.h"
 #include "speaker.h"
 

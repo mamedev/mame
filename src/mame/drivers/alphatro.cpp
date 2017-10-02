@@ -35,6 +35,7 @@
 #include "machine/bankdev.h"
 #include "machine/upd765.h"
 #include "machine/i8257.h"
+#include "machine/timer.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "sound/beep.h"

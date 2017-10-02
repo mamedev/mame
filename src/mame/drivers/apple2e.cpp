@@ -111,6 +111,7 @@ Address bus A0-A11 is Y0-Y11
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "machine/sonydriv.h"
+#include "machine/timer.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"

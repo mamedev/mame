@@ -41,6 +41,7 @@ TODO:
 #include "machine/buffer.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6847.h"

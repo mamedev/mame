@@ -27,6 +27,7 @@
 #include "imagedev/chd_cd.h"
 #include "includes/saturn.h"
 #include "cdrom.h"
+#include "machine/timer.h"
 #include "sound/cdda.h"
 #include "debugger.h"
 #include "coreutil.h"

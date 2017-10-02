@@ -5,9 +5,11 @@
     Gottlieb Exterminator hardware
 
 *************************************************************************/
+
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 
 class exterm_state : public driver_device
 {

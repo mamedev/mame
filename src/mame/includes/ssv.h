@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/es5506.h"
 #include "screen.h"

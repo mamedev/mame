@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, Hau
+
+#include "machine/timer.h"
 #include "screen.h"
 
 #define RASTER_LINES 262
