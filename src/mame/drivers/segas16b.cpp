@@ -1750,11 +1750,34 @@ static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( map_fpointbla, AS_PROGRAM, 16, segas16b_state )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x02002e, 0x02002f) AM_READ(fpointbla_2002e_r)
+
+	AM_RANGE(0x443002, 0x443003) AM_READ(fpointbla_2002e_r)
+	AM_RANGE(0x44301a, 0x44301b) AM_READ(fpointbla_2002e_r)
+	AM_RANGE(0x44302a, 0x44302b) AM_READ(fpointbla_2002e_r)
+
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+
+	AM_RANGE(0x843000, 0x843001) AM_READWRITE(bootleg_custom_io_r, bootleg_custom_io_w)
+	AM_RANGE(0x843018, 0x843019) AM_READ(fpointbla_2002e_r)
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_OPCODES, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map_fpointbla, AS_OPCODES, 16, segas16b_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
@@ -1813,6 +1836,11 @@ static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
+READ16_MEMBER(segas16b_state::fpointbla_2002e_r)
+{
+	return 0xffff;
+}
 
 READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
 {
@@ -3688,6 +3716,12 @@ static MACHINE_CONFIG_DERIVED( system16b_split, system16b )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system16b_fpointbla, system16b_split )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
 MACHINE_CONFIG_END
 
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
@@ -6088,6 +6122,25 @@ ROM_START( fpointbj )
 	ROM_LOAD( "fpointbj_gal16v8_3.bin", 0x0200, 0x0117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) )
 	ROM_LOAD( "fpointbj_gal20v8.bin", 0x0400, 0x019d, NO_DUMP ) /* Protected */
 ROM_END
+
+ROM_START( fpointbla )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "B3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
+	ROM_LOAD16_BYTE( "B2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) // tiles
+	ROM_LOAD( "B8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "B7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "B6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+
+	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "B5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
+	ROM_LOAD16_BYTE( "B4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "B1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
+ROM_END
+
 
 //*************************************************************************************************************************
 //  Flash Point, Sega System 16B
@@ -8726,6 +8779,17 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
+DRIVER_INIT_MEMBER(segas16b_state, generic_5358_fpointbla)
+{
+	init_generic(ROM_BOARD_171_5358);
+
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+
+	for (int i = 0;i < 0x10000;i++)
+	{
+		m_decrypted_opcodes[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,  0, 1, 2, 3, 4, 5, 6, 7);
+	}
+}
 
 DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
 {
@@ -8980,6 +9044,7 @@ GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b
 // bootlegs with modified hardware
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
 GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", 0 )
+GAME( 1989, fpointbla,   fpoint,    system16b_fpointbla, fpoint, segas16b_state, generic_5358_fpointbla, ROT0, "bootleg", "Flash Point (bootleg)", MACHINE_NOT_WORKING )
 
 
 

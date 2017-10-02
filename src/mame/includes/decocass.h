@@ -9,6 +9,7 @@
 
 #include "machine/decocass_tape.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "cpu/mcs48/mcs48.h"
 #include "screen.h"

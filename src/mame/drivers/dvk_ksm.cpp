@@ -59,6 +59,7 @@ ksm|DVK KSM,
 #include "machine/i8255.h"
 #include "machine/ms7004.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 
@@ -428,7 +429,8 @@ static MACHINE_CONFIG_START( ksm )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// D30
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

@@ -460,7 +460,8 @@ void i8155_device::register_w(int offset, uint8_t data)
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length & 0x3fff;
-				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
+				if (clock() > 0)   // a clock of 0 causes MAME to freeze.
+					m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 				// clear timer command so this won't execute twice
 				m_command &= ~COMMAND_TM_MASK;

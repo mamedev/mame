@@ -26,6 +26,7 @@ akaiax80.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
+alphatpx.cpp
 alphatro.cpp
 altair.cpp
 alto2.cpp
@@ -356,7 +357,9 @@ mccpm.cpp
 megadriv.cpp
 mekd2.cpp
 mephisto.cpp
+mephisto_montec.cpp
 mes.cpp
+mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -371,6 +374,7 @@ mikrosha.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
+miniframe.cpp
 minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
@@ -389,6 +393,7 @@ mpf1.cpp
 mps1230.cpp
 mpz80.cpp
 ms0515.cpp
+ms6102.cpp
 ms9540.cpp
 msbc1.cpp
 mstation.cpp
@@ -414,6 +419,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
@@ -549,6 +555,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rzone.cpp
 sacstate.cpp
 sage2.cpp
 samcoupe.cpp

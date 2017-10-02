@@ -14,6 +14,7 @@
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/egret.h"
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"

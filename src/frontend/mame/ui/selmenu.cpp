@@ -120,21 +120,6 @@ bool menu_select_launch::reselect_last::s_reselect = false;
 std::mutex menu_select_launch::s_cache_guard;
 menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
-// this needs to be here to allow the names from the data plugin to be localised
-// it can't have static linkage, and it can't be private or clang will complain
-// it also has to be kept in sync with the data plugin
-char const *const menu_select_launch::s_info_titles[] = {
-		__("Command"),
-		__("Gameinit"),
-		__("High Scores"),
-		__("History"),
-		__("MAMEinfo"),
-		__("MARPScore"),
-		__("MESSinfo"),
-		__("Mamescore"),
-		__("Sysinfo") };
-
-
 // instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);
@@ -1113,19 +1098,19 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		while (path.next(curpath))
 			searchstr.append(";").append(curpath.c_str()).append(PATH_SEPARATOR).append("icons");
 
-		bitmap_argb32 *tmp = auto_alloc(machine(), bitmap_argb32);
+		bitmap_argb32 tmp;
 		emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 		std::string fullname = std::string(driver->name).append(".ico");
-		render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
+		render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
 
-		if (!tmp->valid() && cloneof)
+		if (!tmp.valid() && cloneof)
 		{
 			fullname.assign(driver->parent).append(".ico");
-			render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
+			render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
 		}
 
 		bitmap_argb32 &bitmap(icon->second.second);
-		if (tmp->valid())
+		if (tmp.valid())
 		{
 			float panel_width = x1 - x0;
 			float panel_height = y1 - y0;
@@ -1139,38 +1124,35 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			int panel_height_pixel = panel_height * screen_height;
 
 			// Calculate resize ratios for resizing
-			auto ratioW = (float)panel_width_pixel / tmp->width();
-			auto ratioH = (float)panel_height_pixel / tmp->height();
-			auto dest_xPixel = tmp->width();
-			auto dest_yPixel = tmp->height();
+			auto ratioW = (float)panel_width_pixel / tmp.width();
+			auto ratioH = (float)panel_height_pixel / tmp.height();
+			auto dest_xPixel = tmp.width();
+			auto dest_yPixel = tmp.height();
 
 			if (ratioW < 1 || ratioH < 1)
 			{
 				// smaller ratio will ensure that the image fits in the view
 				float ratio = std::min(ratioW, ratioH);
-				dest_xPixel = tmp->width() * ratio;
-				dest_yPixel = tmp->height() * ratio;
+				dest_xPixel = tmp.width() * ratio;
+				dest_yPixel = tmp.height() * ratio;
 			}
 
-			bitmap_argb32 *dest_bitmap;
-			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 dest_bitmap;
 
 			// resample if necessary
-			if (dest_xPixel != tmp->width() || dest_yPixel != tmp->height())
+			if (dest_xPixel != tmp.width() || dest_yPixel != tmp.height())
 			{
-				dest_bitmap->allocate(dest_xPixel, dest_yPixel);
+				dest_bitmap.allocate(dest_xPixel, dest_yPixel);
 				render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-				render_resample_argb_bitmap_hq(*dest_bitmap, *tmp, color, true);
+				render_resample_argb_bitmap_hq(dest_bitmap, tmp, color, true);
 			}
 			else
-				dest_bitmap = tmp;
+				dest_bitmap = std::move(tmp);
 
 			bitmap.allocate(panel_width_pixel, panel_height_pixel);
 			for (int x = 0; x < dest_xPixel; x++)
 				for (int y = 0; y < dest_yPixel; y++)
-					bitmap.pix32(y, x) = dest_bitmap->pix32(y, x);
-
-			auto_free(machine(), dest_bitmap);
+					bitmap.pix32(y, x) = dest_bitmap.pix32(y, x);
 
 			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
 		}
@@ -1178,8 +1160,6 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		{
 			bitmap.reset();
 		}
-
-		auto_free(machine(), tmp);
 	}
 
 	if (icon->second.second.valid())
@@ -2073,19 +2053,18 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		if (!m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 tmp_bitmap;
 
 			if (software->startempty == 1)
 			{
 				// Load driver snapshot
 				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
 			else if (ui_globals::curimage_view == TITLES_VIEW)
@@ -2093,12 +2072,12 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				// First attempt from name list
 				std::string const pathname = software->listname + "_titles";
 				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 				}
 			}
 			else
@@ -2106,33 +2085,32 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				// First attempt from name list
 				std::string pathname = software->listname;
 				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 				}
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					// Second attempt from driver name + part name
 					pathname.assign(software->driver->name).append(software->part);
 					fullname.assign(software->shortname).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-					if (!tmp_bitmap->valid())
+					if (!tmp_bitmap.valid())
 					{
 						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+						render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 					}
 				}
 			}
 
 			m_cache->set_snapx_software(software);
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
+			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
 		// if the image is available, loaded and valid, display it
@@ -2152,31 +2130,30 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			snapfile.set_restrict_to_mediapath(true);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 tmp_bitmap;
 
 			// try to load snapshot first from saved "0000.png" file
 			std::string fullname(driver->name);
-			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
+			render_load_png(tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
 
-			if (!tmp_bitmap->valid())
-				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
+			if (!tmp_bitmap.valid())
+				render_load_jpeg(tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
 
 			// if fail, attemp to load from standard file
-			if (!tmp_bitmap->valid())
+			if (!tmp_bitmap.valid())
 			{
 				fullname.assign(driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
 
 			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap->valid())
+			if (!tmp_bitmap.valid())
 			{
 				// set clone status
 				bool cloneof = strcmp(driver->parent, "0");
@@ -2190,20 +2167,19 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				if (cloneof)
 				{
 					fullname.assign(driver->parent).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-					if (!tmp_bitmap->valid())
+					if (!tmp_bitmap.valid())
 					{
 						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+						render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 					}
 				}
 			}
 
 			m_cache->set_snapx_driver(driver);
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
+			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
 		// if the image is available, loaded and valid, display it
@@ -2270,26 +2246,26 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 //  perform rendering of image
 //-------------------------------------------------
 
-void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
+void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
 {
 	bool no_available = false;
 	float line_height = ui().get_line_height();
 
 	// if it fails, use the default image
-	if (!tmp_bitmap->valid())
+	if (!tmp_bitmap.valid())
 	{
-		tmp_bitmap->allocate(256, 256);
+		tmp_bitmap.allocate(256, 256);
 		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
 		for (int x = 0; x < 256; x++)
 		{
 			for (int y = 0; y < 256; y++)
-				tmp_bitmap->pix32(y, x) = src.pix32(y, x);
+				tmp_bitmap.pix32(y, x) = src.pix32(y, x);
 		}
 		no_available = true;
 	}
 
 	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
-	if (tmp_bitmap->valid())
+	if (tmp_bitmap.valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
 		float panel_height = origy2 - origy1 - 0.02f - (3.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
@@ -2303,20 +2279,20 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		int panel_height_pixel = panel_height * screen_height;
 
 		// Calculate resize ratios for resizing
-		auto ratioW = (float)panel_width_pixel / tmp_bitmap->width();
-		auto ratioH = (float)panel_height_pixel / tmp_bitmap->height();
-		auto ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
-		auto dest_xPixel = tmp_bitmap->width();
-		auto dest_yPixel = tmp_bitmap->height();
+		auto ratioW = (float)panel_width_pixel / tmp_bitmap.width();
+		auto ratioH = (float)panel_height_pixel / tmp_bitmap.height();
+		auto ratioI = (float)tmp_bitmap.height() / tmp_bitmap.width();
+		auto dest_xPixel = tmp_bitmap.width();
+		auto dest_yPixel = tmp_bitmap.height();
 
 		// force 4:3 ratio min
 		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
 		{
 			// smaller ratio will ensure that the image fits in the view
-			dest_yPixel = tmp_bitmap->width() * 0.75f;
+			dest_yPixel = tmp_bitmap.width() * 0.75f;
 			ratioH = (float)panel_height_pixel / dest_yPixel;
 			float ratio = std::min(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
+			dest_xPixel = tmp_bitmap.width() * ratio;
 			dest_yPixel *= ratio;
 		}
 		// resize the bitmap if necessary
@@ -2324,22 +2300,21 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		{
 			// smaller ratio will ensure that the image fits in the view
 			float ratio = std::min(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
-			dest_yPixel = tmp_bitmap->height() * ratio;
+			dest_xPixel = tmp_bitmap.width() * ratio;
+			dest_yPixel = tmp_bitmap.height() * ratio;
 		}
 
-		bitmap_argb32 *dest_bitmap;
+		bitmap_argb32 dest_bitmap;
 
 		// resample if necessary
-		if (dest_xPixel != tmp_bitmap->width() || dest_yPixel != tmp_bitmap->height())
+		if (dest_xPixel != tmp_bitmap.width() || dest_yPixel != tmp_bitmap.height())
 		{
-			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
-			dest_bitmap->allocate(dest_xPixel, dest_yPixel);
+			dest_bitmap.allocate(dest_xPixel, dest_yPixel);
 			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
+			render_resample_argb_bitmap_hq(dest_bitmap, tmp_bitmap, color, true);
 		}
 		else
-			dest_bitmap = tmp_bitmap;
+			dest_bitmap = std::move(tmp_bitmap);
 
 		snapx_bitmap.allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
@@ -2347,9 +2322,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 
 		for (int x = 0; x < dest_xPixel; x++)
 			for (int y = 0; y < dest_yPixel; y++)
-				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
-
-		auto_free(machine(), dest_bitmap);
+				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap.pix32(y, x);
 
 		// apply bitmap
 		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
@@ -2396,28 +2369,26 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 	if (!driver.rom)
 		return false;
 
-	auto const entries = rom_build_entries(driver.rom);
-
-	std::string default_name;
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			default_name = ROM_GETNAME(&rom);
-
-	for (const rom_entry &rom : entries)
+	char const *default_name(nullptr);
+	for (tiny_rom_entry const *rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			std::string name(ROM_GETHASHDATA(&rom));
-			std::string bname(ROM_GETNAME(&rom));
-			int bios_flags = ROM_GETBIOSFLAGS(&rom);
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = rom->name;
+	}
 
-			if (bname == default_name)
-			{
-				name.append(_(" (default)"));
-				biosname.emplace(biosname.begin(), name, bios_flags - 1);
-			}
-			else
-				biosname.emplace_back(name, bios_flags - 1);
+	for (romload::system_bios const &bios : romload::entries(driver.rom).get_system_bioses())
+	{
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
+
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
+		{
+			name.append(_(" (default)"));
+			biosname.emplace(biosname.begin(), std::move(name), bios_flags - 1);
+		}
+		else
+		{
+			biosname.emplace_back(std::move(name), bios_flags - 1);
 		}
 	}
 	return biosname.size() > 1U;
@@ -2555,16 +2526,16 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;
 
-	char const *const snaptext(m_info_view ? _(m_items_list[m_info_view - 1].c_str()) : _(first));
+	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		char const *const name(x ? m_items_list[x - 1].c_str() : first);
+		char const *const name(x ? m_items_list[x - 1].c_str() : _(first));
 		float txt_length(0.0f);
 		ui().draw_text_full(
-				container(), _(name),
+				container(), name,
 				origx1, origy1, origx2 - origx1,
 				ui::text_layout::CENTER, ui::text_layout::NEVER,
 				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,

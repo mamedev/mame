@@ -47,6 +47,7 @@ ToDO:
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"

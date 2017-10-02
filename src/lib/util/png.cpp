@@ -66,7 +66,7 @@ void png_info::free_data()
 
 namespace {
 
-#define PNG_Signature       "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"
+constexpr std::uint8_t PNG_SIGNATURE[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 #define MNG_Signature       "\x8A\x4D\x4E\x47\x0D\x0A\x1A\x0A"
 
 // Chunk names
@@ -413,21 +413,6 @@ private:
 		return ((samples[pnginfo.color_type] * pnginfo.bit_depth) + 7) >> 3;
 	}
 
-	static png_error verify_header(util::core_file &fp)
-	{
-		uint8_t signature[8];
-
-		/* read 8 bytes */
-		if (fp.read(signature, 8) != 8)
-			return PNGERR_FILE_TRUNCATED;
-
-		/* return an error if we don't match */
-		if (memcmp(signature, PNG_Signature, 8) != 0)
-			return PNGERR_BAD_SIGNATURE;
-
-		return PNGERR_NONE;
-	}
-
 	static png_error read_chunk(util::core_file &fp, std::unique_ptr<std::uint8_t []> &data, std::uint32_t &type, std::uint32_t &length)
 	{
 		std::uint8_t tempbuff[4];
@@ -741,6 +726,21 @@ public:
 
 		return error;
 	}
+
+	static png_error verify_header(util::core_file &fp)
+	{
+		EQUIVALENT_ARRAY(PNG_SIGNATURE, std::uint8_t) signature;
+
+		// read 8 bytes
+		if (fp.read(signature, sizeof(signature)) != sizeof(signature))
+			return PNGERR_FILE_TRUNCATED;
+
+		// return an error if we don't match
+		if (std::memcmp(signature, PNG_SIGNATURE, sizeof(PNG_SIGNATURE)))
+			return PNGERR_BAD_SIGNATURE;
+
+		return PNGERR_NONE;
+	}
 };
 
 constexpr unsigned png_private::ADAM7_X_BIAS[7];
@@ -753,6 +753,17 @@ constexpr unsigned png_private::ADAM7_Y_OFFS[7];
 } // anonymous namespace
 
 
+
+
+/*-------------------------------------------------
+    verify_header - verify PNG file header from a
+    core stream
+-------------------------------------------------*/
+
+png_error png_info::verify_header(util::core_file &fp)
+{
+	return png_private::verify_header(fp);
+}
 
 
 /*-------------------------------------------------
@@ -1219,7 +1230,7 @@ png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &
 		info = &pnginfo;
 
 	// write the PNG signature
-	if (fp.write(PNG_Signature, 8) != 8)
+	if (fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE)) != sizeof(PNG_SIGNATURE))
 		return PNGERR_FILE_ERROR;
 
 	/* write the rest of the PNG data */

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/dmadac.h"
 
 #define CAGE_IRQ_REASON_DATA_READY      (1)

@@ -10,6 +10,7 @@
         CPU:            501-1007/1051
         Chassis type:   deskside
         Bus:            Multibus (9 slots)
+        Oscillator(s):  39.3216MHz
         Memory:         7M physical
         Notes:          First machines in deskside chassis. Serial
                         microswitch keyboard (type 2), Mouse Systems
@@ -39,6 +40,8 @@
         CPU:            501-1141/1142/1143/1426/1427/1428
         Chassis type:   wide pizza box
         Bus:            VME (2 slots)
+        Oscillator(s):  19.6608MHz, 16MHz (Ethernet/VMEbus), 100MHz
+                        (video), 24MHz ("for special applications")
         Memory:         7M physical
         Notes:          The (type 2) keyboard and mouse attach via an
                         adapter that accepts two modular plugs and
@@ -118,8 +121,10 @@ How the architecture works:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
+#include "machine/am9513.h"
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
@@ -487,7 +492,7 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
 	AM_RANGE(0x7f2002, 0x7f2003) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, db_r, db_w, 0xff00)
 	AM_RANGE(0x7f2004, 0x7f2005) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ca_r, ca_w, 0xff00)
 	AM_RANGE(0x7f2006, 0x7f2007) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, da_r, da_w, 0xff00)
-	// 7f2800-7f2fff: AM9513 timer
+	AM_RANGE(0x7f2800, 0x7f2803) AM_MIRROR(0x7fc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
 ADDRESS_MAP_END
 
 // type 2 device space
@@ -514,7 +519,7 @@ static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
 	AM_RANGE(0x002000, 0x0027ff) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
-	// 002800-002fff: AM9513 timer
+	AM_RANGE(0x002800, 0x002803) AM_MIRROR(0x7fc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
 	// 003800-003fff: MM58167 RTC
 ADDRESS_MAP_END
 
@@ -584,7 +589,7 @@ void sun2_state::machine_reset()
 
 static MACHINE_CONFIG_START( sun2vme )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, 16670000)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_19_6608MHz / 2) // or XTAL_24MHz / 2 by jumper setting
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -626,10 +631,22 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("timer", AM9513A, XTAL_19_6608MHz / 4)
+	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
+	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
+	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
+	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_19_6608MHz / 4, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_19_6608MHz / 4, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
 
 	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
@@ -644,7 +661,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sun2mbus )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, 16670000)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_39_3216MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -686,10 +703,22 @@ static MACHINE_CONFIG_START( sun2mbus )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL_39_3216MHz / 8)
+	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
+	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
+	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
+	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_39_3216MHz / 8, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_39_3216MHz / 8, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
 
 	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))

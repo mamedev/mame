@@ -22,8 +22,10 @@
 
 #include "machine/74259.h"
 #include "machine/asic65.h"
+#include "machine/eeprompar.h"
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 
 #include "sound/dac.h"
 

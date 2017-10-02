@@ -63,6 +63,7 @@
 
 #include "cpu/tms9900/tms9980a.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "sound/spkrdev.h"

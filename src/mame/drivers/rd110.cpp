@@ -21,6 +21,7 @@
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "video/msm6222b.h"
 #include "screen.h"
 

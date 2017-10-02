@@ -48,6 +48,8 @@ public:
 	constexpr rgb15_t as_rgb15() const { return ((r() >> 3) << 10) | ((g() >> 3) << 5) | ((b() >> 3) << 0); }
 	constexpr uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }
 	constexpr uint32_t const *ptr() const { return &m_data; }
+	void expand_rgb(uint8_t &r, uint8_t &g, uint8_t &b) const { r = m_data >> 16; g = m_data >> 8; b = m_data >> 0; }
+	void expand_rgb(int &r, int &g, int &b) const { r = (m_data >> 16) & 0xff; g = (m_data >> 8) & 0xff; b = (m_data >> 0) & 0xff; }
 
 	// setters
 	rgb_t &set_a(uint8_t a) { m_data &= ~0xff000000; m_data |= a << 24; return *this; }

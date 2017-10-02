@@ -24,6 +24,11 @@ ROM_START( coco_pak )
 	// this region is filled by cococart_slot_device::call_load()
 ROM_END
 
+ROM_START( coco_pak_banked )
+	ROM_REGION(0x20000, CARTSLOT_TAG, ROMREGION_ERASE00)
+	// this region is filled by cococart_slot_device::call_load()
+ROM_END
+
 
 //-------------------------------------------------
 //  INPUT_PORTS( coco_cart_autostart )
@@ -136,6 +141,7 @@ DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "C
 
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: coco_pak_device(mconfig, type, tag, owner, clock)
+	, m_pos(0)
 {
 }
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -143,39 +149,58 @@ coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, co
 {
 }
 
-/*-------------------------------------------------
-    device_reset - device-specific startup
--------------------------------------------------*/
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *coco_pak_banked_device::device_rom_region() const
+{
+	return ROM_NAME( coco_pak_banked );
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void coco_pak_banked_device::device_start()
+{
+	coco_pak_device::device_start();
+
+	save_item(NAME(m_pos));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific startup
+//-------------------------------------------------
 
 void coco_pak_banked_device::device_reset()
 {
 	coco_pak_device::device_reset();
 
-	banked_pak_set_bank(0);
+	m_pos = 0;
+	cart_base_changed();
 }
 
-/*-------------------------------------------------
-    banked_pak_set_bank - function to set the bank
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_cart_base
+//-------------------------------------------------
 
-void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
+uint8_t *coco_pak_banked_device::get_cart_base()
 {
-	uint64_t pos;
-	uint32_t i;
 	uint8_t *rom = memregion(CARTSLOT_TAG)->base();
 	uint32_t rom_length = memregion(CARTSLOT_TAG)->bytes();
 
-	if (m_cart->exists()) {
-		pos = (bank * 0x4000) % m_cart->length();
-
-		for (i = 0; i < rom_length / 0x4000; i++)
-		{
-			m_cart->fseek(pos, SEEK_SET);
-			m_cart->fread(&rom[i * 0x4000], 0x4000);
-		}
-	}
+	return &rom[(m_pos * 0x4000) % rom_length];
 }
 
+//-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t coco_pak_banked_device::get_cart_size()
+{
+	return 0x4000;
+}
 
 //-------------------------------------------------
 //  scs_write
@@ -187,7 +212,11 @@ WRITE8_MEMBER(coco_pak_banked_device::scs_write)
 	{
 		case 0:
 			// set the bank
-			banked_pak_set_bank(data);
+			if (m_pos != data)
+			{
+				m_pos = data;
+				cart_base_changed();
+			}
 			break;
 	}
 }

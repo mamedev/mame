@@ -35,6 +35,7 @@
 #include "machine/bankdev.h"
 #include "machine/upd765.h"
 #include "machine/i8257.h"
+#include "machine/timer.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "sound/beep.h"
@@ -93,7 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_PALETTE_INIT(alphatro);
@@ -323,12 +323,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 {
 	m_cass_state = state;
-}
-
-WRITE_LINE_MEMBER( alphatro_state::write_usart_clock )
-{
-	m_usart->write_txc(state);
-	m_usart->write_rxc(state);
 }
 
 MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
@@ -741,7 +735,8 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

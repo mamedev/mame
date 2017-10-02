@@ -138,8 +138,6 @@ protected:
 	int         m_filter_highlight;
 	std::string m_search;
 
-	static char const *const s_info_titles[];
-
 private:
 	using bitmap_vector = std::vector<bitmap_argb32>;
 	using texture_ptr_vector = std::vector<texture_ptr>;
@@ -255,7 +253,7 @@ private:
 	// images render
 	void arts_render(float origx1, float origy1, float origx2, float origy2);
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
+	void arts_render_images(bitmap_argb32 &&bitmap, float origx1, float origy1, float origx2, float origy2);
 	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
 
 	// text for main top/bottom panels

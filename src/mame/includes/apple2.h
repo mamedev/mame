@@ -20,6 +20,7 @@
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #include "sound/spkrdev.h"
 

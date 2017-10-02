@@ -15,7 +15,7 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
-#include "machine/ram.h"
+#include "machine/timer.h"
 
 #include "sound/spkrdev.h"
 

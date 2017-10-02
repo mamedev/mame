@@ -1,15 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
 Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
 
 Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
-The DS5002FP has 32KB undumped gameplay code making the game unplayable :_(
+** NOTES: Merge with wrally.ccp???  Address map nearly identical & PCB
+          is reworked to add connections for light guns and different RAM
+		 
+	 	  is the visible area correct? if it's larger than the startup
+		  screen then scene 5 of desert chariots doesn't cover the entire
+		  screen either.
 
-** NOTE: Merge with wrally.ccp???  Address map nearly identical & PCB
-         is reworked to add connections for light guns and different RAM
+		  the instructions say to reload the gun after each shot, but
+		  there is no reload button listed in service mode, and it doesn't
+		  seem to be required, was it a mechanical feature of the gun or
+		  is our logic inverted somewhere, the gun test shows 'ON' when
+		  you're not pressing fire too.
 
 REF.940531
 +-------------------------------------------------+
@@ -59,6 +67,7 @@ DS5002FP Box contains:
 #include "includes/targeth.h"
 
 #include "machine/gaelco_ds5002fp.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -67,10 +76,10 @@ DS5002FP Box contains:
 
 static const gfx_layout tilelayout16_0x080000 =
 {
-	16,16,                                                      /* 16x16 tiles */
-	0x080000/32,                                                /* number of tiles */
-	4,                                                          /* bitplanes */
-	{ 3*0x080000*8, 2*0x080000*8, 1*0x080000*8, 0*0x080000*8 }, /* plane offsets */
+	16,16,                                                          /* 16x16 tiles */
+	RGN_FRAC(1,4),                                                  /* number of tiles */
+	4,                                                              /* bitplanes */
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) }, /* plane offsets */
 	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	32*8
@@ -80,24 +89,18 @@ static GFXDECODE_START( 0x080000 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_0x080000, 0, 64 )
 GFXDECODE_END
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::interrupt)
+TIMER_CALLBACK_MEMBER(targeth_state::gun1_irq)
 {
-	int scanline = param;
+	/* IRQ 4: Read 1P Gun */
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_gun_irq_timer[0]->adjust( m_screen->time_until_pos(128, 0 ) );
+}
 
-	if(scanline == 240)
-	{
-		/* IRQ 2: drives the game */
-		m_maincpu->set_input_line(2, HOLD_LINE);
-	}
-
-	if(scanline == 0)
-	{
-		/* IRQ 4: Read 1P Gun */
-		m_maincpu->set_input_line(4, HOLD_LINE);
-		/* IRQ 6: Read 2P Gun */
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	}
+TIMER_CALLBACK_MEMBER(targeth_state::gun2_irq)
+{
+	/* IRQ 6: Read 2P Gun */
+	m_maincpu->set_input_line(6, HOLD_LINE);
+	m_gun_irq_timer[1]->adjust( m_screen->time_until_pos(160, 0 ) );
 }
 
 WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
@@ -172,23 +175,29 @@ ADDRESS_MAP_END
 void targeth_state::machine_start()
 {
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+
+	m_gun_irq_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun1_irq), this));
+	m_gun_irq_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun2_irq), this));
+
+	m_gun_irq_timer[0]->adjust(m_screen->time_until_pos(128, 0));
+	m_gun_irq_timer[1]->adjust(m_screen->time_until_pos(160, 0));
 }
 
 static INPUT_PORTS_START( targeth )
 	PORT_START("GUNX1")
-	PORT_BIT( 0x01ff, 200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.05, -0.028, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_BIT( 0x01ff, 200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.20, -0.133, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("GUNY1")
-	PORT_BIT( 0x01ff, 128, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.041, -0.011, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_BIT( 0x01ff, 128, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.12, -0.055, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("GUNX2")
-	PORT_BIT( 0x01ff, 400 + 4, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.05, -0.028, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
+	PORT_BIT( 0x01ff, 400 + 4, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.20, -0.133, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2) PORT_REVERSE
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("GUNY2")
-	PORT_BIT( 0x01ff, 255, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.041, -0.011, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
+	PORT_BIT( 0x01ff, 255, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.12, -0.055, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2) PORT_REVERSE
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -234,7 +243,7 @@ static INPUT_PORTS_START( targeth )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Gun alarm" ) /* This doesn't work. What's supposed to do? */
+	PORT_DIPNAME( 0x40, 0x40, "Gun alarm" ) /* Service mode gets default from here when uninitialized */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -264,7 +273,7 @@ static MACHINE_CONFIG_START( targeth )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", targeth_state, irq2_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
@@ -277,8 +286,8 @@ static MACHINE_CONFIG_START( targeth )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*16, 32*16)              /* 1024x512 */
-	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 16, 16*16-1)   /* 400x240 */
+	MCFG_SCREEN_SIZE(64*16, 16*16)
+	MCFG_SCREEN_VISIBLE_AREA(3*8, 23*16-8-1, 16, 16*16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -300,13 +309,13 @@ ROM_START( targeth )
 	ROM_LOAD16_BYTE( "th2_b_c_22.c22", 0x000001, 0x040000, CRC(d2435eb8) SHA1(ce75a115dad8019c8e66a1c3b3e15f54781f65ae) ) // The "B" was hand written
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
-
+	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
+	DS5002FP_SET_MON( 0x49 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
@@ -322,16 +331,17 @@ ROM_END
 
 ROM_START( targetha )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(e38a54e2) SHA1(239bfa6f1c0fc8aa0ad7de9be237bef55b384007) )
-	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(24fe3efb) SHA1(8f48f08a6db28966c9263be119883c9179e349ed) )
+	ROM_LOAD16_BYTE( "th2_n_c_23.C23", 0x000000, 0x040000, CRC(b99b25dc) SHA1(1bf35b2c05a58f934d06eb6ef93f592d9f16344a) ) // The "N" was hand written
+	ROM_LOAD16_BYTE( "th2_n_c_22.C22", 0x000001, 0x040000, CRC(6d34f0cf) SHA1(f44a1231f4fac1f9d443990e8fe2b4aaa3f338be) ) // The "N" was hand written
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	//DS5002FP_SET_MON( x )
-	//DS5002FP_SET_RPCTL( x )
-	//DS5002FP_SET_CRCR( x )
+	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
+	DS5002FP_SET_MON( 0x49 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
@@ -345,5 +355,32 @@ ROM_START( targetha )
 	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
-GAME( 1994, targeth,  0,       targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, targetha, targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.0)", MACHINE_UNEMULATED_PROTECTION )
+ROM_START( targeth10 )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(e38a54e2) SHA1(239bfa6f1c0fc8aa0ad7de9be237bef55b384007) )
+	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(24fe3efb) SHA1(8f48f08a6db28966c9263be119883c9179e349ed) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
+	DS5002FP_SET_MON( 0x49 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
+	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11",    0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+ROM_END
+
+GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", 0 )
+GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", 0 )
+GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", 0 )

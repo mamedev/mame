@@ -947,12 +947,11 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-static MACHINE_CONFIG_START( bublbobl )
+static MACHINE_CONFIG_START( bublbobl_nomcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(bublbobl_maincpu_map)
-	// IRQs are triggered by the MCU
 
 	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(subcpu_map)
@@ -960,10 +959,6 @@ static MACHINE_CONFIG_START( bublbobl )
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
-
-	MCFG_CPU_ADD("mcu", M6801, XTAL_4MHz) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -1007,6 +1002,14 @@ static MACHINE_CONFIG_START( bublbobl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bublbobl, bublbobl_nomcu )
+	MCFG_CPU_ADD("mcu", M6801, XTAL_4MHz) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
+MACHINE_CONFIG_END
+
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
 	MACHINE_START_CALL_MEMBER(common);
@@ -1024,7 +1027,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 	m_ic43_b = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
+static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl_nomcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1033,8 +1036,6 @@ static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
-
-	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 
@@ -1060,11 +1061,9 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 	m_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
+static MACHINE_CONFIG_DERIVED( bub68705, bublbobl_nomcu )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("mcu")
-
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
 	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
 	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))

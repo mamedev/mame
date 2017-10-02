@@ -111,6 +111,7 @@ Address bus A0-A11 is Y0-Y11
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "machine/sonydriv.h"
+#include "machine/timer.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"
@@ -146,6 +147,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
+#include "bus/a2bus/ssprite.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -1342,14 +1344,20 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			break;
 
 		case 0x54:  // set page 1
-			machine().first_screen()->update_now();
+			if (!m_video->m_80col)
+			{
+				machine().first_screen()->update_now();
+			}
 			m_page2 = false;
 			m_video->m_page2 = false;
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			machine().first_screen()->update_now();
+			if (!m_video->m_80col)
+			{
+				machine().first_screen()->update_now();
+			}
 			m_page2 = true;
 			m_video->m_page2 = true;
 			auxbank_update();
@@ -3734,6 +3742,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ezcgi9958", A2BUS_EZCGI_9958)   /* E-Z Color Graphics Interface (TMS9958) */
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 	SLOT_INTERFACE("pcxport", A2BUS_PCXPORTER) /* Applied Engineering PC Transporter */
+	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

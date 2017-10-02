@@ -31,6 +31,8 @@ files {
 	MAME_DIR .. "src/devices/machine/legscsi.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
 	MAME_DIR .. "src/devices/machine/terminal.h",
+	MAME_DIR .. "src/devices/machine/timer.cpp",
+	MAME_DIR .. "src/devices/machine/timer.h",
 }
 files {
 	MAME_DIR .. "src/devices/imagedev/bitbngr.cpp",
@@ -580,6 +582,18 @@ if (MACHINES["AM53CF96"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am53cf96.cpp",
 		MAME_DIR .. "src/devices/machine/am53cf96.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/am9513.h,MACHINES["AM9513"] = true
+---------------------------------------------------
+
+if (MACHINES["AM9513"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am9513.cpp",
+		MAME_DIR .. "src/devices/machine/am9513.h",
 	}
 end
 

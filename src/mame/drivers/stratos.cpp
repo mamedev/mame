@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class stratos_state : public driver_device

@@ -17,11 +17,16 @@ TODO:
   background, and the gradient can move around (the latter doesn't seem to
   be used except for making it cover the whole screen on the title screen,
   and start at the middle during gameplay)
+  Update: stage 2 is supposed to have a different gradient, how/where
+  this is located is unknown (pen 0x20?)
 - Video driver is largely unoptimized
 - Support for the 7630's controlling the sound chip outputs (bass/treble,
   volume) is completely missing.
 - The sound Z80 seems to write answers for the main Z80, but the latter doesn't
   seem to read them.
+- videoram and spriteram garbage occurs when entering into cross hatch test and exiting.
+  Game attempts to transfer content of videoram into spriteram/scrollram, then transfer
+  back again into videoram. Maybe the host CPU cannot read contents of VRAM at all?
 
 Notes:
 - There is also a 4-channel version of the sound board for the cockpit
@@ -93,7 +98,6 @@ Schematics show the jumper set to the 6mhz setting.
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 #include "buggychl.lh"
@@ -198,13 +202,14 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_SHARE("charram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // ???
 	AM_RANGE(0xd100, 0xd100) AM_MIRROR(0x00ff) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_MIRROR(0x00ff) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
 	AM_RANGE(0xd303, 0xd303) AM_MIRROR(0x00f8) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	// d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
+	AM_RANGE(0xd304, 0xd307) AM_WRITENOP // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
 	AM_RANGE(0xd400, 0xd400) AM_MIRROR(0x00fc) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd401, 0xd401) AM_MIRROR(0x00fc) AM_READ(mcu_status_r)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_SHARE("spriteram")
@@ -214,13 +219,14 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd603, 0xd603) AM_MIRROR(0x00e4) AM_READ_PORT("IN0")    /* player inputs */
 	AM_RANGE(0xd608, 0xd608) AM_MIRROR(0x00e4) AM_READ_PORT("WHEEL")
 	AM_RANGE(0xd609, 0xd609) AM_MIRROR(0x00e4) AM_READ_PORT("IN1")    /* coin + accelerator */
-//	AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
-//	AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
+//  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
+//  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_MIRROR(0x00e4) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd611, 0xd611) AM_MIRROR(0x00e4) AM_READ(sound_status_main_r)
-//	AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
+//  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xd618, 0xd618) AM_MIRROR(0x00e7) AM_WRITENOP    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd820, 0xd83f) AM_RAM // TODO
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
 	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_SHARE("scrollh")
 	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
@@ -237,7 +243,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
+	AM_RANGE(0x4820, 0x4820) AM_WRITE(ta7630_volbal_msm_w) /* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output */
 	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x5001, 0x5001) AM_READ(sound_status_sound_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
@@ -247,6 +253,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 ADDRESS_MAP_END
 
 /******************************************************************************/
+
+// accelerator is 4-bit, we need to convert it here so that it doesn't clash with other inputs in IN1 (known i/o framework fault)
+CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
+{
+	return m_pedal_input->read() >> 4;
+}
+
 
 static INPUT_PORTS_START( buggychl )
 	PORT_START("DSW1")
@@ -309,11 +322,11 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPNAME( 0x01, 0x01, "Start button needed" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)") PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Crash only" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
@@ -331,8 +344,8 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )   /* shift */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -342,7 +355,10 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_BUTTON1 )   /* accelerator */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
 
 	PORT_START("WHEEL") /* wheel */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
@@ -380,19 +396,28 @@ static GFXDECODE_START( buggychl )
 GFXDECODE_END
 
 
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
+{
+	m_ta7630->set_device_volume(m_msm, data >> 4);
+}
 
-WRITE8_MEMBER(buggychl_state::port_a_0_w)
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay1_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
+	m_ta7630->set_device_volume(m_ay1, data >> 4);
 }
+
 WRITE8_MEMBER(buggychl_state::port_b_0_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-WRITE8_MEMBER(buggychl_state::port_a_1_w)
+
+WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay2_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
+	m_ta7630->set_device_volume(m_ay2, data >> 4);
 }
+
 WRITE8_MEMBER(buggychl_state::port_b_1_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
@@ -404,10 +429,9 @@ void buggychl_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
-
 	save_item(NAME(m_sprite_lookup));
 	save_item(NAME(m_sl_bank));
-	save_item(NAME(m_bg_on));
+	save_item(NAME(m_bg_clip_on));
 	save_item(NAME(m_sky_on));
 	save_item(NAME(m_sprite_color_base));
 	save_item(NAME(m_bg_scrollx));
@@ -416,7 +440,7 @@ void buggychl_state::machine_start()
 void buggychl_state::machine_reset()
 {
 	m_sl_bank = 0;
-	m_bg_on = 0;
+	m_bg_clip_on = 0;
 	m_sky_on = 0;
 	m_sprite_color_base = 0;
 	m_bg_scrollx = 0;
@@ -431,7 +455,9 @@ static MACHINE_CONFIG_START( buggychl )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4 MHz according to schematics */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60) /* irq is timed, tied to the cpu clock and not to vblank */
+	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL_8MHz/2)/2)/256)/64)) // timer irq
+	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
+	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
 	// schematics show a secondary sound z80 cpu as well, running at the same speed as the audiocpu; unclear if actually populated, or if it only existed on a certain hardware release (cocktail deluxe version?)
@@ -448,6 +474,8 @@ static MACHINE_CONFIG_START( buggychl )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// derived from ladyfrog.cpp, causes glitches?
+//  MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -468,17 +496,19 @@ static MACHINE_CONFIG_START( buggychl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", YM2149, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))
+	MCFG_TA7630_ADD("ta7630")
+
+	MCFG_SOUND_ADD("ay1", YM2149, XTAL_8MHz/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_1_w))
+	MCFG_SOUND_ADD("ay2", YM2149, XTAL_8MHz/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -560,5 +590,5 @@ ROM_START( buggychlt )
 ROM_END
 
 
-GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

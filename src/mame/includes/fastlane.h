@@ -5,6 +5,8 @@
     Fast Lane
 
 *************************************************************************/
+
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
 #include "video/k051733.h"

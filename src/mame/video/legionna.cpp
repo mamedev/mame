@@ -308,7 +308,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_sprite_pri_mask[2] = 0xfffe; // door at the end of sewers part in level 1
 	m_sprite_pri_mask[3] = 0x0000; // briefing guy in pre-stage and portraits before a boss fight
 
-//  m_background_layer->set_transparent_pen(15);
+	m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(7);//?
@@ -582,8 +582,8 @@ uint32_t legionna_state::screen_update_legionna(screen_device &screen, bitmap_in
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
@@ -603,8 +603,8 @@ uint32_t legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
@@ -612,8 +612,9 @@ uint32_t legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind
 
 uint32_t legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x0200, cliprect);
 	screen.priority().fill(0, cliprect);
+	// matches PCB recording for Denjin Makai, settable thru CRTC?
+	bitmap.fill(0xff, cliprect);
 
 	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
 	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
@@ -623,8 +624,8 @@ uint32_t legionna_state::screen_update_godzilla(screen_device &screen, bitmap_in
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 
 	return 0;
@@ -650,8 +651,8 @@ uint32_t legionna_state::screen_update_grainbow(screen_device &screen, bitmap_in
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }

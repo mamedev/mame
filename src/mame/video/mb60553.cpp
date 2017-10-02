@@ -5,12 +5,12 @@
   the actual line scroll / zoom is not properly understood
 
   interestingly the chip seems to require doubled up ROMs (2 copies of each ROM) to draw just the single layer.
-  
+
 */
 /*
-	Tecmo World Cup '94 "service mode" has an item for testing zooming, this is:
-	0xffdf12 target zoom code
-	0xffdf16 current zoom code
+    Tecmo World Cup '94 "service mode" has an item for testing zooming, this is:
+    0xffdf12 target zoom code
+    0xffdf16 current zoom code
 */
 
 #include "emu.h"
@@ -262,7 +262,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 {
 	int line;
 	rectangle clip;
-	
+
 	clip.min_x = screen.visible_area().min_x;
 	clip.max_x = screen.visible_area().max_x;
 
@@ -270,30 +270,32 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 	{
 //      int scrollx;
 //      int scrolly;
-
 		uint32_t startx,starty;
-		uint32_t incxx,incyy;
+		int32_t incxx,incyy;
+		int32_t incxy,incyx;
 		float xoffset;
-		
 
-		incxx = m_lineram[(line)*8+0]<<4;
+		// confirmed on how ROZ is used
+		incyy = ((int16_t)m_lineram[(line)*8+0])<<4;
+		incxx = ((int16_t)m_lineram[(line)*8+3])<<4;
+
 		// startx has an offset based off current x zoom value
 		// This is confirmed by Tecmo World Cup '94 startx being 0xff40 (-192) when showing footballer pics on attract mode (incxx is 0x800)
 		// TODO: slightly offset?
-		xoffset = (float)incxx/(float)0x10000 * 384.0;
+		xoffset = ((float)incyy/(float)0x10000) * 384.0;
 
-		startx = m_regs[0] + (uint32_t)xoffset;
+		startx = m_regs[0] + (int32_t)xoffset;
 		starty = m_regs[1];
 
 		// TODO: what's this? Used by Grand Striker playfield
-//		startx -=  m_lineram[(line)*8+7]/2;
+		incyx =  ((int16_t)m_lineram[(line)*8+7])<<4;
+		// V Goal Soccer rotation
+		incxy =  ((int16_t)m_lineram[(line)*8+4])<<4;
 
-		incyy = m_lineram[(line)*8+3]<<4;
-		
 		clip.min_y = clip.max_y = line;
 
 		draw_roz_core(screen, bitmap, clip, startx<<12,starty<<12,
-				incxx,0,0,incyy,
+				incxx,incxy,-incyx,incyy,
 				1
 				);
 

@@ -72,6 +72,7 @@
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
 #include "screen.h"

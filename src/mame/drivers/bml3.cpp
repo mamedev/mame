@@ -20,6 +20,7 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
@@ -81,7 +82,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_ym2203(*this, "ym2203")
-		, m_acia6850(*this, "acia6850")
+		, m_acia(*this, "acia")
 		, m_palette(*this, "palette")
 	{
 	}
@@ -111,7 +112,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
 	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
@@ -161,7 +161,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
-	required_device<acia6850_device> m_acia6850;
+	required_device<acia6850_device> m_acia;
 	required_device<palette_device> m_palette;
 };
 
@@ -400,9 +400,9 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
 	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
-	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
@@ -745,7 +745,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_acia6850->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }
@@ -923,12 +923,6 @@ WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
 	logerror("%02x TAPE IRQ\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::write_acia_clock )
-{
-	m_acia6850->write_txc(state);
-	m_acia6850->write_rxc(state);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
 {
 	m_cass_data[3]++;
@@ -994,16 +988,17 @@ static MACHINE_CONFIG_START( bml3_common )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
-	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bml3_state, bml3_acia_tx_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bml3_state, bml3_acia_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bml3_state, bml3_acia_irq_w))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bml3_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 

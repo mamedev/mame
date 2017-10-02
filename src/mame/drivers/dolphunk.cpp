@@ -83,6 +83,7 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "speaker.h"

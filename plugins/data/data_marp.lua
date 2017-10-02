@@ -111,10 +111,12 @@ local function init()
 	db:exec("END TRANSACTION")
 end
 
-init()
+if db then
+	init()
+end
 
 function dat.check(set, softlist)
-	if softlist or not ver then
+	if softlist or not ver or not db then
 		return nil
 	end
 	info = nil
@@ -124,7 +126,7 @@ function dat.check(set, softlist)
 		info = "#j2\n" .. stmt:get_value(0)
 	end
 	stmt:finalize()
-	return info and "MARPScore" or nil
+	return info and _("MARPScore") or nil
 end
 
 function dat.get()

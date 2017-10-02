@@ -218,9 +218,15 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
+	bool validated_any = false;
 	while (m_drivlist.next())
+	{
 		if (m_drivlist.matches(string, m_drivlist.driver().name))
+		{
 			validate_one(m_drivlist.driver());
+			validated_any = true;
+		}
+	}
 
 	// validate devices
 	if (!string)
@@ -228,6 +234,10 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// cleanup
 	validate_end();
+
+	// if we failed to match anything, it
+	if (string && !validated_any)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
@@ -586,6 +596,14 @@ void validity_checker::validate_rgb()
 	expected_b = random_i32();
 	rgb.set(rgbaint_t(expected_a, expected_r, expected_g, expected_b));
 	check_expected("rgbaint_t::set(rgbaint_t)");
+
+	packed = random_i32();
+	expected_a = packed.a();
+	expected_r = packed.r();
+	expected_g = packed.g();
+	expected_b = packed.b();
+	rgb.set(packed);
+	check_expected("rgbaint_t::set(const rgb_t& rgb)");
 
 	// check construct/assign
 	expected_a = random_i32();
@@ -1465,7 +1483,7 @@ void validity_checker::validate_roms(device_t &root)
 		std::unordered_map<std::string, int> bios_names;
 		std::unordered_map<std::string, std::string> bios_descs;
 		char const *defbios = nullptr;
-		for (const rom_entry *romp = rom_first_region(device); romp && !ROMENTRY_ISEND(romp); romp++)
+		for (tiny_rom_entry const *romp = device.rom_region(); romp && !ROMENTRY_ISEND(romp); ++romp)
 		{
 			if (ROMENTRY_ISREGION(romp)) // if this is a region, make sure it's valid, and record the length
 			{
@@ -1474,12 +1492,12 @@ void validity_checker::validate_roms(device_t &root)
 					osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
 
 				// reset our region tracking states
-				const char *basetag = ROMREGION_GETTAG(romp);
+				char const *const basetag = romp->name;
 				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 				last_region_name = basetag;
 
 				// check for a valid tag
-				if (basetag == nullptr)
+				if (!basetag)
 				{
 					osd_printf_error("ROM_REGION tag with nullptr name\n");
 					continue;
@@ -1489,7 +1507,7 @@ void validity_checker::validate_roms(device_t &root)
 				validate_tag(basetag);
 
 				// generate the full tag
-				std::string fulltag = rom_region_name(device, romp);
+				std::string const fulltag = device.subtag(romp->name);
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
@@ -1499,7 +1517,7 @@ void validity_checker::validate_roms(device_t &root)
 			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{
 				int const bios_flags = ROM_GETBIOSFLAGS(romp);
-				char const *const biosname = ROM_GETNAME(romp);
+				char const *const biosname = romp->name;
 				if (bios_flags != last_bios + 1)
 					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags, last_bios + 1);
 				last_bios = bios_flags;
@@ -1520,24 +1538,24 @@ void validity_checker::validate_roms(device_t &root)
 				auto const nameins = bios_names.emplace(biosname, bios_flags);
 				if (!nameins.second)
 					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags);
-				auto const descins = bios_descs.emplace(ROM_GETHASHDATA(romp), biosname);
+				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
 				if (!descins.second)
-					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, ROM_GETHASHDATA(romp), descins.first->second.c_str());
+					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second.c_str());
 			}
 			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
 			{
-				defbios = ROM_GETNAME(romp);
+				defbios = romp->name;
 			}
 			else if (ROMENTRY_ISFILE(romp)) // if this is a file, make sure it is properly formatted
 			{
 				// track the last filename we found
-				last_name = ROM_GETNAME(romp);
+				last_name = romp->name;
 				total_files++;
 
 				// make sure the hash is valid
 				util::hash_collection hashes;
-				if (!hashes.from_internal_string(ROM_GETHASHDATA(romp)))
-					osd_printf_error("ROM '%s' has an invalid hash string '%s'\n", last_name, ROM_GETHASHDATA(romp));
+				if (!hashes.from_internal_string(romp->hashdata))
+					osd_printf_error("ROM '%s' has an invalid hash string '%s'\n", last_name, romp->hashdata);
 			}
 
 			// for any non-region ending entries, make sure they don't extend past the end
@@ -1822,6 +1840,19 @@ void validity_checker::validate_inputs()
 				for (ioport_setting &setting : field.settings())
 					if (!setting.condition().none())
 						validate_condition(setting.condition(), device, port_map);
+
+				// verify natural keyboard codes
+				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
+				{
+					char32_t code = field.keyboard_code(which);
+					if (code && !uchar_isvalid(code))
+					{
+						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+							name,
+							(unsigned)code,
+							(int)code);
+					}
+				}
 			}
 
 			// done with this port

@@ -996,12 +996,6 @@ void adsp21062_device::check_interrupts()
 
 void adsp21062_device::execute_run()
 {
-	static bool first = true;
-	if(first) {
-		first = false;
-		machine().debug_break();
-	}
-
 	if (m_enable_drc)
 	{
 		if (m_core->irq_pending != 0)
@@ -1034,12 +1028,6 @@ void adsp21062_device::execute_run()
 			m_core->astat_old_old_old = m_core->astat_old_old;
 			m_core->astat_old_old = m_core->astat_old;
 			m_core->astat_old = m_core->astat;
-
-			static bool first = true;
-			if(first) {
-				first = false;
-				machine().debug_break();
-			}
 
 			debugger_instruction_hook(this, m_core->pc);
 

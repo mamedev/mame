@@ -173,6 +173,7 @@ void gime_device::device_start(void)
 	// set up ROM/RAM pointers
 	m_rom = machine().root_device().memregion(m_maincpu_tag)->base();
 	m_cart_rom = m_cart_device->get_cart_base();
+	m_cart_size = m_cart_device->get_cart_size();
 
 	// populate palettes
 	m_composite_phase_invert = false;
@@ -348,6 +349,7 @@ void gime_device::device_pre_save()
 void gime_device::device_post_load()
 {
 	super::device_post_load();
+	update_cart_rom();
 	update_memory();
 	update_cpu_clock();
 
@@ -566,11 +568,15 @@ void gime_device::update_memory(int bank)
 		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
 
 		// are we in onboard ROM or cart ROM?
-		uint8_t *rom_ptr = (block & 4) ? m_cart_rom : m_rom;
-		// TODO: make this unmapped
-		if (rom_ptr==nullptr) rom_ptr = m_rom;
-		// perform the look up
-		memory = &rom_ptr[(block & 3) * 0x2000];
+		if (BIT(block, 2) && m_cart_rom != nullptr)
+		{
+			// perform the look up
+			memory = &m_cart_rom[((block & 3) * 0x2000) % m_cart_size];
+		}
+		else
+		{
+			memory = &m_rom[(block & 3) * 0x2000];
+		}
 		is_read_only = true;
 	}
 	else
@@ -608,6 +614,7 @@ uint8_t *gime_device::memory_pointer(uint32_t address)
 void gime_device::update_cart_rom(void)
 {
 	m_cart_rom = m_cart_device->get_cart_base();
+	m_cart_size = m_cart_device->get_cart_size();
 	update_memory();
 }
 

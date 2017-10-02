@@ -86,7 +86,6 @@ public:
 	DECLARE_WRITE8_MEMBER(onetwo_fgram_w);
 	DECLARE_WRITE8_MEMBER(onetwo_cpubank_w);
 	DECLARE_WRITE8_MEMBER(onetwo_coin_counters_w);
-	DECLARE_WRITE8_MEMBER(onetwo_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(palette1_w);
 	DECLARE_WRITE8_MEMBER(palette2_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -149,12 +148,6 @@ WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void onetwo_state::set_color(int offset)
 {
 	int r, g, b;
@@ -195,7 +188,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_cpu_io, AS_IO, 8, onetwo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(onetwo_coin_counters_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_WRITE(onetwo_soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(onetwo_cpubank_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
@@ -212,7 +205,7 @@ static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -386,6 +379,8 @@ static MACHINE_CONFIG_START( onetwo )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

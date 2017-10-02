@@ -208,10 +208,12 @@ void mn10200_device::device_start()
 		m_serial[i].ctrll = 0;
 		m_serial[i].ctrlh = 0;
 		m_serial[i].buf = 0;
+		m_serial[i].recv = 0;
 
 		save_item(NAME(m_serial[i].ctrll), i);
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
+		save_item(NAME(m_serial[i].recv), i);
 	}
 
 	// ports
@@ -2153,13 +2155,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x181: case 0x191:
 			return m_serial[(offset-0x180) >> 4].ctrlh;
 
-		case 0x182:
+		case 0x182: //case 0x192:
 		{
-			static int zz;
-			return zz++;
+			int ser = (offset-0x180) >> 4;
+			return m_serial[ser].recv++;
 		}
 
-		case 0x183:
+		case 0x183: //case 0x193:
 			return 0x10;
 
 		// 8-bit timers

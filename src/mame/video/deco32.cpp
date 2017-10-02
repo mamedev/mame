@@ -98,19 +98,6 @@ void deco32_state::updateAceRam()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE32_MEMBER(deco32_state::nonbuffered_palette_w)
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	b = (m_generic_paletteram_32[offset] >>16) & 0xff;
-	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
 WRITE32_MEMBER(deco32_state::buffered_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);

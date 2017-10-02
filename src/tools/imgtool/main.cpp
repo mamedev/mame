@@ -864,6 +864,12 @@ int main(int argc, char *argv[])
 		return -1;
 #endif // MAME_DEBUG
 
+	// convert arguments to UTF-8
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
+	argv = (char **)alloca(sizeof(char *) * args.size());
+	for (i = 0; i < args.size(); i++)
+		argv[i] = (char *)args[i].c_str();
+
 	util::stream_format(std::wcout, L"\n");
 
 	if (argc > 1)

@@ -1019,14 +1019,21 @@ static const uint8_t dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
+//static const uint8_t dither_matrix_2x2[16] =
+//{
+//      2, 10,  2, 10,
+//  14,  6, 14,  6,
+//      2, 10,  2, 10,
+//  14,  6, 14,  6
+//};
+// Using this matrix allows iteagle video memory tests to pass
 static const uint8_t dither_matrix_2x2[16] =
 {
-		2, 10,  2, 10,
-	14,  6, 14,  6,
-		2, 10,  2, 10,
-	14,  6, 14,  6
+	8, 10, 8, 10,
+	11, 9, 11, 9,
+	8, 10, 8, 10,
+	11, 9, 11, 9
 };
-
 
 
 /*************************************
@@ -1637,7 +1644,7 @@ protected:
 		rgb_t               int8[256];              /* intensity 8-bit lookup table */
 		rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
 
-		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
+		rgb_t*              rgb565;                 /* RGB 5-6-5 lookup table */
 		rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
 		rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
 	};
@@ -1716,6 +1723,7 @@ protected:
 		rgb_t               pen[65536];             /* mapping from pixels to pens */
 		rgb_t               clut[512];              /* clut gamma data */
 		uint8_t               clut_dirty;             /* do we need to recompute? */
+		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
 	};
 
 

@@ -168,6 +168,7 @@ Measurements -
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -377,7 +378,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_READ(sound_busy_r) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
@@ -388,7 +389,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfe8000, 0xfe9fff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
 	AM_RANGE(0xfea000, 0xfebfff) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
-	AM_RANGE(0xfee000, 0xfeffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xfee000, 0xfeffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
@@ -513,7 +514,8 @@ static MACHINE_CONFIG_START( badlands )
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -660,7 +662,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r ) // sound comms?
 
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(video_int_ack_w)
 
@@ -669,7 +671,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("P1")
 	AM_RANGE(0xfe4006, 0xfe4007) AM_READ_PORT("P2")
 	AM_RANGE(0xfe4008, 0xfe4009) AM_WRITE(badlands_pf_bank_w)
-	AM_RANGE(0xfe400c, 0xfe400d) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xfe400c, 0xfe400d) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 
 	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
@@ -768,7 +770,8 @@ static MACHINE_CONFIG_START( badlandsb )
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlandsb)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlandsb)

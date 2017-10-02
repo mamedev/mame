@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( pcm )
 	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
 
-	MCFG_Z80SIO0_ADD("z80sio", 4800, 0, 0, 0, 0) // clocks come from the system ctc
+	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 4800) // clocks come from the system ctc
 
 	MCFG_DEVICE_ADD("z80ctc_u", Z80CTC, XTAL_10MHz /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

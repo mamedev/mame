@@ -503,10 +503,7 @@ void menu_select_game::build_available_list()
 	{
 		// FIXME: can't use the convenience macros tiny ROM entries
 		auto const is_required_rom =
-				[] (tiny_rom_entry const &rom)
-				{
-					return ((rom.flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_ROM) && ((rom.flags & ROM_OPTIONALMASK) != ROM_OPTIONAL) && !std::strchr(rom.hashdata, '!');
-				};
+				[] (tiny_rom_entry const &rom) { return ROMENTRY_ISFILE(rom) && !ROM_ISOPTIONAL(rom) && !std::strchr(rom.hashdata, '!'); };
 		for (std::size_t x = 0; total > x; ++x)
 		{
 			game_driver const &driver(driver_list::driver(x));
@@ -514,7 +511,7 @@ void menu_select_game::build_available_list()
 			{
 				bool noroms(true);
 				tiny_rom_entry const *rom;
-				for (rom = driver.rom; (rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END; ++rom)
+				for (rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
 				{
 					// check optional and NO_DUMP
 					if (is_required_rom(*rom))
@@ -539,14 +536,14 @@ void menu_select_game::build_available_list()
 						{
 							// check if clone < parent
 							noroms = true;
-							for ( ; noroms && rom && ((rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END); ++rom)
+							for ( ; noroms && !ROMENTRY_ISEND(rom); ++rom)
 							{
 								if (is_required_rom(*rom))
 								{
 									util::hash_collection const hashes(rom->hashdata);
 
 									bool found(false);
-									for (tiny_rom_entry const *parentrom = parent.rom; !found && ((parentrom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END); ++parentrom)
+									for (tiny_rom_entry const *parentrom = parent.rom; !found && !ROMENTRY_ISEND(parentrom); ++parentrom)
 									{
 										if (is_required_rom(*parentrom) && (rom->length == parentrom->length))
 										{

@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
@@ -243,6 +244,7 @@ public:
 	DECLARE_DRIVER_INIT(thepitm);
 	DECLARE_DRIVER_INIT(theend);
 	DECLARE_DRIVER_INIT(scramble);
+	DECLARE_DRIVER_INIT(explorer);
 	DECLARE_DRIVER_INIT(mandinga);
 	DECLARE_DRIVER_INIT(sfx);
 	DECLARE_DRIVER_INIT(atlantis);
@@ -275,7 +277,7 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt_gen);
 	INTERRUPT_GEN_MEMBER(fakechange_interrupt_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(galaxian_stars_blink_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
 	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);

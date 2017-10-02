@@ -16,6 +16,7 @@
 #include "machine/eepromser.h"
 #include "machine/kaneko_calc3.h"
 #include "machine/kaneko_toybox.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 

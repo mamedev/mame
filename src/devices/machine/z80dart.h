@@ -154,39 +154,6 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z80DART_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80DART, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO0_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO0, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO1_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO1, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO2_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO2, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO3_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO3, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO4_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO4, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, I8274, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-
 #define MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80dart_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 

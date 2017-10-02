@@ -12,6 +12,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/am9513.h"
+#include "machine/i8255.h"
 #include "screen.h"
 
 
@@ -43,6 +45,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(unistar_io, AS_IO, 8, unistar_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)
+	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
 ADDRESS_MAP_END
@@ -91,6 +95,11 @@ static MACHINE_CONFIG_START( unistar )
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
 	MCFG_CPU_IO_MAP(unistar_io)
+
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL_8MHz)
+	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -27,10 +27,10 @@ class mephisto_pinball_state : public driver_device
 {
 public:
 	mephisto_pinball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_aysnd(*this, "aysnd"),
-			m_soundbank(*this, "soundbank")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_aysnd(*this, "aysnd")
+		, m_soundbank(*this, "soundbank")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(shift_load_w);
@@ -41,24 +41,16 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<ay8910_device> m_aysnd;
-	required_memory_bank m_soundbank;
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// internal data
+private:
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
 	bool m_ay8910_bc1;
-
-private:
 	void ay8910_update();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_aysnd;
+	required_memory_bank m_soundbank;
 };
 
 

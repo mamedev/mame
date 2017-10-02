@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman
+
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 
 class srumbler_state : public driver_device

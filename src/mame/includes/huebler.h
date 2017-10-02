@@ -14,6 +14,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"

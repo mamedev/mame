@@ -17,6 +17,7 @@
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "machine/v1050kb.h"

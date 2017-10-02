@@ -156,6 +156,7 @@
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/i8275.h"

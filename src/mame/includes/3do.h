@@ -10,6 +10,7 @@
 #define _3DO_H_
 
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 
 struct SLOW2 {

@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/6522via.h"
+//#include "machine/74259.h"
+//#include "sound/ay8910.h"
 
 class jvh_state : public driver_device
 {
@@ -91,7 +94,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jvh_sub_map, AS_PROGRAM, 8, jvh_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	//AM_RANGE(0x0080, 0x008f) via6522_r,w
+	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
 ADDRESS_MAP_END
 
@@ -109,15 +112,23 @@ DRIVER_INIT_MEMBER(jvh_state,jvh)
 static MACHINE_CONFIG_START( jvh )
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
-	MCFG_CPU_ADD("cpu2", M6800, 1000000)
+
+	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4) // MC6802 E clock
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jvh2 )
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
-	MCFG_CPU_ADD("cpu2", M6800, 1000000)
+
+	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
 
@@ -130,7 +141,7 @@ ROM_START(escape)
 	ROM_LOAD("cpu_ic1.bin", 0x0000, 0x2000, CRC(fadb8f9a) SHA1(b7e7ea8e33847c14a3414f5e367e304f12c0bc00))
 	ROM_LOAD("cpu_ic7.bin", 0x2000, 0x2000, CRC(2f9402b4) SHA1(3d3bae7e4e5ad40e3c8019d55392defdffd21cc4))
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "soundcpu", 0)
 	ROM_LOAD("snd.bin",     0xc000, 0x2000, CRC(2477bbe2) SHA1(f636952822153f43e9d09f8211edde1057249203))
 ROM_END
 
@@ -142,7 +153,7 @@ ROM_START(movmastr)
 	ROM_LOAD("mm_ic1.764", 0x0000, 0x2000, CRC(fb59920d) SHA1(05536c4c036a8d73516766e14f4449665b2ec180))
 	ROM_LOAD("mm_ic7.764", 0x2000, 0x2000, CRC(9b47af41) SHA1(ae795c22aa437d6c71312d93de8a87f43ee500fb))
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "soundcpu", 0)
 	ROM_LOAD("snd.bin", 0xc000, 0x2000, NO_DUMP)
 ROM_END
 

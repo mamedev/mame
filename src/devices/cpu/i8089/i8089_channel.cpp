@@ -105,6 +105,8 @@ void i8089_channel_device::device_reset()
 		elem.t = 0;
 	}
 	m_prio = PRIO_IDLE;
+	m_load_hi = false;
+	m_store_hi = false;
 }
 
 
@@ -230,6 +232,8 @@ int i8089_channel_device::execute_run()
 			// we are no longer executing task blocks
 			m_r[PSW].w &= ~(1 << 2);
 			m_xfer_pending = false;
+			m_load_hi = false;
+			m_store_hi = false;
 
 			if (VERBOSE)
 			{
@@ -269,21 +273,23 @@ int i8089_channel_device::execute_run()
 					m_r[GA + CC_SOURCE].w += 2;
 				m_r[BC].w -= 2;
 			}
-			// destination is 16-bit, byte count is even
-			else if (BIT(m_r[PSW].w, 0) && !(m_r[BC].w & 1))
+			// destination is 16-bit, low byte
+			else if (BIT(m_r[PSW].w, 0) && !m_load_hi)
 			{
 				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w);
 				if(CC_FUNC & 1)
 					m_r[GA + CC_SOURCE].w++;
-				m_r[BC].w--;
+				if(--m_r[BC].w)
+					m_load_hi = true;
 			}
-			// destination is 16-bit, byte count is odd
-			else if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+			// destination is 16-bit, high byte
+			else if (BIT(m_r[PSW].w, 0) && m_load_hi)
 			{
 				m_dma_value |= m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w) << 8;
 				if(CC_FUNC & 1)
 					m_r[GA + CC_SOURCE].w++;
 				m_r[BC].w--;
+				m_load_hi = false;
 			}
 			// 8-bit transfer
 			else
@@ -300,7 +306,7 @@ int i8089_channel_device::execute_run()
 			if (VERBOSE_DMA)
 				logerror("[ %04x ]\n", m_dma_value);
 
-			if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+			if (BIT(m_r[PSW].w, 0) && m_load_hi)
 				m_dma_state = DMA_FETCH;
 			else if (CC_TRANS)
 				m_dma_state = DMA_TRANSLATE;
@@ -316,7 +322,12 @@ int i8089_channel_device::execute_run()
 
 		case DMA_WAIT_FOR_DEST_DRQ:
 			if (m_drq)
-				m_dma_state = DMA_STORE;
+			{
+				if(m_store_hi)
+					m_dma_state = DMA_STORE_BYTE_HIGH;
+				else
+					m_dma_state = DMA_STORE;
+			}
 			break;
 
 		case DMA_STORE:
@@ -360,8 +371,20 @@ int i8089_channel_device::execute_run()
 			if (VERBOSE_DMA)
 				logerror("%s('%s'): entering state: DMA_TERMINATE\n", shortname(), tag());
 
+			// do we need to read another byte?
+			if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0) && !m_store_hi)
+			{
+				if (CC_SYNC == 0x02)
+				{
+					m_store_hi = true;
+					m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
+				}
+				else
+					m_dma_state = DMA_STORE_BYTE_HIGH;
+			}
+
 			// terminate on masked compare?
-			if (CC_TMC & 0x03)
+			else if (CC_TMC & 0x03)
 				fatalerror("%s('%s'): terminate on masked compare not supported\n", shortname(), tag());
 
 			// terminate on byte count?
@@ -372,18 +395,11 @@ int i8089_channel_device::execute_run()
 			else if (CC_TS)
 				fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname(), tag());
 
-			// not terminated, continue transfer
 			else
-				// do we need to read another byte?
-				if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0))
-					if (CC_SYNC == 0x02)
-						m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
-					else
-						m_dma_state = DMA_STORE_BYTE_HIGH;
-
-				// transfer done
-				else
-					m_dma_state = DMA_IDLE;
+			{
+				m_store_hi = false;
+				m_dma_state = DMA_IDLE;
+			}
 
 			break;
 
@@ -391,8 +407,9 @@ int i8089_channel_device::execute_run()
 			if (VERBOSE_DMA)
 				logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname(), tag(), (m_dma_value >> 8) & 0xff);
 
-			m_iop->write_byte(m_r[GA - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
-			m_r[GB - CC_SOURCE].w++;
+			m_iop->write_byte(m_r[GB - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
+			if(CC_FUNC & 2)
+				m_r[GB - CC_SOURCE].w++;
 			m_dma_state = DMA_TERMINATE;
 
 			break;
@@ -685,16 +702,16 @@ void i8089_channel_device::examine_ccw(uint8_t ccw)
 	m_r[PSW].w = (m_r[PSW].w & 0x5f) | (ccw & 0xa0);
 
 	// acknowledge interrupt
-	if (BIT(ccw, 4))
+	if (BIT(ccw, 3))
 	{
 		m_write_sintr(0);
 		m_r[PSW].w &= ~(1 << 5);
 	}
 
 	// interrupt enable
-	if (BIT(ccw, 5))
+	if (BIT(ccw, 4))
 	{
-		if (BIT(ccw, 4))
+		if (BIT(ccw, 3))
 			m_r[PSW].w &= ~(1 << 4);
 		else
 			m_r[PSW].w |= 1 << 4;

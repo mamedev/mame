@@ -54,6 +54,7 @@ Notes:
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/igs017_igs031.h"
 
 #include "screen.h"

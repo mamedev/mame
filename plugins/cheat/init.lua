@@ -455,13 +455,13 @@ function cheat.startplugin()
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
-			menu[1] = {"Select cheat to set hotkey", "", "off"}
+			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
 			menu[2] = {"---", "", "off"}
 			hotkeylist = {}
 
 			local function hkcbfunc(cheat)
 				local input = manager:machine():input()
-				manager:machine():popmessage("Press button for hotkey or wait to clear")
+				manager:machine():popmessage(_("Press button for hotkey or wait to clear"))
 				manager:machine():video():frame_update(true)
 				input:seq_poll_start("switch")
 				local time = os.clock()
@@ -473,12 +473,12 @@ function cheat.startplugin()
 
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or "None", ""}
+					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or _("None"), ""}
 					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
-			menu[#menu + 1] = {"Done", "", ""}
+			menu[#menu + 1] = {_("Done"), "", ""}
 			return menu
 		end
 		for num, cheat in ipairs(cheats) do
@@ -492,23 +492,23 @@ function cheat.startplugin()
 					menu[num][2] = ""
 					menu[num][3] = "off"
 				elseif is_oneshot(cheat) then
-					menu[num][2] = "Set"
+					menu[num][2] = _("Set")
 					menu[num][3] = 0
 				else
 					if cheat.enabled then
-						menu[num][2] = "On"
+						menu[num][2] = _("On")
 						menu[num][3] = "l"
 					else
-						menu[num][2] = "Off"
+						menu[num][2] = _("Off")
 						menu[num][3] = "r"
 					end
 				end
 			else
 				if cheat.parameter.index == 0 then
 					if is_oneshot(cheat) then
-						menu[num][2] = "Set"
+						menu[num][2] = _("Set")
 					else
-						menu[num][2] = "Off"
+						menu[num][2] = _("Off")
 					end
 					menu[num][3] = "r"
 				else
@@ -525,9 +525,9 @@ function cheat.startplugin()
 			end
 		end
 		menu[#menu + 1] = {"---", "", 0}
-		menu[#menu + 1] = {"Set hotkeys", "", 0}
-		menu[#menu + 1] = {"Reset All", "", 0}
-		menu[#menu + 1] = {"Reload All", "", 0}
+		menu[#menu + 1] = {_("Set hotkeys"), "", 0}
+		menu[#menu + 1] = {_("Reset All"), "", 0}
+		menu[#menu + 1] = {_("Reload All"), "", 0}
 		return menu
 	end
 
@@ -598,7 +598,7 @@ function cheat.startplugin()
 		end
 		if event == "up" or event == "down" or event == "comment" then
 			if cheat.comment then
-				manager:machine():popmessage("Cheat Comment:\n" .. cheat.comment)
+				manager:machine():popmessage(_("Cheat Comment:\n") .. cheat.comment)
 			end
 		elseif event == "left" then
 			if cheat.parameter then
@@ -616,7 +616,7 @@ function cheat.startplugin()
 				param.index = param.index - 1
 				param_calc(param)
 				cheat.cheat_env.param = param.value
-				if not is_oneshot() then
+				if not is_oneshot(cheat) then
 					run_if(cheat, cheat.script.change)
 				end
 				return true
@@ -665,10 +665,10 @@ function cheat.startplugin()
 					else
 						subtext = cheat.parameter.value
 					end
-					manager:machine():popmessage("Activated: " .. cheat.desc .. " = " .. subtext)
+					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc .. " = " .. subtext)
 				elseif not cheat.parameter and cheat.script.on then
 					cheat.script.on()
-					manager:machine():popmessage("Activated: " .. cheat.desc)
+					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
 				end
 			end
 		end
@@ -680,7 +680,7 @@ function cheat.startplugin()
 			  end,
 			  function()
 				return menu_populate()
-			  end, "Cheat")
+			  end, _("Cheat"))
 
 	emu.register_start(function()
 		if not stop then
@@ -726,16 +726,16 @@ function cheat.startplugin()
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
-							manager:machine():popmessage("Activated: " .. cheat.desc)
+							manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
 						elseif not cheat.enabled then
 							cheat.enabled = true
 							run_if(cheat, cheat.script.on)
-							manager:machine():popmessage("Enabled: " .. cheat.desc)
+							manager:machine():popmessage(_("Enabled") .. ": " .. cheat.desc)
 						else
 							cheat.enabled = false
 							run_if(cheat, cheat.script.off)
 							bwpclr(cheat)
-							manager:machine():popmessage("Disabled: " .. cheat.desc)
+							manager:machine():popmessage(_("Disabled") .. ": " .. cheat.desc)
 						end
 					end
 					cheat.hotkeys.pressed = true
@@ -773,7 +773,7 @@ function cheat.startplugin()
 	function ce.inject(newcheat)
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
-		manager:machine():popmessage(newcheat.desc .. " added")
+		manager:machine():popmessage(newcheat.desc .. _(" added"))
 	end
 
 	function ce.get(index)

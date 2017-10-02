@@ -157,7 +157,10 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 void segag80r_state::machine_start()
 {
 	m_vblank_latch_clear_timer = timer_alloc(TIMER_VBLANK_LATCH_CLEAR);
+	m_scrambled_write_pc = 0xffff;
+
 	/* register for save states */
+	save_item(NAME(m_scrambled_write_pc));
 }
 
 
@@ -168,12 +171,25 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
+READ8_MEMBER(segag80r_state::g80r_opcode_r)
+{
+	// opcodes themselves are not scrambled
+	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+
+	// writes via opcode $32 (LD $(XXYY),A) get scrambled
+	if (!machine().side_effect_disabled())
+		m_scrambled_write_pc = (op == 0x32) ? offset : 0xffff;
+
+	return op;
+}
+
 offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 {
-	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = space.device().safe_pcbase();
-	if ((uint16_t)pc == 0xffff || space.read_byte(pc) != 0x32)
+	if (m_scrambled_write_pc == 0xffff)
 		return offset;
+
+	offs_t pc = m_scrambled_write_pc;
+	m_scrambled_write_pc = 0xffff;
 
 	/* munge the low byte of the address */
 	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
@@ -324,7 +340,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, segag80r_state )
+static ADDRESS_MAP_START( g80r_opcodes_map, AS_OPCODES, 8, segag80r_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(g80r_opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sega_315_opcodes_map, AS_OPCODES, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -815,8 +835,9 @@ static MACHINE_CONFIG_START( g80r_base )
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
@@ -890,8 +911,9 @@ static MACHINE_CONFIG_DERIVED( monster2, monsterb )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -915,7 +937,7 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 

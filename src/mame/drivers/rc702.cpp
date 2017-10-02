@@ -47,7 +47,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-		, m_sio1(*this, "sio1")
 		, m_ctc1(*this, "ctc1")
 		, m_pio(*this, "pio")
 		, m_dma(*this, "dma")
@@ -66,10 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port18_w);
 	DECLARE_WRITE8_MEMBER(port1c_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(zc0_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
@@ -87,7 +84,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<z80dart_device> m_sio1;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
 	required_device<am9517a_device> m_dma;
@@ -287,18 +283,6 @@ WRITE_LINE_MEMBER( rc702_state::clock_w )
 		m_beepcnt--;
 }
 
-WRITE_LINE_MEMBER( rc702_state::zc0_w )
-{
-	m_sio1->txca_w(state);
-	m_sio1->rxca_w(state);
-}
-
-WRITE_LINE_MEMBER( rc702_state::crtc_irq_w )
-{
-	m_7474->clear_w(!state);
-	m_ctc1->trg2(state);
-}
-
 WRITE_LINE_MEMBER( rc702_state::busreq_w )
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
@@ -350,11 +334,12 @@ static MACHINE_CONFIG_START( rc702 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rc702_state, clock_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_8MHz / 2)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(rc702_state, zc0_w))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80dart_device, rxca_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD("sio1", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio1", Z80DART, XTAL_8MHz / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz / 2)
@@ -396,7 +381,8 @@ static MACHINE_CONFIG_START( rc702 )
 	MCFG_DEVICE_ADD("crtc", I8275, 11640000/7)
 	MCFG_I8275_CHARACTER_WIDTH(7)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rc702_state, display_pixels)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(rc702_state, crtc_irq_w))
+	MCFG_I8275_IRQ_CALLBACK(DEVWRITELINE("7474", ttl7474_device, clear_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(rc702_state, crtc_drq_w))
 	MCFG_PALETTE_ADD("palette", 2)
 

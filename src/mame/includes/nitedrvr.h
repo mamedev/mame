@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */

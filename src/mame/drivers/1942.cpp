@@ -215,12 +215,6 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -239,7 +233,7 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_WRITE(c1942p_palette_w)  AM_SHARE("protopal")
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(c1942p_soundlatch_w)
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(c1942p_f600_w)
 
 	AM_RANGE(0xf700, 0xf700) AM_READ_PORT("DSWA")
@@ -662,6 +656,7 @@ static MACHINE_CONFIG_START( 1942p )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK_1942P) /* 1.25 MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

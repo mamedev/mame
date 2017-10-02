@@ -3,6 +3,7 @@
 
 #include "cdrom.h"
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/scudsp/scudsp.h"

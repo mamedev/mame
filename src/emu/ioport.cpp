@@ -488,17 +488,12 @@ void digital_joystick::frame_update()
 		//  to a diagonal, or from one diagonal directly to an extreme diagonal.
 		//
 		//  The chances of this happening with a keyboard are slim, but we still need to
-		//  constrain this case.
-		//
-		//  For now, just resolve randomly.
+		//  constrain this case. Let's pick the horizontal axis.
 		//
 		if ((m_current4way & (UP_BIT | DOWN_BIT)) &&
 			(m_current4way & (LEFT_BIT | RIGHT_BIT)))
 		{
-			if (machine->rand() & 1)
-				m_current4way &= ~(LEFT_BIT | RIGHT_BIT);
-			else
-				m_current4way &= ~(UP_BIT | DOWN_BIT);
+			m_current4way &= ~(UP_BIT | DOWN_BIT);
 		}
 	}
 }
@@ -621,7 +616,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
-	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = char32_t(0);
+	std::fill(std::begin(m_chars), std::end(m_chars), char32_t(0));
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -766,17 +761,10 @@ ioport_type_class ioport_field::type_class() const
 
 char32_t ioport_field::keyboard_code(int which) const
 {
-	char32_t ch;
-
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
-	ch = m_chars[which];
-
-	// special hack to allow for PORT_CODE('\xA3')
-	if (ch >= 0xffffff80 && ch <= 0xffffffff)
-		ch &= 0xff;
-	return ch;
+	return m_chars[which];
 }
 
 
@@ -791,51 +779,51 @@ std::string ioport_field::key_name(int which) const
 	// attempt to get the string from the character info table
 	switch (ch)
 	{
-		case 8: return "Backspace";
-		case 9: return "Tab";
-		case 12: return "Clear";
-		case 13: return "Enter";
-		case 27: return "Esc";
-		case 32: return "Space";
-		case UCHAR_SHIFT_1: return "Shift";
-		case UCHAR_SHIFT_2: return "Ctrl";
-		case UCHAR_MAMEKEY(ESC): return "Esc";
-		case UCHAR_MAMEKEY(INSERT): return "Insert";
-		case UCHAR_MAMEKEY(DEL): return "Delete";
-		case UCHAR_MAMEKEY(HOME): return "Home";
-		case UCHAR_MAMEKEY(END): return "End";
-		case UCHAR_MAMEKEY(PGUP): return "Page Up";
-		case UCHAR_MAMEKEY(PGDN): return "Page Down";
-		case UCHAR_MAMEKEY(LEFT): return "Cursor Left";
-		case UCHAR_MAMEKEY(RIGHT): return "Cursor Right";
-		case UCHAR_MAMEKEY(UP): return "Cursor Up";
-		case UCHAR_MAMEKEY(DOWN): return "Cursor Down";
-		case UCHAR_MAMEKEY(SLASH_PAD): return "Keypad /";
-		case UCHAR_MAMEKEY(ASTERISK): return "Keypad *";
-		case UCHAR_MAMEKEY(MINUS_PAD): return "Keypad -";
-		case UCHAR_MAMEKEY(PLUS_PAD): return "Keypad +";
-		case UCHAR_MAMEKEY(DEL_PAD): return "Keypad .";
-		case UCHAR_MAMEKEY(ENTER_PAD): return "Keypad Enter";
-		case UCHAR_MAMEKEY(BS_PAD): return "Keypad Backspace";
-		case UCHAR_MAMEKEY(TAB_PAD): return "Keypad Tab";
-		case UCHAR_MAMEKEY(00_PAD): return "Keypad 00";
-		case UCHAR_MAMEKEY(000_PAD): return "Keypad 000";
-		case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
-		case UCHAR_MAMEKEY(PAUSE): return "Pause";
-		case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
-		case UCHAR_MAMEKEY(RSHIFT): return "Right Shift";
-		case UCHAR_MAMEKEY(LCONTROL): return "Left Ctrl";
-		case UCHAR_MAMEKEY(RCONTROL): return "Right Ctrl";
-		case UCHAR_MAMEKEY(LALT): return "Left Alt";
-		case UCHAR_MAMEKEY(RALT): return "Right Alt";
-		case UCHAR_MAMEKEY(SCRLOCK): return "Scroll Lock";
-		case UCHAR_MAMEKEY(NUMLOCK): return "Num Lock";
-		case UCHAR_MAMEKEY(CAPSLOCK): return "Caps Lock";
-		case UCHAR_MAMEKEY(LWIN): return "Left Win";
-		case UCHAR_MAMEKEY(RWIN): return "Right Win";
-		case UCHAR_MAMEKEY(MENU): return "Menu";
-		case UCHAR_MAMEKEY(CANCEL): return "Break";
-		default: break;
+	case 8: return "Backspace";
+	case 9: return "Tab";
+	case 12: return "Clear";
+	case 13: return "Enter";
+	case 27: return "Esc";
+	case 32: return "Space";
+	case UCHAR_SHIFT_1: return "Shift";
+	case UCHAR_SHIFT_2: return "Ctrl";
+	case UCHAR_MAMEKEY(ESC): return "Esc";
+	case UCHAR_MAMEKEY(INSERT): return "Insert";
+	case UCHAR_MAMEKEY(DEL): return "Delete";
+	case UCHAR_MAMEKEY(HOME): return "Home";
+	case UCHAR_MAMEKEY(END): return "End";
+	case UCHAR_MAMEKEY(PGUP): return "Page Up";
+	case UCHAR_MAMEKEY(PGDN): return "Page Down";
+	case UCHAR_MAMEKEY(LEFT): return "Cursor Left";
+	case UCHAR_MAMEKEY(RIGHT): return "Cursor Right";
+	case UCHAR_MAMEKEY(UP): return "Cursor Up";
+	case UCHAR_MAMEKEY(DOWN): return "Cursor Down";
+	case UCHAR_MAMEKEY(SLASH_PAD): return "Keypad /";
+	case UCHAR_MAMEKEY(ASTERISK): return "Keypad *";
+	case UCHAR_MAMEKEY(MINUS_PAD): return "Keypad -";
+	case UCHAR_MAMEKEY(PLUS_PAD): return "Keypad +";
+	case UCHAR_MAMEKEY(DEL_PAD): return "Keypad .";
+	case UCHAR_MAMEKEY(ENTER_PAD): return "Keypad Enter";
+	case UCHAR_MAMEKEY(BS_PAD): return "Keypad Backspace";
+	case UCHAR_MAMEKEY(TAB_PAD): return "Keypad Tab";
+	case UCHAR_MAMEKEY(00_PAD): return "Keypad 00";
+	case UCHAR_MAMEKEY(000_PAD): return "Keypad 000";
+	case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
+	case UCHAR_MAMEKEY(PAUSE): return "Pause";
+	case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
+	case UCHAR_MAMEKEY(RSHIFT): return "Right Shift";
+	case UCHAR_MAMEKEY(LCONTROL): return "Left Ctrl";
+	case UCHAR_MAMEKEY(RCONTROL): return "Right Ctrl";
+	case UCHAR_MAMEKEY(LALT): return "Left Alt";
+	case UCHAR_MAMEKEY(RALT): return "Right Alt";
+	case UCHAR_MAMEKEY(SCRLOCK): return "Scroll Lock";
+	case UCHAR_MAMEKEY(NUMLOCK): return "Num Lock";
+	case UCHAR_MAMEKEY(CAPSLOCK): return "Caps Lock";
+	case UCHAR_MAMEKEY(LWIN): return "Left Win";
+	case UCHAR_MAMEKEY(RWIN): return "Right Win";
+	case UCHAR_MAMEKEY(MENU): return "Menu";
+	case UCHAR_MAMEKEY(CANCEL): return "Break";
+	default: break;
 	}
 
 	// handle function keys
@@ -848,12 +836,7 @@ std::string ioport_field::key_name(int which) const
 
 	// if that doesn't work, convert to UTF-8
 	if (ch > 0x7F || isprint(ch))
-	{
-		char buf[10];
-		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
-		buf[count] = 0;
-		return std::string(buf);
-	}
+		return utf8_from_uchar(ch);
 
 	// otherwise, opt for question marks
 	return "???";

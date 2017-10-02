@@ -146,6 +146,7 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "machine/intelfsh.h"
 #include "machine/midikbd.h"
 #include "machine/rtc65271.h"
+#include "machine/timer.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
 #include "sound/ymz280b.h"

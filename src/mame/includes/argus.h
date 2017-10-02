@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+
+#include "machine/timer.h"
 #include "video/jalblend.h"
 #include "screen.h"
 

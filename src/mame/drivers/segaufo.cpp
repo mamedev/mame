@@ -45,6 +45,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/315_5296.h"
+#include "machine/timer.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
 #include "speaker.h"

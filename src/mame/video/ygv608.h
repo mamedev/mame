@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pattern_name_table_x_w);
 	DECLARE_READ8_MEMBER(pattern_name_table_y_r);
 	DECLARE_WRITE8_MEMBER(pattern_name_table_y_w);
+	DECLARE_READ8_MEMBER(ram_access_ctrl_r);
+	DECLARE_WRITE8_MEMBER(ram_access_ctrl_w);
 	DECLARE_READ8_MEMBER(sprite_address_r);
 	DECLARE_WRITE8_MEMBER(sprite_address_w);
 	DECLARE_READ8_MEMBER(scroll_address_r);
@@ -54,8 +56,18 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_address_w);
 	DECLARE_READ8_MEMBER(sprite_bank_r);
 	DECLARE_WRITE8_MEMBER(sprite_bank_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_mosaic_sprite_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_mosaic_sprite_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_7_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_7_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_8_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_8_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_9_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_9_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_10_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_11_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_11_w);
+	DECLARE_READ8_MEMBER(screen_ctrl_12_r);
+	DECLARE_WRITE8_MEMBER(screen_ctrl_12_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(irq_ctrl_r);
@@ -97,87 +109,6 @@ private:
 	const address_space_config m_io_space_config;
 	static constexpr unsigned SPRITE_ATTR_TABLE_SIZE = 256;
 
-	struct YGV_PORTS {
-		uint8_t na;           // P#0 - pattern name table data port (read/write)
-		uint8_t p1;           // P#1 - sprite data port (read/write)
-		uint8_t p2;           // P#2 - scroll data port (read/write)
-		uint8_t p3;           // P#3 - colour palette data port (read/write)
-		uint8_t p4;           // P#4 - register data port (read/write)
-		uint8_t p5;           // P#5 - register select port (write only)
-		uint8_t p6;           // P#6 - status port (read/write)
-		uint8_t p7;           // P#7 - system control port (read/write)
-	};
-
-	struct YGV_REGS {
-		uint8_t r0;           // R#0 - pattern name table access ptr (r/w)
-		uint8_t r1;           // R#1 - pattern name table access ptr (r/w)
-		uint8_t r2;           // R#2 - built in ram access control
-		uint8_t saa;          // R#3 - sprite attribute table access ptr (r/w)
-		uint8_t sca;          // R#4 - scroll table access ptr (r/w)
-		uint8_t cc;           // R#5 - color palette access ptr (r/w)
-		uint8_t sba;          // R#6 - sprite generator base address (r/w)
-
-		// R#7 - R#11 - screen control (r/w)
-		uint8_t r7;           // misc screen control (r/w)
-		uint8_t r8;           // misc screen control (r/w)
-		uint8_t r9;           // misc screen control (r/w)
-		uint8_t r10;          // misc screen control (r/w)
-		uint8_t r11;          // misc screen control (r/w)
-
-		uint8_t r12;          // R#12 - color palette selection (r/w)
-		uint8_t bdc;          // R#13 - border colour (wo)
-
-		// R#14 - R#16 - interrupt control
-		uint8_t r14;
-		uint8_t il;
-		uint8_t r16;
-
-		// R#17 - R#24 - base address (wo)
-		uint8_t r17;
-		uint8_t r18;
-		uint8_t r19;
-		uint8_t r20;
-		uint8_t r21;
-		uint8_t r22;
-		uint8_t r23;
-		uint8_t r24;
-
-		// R#25 - R#38 - enlargement, contraction and rotation parameters (wo)
-		uint8_t ax0;
-		uint8_t ax8;
-		uint8_t ax16;
-
-		uint8_t dx0;
-		uint8_t dx8;
-		uint8_t dxy0;
-		uint8_t dxy8;
-
-		uint8_t ay0;
-		uint8_t ay8;
-		uint8_t ay16;
-
-		uint8_t dy0;
-		uint8_t dy8;
-		uint8_t dyx0;
-		uint8_t dyx8;
-
-		// R#39 - R#46 - display scan control (wo)
-		uint8_t r39;
-		uint8_t r40;
-		uint8_t hdsp;
-		uint8_t htl;
-		uint8_t r43;
-		uint8_t r44;
-		uint8_t r45;
-		uint8_t vtl;
-
-		// R#47 - R#49 - rom transfer control (wo)
-		uint8_t tb5;
-		uint8_t tb13;
-		uint8_t tn4;
-
-	};
-
 	static constexpr unsigned MAX_SPRITES = SPRITE_ATTR_TABLE_SIZE >> 2;
 
 	struct SPRITE_ATTR {
@@ -207,21 +138,9 @@ private:
 	tilemap_t *m_tilemap_B;
 	bitmap_ind16 m_work_bitmap;
 
-	void HandleYGV608Reset();
+	void HandleReset();
 	void HandleRomTransfers(uint8_t type);
-	void SetPreShortcuts(int reg, int data );
-	void SetPostShortcuts(int reg);
-	void ShowYGV608Registers();
 
-	union {
-		uint8_t       b[8];
-		YGV_PORTS   s;
-	} m_ports;
-
-	union {
-		uint8_t       b[50];
-		YGV_REGS    s;
-	} m_regs;
 
 	/*
 	*  Built in ram
@@ -247,6 +166,7 @@ private:
 	uint8_t m_na8_mask;       // mask on/off na11/9:8
 	int m_col_shift;                // shift in scroll table column index
 
+	
 	// base address shortcuts
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
@@ -260,10 +180,12 @@ private:
 	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
+	uint8_t m_screen_status;    /**< port #6: status port r/w */
+	uint8_t m_dma_status;		/**< port #7: system control port r/w */
+	
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
 	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
-	uint8_t m_screen_status;    /**< CD: status port r/w */
 
 	bool m_raster_irq_mask;     /**< IEP: raster irq mask (INT1 occurs if 1) */
 	bool m_vblank_irq_mask;     /**< IEV: vblank irq mask (INT0 occurs if 1) */
@@ -288,6 +210,41 @@ private:
 	uint8_t m_sprite_aux_reg;   /**< SPA: auxiliary bits of sprite attribute table */
 	uint8_t m_border_color;     /**< BDC: border color */
 
+	bool m_saar;					/**< SAAR: Address autoinc after reading sprite attribute table */
+	bool m_saaw;					/**< SAAW: Address autoinc after writing sprite attribute table */
+	bool m_scar;					/**< SCAR: Address autoinc after reading scroll data table */
+	bool m_scaw;					/**< SCAW: Address autoinc after writing scroll data table */
+	bool m_cpar;					/**< CPAR: Address autoinc after reading color palette */
+	bool m_cpaw;					/**< CPAW: Address autoinc after writing color palette */
+	bool m_ba_plane_scroll_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
+	
+	bool m_dspe;					/**< DSPE: display permission of pattern plane(s) (screen blanked if 0) */
+	uint8_t m_md;					/**< MDx: mode for pattern planes */
+	bool m_zron;					/**< ZRON: enable ROZ features */
+	bool m_flip;					/**< FLIP: enable flip for attribute bits 11 & 10 */
+	bool m_dckm;					/**< DCKM: dot clock frequency select */
+	
+	bool m_page_size;				/**< PGS: page size setter */
+	uint8_t m_h_display_size;		/**< HDS: horizontal display domain */
+	uint8_t m_v_display_size;		/**< VDS: vertical display domain */
+	bool m_roz_wrap_disable;		/**< RLRT: ROZ wraparound disable */
+	bool m_scroll_wrap_disable;		/**< RLSC: ROZ wraparound disable */
+
+	uint8_t m_pattern_size;			/**< PTS: pattern size of pattern plane */
+	uint8_t m_h_div_size;			/**< SLH: size of horizontal division in screen division scrolling */
+	uint8_t m_v_div_size;			/**< SLV: size of vertical division in screen division scrolling */
+	
+	bool m_planeA_trans_enable;		/**< CTPA: enable transparency for plane A */
+	bool m_planeB_trans_enable;		/**< CTPA: enable transparency for plane B */
+	uint8_t m_priority_mode;		/**< PRM: priority mode select */
+	bool m_cbdr;					/**< CBDR: color bus terminals CB7 to 0 and SPRT */
+	bool m_yse;						/**< YSE: permission control of trasparency timing output of YS terminal */
+	uint8_t m_scm;					/**< SCM: output frequency of clock signal output from terminal FSC */
+
+	uint8_t m_planeA_color_fetch;	/**< APF: A plane color fetch mode */
+	uint8_t m_planeB_color_fetch; 	/**< BPF: B plane color fetch mode */
+	uint8_t m_sprite_color_fetch;	/**< SPF: sprite color fetch mode */
+	
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
@@ -300,7 +257,9 @@ private:
 	void vblank_irq_check();        /**< mask + pend check for vblank irq */
 	void raster_irq_check();        /**< mask + pend check for raster irq */
 	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
-
+	void pattern_mode_setup();		/**< refresh pattern mode at register 7/8 change*/
+	int get_col_division(int raw_col); /**< calculate column scroll */	
+	
 	enum
 	{
 		VBLANK_TIMER,

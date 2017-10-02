@@ -68,11 +68,13 @@ enum
 	COP400_B,
 	COP400_C,
 	COP400_G,
+	COP400_M,
 	COP400_Q,
 	COP400_EN,
 	COP400_SIO,
 	COP400_SKL,
-	COP400_T
+	COP400_T,
+	COP400_SKIP
 };
 
 /* input lines */
@@ -224,7 +226,8 @@ protected:
 	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
 	uint8_t   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
-	uint8_t   m_flags;          // used for I/O only
+	uint8_t   m_flags;          // used for debugger state only
+	uint8_t   m_temp_m;         // 4-bit RAM at B (for debugger state only)
 
 	/* counter */
 	uint8_t   m_t;              /* 8-bit timer */
@@ -248,13 +251,13 @@ protected:
 	/* execution logic */
 	int m_InstLen[256];       /* instruction length in bytes */
 	int m_icount;             /* instruction counter */
+	uint8_t m_opcode;         /* opcode being executed */
+	bool m_second_byte;       /* second byte of opcode */
 
 	/* timers */
-	emu_timer *m_serial_timer;
 	emu_timer *m_counter_timer;
-	emu_timer *m_inil_timer;
 
-	typedef void ( cop400_cpu_device::*cop400_opcode_func ) (uint8_t opcode);
+	typedef void (cop400_cpu_device::*cop400_opcode_func)(uint8_t operand);
 
 	const cop400_opcode_func *m_opcode_map;
 
@@ -271,6 +274,8 @@ protected:
 	static const cop400_opcode_func COP424C_OPCODE_33_MAP[256];
 	static const cop400_opcode_func COP424C_OPCODE_MAP[256];
 
+	inline static bool is_control_transfer(uint8_t opcode);
+
 	void serial_tick();
 	void counter_tick();
 	void inil_tick();
@@ -279,85 +284,87 @@ protected:
 	void POP();
 	void WRITE_Q(uint8_t data);
 	void WRITE_G(uint8_t data);
+	void WRITE_EN(uint8_t data);
 
-	uint8_t fetch();
+	void skip();
+	void sk_update();
 
-	void illegal(uint8_t opcode);
-	void asc(uint8_t opcode);
-	void add(uint8_t opcode);
-	void aisc(uint8_t opcode);
-	void clra(uint8_t opcode);
-	void comp(uint8_t opcode);
-	void nop(uint8_t opcode);
-	void rc(uint8_t opcode);
-	void sc(uint8_t opcode);
-	void xor_(uint8_t opcode);
-	void adt(uint8_t opcode);
-	void casc(uint8_t opcode);
-	void jid(uint8_t opcode);
-	void jmp(uint8_t opcode);
-	void jp(uint8_t opcode);
-	void jsr(uint8_t opcode);
-	void ret(uint8_t opcode);
-	void cop420_ret(uint8_t opcode);
-	void retsk(uint8_t opcode);
-	void halt(uint8_t opcode);
-	void it(uint8_t opcode);
-	void camq(uint8_t opcode);
-	void ld(uint8_t opcode);
-	void lqid(uint8_t opcode);
-	void rmb0(uint8_t opcode);
-	void rmb1(uint8_t opcode);
-	void rmb2(uint8_t opcode);
-	void rmb3(uint8_t opcode);
-	void smb0(uint8_t opcode);
-	void smb1(uint8_t opcode);
-	void smb2(uint8_t opcode);
-	void smb3(uint8_t opcode);
-	void stii(uint8_t opcode);
-	void x(uint8_t opcode);
-	void xad(uint8_t opcode);
-	void xds(uint8_t opcode);
-	void xis(uint8_t opcode);
-	void cqma(uint8_t opcode);
-	void ldd(uint8_t opcode);
-	void camt(uint8_t opcode);
-	void ctma(uint8_t opcode);
-	void cab(uint8_t opcode);
-	void cba(uint8_t opcode);
-	void lbi(uint8_t opcode);
-	void lei(uint8_t opcode);
-	void xabr(uint8_t opcode);
-	void cop444l_xabr(uint8_t opcode);
-	void skc(uint8_t opcode);
-	void ske(uint8_t opcode);
-	void skgz(uint8_t opcode);
-	void skgbz0(uint8_t opcode);
-	void skgbz1(uint8_t opcode);
-	void skgbz2(uint8_t opcode);
-	void skgbz3(uint8_t opcode);
-	void skmbz0(uint8_t opcode);
-	void skmbz1(uint8_t opcode);
-	void skmbz2(uint8_t opcode);
-	void skmbz3(uint8_t opcode);
-	void skt(uint8_t opcode);
-	void ing(uint8_t opcode);
-	void inl(uint8_t opcode);
-	void obd(uint8_t opcode);
-	void omg(uint8_t opcode);
-	void xas(uint8_t opcode);
-	void inin(uint8_t opcode);
-	void cop402m_inin(uint8_t opcode);
-	void inil(uint8_t opcode);
-	void ogi(uint8_t opcode);
-	void cop410_op23(uint8_t opcode);
-	void cop410_op33(uint8_t opcode);
-	void cop420_op23(uint8_t opcode);
-	void cop420_op33(uint8_t opcode);
-	void cop444l_op23(uint8_t opcode);
-	void cop444l_op33(uint8_t opcode);
-	void cop424c_op23(uint8_t opcode);
-	void cop424c_op33(uint8_t opcode);
+	void illegal(uint8_t operand);
+	void asc(uint8_t operand);
+	void add(uint8_t operand);
+	void aisc(uint8_t operand);
+	void clra(uint8_t operand);
+	void comp(uint8_t operand);
+	void nop(uint8_t operand);
+	void rc(uint8_t operand);
+	void sc(uint8_t operand);
+	void xor_(uint8_t operand);
+	void adt(uint8_t operand);
+	void casc(uint8_t operand);
+	void jid(uint8_t operand);
+	void jmp(uint8_t operand);
+	void jp(uint8_t operand);
+	void jsr(uint8_t operand);
+	void ret(uint8_t operand);
+	void cop420_ret(uint8_t operand);
+	void retsk(uint8_t operand);
+	void halt(uint8_t operand);
+	void it(uint8_t operand);
+	void camq(uint8_t operand);
+	void ld(uint8_t operand);
+	void lqid(uint8_t operand);
+	void rmb0(uint8_t operand);
+	void rmb1(uint8_t operand);
+	void rmb2(uint8_t operand);
+	void rmb3(uint8_t operand);
+	void smb0(uint8_t operand);
+	void smb1(uint8_t operand);
+	void smb2(uint8_t operand);
+	void smb3(uint8_t operand);
+	void stii(uint8_t operand);
+	void x(uint8_t operand);
+	void xad(uint8_t operand);
+	void xds(uint8_t operand);
+	void xis(uint8_t operand);
+	void cqma(uint8_t operand);
+	void ldd(uint8_t operand);
+	void camt(uint8_t operand);
+	void ctma(uint8_t operand);
+	void cab(uint8_t operand);
+	void cba(uint8_t operand);
+	void lbi(uint8_t operand);
+	void lei(uint8_t operand);
+	void xabr(uint8_t operand);
+	void cop444l_xabr(uint8_t operand);
+	void skc(uint8_t operand);
+	void ske(uint8_t operand);
+	void skgz(uint8_t operand);
+	void skgbz0(uint8_t operand);
+	void skgbz1(uint8_t operand);
+	void skgbz2(uint8_t operand);
+	void skgbz3(uint8_t operand);
+	void skmbz0(uint8_t operand);
+	void skmbz1(uint8_t operand);
+	void skmbz2(uint8_t operand);
+	void skmbz3(uint8_t operand);
+	void skt(uint8_t operand);
+	void ing(uint8_t operand);
+	void inl(uint8_t operand);
+	void obd(uint8_t operand);
+	void omg(uint8_t operand);
+	void xas(uint8_t operand);
+	void inin(uint8_t operand);
+	void cop402m_inin(uint8_t operand);
+	void inil(uint8_t operand);
+	void ogi(uint8_t operand);
+	void cop410_op23(uint8_t operand);
+	void cop410_op33(uint8_t operand);
+	void cop420_op23(uint8_t operand);
+	void cop420_op33(uint8_t operand);
+	void cop444l_op23(uint8_t operand);
+	void cop444l_op33(uint8_t operand);
+	void cop424c_op23(uint8_t operand);
+	void cop424c_op33(uint8_t operand);
 	void skgbz(int bit);
 	void skmbz(int bit);
 };
