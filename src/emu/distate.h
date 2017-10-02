@@ -139,12 +139,6 @@ private:
 	ItemType &              m_data;                 // reference to where the data lives
 };
 
-// explicit instantiations
-template class device_state_register<u8>;
-template class device_state_register<u16>;
-template class device_state_register<u32>;
-template class device_state_register<u64>;
-
 
 // ======================> device_state_register
 
@@ -173,12 +167,6 @@ private:
 	getter_func             m_getter;               // function to retrieve the data
 	setter_func             m_setter;               // function to store the data
 };
-
-// explicit instantiations
-template class device_pseudo_state_register<u8>;
-template class device_pseudo_state_register<u16>;
-template class device_pseudo_state_register<u32>;
-template class device_pseudo_state_register<u64>;
 
 
 // ======================> device_state_interface
