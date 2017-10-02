@@ -22,7 +22,7 @@
 #include "cdrom.h"
 #include "debugger.h"
 #include "includes/dc.h"
-#include "cpu/superh/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "sound/aica.h"
 #include "includes/dccons.h"
 

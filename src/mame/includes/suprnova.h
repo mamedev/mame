@@ -4,7 +4,7 @@
 #include "machine/timer.h"
 #include "video/sknsspr.h"
 
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 
 
 struct hit_t

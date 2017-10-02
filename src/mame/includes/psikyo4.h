@@ -6,7 +6,7 @@
 
 *************************************************************************/
 
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "sound/ymf278b.h"
 #include "machine/eepromser.h"
 #include "screen.h"

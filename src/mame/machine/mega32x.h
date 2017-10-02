@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "cpu/superh/sh2.h"
-#include "cpu/superh/sh2comn.h"
+#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh2comn.h"
 #include "sound/dac.h"
 
 class sega_32x_device : public device_t

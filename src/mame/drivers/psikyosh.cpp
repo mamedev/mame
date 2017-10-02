@@ -276,7 +276,7 @@ Notes:
 #include "emu.h"
 #include "includes/psikyosh.h"
 
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymf278b.h"

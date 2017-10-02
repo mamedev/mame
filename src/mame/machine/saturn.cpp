@@ -45,7 +45,7 @@
 
 #include "emu.h"
 #include "includes/saturn.h"
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "cpu/scudsp/scudsp.h"
 
 /* TODO: do this in a verboselog style */

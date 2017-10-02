@@ -460,7 +460,7 @@ hardware modification to the security cart.....
 
 #include "emu.h"
 #include "cdrom.h"
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "includes/cps3.h"

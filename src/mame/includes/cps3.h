@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "machine/intelfsh.h"
-#include "cpu/superh/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "audio/cps3.h"
 
 
