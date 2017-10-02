@@ -700,7 +700,7 @@
 	<software name="uspeech">
 		<description>Currah µSpeech Demo</description>
 		<year>1983</year>
-		<publisher>Fuller Micro Systems</publisher>
+		<publisher>Currah Computer Components</publisher>
 		<info name="usage" value="Requires Currah µSpeech" />
 		<part name="cass1" interface="spectrum_cass">
 			<feature name="part_id" value="Side A"/>
