@@ -160,8 +160,8 @@
 		<info name="format" value="DDCP/M" />
 		<info name="usage" value="Requires Z80 2nd Processor and Opus DDOS" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="811520">
-				<rom name="DDCPM.ssd" size="811520" crc="986d8057" sha1="745bece1a8423fe363fc5a5c72bc64e8c58080df" offset="0" />
+			<dataarea name="flop" size="819200">
+				<rom name="DDCPM.ssd" size="819200" crc="c9d07eff" sha1="ccb1a0076d435ced493775ec8ca2c6c2bf4b5fef" offset="0" />
 			</dataarea>
 		</part>
 	</software>

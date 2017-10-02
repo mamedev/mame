@@ -63,7 +63,7 @@ int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 				sectors2 = sectors0;
 			}
 
-			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0)
+			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
 	}
@@ -156,7 +156,7 @@ int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 
 			LOG_FORMATS("dsd: sector count 2: %d %s\n", sectors2, sectors2 % 10 != 0 ? "invalid" : "");
 
-			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0)
+			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
 	}
@@ -512,7 +512,7 @@ int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
 	int type = find_size(io, form_factor);
 
 	if(type != -1)
-		return 90;
+		return 90; 
 	return 0;
 }
 
@@ -564,8 +564,9 @@ int opus_ddcpm_format::identify(io_generic *io, uint32_t form_factor)
 
 	io_generic_read(io, h, 0, 8);
 
-	if (io_generic_size(io) == 811520 && memcmp(h, "Slogger ", 8) == 0)
+	if (io_generic_size(io) == 819200 && memcmp(h, "Slogger ", 8) == 0)
 		return 100;
+	LOG_FORMATS("ddcpm: no match\n");
 	return 0;
 }
 
@@ -584,7 +585,6 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 // Sector interleave of 2
 //
 	int spt, bps;
-	uint64_t file_offset = 0;
 
 	for (int head = 0; head < 2; head++) {
 		for (int track = 0; track < 80; track++) {
@@ -593,8 +593,8 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 			spt = 10;
 			desc_pc_sector sects[10];
 			uint8_t sectdata[10*512];
-
-			io_generic_read(io, sectdata, file_offset, spt * bps);
+			
+			io_generic_read(io, sectdata, head * 80 * spt * 512 + track * spt * 512, spt * 512);
 
 			for (int i = 0; i < spt; i++) {
 				sects[i].track = track;
@@ -602,7 +602,7 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 				sects[i].sector = i;
 				sects[i].size =  mfm ? 2 : 1;
 				sects[i].actual_size = bps;
-				sects[i].data = sectdata + bps * i;
+				sects[i].data = sectdata + i * 512;
 				sects[i].deleted = false;
 				sects[i].bad_crc = false;
 			}
@@ -611,8 +611,6 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 				build_wd_track_mfm(track, head, image, 100000, 10, sects, 60, 43, 22);
 			else
 				build_wd_track_fm(track, head, image, 50000, 10, sects, 40, 10, 10);
-
-			file_offset += spt * bps;
 		}
 	}
 
