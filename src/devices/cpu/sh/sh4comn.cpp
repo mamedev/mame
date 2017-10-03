@@ -1211,7 +1211,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag(), m_irln));
 			}
 		}
-		if (m_test_irq && (!m_delay))
+		if (m_test_irq && (!m_sh2_state->m_delay))
 			sh4_check_pending_irq("sh4_set_irq_line");
 	}
 }

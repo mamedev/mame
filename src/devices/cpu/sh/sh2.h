@@ -144,7 +144,7 @@ private:
 
 
 
-	uint32_t  m_delay;
+	//uint32_t  m_sh2_state->m_delay;
 	uint32_t  m_cpu_off;
 	uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
 	uint32_t  m_test_irq;
@@ -234,10 +234,10 @@ private:
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A);
+	inline uint8_t RB(offs_t A) override;
 	inline uint16_t RW(offs_t A);
 	inline uint32_t RL(offs_t A);
-	inline void WB(offs_t A, uint8_t V);
+	inline void WB(offs_t A, uint8_t V) override;
 	inline void WW(offs_t A, uint16_t V);
 	inline void WL(offs_t A, uint32_t V);
 

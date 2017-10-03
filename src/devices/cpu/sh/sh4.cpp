@@ -545,224 +545,7 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1100  1       -
- *  ADD     Rm,Rn
- */
-inline void sh34_base_device::ADD(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] += m_sh2_state->r[Rm];
-}
 
-/*  code                 cycles  t-bit
- *  0111 nnnn iiii iiii  1       -
- *  ADD     #imm,Rn
- */
-inline void sh34_base_device::ADDI(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] += (int32_t)(int16_t)(int8_t)(opcode&0xff);
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1110  1       carry
- *  ADDC    Rm,Rn
- */
-inline void sh34_base_device::ADDC(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_sh2_state->r[n] + m_sh2_state->r[m];
-	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 + (m_sh2_state->sr & T);
-	if (tmp0 > tmp1)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	if (tmp1 > m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1111  1       overflow
- *  ADDV    Rm,Rn
- */
-inline void sh34_base_device::ADDV(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 0 || src == 2)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1001  1       -
- *  AND     Rm,Rn
- */
-inline void sh34_base_device::AND(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] &= m_sh2_state->r[Rm];
-}
-
-
-/*  code                 cycles  t-bit
- *  1100 1001 iiii iiii  1       -
- *  AND     #imm,R0
- */
-inline void sh34_base_device::ANDI(const uint16_t opcode)
-{
-	m_sh2_state->r[0] &= (opcode&0xff);
-}
-
-/*  code                 cycles  t-bit
- *  1100 1101 iiii iiii  1       -
- *  AND.B   #imm,@(R0,GBR)
- */
-inline void sh34_base_device::ANDM(const uint16_t opcode)
-{
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = (opcode&0xff) & RB( m_sh2_state->ea );
-	WB(m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1011 dddd dddd  3/1     -
- *  BF      disp8
- */
-inline void sh34_base_device::BF(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1111 dddd dddd  3/1     -
- *  BFS     disp8
- */
-inline void sh34_base_device::BFS(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1010 dddd dddd dddd  2       -
- *  BRA     disp12
- */
-inline void sh34_base_device::BRA(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
-
-#if BUSY_LOOP_HACKS
-	if (disp == -2)
-	{
-		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
-		/* BRA  $
-		 * NOP
-		 */
-		if (next_opcode == 0x0009)
-			m_sh2_state->icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
-	}
-#endif
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0010 0011  2       -
- *  BRAF    Rm
- */
-inline void sh34_base_device::BRAF(const uint16_t opcode)
-{
-	m_delay = m_sh2_state->pc + m_sh2_state->r[Rn] + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1011 dddd dddd dddd  2       -
- *  BSR     disp12
- */
-inline void sh34_base_device::BSR(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
-
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0000 0011  2       -
- *  BSRF    Rm
- */
-inline void sh34_base_device::BSRF(const uint16_t opcode)
-{
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->pc + m_sh2_state->r[Rn] + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1001 dddd dddd  3/1     -
- *  BT      disp8
- */
-inline void sh34_base_device::BT(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1101 dddd dddd  2/1     -
- *  BTS     disp8
- */
-inline void sh34_base_device::BTS(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
 
 /*  code                 cycles  t-bit
  *  0000 0000 0010 1000  1       -
@@ -1166,14 +949,14 @@ inline void sh34_base_device::EXTUW(const uint16_t opcode)
 /*  JMP     @Rm */
 inline void sh34_base_device::JMP(const uint16_t opcode)
 {
-	m_delay = m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[Rn];
 }
 
 /*  JSR     @Rm */
 inline void sh34_base_device::JSR(const uint16_t opcode)
 {
 	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[Rn];
 	m_sh2_state->icount--;
 }
 
@@ -1813,7 +1596,7 @@ inline void sh34_base_device::ROTR(const uint16_t opcode)
 /*  RTE */
 inline void sh34_base_device::RTE(const uint16_t opcode)
 {
-	m_delay = m_sh2_state->ea = m_spc;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_spc;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if ((m_ssr & sRB) != (m_sh2_state->sr & sRB))
@@ -1826,7 +1609,7 @@ inline void sh34_base_device::RTE(const uint16_t opcode)
 /*  RTS */
 inline void sh34_base_device::RTS(const uint16_t opcode)
 {
-	m_delay = m_sh2_state->ea = m_sh2_state->pr;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pr;
 	m_sh2_state->icount--;
 }
 
@@ -3229,7 +3012,7 @@ void sh34_base_device::device_reset()
 	memset(m_fr, 0, sizeof(m_fr));
 	memset(m_xf, 0, sizeof(m_xf));
 	m_sh2_state->ea = 0;
-	m_delay = 0;
+	m_sh2_state->m_delay = 0;
 	m_cpu_off = 0;
 	m_pending_irq = 0;
 	m_test_irq = 0;
@@ -4094,17 +3877,17 @@ void sh34_base_device::execute_run()
 		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD2_XOR_LE(0));
 		else opcode = RW(m_sh2_state->pc); // should probably use a different function as this needs to go through the ITLB
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_sh2_state->pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
 			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -4128,17 +3911,17 @@ void sh3be_device::execute_run()
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD_XOR_LE(6));
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_sh2_state->pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
 			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -4162,17 +3945,17 @@ void sh4be_device::execute_run()
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD_XOR_LE(6));
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_sh2_state->pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
 			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -4272,7 +4055,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_fr));
 	save_item(NAME(m_xf));
 	save_item(NAME(m_sh2_state->ea));
-	save_item(NAME(m_delay));
+	save_item(NAME(m_sh2_state->m_delay));
 	save_item(NAME(m_cpu_off));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_test_irq));
@@ -4438,7 +4221,7 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 			m_sh2_state->pc = m_debugger_temp;
 		case SH4_PC:
-			m_delay = 0;
+			m_sh2_state->m_delay = 0;
 			break;
 
 		case SH4_SR:

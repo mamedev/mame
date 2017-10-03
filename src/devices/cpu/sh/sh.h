@@ -6,6 +6,7 @@
 /* size of the execution code cache */
 #define CACHE_SIZE                  (32 * 1024 * 1024)
 
+
 class sh_common_execution
 {
 public:
@@ -38,11 +39,33 @@ public:
 		// SH1/2 only?
 		uint32_t  gbr;
 		uint32_t  vbr;
+
+		uint32_t  m_delay;
 	};
 
 	internal_sh2_state *m_sh2_state;
 
+	virtual uint8_t RB(offs_t A) = 0;
+	virtual void WB(offs_t A, uint8_t V) = 0;
+
 protected:
 	void ADD(uint32_t m, uint32_t n);
+
+	void ADD(const uint16_t opcode);
+	void ADDI(const uint16_t opcode);
+	void ADDC(const uint16_t opcode);
+	void ADDV(const uint16_t opcode);
+	void AND(const uint16_t opcode);
+	void ANDI(const uint16_t opcode);
+	void ANDM(const uint16_t opcode);
+	void BF(const uint16_t opcode);
+	void BFS(const uint16_t opcode);
+	void BRA(const uint16_t opcode);
+	void BRAF(const uint16_t opcode);
+	void BSR(const uint16_t opcode);
+	void BSRF(const uint16_t opcode);
+	void BT(const uint16_t opcode);
+	void BTS(const uint16_t opcode);
+
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 };

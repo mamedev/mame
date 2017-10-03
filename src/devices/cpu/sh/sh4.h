@@ -290,7 +290,7 @@ protected:
 	uint32_t  m_fr[16];
 	uint32_t  m_xf[16];
 	//uint32_t  m_sh2_state->ea;
-	uint32_t  m_delay;
+	//uint32_t  m_sh2_state->m_delay;
 	uint32_t  m_cpu_off;
 	uint32_t  m_pending_irq;
 	uint32_t  m_test_irq;
@@ -428,24 +428,11 @@ protected:
 	}
 
 	void TODO(const uint16_t opcode);
-	void WB(offs_t A, uint8_t V);
+	virtual void WB(offs_t A, uint8_t V) override;
 	void WW(offs_t A, uint16_t V);
 	void WL(offs_t A, uint32_t V);
-	void ADD(const uint16_t opcode);
-	void ADDI(const uint16_t opcode);
-	void ADDC(const uint16_t opcode);
-	void ADDV(const uint16_t opcode);
-	void AND(const uint16_t opcode);
-	void ANDI(const uint16_t opcode);
-	void ANDM(const uint16_t opcode);
-	void BF(const uint16_t opcode);
-	void BFS(const uint16_t opcode);
-	void BRA(const uint16_t opcode);
-	void BRAF(const uint16_t opcode);
-	void BSR(const uint16_t opcode);
-	void BSRF(const uint16_t opcode);
-	void BT(const uint16_t opcode);
-	void BTS(const uint16_t opcode);
+
+
 	void CLRMAC(const uint16_t opcode);
 	void CLRT(const uint16_t opcode);
 	void CMPEQ(const uint16_t opcode);
@@ -640,7 +627,7 @@ protected:
 	void op1111_0xf13(const uint16_t opcode);
 	void dbreak(const uint16_t opcode);
 	void op1111_0x13(uint16_t opcode);
-	uint8_t RB(offs_t A);
+	virtual uint8_t RB(offs_t A) override;
 	uint16_t RW(offs_t A);
 	uint32_t RL(offs_t A);
 	void sh4_change_register_bank(int to);

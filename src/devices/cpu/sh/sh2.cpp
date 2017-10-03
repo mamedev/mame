@@ -422,7 +422,7 @@ void sh2_device::BFS(uint32_t d)
 	if ((m_sh2_state->sr & T) == 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
+		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount--;
 	}
 }
@@ -446,7 +446,7 @@ void sh2_device::BRA(uint32_t d)
 			m_sh2_state->icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
 	}
 #endif
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 	m_sh2_state->icount--;
 }
 
@@ -456,7 +456,7 @@ void sh2_device::BRA(uint32_t d)
  */
 void sh2_device::BRAF(uint32_t m)
 {
-	m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
+	m_sh2_state->m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
 	m_sh2_state->icount--;
 }
 
@@ -469,7 +469,7 @@ void sh2_device::BSR(uint32_t d)
 	int32_t disp = ((int32_t)d << 20) >> 20;
 
 	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 	m_sh2_state->icount--;
 }
 
@@ -480,7 +480,7 @@ void sh2_device::BSR(uint32_t d)
 void sh2_device::BSRF(uint32_t m)
 {
 	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
+	m_sh2_state->m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
 	m_sh2_state->icount--;
 }
 
@@ -507,7 +507,7 @@ void sh2_device::BTS(uint32_t d)
 	if ((m_sh2_state->sr & T) != 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
+		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount--;
 	}
 }
@@ -921,7 +921,7 @@ void sh2_device::ILLEGAL()
 /*  JMP     @Rm */
 void sh2_device::JMP(uint32_t m)
 {
-	m_delay = m_sh2_state->ea = m_sh2_state->r[m];
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[m];
 	m_sh2_state->icount--;
 }
 
@@ -929,7 +929,7 @@ void sh2_device::JMP(uint32_t m)
 void sh2_device::JSR(uint32_t m)
 {
 	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->r[m];
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[m];
 	m_sh2_state->icount--;
 }
 
@@ -1539,7 +1539,7 @@ void sh2_device::ROTR(uint32_t n)
 void sh2_device::RTE()
 {
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_delay = RL( m_sh2_state->ea );
+	m_sh2_state->m_delay = RL( m_sh2_state->ea );
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->ea = m_sh2_state->r[15];
 	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
@@ -1551,7 +1551,7 @@ void sh2_device::RTE()
 /*  RTS */
 void sh2_device::RTS()
 {
-	m_delay = m_sh2_state->ea = m_sh2_state->pr;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pr;
 	m_sh2_state->icount--;
 }
 
@@ -2227,7 +2227,7 @@ void sh2_device::device_reset()
 	m_sh2_state->pc = m_sh2_state->pr = m_sh2_state->sr = m_sh2_state->gbr = m_sh2_state->vbr = m_sh2_state->mach = m_sh2_state->macl = 0;
 	m_sh2_state->evec = m_sh2_state->irqsr = 0;
 	memset(&m_sh2_state->r[0], 0, sizeof(m_sh2_state->r[0])*16);
-	m_sh2_state->ea = m_delay = m_cpu_off = m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
+	m_sh2_state->ea = m_sh2_state->m_delay = m_cpu_off = m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
 	m_sh2_state->pending_irq = m_test_irq = 0;
 	memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
 	memset(&m_irq_line_state[0], 0, sizeof(m_irq_line_state[0])*17);
@@ -2285,10 +2285,10 @@ void sh2_device::execute_run()
 
 		opcode = m_program->read_word(m_sh2_state->pc & AM);
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_sh2_state->pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
 			m_sh2_state->pc += 2;
@@ -2313,7 +2313,7 @@ void sh2_device::execute_run()
 		default: op1111(opcode); break;
 		}
 
-		if(m_test_irq && !m_delay)
+		if(m_test_irq && !m_sh2_state->m_delay)
 		{
 			CHECK_PENDING_IRQ("mame_sh2_execute");
 			m_test_irq = 0;
@@ -2355,7 +2355,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_sh2_state->macl));
 	save_item(NAME(m_sh2_state->r));
 	save_item(NAME(m_sh2_state->ea));
-	save_item(NAME(m_delay));
+	save_item(NAME(m_sh2_state->m_delay));
 	save_item(NAME(m_cpu_off));
 	save_item(NAME(m_dvsr));
 	save_item(NAME(m_dvdnth));
@@ -2434,7 +2434,7 @@ void sh2_device::device_start()
 	m_sh2_state->macl = 0;
 	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
 	m_sh2_state->ea = 0;
-	m_delay = 0;
+	m_sh2_state->m_delay = 0;
 	m_cpu_off = 0;
 	m_dvsr = 0;
 	m_dvdnth = 0;
@@ -2563,7 +2563,7 @@ void sh2_device::state_import(const device_state_entry &entry)
 	{
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
-			m_delay = 0;
+			m_sh2_state->m_delay = 0;
 			break;
 
 		case SH2_SR:
@@ -2614,7 +2614,7 @@ void sh2_device::execute_set_input(int irqline, int state)
 			{
 				m_test_irq = 1;
 			} else {
-				if(m_delay)
+				if(m_sh2_state->m_delay)
 					m_test_irq = 1;
 				else
 					CHECK_PENDING_IRQ("sh2_set_irq_line");
