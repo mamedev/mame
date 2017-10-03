@@ -202,8 +202,6 @@ static void cfunc_MAC_W(void *param)
 
 void sh2_device::func_MAC_W()
 {
-	int32_t tempm, tempn, dest, src, ans;
-	uint32_t templ;
 	uint16_t opcode;
 	int n, m;
 
@@ -214,69 +212,7 @@ void sh2_device::func_MAC_W()
 	n = Rn;
 	m = Rm;
 
-	tempn = (int32_t) RW( m_sh2_state->r[n] );
-	m_sh2_state->r[n] += 2;
-	tempm = (int32_t) RW( m_sh2_state->r[m] );
-	m_sh2_state->r[m] += 2;
-	templ = m_sh2_state->macl;
-	tempm = ((int32_t) (short) tempn * (int32_t) (short) tempm);
-	if ((int32_t) m_sh2_state->macl >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) tempm >= 0)
-	{
-		src = 0;
-		tempn = 0;
-	}
-	else
-	{
-		src = 1;
-		tempn = 0xffffffff;
-	}
-	src += dest;
-	m_sh2_state->macl += tempm;
-	if ((int32_t) m_sh2_state->macl >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (m_sh2_state->sr & S)
-	{
-		if (ans == 1)
-			{
-				if ((m_cpu_type == CPU_TYPE_SH1) && ((src == 0) || (src == 2)))
-				{
-					m_sh2_state->mach |= 0x00000001;
-				}
-
-				if (src == 0)
-					m_sh2_state->macl = 0x7fffffff;
-				if (src == 2)
-					m_sh2_state->macl = 0x80000000;
-			}
-	}
-	else
-	{
-		m_sh2_state->mach += tempn;
-		if (templ > m_sh2_state->macl)
-			m_sh2_state->mach += 1;
-
-		// SH-1 has limited precision
-		if (m_cpu_type == CPU_TYPE_SH1)
-		{
-			if ((m_sh2_state->mach & 0x200) == 0)
-			{
-				m_sh2_state->mach &= 0x3ff;
-			}
-			else
-			{
-				m_sh2_state->mach |= 0xfffffc00;
-			}
-		}
-
-
-	}
+	SH2MAC_W(m, n);
 }
 
 /*-------------------------------------------------
@@ -289,9 +225,6 @@ static void cfunc_MAC_L(void *param)
 
 void sh2_device::func_MAC_L()
 {
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
 	uint16_t opcode;
 	int n, m;
 
@@ -302,73 +235,7 @@ void sh2_device::func_MAC_L()
 	n = Rn;
 	m = Rm;
 
-	tempn = (int32_t) RL( m_sh2_state->r[n] );
-	m_sh2_state->r[n] += 4;
-	tempm = (int32_t) RL( m_sh2_state->r[m] );
-	m_sh2_state->r[m] += 4;
-	if ((int32_t) (tempn ^ tempm) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	if (m_sh2_state->sr & S)
-	{
-		Res0 = m_sh2_state->macl + Res0;
-		if (m_sh2_state->macl > Res0)
-			Res2++;
-		Res2 += (m_sh2_state->mach & 0x0000ffff);
-		if (((int32_t) Res2 < 0) && (Res2 < 0xffff8000))
-		{
-			Res2 = 0x00008000;
-			Res0 = 0x00000000;
-		}
-		else if (((int32_t) Res2 > 0) && (Res2 > 0x00007fff))
-		{
-			Res2 = 0x00007fff;
-			Res0 = 0xffffffff;
-		}
-		m_sh2_state->mach = Res2;
-		m_sh2_state->macl = Res0;
-	}
-	else
-	{
-		Res0 = m_sh2_state->macl + Res0;
-		if (m_sh2_state->macl > Res0)
-			Res2++;
-		Res2 += m_sh2_state->mach;
-		m_sh2_state->mach = Res2;
-		m_sh2_state->macl = Res0;
-	}
+	SH2MAC_L(m, n);
 }
 
 /*-------------------------------------------------
@@ -381,8 +248,6 @@ static void cfunc_DIV1(void *param)
 
 void sh2_device::func_DIV1()
 {
-	uint32_t tmp0;
-	uint32_t old_q;
 	uint16_t opcode;
 	int n, m;
 
@@ -393,90 +258,7 @@ void sh2_device::func_DIV1()
 	n = Rn;
 	m = Rm;
 
-	old_q = m_sh2_state->sr & Q;
-	if (0x80000000 & m_sh2_state->r[n])
-		m_sh2_state->sr |= Q;
-	else
-		m_sh2_state->sr &= ~Q;
-
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
-
-	if (!old_q)
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			}
-			else
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			}
-		}
-	}
-	else
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-		}
-	}
-
-	tmp0 = (m_sh2_state->sr & (Q | M));
-	if((!tmp0) || (tmp0 == 0x300)) /* if Q == M set T else clear T */
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
+	SH2DIV1(m, n);
 }
 
 #if (!ADDSUBV_DIRECT)
@@ -490,7 +272,6 @@ static void cfunc_ADDV(void *param)
 
 void sh2_device::func_ADDV()
 {
-	int32_t dest, src, ans;
 	uint16_t opcode;
 	int n, m;
 
@@ -501,30 +282,7 @@ void sh2_device::func_ADDV()
 	n = Rn;
 	m = Rm;
 
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 0 || src == 2)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
+	SH2ADDV(m, n);
 }
 
 /*-------------------------------------------------
@@ -537,7 +295,6 @@ static void cfunc_SUBV(void *param)
 
 void sh2_device::func_SUBV()
 {
-	int32_t dest, src, ans;
 	uint16_t opcode;
 	int n, m;
 
@@ -548,30 +305,7 @@ void sh2_device::func_SUBV()
 	n = Rn;
 	m = Rm;
 
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] -= m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 1)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
+	SH2SUBV(m, n);
 }
 #else
 void sh2_device::func_ADDV() {}
