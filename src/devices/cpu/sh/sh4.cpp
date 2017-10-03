@@ -2307,7 +2307,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x1000:
-			MOVLS4(opcode);
+			SH2MOVLS4(Rm, opcode & 0x0f, Rn);
 			break;
 
 		case 0x2000: // void sh2_device::op0010(uint16_t opcode)
@@ -2359,7 +2359,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x5000:
-			MOVLL4(opcode);
+			SH2MOVLL4(Rm, opcode & 0x0f, Rn);
 			break;
 
 		case 0x6000: // void sh2_device::op0110(uint16_t opcode)
@@ -2385,7 +2385,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x7000:
-			ADDI(opcode);
+			SH2ADDI(opcode & 0xff, Rn);
 			break;
 
 		case 0x8000: // sh2_device::op1000(uint16_t opcode)
@@ -2411,7 +2411,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x9000:
-			MOVWI(opcode);
+			SH2MOVWI(opcode & 0xff, Rn);
 			break;
 
 		case 0xa000:
@@ -2446,11 +2446,11 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0xd000:
-			MOVLI(opcode);
+			SH2MOVLI(opcode & 0xff, Rn);
 			break;
 
 		case 0xe000:
-			MOVI(opcode);
+			SH2MOVI(opcode & 0xff, Rn);
 			break;
 
 		case 0xf000: // sh4 only
