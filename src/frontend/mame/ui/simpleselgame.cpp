@@ -334,25 +334,21 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
-		const char *gfxstat;
 		if (m_cached_unemulated & device_t::feature::GRAPHICS)
-			gfxstat = _("Unimplemented");
+			tempbuf[4] = _("Graphics: Unimplemented, ");
 		else if ((m_cached_unemulated | m_cached_imperfect) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
-			gfxstat = _("Imperfect");
+			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
-			gfxstat = _("OK");
+			tempbuf[4] = _("Graphics: OK, ");
 
-		const char *soundstat;
 		if (m_cached_flags & machine_flags::NO_SOUND_HW)
-			soundstat = _("None");
+			tempbuf[4].append(_("Sound: None"));
 		else if (m_cached_unemulated & device_t::feature::SOUND)
-			soundstat = _("Unimplemented");
+			tempbuf[4].append(_("Sound: Unimplemented"));
 		else if (m_cached_imperfect & device_t::feature::SOUND)
-			soundstat = _("Imperfect");
+			tempbuf[4].append(_("Sound: Imperfect"));
 		else
-			soundstat = _("OK");
-
-		tempbuf[4] = string_format(_("Gfx: %s, Sound: %s"), gfxstat, soundstat);
+			tempbuf[4].append(_("Sound: OK"));
 	}
 	else
 	{

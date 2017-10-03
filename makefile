@@ -971,9 +971,10 @@ PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
-.PHONY: all clean regenie generate
+.PHONY: all clean regenie generate FORCE
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
 regenie:
+FORCE:
 
 #-------------------------------------------------
 # gmake-mingw64-gcc
@@ -1710,9 +1711,11 @@ shaders: bgfx-tools
 
 .PHONY: translation
 
-translation:
+$(GENDIR)/mame.pot: FORCE
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src plugins -iname "*.cpp" -print0 -o -iname "*.lua" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -j -o mame.pot
-	$(SILENT) find language -iname "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% mame.pot
-	$(SILENT) find language -iname "*.po" -print0 | xargs -0 -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
+	$(SILENT) find src -iname "*.cpp" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -o $@
+	$(SILENT) find plugins -iname "*.lua" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -j -o $@
 
+translation: $(GENDIR)/mame.pot
+	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% $<
+	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%

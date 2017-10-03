@@ -24,7 +24,7 @@
 
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "screen.h"
 #include "speaker.h"
 
