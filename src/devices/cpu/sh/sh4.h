@@ -429,87 +429,18 @@ protected:
 
 	void TODO(const uint16_t opcode);
 	virtual void WB(offs_t A, uint8_t V) override;
-	void WW(offs_t A, uint16_t V);
-	void WL(offs_t A, uint32_t V);
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
 
-	void CLRMAC(const uint16_t opcode);
-	void CLRT(const uint16_t opcode);
-	void CMPEQ(const uint16_t opcode);
-	void CMPGE(const uint16_t opcode);
-	void CMPGT(const uint16_t opcode);
-	void CMPHI(const uint16_t opcode);
-	void CMPHS(const uint16_t opcode);
-	void CMPPL(const uint16_t opcode);
-	void CMPPZ(const uint16_t opcode);
-	void CMPSTR(const uint16_t opcode);
-	void CMPIM(const uint16_t opcode);
-	void DIV0S(const uint16_t opcode);
-	void DIV0U(const uint16_t opcode);
-	void DIV1(const uint16_t opcode);
-	void DMULS(const uint16_t opcode);
-	void DMULU(const uint16_t opcode);
-	void DT(const uint16_t opcode);
-	void EXTSB(const uint16_t opcode);
-	void EXTSW(const uint16_t opcode);
-	void EXTUB(const uint16_t opcode);
-	void EXTUW(const uint16_t opcode);
-	void JMP(const uint16_t opcode);
-	void JSR(const uint16_t opcode);
+
+
 	void LDCSR(const uint16_t opcode);
-	void LDCGBR(const uint16_t opcode);
-	void LDCVBR(const uint16_t opcode);
 	void LDCMSR(const uint16_t opcode);
-	void LDCMGBR(const uint16_t opcode);
-	void LDCMVBR(const uint16_t opcode);
-	void LDSMACH(const uint16_t opcode);
-	void LDSMACL(const uint16_t opcode);
-	void LDSPR(const uint16_t opcode);
-	void LDSMMACH(const uint16_t opcode);
-	void LDSMMACL(const uint16_t opcode);
-	void LDSMPR(const uint16_t opcode);
+
 	virtual void LDTLB(const uint16_t opcode);
-	void MAC_L(const uint16_t opcode);
-	void MAC_W(const uint16_t opcode);
-	void MOV(const uint16_t opcode);
-	void MOVBS(const uint16_t opcode);
-	void MOVWS(const uint16_t opcode);
-	void MOVLS(const uint16_t opcode);
-	void MOVBL(const uint16_t opcode);
-	void MOVWL(const uint16_t opcode);
-	void MOVLL(const uint16_t opcode);
-	void MOVBM(const uint16_t opcode);
-	void MOVWM(const uint16_t opcode);
-	void MOVLM(const uint16_t opcode);
-	void MOVBP(const uint16_t opcode);
-	void MOVWP(const uint16_t opcode);
-	void MOVLP(const uint16_t opcode);
-	void MOVBS0(const uint16_t opcode);
-	void MOVWS0(const uint16_t opcode);
-	void MOVLS0(const uint16_t opcode);
-	void MOVBL0(const uint16_t opcode);
-	void MOVWL0(const uint16_t opcode);
-	void MOVLL0(const uint16_t opcode);
-	void MOVI(const uint16_t opcode);
-	void MOVWI(const uint16_t opcode);
-	void MOVLI(const uint16_t opcode);
-	void MOVBLG(const uint16_t opcode);
-	void MOVWLG(const uint16_t opcode);
-	void MOVLLG(const uint16_t opcode);
-	void MOVBSG(const uint16_t opcode);
-	void MOVWSG(const uint16_t opcode);
-	void MOVLSG(const uint16_t opcode);
-	void MOVBS4(const uint16_t opcode);
-	void MOVWS4(const uint16_t opcode);
-	void MOVLS4(const uint16_t opcode);
-	void MOVBL4(const uint16_t opcode);
-	void MOVWL4(const uint16_t opcode);
-	void MOVLL4(const uint16_t opcode);
-	void MOVA(const uint16_t opcode);
-	void MOVT(const uint16_t opcode);
-	void MULL(const uint16_t opcode);
-	void MULS(const uint16_t opcode);
-	void MULU(const uint16_t opcode);
+
+
 	void NEG(const uint16_t opcode);
 	void NEGC(const uint16_t opcode);
 	void NOP(const uint16_t opcode);
@@ -628,8 +559,8 @@ protected:
 	void dbreak(const uint16_t opcode);
 	void op1111_0x13(uint16_t opcode);
 	virtual uint8_t RB(offs_t A) override;
-	uint16_t RW(offs_t A);
-	uint32_t RL(offs_t A);
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
 	void sh4_change_register_bank(int to);
 	void sh4_swap_fp_registers();
 	void sh4_swap_fp_couples();

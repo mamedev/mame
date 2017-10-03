@@ -132,6 +132,8 @@ enum
 #define I   0x000000f0
 #define Q   0x00000100
 #define M   0x00000200
+
+
 #define FD  0x00008000
 #define BL  0x10000000
 #define sRB 0x20000000

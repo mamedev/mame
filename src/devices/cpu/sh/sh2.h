@@ -235,11 +235,11 @@ private:
 	uint32_t m_debugger_temp;
 
 	inline uint8_t RB(offs_t A) override;
-	inline uint16_t RW(offs_t A);
-	inline uint32_t RL(offs_t A);
+	inline uint16_t RW(offs_t A) override;
+	inline uint32_t RL(offs_t A) override;
 	inline void WB(offs_t A, uint8_t V) override;
-	inline void WW(offs_t A, uint16_t V);
-	inline void WL(offs_t A, uint32_t V);
+	inline void WW(offs_t A, uint16_t V) override;
+	inline void WL(offs_t A, uint32_t V) override;
 
 	inline void ADDI(uint32_t i, uint32_t n);
 	inline void ADDC(uint32_t m, uint32_t n);
