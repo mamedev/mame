@@ -1158,11 +1158,18 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 		m_cart_reg[0] = memregion("cart");
 	if (m_cart2)
 		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[1] = nullptr;
 	if (m_cart3)
 		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[2] = nullptr;
 	if (m_cart4)
 		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[3] = nullptr;
 
+	
 	m_en_68k = 0;
 	m_NMI_reset = 0;
 
