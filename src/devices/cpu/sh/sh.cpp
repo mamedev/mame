@@ -1166,7 +1166,488 @@ void sh_common_execution::MULU(const uint16_t opcode)
 }
 
 
+/*  NEG     Rm,Rn */
+void sh_common_execution::NEG(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = 0 - m_sh2_state->r[Rm];
+}
+
+/*  NEGC    Rm,Rn */
+void sh_common_execution::NEGC(const uint16_t opcode)
+{
+	uint32_t temp;
+
+	temp = m_sh2_state->r[Rm];
+	m_sh2_state->r[Rn] = -temp - (m_sh2_state->sr & T);
+	if (temp || (m_sh2_state->sr & T))
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+}
+
+/*  NOP */
+void sh_common_execution::NOP(const uint16_t opcode)
+{
+}
+
+/*  NOT     Rm,Rn */
+void sh_common_execution::NOT(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = ~m_sh2_state->r[Rm];
+}
+
+/*  OR      Rm,Rn */
+void sh_common_execution::OR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] |= m_sh2_state->r[Rm];
+}
+
+/*  OR      #imm,R0 */
+void sh_common_execution::ORI(const uint16_t opcode)
+{
+	m_sh2_state->r[0] |= (opcode&0xff);
+	m_sh2_state->icount -= 2;
+}
+
+/*  OR.B    #imm,@(R0,GBR) */
+void sh_common_execution::ORM(const uint16_t opcode)
+{
+	uint32_t temp;
+
+	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
+	temp = RB( m_sh2_state->ea );
+	temp |= (opcode&0xff);
+	WB(m_sh2_state->ea, temp );
+}
+
+/*  ROTCL   Rn */
+void sh_common_execution::ROTCL(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	uint32_t temp;
+
+	temp = (m_sh2_state->r[n] >> 31) & T;
+	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | temp;
+}
+
+/*  ROTCR   Rn */
+void sh_common_execution::ROTCR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	uint32_t temp;
+	temp = (m_sh2_state->sr & T) << 31;
+	if (m_sh2_state->r[n] & T)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | temp;
+}
+
+/*  ROTL    Rn */
+void sh_common_execution::ROTL(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->r[n] >> 31);
+}
+
+/*  ROTR    Rn */
+void sh_common_execution::ROTR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | (m_sh2_state->r[n] << 31);
+}
+
+
+/*  RTS */
+void sh_common_execution::RTS(const uint16_t opcode)
+{
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pr;
+	m_sh2_state->icount--;
+}
+
+/*  SETT */
+void sh_common_execution::SETT(const uint16_t opcode)
+{
+	m_sh2_state->sr |= T;
+}
+
+/*  SHAL    Rn      (same as SHLL) */
+void sh_common_execution::SHAL(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->r[n] <<= 1;
+}
+
+/*  SHAR    Rn */
+void sh_common_execution::SHAR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->r[n] = (uint32_t)((int32_t)m_sh2_state->r[n] >> 1);
+}
+
+/*  SHLL    Rn      (same as SHAL) */
+void sh_common_execution::SHLL(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->r[n] <<= 1;
+}
+
+/*  SHLL2   Rn */
+void sh_common_execution::SHLL2(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] <<= 2;
+}
+
+/*  SHLL8   Rn */
+void sh_common_execution::SHLL8(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] <<= 8;
+}
+
+/*  SHLL16  Rn */
+void sh_common_execution::SHLL16(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] <<= 16;
+}
+
+/*  SHLR    Rn */
+void sh_common_execution::SHLR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->r[n] >>= 1;
+}
+
+/*  SHLR2   Rn */
+void sh_common_execution::SHLR2(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] >>= 2;
+}
+
+/*  SHLR8   Rn */
+void sh_common_execution::SHLR8(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] >>= 8;
+}
+
+/*  SHLR16  Rn */
+void sh_common_execution::SHLR16(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] >>= 16;
+}
+
+
+/*  STC     SR,Rn */
+void sh_common_execution::STCSR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->sr;
+}
+
+/*  STC     GBR,Rn */
+void sh_common_execution::STCGBR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->gbr;
+}
+
+/*  STC     VBR,Rn */
+void sh_common_execution::STCVBR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->vbr;
+}
+
+/*  STC.L   SR,@-Rn */
+void sh_common_execution::STCMSR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->sr );
+	m_sh2_state->icount--;
+}
+
+/*  STC.L   GBR,@-Rn */
+void sh_common_execution::STCMGBR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->gbr );
+	m_sh2_state->icount--;
+}
+
+/*  STC.L   VBR,@-Rn */
+void sh_common_execution::STCMVBR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->vbr );
+	m_sh2_state->icount--;
+}
+
+/*  STS     MACH,Rn */
+void sh_common_execution::STSMACH(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->mach;
+}
+
+/*  STS     MACL,Rn */
+void sh_common_execution::STSMACL(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->macl;
+}
+
+/*  STS     PR,Rn */
+void sh_common_execution::STSPR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sh2_state->pr;
+}
+
+/*  STS.L   MACH,@-Rn */
+void sh_common_execution::STSMMACH(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->mach );
+}
+
+/*  STS.L   MACL,@-Rn */
+void sh_common_execution::STSMMACL(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->macl );
+}
+
+/*  STS.L   PR,@-Rn */
+void sh_common_execution::STSMPR(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sh2_state->pr );
+}
+
+/*  SUB     Rm,Rn */
+void sh_common_execution::SUB(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] -= m_sh2_state->r[Rm];
+}
+
+/*  SUBC    Rm,Rn */
+void sh_common_execution::SUBC(const uint16_t opcode)
+{
+	uint32_t m = Rm; uint32_t n = Rn;
+
+	uint32_t tmp0, tmp1;
+
+	tmp1 = m_sh2_state->r[n] - m_sh2_state->r[m];
+	tmp0 = m_sh2_state->r[n];
+	m_sh2_state->r[n] = tmp1 - (m_sh2_state->sr & T);
+	if (tmp0 < tmp1)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+	if (tmp1 < m_sh2_state->r[n])
+		m_sh2_state->sr |= T;
+}
+
+/*  SUBV    Rm,Rn */
+void sh_common_execution::SUBV(const uint16_t opcode)
+{
+	uint32_t m = Rm; uint32_t n = Rn;
+
+	int32_t dest, src, ans;
+
+	if ((int32_t) m_sh2_state->r[n] >= 0)
+		dest = 0;
+	else
+		dest = 1;
+	if ((int32_t) m_sh2_state->r[m] >= 0)
+		src = 0;
+	else
+		src = 1;
+	src += dest;
+	m_sh2_state->r[n] -= m_sh2_state->r[m];
+	if ((int32_t) m_sh2_state->r[n] >= 0)
+		ans = 0;
+	else
+		ans = 1;
+	ans += dest;
+	if (src == 1)
+	{
+		if (ans == 1)
+			m_sh2_state->sr |= T;
+		else
+			m_sh2_state->sr &= ~T;
+	}
+	else
+		m_sh2_state->sr &= ~T;
+}
+
+/*  SWAP.B  Rm,Rn */
+void sh_common_execution::SWAPB(const uint16_t opcode)
+{
+	uint32_t m = Rm; uint32_t n = Rn;
+
+	uint32_t temp0, temp1;
+
+	temp0 = m_sh2_state->r[m] & 0xffff0000;
+	temp1 = (m_sh2_state->r[m] & 0x000000ff) << 8;
+	m_sh2_state->r[n] = (m_sh2_state->r[m] >> 8) & 0x000000ff;
+	m_sh2_state->r[n] = m_sh2_state->r[n] | temp1 | temp0;
+}
+
+/*  SWAP.W  Rm,Rn */
+void sh_common_execution::SWAPW(const uint16_t opcode)
+{
+	uint32_t m = Rm; uint32_t n = Rn;
+
+	uint32_t temp;
+
+	temp = (m_sh2_state->r[m] >> 16) & 0x0000ffff;
+	m_sh2_state->r[n] = (m_sh2_state->r[m] << 16) | temp;
+}
+
+/*  TAS.B   @Rn */
+void sh_common_execution::TAS(const uint16_t opcode)
+{
+	uint32_t n = Rn;
+
+	uint32_t temp;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	/* Bus Lock enable */
+	temp = RB( m_sh2_state->ea );
+	if (temp == 0)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+	temp |= 0x80;
+	/* Bus Lock disable */
+	WB(m_sh2_state->ea, temp );
+	m_sh2_state->icount -= 3;
+}
+
+
+/*  TST     Rm,Rn */
+void sh_common_execution::TST(const uint16_t opcode)
+{
+	if ((m_sh2_state->r[Rn] & m_sh2_state->r[Rm]) == 0)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+}
+
+/*  TST     #imm,R0 */
+void sh_common_execution::TSTI(const uint16_t opcode)
+{
+	uint32_t imm = opcode & 0xff;
+
+	if ((imm & m_sh2_state->r[0]) == 0)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+}
+
+/*  TST.B   #imm,@(R0,GBR) */
+void sh_common_execution::TSTM(const uint16_t opcode)
+{
+	uint32_t imm = opcode & 0xff;
+
+	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
+	if ((imm & RB( m_sh2_state->ea )) == 0)
+		m_sh2_state->sr |= T;
+	else
+		m_sh2_state->sr &= ~T;
+	m_sh2_state->icount -= 2;
+}
+
+/*  XOR     Rm,Rn */
+void sh_common_execution::XOR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] ^= m_sh2_state->r[Rm];
+}
+
+/*  XOR     #imm,R0 */
+void sh_common_execution::XORI(const uint16_t opcode)
+{
+	uint32_t imm = opcode & 0xff;
+	m_sh2_state->r[0] ^= imm;
+}
+
+/*  XOR.B   #imm,@(R0,GBR) */
+void sh_common_execution::XORM(const uint16_t opcode)
+{
+	uint32_t imm = opcode & 0xff;
+	uint32_t temp;
+
+	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
+	temp = RB( m_sh2_state->ea );
+	temp ^= imm;
+	WB(m_sh2_state->ea, temp );
+	m_sh2_state->icount -= 2;
+}
+
+/*  XTRCT   Rm,Rn */
+void sh_common_execution::XTRCT(const uint16_t opcode)
+{
+	uint32_t m = Rm; uint32_t n = Rn;
+
+	uint32_t temp;
+
+	temp = (m_sh2_state->r[m] << 16) & 0xffff0000;
+	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 16) & 0x0000ffff;
+	m_sh2_state->r[n] |= temp;
+}
+
+
+/*  MOVCA.L     R0,@Rn */
+void sh_common_execution::MOVCAL(const uint16_t opcode)
+{
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	WL(m_sh2_state->ea, m_sh2_state->r[0] );
+}
+
+void sh_common_execution::CLRS(const uint16_t opcode)
+{
+	m_sh2_state->sr &= ~S;
+}
+
+void sh_common_execution::SETS(const uint16_t opcode)
+{
+	m_sh2_state->sr |= S;
+}
+
+
+
 #undef Rn
 #undef Rm
 
 #undef T
+#undef S
+#undef I
+#undef Q
+#undef M
+
