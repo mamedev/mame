@@ -114,8 +114,7 @@
     CONSTANTS
 ***************************************************************************/
 
-/* size of the execution code cache */
-#define CACHE_SIZE                  (32 * 1024 * 1024)
+
 
 /* compilation boundaries -- how far back/forward does the analysis extend? */
 #define COMPILE_BACKWARDS_BYTES         64
@@ -182,18 +181,19 @@ void sh2_device::device_stop()
 }
 
 
+
+
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, sh_common_execution()
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
-	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_sh2_state(nullptr)
 	, m_entry(nullptr)
 	, m_read8(nullptr)
 	, m_write8(nullptr)
@@ -303,14 +303,6 @@ void sh2_device::WL(offs_t A, uint32_t V)
 	m_program->write_dword(A,V);
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1100  1       -
- *  ADD     Rm,Rn
- */
-void sh2_device::ADD(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-}
 
 /*  code                 cycles  t-bit
  *  0111 nnnn iiii iiii  1       -

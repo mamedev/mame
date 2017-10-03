@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include "sh.h"
+
 // doesn't actually seem to improve performance at all
 #define SH4_USE_FASTRAM_OPTIMIZATION 0
 #define SH4_MAX_FASTRAM       3
@@ -196,7 +198,7 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
 
 
-class sh34_base_device : public cpu_device
+class sh34_base_device : public cpu_device, public sh_common_execution
 {
 public:
 //#if SH4_USE_FASTRAM_OPTIMIZATION
@@ -273,21 +275,21 @@ protected:
 	int m_mmuhack;
 
 	uint32_t  m_ppc;
-	uint32_t  m_pc;
+	//uint32_t  m_sh2_state->pc;
 	uint32_t  m_spc;
-	uint32_t  m_pr;
-	uint32_t  m_sr;
+	//uint32_t  m_sh2_state->pr;
+	//uint32_t  m_sh2_state->sr;
 	uint32_t  m_ssr;
-	uint32_t  m_gbr;
-	uint32_t  m_vbr;
-	uint32_t  m_mach;
-	uint32_t  m_macl;
-	uint32_t  m_r[16];
+	//uint32_t  m_sh2_state->gbr;
+	//uint32_t  m_sh2_state->vbr;
+	//uint32_t  m_sh2_state->mach;
+	//uint32_t  m_sh2_state->macl;
+	//uint32_t  m_sh2_state->r[16];
 	uint32_t  m_rbnk[2][8];
 	uint32_t  m_sgr;
 	uint32_t  m_fr[16];
 	uint32_t  m_xf[16];
-	uint32_t  m_ea;
+	//uint32_t  m_sh2_state->ea;
 	uint32_t  m_delay;
 	uint32_t  m_cpu_off;
 	uint32_t  m_pending_irq;
@@ -373,7 +375,7 @@ protected:
 	int     m_dma_destination_increment[4];
 	int     m_dma_mode[4];
 
-	int     m_sh4_icount;
+	//int     m_sh2_state->icount;
 	int     m_is_slave;
 	int     m_cpu_clock;
 	int     m_bus_clock;

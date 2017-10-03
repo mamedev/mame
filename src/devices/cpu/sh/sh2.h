@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
 
+#include "sh.h"
 
 #define SH2_INT_NONE    -1
 #define SH2_INT_VBLIN   0
@@ -83,7 +82,7 @@ enum
 
 class sh2_frontend;
 
-class sh2_device : public cpu_device
+class sh2_device : public cpu_device, public sh_common_execution
 {
 	friend class sh2_frontend;
 
@@ -143,29 +142,7 @@ protected:
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
-	// Data that needs to be stored close to the generated DRC code
-	struct internal_sh2_state
-	{
-		uint32_t  pc;
-		uint32_t  pr;
-		uint32_t  sr;
-		uint32_t  gbr;
-		uint32_t  vbr;
-		uint32_t  mach;
-		uint32_t  macl;
-		uint32_t  r[16];
-		uint32_t  ea;
-		uint32_t  pending_irq;
-		uint32_t  pending_nmi;
-		int32_t   irqline;
-		uint32_t  evec;               // exception vector for DRC
-		uint32_t  irqsr;              // IRQ-time old SR for DRC
-		uint32_t  target;             // target for jmp/jsr/etc so the delay slot can't kill it
-		int     internal_irq_level;
-		int     icount;
-		uint8_t   sleep_mode;
-		uint32_t  arg0;              /* print_debug argument 1 */
-	};
+
 
 	uint32_t  m_delay;
 	uint32_t  m_cpu_off;
@@ -218,12 +195,9 @@ private:
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
-	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	uint32_t              m_drcoptions;         /* configurable DRC options */
-
-	internal_sh2_state *m_sh2_state;
 
 	/* internal stuff */
 	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
@@ -266,7 +240,7 @@ private:
 	inline void WB(offs_t A, uint8_t V);
 	inline void WW(offs_t A, uint16_t V);
 	inline void WL(offs_t A, uint32_t V);
-	inline void ADD(uint32_t m, uint32_t n);
+
 	inline void ADDI(uint32_t i, uint32_t n);
 	inline void ADDC(uint32_t m, uint32_t n);
 	inline void ADDV(uint32_t m, uint32_t n);

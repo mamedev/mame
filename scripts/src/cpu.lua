@@ -643,6 +643,8 @@ end
 
 if (CPUS["SH"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/cpu/sh/sh.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2comn.cpp",
