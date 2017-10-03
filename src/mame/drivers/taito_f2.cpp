@@ -2022,9 +2022,9 @@ static INPUT_PORTS_START( metalb )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
-	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
