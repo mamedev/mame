@@ -2210,21 +2210,21 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xea:  NOP(opcode); break;
 		case 0xfa:  LDCDBR(opcode); break;
 		// 0xb0
-		case 0x0b:  JSR(opcode); break;
+		case 0x0b:  SH2JSR(Rn);  break;
 		case 0x1b:  TAS(opcode); break;
-		case 0x2b:  JMP(opcode); break;
+		case 0x2b:  SH2JMP(Rn);  break;
 		case 0x3b:  NOP(opcode); break;
-		case 0x4b:  JSR(opcode); break;
+		case 0x4b:  SH2JSR(Rn);  break;
 		case 0x5b:  TAS(opcode); break;
-		case 0x6b:  JMP(opcode); break;
+		case 0x6b:  SH2JMP(Rn);  break;
 		case 0x7b:  NOP(opcode); break;
-		case 0x8b:  JSR(opcode); break;
+		case 0x8b:  SH2JSR(Rn);  break;
 		case 0x9b:  TAS(opcode); break;
-		case 0xab:  JMP(opcode); break;
+		case 0xab:  SH2JMP(Rn);  break;
 		case 0xbb:  NOP(opcode); break;
-		case 0xcb:  JSR(opcode); break;
+		case 0xcb:  SH2JSR(Rn);  break;
 		case 0xdb:  TAS(opcode); break;
-		case 0xeb:  JMP(opcode); break;
+		case 0xeb:  SH2JMP(Rn);  break;
 		case 0xfb:  NOP(opcode); break;
 		// 0xc0
 		case 0x0c:  SHAD(opcode); break;
@@ -2310,47 +2310,47 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			MOVLS4(opcode);
 			break;
 
-		case 0x2000:
-			switch(opcode & 0x0f)
+		case 0x2000: // void sh2_device::op0010(uint16_t opcode)
+			switch (opcode & 0x0f)
 			{
-				case 0x00:  MOVBS(opcode); break;
-				case 0x01:  MOVWS(opcode); break;
-				case 0x02:  MOVLS(opcode); break;
-				case 0x03:  NOP(opcode); break;
-				case 0x04:  MOVBM(opcode); break;
-				case 0x05:  MOVWM(opcode); break;
-				case 0x06:  MOVLM(opcode); break;
-				case 0x07:  DIV0S(opcode); break;
-				case 0x08:  TST(opcode); break;
-				case 0x09:  AND(opcode); break;
-				case 0x0a:  XOR(opcode); break;
-				case 0x0b:  OR(opcode); break;
-				case 0x0c:  CMPSTR(opcode); break;
-				case 0x0d:  XTRCT(opcode); break;
-				case 0x0e:  MULU(opcode); break;
-				case 0x0f:  MULS(opcode); break;
+			case  0: SH2MOVBS(Rm, Rn);                break;
+			case  1: SH2MOVWS(Rm, Rn);                break;
+			case  2: SH2MOVLS(Rm, Rn);                break;
+			case  3: SH2ILLEGAL();                         break; // NOP
+			case  4: SH2MOVBM(Rm, Rn);                break;
+			case  5: SH2MOVWM(Rm, Rn);                break;
+			case  6: SH2MOVLM(Rm, Rn);                break;
+			case  7: SH2DIV0S(Rm, Rn);                break;
+			case  8: SH2TST(Rm, Rn);                  break;
+			case  9: SH2AND(Rm, Rn);                  break;
+			case 10: SH2XOR(Rm, Rn);                  break;
+			case 11: SH2OR(Rm, Rn);                   break;
+			case 12: SH2CMPSTR(Rm, Rn);               break;
+			case 13: SH2XTRCT(Rm, Rn);                break;
+			case 14: SH2MULU(Rm, Rn);                 break;
+			case 15: SH2MULS(Rm, Rn);                 break;
 			}
 			break;
 
-		case 0x3000:
-			switch(opcode & 0x0f)
+		case 0x3000: // void sh2_device::op0011(uint16_t opcode)
+			switch (opcode & 0x0f)
 			{
-				case 0x00:  CMPEQ(opcode); break;
-				case 0x01:  NOP(opcode); break;
-				case 0x02:  CMPHS(opcode); break;
-				case 0x03:  CMPGE(opcode); break;
-				case 0x04:  DIV1(opcode); break;
-				case 0x05:  DMULU(opcode); break;
-				case 0x06:  CMPHI(opcode); break;
-				case 0x07:  CMPGT(opcode); break;
-				case 0x08:  SUB(opcode); break;
-				case 0x09:  NOP(opcode); break;
-				case 0x0a:  SUBC(opcode); break;
-				case 0x0b:  SUBV(opcode); break;
-				case 0x0c:  ADD(opcode); break;
-				case 0x0d:  DMULS(opcode); break;
-				case 0x0e:  ADDC(opcode); break;
-				case 0x0f:  ADDV(opcode); break;
+			case  0: SH2CMPEQ(Rm, Rn);                break;
+			case  1: SH2ILLEGAL();                         break; // NOP
+			case  2: SH2CMPHS(Rm, Rn);                break;
+			case  3: SH2CMPGE(Rm, Rn);                break;
+			case  4: SH2DIV1(Rm, Rn);                 break;
+			case  5: SH2DMULU(Rm, Rn);                break;
+			case  6: SH2CMPHI(Rm, Rn);                break;
+			case  7: SH2CMPGT(Rm, Rn);                break;
+			case  8: SH2SUB(Rm, Rn);                  break;
+			case  9: SH2ILLEGAL();                         break; // NOP
+			case 10: SH2SUBC(Rm, Rn);                 break;
+			case 11: SH2SUBV(Rm, Rn);                 break;
+			case 12: SH2ADD(Rm, Rn);                  break;
+			case 13: SH2DMULS(Rm, Rn);                break;
+			case 14: SH2ADDC(Rm, Rn);                 break;
+			case 15: SH2ADDV(Rm, Rn);                 break;
 			}
 			break;
 
@@ -2362,25 +2362,25 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			MOVLL4(opcode);
 			break;
 
-		case 0x6000:
-			switch(opcode & 0x0f)
+		case 0x6000: // void sh2_device::op0110(uint16_t opcode)
+			switch (opcode & 0x0f)
 			{
-				case 0x00:  MOVBL(opcode); break;
-				case 0x01:  MOVWL(opcode); break;
-				case 0x02:  MOVLL(opcode); break;
-				case 0x03:  MOV(opcode); break;
-				case 0x04:  MOVBP(opcode); break;
-				case 0x05:  MOVWP(opcode); break;
-				case 0x06:  MOVLP(opcode); break;
-				case 0x07:  NOT(opcode); break;
-				case 0x08:  SWAPB(opcode); break;
-				case 0x09:  SWAPW(opcode); break;
-				case 0x0a:  NEGC(opcode); break;
-				case 0x0b:  NEG(opcode); break;
-				case 0x0c:  EXTUB(opcode); break;
-				case 0x0d:  EXTUW(opcode); break;
-				case 0x0e:  EXTSB(opcode); break;
-				case 0x0f:  EXTSW(opcode); break;
+			case  0: SH2MOVBL(Rm, Rn);                break;
+			case  1: SH2MOVWL(Rm, Rn);                break;
+			case  2: SH2MOVLL(Rm, Rn);                break;
+			case  3: SH2MOV(Rm, Rn);                  break;
+			case  4: SH2MOVBP(Rm, Rn);                break;
+			case  5: SH2MOVWP(Rm, Rn);                break;
+			case  6: SH2MOVLP(Rm, Rn);                break;
+			case  7: SH2NOT(Rm, Rn);                  break;
+			case  8: SH2SWAPB(Rm, Rn);                break;
+			case  9: SH2SWAPW(Rm, Rn);                break;
+			case 10: SH2NEGC(Rm, Rn);                 break;
+			case 11: SH2NEG(Rm, Rn);                  break;
+			case 12: SH2EXTUB(Rm, Rn);                break;
+			case 13: SH2EXTUW(Rm, Rn);                break;
+			case 14: SH2EXTSB(Rm, Rn);                break;
+			case 15: SH2EXTSW(Rm, Rn);                break;
 			}
 			break;
 
@@ -2388,25 +2388,25 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			ADDI(opcode);
 			break;
 
-		case 0x8000:
-			switch((opcode >> 8) & 0x0f)
+		case 0x8000: // sh2_device::op1000(uint16_t opcode)
+			switch ((opcode >> 8) & 0x0f)
 			{
-				case 0x00:  MOVBS4(opcode); break;
-				case 0x01:  MOVWS4(opcode); break;
-				case 0x02:  NOP(opcode); break;
-				case 0x03:  NOP(opcode); break;
-				case 0x04:  MOVBL4(opcode); break;
-				case 0x05:  MOVWL4(opcode); break;
-				case 0x06:  NOP(opcode); break;
-				case 0x07:  NOP(opcode); break;
-				case 0x08:  CMPIM(opcode); break;
-				case 0x09:  BT(opcode); break;
-				case 0x0a:  NOP(opcode); break;
-				case 0x0b:  BF(opcode); break;
-				case 0x0c:  NOP(opcode); break;
-				case 0x0d:  BTS(opcode); break;
-				case 0x0e:  NOP(opcode); break;
-				case 0x0f:  BFS(opcode); break;
+			case  0: SH2MOVBS4(opcode & 0x0f, Rm);   break;
+			case  1: SH2MOVWS4(opcode & 0x0f, Rm);   break;
+			case  2: SH2ILLEGAL();                 break; // NOP
+			case  3: SH2ILLEGAL();                 break; // NOP
+			case  4: SH2MOVBL4(Rm, opcode & 0x0f);    break;
+			case  5: SH2MOVWL4(Rm, opcode & 0x0f);    break;
+			case  6: SH2ILLEGAL();                 break; // NOP
+			case  7: SH2ILLEGAL();                 break; // NOP
+			case  8: SH2CMPIM(opcode & 0xff);     break;
+			case  9: SH2BT(opcode & 0xff);        break;
+			case 10: SH2ILLEGAL();                 break; // NOP
+			case 11: SH2BF(opcode & 0xff);        break;
+			case 12: SH2ILLEGAL();                 break; // NOP
+			case 13: SH2BTS(opcode & 0xff);       break;
+			case 14: SH2ILLEGAL();                 break; // NOP
+			case 15: SH2BFS(opcode & 0xff);       break;
 			}
 			break;
 
@@ -2415,32 +2415,33 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0xa000:
-			BRA(opcode);
+			SH2BRA(opcode & 0xfff);
 			break;
 
 		case 0xb000:
-			BSR(opcode);
+			SH2BSR(opcode & 0xfff);
 			break;
 
-		case 0xc000:
-			switch((opcode >> 8) & 0x0f)
+		case 0xc000: // void sh2_device::op1100(uint16_t opcode)
+			switch ((opcode >> 8) & 0x0f)
 			{
-				case 0x00:  MOVBSG(opcode); break;
-				case 0x01:  MOVWSG(opcode); break;
-				case 0x02:  MOVLSG(opcode); break;
-				case 0x03:  TRAPA(opcode); break;
-				case 0x04:  MOVBLG(opcode); break;
-				case 0x05:  MOVWLG(opcode); break;
-				case 0x06:  MOVLLG(opcode); break;
-				case 0x07:  MOVA(opcode); break;
-				case 0x08:  TSTI(opcode); break;
-				case 0x09:  ANDI(opcode); break;
-				case 0x0a:  XORI(opcode); break;
-				case 0x0b:  ORI(opcode); break;
-				case 0x0c:  TSTM(opcode); break;
-				case 0x0d:  ANDM(opcode); break;
-				case 0x0e:  XORM(opcode); break;
-				case 0x0f:  ORM(opcode); break;
+
+			case  0: SH2MOVBSG(opcode & 0xff);     break;
+			case  1: SH2MOVWSG(opcode & 0xff);     break;
+			case  2: SH2MOVLSG(opcode & 0xff);     break;
+			case  3: TRAPA(opcode); break; // note SH4 implementation is different
+			case  4: SH2MOVBLG(opcode & 0xff);     break;
+			case  5: SH2MOVWLG(opcode & 0xff);     break;
+			case  6: SH2MOVLLG(opcode & 0xff);     break;
+			case  7: SH2MOVA(opcode & 0xff);       break;
+			case  8: SH2TSTI(opcode & 0xff);       break;
+			case  9: SH2ANDI(opcode & 0xff);       break;
+			case 10: SH2XORI(opcode & 0xff);       break;
+			case 11: SH2ORI(opcode & 0xff);            break;
+			case 12: SH2TSTM(opcode & 0xff);       break;
+			case 13: SH2ANDM(opcode & 0xff);       break;
+			case 14: SH2XORM(opcode & 0xff);       break;
+			case 15: SH2ORM(opcode & 0xff);            break;
 			}
 			break;
 
@@ -2452,7 +2453,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			MOVI(opcode);
 			break;
 
-		case 0xf000:
+		case 0xf000: // sh4 only
 			switch(opcode & 0x0f)
 			{
 				case 0x00:  FADD(opcode); break;
