@@ -4879,6 +4879,10 @@ ROM_END
  **************************************************************************************************************************
     Super Visual Football
     protected via FD1149 317-0222
+
+    Sega Game ID codes:
+     Game: 833-10851-02
+Rom board: 834-10852-02
 */
 ROM_START( svf )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
