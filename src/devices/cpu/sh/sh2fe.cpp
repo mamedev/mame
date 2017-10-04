@@ -18,8 +18,8 @@
     INSTRUCTION PARSERS
 ***************************************************************************/
 
-sh2_frontend::sh2_frontend(sh2_device *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*device, window_start, window_end, max_sequence)
+sh2_frontend::sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: sh_frontend(device, window_start, window_end, max_sequence)
 	, m_sh2(device)
 {
 }

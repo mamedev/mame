@@ -1720,6 +1720,11 @@ void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t r
 
 
 
+sh_frontend::sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: drc_frontend(*device, window_start, window_end, max_sequence)
+	, m_sh(device)
+{
+}
 
 #undef Rn
 #undef Rm

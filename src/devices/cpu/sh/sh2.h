@@ -140,9 +140,6 @@ protected:
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
-
-
-	//uint32_t  m_sh2_state->m_delay;
 	uint32_t  m_cpu_off;
 	uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
 	uint32_t  m_test_irq;
@@ -159,8 +156,7 @@ private:
 	uint32_t m_pcflushes[16];           // pcflush entries
 
 	int8_t    m_irq_line_state[17];
-protected:
-	direct_read_data *m_direct;
+
 private:
 	address_space *m_internal;
 	uint32_t m_m[0x200/4];
@@ -344,10 +340,10 @@ private:
 };
 
 
-class sh2_frontend : public drc_frontend
+class sh2_frontend : public sh_frontend
 {
 public:
-	sh2_frontend(sh2_device *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
@@ -361,7 +357,7 @@ private:
 	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 
-	sh2_device *m_sh2;
+	sh_common_execution *m_sh2;
 };
 
 
