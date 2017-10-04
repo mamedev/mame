@@ -90,7 +90,6 @@ protected:
 	void SH2EXTSW(uint32_t m, uint32_t n);
 	void SH2EXTUB(uint32_t m, uint32_t n);
 	void SH2EXTUW(uint32_t m, uint32_t n);
-	void SH2ILLEGAL();
 	void SH2JMP(uint32_t m);
 	void SH2JSR(uint32_t m);
 	void SH2LDCGBR(uint32_t m);
@@ -198,6 +197,8 @@ protected:
 	virtual void LDCSR(const uint16_t opcode) = 0;
 	virtual void LDCMSR(const uint16_t opcode) = 0;
 	virtual void TRAPA(uint32_t i) = 0;
+	virtual	void ILLEGAL() = 0;
+
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 };

@@ -430,6 +430,7 @@ protected:
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void RTE() override;
 	virtual void TRAPA(uint32_t i) override;
+	virtual	void ILLEGAL() override;
 
 	virtual void LDTLB(const uint16_t opcode);
 

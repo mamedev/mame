@@ -354,6 +354,22 @@ inline void sh2_device::TRAPA(uint32_t i)
 	m_sh2_state->icount -= 7;
 }
 
+/*  ILLEGAL */
+inline void sh2_device::ILLEGAL()
+{
+	//logerror("Illegal opcode at %08x\n", m_sh2_state->pc - 2);
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->pc - 2 ); /* push PC onto stack */
+
+	/* fetch PC */
+	m_sh2_state->pc = RL( m_sh2_state->vbr + 4 * 4 );
+
+	/* TODO: timing is a guess */
+	m_sh2_state->icount -= 5;
+}
+
 /*****************************************************************************
  *  OPCODE DISPATCHERS
  *****************************************************************************/
@@ -362,8 +378,8 @@ void sh2_device::op0000(uint16_t opcode)
 {
 	switch (opcode & 0x3F)
 	{
-	case 0x00: SH2ILLEGAL();                       break;
-	case 0x01: SH2ILLEGAL();                       break;
+	case 0x00: ILLEGAL();                       break;
+	case 0x01: ILLEGAL();                       break;
 	case 0x02: SH2STCSR(Rn);                  break;
 	case 0x03: SH2BSRF(Rn);                   break;
 	case 0x04: SH2MOVBS0(Rm, Rn);             break;
@@ -379,10 +395,10 @@ void sh2_device::op0000(uint16_t opcode)
 	case 0x0e: SH2MOVLL0(Rm, Rn);             break;
 	case 0x0f: SH2MAC_L(Rm, Rn);              break;
 
-	case 0x10: SH2ILLEGAL();                       break;
-	case 0x11: SH2ILLEGAL();                       break;
+	case 0x10: ILLEGAL();                       break;
+	case 0x11: ILLEGAL();                       break;
 	case 0x12: SH2STCGBR(Rn);                 break;
-	case 0x13: SH2ILLEGAL();                       break;
+	case 0x13: ILLEGAL();                       break;
 	case 0x14: SH2MOVBS0(Rm, Rn);             break;
 	case 0x15: SH2MOVWS0(Rm, Rn);             break;
 	case 0x16: SH2MOVLS0(Rm, Rn);             break;
@@ -396,8 +412,8 @@ void sh2_device::op0000(uint16_t opcode)
 	case 0x1e: SH2MOVLL0(Rm, Rn);             break;
 	case 0x1f: SH2MAC_L(Rm, Rn);              break;
 
-	case 0x20: SH2ILLEGAL();                       break;
-	case 0x21: SH2ILLEGAL();                       break;
+	case 0x20: ILLEGAL();                       break;
+	case 0x21: ILLEGAL();                       break;
 	case 0x22: SH2STCVBR(Rn);                 break;
 	case 0x23: SH2BRAF(Rn);                   break;
 	case 0x24: SH2MOVBS0(Rm, Rn);             break;
@@ -413,22 +429,22 @@ void sh2_device::op0000(uint16_t opcode)
 	case 0x2e: SH2MOVLL0(Rm, Rn);             break;
 	case 0x2f: SH2MAC_L(Rm, Rn);              break;
 
-	case 0x30: SH2ILLEGAL();                       break;
-	case 0x31: SH2ILLEGAL();                       break;
-	case 0x32: SH2ILLEGAL();                       break;
-	case 0x33: SH2ILLEGAL();                       break;
+	case 0x30: ILLEGAL();                       break;
+	case 0x31: ILLEGAL();                       break;
+	case 0x32: ILLEGAL();                       break;
+	case 0x33: ILLEGAL();                       break;
 	case 0x34: SH2MOVBS0(Rm, Rn);             break;
 	case 0x35: SH2MOVWS0(Rm, Rn);             break;
 	case 0x36: SH2MOVLS0(Rm, Rn);             break;
 	case 0x37: SH2MULL(Rm, Rn);               break;
-	case 0x38: SH2ILLEGAL();                       break;
-	case 0x39: SH2ILLEGAL();                       break;
+	case 0x38: ILLEGAL();                       break;
+	case 0x39: ILLEGAL();                       break;
 	case 0x3c: SH2MOVBL0(Rm, Rn);             break;
 	case 0x3d: SH2MOVWL0(Rm, Rn);             break;
 	case 0x3e: SH2MOVLL0(Rm, Rn);             break;
 	case 0x3f: SH2MAC_L(Rm, Rn);              break;
-	case 0x3a: SH2ILLEGAL();                       break;
-	case 0x3b: SH2ILLEGAL();                       break;
+	case 0x3a: ILLEGAL();                       break;
+	case 0x3b: ILLEGAL();                       break;
 
 
 
@@ -447,7 +463,7 @@ void sh2_device::op0010(uint16_t opcode)
 	case  0: SH2MOVBS(Rm, Rn);                break;
 	case  1: SH2MOVWS(Rm, Rn);                break;
 	case  2: SH2MOVLS(Rm, Rn);                break;
-	case  3: SH2ILLEGAL();                         break;
+	case  3: ILLEGAL();                         break;
 	case  4: SH2MOVBM(Rm, Rn);                break;
 	case  5: SH2MOVWM(Rm, Rn);                break;
 	case  6: SH2MOVLM(Rm, Rn);                break;
@@ -468,7 +484,7 @@ void sh2_device::op0011(uint16_t opcode)
 	switch (opcode & 15)
 	{
 	case  0: SH2CMPEQ(Rm, Rn);                break;
-	case  1: SH2ILLEGAL();                         break;
+	case  1: ILLEGAL();                         break;
 	case  2: SH2CMPHS(Rm, Rn);                break;
 	case  3: SH2CMPGE(Rm, Rn);                break;
 	case  4: SH2DIV1(Rm, Rn);                 break;
@@ -476,7 +492,7 @@ void sh2_device::op0011(uint16_t opcode)
 	case  6: SH2CMPHI(Rm, Rn);                break;
 	case  7: SH2CMPGT(Rm, Rn);                break;
 	case  8: SH2SUB(Rm, Rn);                  break;
-	case  9: SH2ILLEGAL();                         break;
+	case  9: ILLEGAL();                         break;
 	case 10: SH2SUBC(Rm, Rn);                 break;
 	case 11: SH2SUBV(Rm, Rn);                 break;
 	case 12: SH2ADD(Rm, Rn);                  break;
@@ -502,8 +518,8 @@ void sh2_device::op0100(uint16_t opcode)
 	case 0x09: SH2SHLR2(Rn);                  break;
 	case 0x0a: SH2LDSMACH(Rn);                break;
 	case 0x0b: SH2JSR(Rn);                    break;
-	case 0x0c: SH2ILLEGAL();                       break;
-	case 0x0d: SH2ILLEGAL();                       break;
+	case 0x0c: ILLEGAL();                       break;
+	case 0x0d: ILLEGAL();                       break;
 	case 0x0e: LDCSR(opcode);                  break;
 	case 0x0f: SH2MAC_W(Rm, Rn);              break;
 
@@ -511,7 +527,7 @@ void sh2_device::op0100(uint16_t opcode)
 	case 0x11: SH2CMPPZ(Rn);                  break;
 	case 0x12: SH2STSMMACL(Rn);               break;
 	case 0x13: SH2STCMGBR(Rn);                break;
-	case 0x14: SH2ILLEGAL();                       break;
+	case 0x14: ILLEGAL();                       break;
 	case 0x15: SH2CMPPL(Rn);                  break;
 	case 0x16: SH2LDSMMACL(Rn);               break;
 	case 0x17: SH2LDCMGBR(Rn);                break;
@@ -519,8 +535,8 @@ void sh2_device::op0100(uint16_t opcode)
 	case 0x19: SH2SHLR8(Rn);                  break;
 	case 0x1a: SH2LDSMACL(Rn);                break;
 	case 0x1b: SH2TAS(Rn);                    break;
-	case 0x1c: SH2ILLEGAL();                       break;
-	case 0x1d: SH2ILLEGAL();                       break;
+	case 0x1c: ILLEGAL();                       break;
+	case 0x1d: ILLEGAL();                       break;
 	case 0x1e: SH2LDCGBR(Rn);                 break;
 	case 0x1f: SH2MAC_W(Rm, Rn);              break;
 
@@ -536,26 +552,26 @@ void sh2_device::op0100(uint16_t opcode)
 	case 0x29: SH2SHLR16(Rn);                 break;
 	case 0x2a: SH2LDSPR(Rn);                  break;
 	case 0x2b: SH2JMP(Rn);                    break;
-	case 0x2c: SH2ILLEGAL();                       break;
-	case 0x2d: SH2ILLEGAL();                       break;
+	case 0x2c: ILLEGAL();                       break;
+	case 0x2d: ILLEGAL();                       break;
 	case 0x2e: SH2LDCVBR(Rn);                 break;
 	case 0x2f: SH2MAC_W(Rm, Rn);              break;
 
-	case 0x30: SH2ILLEGAL();                       break;
-	case 0x31: SH2ILLEGAL();                       break;
-	case 0x32: SH2ILLEGAL();                       break;
-	case 0x33: SH2ILLEGAL();                       break;
-	case 0x34: SH2ILLEGAL();                       break;
-	case 0x35: SH2ILLEGAL();                       break;
-	case 0x36: SH2ILLEGAL();                       break;
-	case 0x37: SH2ILLEGAL();                       break;
-	case 0x38: SH2ILLEGAL();                       break;
-	case 0x39: SH2ILLEGAL();                       break;
-	case 0x3a: SH2ILLEGAL();                       break;
-	case 0x3b: SH2ILLEGAL();                       break;
-	case 0x3c: SH2ILLEGAL();                       break;
-	case 0x3d: SH2ILLEGAL();                       break;
-	case 0x3e: SH2ILLEGAL();                       break;
+	case 0x30: ILLEGAL();                       break;
+	case 0x31: ILLEGAL();                       break;
+	case 0x32: ILLEGAL();                       break;
+	case 0x33: ILLEGAL();                       break;
+	case 0x34: ILLEGAL();                       break;
+	case 0x35: ILLEGAL();                       break;
+	case 0x36: ILLEGAL();                       break;
+	case 0x37: ILLEGAL();                       break;
+	case 0x38: ILLEGAL();                       break;
+	case 0x39: ILLEGAL();                       break;
+	case 0x3a: ILLEGAL();                       break;
+	case 0x3b: ILLEGAL();                       break;
+	case 0x3c: ILLEGAL();                       break;
+	case 0x3d: ILLEGAL();                       break;
+	case 0x3e: ILLEGAL();                       break;
 	case 0x3f: SH2MAC_W(Rm, Rn);              break;
 
 	}
@@ -600,19 +616,19 @@ void sh2_device::op1000(uint16_t opcode)
 	{
 	case  0 << 8: SH2MOVBS4(opcode & 0x0f, Rm);   break;
 	case  1 << 8: SH2MOVWS4(opcode & 0x0f, Rm);   break;
-	case  2<< 8: SH2ILLEGAL();                 break;
-	case  3<< 8: SH2ILLEGAL();                 break;
+	case  2<< 8: ILLEGAL();                 break;
+	case  3<< 8: ILLEGAL();                 break;
 	case  4<< 8: SH2MOVBL4(Rm, opcode & 0x0f);    break;
 	case  5<< 8: SH2MOVWL4(Rm, opcode & 0x0f);    break;
-	case  6<< 8: SH2ILLEGAL();                 break;
-	case  7<< 8: SH2ILLEGAL();                 break;
+	case  6<< 8: ILLEGAL();                 break;
+	case  7<< 8: ILLEGAL();                 break;
 	case  8<< 8: SH2CMPIM(opcode & 0xff);     break;
 	case  9<< 8: SH2BT(opcode & 0xff);        break;
-	case 10<< 8: SH2ILLEGAL();                 break;
+	case 10<< 8: ILLEGAL();                 break;
 	case 11<< 8: SH2BF(opcode & 0xff);        break;
-	case 12<< 8: SH2ILLEGAL();                 break;
+	case 12<< 8: ILLEGAL();                 break;
 	case 13<< 8: SH2BTS(opcode & 0xff);       break;
-	case 14<< 8: SH2ILLEGAL();                 break;
+	case 14<< 8: ILLEGAL();                 break;
 	case 15<< 8: SH2BFS(opcode & 0xff);       break;
 	}
 }
@@ -668,7 +684,7 @@ void sh2_device::op1110(uint16_t opcode)
 
 void sh2_device::op1111(uint16_t opcode)
 {
-	SH2ILLEGAL();
+	ILLEGAL();
 }
 
 /*****************************************************************************

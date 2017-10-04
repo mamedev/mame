@@ -1540,28 +1540,6 @@ void sh_common_execution::SH2XTRCT(uint32_t m, uint32_t n)
 	m_sh2_state->r[n] |= temp;
 }
 
-/* SH4 only */
-
-
-
-// SH2
-
-/*  ILLEGAL */
-void sh_common_execution::SH2ILLEGAL()
-{
-	//logerror("Illegal opcode at %08x\n", m_sh2_state->pc - 2);
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc - 2 ); /* push PC onto stack */
-
-	/* fetch PC */
-	m_sh2_state->pc = RL( m_sh2_state->vbr + 4 * 4 );
-
-	/* TODO: timing is a guess */
-	m_sh2_state->icount -= 5;
-}
-
 /*  SLEEP */
 void sh_common_execution::SH2SLEEP()
 {
