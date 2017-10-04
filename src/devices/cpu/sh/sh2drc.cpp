@@ -212,7 +212,7 @@ void sh2_device::func_MAC_W()
 	n = Rn;
 	m = Rm;
 
-	SH2MAC_W(m, n);
+	MAC_W(m, n);
 }
 
 /*-------------------------------------------------
@@ -235,7 +235,7 @@ void sh2_device::func_MAC_L()
 	n = Rn;
 	m = Rm;
 
-	SH2MAC_L(m, n);
+	MAC_L(m, n);
 }
 
 /*-------------------------------------------------
@@ -258,7 +258,7 @@ void sh2_device::func_DIV1()
 	n = Rn;
 	m = Rm;
 
-	SH2DIV1(m, n);
+	DIV1(m, n);
 }
 
 #if (!ADDSUBV_DIRECT)
@@ -282,7 +282,7 @@ void sh2_device::func_ADDV()
 	n = Rn;
 	m = Rm;
 
-	SH2ADDV(m, n);
+	ADDV(m, n);
 }
 
 /*-------------------------------------------------
@@ -305,7 +305,7 @@ void sh2_device::func_SUBV()
 	n = Rn;
 	m = Rm;
 
-	SH2SUBV(m, n);
+	SUBV(m, n);
 }
 #else
 void sh2_device::func_ADDV() {}

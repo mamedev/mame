@@ -547,7 +547,7 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 
 inline void sh34_base_device::ILLEGAL()
 {
-	SH2NOP();
+	NOP();
 }
 
 /*  MOVCA.L     R0,@Rn */
@@ -1781,9 +1781,9 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xe1:  ILLEGAL(); break;
 		case 0xf1:  ILLEGAL(); break;
 		// 0x20
-		case 0x02:  SH2STCSR(Rn); break;
-		case 0x12:  SH2STCGBR(Rn); break;
-		case 0x22:  SH2STCVBR(Rn); break;
+		case 0x02:  STCSR(Rn); break;
+		case 0x12:  STCGBR(Rn); break;
+		case 0x22:  STCVBR(Rn); break;
 		case 0x32:  STCSSR(opcode); break; // sh4 only
 		case 0x42:  STCSPC(opcode); break; // sh4 only
 		case 0x52:  ILLEGAL(); break;
@@ -1798,9 +1798,9 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xe2:  STCRBANK(opcode); break;
 		case 0xf2:  STCRBANK(opcode); break;
 		// 0x30
-		case 0x03:  SH2BSRF(Rn); break;
+		case 0x03:  BSRF(Rn); break;
 		case 0x13:  ILLEGAL(); break;
-		case 0x23:  SH2BRAF(Rn); break;
+		case 0x23:  BRAF(Rn); break;
 		case 0x33:  ILLEGAL(); break;
 		case 0x43:  ILLEGAL(); break;
 		case 0x53:  ILLEGAL(); break;
@@ -1815,209 +1815,209 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xe3:  ILLEGAL(); break;
 		case 0xf3:  ILLEGAL(); break;
 		// 0x40
-		case 0x04:  SH2MOVBS0(Rm, Rn); break;
-		case 0x14:  SH2MOVBS0(Rm, Rn); break;
-		case 0x24:  SH2MOVBS0(Rm, Rn); break;
-		case 0x34:  SH2MOVBS0(Rm, Rn); break;
-		case 0x44:  SH2MOVBS0(Rm, Rn); break;
-		case 0x54:  SH2MOVBS0(Rm, Rn); break;
-		case 0x64:  SH2MOVBS0(Rm, Rn); break;
-		case 0x74:  SH2MOVBS0(Rm, Rn); break;
-		case 0x84:  SH2MOVBS0(Rm, Rn); break;
-		case 0x94:  SH2MOVBS0(Rm, Rn); break;
-		case 0xa4:  SH2MOVBS0(Rm, Rn); break;
-		case 0xb4:  SH2MOVBS0(Rm, Rn); break;
-		case 0xc4:  SH2MOVBS0(Rm, Rn); break;
-		case 0xd4:  SH2MOVBS0(Rm, Rn); break;
-		case 0xe4:  SH2MOVBS0(Rm, Rn); break;
-		case 0xf4:  SH2MOVBS0(Rm, Rn); break;
+		case 0x04:  MOVBS0(Rm, Rn); break;
+		case 0x14:  MOVBS0(Rm, Rn); break;
+		case 0x24:  MOVBS0(Rm, Rn); break;
+		case 0x34:  MOVBS0(Rm, Rn); break;
+		case 0x44:  MOVBS0(Rm, Rn); break;
+		case 0x54:  MOVBS0(Rm, Rn); break;
+		case 0x64:  MOVBS0(Rm, Rn); break;
+		case 0x74:  MOVBS0(Rm, Rn); break;
+		case 0x84:  MOVBS0(Rm, Rn); break;
+		case 0x94:  MOVBS0(Rm, Rn); break;
+		case 0xa4:  MOVBS0(Rm, Rn); break;
+		case 0xb4:  MOVBS0(Rm, Rn); break;
+		case 0xc4:  MOVBS0(Rm, Rn); break;
+		case 0xd4:  MOVBS0(Rm, Rn); break;
+		case 0xe4:  MOVBS0(Rm, Rn); break;
+		case 0xf4:  MOVBS0(Rm, Rn); break;
 		// 0x50
-		case 0x05:  SH2MOVWS0(Rm, Rn); break;
-		case 0x15:  SH2MOVWS0(Rm, Rn); break;
-		case 0x25:  SH2MOVWS0(Rm, Rn); break;
-		case 0x35:  SH2MOVWS0(Rm, Rn); break;
-		case 0x45:  SH2MOVWS0(Rm, Rn); break;
-		case 0x55:  SH2MOVWS0(Rm, Rn); break;
-		case 0x65:  SH2MOVWS0(Rm, Rn); break;
-		case 0x75:  SH2MOVWS0(Rm, Rn); break;
-		case 0x85:  SH2MOVWS0(Rm, Rn); break;
-		case 0x95:  SH2MOVWS0(Rm, Rn); break;
-		case 0xa5:  SH2MOVWS0(Rm, Rn); break;
-		case 0xb5:  SH2MOVWS0(Rm, Rn); break;
-		case 0xc5:  SH2MOVWS0(Rm, Rn); break;
-		case 0xd5:  SH2MOVWS0(Rm, Rn); break;
-		case 0xe5:  SH2MOVWS0(Rm, Rn); break;
-		case 0xf5:  SH2MOVWS0(Rm, Rn); break;
+		case 0x05:  MOVWS0(Rm, Rn); break;
+		case 0x15:  MOVWS0(Rm, Rn); break;
+		case 0x25:  MOVWS0(Rm, Rn); break;
+		case 0x35:  MOVWS0(Rm, Rn); break;
+		case 0x45:  MOVWS0(Rm, Rn); break;
+		case 0x55:  MOVWS0(Rm, Rn); break;
+		case 0x65:  MOVWS0(Rm, Rn); break;
+		case 0x75:  MOVWS0(Rm, Rn); break;
+		case 0x85:  MOVWS0(Rm, Rn); break;
+		case 0x95:  MOVWS0(Rm, Rn); break;
+		case 0xa5:  MOVWS0(Rm, Rn); break;
+		case 0xb5:  MOVWS0(Rm, Rn); break;
+		case 0xc5:  MOVWS0(Rm, Rn); break;
+		case 0xd5:  MOVWS0(Rm, Rn); break;
+		case 0xe5:  MOVWS0(Rm, Rn); break;
+		case 0xf5:  MOVWS0(Rm, Rn); break;
 		// 0x60
-		case 0x06:  SH2MOVLS0(Rm, Rn); break;
-		case 0x16:  SH2MOVLS0(Rm, Rn); break;
-		case 0x26:  SH2MOVLS0(Rm, Rn); break;
-		case 0x36:  SH2MOVLS0(Rm, Rn); break;
-		case 0x46:  SH2MOVLS0(Rm, Rn); break;
-		case 0x56:  SH2MOVLS0(Rm, Rn); break;
-		case 0x66:  SH2MOVLS0(Rm, Rn); break;
-		case 0x76:  SH2MOVLS0(Rm, Rn); break;
-		case 0x86:  SH2MOVLS0(Rm, Rn); break;
-		case 0x96:  SH2MOVLS0(Rm, Rn); break;
-		case 0xa6:  SH2MOVLS0(Rm, Rn); break;
-		case 0xb6:  SH2MOVLS0(Rm, Rn); break;
-		case 0xc6:  SH2MOVLS0(Rm, Rn); break;
-		case 0xd6:  SH2MOVLS0(Rm, Rn); break;
-		case 0xe6:  SH2MOVLS0(Rm, Rn); break;
-		case 0xf6:  SH2MOVLS0(Rm, Rn); break;
+		case 0x06:  MOVLS0(Rm, Rn); break;
+		case 0x16:  MOVLS0(Rm, Rn); break;
+		case 0x26:  MOVLS0(Rm, Rn); break;
+		case 0x36:  MOVLS0(Rm, Rn); break;
+		case 0x46:  MOVLS0(Rm, Rn); break;
+		case 0x56:  MOVLS0(Rm, Rn); break;
+		case 0x66:  MOVLS0(Rm, Rn); break;
+		case 0x76:  MOVLS0(Rm, Rn); break;
+		case 0x86:  MOVLS0(Rm, Rn); break;
+		case 0x96:  MOVLS0(Rm, Rn); break;
+		case 0xa6:  MOVLS0(Rm, Rn); break;
+		case 0xb6:  MOVLS0(Rm, Rn); break;
+		case 0xc6:  MOVLS0(Rm, Rn); break;
+		case 0xd6:  MOVLS0(Rm, Rn); break;
+		case 0xe6:  MOVLS0(Rm, Rn); break;
+		case 0xf6:  MOVLS0(Rm, Rn); break;
 		// 0x70
-		case 0x07:  SH2MULL(Rm, Rn); break;
-		case 0x17:  SH2MULL(Rm, Rn); break;
-		case 0x27:  SH2MULL(Rm, Rn); break;
-		case 0x37:  SH2MULL(Rm, Rn); break;
-		case 0x47:  SH2MULL(Rm, Rn); break;
-		case 0x57:  SH2MULL(Rm, Rn); break;
-		case 0x67:  SH2MULL(Rm, Rn); break;
-		case 0x77:  SH2MULL(Rm, Rn); break;
-		case 0x87:  SH2MULL(Rm, Rn); break;
-		case 0x97:  SH2MULL(Rm, Rn); break;
-		case 0xa7:  SH2MULL(Rm, Rn); break;
-		case 0xb7:  SH2MULL(Rm, Rn); break;
-		case 0xc7:  SH2MULL(Rm, Rn); break;
-		case 0xd7:  SH2MULL(Rm, Rn); break;
-		case 0xe7:  SH2MULL(Rm, Rn); break;
-		case 0xf7:  SH2MULL(Rm, Rn); break;
+		case 0x07:  MULL(Rm, Rn); break;
+		case 0x17:  MULL(Rm, Rn); break;
+		case 0x27:  MULL(Rm, Rn); break;
+		case 0x37:  MULL(Rm, Rn); break;
+		case 0x47:  MULL(Rm, Rn); break;
+		case 0x57:  MULL(Rm, Rn); break;
+		case 0x67:  MULL(Rm, Rn); break;
+		case 0x77:  MULL(Rm, Rn); break;
+		case 0x87:  MULL(Rm, Rn); break;
+		case 0x97:  MULL(Rm, Rn); break;
+		case 0xa7:  MULL(Rm, Rn); break;
+		case 0xb7:  MULL(Rm, Rn); break;
+		case 0xc7:  MULL(Rm, Rn); break;
+		case 0xd7:  MULL(Rm, Rn); break;
+		case 0xe7:  MULL(Rm, Rn); break;
+		case 0xf7:  MULL(Rm, Rn); break;
 		// 0x80
-		case 0x08:  SH2CLRT(); break;
-		case 0x18:  SH2SETT(); break;
-		case 0x28:  SH2CLRMAC(); break;
+		case 0x08:  CLRT(); break;
+		case 0x18:  SETT(); break;
+		case 0x28:  CLRMAC(); break;
 		case 0x38:  LDTLB(opcode); break; // sh4 only
 		case 0x48:  CLRS(opcode); break; // sh4 only
 		case 0x58:  SETS(opcode); break; // sh4 only
 		case 0x68:  ILLEGAL(); break;
 		case 0x78:  ILLEGAL(); break;
-		case 0x88:  SH2CLRT(); break;
-		case 0x98:  SH2SETT(); break;
-		case 0xa8:  SH2CLRMAC(); break;
+		case 0x88:  CLRT(); break;
+		case 0x98:  SETT(); break;
+		case 0xa8:  CLRMAC(); break;
 		case 0xb8:  LDTLB(opcode); break; // sh4 only
 		case 0xc8:  CLRS(opcode); break; // sh4 only
 		case 0xd8:  SETS(opcode); break; // sh4 only
 		case 0xe8:  ILLEGAL(); break;
 		case 0xf8:  ILLEGAL(); break;
 		// 0x90
-		case 0x09:  SH2NOP(); break;
-		case 0x19:  SH2DIV0U(); break;
-		case 0x29:  SH2MOVT(Rn); break;
+		case 0x09:  NOP(); break;
+		case 0x19:  DIV0U(); break;
+		case 0x29:  MOVT(Rn); break;
 		case 0x39:  ILLEGAL(); break;
 		case 0x49:  ILLEGAL(); break;
-		case 0x59:  SH2DIV0U(); break;
-		case 0x69:  SH2MOVT(Rn); break;
+		case 0x59:  DIV0U(); break;
+		case 0x69:  MOVT(Rn); break;
 		case 0x79:  ILLEGAL(); break;
 		case 0x89:  ILLEGAL(); break;
-		case 0x99:  SH2DIV0U(); break;
-		case 0xa9:  SH2MOVT(Rn); break;
+		case 0x99:  DIV0U(); break;
+		case 0xa9:  MOVT(Rn); break;
 		case 0xb9:  ILLEGAL(); break;
 		case 0xc9:  ILLEGAL(); break;
-		case 0xd9:  SH2DIV0U(); break;
-		case 0xe9:  SH2MOVT(Rn); break;
+		case 0xd9:  DIV0U(); break;
+		case 0xe9:  MOVT(Rn); break;
 		case 0xf9:  ILLEGAL(); break;
 		// 0xa0
-		case 0x0a:  SH2STSMACH(Rn); break;
-		case 0x1a:  SH2STSMACL(Rn); break;
-		case 0x2a:  SH2STSPR(Rn); break;
+		case 0x0a:  STSMACH(Rn); break;
+		case 0x1a:  STSMACL(Rn); break;
+		case 0x2a:  STSPR(Rn); break;
 		case 0x3a:  STCSGR(opcode); break; // sh4 only
 		case 0x4a:  ILLEGAL(); break;
 		case 0x5a:  STSFPUL(opcode); break; // sh4 only
 		case 0x6a:  STSFPSCR(opcode); break; // sh4 only
 		case 0x7a:  STCDBR(opcode); break; // sh4 only
-		case 0x8a:  SH2STSMACH(Rn); break;
-		case 0x9a:  SH2STSMACL(Rn); break;
-		case 0xaa:  SH2STSPR(Rn); break;
+		case 0x8a:  STSMACH(Rn); break;
+		case 0x9a:  STSMACL(Rn); break;
+		case 0xaa:  STSPR(Rn); break;
 		case 0xba:  STCSGR(opcode); break; // sh4 only
 		case 0xca:  ILLEGAL(); break;
 		case 0xda:  STSFPUL(opcode); break; // sh4only
 		case 0xea:  STSFPSCR(opcode); break; // sh4only
 		case 0xfa:  STCDBR(opcode); break; // sh4 only
 		// 0xb0
-		case 0x0b:  SH2RTS(); break;
-		case 0x1b:  SH2SLEEP(); break;
+		case 0x0b:  RTS(); break;
+		case 0x1b:  SLEEP(); break;
 		case 0x2b:  RTE(); break;
 		case 0x3b:  ILLEGAL(); break;
-		case 0x4b:  SH2RTS(); break;
-		case 0x5b:  SH2SLEEP(); break;
+		case 0x4b:  RTS(); break;
+		case 0x5b:  SLEEP(); break;
 		case 0x6b:  RTE(); break;
 		case 0x7b:  ILLEGAL(); break;
-		case 0x8b:  SH2RTS(); break;
-		case 0x9b:  SH2SLEEP(); break;
+		case 0x8b:  RTS(); break;
+		case 0x9b:  SLEEP(); break;
 		case 0xab:  RTE(); break;
 		case 0xbb:  ILLEGAL(); break;
-		case 0xcb:  SH2RTS(); break;
-		case 0xdb:  SH2SLEEP(); break;
+		case 0xcb:  RTS(); break;
+		case 0xdb:  SLEEP(); break;
 		case 0xeb:  RTE(); break;
 		case 0xfb:  ILLEGAL(); break;
 		// 0xc0
-		case 0x0c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x1c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x2c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x3c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x4c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x5c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x6c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x7c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x8c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0x9c:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xac:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xbc:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xcc:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xdc:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xec:  SH2MOVBL0(Rm, Rn);  break;
-		case 0xfc:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x0c:  MOVBL0(Rm, Rn);  break;
+		case 0x1c:  MOVBL0(Rm, Rn);  break;
+		case 0x2c:  MOVBL0(Rm, Rn);  break;
+		case 0x3c:  MOVBL0(Rm, Rn);  break;
+		case 0x4c:  MOVBL0(Rm, Rn);  break;
+		case 0x5c:  MOVBL0(Rm, Rn);  break;
+		case 0x6c:  MOVBL0(Rm, Rn);  break;
+		case 0x7c:  MOVBL0(Rm, Rn);  break;
+		case 0x8c:  MOVBL0(Rm, Rn);  break;
+		case 0x9c:  MOVBL0(Rm, Rn);  break;
+		case 0xac:  MOVBL0(Rm, Rn);  break;
+		case 0xbc:  MOVBL0(Rm, Rn);  break;
+		case 0xcc:  MOVBL0(Rm, Rn);  break;
+		case 0xdc:  MOVBL0(Rm, Rn);  break;
+		case 0xec:  MOVBL0(Rm, Rn);  break;
+		case 0xfc:  MOVBL0(Rm, Rn);  break;
 		// 0xd0
-		case 0x0d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x1d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x2d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x3d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x4d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x5d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x6d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x7d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x8d:  SH2MOVWL0(Rm, Rn); break;
-		case 0x9d:  SH2MOVWL0(Rm, Rn); break;
-		case 0xad:  SH2MOVWL0(Rm, Rn); break;
-		case 0xbd:  SH2MOVWL0(Rm, Rn); break;
-		case 0xcd:  SH2MOVWL0(Rm, Rn); break;
-		case 0xdd:  SH2MOVWL0(Rm, Rn); break;
-		case 0xed:  SH2MOVWL0(Rm, Rn); break;
-		case 0xfd:  SH2MOVWL0(Rm, Rn); break;
+		case 0x0d:  MOVWL0(Rm, Rn); break;
+		case 0x1d:  MOVWL0(Rm, Rn); break;
+		case 0x2d:  MOVWL0(Rm, Rn); break;
+		case 0x3d:  MOVWL0(Rm, Rn); break;
+		case 0x4d:  MOVWL0(Rm, Rn); break;
+		case 0x5d:  MOVWL0(Rm, Rn); break;
+		case 0x6d:  MOVWL0(Rm, Rn); break;
+		case 0x7d:  MOVWL0(Rm, Rn); break;
+		case 0x8d:  MOVWL0(Rm, Rn); break;
+		case 0x9d:  MOVWL0(Rm, Rn); break;
+		case 0xad:  MOVWL0(Rm, Rn); break;
+		case 0xbd:  MOVWL0(Rm, Rn); break;
+		case 0xcd:  MOVWL0(Rm, Rn); break;
+		case 0xdd:  MOVWL0(Rm, Rn); break;
+		case 0xed:  MOVWL0(Rm, Rn); break;
+		case 0xfd:  MOVWL0(Rm, Rn); break;
 		// 0xe0
-		case 0x0e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x1e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x2e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x3e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x4e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x5e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x6e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x7e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x8e:  SH2MOVLL0(Rm, Rn); break;
-		case 0x9e:  SH2MOVLL0(Rm, Rn); break;
-		case 0xae:  SH2MOVLL0(Rm, Rn); break;
-		case 0xbe:  SH2MOVLL0(Rm, Rn); break;
-		case 0xce:  SH2MOVLL0(Rm, Rn); break;
-		case 0xde:  SH2MOVLL0(Rm, Rn); break;
-		case 0xee:  SH2MOVLL0(Rm, Rn); break;
-		case 0xfe:  SH2MOVLL0(Rm, Rn); break;
+		case 0x0e:  MOVLL0(Rm, Rn); break;
+		case 0x1e:  MOVLL0(Rm, Rn); break;
+		case 0x2e:  MOVLL0(Rm, Rn); break;
+		case 0x3e:  MOVLL0(Rm, Rn); break;
+		case 0x4e:  MOVLL0(Rm, Rn); break;
+		case 0x5e:  MOVLL0(Rm, Rn); break;
+		case 0x6e:  MOVLL0(Rm, Rn); break;
+		case 0x7e:  MOVLL0(Rm, Rn); break;
+		case 0x8e:  MOVLL0(Rm, Rn); break;
+		case 0x9e:  MOVLL0(Rm, Rn); break;
+		case 0xae:  MOVLL0(Rm, Rn); break;
+		case 0xbe:  MOVLL0(Rm, Rn); break;
+		case 0xce:  MOVLL0(Rm, Rn); break;
+		case 0xde:  MOVLL0(Rm, Rn); break;
+		case 0xee:  MOVLL0(Rm, Rn); break;
+		case 0xfe:  MOVLL0(Rm, Rn); break;
 		// 0xf0
-		case 0x0f:  SH2MAC_L(Rm, Rn); break;
-		case 0x1f:  SH2MAC_L(Rm, Rn); break;
-		case 0x2f:  SH2MAC_L(Rm, Rn); break;
-		case 0x3f:  SH2MAC_L(Rm, Rn); break;
-		case 0x4f:  SH2MAC_L(Rm, Rn); break;
-		case 0x5f:  SH2MAC_L(Rm, Rn); break;
-		case 0x6f:  SH2MAC_L(Rm, Rn); break;
-		case 0x7f:  SH2MAC_L(Rm, Rn); break;
-		case 0x8f:  SH2MAC_L(Rm, Rn); break;
-		case 0x9f:  SH2MAC_L(Rm, Rn); break;
-		case 0xaf:  SH2MAC_L(Rm, Rn); break;
-		case 0xbf:  SH2MAC_L(Rm, Rn); break;
-		case 0xcf:  SH2MAC_L(Rm, Rn); break;
-		case 0xdf:  SH2MAC_L(Rm, Rn); break;
-		case 0xef:  SH2MAC_L(Rm, Rn); break;
-		case 0xff:  SH2MAC_L(Rm, Rn); break;
+		case 0x0f:  MAC_L(Rm, Rn); break;
+		case 0x1f:  MAC_L(Rm, Rn); break;
+		case 0x2f:  MAC_L(Rm, Rn); break;
+		case 0x3f:  MAC_L(Rm, Rn); break;
+		case 0x4f:  MAC_L(Rm, Rn); break;
+		case 0x5f:  MAC_L(Rm, Rn); break;
+		case 0x6f:  MAC_L(Rm, Rn); break;
+		case 0x7f:  MAC_L(Rm, Rn); break;
+		case 0x8f:  MAC_L(Rm, Rn); break;
+		case 0x9f:  MAC_L(Rm, Rn); break;
+		case 0xaf:  MAC_L(Rm, Rn); break;
+		case 0xbf:  MAC_L(Rm, Rn); break;
+		case 0xcf:  MAC_L(Rm, Rn); break;
+		case 0xdf:  MAC_L(Rm, Rn); break;
+		case 0xef:  MAC_L(Rm, Rn); break;
+		case 0xff:  MAC_L(Rm, Rn); break;
 	}
 }
 
@@ -2026,43 +2026,43 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	switch(opcode & 0xff)
 	{
 		// 0x00
-		case 0x00:  SH2SHLL(Rn); break;
-		case 0x10:  SH2DT(Rn); break;
-		case 0x20:  SH2SHAL(Rn); break;
+		case 0x00:  SHLL(Rn); break;
+		case 0x10:  DT(Rn); break;
+		case 0x20:  SHAL(Rn); break;
 		case 0x30:  ILLEGAL(); break;
-		case 0x40:  SH2SHLL(Rn); break;
-		case 0x50:  SH2DT(Rn); break;
-		case 0x60:  SH2SHAL(Rn); break;
+		case 0x40:  SHLL(Rn); break;
+		case 0x50:  DT(Rn); break;
+		case 0x60:  SHAL(Rn); break;
 		case 0x70:  ILLEGAL(); break;
-		case 0x80:  SH2SHLL(Rn); break;
-		case 0x90:  SH2DT(Rn); break;
-		case 0xa0:  SH2SHAL(Rn); break;
+		case 0x80:  SHLL(Rn); break;
+		case 0x90:  DT(Rn); break;
+		case 0xa0:  SHAL(Rn); break;
 		case 0xb0:  ILLEGAL(); break;
-		case 0xc0:  SH2SHLL(Rn); break;
-		case 0xd0:  SH2DT(Rn); break;
-		case 0xe0:  SH2SHAL(Rn); break;
+		case 0xc0:  SHLL(Rn); break;
+		case 0xd0:  DT(Rn); break;
+		case 0xe0:  SHAL(Rn); break;
 		case 0xf0:  ILLEGAL(); break;
 		// 0x10
-		case 0x01:  SH2SHLR(Rn); break;
-		case 0x11:  SH2CMPPZ(Rn);  break;
-		case 0x21:  SH2SHAR(Rn); break;
+		case 0x01:  SHLR(Rn); break;
+		case 0x11:  CMPPZ(Rn);  break;
+		case 0x21:  SHAR(Rn); break;
 		case 0x31:  ILLEGAL(); break;
-		case 0x41:  SH2SHLR(Rn); break;
-		case 0x51:  SH2CMPPZ(Rn);  break;
-		case 0x61:  SH2SHAR(Rn); break;
+		case 0x41:  SHLR(Rn); break;
+		case 0x51:  CMPPZ(Rn);  break;
+		case 0x61:  SHAR(Rn); break;
 		case 0x71:  ILLEGAL(); break;
-		case 0x81:  SH2SHLR(Rn); break;
-		case 0x91:  SH2CMPPZ(Rn);  break;
-		case 0xa1:  SH2SHAR(Rn); break;
+		case 0x81:  SHLR(Rn); break;
+		case 0x91:  CMPPZ(Rn);  break;
+		case 0xa1:  SHAR(Rn); break;
 		case 0xb1:  ILLEGAL(); break;
-		case 0xc1:  SH2SHLR(Rn); break;
-		case 0xd1:  SH2CMPPZ(Rn);  break;
-		case 0xe1:  SH2SHAR(Rn); break;
+		case 0xc1:  SHLR(Rn); break;
+		case 0xd1:  CMPPZ(Rn);  break;
+		case 0xe1:  SHAR(Rn); break;
 		case 0xf1:  ILLEGAL(); break;
 		// 0x20
-		case 0x02:  SH2STSMMACH(Rn); break;
-		case 0x12:  SH2STSMMACL(Rn);  break;
-		case 0x22:  SH2STSMPR(Rn); break;
+		case 0x02:  STSMMACH(Rn); break;
+		case 0x12:  STSMMACL(Rn);  break;
+		case 0x22:  STSMPR(Rn); break;
 		case 0x32:  STCMSGR(opcode); break; // sh4 only
 		case 0x42:  ILLEGAL(); break;
 		case 0x52:  STSMFPUL(opcode); break; // sh4 only
@@ -2077,9 +2077,9 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xe2:  ILLEGAL(); break;
 		case 0xf2:  STCMDBR(opcode); break; // sh4 only
 		// 0x30
-		case 0x03:  SH2STCMSR(Rn); break;
-		case 0x13:  SH2STCMGBR(Rn);  break;
-		case 0x23:  SH2STCMVBR(Rn); break;
+		case 0x03:  STCMSR(Rn); break;
+		case 0x13:  STCMGBR(Rn);  break;
+		case 0x23:  STCMVBR(Rn); break;
 		case 0x33:  STCMSSR(opcode); break; // sh4 only
 		case 0x43:  STCMSPC(opcode); break; // sh4 only
 		case 0x53:  ILLEGAL(); break;
@@ -2094,43 +2094,43 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xe3:  STCMRBANK(opcode); break;
 		case 0xf3:  STCMRBANK(opcode); break;
 		// 0x40
-		case 0x04:  SH2ROTL(Rn); break;
+		case 0x04:  ROTL(Rn); break;
 		case 0x14:  ILLEGAL(); break;
-		case 0x24:  SH2ROTCL(Rn); break;
+		case 0x24:  ROTCL(Rn); break;
 		case 0x34:  ILLEGAL(); break;
-		case 0x44:  SH2ROTL(Rn); break;
+		case 0x44:  ROTL(Rn); break;
 		case 0x54:  ILLEGAL(); break;
-		case 0x64:  SH2ROTCL(Rn); break;
+		case 0x64:  ROTCL(Rn); break;
 		case 0x74:  ILLEGAL(); break;
-		case 0x84:  SH2ROTL(Rn); break;
+		case 0x84:  ROTL(Rn); break;
 		case 0x94:  ILLEGAL(); break;
-		case 0xa4:  SH2ROTCL(Rn); break;
+		case 0xa4:  ROTCL(Rn); break;
 		case 0xb4:  ILLEGAL(); break;
-		case 0xc4:  SH2ROTL(Rn); break;
+		case 0xc4:  ROTL(Rn); break;
 		case 0xd4:  ILLEGAL(); break;
-		case 0xe4:  SH2ROTCL(Rn); break;
+		case 0xe4:  ROTCL(Rn); break;
 		case 0xf4:  ILLEGAL(); break;
 		// 0x50
-		case 0x05:  SH2ROTR(Rn);  break;
-		case 0x15:  SH2CMPPL(Rn); break;
-		case 0x25:  SH2ROTCR(Rn); break;
+		case 0x05:  ROTR(Rn);  break;
+		case 0x15:  CMPPL(Rn); break;
+		case 0x25:  ROTCR(Rn); break;
 		case 0x35:  ILLEGAL(); break;
-		case 0x45:  SH2ROTR(Rn);  break;
-		case 0x55:  SH2CMPPL(Rn); break;
-		case 0x65:  SH2ROTCR(Rn); break;
+		case 0x45:  ROTR(Rn);  break;
+		case 0x55:  CMPPL(Rn); break;
+		case 0x65:  ROTCR(Rn); break;
 		case 0x75:  ILLEGAL(); break;
-		case 0x85:  SH2ROTR(Rn);  break;
-		case 0x95:  SH2CMPPL(Rn); break;
-		case 0xa5:  SH2ROTCR(Rn); break;
+		case 0x85:  ROTR(Rn);  break;
+		case 0x95:  CMPPL(Rn); break;
+		case 0xa5:  ROTCR(Rn); break;
 		case 0xb5:  ILLEGAL(); break;
-		case 0xc5:  SH2ROTR(Rn);  break;
-		case 0xd5:  SH2CMPPL(Rn); break;
-		case 0xe5:  SH2ROTCR(Rn); break;
+		case 0xc5:  ROTR(Rn);  break;
+		case 0xd5:  CMPPL(Rn); break;
+		case 0xe5:  ROTCR(Rn); break;
 		case 0xf5:  ILLEGAL(); break;
 		// 0x60
-		case 0x06:  SH2LDSMMACH(Rn); break;
-		case 0x16:  SH2LDSMMACL(Rn); break;
-		case 0x26:  SH2LDSMPR(Rn);  break;
+		case 0x06:  LDSMMACH(Rn); break;
+		case 0x16:  LDSMMACL(Rn); break;
+		case 0x26:  LDSMPR(Rn);  break;
 		case 0x36:  ILLEGAL(); break;
 		case 0x46:  ILLEGAL(); break;
 		case 0x56:  LDSMFPUL(opcode); break; // sh4 only
@@ -2146,8 +2146,8 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xf6:  LDCMDBR(opcode); break; // sh4 only
 		// 0x70
 		case 0x07:  LDCMSR(opcode);  break; // sh2/4 flag difference
-		case 0x17:  SH2LDCMGBR(Rn); break;
-		case 0x27:  SH2LDCMVBR(Rn); break;
+		case 0x17:  LDCMGBR(Rn); break;
+		case 0x27:  LDCMVBR(Rn); break;
 		case 0x37:  LDCMSSR(opcode); break; // sh4 only
 		case 0x47:  LDCMSPC(opcode); break; // sh4 only
 		case 0x57:  ILLEGAL(); break;
@@ -2162,43 +2162,43 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xe7:  LDCMRBANK(opcode); break;
 		case 0xf7:  LDCMRBANK(opcode); break;
 		// 0x80
-		case 0x08:  SH2SHLL2(Rn);  break;
-		case 0x18:  SH2SHLL8(Rn); break;
-		case 0x28:  SH2SHLL16(Rn); break;
+		case 0x08:  SHLL2(Rn);  break;
+		case 0x18:  SHLL8(Rn); break;
+		case 0x28:  SHLL16(Rn); break;
 		case 0x38:  ILLEGAL(); break;
-		case 0x48:  SH2SHLL2(Rn);  break;
-		case 0x58:  SH2SHLL8(Rn); break;
-		case 0x68:  SH2SHLL16(Rn); break;
+		case 0x48:  SHLL2(Rn);  break;
+		case 0x58:  SHLL8(Rn); break;
+		case 0x68:  SHLL16(Rn); break;
 		case 0x78:  ILLEGAL(); break;
-		case 0x88:  SH2SHLL2(Rn);  break;
-		case 0x98:  SH2SHLL8(Rn); break;
-		case 0xa8:  SH2SHLL16(Rn); break;
+		case 0x88:  SHLL2(Rn);  break;
+		case 0x98:  SHLL8(Rn); break;
+		case 0xa8:  SHLL16(Rn); break;
 		case 0xb8:  ILLEGAL(); break;
-		case 0xc8:  SH2SHLL2(Rn);  break;
-		case 0xd8:  SH2SHLL8(Rn); break;
-		case 0xe8:  SH2SHLL16(Rn); break;
+		case 0xc8:  SHLL2(Rn);  break;
+		case 0xd8:  SHLL8(Rn); break;
+		case 0xe8:  SHLL16(Rn); break;
 		case 0xf8:  ILLEGAL(); break;
 		// 0x90
-		case 0x09:  SH2SHLR2(Rn); break;
-		case 0x19:  SH2SHLR8(Rn); break;
-		case 0x29:  SH2SHLR16(Rn); break;
+		case 0x09:  SHLR2(Rn); break;
+		case 0x19:  SHLR8(Rn); break;
+		case 0x29:  SHLR16(Rn); break;
 		case 0x39:  ILLEGAL(); break;
-		case 0x49:  SH2SHLR2(Rn); break;
-		case 0x59:  SH2SHLR8(Rn); break;
-		case 0x69:  SH2SHLR16(Rn); break;
+		case 0x49:  SHLR2(Rn); break;
+		case 0x59:  SHLR8(Rn); break;
+		case 0x69:  SHLR16(Rn); break;
 		case 0x79:  ILLEGAL(); break;
-		case 0x89:  SH2SHLR2(Rn); break;
-		case 0x99:  SH2SHLR8(Rn); break;
-		case 0xa9:  SH2SHLR16(Rn); break;
+		case 0x89:  SHLR2(Rn); break;
+		case 0x99:  SHLR8(Rn); break;
+		case 0xa9:  SHLR16(Rn); break;
 		case 0xb9:  ILLEGAL(); break;
-		case 0xc9:  SH2SHLR2(Rn); break;
-		case 0xd9:  SH2SHLR8(Rn); break;
-		case 0xe9:  SH2SHLR16(Rn); break;
+		case 0xc9:  SHLR2(Rn); break;
+		case 0xd9:  SHLR8(Rn); break;
+		case 0xe9:  SHLR16(Rn); break;
 		case 0xf9:  ILLEGAL(); break;
 		// 0xa0
-		case 0x0a:  SH2LDSMACH(Rn); break;
-		case 0x1a:  SH2LDSMACL(Rn); break;
-		case 0x2a:  SH2LDSPR(Rn); break;
+		case 0x0a:  LDSMACH(Rn); break;
+		case 0x1a:  LDSMACL(Rn); break;
+		case 0x2a:  LDSPR(Rn); break;
 		case 0x3a:  ILLEGAL(); break;
 		case 0x4a:  ILLEGAL(); break;
 		case 0x5a:  LDSFPUL(opcode); break; // sh4 only
@@ -2213,21 +2213,21 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xea:  ILLEGAL(); break;
 		case 0xfa:  LDCDBR(opcode); break; // sh4 only
 		// 0xb0
-		case 0x0b:  SH2JSR(Rn);  break;
-		case 0x1b:  SH2TAS(Rn); break;
-		case 0x2b:  SH2JMP(Rn);  break;
+		case 0x0b:  JSR(Rn);  break;
+		case 0x1b:  TAS(Rn); break;
+		case 0x2b:  JMP(Rn);  break;
 		case 0x3b:  ILLEGAL(); break;
-		case 0x4b:  SH2JSR(Rn);  break;
-		case 0x5b:  SH2TAS(Rn); break;
-		case 0x6b:  SH2JMP(Rn);  break;
+		case 0x4b:  JSR(Rn);  break;
+		case 0x5b:  TAS(Rn); break;
+		case 0x6b:  JMP(Rn);  break;
 		case 0x7b:  ILLEGAL(); break;
-		case 0x8b:  SH2JSR(Rn);  break;
-		case 0x9b:  SH2TAS(Rn); break;
-		case 0xab:  SH2JMP(Rn);  break;
+		case 0x8b:  JSR(Rn);  break;
+		case 0x9b:  TAS(Rn); break;
+		case 0xab:  JMP(Rn);  break;
 		case 0xbb:  ILLEGAL(); break;
-		case 0xcb:  SH2JSR(Rn);  break;
-		case 0xdb:  SH2TAS(Rn); break;
-		case 0xeb:  SH2JMP(Rn);  break;
+		case 0xcb:  JSR(Rn);  break;
+		case 0xdb:  TAS(Rn); break;
+		case 0xeb:  JMP(Rn);  break;
 		case 0xfb:  ILLEGAL(); break;
 		// 0xc0
 		case 0x0c:  SHAD(opcode); break; // sh4 only
@@ -2265,8 +2265,8 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xfd:  SHLD(opcode); break;
 		// 0xe0
 		case 0x0e:  LDCSR(opcode); break; // sh2/4 flag difference
-		case 0x1e:  SH2LDCGBR(Rn); break;
-		case 0x2e:  SH2LDCVBR(Rn); break;
+		case 0x1e:  LDCGBR(Rn); break;
+		case 0x2e:  LDCVBR(Rn); break;
 		case 0x3e:  LDCSSR(opcode); break; // sh4 only
 		case 0x4e:  LDCSPC(opcode); break; // sh4 only
 		case 0x5e:  ILLEGAL(); break;
@@ -2281,22 +2281,22 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xee:  LDCRBANK(opcode); break;
 		case 0xfe:  LDCRBANK(opcode); break;
 		// 0xf0
-		case 0x0f:  SH2MAC_W(Rm, Rn); break;
-		case 0x1f:  SH2MAC_W(Rm, Rn); break;
-		case 0x2f:  SH2MAC_W(Rm, Rn); break;
-		case 0x3f:  SH2MAC_W(Rm, Rn); break;
-		case 0x4f:  SH2MAC_W(Rm, Rn); break;
-		case 0x5f:  SH2MAC_W(Rm, Rn); break;
-		case 0x6f:  SH2MAC_W(Rm, Rn); break;
-		case 0x7f:  SH2MAC_W(Rm, Rn); break;
-		case 0x8f:  SH2MAC_W(Rm, Rn); break;
-		case 0x9f:  SH2MAC_W(Rm, Rn); break;
-		case 0xaf:  SH2MAC_W(Rm, Rn); break;
-		case 0xbf:  SH2MAC_W(Rm, Rn); break;
-		case 0xcf:  SH2MAC_W(Rm, Rn); break;
-		case 0xdf:  SH2MAC_W(Rm, Rn); break;
-		case 0xef:  SH2MAC_W(Rm, Rn); break;
-		case 0xff:  SH2MAC_W(Rm, Rn); break;
+		case 0x0f:  MAC_W(Rm, Rn); break;
+		case 0x1f:  MAC_W(Rm, Rn); break;
+		case 0x2f:  MAC_W(Rm, Rn); break;
+		case 0x3f:  MAC_W(Rm, Rn); break;
+		case 0x4f:  MAC_W(Rm, Rn); break;
+		case 0x5f:  MAC_W(Rm, Rn); break;
+		case 0x6f:  MAC_W(Rm, Rn); break;
+		case 0x7f:  MAC_W(Rm, Rn); break;
+		case 0x8f:  MAC_W(Rm, Rn); break;
+		case 0x9f:  MAC_W(Rm, Rn); break;
+		case 0xaf:  MAC_W(Rm, Rn); break;
+		case 0xbf:  MAC_W(Rm, Rn); break;
+		case 0xcf:  MAC_W(Rm, Rn); break;
+		case 0xdf:  MAC_W(Rm, Rn); break;
+		case 0xef:  MAC_W(Rm, Rn); break;
+		case 0xff:  MAC_W(Rm, Rn); break;
 	}
 }
 
@@ -2310,50 +2310,50 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x1000:
-			SH2MOVLS4(Rm, opcode & 0x0f, Rn);
+			MOVLS4(Rm, opcode & 0x0f, Rn);
 			break;
 
 		case 0x2000: // void sh2_device::op0010(uint16_t opcode)
 			switch (opcode & 0x0f)
 			{
-			case  0: SH2MOVBS(Rm, Rn);                break;
-			case  1: SH2MOVWS(Rm, Rn);                break;
-			case  2: SH2MOVLS(Rm, Rn);                break;
+			case  0: MOVBS(Rm, Rn);                break;
+			case  1: MOVWS(Rm, Rn);                break;
+			case  2: MOVLS(Rm, Rn);                break;
 			case  3: ILLEGAL();                         break;
-			case  4: SH2MOVBM(Rm, Rn);                break;
-			case  5: SH2MOVWM(Rm, Rn);                break;
-			case  6: SH2MOVLM(Rm, Rn);                break;
-			case  7: SH2DIV0S(Rm, Rn);                break;
-			case  8: SH2TST(Rm, Rn);                  break;
-			case  9: SH2AND(Rm, Rn);                  break;
-			case 10: SH2XOR(Rm, Rn);                  break;
-			case 11: SH2OR(Rm, Rn);                   break;
-			case 12: SH2CMPSTR(Rm, Rn);               break;
-			case 13: SH2XTRCT(Rm, Rn);                break;
-			case 14: SH2MULU(Rm, Rn);                 break;
-			case 15: SH2MULS(Rm, Rn);                 break;
+			case  4: MOVBM(Rm, Rn);                break;
+			case  5: MOVWM(Rm, Rn);                break;
+			case  6: MOVLM(Rm, Rn);                break;
+			case  7: DIV0S(Rm, Rn);                break;
+			case  8: TST(Rm, Rn);                  break;
+			case  9: AND(Rm, Rn);                  break;
+			case 10: XOR(Rm, Rn);                  break;
+			case 11: OR(Rm, Rn);                   break;
+			case 12: CMPSTR(Rm, Rn);               break;
+			case 13: XTRCT(Rm, Rn);                break;
+			case 14: MULU(Rm, Rn);                 break;
+			case 15: MULS(Rm, Rn);                 break;
 			}
 			break;
 
 		case 0x3000: // void sh2_device::op0011(uint16_t opcode)
 			switch (opcode & 0x0f)
 			{
-			case  0: SH2CMPEQ(Rm, Rn);                break;
+			case  0: CMPEQ(Rm, Rn);                break;
 			case  1: ILLEGAL();                         break;
-			case  2: SH2CMPHS(Rm, Rn);                break;
-			case  3: SH2CMPGE(Rm, Rn);                break;
-			case  4: SH2DIV1(Rm, Rn);                 break;
-			case  5: SH2DMULU(Rm, Rn);                break;
-			case  6: SH2CMPHI(Rm, Rn);                break;
-			case  7: SH2CMPGT(Rm, Rn);                break;
-			case  8: SH2SUB(Rm, Rn);                  break;
+			case  2: CMPHS(Rm, Rn);                break;
+			case  3: CMPGE(Rm, Rn);                break;
+			case  4: DIV1(Rm, Rn);                 break;
+			case  5: DMULU(Rm, Rn);                break;
+			case  6: CMPHI(Rm, Rn);                break;
+			case  7: CMPGT(Rm, Rn);                break;
+			case  8: SUB(Rm, Rn);                  break;
 			case  9: ILLEGAL();                         break;
-			case 10: SH2SUBC(Rm, Rn);                 break;
-			case 11: SH2SUBV(Rm, Rn);                 break;
-			case 12: SH2ADD(Rm, Rn);                  break;
-			case 13: SH2DMULS(Rm, Rn);                break;
-			case 14: SH2ADDC(Rm, Rn);                 break;
-			case 15: SH2ADDV(Rm, Rn);                 break;
+			case 10: SUBC(Rm, Rn);                 break;
+			case 11: SUBV(Rm, Rn);                 break;
+			case 12: ADD(Rm, Rn);                  break;
+			case 13: DMULS(Rm, Rn);                break;
+			case 14: ADDC(Rm, Rn);                 break;
+			case 15: ADDV(Rm, Rn);                 break;
 			}
 			break;
 
@@ -2362,98 +2362,98 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x5000:
-			SH2MOVLL4(Rm, opcode & 0x0f, Rn);
+			MOVLL4(Rm, opcode & 0x0f, Rn);
 			break;
 
 		case 0x6000: // void sh2_device::op0110(uint16_t opcode)
 			switch (opcode & 0x0f)
 			{
-			case  0: SH2MOVBL(Rm, Rn);                break;
-			case  1: SH2MOVWL(Rm, Rn);                break;
-			case  2: SH2MOVLL(Rm, Rn);                break;
-			case  3: SH2MOV(Rm, Rn);                  break;
-			case  4: SH2MOVBP(Rm, Rn);                break;
-			case  5: SH2MOVWP(Rm, Rn);                break;
-			case  6: SH2MOVLP(Rm, Rn);                break;
-			case  7: SH2NOT(Rm, Rn);                  break;
-			case  8: SH2SWAPB(Rm, Rn);                break;
-			case  9: SH2SWAPW(Rm, Rn);                break;
-			case 10: SH2NEGC(Rm, Rn);                 break;
-			case 11: SH2NEG(Rm, Rn);                  break;
-			case 12: SH2EXTUB(Rm, Rn);                break;
-			case 13: SH2EXTUW(Rm, Rn);                break;
-			case 14: SH2EXTSB(Rm, Rn);                break;
-			case 15: SH2EXTSW(Rm, Rn);                break;
+			case  0: MOVBL(Rm, Rn);                break;
+			case  1: MOVWL(Rm, Rn);                break;
+			case  2: MOVLL(Rm, Rn);                break;
+			case  3: MOV(Rm, Rn);                  break;
+			case  4: MOVBP(Rm, Rn);                break;
+			case  5: MOVWP(Rm, Rn);                break;
+			case  6: MOVLP(Rm, Rn);                break;
+			case  7: NOT(Rm, Rn);                  break;
+			case  8: SWAPB(Rm, Rn);                break;
+			case  9: SWAPW(Rm, Rn);                break;
+			case 10: NEGC(Rm, Rn);                 break;
+			case 11: NEG(Rm, Rn);                  break;
+			case 12: EXTUB(Rm, Rn);                break;
+			case 13: EXTUW(Rm, Rn);                break;
+			case 14: EXTSB(Rm, Rn);                break;
+			case 15: EXTSW(Rm, Rn);                break;
 			}
 			break;
 
 		case 0x7000:
-			SH2ADDI(opcode & 0xff, Rn);
+			ADDI(opcode & 0xff, Rn);
 			break;
 
 		case 0x8000: // sh2_device::op1000(uint16_t opcode)
 			switch ((opcode >> 8) & 0x0f)
 			{
-			case  0: SH2MOVBS4(opcode & 0x0f, Rm);   break;
-			case  1: SH2MOVWS4(opcode & 0x0f, Rm);   break;
+			case  0: MOVBS4(opcode & 0x0f, Rm);   break;
+			case  1: MOVWS4(opcode & 0x0f, Rm);   break;
 			case  2: ILLEGAL();                 break;
 			case  3: ILLEGAL();                 break;
-			case  4: SH2MOVBL4(Rm, opcode & 0x0f);    break;
-			case  5: SH2MOVWL4(Rm, opcode & 0x0f);    break;
+			case  4: MOVBL4(Rm, opcode & 0x0f);    break;
+			case  5: MOVWL4(Rm, opcode & 0x0f);    break;
 			case  6: ILLEGAL();                 break;
 			case  7: ILLEGAL();                 break;
-			case  8: SH2CMPIM(opcode & 0xff);     break;
-			case  9: SH2BT(opcode & 0xff);        break;
+			case  8: CMPIM(opcode & 0xff);     break;
+			case  9: BT(opcode & 0xff);        break;
 			case 10: ILLEGAL();                 break;
-			case 11: SH2BF(opcode & 0xff);        break;
+			case 11: BF(opcode & 0xff);        break;
 			case 12: ILLEGAL();                 break;
-			case 13: SH2BTS(opcode & 0xff);       break;
+			case 13: BTS(opcode & 0xff);       break;
 			case 14: ILLEGAL();                 break;
-			case 15: SH2BFS(opcode & 0xff);       break;
+			case 15: BFS(opcode & 0xff);       break;
 			}
 			break;
 
 		case 0x9000:
-			SH2MOVWI(opcode & 0xff, Rn);
+			MOVWI(opcode & 0xff, Rn);
 			break;
 
 		case 0xa000:
-			SH2BRA(opcode & 0xfff);
+			BRA(opcode & 0xfff);
 			break;
 
 		case 0xb000:
-			SH2BSR(opcode & 0xfff);
+			BSR(opcode & 0xfff);
 			break;
 
 		case 0xc000: // void sh2_device::op1100(uint16_t opcode)
 			switch ((opcode >> 8) & 0x0f)
 			{
 
-			case  0: SH2MOVBSG(opcode & 0xff);     break;
-			case  1: SH2MOVWSG(opcode & 0xff);     break;
-			case  2: SH2MOVLSG(opcode & 0xff);     break;
+			case  0: MOVBSG(opcode & 0xff);     break;
+			case  1: MOVWSG(opcode & 0xff);     break;
+			case  2: MOVLSG(opcode & 0xff);     break;
 			case  3: TRAPA(opcode & 0xff); break; // note SH4 implementation is different
-			case  4: SH2MOVBLG(opcode & 0xff);     break;
-			case  5: SH2MOVWLG(opcode & 0xff);     break;
-			case  6: SH2MOVLLG(opcode & 0xff);     break;
-			case  7: SH2MOVA(opcode & 0xff);       break;
-			case  8: SH2TSTI(opcode & 0xff);       break;
-			case  9: SH2ANDI(opcode & 0xff);       break;
-			case 10: SH2XORI(opcode & 0xff);       break;
-			case 11: SH2ORI(opcode & 0xff);            break;
-			case 12: SH2TSTM(opcode & 0xff);       break;
-			case 13: SH2ANDM(opcode & 0xff);       break;
-			case 14: SH2XORM(opcode & 0xff);       break;
-			case 15: SH2ORM(opcode & 0xff);            break;
+			case  4: MOVBLG(opcode & 0xff);     break;
+			case  5: MOVWLG(opcode & 0xff);     break;
+			case  6: MOVLLG(opcode & 0xff);     break;
+			case  7: MOVA(opcode & 0xff);       break;
+			case  8: TSTI(opcode & 0xff);       break;
+			case  9: ANDI(opcode & 0xff);       break;
+			case 10: XORI(opcode & 0xff);       break;
+			case 11: ORI(opcode & 0xff);            break;
+			case 12: TSTM(opcode & 0xff);       break;
+			case 13: ANDM(opcode & 0xff);       break;
+			case 14: XORM(opcode & 0xff);       break;
+			case 15: ORM(opcode & 0xff);            break;
 			}
 			break;
 
 		case 0xd000:
-			SH2MOVLI(opcode & 0xff, Rn);
+			MOVLI(opcode & 0xff, Rn);
 			break;
 
 		case 0xe000:
-			SH2MOVI(opcode & 0xff, Rn);
+			MOVI(opcode & 0xff, Rn);
 			break;
 
 		case 0xf000: // sh4 only
