@@ -239,16 +239,18 @@ public:
 	sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
-	//virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
+	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-	//bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	//bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	
+	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
+	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
+	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
 
 	sh_common_execution *m_sh;
 };

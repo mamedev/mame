@@ -346,20 +346,12 @@ public:
 	sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-	bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-
-	sh_common_execution *m_sh2;
+	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
-
 
 DECLARE_DEVICE_TYPE(SH1,  sh1_device)
 DECLARE_DEVICE_TYPE(SH2,  sh2_device)

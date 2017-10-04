@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller
+// copyright-holders:Juergen Buchmueller, R. Belmont
 #include "emu.h"
 #include "debugger.h"
 #include "sh2.h"
