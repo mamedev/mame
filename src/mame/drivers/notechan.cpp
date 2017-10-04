@@ -133,6 +133,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	DECLARE_WRITE8_MEMBER(out_f8_w);
+	DECLARE_WRITE8_MEMBER(out_f9_w);
+	DECLARE_WRITE8_MEMBER(out_fa_w);
 };
 
 
@@ -153,20 +156,28 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( notechan_port_map, AS_IO, 8, notechan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)  // wrong... just a placeholder. 00h seems unused.
-	AM_RANGE(0xf8, 0xf8) AM_WRITENOP    // watchdog reset?
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0") AM_WRITE(out_f8_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN1") AM_WRITE(out_f9_w)
+	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN2") AM_WRITE(out_fa_w)
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
+	AM_RANGE(0xff, 0xff) AM_WRITENOP    // watchdog reset? (written immediately upon reset, INT and NMI)
 ADDRESS_MAP_END
 
-/*
-  F0:  -W  78
-  F8:  RW  (alternate 00 & 02 and ends with C0)
-  FA:  -W  00 (from $A4B1 contents transferred to reg A)
-  FB:  R-  ???
-  FF:  -W  00 (at start, and then often later)
+WRITE8_MEMBER(notechan_state::out_f8_w)
+{
+	logerror("Output %02X to $F8\n", data);
+}
 
-  Need more analysis...
+WRITE8_MEMBER(notechan_state::out_f9_w)
+{
+	logerror("Output %02X to $F9\n", data);
+}
 
-*/
+WRITE8_MEMBER(notechan_state::out_fa_w)
+{
+	logerror("Output %02X to $FA\n", data);
+}
 
 /*********************************************
 *          Input Ports Definitions           *
@@ -184,14 +195,8 @@ static INPUT_PORTS_START( notechan )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
@@ -250,6 +255,7 @@ static MACHINE_CONFIG_START( notechan )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
 	MCFG_CPU_PROGRAM_MAP(notechan_map)
 	MCFG_CPU_IO_MAP(notechan_port_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(driver_device, irq0_line_hold, 60)
 
 	/* NO VIDEO */
 
