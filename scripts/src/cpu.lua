@@ -672,8 +672,7 @@ if (CPUS["SH"]~=null) then
 end
 
 if (CPUS["SH"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh2dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh4dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh_dasm.cpp")
 end
 
 --------------------------------------------------
