@@ -186,7 +186,6 @@ protected:
 	void SH2SWAPB(uint32_t m, uint32_t n);
 	void SH2SWAPW(uint32_t m, uint32_t n);
 	void SH2TAS(uint32_t n);
-	void SH2TRAPA(uint32_t i);
 	void SH2TST(uint32_t m, uint32_t n);
 	void SH2TSTI(uint32_t i);
 	void SH2TSTM(uint32_t i);
@@ -198,6 +197,7 @@ protected:
 	virtual void RTE() = 0;
 	virtual void LDCSR(const uint16_t opcode) = 0;
 	virtual void LDCMSR(const uint16_t opcode) = 0;
+	virtual void TRAPA(uint32_t i) = 0;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 };

@@ -337,6 +337,22 @@ inline void sh2_device::RTE()
 	m_test_irq = 1;
 }
 
+/*  TRAPA   #imm */
+inline void sh2_device::TRAPA(uint32_t i)
+{
+	uint32_t imm = i & 0xff;
+
+	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
+
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->sr );
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->pc );
+
+	m_sh2_state->pc = RL( m_sh2_state->ea );
+
+	m_sh2_state->icount -= 7;
+}
 
 /*****************************************************************************
  *  OPCODE DISPATCHERS
@@ -624,7 +640,7 @@ void sh2_device::op1100(uint16_t opcode)
 	case  0<<8: SH2MOVBSG(opcode & 0xff);     break;
 	case  1<<8: SH2MOVWSG(opcode & 0xff);     break;
 	case  2<<8: SH2MOVLSG(opcode & 0xff);     break;
-	case  3<<8: SH2TRAPA(opcode & 0xff);      break;
+	case  3<<8: TRAPA(opcode & 0xff);      break;
 	case  4<<8: SH2MOVBLG(opcode & 0xff);     break;
 	case  5<<8: SH2MOVWLG(opcode & 0xff);     break;
 	case  6<<8: SH2MOVLLG(opcode & 0xff);     break;

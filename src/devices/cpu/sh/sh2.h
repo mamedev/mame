@@ -243,6 +243,7 @@ private:
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;
+	virtual void TRAPA(uint32_t i) override;
 	virtual void RTE() override;
 
 	inline void op0000(uint16_t opcode);

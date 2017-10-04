@@ -610,27 +610,10 @@ inline void sh34_base_device::RTE()
 	sh4_exception_recompute();
 }
 
-/*  SLEEP */
-inline void sh34_base_device::SLEEP(const uint16_t opcode)
-{
-	/* 0 = normal mode */
-	/* 1 = enters into power-down mode */
-	/* 2 = go out the power-down mode after an exception */
-	if(m_sh2_state->sleep_mode != 2)
-		m_sh2_state->pc -= 2;
-	m_sh2_state->icount -= 2;
-	/* Wait_for_exception; */
-	if(m_sh2_state->sleep_mode == 0)
-		m_sh2_state->sleep_mode = 1;
-	else if(m_sh2_state->sleep_mode == 2)
-		m_sh2_state->sleep_mode = 0;
-}
-
-
 /*  TRAPA   #imm */
-inline void sh34_base_device::TRAPA(const uint16_t opcode)
+inline void sh34_base_device::TRAPA(uint32_t i)
 {
-	uint32_t imm = opcode & 0xff;
+	uint32_t imm = i & 0xff;
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
@@ -1947,19 +1930,19 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xfa:  STCDBR(opcode); break; // sh4 only
 		// 0xb0
 		case 0x0b:  SH2RTS(); break;
-		case 0x1b:  SLEEP(opcode); break;
+		case 0x1b:  SH2SLEEP(); break;
 		case 0x2b:  RTE(); break;
 		case 0x3b:  SH2NOP(); break;
 		case 0x4b:  SH2RTS(); break;
-		case 0x5b:  SLEEP(opcode); break;
+		case 0x5b:  SH2SLEEP(); break;
 		case 0x6b:  RTE(); break;
 		case 0x7b:  SH2NOP(); break;
 		case 0x8b:  SH2RTS(); break;
-		case 0x9b:  SLEEP(opcode); break;
+		case 0x9b:  SH2SLEEP(); break;
 		case 0xab:  RTE(); break;
 		case 0xbb:  SH2NOP(); break;
 		case 0xcb:  SH2RTS(); break;
-		case 0xdb:  SLEEP(opcode); break;
+		case 0xdb:  SH2SLEEP(); break;
 		case 0xeb:  RTE(); break;
 		case 0xfb:  SH2NOP(); break;
 		// 0xc0
@@ -2444,7 +2427,7 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			case  0: SH2MOVBSG(opcode & 0xff);     break;
 			case  1: SH2MOVWSG(opcode & 0xff);     break;
 			case  2: SH2MOVLSG(opcode & 0xff);     break;
-			case  3: TRAPA(opcode); break; // note SH4 implementation is different
+			case  3: TRAPA(opcode & 0xff); break; // note SH4 implementation is different
 			case  4: SH2MOVBLG(opcode & 0xff);     break;
 			case  5: SH2MOVWLG(opcode & 0xff);     break;
 			case  6: SH2MOVLLG(opcode & 0xff);     break;

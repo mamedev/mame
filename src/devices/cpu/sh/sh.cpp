@@ -1565,6 +1565,9 @@ void sh_common_execution::SH2ILLEGAL()
 /*  SLEEP */
 void sh_common_execution::SH2SLEEP()
 {
+	/* 0 = normal mode */
+	/* 1 = enters into power-down mode */
+	/* 2 = go out the power-down mode after an exception */
 	if(m_sh2_state->sleep_mode != 2)
 		m_sh2_state->pc -= 2;
 	m_sh2_state->icount -= 2;
@@ -1575,22 +1578,6 @@ void sh_common_execution::SH2SLEEP()
 		m_sh2_state->sleep_mode = 0;
 }
 
-/*  TRAPA   #imm */
-void sh_common_execution::SH2TRAPA(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-
-	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
-
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc );
-
-	m_sh2_state->pc = RL( m_sh2_state->ea );
-
-	m_sh2_state->icount -= 7;
-}
 
 #undef Rn
 #undef Rm

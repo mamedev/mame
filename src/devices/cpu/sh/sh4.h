@@ -429,6 +429,7 @@ protected:
 	virtual void LDCSR(const uint16_t opcode) override;
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void RTE() override;
+	virtual void TRAPA(uint32_t i) override;
 
 	virtual void LDTLB(const uint16_t opcode);
 
@@ -437,8 +438,6 @@ protected:
 	void CLRS(const uint16_t opcode);
 	void SETS(const uint16_t opcode);
 
-	void SLEEP(const uint16_t opcode);
-	void TRAPA(const uint16_t opcode);
 	void STCRBANK(const uint16_t opcode);
 	void STCMRBANK(const uint16_t opcode);
 	void STCSSR(const uint16_t opcode);
