@@ -3,7 +3,11 @@
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
 
-<!-- To load and run a tape: 1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]". 2. Enter the address information or type LOAD for BASIC programs but do not press <Return>. 3. Play the tape, then press <Return>. 4. Enter the address information or type RUN for BASIC programsn and press <Return> to run the program. -->
+<!-- To load and run a tape:
+1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
+2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
+3. Play the tape, then press <Return>.
+4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
 
 	<software name="aligren" supported="partial">
 		<description>Alignment Test Tone / Renumber</description>
@@ -30,7 +34,7 @@
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-0002-02" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value="cass1 >Load 16K, cass2 >HIMEM:16384 >Load 16K" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="ALIGNMENT TEST TONE" />
 			<dataarea name="cass" size="5677100">
@@ -38,9 +42,10 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="SAMPLER >HIMEM:16384" />
+			<feature name="part_id" value="SAMPLER" />
 			<dataarea name="cass" size="3583788">
-				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />			</dataarea>
+				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -83,7 +88,7 @@
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-2006-00" />
 		<info name="P/N" value="A2T0004X" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
 			<dataarea name="cass" size="3260004">
@@ -91,7 +96,7 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Floating Point BASIC Demo (APPLESOFT LOADED) ]Load 16K" />
+			<feature name="part_id" value="Floating Point BASIC Demo (APPLESOFT LOADED)" />
 			<dataarea name="cass" size="1984556">
 				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
 			</dataarea>
@@ -116,9 +121,9 @@
 		<description>Apple-2 Trek</description>
 		<year>1977</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">HIMEM:16384 >Load 16K" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="Apple-2 Trek >HIMEM:16384" />
+			<feature name="part_id" value="Apple-2 Trek" />
 			<dataarea name="cass" size="8449462">
 				<rom name="apple-2 trek (1977)(apple computer).wav" size="8449462" crc="3edd69cf" sha1="5b260523993893fa6cce5520d955cab425a9ecc4" offset="0" />
 			</dataarea>
@@ -144,9 +149,9 @@
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="685-0005-00" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value="cass1  >HIMEM:16384 >Load 16K, cass2 Load 16K" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="APPLEVISION >HIMEM:16384" />
+			<feature name="part_id" value="APPLEVISION" />
 			<dataarea name="cass" size="2063394">
 				<rom name="apple-vision (1979)(apple computer).wav" size="2063394" crc="09a87b3d" sha1="5f8924a88220a7a1c93ddd358d50a8b85f6b1f51" offset="0" />
 			</dataarea>
@@ -319,7 +324,7 @@
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="002-0016-00" />
 		<info name="P/N" value="A2T0012X" />
-		<info name="usage" value="*800.A4FR >LOMEM:2700 4K, >Load 4K" />
+		<info name="usage" value="cass1 *800.A4FR >LOMEM:2700 4K, cass2 >Load 4K" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Datamover (Machine Language Load)" />
 			<dataarea name="cass" size="456748">
