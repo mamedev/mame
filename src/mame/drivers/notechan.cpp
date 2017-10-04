@@ -121,7 +121,7 @@
 
 #define MASTER_CLOCK     XTAL_8_448MHz
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
-#define SND_CLOCK        1056000             // unverified resonator
+#define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
 
 
 class notechan_state : public driver_device
