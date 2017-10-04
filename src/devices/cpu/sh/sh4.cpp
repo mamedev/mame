@@ -1948,56 +1948,56 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xeb:  RTE(opcode); break;
 		case 0xfb:  NOP(opcode); break;
 		// 0xc0
-		case 0x0c:  MOVBL0(opcode); break;
-		case 0x1c:  MOVBL0(opcode); break;
-		case 0x2c:  MOVBL0(opcode); break;
-		case 0x3c:  MOVBL0(opcode); break;
-		case 0x4c:  MOVBL0(opcode); break;
-		case 0x5c:  MOVBL0(opcode); break;
-		case 0x6c:  MOVBL0(opcode); break;
-		case 0x7c:  MOVBL0(opcode); break;
-		case 0x8c:  MOVBL0(opcode); break;
-		case 0x9c:  MOVBL0(opcode); break;
-		case 0xac:  MOVBL0(opcode); break;
-		case 0xbc:  MOVBL0(opcode); break;
-		case 0xcc:  MOVBL0(opcode); break;
-		case 0xdc:  MOVBL0(opcode); break;
-		case 0xec:  MOVBL0(opcode); break;
-		case 0xfc:  MOVBL0(opcode); break;
+		case 0x0c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x1c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x2c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x3c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x4c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x5c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x6c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x7c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x8c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0x9c:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xac:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xbc:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xcc:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xdc:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xec:  SH2MOVBL0(Rm, Rn);  break;
+		case 0xfc:  SH2MOVBL0(Rm, Rn);  break;
 		// 0xd0
-		case 0x0d:  MOVWL0(opcode); break;
-		case 0x1d:  MOVWL0(opcode); break;
-		case 0x2d:  MOVWL0(opcode); break;
-		case 0x3d:  MOVWL0(opcode); break;
-		case 0x4d:  MOVWL0(opcode); break;
-		case 0x5d:  MOVWL0(opcode); break;
-		case 0x6d:  MOVWL0(opcode); break;
-		case 0x7d:  MOVWL0(opcode); break;
-		case 0x8d:  MOVWL0(opcode); break;
-		case 0x9d:  MOVWL0(opcode); break;
-		case 0xad:  MOVWL0(opcode); break;
-		case 0xbd:  MOVWL0(opcode); break;
-		case 0xcd:  MOVWL0(opcode); break;
-		case 0xdd:  MOVWL0(opcode); break;
-		case 0xed:  MOVWL0(opcode); break;
-		case 0xfd:  MOVWL0(opcode); break;
+		case 0x0d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x1d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x2d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x3d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x4d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x5d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x6d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x7d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x8d:  SH2MOVWL0(Rm, Rn); break;
+		case 0x9d:  SH2MOVWL0(Rm, Rn); break;
+		case 0xad:  SH2MOVWL0(Rm, Rn); break;
+		case 0xbd:  SH2MOVWL0(Rm, Rn); break;
+		case 0xcd:  SH2MOVWL0(Rm, Rn); break;
+		case 0xdd:  SH2MOVWL0(Rm, Rn); break;
+		case 0xed:  SH2MOVWL0(Rm, Rn); break;
+		case 0xfd:  SH2MOVWL0(Rm, Rn); break;
 		// 0xe0
-		case 0x0e:  MOVLL0(opcode); break;
-		case 0x1e:  MOVLL0(opcode); break;
-		case 0x2e:  MOVLL0(opcode); break;
-		case 0x3e:  MOVLL0(opcode); break;
-		case 0x4e:  MOVLL0(opcode); break;
-		case 0x5e:  MOVLL0(opcode); break;
-		case 0x6e:  MOVLL0(opcode); break;
-		case 0x7e:  MOVLL0(opcode); break;
-		case 0x8e:  MOVLL0(opcode); break;
-		case 0x9e:  MOVLL0(opcode); break;
-		case 0xae:  MOVLL0(opcode); break;
-		case 0xbe:  MOVLL0(opcode); break;
-		case 0xce:  MOVLL0(opcode); break;
-		case 0xde:  MOVLL0(opcode); break;
-		case 0xee:  MOVLL0(opcode); break;
-		case 0xfe:  MOVLL0(opcode); break;
+		case 0x0e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x1e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x2e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x3e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x4e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x5e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x6e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x7e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x8e:  SH2MOVLL0(Rm, Rn); break;
+		case 0x9e:  SH2MOVLL0(Rm, Rn); break;
+		case 0xae:  SH2MOVLL0(Rm, Rn); break;
+		case 0xbe:  SH2MOVLL0(Rm, Rn); break;
+		case 0xce:  SH2MOVLL0(Rm, Rn); break;
+		case 0xde:  SH2MOVLL0(Rm, Rn); break;
+		case 0xee:  SH2MOVLL0(Rm, Rn); break;
+		case 0xfe:  SH2MOVLL0(Rm, Rn); break;
 		// 0xf0
 		case 0x0f:  SH2MAC_L(Rm, Rn); break;
 		case 0x1f:  SH2MAC_L(Rm, Rn); break;
@@ -2023,47 +2023,47 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	switch(opcode & 0xff)
 	{
 		// 0x00
-		case 0x00:  SHLL(opcode); break;
-		case 0x10:  DT(opcode); break;
-		case 0x20:  SHAL(opcode); break;
+		case 0x00:  SH2SHLL(Rn); break;
+		case 0x10:  SH2DT(Rn); break;
+		case 0x20:  SH2SHAL(Rn); break;
 		case 0x30:  NOP(opcode); break;
-		case 0x40:  SHLL(opcode); break;
-		case 0x50:  DT(opcode); break;
-		case 0x60:  SHAL(opcode); break;
+		case 0x40:  SH2SHLL(Rn); break;
+		case 0x50:  SH2DT(Rn); break;
+		case 0x60:  SH2SHAL(Rn); break;
 		case 0x70:  NOP(opcode); break;
-		case 0x80:  SHLL(opcode); break;
-		case 0x90:  DT(opcode); break;
-		case 0xa0:  SHAL(opcode); break;
+		case 0x80:  SH2SHLL(Rn); break;
+		case 0x90:  SH2DT(Rn); break;
+		case 0xa0:  SH2SHAL(Rn); break;
 		case 0xb0:  NOP(opcode); break;
-		case 0xc0:  SHLL(opcode); break;
-		case 0xd0:  DT(opcode); break;
-		case 0xe0:  SHAL(opcode); break;
+		case 0xc0:  SH2SHLL(Rn); break;
+		case 0xd0:  SH2DT(Rn); break;
+		case 0xe0:  SH2SHAL(Rn); break;
 		case 0xf0:  NOP(opcode); break;
 		// 0x10
-		case 0x01:  SHLR(opcode); break;
-		case 0x11:  CMPPZ(opcode); break;
-		case 0x21:  SHAR(opcode); break;
+		case 0x01:  SH2SHLR(Rn); break;
+		case 0x11:  SH2CMPPZ(Rn);  break;
+		case 0x21:  SH2SHAR(Rn); break;
 		case 0x31:  NOP(opcode); break;
-		case 0x41:  SHLR(opcode); break;
-		case 0x51:  CMPPZ(opcode); break;
-		case 0x61:  SHAR(opcode); break;
+		case 0x41:  SH2SHLR(Rn); break;
+		case 0x51:  SH2CMPPZ(Rn);  break;
+		case 0x61:  SH2SHAR(Rn); break;
 		case 0x71:  NOP(opcode); break;
-		case 0x81:  SHLR(opcode); break;
-		case 0x91:  CMPPZ(opcode); break;
-		case 0xa1:  SHAR(opcode); break;
+		case 0x81:  SH2SHLR(Rn); break;
+		case 0x91:  SH2CMPPZ(Rn);  break;
+		case 0xa1:  SH2SHAR(Rn); break;
 		case 0xb1:  NOP(opcode); break;
-		case 0xc1:  SHLR(opcode); break;
-		case 0xd1:  CMPPZ(opcode); break;
-		case 0xe1:  SHAR(opcode); break;
+		case 0xc1:  SH2SHLR(Rn); break;
+		case 0xd1:  SH2CMPPZ(Rn);  break;
+		case 0xe1:  SH2SHAR(Rn); break;
 		case 0xf1:  NOP(opcode); break;
 		// 0x20
-		case 0x02:  STSMMACH(opcode); break;
-		case 0x12:  STSMMACL(opcode); break;
-		case 0x22:  STSMPR(opcode); break;
-		case 0x32:  STCMSGR(opcode); break;
+		case 0x02:  SH2STSMMACH(Rn); break;
+		case 0x12:  SH2STSMMACL(Rn);  break;
+		case 0x22:  SH2STSMPR(Rn); break;
+		case 0x32:  STCMSGR(opcode); break; // sh4 only
 		case 0x42:  NOP(opcode); break;
-		case 0x52:  STSMFPUL(opcode); break;
-		case 0x62:  STSMFPSCR(opcode); break;
+		case 0x52:  STSMFPUL(opcode); break; // sh4 only
+		case 0x62:  STSMFPSCR(opcode); break; // sh4 only
 		case 0x72:  NOP(opcode); break;
 		case 0x82:  NOP(opcode); break;
 		case 0x92:  NOP(opcode); break;
@@ -2072,17 +2072,17 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xc2:  NOP(opcode); break;
 		case 0xd2:  NOP(opcode); break;
 		case 0xe2:  NOP(opcode); break;
-		case 0xf2:  STCMDBR(opcode); break;
+		case 0xf2:  STCMDBR(opcode); break; // sh4 only
 		// 0x30
-		case 0x03:  STCMSR(opcode); break;
-		case 0x13:  STCMGBR(opcode); break;
-		case 0x23:  STCMVBR(opcode); break;
-		case 0x33:  STCMSSR(opcode); break;
-		case 0x43:  STCMSPC(opcode); break;
+		case 0x03:  SH2STCMSR(Rn); break;
+		case 0x13:  SH2STCMGBR(Rn);  break;
+		case 0x23:  SH2STCMVBR(Rn); break;
+		case 0x33:  STCMSSR(opcode); break; // sh4 only
+		case 0x43:  STCMSPC(opcode); break; // sh4 only
 		case 0x53:  NOP(opcode); break;
 		case 0x63:  NOP(opcode); break;
 		case 0x73:  NOP(opcode); break;
-		case 0x83:  STCMRBANK(opcode); break;
+		case 0x83:  STCMRBANK(opcode); break; // sh4 only
 		case 0x93:  STCMRBANK(opcode); break;
 		case 0xa3:  STCMRBANK(opcode); break;
 		case 0xb3:  STCMRBANK(opcode); break;
@@ -2125,13 +2125,13 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xe5:  SH2ROTCR(Rn); break;
 		case 0xf5:  NOP(opcode); break;
 		// 0x60
-		case 0x06:  LDSMMACH(opcode); break;
-		case 0x16:  LDSMMACL(opcode); break;
-		case 0x26:  LDSMPR(opcode); break;
+		case 0x06:  SH2LDSMMACH(Rn); break;
+		case 0x16:  SH2LDSMMACL(Rn); break;
+		case 0x26:  SH2LDSMPR(Rn);  break;
 		case 0x36:  NOP(opcode); break;
 		case 0x46:  NOP(opcode); break;
-		case 0x56:  LDSMFPUL(opcode); break;
-		case 0x66:  LDSMFPSCR(opcode); break;
+		case 0x56:  LDSMFPUL(opcode); break; // sh4 only
+		case 0x66:  LDSMFPSCR(opcode); break; // sh4 only
 		case 0x76:  NOP(opcode); break;
 		case 0x86:  NOP(opcode); break;
 		case 0x96:  NOP(opcode); break;
@@ -2140,17 +2140,17 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xc6:  NOP(opcode); break;
 		case 0xd6:  NOP(opcode); break;
 		case 0xe6:  NOP(opcode); break;
-		case 0xf6:  LDCMDBR(opcode); break;
+		case 0xf6:  LDCMDBR(opcode); break; // sh4 only
 		// 0x70
-		case 0x07:  LDCMSR(opcode); break;
-		case 0x17:  LDCMGBR(opcode); break;
-		case 0x27:  LDCMVBR(opcode); break;
-		case 0x37:  LDCMSSR(opcode); break;
-		case 0x47:  LDCMSPC(opcode); break;
+		case 0x07:  LDCMSR(opcode);  break; // sh2/4 flag difference
+		case 0x17:  SH2LDCMGBR(Rn); break;
+		case 0x27:  SH2LDCMVBR(Rn); break;
+		case 0x37:  LDCMSSR(opcode); break; // sh4 only
+		case 0x47:  LDCMSPC(opcode); break; // sh4 only
 		case 0x57:  NOP(opcode); break;
 		case 0x67:  NOP(opcode); break;
 		case 0x77:  NOP(opcode); break;
-		case 0x87:  LDCMRBANK(opcode); break;
+		case 0x87:  LDCMRBANK(opcode); break; // sh4 only
 		case 0x97:  LDCMRBANK(opcode); break;
 		case 0xa7:  LDCMRBANK(opcode); break;
 		case 0xb7:  LDCMRBANK(opcode); break;
@@ -2193,13 +2193,13 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xe9:  SH2SHLR16(Rn); break;
 		case 0xf9:  NOP(opcode); break;
 		// 0xa0
-		case 0x0a:  LDSMACH(opcode); break;
-		case 0x1a:  LDSMACL(opcode); break;
-		case 0x2a:  LDSPR(opcode); break;
+		case 0x0a:  SH2LDSMACH(Rn); break;
+		case 0x1a:  SH2LDSMACL(Rn); break;
+		case 0x2a:  SH2LDSPR(Rn); break;
 		case 0x3a:  NOP(opcode); break;
 		case 0x4a:  NOP(opcode); break;
-		case 0x5a:  LDSFPUL(opcode); break;
-		case 0x6a:  LDSFPSCR(opcode); break;
+		case 0x5a:  LDSFPUL(opcode); break; // sh4 only
+		case 0x6a:  LDSFPSCR(opcode); break; // sh4 only
 		case 0x7a:  NOP(opcode); break;
 		case 0x8a:  NOP(opcode); break;
 		case 0x9a:  NOP(opcode); break;
@@ -2208,7 +2208,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xca:  NOP(opcode); break;
 		case 0xda:  NOP(opcode); break;
 		case 0xea:  NOP(opcode); break;
-		case 0xfa:  LDCDBR(opcode); break;
+		case 0xfa:  LDCDBR(opcode); break; // sh4 only
 		// 0xb0
 		case 0x0b:  SH2JSR(Rn);  break;
 		case 0x1b:  TAS(opcode); break;
@@ -2227,7 +2227,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xeb:  SH2JMP(Rn);  break;
 		case 0xfb:  NOP(opcode); break;
 		// 0xc0
-		case 0x0c:  SHAD(opcode); break;
+		case 0x0c:  SHAD(opcode); break; // sh4 only
 		case 0x1c:  SHAD(opcode); break;
 		case 0x2c:  SHAD(opcode); break;
 		case 0x3c:  SHAD(opcode); break;
@@ -2244,7 +2244,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xec:  SHAD(opcode); break;
 		case 0xfc:  SHAD(opcode); break;
 		// 0xd0
-		case 0x0d:  SHLD(opcode); break;
+		case 0x0d:  SHLD(opcode); break; // sh4 only
 		case 0x1d:  SHLD(opcode); break;
 		case 0x2d:  SHLD(opcode); break;
 		case 0x3d:  SHLD(opcode); break;
@@ -2261,15 +2261,15 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xed:  SHLD(opcode); break;
 		case 0xfd:  SHLD(opcode); break;
 		// 0xe0
-		case 0x0e:  LDCSR(opcode); break;
-		case 0x1e:  LDCGBR(opcode); break;
-		case 0x2e:  LDCVBR(opcode); break;
-		case 0x3e:  LDCSSR(opcode); break;
-		case 0x4e:  LDCSPC(opcode); break;
+		case 0x0e:  LDCSR(opcode); break; // sh2/4 flag difference
+		case 0x1e:  SH2LDCGBR(Rn); break;
+		case 0x2e:  SH2LDCVBR(Rn); break;
+		case 0x3e:  LDCSSR(opcode); break; // sh4 only
+		case 0x4e:  LDCSPC(opcode); break; // sh4 only
 		case 0x5e:  NOP(opcode); break;
 		case 0x6e:  NOP(opcode); break;
 		case 0x7e:  NOP(opcode); break;
-		case 0x8e:  LDCRBANK(opcode); break;
+		case 0x8e:  LDCRBANK(opcode); break; // sh4 only
 		case 0x9e:  LDCRBANK(opcode); break;
 		case 0xae:  LDCRBANK(opcode); break;
 		case 0xbe:  LDCRBANK(opcode); break;
