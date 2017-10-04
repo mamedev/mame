@@ -68,6 +68,46 @@
   
 ****************************************************************************
 
+  General Notes...
+
+  Samples:
+  The waveform is ADPCM 4-bit mono, 8000 Hz.
+  Sampleset has sounds, music and voices at the following rom offsets:
+
+  $000400-$0013B2:    Sample #01    'cling' sound.
+  $0013B3-$0090B1:    Sample #02    music #1.
+  $0090B2-$00DD8D:    Sample #03
+  $00DD8E-$00EF2F:    Sample #04
+  $00EF30-$0101D0:    Sample #05
+  $0101D1-$011713:    Sample #06
+  $011714-$0129FF:    Sample #07
+  $012A00-$014136:    Sample #08
+  $014137-$015B57:    Sample #09
+  $015B58-$018E0E:    Sample #10
+  $018E0F-$01BB61:    Sample #11
+  $01BB62-$01F25C:    Sample #12
+  $01F25D-$01FA35:    Sample #13
+  $01FA36-$020372:    Sample #14
+  $020373-$0227E2:    Sample #15
+  $0227E3-$023E8D:    Sample #16
+  $023E8E-$026FF7:    Sample #17    music #2
+  $026FF8-$02A649:    Sample #18    music #3
+  $02A64A-$02D8E9:    Sample #19    music #4
+  $02D8EA-$02E635:    Sample #20    'boing' sound.
+  $02E636-$02FFB6:    Sample #21
+  $02FFB7-$03171E:    Sample #22
+  $03171F-$031EC9:    Sample #23
+  $031ECA-$032A0D:    Sample #24
+  $032A0E-$0336E2:    Sample #25
+  $0336E3-$034748:    Sample #26
+  $034749-$03523C:    Sample #27
+  $03523D-$035B00:    Sample #28
+  $035B01-$03BBE9:    Sample #29    music #5
+  $03BBEA-$03E9E1:    Sample #30
+  $03E9E2-$03F872:    Sample #31
+
+****************************************************************************
+
   About lamps...
 
   (nothing yet)
