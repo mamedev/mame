@@ -1778,15 +1778,15 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xe1:  NOP(opcode); break;
 		case 0xf1:  NOP(opcode); break;
 		// 0x20
-		case 0x02:  STCSR(opcode); break;
-		case 0x12:  STCGBR(opcode); break;
-		case 0x22:  STCVBR(opcode); break;
-		case 0x32:  STCSSR(opcode); break;
-		case 0x42:  STCSPC(opcode); break;
+		case 0x02:  SH2STCSR(Rn); break;
+		case 0x12:  SH2STCGBR(Rn); break;
+		case 0x22:  SH2STCVBR(Rn); break;
+		case 0x32:  STCSSR(opcode); break; // sh4 only
+		case 0x42:  STCSPC(opcode); break; // sh4 only
 		case 0x52:  NOP(opcode); break;
 		case 0x62:  NOP(opcode); break;
 		case 0x72:  NOP(opcode); break;
-		case 0x82:  STCRBANK(opcode); break;
+		case 0x82:  STCRBANK(opcode); break; // sh4 only
 		case 0x92:  STCRBANK(opcode); break;
 		case 0xa2:  STCRBANK(opcode); break;
 		case 0xb2:  STCRBANK(opcode); break;
@@ -1795,155 +1795,155 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xe2:  STCRBANK(opcode); break;
 		case 0xf2:  STCRBANK(opcode); break;
 		// 0x30
-		case 0x03:  BSRF(opcode); break;
+		case 0x03:  SH2BSRF(Rn); break;
 		case 0x13:  NOP(opcode); break;
-		case 0x23:  BRAF(opcode); break;
+		case 0x23:  SH2BRAF(Rn); break;
 		case 0x33:  NOP(opcode); break;
 		case 0x43:  NOP(opcode); break;
 		case 0x53:  NOP(opcode); break;
 		case 0x63:  NOP(opcode); break;
 		case 0x73:  NOP(opcode); break;
-		case 0x83:  PREFM(opcode); break;
+		case 0x83:  PREFM(opcode); break; // sh4 only
 		case 0x93:  TODO(opcode); break;
 		case 0xa3:  TODO(opcode); break;
 		case 0xb3:  TODO(opcode); break;
-		case 0xc3:  MOVCAL(opcode); break;
+		case 0xc3:  MOVCAL(opcode); break; // sh4 only
 		case 0xd3:  NOP(opcode); break;
 		case 0xe3:  NOP(opcode); break;
 		case 0xf3:  NOP(opcode); break;
 		// 0x40
-		case 0x04:  MOVBS0(opcode); break;
-		case 0x14:  MOVBS0(opcode); break;
-		case 0x24:  MOVBS0(opcode); break;
-		case 0x34:  MOVBS0(opcode); break;
-		case 0x44:  MOVBS0(opcode); break;
-		case 0x54:  MOVBS0(opcode); break;
-		case 0x64:  MOVBS0(opcode); break;
-		case 0x74:  MOVBS0(opcode); break;
-		case 0x84:  MOVBS0(opcode); break;
-		case 0x94:  MOVBS0(opcode); break;
-		case 0xa4:  MOVBS0(opcode); break;
-		case 0xb4:  MOVBS0(opcode); break;
-		case 0xc4:  MOVBS0(opcode); break;
-		case 0xd4:  MOVBS0(opcode); break;
-		case 0xe4:  MOVBS0(opcode); break;
-		case 0xf4:  MOVBS0(opcode); break;
+		case 0x04:  SH2MOVBS0(Rm, Rn); break;
+		case 0x14:  SH2MOVBS0(Rm, Rn); break;
+		case 0x24:  SH2MOVBS0(Rm, Rn); break;
+		case 0x34:  SH2MOVBS0(Rm, Rn); break;
+		case 0x44:  SH2MOVBS0(Rm, Rn); break;
+		case 0x54:  SH2MOVBS0(Rm, Rn); break;
+		case 0x64:  SH2MOVBS0(Rm, Rn); break;
+		case 0x74:  SH2MOVBS0(Rm, Rn); break;
+		case 0x84:  SH2MOVBS0(Rm, Rn); break;
+		case 0x94:  SH2MOVBS0(Rm, Rn); break;
+		case 0xa4:  SH2MOVBS0(Rm, Rn); break;
+		case 0xb4:  SH2MOVBS0(Rm, Rn); break;
+		case 0xc4:  SH2MOVBS0(Rm, Rn); break;
+		case 0xd4:  SH2MOVBS0(Rm, Rn); break;
+		case 0xe4:  SH2MOVBS0(Rm, Rn); break;
+		case 0xf4:  SH2MOVBS0(Rm, Rn); break;
 		// 0x50
-		case 0x05:  MOVWS0(opcode); break;
-		case 0x15:  MOVWS0(opcode); break;
-		case 0x25:  MOVWS0(opcode); break;
-		case 0x35:  MOVWS0(opcode); break;
-		case 0x45:  MOVWS0(opcode); break;
-		case 0x55:  MOVWS0(opcode); break;
-		case 0x65:  MOVWS0(opcode); break;
-		case 0x75:  MOVWS0(opcode); break;
-		case 0x85:  MOVWS0(opcode); break;
-		case 0x95:  MOVWS0(opcode); break;
-		case 0xa5:  MOVWS0(opcode); break;
-		case 0xb5:  MOVWS0(opcode); break;
-		case 0xc5:  MOVWS0(opcode); break;
-		case 0xd5:  MOVWS0(opcode); break;
-		case 0xe5:  MOVWS0(opcode); break;
-		case 0xf5:  MOVWS0(opcode); break;
+		case 0x05:  SH2MOVWS0(Rm, Rn); break;
+		case 0x15:  SH2MOVWS0(Rm, Rn); break;
+		case 0x25:  SH2MOVWS0(Rm, Rn); break;
+		case 0x35:  SH2MOVWS0(Rm, Rn); break;
+		case 0x45:  SH2MOVWS0(Rm, Rn); break;
+		case 0x55:  SH2MOVWS0(Rm, Rn); break;
+		case 0x65:  SH2MOVWS0(Rm, Rn); break;
+		case 0x75:  SH2MOVWS0(Rm, Rn); break;
+		case 0x85:  SH2MOVWS0(Rm, Rn); break;
+		case 0x95:  SH2MOVWS0(Rm, Rn); break;
+		case 0xa5:  SH2MOVWS0(Rm, Rn); break;
+		case 0xb5:  SH2MOVWS0(Rm, Rn); break;
+		case 0xc5:  SH2MOVWS0(Rm, Rn); break;
+		case 0xd5:  SH2MOVWS0(Rm, Rn); break;
+		case 0xe5:  SH2MOVWS0(Rm, Rn); break;
+		case 0xf5:  SH2MOVWS0(Rm, Rn); break;
 		// 0x60
-		case 0x06:  MOVLS0(opcode); break;
-		case 0x16:  MOVLS0(opcode); break;
-		case 0x26:  MOVLS0(opcode); break;
-		case 0x36:  MOVLS0(opcode); break;
-		case 0x46:  MOVLS0(opcode); break;
-		case 0x56:  MOVLS0(opcode); break;
-		case 0x66:  MOVLS0(opcode); break;
-		case 0x76:  MOVLS0(opcode); break;
-		case 0x86:  MOVLS0(opcode); break;
-		case 0x96:  MOVLS0(opcode); break;
-		case 0xa6:  MOVLS0(opcode); break;
-		case 0xb6:  MOVLS0(opcode); break;
-		case 0xc6:  MOVLS0(opcode); break;
-		case 0xd6:  MOVLS0(opcode); break;
-		case 0xe6:  MOVLS0(opcode); break;
-		case 0xf6:  MOVLS0(opcode); break;
+		case 0x06:  SH2MOVLS0(Rm, Rn); break;
+		case 0x16:  SH2MOVLS0(Rm, Rn); break;
+		case 0x26:  SH2MOVLS0(Rm, Rn); break;
+		case 0x36:  SH2MOVLS0(Rm, Rn); break;
+		case 0x46:  SH2MOVLS0(Rm, Rn); break;
+		case 0x56:  SH2MOVLS0(Rm, Rn); break;
+		case 0x66:  SH2MOVLS0(Rm, Rn); break;
+		case 0x76:  SH2MOVLS0(Rm, Rn); break;
+		case 0x86:  SH2MOVLS0(Rm, Rn); break;
+		case 0x96:  SH2MOVLS0(Rm, Rn); break;
+		case 0xa6:  SH2MOVLS0(Rm, Rn); break;
+		case 0xb6:  SH2MOVLS0(Rm, Rn); break;
+		case 0xc6:  SH2MOVLS0(Rm, Rn); break;
+		case 0xd6:  SH2MOVLS0(Rm, Rn); break;
+		case 0xe6:  SH2MOVLS0(Rm, Rn); break;
+		case 0xf6:  SH2MOVLS0(Rm, Rn); break;
 		// 0x70
-		case 0x07:  MULL(opcode); break;
-		case 0x17:  MULL(opcode); break;
-		case 0x27:  MULL(opcode); break;
-		case 0x37:  MULL(opcode); break;
-		case 0x47:  MULL(opcode); break;
-		case 0x57:  MULL(opcode); break;
-		case 0x67:  MULL(opcode); break;
-		case 0x77:  MULL(opcode); break;
-		case 0x87:  MULL(opcode); break;
-		case 0x97:  MULL(opcode); break;
-		case 0xa7:  MULL(opcode); break;
-		case 0xb7:  MULL(opcode); break;
-		case 0xc7:  MULL(opcode); break;
-		case 0xd7:  MULL(opcode); break;
-		case 0xe7:  MULL(opcode); break;
-		case 0xf7:  MULL(opcode); break;
+		case 0x07:  SH2MULL(Rm, Rn); break;
+		case 0x17:  SH2MULL(Rm, Rn); break;
+		case 0x27:  SH2MULL(Rm, Rn); break;
+		case 0x37:  SH2MULL(Rm, Rn); break;
+		case 0x47:  SH2MULL(Rm, Rn); break;
+		case 0x57:  SH2MULL(Rm, Rn); break;
+		case 0x67:  SH2MULL(Rm, Rn); break;
+		case 0x77:  SH2MULL(Rm, Rn); break;
+		case 0x87:  SH2MULL(Rm, Rn); break;
+		case 0x97:  SH2MULL(Rm, Rn); break;
+		case 0xa7:  SH2MULL(Rm, Rn); break;
+		case 0xb7:  SH2MULL(Rm, Rn); break;
+		case 0xc7:  SH2MULL(Rm, Rn); break;
+		case 0xd7:  SH2MULL(Rm, Rn); break;
+		case 0xe7:  SH2MULL(Rm, Rn); break;
+		case 0xf7:  SH2MULL(Rm, Rn); break;
 		// 0x80
-		case 0x08:  CLRT(opcode); break;
-		case 0x18:  SETT(opcode); break;
-		case 0x28:  CLRMAC(opcode); break;
-		case 0x38:  LDTLB(opcode); break;
-		case 0x48:  CLRS(opcode); break;
-		case 0x58:  SETS(opcode); break;
+		case 0x08:  SH2CLRT(); break;
+		case 0x18:  SH2SETT(); break;
+		case 0x28:  SH2CLRMAC(); break;
+		case 0x38:  LDTLB(opcode); break; // sh4 only
+		case 0x48:  CLRS(opcode); break; // sh4 only
+		case 0x58:  SETS(opcode); break; // sh4 only
 		case 0x68:  NOP(opcode); break;
 		case 0x78:  NOP(opcode); break;
-		case 0x88:  CLRT(opcode); break;
-		case 0x98:  SETT(opcode); break;
-		case 0xa8:  CLRMAC(opcode); break;
-		case 0xb8:  LDTLB(opcode); break;
-		case 0xc8:  CLRS(opcode); break;
-		case 0xd8:  SETS(opcode); break;
+		case 0x88:  SH2CLRT(); break;
+		case 0x98:  SH2SETT(); break;
+		case 0xa8:  SH2CLRMAC(); break;
+		case 0xb8:  LDTLB(opcode); break; // sh4 only
+		case 0xc8:  CLRS(opcode); break; // sh4 only
+		case 0xd8:  SETS(opcode); break; // sh4 only
 		case 0xe8:  NOP(opcode); break;
 		case 0xf8:  NOP(opcode); break;
 		// 0x90
 		case 0x09:  NOP(opcode); break;
-		case 0x19:  DIV0U(opcode); break;
-		case 0x29:  MOVT(opcode); break;
+		case 0x19:  SH2DIV0U(); break;
+		case 0x29:  SH2MOVT(Rn); break;
 		case 0x39:  NOP(opcode); break;
 		case 0x49:  NOP(opcode); break;
-		case 0x59:  DIV0U(opcode); break;
-		case 0x69:  MOVT(opcode); break;
+		case 0x59:  SH2DIV0U(); break;
+		case 0x69:  SH2MOVT(Rn); break;
 		case 0x79:  NOP(opcode); break;
 		case 0x89:  NOP(opcode); break;
-		case 0x99:  DIV0U(opcode); break;
-		case 0xa9:  MOVT(opcode); break;
+		case 0x99:  SH2DIV0U(); break;
+		case 0xa9:  SH2MOVT(Rn); break;
 		case 0xb9:  NOP(opcode); break;
 		case 0xc9:  NOP(opcode); break;
-		case 0xd9:  DIV0U(opcode); break;
-		case 0xe9:  MOVT(opcode); break;
+		case 0xd9:  SH2DIV0U(); break;
+		case 0xe9:  SH2MOVT(Rn); break;
 		case 0xf9:  NOP(opcode); break;
 		// 0xa0
-		case 0x0a:  STSMACH(opcode); break;
-		case 0x1a:  STSMACL(opcode); break;
-		case 0x2a:  STSPR(opcode); break;
-		case 0x3a:  STCSGR(opcode); break;
+		case 0x0a:  SH2STSMACH(Rn); break;
+		case 0x1a:  SH2STSMACL(Rn); break;
+		case 0x2a:  SH2STSPR(Rn); break;
+		case 0x3a:  STCSGR(opcode); break; // sh4 only
 		case 0x4a:  NOP(opcode); break;
-		case 0x5a:  STSFPUL(opcode); break;
-		case 0x6a:  STSFPSCR(opcode); break;
-		case 0x7a:  STCDBR(opcode); break;
-		case 0x8a:  STSMACH(opcode); break;
-		case 0x9a:  STSMACL(opcode); break;
-		case 0xaa:  STSPR(opcode); break;
-		case 0xba:  STCSGR(opcode); break;
+		case 0x5a:  STSFPUL(opcode); break; // sh4 only
+		case 0x6a:  STSFPSCR(opcode); break; // sh4 only
+		case 0x7a:  STCDBR(opcode); break; // sh4 only
+		case 0x8a:  SH2STSMACH(Rn); break;
+		case 0x9a:  SH2STSMACL(Rn); break;
+		case 0xaa:  SH2STSPR(Rn); break;
+		case 0xba:  STCSGR(opcode); break; // sh4 only
 		case 0xca:  NOP(opcode); break;
-		case 0xda:  STSFPUL(opcode); break;
-		case 0xea:  STSFPSCR(opcode); break;
-		case 0xfa:  STCDBR(opcode); break;
+		case 0xda:  STSFPUL(opcode); break; // sh4only
+		case 0xea:  STSFPSCR(opcode); break; // sh4only
+		case 0xfa:  STCDBR(opcode); break; // sh4 only
 		// 0xb0
-		case 0x0b:  RTS(opcode); break;
+		case 0x0b:  SH2RTS(); break;
 		case 0x1b:  SLEEP(opcode); break;
 		case 0x2b:  RTE(opcode); break;
 		case 0x3b:  NOP(opcode); break;
-		case 0x4b:  RTS(opcode); break;
+		case 0x4b:  SH2RTS(); break;
 		case 0x5b:  SLEEP(opcode); break;
 		case 0x6b:  RTE(opcode); break;
 		case 0x7b:  NOP(opcode); break;
-		case 0x8b:  RTS(opcode); break;
+		case 0x8b:  SH2RTS(); break;
 		case 0x9b:  SLEEP(opcode); break;
 		case 0xab:  RTE(opcode); break;
 		case 0xbb:  NOP(opcode); break;
-		case 0xcb:  RTS(opcode); break;
+		case 0xcb:  SH2RTS(); break;
 		case 0xdb:  SLEEP(opcode); break;
 		case 0xeb:  RTE(opcode); break;
 		case 0xfb:  NOP(opcode); break;

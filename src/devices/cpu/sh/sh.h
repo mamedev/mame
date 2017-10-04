@@ -53,40 +53,7 @@ public:
 	virtual void WL(offs_t A, uint32_t V) = 0;
 
 protected:
-	void SH2ADD(uint32_t m, uint32_t n);
 
-	void ADD(const uint16_t opcode);
-	void ADDI(const uint16_t opcode);
-	void ADDC(const uint16_t opcode);
-	void ADDV(const uint16_t opcode);
-	void AND(const uint16_t opcode);
-	void ANDI(const uint16_t opcode);
-	void ANDM(const uint16_t opcode);
-	void BF(const uint16_t opcode);
-	void BFS(const uint16_t opcode);
-	void BRA(const uint16_t opcode);
-	void BRAF(const uint16_t opcode);
-	void BSR(const uint16_t opcode);
-	void BSRF(const uint16_t opcode);
-	void BT(const uint16_t opcode);
-	void BTS(const uint16_t opcode);
-	void CLRMAC(const uint16_t opcode);
-	void CLRT(const uint16_t opcode);
-	void CMPEQ(const uint16_t opcode);
-	void CMPGE(const uint16_t opcode);
-	void CMPGT(const uint16_t opcode);
-	void CMPHI(const uint16_t opcode);
-	void CMPHS(const uint16_t opcode);
-	void CMPPL(const uint16_t opcode);
-	void CMPPZ(const uint16_t opcode);
-	void CMPSTR(const uint16_t opcode);
-	void CMPIM(const uint16_t opcode);
-	void DIV0S(const uint16_t opcode);
-	void DIV0U(const uint16_t opcode);
-	void DIV1(const uint16_t opcode);
-	void DMULS(const uint16_t opcode);
-	void DMULU(const uint16_t opcode);
-	void DT(const uint16_t opcode);
 	void EXTSB(const uint16_t opcode);
 	void EXTSW(const uint16_t opcode);
 	void EXTUB(const uint16_t opcode);
@@ -197,7 +164,7 @@ protected:
 	void CLRS(const uint16_t opcode);
 	void SETS(const uint16_t opcode);
 
-
+	void SH2ADD(uint32_t m, uint32_t n);
 	void SH2ADDI(uint32_t i, uint32_t n);
 	void SH2ADDC(uint32_t m, uint32_t n);
 	void SH2ADDV(uint32_t m, uint32_t n);

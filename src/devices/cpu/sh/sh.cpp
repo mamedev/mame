@@ -24,31 +24,12 @@ void sh_common_execution::SH2ADD(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1100  1       -
- *  ADD     Rm,Rn
- */
-void sh_common_execution::ADD(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] += m_sh2_state->r[Rm];
-}
-
-
-/*  code                 cycles  t-bit
  *  0111 nnnn iiii iiii  1       -
  *  ADD     #imm,Rn
  */
 void sh_common_execution::SH2ADDI(uint32_t i, uint32_t n)
 {
 	m_sh2_state->r[n] += (int32_t)(int16_t)(int8_t)i;
-}
-
-/*  code                 cycles  t-bit
- *  0111 nnnn iiii iiii  1       -
- *  ADD     #imm,Rn
- */
-void sh_common_execution::ADDI(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] += (int32_t)(int16_t)(int8_t)(opcode&0xff);
 }
 
 /*  code                 cycles  t-bit
@@ -71,67 +52,11 @@ void sh_common_execution::SH2ADDC(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1110  1       carry
- *  ADDC    Rm,Rn
- */
-void sh_common_execution::ADDC(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_sh2_state->r[n] + m_sh2_state->r[m];
-	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 + (m_sh2_state->sr & T);
-	if (tmp0 > tmp1)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	if (tmp1 > m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
-}
-
-
-/*  code                 cycles  t-bit
  *  0011 nnnn mmmm 1111  1       overflow
  *  ADDV    Rm,Rn
  */
 void sh_common_execution::SH2ADDV(uint32_t m, uint32_t n)
 {
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 0 || src == 2)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1111  1       overflow
- *  ADDV    Rm,Rn
- */
-void sh_common_execution::ADDV(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
 	int32_t dest, src, ans;
 
 	if ((int32_t) m_sh2_state->r[n] >= 0)
@@ -169,17 +94,6 @@ void sh_common_execution::SH2AND(uint32_t m, uint32_t n)
 	m_sh2_state->r[n] &= m_sh2_state->r[m];
 }
 
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1001  1       -
- *  AND     Rm,Rn
- */
-void sh_common_execution::AND(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] &= m_sh2_state->r[Rm];
-}
-
-
 /*  code                 cycles  t-bit
  *  1100 1001 iiii iiii  1       -
  *  AND     #imm,R0
@@ -187,16 +101,6 @@ void sh_common_execution::AND(const uint16_t opcode)
 void sh_common_execution::SH2ANDI(uint32_t i)
 {
 	m_sh2_state->r[0] &= i;
-}
-
-
-/*  code                 cycles  t-bit
- *  1100 1001 iiii iiii  1       -
- *  AND     #imm,R0
- */
-void sh_common_execution::ANDI(const uint16_t opcode)
-{
-	m_sh2_state->r[0] &= (opcode&0xff);
 }
 
 /*  code                 cycles  t-bit
@@ -210,20 +114,6 @@ void sh_common_execution::SH2ANDM(uint32_t i)
 	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
 	temp = i & RB( m_sh2_state->ea );
 	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
-}
-
-/*  code                 cycles  t-bit
- *  1100 1101 iiii iiii  1       -
- *  AND.B   #imm,@(R0,GBR)
- */
-void sh_common_execution::ANDM(const uint16_t opcode)
-{
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = (opcode&0xff) & RB( m_sh2_state->ea );
-	WB(m_sh2_state->ea, temp );
 	m_sh2_state->icount -= 2;
 }
 
@@ -242,20 +132,6 @@ void sh_common_execution::SH2BF(uint32_t d)
 }
 
 /*  code                 cycles  t-bit
- *  1000 1011 dddd dddd  3/1     -
- *  BF      disp8
- */
-void sh_common_execution::BF(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
  *  1000 1111 dddd dddd  3/1     -
  *  BFS     disp8
  */
@@ -264,20 +140,6 @@ void sh_common_execution::SH2BFS(uint32_t d)
 	if ((m_sh2_state->sr & T) == 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1111 dddd dddd  3/1     -
- *  BFS     disp8
- */
-void sh_common_execution::BFS(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
 		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount--;
 	}
@@ -307,29 +169,6 @@ void sh_common_execution::SH2BRA(uint32_t d)
 }
 
 /*  code                 cycles  t-bit
- *  1010 dddd dddd dddd  2       -
- *  BRA     disp12
- */
-void sh_common_execution::BRA(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
-
-#if BUSY_LOOP_HACKS
-	if (disp == -2)
-	{
-		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
-		/* BRA  $
-		 * NOP
-		 */
-		if (next_opcode == 0x0009)
-			m_sh2_state->icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
-	}
-#endif
-	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
  *  0000 mmmm 0010 0011  2       -
  *  BRAF    Rm
  */
@@ -340,36 +179,12 @@ void sh_common_execution::SH2BRAF(uint32_t m)
 }
 
 /*  code                 cycles  t-bit
- *  0000 mmmm 0010 0011  2       -
- *  BRAF    Rm
- */
-void sh_common_execution::BRAF(const uint16_t opcode)
-{
-	m_sh2_state->m_delay = m_sh2_state->pc + m_sh2_state->r[Rn] + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
  *  1011 dddd dddd dddd  2       -
  *  BSR     disp12
  */
 void sh_common_execution::SH2BSR(uint32_t d)
 {
 	int32_t disp = ((int32_t)d << 20) >> 20;
-
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-
-/*  code                 cycles  t-bit
- *  1011 dddd dddd dddd  2       -
- *  BSR     disp12
- */
-void sh_common_execution::BSR(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
 
 	m_sh2_state->pr = m_sh2_state->pc + 2;
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -388,18 +203,6 @@ void sh_common_execution::SH2BSRF(uint32_t m)
 }
 
 /*  code                 cycles  t-bit
- *  0000 mmmm 0000 0011  2       -
- *  BSRF    Rm
- */
-void sh_common_execution::BSRF(const uint16_t opcode)
-{
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_sh2_state->m_delay = m_sh2_state->pc + m_sh2_state->r[Rn] + 2;
-	m_sh2_state->icount--;
-}
-
-
-/*  code                 cycles  t-bit
  *  1000 1001 dddd dddd  3/1     -
  *  BT      disp8
  */
@@ -408,20 +211,6 @@ void sh_common_execution::SH2BT(uint32_t d)
 	if ((m_sh2_state->sr & T) != 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1001 dddd dddd  3/1     -
- *  BT      disp8
- */
-void sh_common_execution::BT(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
 		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
 		m_sh2_state->icount -= 2;
 	}
@@ -442,21 +231,6 @@ void sh_common_execution::SH2BTS(uint32_t d)
 }
 
 /*  code                 cycles  t-bit
- *  1000 1101 dddd dddd  2/1     -
- *  BTS     disp8
- */
-void sh_common_execution::BTS(const uint16_t opcode)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
-
-
-/*  code                 cycles  t-bit
  *  0000 0000 0010 1000  1       -
  *  CLRMAC
  */
@@ -467,30 +241,10 @@ void sh_common_execution::SH2CLRMAC()
 }
 
 /*  code                 cycles  t-bit
- *  0000 0000 0010 1000  1       -
- *  CLRMAC
- */
-void sh_common_execution::CLRMAC(const uint16_t opcode)
-{
-	m_sh2_state->mach = 0;
-	m_sh2_state->macl = 0;
-}
-
-
-/*  code                 cycles  t-bit
  *  0000 0000 0000 1000  1       -
  *  CLRT
  */
 void sh_common_execution::SH2CLRT()
-{
-	m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0000 1000  1       -
- *  CLRT
- */
-void sh_common_execution::CLRT(const uint16_t opcode)
 {
 	m_sh2_state->sr &= ~T;
 }
@@ -508,18 +262,6 @@ void sh_common_execution::SH2CMPEQ(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0000  1       comparison result
- *  CMP_EQ  Rm,Rn
- */
-void sh_common_execution::CMPEQ(const uint16_t opcode)
-{
-	if (m_sh2_state->r[Rn] == m_sh2_state->r[Rm])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
  *  0011 nnnn mmmm 0011  1       comparison result
  *  CMP_GE  Rm,Rn
  */
@@ -530,20 +272,6 @@ void sh_common_execution::SH2CMPGE(uint32_t m, uint32_t n)
 	else
 		m_sh2_state->sr &= ~T;
 }
-
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0011  1       comparison result
- *  CMP_GE  Rm,Rn
- */
-void sh_common_execution::CMPGE(const uint16_t opcode)
-{
-	if ((int32_t) m_sh2_state->r[Rn] >= (int32_t) m_sh2_state->r[Rm])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
 
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 0111  1       comparison result
@@ -558,19 +286,6 @@ void sh_common_execution::SH2CMPGT(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0111  1       comparison result
- *  CMP_GT  Rm,Rn
- */
-void sh_common_execution::CMPGT(const uint16_t opcode)
-{
-	if ((int32_t) m_sh2_state->r[Rn] > (int32_t) m_sh2_state->r[Rm])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-
-/*  code                 cycles  t-bit
  *  0011 nnnn mmmm 0110  1       comparison result
  *  CMP_HI  Rm,Rn
  */
@@ -581,19 +296,6 @@ void sh_common_execution::SH2CMPHI(uint32_t m, uint32_t n)
 	else
 		m_sh2_state->sr &= ~T;
 }
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0110  1       comparison result
- *  CMP_HI  Rm,Rn
- */
-void sh_common_execution::CMPHI(const uint16_t opcode)
-{
-	if ((uint32_t) m_sh2_state->r[Rn] > (uint32_t) m_sh2_state->r[Rm])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
 
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 0010  1       comparison result
@@ -608,19 +310,6 @@ void sh_common_execution::SH2CMPHS(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0010  1       comparison result
- *  CMP_HS  Rm,Rn
- */
-void sh_common_execution::CMPHS(const uint16_t opcode)
-{
-	if ((uint32_t) m_sh2_state->r[Rn] >= (uint32_t) m_sh2_state->r[Rm])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-
-/*  code                 cycles  t-bit
  *  0100 nnnn 0001 0101  1       comparison result
  *  CMP_PL  Rn
  */
@@ -633,36 +322,12 @@ void sh_common_execution::SH2CMPPL(uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0100 nnnn 0001 0101  1       comparison result
- *  CMP_PL  Rn
- */
-void sh_common_execution::CMPPL(const uint16_t opcode)
-{
-	if ((int32_t) m_sh2_state->r[Rn] > 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
  *  0100 nnnn 0001 0001  1       comparison result
  *  CMP_PZ  Rn
  */
 void sh_common_execution::SH2CMPPZ(uint32_t n)
 {
 	if ((int32_t) m_sh2_state->r[n] >= 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0100 nnnn 0001 0001  1       comparison result
- *  CMP_PZ  Rn
- */
-void sh_common_execution::CMPPZ(const uint16_t opcode)
-{
-	if ((int32_t) m_sh2_state->r[Rn] >= 0)
 		m_sh2_state->sr |= T;
 	else
 		m_sh2_state->sr &= ~T;
@@ -688,46 +353,12 @@ void sh_common_execution::SH2CMPSTR(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1100  1       comparison result
- * CMP_STR  Rm,Rn
- */
-void sh_common_execution::CMPSTR(const uint16_t opcode)
-{
-	uint32_t temp;
-	int32_t HH, HL, LH, LL;
-	temp = m_sh2_state->r[Rn] ^ m_sh2_state->r[Rm];
-	HH = (temp >> 24) & 0xff;
-	HL = (temp >> 16) & 0xff;
-	LH = (temp >> 8) & 0xff;
-	LL = temp & 0xff;
-	if (HH && HL && LH && LL)
-		m_sh2_state->sr &= ~T;
-	else
-		m_sh2_state->sr |= T;
-}
-
-
-/*  code                 cycles  t-bit
  *  1000 1000 iiii iiii  1       comparison result
  *  CMP/EQ #imm,R0
  */
 void sh_common_execution::SH2CMPIM(uint32_t i)
 {
 	uint32_t imm = (uint32_t)(int32_t)(int16_t)(int8_t)i;
-
-	if (m_sh2_state->r[0] == imm)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1000 iiii iiii  1       comparison result
- *  CMP/EQ #imm,R0
- */
-void sh_common_execution::CMPIM(const uint16_t opcode)
-{
-	uint32_t imm = (uint32_t)(int32_t)(int16_t)(int8_t)(opcode&0xff);
 
 	if (m_sh2_state->r[0] == imm)
 		m_sh2_state->sr |= T;
@@ -756,28 +387,6 @@ void sh_common_execution::SH2DIV0S(uint32_t m, uint32_t n)
 }
 
 /*  code                 cycles  t-bit
- *  0010 nnnn mmmm 0111  1       calculation result
- *  DIV0S   Rm,Rn
- */
-void sh_common_execution::DIV0S(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	if ((m_sh2_state->r[n] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~Q;
-	else
-		m_sh2_state->sr |= Q;
-	if ((m_sh2_state->r[m] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~M;
-	else
-		m_sh2_state->sr |= M;
-	if ((m_sh2_state->r[m] ^ m_sh2_state->r[n]) & 0x80000000)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
  *  0000 0000 0001 1001  1       0
  *  DIV0U
  */
@@ -785,16 +394,6 @@ void sh_common_execution::SH2DIV0U()
 {
 	m_sh2_state->sr &= ~(M | Q | T);
 }
-
-/*  code                 cycles  t-bit
- *  0000 0000 0001 1001  1       0
- *  DIV0U
- */
-void sh_common_execution::DIV0U(const uint16_t opcode)
-{
-	m_sh2_state->sr &= ~(M | Q | T);
-}
-
 
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 0100  1       calculation result
@@ -891,104 +490,6 @@ void sh_common_execution::SH2DIV1(uint32_t m, uint32_t n)
 		m_sh2_state->sr &= ~T;
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0100  1       calculation result
- *  DIV1 Rm,Rn
- */
-void sh_common_execution::DIV1(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t tmp0;
-	uint32_t old_q;
-
-	old_q = m_sh2_state->sr & Q;
-	if (0x80000000 & m_sh2_state->r[n])
-		m_sh2_state->sr |= Q;
-	else
-		m_sh2_state->sr &= ~Q;
-
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
-
-	if (!old_q)
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			}
-			else
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			}
-		}
-	}
-	else
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-		}
-	}
-
-	tmp0 = (m_sh2_state->sr & (Q | M));
-	if((!tmp0) || (tmp0 == 0x300)) /* if Q == M set T else clear T */
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-
 /*  DMULS.L Rm,Rn */
 void sh_common_execution::SH2DMULS(uint32_t m, uint32_t n)
 {
@@ -1038,58 +539,6 @@ void sh_common_execution::SH2DMULS(uint32_t m, uint32_t n)
 	m_sh2_state->icount--;
 }
 
-/*  DMULS.L Rm,Rn */
-void sh_common_execution::DMULS(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
-
-	tempn = (int32_t) m_sh2_state->r[n];
-	tempm = (int32_t) m_sh2_state->r[m];
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	if ((int32_t) (m_sh2_state->r[n] ^ m_sh2_state->r[m]) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	m_sh2_state->mach = Res2;
-	m_sh2_state->macl = Res0;
-	m_sh2_state->icount--;
-}
-
-
 /*  DMULU.L Rm,Rn */
 void sh_common_execution::SH2DMULU(uint32_t m, uint32_t n)
 {
@@ -1118,67 +567,9 @@ void sh_common_execution::SH2DMULU(uint32_t m, uint32_t n)
 	m_sh2_state->icount--;
 }
 
-/*  DMULU.L Rm,Rn */
-void sh_common_execution::DMULU(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-
-	RnL = m_sh2_state->r[n] & 0x0000ffff;
-	RnH = (m_sh2_state->r[n] >> 16) & 0x0000ffff;
-	RmL = m_sh2_state->r[m] & 0x0000ffff;
-	RmH = (m_sh2_state->r[m] >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	m_sh2_state->mach = Res2;
-	m_sh2_state->macl = Res0;
-	m_sh2_state->icount--;
-}
-
 /*  DT      Rn */
 void sh_common_execution::SH2DT(uint32_t n)
 {
-	m_sh2_state->r[n]--;
-	if (m_sh2_state->r[n] == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-#if BUSY_LOOP_HACKS
-	{
-		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
-		/* DT   Rn
-		 * BF   $-2
-		 */
-		if (next_opcode == 0x8bfd)
-		{
-			while (m_sh2_state->r[n] > 1 && m_sh2_state->icount > 4)
-			{
-				m_sh2_state->r[n]--;
-				m_sh2_state->icount -= 4;   /* cycles for DT (1) and BF taken (3) */
-			}
-		}
-	}
-#endif
-}
-
-/*  DT      Rn */
-void sh_common_execution::DT(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
 	m_sh2_state->r[n]--;
 	if (m_sh2_state->r[n] == 0)
 		m_sh2_state->sr |= T;
