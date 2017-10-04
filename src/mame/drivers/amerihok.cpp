@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, AJR
+// copyright-holders:AJR
 /*
 
 Ameri-Hockey?
+
+One of an unknown number of mechanical games developed by Ameri Corporation,
+an Illinois-based company in business between 1988 and 1995.
 
 U3 -  27C512
 U8 -  27C020
