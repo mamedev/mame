@@ -38831,3 +38831,6 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
+
+@source:notechan.cpp
+notechan                        // (c) Banpresto
