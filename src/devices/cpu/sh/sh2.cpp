@@ -321,7 +321,7 @@ void sh2_device::SH2LDCSR(uint32_t m)
 }
 
 /*  RTE */
-void sh2_device::SH2RTE()
+inline void sh2_device::RTE()
 {
 	m_sh2_state->ea = m_sh2_state->r[15];
 	m_sh2_state->m_delay = RL( m_sh2_state->ea );
@@ -387,7 +387,7 @@ void sh2_device::op0000(uint16_t opcode)
 	case 0x28: SH2CLRMAC();                 break;
 	case 0x29: SH2MOVT(Rn);                   break;
 	case 0x2a: SH2STSPR(Rn);                  break;
-	case 0x2b: SH2RTE();                        break;
+	case 0x2b: RTE();                        break;
 	case 0x2c: SH2MOVBL0(Rm, Rn);             break;
 	case 0x2d: SH2MOVWL0(Rm, Rn);             break;
 	case 0x2e: SH2MOVLL0(Rm, Rn);             break;

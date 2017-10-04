@@ -195,5 +195,7 @@ protected:
 	void SH2XORM(uint32_t i);
 	void SH2XTRCT(uint32_t m, uint32_t n);
 
+	virtual void RTE() = 0;
+
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 };

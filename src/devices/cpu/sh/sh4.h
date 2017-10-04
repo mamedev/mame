@@ -436,7 +436,8 @@ protected:
 	void LDCSR(const uint16_t opcode);
 	void LDCMSR(const uint16_t opcode);
 	virtual void LDTLB(const uint16_t opcode);
-	void RTE(const uint16_t opcode);
+	virtual void RTE() override;
+
 	void SLEEP(const uint16_t opcode);
 	void TRAPA(const uint16_t opcode);
 	void STCRBANK(const uint16_t opcode);

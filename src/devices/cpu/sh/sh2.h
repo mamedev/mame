@@ -243,7 +243,7 @@ private:
 
 	void SH2LDCMSR(uint32_t m);
 	void SH2LDCSR(uint32_t m);
-	void SH2RTE();
+	virtual void RTE() override;
 
 	inline void op0000(uint16_t opcode);
 	inline void op0001(uint16_t opcode);

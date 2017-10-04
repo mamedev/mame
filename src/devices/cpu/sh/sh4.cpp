@@ -598,7 +598,7 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 
 
 /*  RTE */
-inline void sh34_base_device::RTE(const uint16_t opcode)
+inline void sh34_base_device::RTE()
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_spc;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -1948,19 +1948,19 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		// 0xb0
 		case 0x0b:  SH2RTS(); break;
 		case 0x1b:  SLEEP(opcode); break;
-		case 0x2b:  RTE(opcode); break;
+		case 0x2b:  RTE(); break;
 		case 0x3b:  SH2NOP(); break;
 		case 0x4b:  SH2RTS(); break;
 		case 0x5b:  SLEEP(opcode); break;
-		case 0x6b:  RTE(opcode); break;
+		case 0x6b:  RTE(); break;
 		case 0x7b:  SH2NOP(); break;
 		case 0x8b:  SH2RTS(); break;
 		case 0x9b:  SLEEP(opcode); break;
-		case 0xab:  RTE(opcode); break;
+		case 0xab:  RTE(); break;
 		case 0xbb:  SH2NOP(); break;
 		case 0xcb:  SH2RTS(); break;
 		case 0xdb:  SLEEP(opcode); break;
-		case 0xeb:  RTE(opcode); break;
+		case 0xeb:  RTE(); break;
 		case 0xfb:  SH2NOP(); break;
 		// 0xc0
 		case 0x0c:  SH2MOVBL0(Rm, Rn);  break;
