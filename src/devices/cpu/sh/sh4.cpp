@@ -1884,71 +1884,92 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0xf7:  MULL(Rm, Rn); break;
 		// 0x80
 		case 0x08:  CLRT(); break;
-		case 0x18:  SETT(); break;
-		case 0x28:  CLRMAC(); break;
-		case 0x38:  LDTLB(opcode); break; // sh4 only
-		case 0x48:  CLRS(opcode); break; // sh4 only
-		case 0x58:  SETS(opcode); break; // sh4 only
-		case 0x68:  ILLEGAL(); break;
-		case 0x78:  ILLEGAL(); break;
 		case 0x88:  CLRT(); break;
+
+		case 0x18:  SETT(); break;
 		case 0x98:  SETT(); break;
+
+		case 0x28:  CLRMAC(); break;
 		case 0xa8:  CLRMAC(); break;
+
+		case 0x38:  LDTLB(opcode); break; // sh4 only
 		case 0xb8:  LDTLB(opcode); break; // sh4 only
+
+		case 0x48:  CLRS(opcode); break; // sh4 only
 		case 0xc8:  CLRS(opcode); break; // sh4 only
+
+		case 0x58:  SETS(opcode); break; // sh4 only
 		case 0xd8:  SETS(opcode); break; // sh4 only
+
+		case 0x68:  ILLEGAL(); break;
 		case 0xe8:  ILLEGAL(); break;
+
+		case 0x78:  ILLEGAL(); break;
 		case 0xf8:  ILLEGAL(); break;
 		// 0x90
 		case 0x09:  NOP(); break;
+		case 0x49:  NOP(); break;
+		case 0x89:  NOP(); break;
+		case 0xc9:  NOP(); break;
+
 		case 0x19:  DIV0U(); break;
-		case 0x29:  MOVT(Rn); break;
-		case 0x39:  ILLEGAL(); break;
-		case 0x49:  ILLEGAL(); break;
 		case 0x59:  DIV0U(); break;
-		case 0x69:  MOVT(Rn); break;
-		case 0x79:  ILLEGAL(); break;
-		case 0x89:  ILLEGAL(); break;
 		case 0x99:  DIV0U(); break;
-		case 0xa9:  MOVT(Rn); break;
-		case 0xb9:  ILLEGAL(); break;
-		case 0xc9:  ILLEGAL(); break;
 		case 0xd9:  DIV0U(); break;
+
+		case 0x29:  MOVT(Rn); break;
+		case 0x69:  MOVT(Rn); break;
+		case 0xa9:  MOVT(Rn); break;
 		case 0xe9:  MOVT(Rn); break;
+
+		case 0x39:  ILLEGAL(); break;
+		case 0x79:  ILLEGAL(); break;
+		case 0xb9:  ILLEGAL(); break;
 		case 0xf9:  ILLEGAL(); break;
+		
 		// 0xa0
 		case 0x0a:  STSMACH(Rn); break;
-		case 0x1a:  STSMACL(Rn); break;
-		case 0x2a:  STSPR(Rn); break;
-		case 0x3a:  STCSGR(opcode); break; // sh4 only
-		case 0x4a:  ILLEGAL(); break;
-		case 0x5a:  STSFPUL(opcode); break; // sh4 only
-		case 0x6a:  STSFPSCR(opcode); break; // sh4 only
-		case 0x7a:  STCDBR(opcode); break; // sh4 only
 		case 0x8a:  STSMACH(Rn); break;
+
+		case 0x1a:  STSMACL(Rn); break;
 		case 0x9a:  STSMACL(Rn); break;
+
+		case 0x2a:  STSPR(Rn); break;
 		case 0xaa:  STSPR(Rn); break;
+
+		case 0x3a:  STCSGR(opcode); break; // sh4 only
 		case 0xba:  STCSGR(opcode); break; // sh4 only
+
+		case 0x4a:  ILLEGAL(); break;
 		case 0xca:  ILLEGAL(); break;
+
+		case 0x5a:  STSFPUL(opcode); break; // sh4 only
 		case 0xda:  STSFPUL(opcode); break; // sh4only
+
+		case 0x6a:  STSFPSCR(opcode); break; // sh4 only
 		case 0xea:  STSFPSCR(opcode); break; // sh4only
+
+		case 0x7a:  STCDBR(opcode); break; // sh4 only
 		case 0xfa:  STCDBR(opcode); break; // sh4 only
 		// 0xb0
 		case 0x0b:  RTS(); break;
-		case 0x1b:  SLEEP(); break;
-		case 0x2b:  RTE(); break;
-		case 0x3b:  ILLEGAL(); break;
 		case 0x4b:  RTS(); break;
-		case 0x5b:  SLEEP(); break;
-		case 0x6b:  RTE(); break;
-		case 0x7b:  ILLEGAL(); break;
 		case 0x8b:  RTS(); break;
-		case 0x9b:  SLEEP(); break;
-		case 0xab:  RTE(); break;
-		case 0xbb:  ILLEGAL(); break;
 		case 0xcb:  RTS(); break;
+
+		case 0x1b:  SLEEP(); break;
+		case 0x5b:  SLEEP(); break;
+		case 0x9b:  SLEEP(); break;
 		case 0xdb:  SLEEP(); break;
+
+		case 0x2b:  RTE(); break;
+		case 0x6b:  RTE(); break;
+		case 0xab:  RTE(); break;
 		case 0xeb:  RTE(); break;
+
+		case 0x3b:  ILLEGAL(); break;
+		case 0x7b:  ILLEGAL(); break;
+		case 0xbb:  ILLEGAL(); break;
 		case 0xfb:  ILLEGAL(); break;
 		// 0xc0
 		case 0x0c:  MOVBL0(Rm, Rn);  break;
@@ -2027,37 +2048,44 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	{
 		// 0x00
 		case 0x00:  SHLL(Rn); break;
-		case 0x10:  DT(Rn); break;
-		case 0x20:  SHAL(Rn); break;
-		case 0x30:  ILLEGAL(); break;
 		case 0x40:  SHLL(Rn); break;
-		case 0x50:  DT(Rn); break;
-		case 0x60:  SHAL(Rn); break;
-		case 0x70:  ILLEGAL(); break;
 		case 0x80:  SHLL(Rn); break;
-		case 0x90:  DT(Rn); break;
-		case 0xa0:  SHAL(Rn); break;
-		case 0xb0:  ILLEGAL(); break;
 		case 0xc0:  SHLL(Rn); break;
+
+		case 0x10:  DT(Rn); break;
+		case 0x50:  DT(Rn); break;
+		case 0x90:  DT(Rn); break;
 		case 0xd0:  DT(Rn); break;
+
+		case 0x20:  SHAL(Rn); break;
+		case 0x60:  SHAL(Rn); break;
+		case 0xa0:  SHAL(Rn); break;
 		case 0xe0:  SHAL(Rn); break;
+
+		case 0x30:  ILLEGAL(); break;
+		case 0x70:  ILLEGAL(); break;
+		case 0xb0:  ILLEGAL(); break;
 		case 0xf0:  ILLEGAL(); break;
+		
 		// 0x10
 		case 0x01:  SHLR(Rn); break;
-		case 0x11:  CMPPZ(Rn);  break;
-		case 0x21:  SHAR(Rn); break;
-		case 0x31:  ILLEGAL(); break;
 		case 0x41:  SHLR(Rn); break;
-		case 0x51:  CMPPZ(Rn);  break;
-		case 0x61:  SHAR(Rn); break;
-		case 0x71:  ILLEGAL(); break;
 		case 0x81:  SHLR(Rn); break;
-		case 0x91:  CMPPZ(Rn);  break;
-		case 0xa1:  SHAR(Rn); break;
-		case 0xb1:  ILLEGAL(); break;
 		case 0xc1:  SHLR(Rn); break;
+
+		case 0x11:  CMPPZ(Rn);  break;
+		case 0x51:  CMPPZ(Rn);  break;
+		case 0x91:  CMPPZ(Rn);  break;
 		case 0xd1:  CMPPZ(Rn);  break;
+
+		case 0x21:  SHAR(Rn); break;
+		case 0x61:  SHAR(Rn); break;
+		case 0xa1:  SHAR(Rn); break;
 		case 0xe1:  SHAR(Rn); break;
+
+		case 0x31:  ILLEGAL(); break;
+		case 0x71:  ILLEGAL(); break;
+		case 0xb1:  ILLEGAL(); break;
 		case 0xf1:  ILLEGAL(); break;
 		// 0x20
 		case 0x02:  STSMMACH(Rn); break;
@@ -2095,38 +2123,45 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xf3:  STCMRBANK(opcode); break;
 		// 0x40
 		case 0x04:  ROTL(Rn); break;
-		case 0x14:  ILLEGAL(); break;
-		case 0x24:  ROTCL(Rn); break;
-		case 0x34:  ILLEGAL(); break;
 		case 0x44:  ROTL(Rn); break;
-		case 0x54:  ILLEGAL(); break;
-		case 0x64:  ROTCL(Rn); break;
-		case 0x74:  ILLEGAL(); break;
 		case 0x84:  ROTL(Rn); break;
-		case 0x94:  ILLEGAL(); break;
-		case 0xa4:  ROTCL(Rn); break;
-		case 0xb4:  ILLEGAL(); break;
 		case 0xc4:  ROTL(Rn); break;
-		case 0xd4:  ILLEGAL(); break;
+
+		case 0x14:  ILLEGAL(); break;
+		case 0x34:  ILLEGAL(); break;
+		case 0x74:  ILLEGAL(); break;
+		case 0xb4:  ILLEGAL(); break;
+
+		case 0x24:  ROTCL(Rn); break;
+		case 0x64:  ROTCL(Rn); break;
+		case 0xa4:  ROTCL(Rn); break;
 		case 0xe4:  ROTCL(Rn); break;
+
+		case 0x54:  ILLEGAL(); break;
+		case 0x94:  ILLEGAL(); break;
+		case 0xd4:  ILLEGAL(); break;
 		case 0xf4:  ILLEGAL(); break;
 		// 0x50
 		case 0x05:  ROTR(Rn);  break;
-		case 0x15:  CMPPL(Rn); break;
-		case 0x25:  ROTCR(Rn); break;
-		case 0x35:  ILLEGAL(); break;
 		case 0x45:  ROTR(Rn);  break;
-		case 0x55:  CMPPL(Rn); break;
-		case 0x65:  ROTCR(Rn); break;
-		case 0x75:  ILLEGAL(); break;
 		case 0x85:  ROTR(Rn);  break;
-		case 0x95:  CMPPL(Rn); break;
-		case 0xa5:  ROTCR(Rn); break;
-		case 0xb5:  ILLEGAL(); break;
 		case 0xc5:  ROTR(Rn);  break;
+
+		case 0x15:  CMPPL(Rn); break;
+		case 0x55:  CMPPL(Rn); break;
+		case 0x95:  CMPPL(Rn); break;
 		case 0xd5:  CMPPL(Rn); break;
+
+		case 0x25:  ROTCR(Rn); break;
+		case 0x65:  ROTCR(Rn); break;
+		case 0xa5:  ROTCR(Rn); break;
 		case 0xe5:  ROTCR(Rn); break;
+
+		case 0x35:  ILLEGAL(); break;
+		case 0x75:  ILLEGAL(); break;
+		case 0xb5:  ILLEGAL(); break;
 		case 0xf5:  ILLEGAL(); break;
+		
 		// 0x60
 		case 0x06:  LDSMMACH(Rn); break;
 		case 0x16:  LDSMMACL(Rn); break;
@@ -2163,37 +2198,43 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xf7:  LDCMRBANK(opcode); break;
 		// 0x80
 		case 0x08:  SHLL2(Rn);  break;
-		case 0x18:  SHLL8(Rn); break;
-		case 0x28:  SHLL16(Rn); break;
-		case 0x38:  ILLEGAL(); break;
 		case 0x48:  SHLL2(Rn);  break;
-		case 0x58:  SHLL8(Rn); break;
-		case 0x68:  SHLL16(Rn); break;
-		case 0x78:  ILLEGAL(); break;
 		case 0x88:  SHLL2(Rn);  break;
-		case 0x98:  SHLL8(Rn); break;
-		case 0xa8:  SHLL16(Rn); break;
-		case 0xb8:  ILLEGAL(); break;
 		case 0xc8:  SHLL2(Rn);  break;
+
+		case 0x18:  SHLL8(Rn); break;
+		case 0x58:  SHLL8(Rn); break;
+		case 0x98:  SHLL8(Rn); break;
 		case 0xd8:  SHLL8(Rn); break;
+
+		case 0x28:  SHLL16(Rn); break;
+		case 0x68:  SHLL16(Rn); break;
+		case 0xa8:  SHLL16(Rn); break;
 		case 0xe8:  SHLL16(Rn); break;
+
+		case 0x38:  ILLEGAL(); break;
+		case 0x78:  ILLEGAL(); break;
+		case 0xb8:  ILLEGAL(); break;
 		case 0xf8:  ILLEGAL(); break;
 		// 0x90
 		case 0x09:  SHLR2(Rn); break;
-		case 0x19:  SHLR8(Rn); break;
-		case 0x29:  SHLR16(Rn); break;
-		case 0x39:  ILLEGAL(); break;
 		case 0x49:  SHLR2(Rn); break;
-		case 0x59:  SHLR8(Rn); break;
-		case 0x69:  SHLR16(Rn); break;
-		case 0x79:  ILLEGAL(); break;
 		case 0x89:  SHLR2(Rn); break;
-		case 0x99:  SHLR8(Rn); break;
-		case 0xa9:  SHLR16(Rn); break;
-		case 0xb9:  ILLEGAL(); break;
 		case 0xc9:  SHLR2(Rn); break;
+
+		case 0x19:  SHLR8(Rn); break;
+		case 0x59:  SHLR8(Rn); break;
+		case 0x99:  SHLR8(Rn); break;
 		case 0xd9:  SHLR8(Rn); break;
+
+		case 0x29:  SHLR16(Rn); break;
+		case 0x69:  SHLR16(Rn); break;
+		case 0xa9:  SHLR16(Rn); break;
 		case 0xe9:  SHLR16(Rn); break;
+
+		case 0x39:  ILLEGAL(); break;
+		case 0x79:  ILLEGAL(); break;
+		case 0xb9:  ILLEGAL(); break;
 		case 0xf9:  ILLEGAL(); break;
 		// 0xa0
 		case 0x0a:  LDSMACH(Rn); break;
@@ -2214,20 +2255,23 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 		case 0xfa:  LDCDBR(opcode); break; // sh4 only
 		// 0xb0
 		case 0x0b:  JSR(Rn);  break;
-		case 0x1b:  TAS(Rn); break;
-		case 0x2b:  JMP(Rn);  break;
-		case 0x3b:  ILLEGAL(); break;
 		case 0x4b:  JSR(Rn);  break;
-		case 0x5b:  TAS(Rn); break;
-		case 0x6b:  JMP(Rn);  break;
-		case 0x7b:  ILLEGAL(); break;
 		case 0x8b:  JSR(Rn);  break;
-		case 0x9b:  TAS(Rn); break;
-		case 0xab:  JMP(Rn);  break;
-		case 0xbb:  ILLEGAL(); break;
 		case 0xcb:  JSR(Rn);  break;
+
+		case 0x1b:  TAS(Rn); break;
+		case 0x5b:  TAS(Rn); break;
+		case 0x9b:  TAS(Rn); break;
 		case 0xdb:  TAS(Rn); break;
+
+		case 0x2b:  JMP(Rn);  break;
+		case 0x6b:  JMP(Rn);  break;
+		case 0xab:  JMP(Rn);  break;
 		case 0xeb:  JMP(Rn);  break;
+
+		case 0x3b:  ILLEGAL(); break;
+		case 0x7b:  ILLEGAL(); break;
+		case 0xbb:  ILLEGAL(); break;
 		case 0xfb:  ILLEGAL(); break;
 		// 0xc0
 		case 0x0c:  SHAD(opcode); break; // sh4 only

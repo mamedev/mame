@@ -248,15 +248,7 @@ private:
 	virtual	void ILLEGAL() override;
 
 	inline void op0000(uint16_t opcode);
-	inline void op0001(uint16_t opcode);
 	inline void op0100(uint16_t opcode);
-	inline void op0101(uint16_t opcode);
-	inline void op0111(uint16_t opcode);
-	inline void op1001(uint16_t opcode);
-	inline void op1010(uint16_t opcode);
-	inline void op1011(uint16_t opcode);
-	inline void op1101(uint16_t opcode);
-	inline void op1110(uint16_t opcode);
 	inline void op1111(uint16_t opcode);
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );

@@ -439,26 +439,14 @@ void sh2_device::op0000(uint16_t opcode)
 	case 0x37: MULL(Rm, Rn);               break;
 	case 0x38: ILLEGAL();                       break;
 	case 0x39: ILLEGAL();                       break;
+	case 0x3a: ILLEGAL();                       break;
+	case 0x3b: ILLEGAL();                       break;
 	case 0x3c: MOVBL0(Rm, Rn);             break;
 	case 0x3d: MOVWL0(Rm, Rn);             break;
 	case 0x3e: MOVLL0(Rm, Rn);             break;
 	case 0x3f: MAC_L(Rm, Rn);              break;
-	case 0x3a: ILLEGAL();                       break;
-	case 0x3b: ILLEGAL();                       break;
-
-
-
 	}
 }
-
-void sh2_device::op0001(uint16_t opcode)
-{
-	MOVLS4(Rm, opcode & 0x0f, Rn);
-}
-
-
-
-
 
 void sh2_device::op0100(uint16_t opcode)
 {
@@ -535,44 +523,16 @@ void sh2_device::op0100(uint16_t opcode)
 	}
 }
 
-void sh2_device::op0101(uint16_t opcode)
-{
-	MOVLL4(Rm, opcode & 0x0f, Rn);
-}
 
 
 
-void sh2_device::op0111(uint16_t opcode)
-{
-	ADDI(opcode & 0xff, Rn);
-}
 
 
 
-void sh2_device::op1001(uint16_t opcode)
-{
-	MOVWI(opcode & 0xff, Rn);
-}
 
-void sh2_device::op1010(uint16_t opcode)
-{
-	BRA(opcode & 0xfff);
-}
 
-void sh2_device::op1011(uint16_t opcode)
-{
-	BSR(opcode & 0xfff);
-}
 
-void sh2_device::op1101(uint16_t opcode)
-{
-	MOVLI(opcode & 0xff, Rn);
-}
 
-void sh2_device::op1110(uint16_t opcode)
-{
-	MOVI(opcode & 0xff, Rn);
-}
 
 void sh2_device::op1111(uint16_t opcode)
 {
@@ -657,20 +617,20 @@ void sh2_device::execute_run()
 		switch (opcode & ( 15 << 12))
 		{
 		case  0<<12: op0000(opcode); break;
-		case  1<<12: op0001(opcode); break;
+		case  1<<12: MOVLS4(Rm, opcode & 0x0f, Rn); break;
 		case  2<<12: op0010(opcode); break;
 		case  3<<12: op0011(opcode); break;
 		case  4<<12: op0100(opcode); break;
-		case  5<<12: op0101(opcode); break;
+		case  5<<12: MOVLL4(Rm, opcode & 0x0f, Rn); break;
 		case  6<<12: op0110(opcode); break;
-		case  7<<12: op0111(opcode); break;
+		case  7<<12: ADDI(opcode & 0xff, Rn); break;
 		case  8<<12: op1000(opcode); break;
-		case  9<<12: op1001(opcode); break;
-		case 10<<12: op1010(opcode); break;
-		case 11<<12: op1011(opcode); break;
+		case  9<<12: MOVWI(opcode & 0xff, Rn); break;
+		case 10<<12: BRA(opcode & 0xfff); break;
+		case 11<<12: BSR(opcode & 0xfff); break;
 		case 12<<12: op1100(opcode); break;
-		case 13<<12: op1101(opcode); break;
-		case 14<<12: op1110(opcode); break;
+		case 13<<12: MOVLI(opcode & 0xff, Rn); break;
+		case 14<<12: MOVI(opcode & 0xff, Rn); break;
 		default: op1111(opcode); break;
 		}
 
