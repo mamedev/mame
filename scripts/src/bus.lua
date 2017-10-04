@@ -66,6 +66,8 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/abcbus/abcbus.h",
 		MAME_DIR .. "src/devices/bus/abcbus/abc890.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/abc890.h",
+		MAME_DIR .. "src/devices/bus/abcbus/db411223.cpp",
+		MAME_DIR .. "src/devices/bus/abcbus/db411223.h",
 		MAME_DIR .. "src/devices/bus/abcbus/fd2.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/fd2.h",
 		MAME_DIR .. "src/devices/bus/abcbus/hdc.cpp",
