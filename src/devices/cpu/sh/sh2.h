@@ -81,7 +81,7 @@ enum
 
 class sh2_frontend;
 
-class sh2_device : public cpu_device, public sh_common_execution
+class sh2_device : public sh_common_execution
 {
 	friend class sh2_frontend;
 

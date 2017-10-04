@@ -194,7 +194,7 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
 
 
-class sh34_base_device : public cpu_device, public sh_common_execution
+class sh34_base_device : public sh_common_execution
 {
 public:
 	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }

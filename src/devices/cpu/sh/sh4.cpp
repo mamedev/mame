@@ -74,8 +74,7 @@ ADDRESS_MAP_END
 
 
 sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
-	: cpu_device(mconfig, type, tag, owner, clock)
-	, sh_common_execution()
+	: sh_common_execution(mconfig, type, tag, owner, clock, endianness, internal)
 	, m_program_config("program", endianness, 64, 32, 0, internal)
 	, m_io_config("io", endianness, 64, 8)
 	, c_md2(0)
