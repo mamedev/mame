@@ -138,9 +138,9 @@ public:
 //		uint8_t DDR2;
 //		uint8_t SF;
 //		uint8_t SR;
-		uint8_t IREG[7];
+//		uint8_t IREG[7];
 		uint8_t intback_buf[7];
-		uint8_t OREG[32];
+//		uint8_t OREG[32];
 		int   intback_stage;
 		int   pmode;
 		uint8_t SMEM[4];

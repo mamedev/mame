@@ -74,6 +74,8 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 	// I/O operations
+	DECLARE_WRITE8_MEMBER( ireg_w );
+	DECLARE_READ8_MEMBER( oreg_r );
 	DECLARE_READ8_MEMBER( status_register_r );
 	DECLARE_WRITE8_MEMBER( status_flag_w );
 	DECLARE_READ8_MEMBER( status_flag_r );
@@ -86,6 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER( iosel_w );
 	DECLARE_WRITE8_MEMBER( exle_w );
 
+	
 	// TODO: public stuff & trampolines that should be internal to the device
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -94,7 +97,7 @@ public:
 	void sf_ack(bool cd_enable);
 	void sf_set();
 	void master_sh2_reset(bool state);
-	void master_sh2_nmi(bool state);
+	void master_sh2_nmi();
 	void slave_sh2_reset(bool state);
 	void sound_reset(bool state);
 	void system_reset(bool state);
@@ -104,7 +107,9 @@ public:
 	
 	bool get_iosel(bool which);
 	uint8_t get_ddr(bool which);
-
+	uint8_t get_ireg(uint8_t offset);
+	void set_oreg(uint8_t offset,uint8_t data);
+	
 //	system delegation
 	template <class Object> static devcb_base &set_master_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshres.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_master_nmi_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshnmi.set_callback(std::forward<Object>(cb)); }
@@ -143,6 +148,8 @@ private:
 	uint8_t m_pdr1_readback, m_pdr2_readback;
 	bool m_iosel1, m_iosel2;
 	bool m_exle1, m_exle2;
+	uint8_t m_ireg[7];
+	uint8_t m_oreg[32];
 	
 	devcb_write_line m_mshres;
 	devcb_write_line m_mshnmi;
