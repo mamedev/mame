@@ -672,35 +672,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_wtcsr));
 
 	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(AM).callimport();
-	state_add( SH2_SR,   "SR",   m_sh2_state->sr).callimport().formatstr("%08X");
-	state_add( SH2_PR,   "PR",   m_sh2_state->pr).formatstr("%08X");
-	state_add( SH2_GBR,  "GBR",  m_sh2_state->gbr).formatstr("%08X");
-	state_add( SH2_VBR,  "VBR",  m_sh2_state->vbr).formatstr("%08X");
-	state_add( SH2_MACH, "MACH", m_sh2_state->mach).formatstr("%08X");
-	state_add( SH2_MACL, "MACL", m_sh2_state->macl).formatstr("%08X");
-	state_add( SH2_R0,   "R0",   m_sh2_state->r[ 0]).formatstr("%08X");
-	state_add( SH2_R1,   "R1",   m_sh2_state->r[ 1]).formatstr("%08X");
-	state_add( SH2_R2,   "R2",   m_sh2_state->r[ 2]).formatstr("%08X");
-	state_add( SH2_R3,   "R3",   m_sh2_state->r[ 3]).formatstr("%08X");
-	state_add( SH2_R4,   "R4",   m_sh2_state->r[ 4]).formatstr("%08X");
-	state_add( SH2_R5,   "R5",   m_sh2_state->r[ 5]).formatstr("%08X");
-	state_add( SH2_R6,   "R6",   m_sh2_state->r[ 6]).formatstr("%08X");
-	state_add( SH2_R7,   "R7",   m_sh2_state->r[ 7]).formatstr("%08X");
-	state_add( SH2_R8,   "R8",   m_sh2_state->r[ 8]).formatstr("%08X");
-	state_add( SH2_R9,   "R9",   m_sh2_state->r[ 9]).formatstr("%08X");
-	state_add( SH2_R10,  "R10",  m_sh2_state->r[10]).formatstr("%08X");
-	state_add( SH2_R11,  "R11",  m_sh2_state->r[11]).formatstr("%08X");
-	state_add( SH2_R12,  "R12",  m_sh2_state->r[12]).formatstr("%08X");
-	state_add( SH2_R13,  "R13",  m_sh2_state->r[13]).formatstr("%08X");
-	state_add( SH2_R14,  "R14",  m_sh2_state->r[14]).formatstr("%08X");
-	state_add( SH2_R15,  "R15",  m_sh2_state->r[15]).formatstr("%08X");
-	state_add( SH2_EA,   "EA",   m_sh2_state->ea).formatstr("%08X");
-
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_sh2_state->r[15] ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr ).formatstr("%6s").noshow();
-
-	m_icountptr = &m_sh2_state->icount;
 
 	// Clear state
 	m_cpu_off = 0;
@@ -826,7 +798,7 @@ void sh2_device::state_import(const device_state_entry &entry)
 			m_sh2_state->m_delay = 0;
 			break;
 
-		case SH2_SR:
+		case SH_SR:
 			CHECK_PENDING_IRQ("sh2_set_reg");
 			break;
 	}

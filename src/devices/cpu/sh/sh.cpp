@@ -62,6 +62,36 @@ void sh_common_execution::device_start()
 	m_sh2_state->sleep_mode = 0;
 	m_sh2_state->arg0 = 0;
 
+	state_add(SH4_PC, "PC", m_sh2_state->pc).formatstr("%08X").callimport();
+	state_add(SH_SR, "SR", m_sh2_state->sr).formatstr("%08X").callimport();
+	state_add(SH4_PR, "PR", m_sh2_state->pr).formatstr("%08X");
+	state_add(SH4_GBR, "GBR", m_sh2_state->gbr).formatstr("%08X");
+	state_add(SH4_VBR, "VBR", m_sh2_state->vbr).formatstr("%08X");
+	state_add(SH4_MACH, "MACH", m_sh2_state->mach).formatstr("%08X");
+	state_add(SH4_MACL, "MACL", m_sh2_state->macl).formatstr("%08X");
+	state_add(SH4_R0, "R0", m_sh2_state->r[0]).formatstr("%08X");
+	state_add(SH4_R1, "R1", m_sh2_state->r[1]).formatstr("%08X");
+	state_add(SH4_R2, "R2", m_sh2_state->r[2]).formatstr("%08X");
+	state_add(SH4_R3, "R3", m_sh2_state->r[3]).formatstr("%08X");
+	state_add(SH4_R4, "R4", m_sh2_state->r[4]).formatstr("%08X");
+	state_add(SH4_R5, "R5", m_sh2_state->r[5]).formatstr("%08X");
+	state_add(SH4_R6, "R6", m_sh2_state->r[6]).formatstr("%08X");
+	state_add(SH4_R7, "R7", m_sh2_state->r[7]).formatstr("%08X");
+	state_add(SH4_R8, "R8", m_sh2_state->r[8]).formatstr("%08X");
+	state_add(SH4_R9, "R9", m_sh2_state->r[9]).formatstr("%08X");
+	state_add(SH4_R10, "R10", m_sh2_state->r[10]).formatstr("%08X");
+	state_add(SH4_R11, "R11", m_sh2_state->r[11]).formatstr("%08X");
+	state_add(SH4_R12, "R12", m_sh2_state->r[12]).formatstr("%08X");
+	state_add(SH4_R13, "R13", m_sh2_state->r[13]).formatstr("%08X");
+	state_add(SH4_R14, "R14", m_sh2_state->r[14]).formatstr("%08X");
+	state_add(SH4_R15, "R15", m_sh2_state->r[15]).formatstr("%08X");
+	state_add(SH4_EA, "EA", m_sh2_state->ea).formatstr("%08X");
+
+	state_add(STATE_GENSP, "GENSP", m_sh2_state->r[15]).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr).formatstr("%20s").noshow();
+
+	m_icountptr = &m_sh2_state->icount;
+
 
 }
 

@@ -25,10 +25,7 @@ enum
 
 enum
 {
-	SH4_PC=1, SH4_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,
-	SH4_R0, SH4_R1, SH4_R2, SH4_R3, SH4_R4, SH4_R5, SH4_R6, SH4_R7,
-	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA,
-	SH4_R0_BK0, SH4_R1_BK0, SH4_R2_BK0, SH4_R3_BK0, SH4_R4_BK0, SH4_R5_BK0, SH4_R6_BK0, SH4_R7_BK0,
+	SH4_R0_BK0 = SH4_EA+1, SH4_R1_BK0, SH4_R2_BK0, SH4_R3_BK0, SH4_R4_BK0, SH4_R5_BK0, SH4_R6_BK0, SH4_R7_BK0,
 	SH4_R0_BK1, SH4_R1_BK1, SH4_R2_BK1, SH4_R3_BK1, SH4_R4_BK1, SH4_R5_BK1, SH4_R6_BK1, SH4_R7_BK1,
 	SH4_SPC, SH4_SSR, SH4_SGR, SH4_FPSCR, SH4_FPUL, SH4_FR0, SH4_FR1, SH4_FR2, SH4_FR3, SH4_FR4, SH4_FR5,
 	SH4_FR6, SH4_FR7, SH4_FR8, SH4_FR9, SH4_FR10, SH4_FR11, SH4_FR12, SH4_FR13, SH4_FR14, SH4_FR15,
@@ -665,19 +662,5 @@ DECLARE_DEVICE_TYPE(SH3BE, sh3be_device)
 DECLARE_DEVICE_TYPE(SH4LE, sh4_device)
 DECLARE_DEVICE_TYPE(SH4BE, sh4be_device)
 
-
-/***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
-***************************************************************************/
-
-#define SH4DRC_STRICT_VERIFY    0x0001          /* verify all instructions */
-#define SH4DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
-#define SH4DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
-
-#define SH4DRC_COMPATIBLE_OPTIONS   (SH4DRC_STRICT_VERIFY | SH4DRC_FLUSH_PC | SH4DRC_STRICT_PCREL)
-#define SH4DRC_FASTEST_OPTIONS  (0)
-
-void sh4drc_set_options(device_t *device, uint32_t options);
-void sh4drc_add_pcflush(device_t *device, offs_t address);
 
 #endif // MAME_CPU_SH4_SH4_H

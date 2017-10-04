@@ -2433,13 +2433,13 @@ void sh34_base_device::device_start()
 {
 	sh_common_execution::device_start();
 
-	for (int i=0; i<3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_timer_callback), this));
 		m_timer[i]->adjust(attotime::never, i);
 	}
 
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_dma_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_dmac_callback), this));
 		m_dma_timer[i]->adjust(attotime::never, i);
@@ -2536,92 +2536,66 @@ void sh34_base_device::device_start()
 
 	// Debugger state
 
-	state_add(SH4_PC,             "PC", m_sh2_state->pc).formatstr("%08X").callimport();
-	state_add(SH4_SR,             "SR", m_sh2_state->sr).formatstr("%08X").callimport();
-	state_add(SH4_PR,             "PR", m_sh2_state->pr).formatstr("%08X");
-	state_add(SH4_GBR,            "GBR", m_sh2_state->gbr).formatstr("%08X");
-	state_add(SH4_VBR,            "VBR", m_sh2_state->vbr).formatstr("%08X");
-	state_add(SH4_DBR,            "DBR", m_dbr).formatstr("%08X");
-	state_add(SH4_MACH,           "MACH", m_sh2_state->mach).formatstr("%08X");
-	state_add(SH4_MACL,           "MACL", m_sh2_state->macl).formatstr("%08X");
-	state_add(SH4_R0,             "R0", m_sh2_state->r[ 0]).formatstr("%08X");
-	state_add(SH4_R1,             "R1", m_sh2_state->r[ 1]).formatstr("%08X");
-	state_add(SH4_R2,             "R2", m_sh2_state->r[ 2]).formatstr("%08X");
-	state_add(SH4_R3,             "R3", m_sh2_state->r[ 3]).formatstr("%08X");
-	state_add(SH4_R4,             "R4", m_sh2_state->r[ 4]).formatstr("%08X");
-	state_add(SH4_R5,             "R5", m_sh2_state->r[ 5]).formatstr("%08X");
-	state_add(SH4_R6,             "R6", m_sh2_state->r[ 6]).formatstr("%08X");
-	state_add(SH4_R7,             "R7", m_sh2_state->r[ 7]).formatstr("%08X");
-	state_add(SH4_R8,             "R8", m_sh2_state->r[ 8]).formatstr("%08X");
-	state_add(SH4_R9,             "R9", m_sh2_state->r[ 9]).formatstr("%08X");
-	state_add(SH4_R10,            "R10", m_sh2_state->r[10]).formatstr("%08X");
-	state_add(SH4_R11,            "R11", m_sh2_state->r[11]).formatstr("%08X");
-	state_add(SH4_R12,            "R12", m_sh2_state->r[12]).formatstr("%08X");
-	state_add(SH4_R13,            "R13", m_sh2_state->r[13]).formatstr("%08X");
-	state_add(SH4_R14,            "R14", m_sh2_state->r[14]).formatstr("%08X");
-	state_add(SH4_R15,            "R15", m_sh2_state->r[15]).formatstr("%08X");
-	state_add(SH4_EA,             "EA", m_sh2_state->ea).formatstr("%08X");
-	state_add(SH4_R0_BK0,         "R0 BK 0", m_rbnk[0][0]).formatstr("%08X");
-	state_add(SH4_R1_BK0,         "R1 BK 0", m_rbnk[0][1]).formatstr("%08X");
-	state_add(SH4_R2_BK0,         "R2 BK 0", m_rbnk[0][2]).formatstr("%08X");
-	state_add(SH4_R3_BK0,         "R3 BK 0", m_rbnk[0][3]).formatstr("%08X");
-	state_add(SH4_R4_BK0,         "R4 BK 0", m_rbnk[0][4]).formatstr("%08X");
-	state_add(SH4_R5_BK0,         "R5 BK 0", m_rbnk[0][5]).formatstr("%08X");
-	state_add(SH4_R6_BK0,         "R6 BK 0", m_rbnk[0][6]).formatstr("%08X");
-	state_add(SH4_R7_BK0,         "R7 BK 0", m_rbnk[0][7]).formatstr("%08X");
-	state_add(SH4_R0_BK1,         "R0 BK 1", m_rbnk[1][0]).formatstr("%08X");
-	state_add(SH4_R1_BK1,         "R1 BK 1", m_rbnk[1][1]).formatstr("%08X");
-	state_add(SH4_R2_BK1,         "R2 BK 1", m_rbnk[1][2]).formatstr("%08X");
-	state_add(SH4_R3_BK1,         "R3 BK 1", m_rbnk[1][3]).formatstr("%08X");
-	state_add(SH4_R4_BK1,         "R4 BK 1", m_rbnk[1][4]).formatstr("%08X");
-	state_add(SH4_R5_BK1,         "R5 BK 1", m_rbnk[1][5]).formatstr("%08X");
-	state_add(SH4_R6_BK1,         "R6 BK 1", m_rbnk[1][6]).formatstr("%08X");
-	state_add(SH4_R7_BK1,         "R7 BK 1", m_rbnk[1][7]).formatstr("%08X");
-	state_add(SH4_SPC,            "SPC", m_spc).formatstr("%08X");
-	state_add(SH4_SSR,            "SSR", m_ssr).formatstr("%08X");
-	state_add(SH4_SGR,            "SGR", m_sgr).formatstr("%08X");
-	state_add(SH4_FPSCR,          "FPSCR", m_fpscr).formatstr("%08X");
-	state_add(SH4_FPUL,           "FPUL", m_fpul).formatstr("%08X");
 
-	state_add(SH4_FR0,            "FR0", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR1,            "FR1", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR2,            "FR2", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR3,            "FR3", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR4,            "FR4", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR5,            "FR5", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR6,            "FR6", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR7,            "FR7", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR8,            "FR8", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR9,            "FR9", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR10,           "FR10", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR11,           "FR11", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR12,           "FR12", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR13,           "FR13", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR14,           "FR14", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR15,           "FR15", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF0,            "XF0", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF1,            "XF1", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF2,            "XF2", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF3,            "XF3", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF4,            "XF4", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF5,            "XF5", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF6,            "XF6", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF7,            "XF7", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF8,            "XF8", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF9,            "XF9", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF10,           "XF10", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF11,           "XF11", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF12,           "XF12", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF13,           "XF13", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF14,           "XF14", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF15,           "XF15", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_DBR, "DBR", m_dbr).formatstr("%08X");
+
+	state_add(SH4_R0_BK0, "R0 BK 0", m_rbnk[0][0]).formatstr("%08X");
+	state_add(SH4_R1_BK0, "R1 BK 0", m_rbnk[0][1]).formatstr("%08X");
+	state_add(SH4_R2_BK0, "R2 BK 0", m_rbnk[0][2]).formatstr("%08X");
+	state_add(SH4_R3_BK0, "R3 BK 0", m_rbnk[0][3]).formatstr("%08X");
+	state_add(SH4_R4_BK0, "R4 BK 0", m_rbnk[0][4]).formatstr("%08X");
+	state_add(SH4_R5_BK0, "R5 BK 0", m_rbnk[0][5]).formatstr("%08X");
+	state_add(SH4_R6_BK0, "R6 BK 0", m_rbnk[0][6]).formatstr("%08X");
+	state_add(SH4_R7_BK0, "R7 BK 0", m_rbnk[0][7]).formatstr("%08X");
+	state_add(SH4_R0_BK1, "R0 BK 1", m_rbnk[1][0]).formatstr("%08X");
+	state_add(SH4_R1_BK1, "R1 BK 1", m_rbnk[1][1]).formatstr("%08X");
+	state_add(SH4_R2_BK1, "R2 BK 1", m_rbnk[1][2]).formatstr("%08X");
+	state_add(SH4_R3_BK1, "R3 BK 1", m_rbnk[1][3]).formatstr("%08X");
+	state_add(SH4_R4_BK1, "R4 BK 1", m_rbnk[1][4]).formatstr("%08X");
+	state_add(SH4_R5_BK1, "R5 BK 1", m_rbnk[1][5]).formatstr("%08X");
+	state_add(SH4_R6_BK1, "R6 BK 1", m_rbnk[1][6]).formatstr("%08X");
+	state_add(SH4_R7_BK1, "R7 BK 1", m_rbnk[1][7]).formatstr("%08X");
+	state_add(SH4_SPC, "SPC", m_spc).formatstr("%08X");
+	state_add(SH4_SSR, "SSR", m_ssr).formatstr("%08X");
+	state_add(SH4_SGR, "SGR", m_sgr).formatstr("%08X");
+	state_add(SH4_FPSCR, "FPSCR", m_fpscr).formatstr("%08X");
+	state_add(SH4_FPUL, "FPUL", m_fpul).formatstr("%08X");
+
+	state_add(SH4_FR0, "FR0", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR1, "FR1", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR2, "FR2", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR3, "FR3", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR4, "FR4", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR5, "FR5", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR6, "FR6", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR7, "FR7", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR8, "FR8", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR9, "FR9", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR10, "FR10", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR11, "FR11", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR12, "FR12", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR13, "FR13", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR14, "FR14", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR15, "FR15", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF0, "XF0", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF1, "XF1", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF2, "XF2", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF3, "XF3", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF4, "XF4", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF5, "XF5", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF6, "XF6", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF7, "XF7", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF8, "XF8", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF9, "XF9", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF10, "XF10", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF11, "XF11", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF12, "XF12", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF13, "XF13", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF14, "XF14", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF15, "XF15", m_debugger_temp).callimport().formatstr("%25s");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_sh2_state->r[15]).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr).formatstr("%20s").noshow();
-
-	m_icountptr = &m_sh2_state->icount;
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -2640,7 +2614,7 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 			m_sh2_state->m_delay = 0;
 			break;
 
-		case SH4_SR:
+		case SH_SR:
 			sh4_exception_recompute();
 			sh4_check_pending_irq("sh4_set_info");
 			break;
