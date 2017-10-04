@@ -304,19 +304,23 @@ void sh2_device::WL(offs_t A, uint32_t V)
 }
 
 /*  LDC.L   @Rm+,SR */
-void sh2_device::SH2LDCMSR(uint32_t m)
+inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 {
-	m_sh2_state->ea = m_sh2_state->r[m];
+	uint32_t x = Rn;
+
+	m_sh2_state->ea = m_sh2_state->r[x];
 	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
-	m_sh2_state->r[m] += 4;
+	m_sh2_state->r[x] += 4;
 	m_sh2_state->icount -= 2;
 	m_test_irq = 1;
 }
 
 /*  LDC     Rm,SR */
-void sh2_device::SH2LDCSR(uint32_t m)
+inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
-	m_sh2_state->sr = m_sh2_state->r[m] & FLAGS;
+	uint32_t x = Rn;
+
+	m_sh2_state->sr = m_sh2_state->r[x] & FLAGS;
 	m_test_irq = 1;
 }
 
@@ -477,14 +481,14 @@ void sh2_device::op0100(uint16_t opcode)
 	case 0x04: SH2ROTL(Rn);                   break;
 	case 0x05: SH2ROTR(Rn);                   break;
 	case 0x06: SH2LDSMMACH(Rn);               break;
-	case 0x07: SH2LDCMSR(Rn);                 break;
+	case 0x07: LDCMSR(opcode);                 break;
 	case 0x08: SH2SHLL2(Rn);                  break;
 	case 0x09: SH2SHLR2(Rn);                  break;
 	case 0x0a: SH2LDSMACH(Rn);                break;
 	case 0x0b: SH2JSR(Rn);                    break;
 	case 0x0c: SH2ILLEGAL();                       break;
 	case 0x0d: SH2ILLEGAL();                       break;
-	case 0x0e: SH2LDCSR(Rn);                  break;
+	case 0x0e: LDCSR(opcode);                  break;
 	case 0x0f: SH2MAC_W(Rm, Rn);              break;
 
 	case 0x10: SH2DT(Rn);                     break;

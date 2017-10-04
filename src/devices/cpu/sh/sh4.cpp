@@ -616,14 +616,14 @@ inline void sh34_base_device::SLEEP(const uint16_t opcode)
 	/* 0 = normal mode */
 	/* 1 = enters into power-down mode */
 	/* 2 = go out the power-down mode after an exception */
-	if(m_sleep_mode != 2)
+	if(m_sh2_state->sleep_mode != 2)
 		m_sh2_state->pc -= 2;
 	m_sh2_state->icount -= 2;
 	/* Wait_for_exception; */
-	if(m_sleep_mode == 0)
-		m_sleep_mode = 1;
-	else if(m_sleep_mode == 2)
-		m_sleep_mode = 0;
+	if(m_sh2_state->sleep_mode == 0)
+		m_sh2_state->sleep_mode = 1;
+	else if(m_sh2_state->sleep_mode == 2)
+		m_sh2_state->sleep_mode = 0;
 }
 
 
@@ -1720,7 +1720,7 @@ void sh34_base_device::device_reset()
 
 	m_internal_irq_level = -1;
 	m_irln = 15;
-	m_sleep_mode = 0;
+	m_sh2_state->sleep_mode = 0;
 
 	m_sh4_mmu_enabled = 0;
 }
@@ -2728,7 +2728,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_SH4_DMATCR3));
 	save_item(NAME(m_SH4_DMAOR));
 	save_item(NAME(m_nmi_line_state));
-	save_item(NAME(m_sleep_mode));
+	save_item(NAME(m_sh2_state->sleep_mode));
 	save_item(NAME(m_frt_input));
 	save_item(NAME(m_irln));
 	save_item(NAME(m_internal_irq_level));

@@ -458,7 +458,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 	/* fetch PC */
 	m_sh2_state->pc = m_sh2_state->vbr + vector;
 	/* wake up if a sleep opcode is triggered */
-	if(m_sleep_mode == 1) { m_sleep_mode = 2; }
+	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
 
 

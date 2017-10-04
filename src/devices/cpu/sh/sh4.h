@@ -344,8 +344,6 @@ protected:
 
 	int8_t    m_nmi_line_state;
 
-	uint8_t m_sleep_mode;
-
 	int     m_frt_input;
 	int     m_irln;
 	int     m_internal_irq_level;
@@ -427,16 +425,17 @@ protected:
 	virtual void WW(offs_t A, uint16_t V) override;
 	virtual void WL(offs_t A, uint32_t V) override;
 
-	// opcode handlers
+	// opcode handlers	
+	virtual void LDCSR(const uint16_t opcode) override;
+	virtual void LDCMSR(const uint16_t opcode) override;
+	virtual void RTE() override;
+
+	virtual void LDTLB(const uint16_t opcode);
 
 	void TODO(const uint16_t opcode);
 	void MOVCAL(const uint16_t opcode);
 	void CLRS(const uint16_t opcode);
 	void SETS(const uint16_t opcode);
-	void LDCSR(const uint16_t opcode);
-	void LDCMSR(const uint16_t opcode);
-	virtual void LDTLB(const uint16_t opcode);
-	virtual void RTE() override;
 
 	void SLEEP(const uint16_t opcode);
 	void TRAPA(const uint16_t opcode);

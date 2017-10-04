@@ -241,8 +241,8 @@ private:
 	inline void WW(offs_t A, uint16_t V) override;
 	inline void WL(offs_t A, uint32_t V) override;
 
-	void SH2LDCMSR(uint32_t m);
-	void SH2LDCSR(uint32_t m);
+	virtual void LDCMSR(const uint16_t opcode) override;
+	virtual void LDCSR(const uint16_t opcode) override;
 	virtual void RTE() override;
 
 	inline void op0000(uint16_t opcode);

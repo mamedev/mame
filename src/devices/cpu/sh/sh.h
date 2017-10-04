@@ -196,6 +196,8 @@ protected:
 	void SH2XTRCT(uint32_t m, uint32_t n);
 
 	virtual void RTE() = 0;
+	virtual void LDCSR(const uint16_t opcode) = 0;
+	virtual void LDCMSR(const uint16_t opcode) = 0;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 };
