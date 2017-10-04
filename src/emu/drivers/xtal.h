@@ -101,6 +101,7 @@ enum
 	XTAL_8MHz           = 8000000,      /* Extremely common, used on 100's of PCBs */
 	XTAL_8_2MHz         = 8200000,      /* Universal Mr. Do - Model 8021 PCB */
 	XTAL_8_388MHz       = 8388000,      /* Nintendo Game Boy Color */
+	XTAL_8_448MHz       = 8448000,      /* Banpresto's Note Chance */
 	XTAL_8_4672MHz      = 8467200,      /* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz       = 8664000,      /* Touchmaster */
 	XTAL_8_7MHz         = 8700000,      /* Tandberg TDV 2324 */

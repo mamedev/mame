@@ -119,9 +119,9 @@
 #include "sound/okim6295.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK     8448800
-#define CPU_CLOCK        MASTER_CLOCK / 2
-#define SND_CLOCK        1056000          // unverified resonator
+#define MASTER_CLOCK     XTAL_8_448MHz
+#define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
+#define SND_CLOCK        1056000             // unverified resonator
 
 
 class notechan_state : public driver_device
