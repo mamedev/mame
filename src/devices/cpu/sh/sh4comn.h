@@ -140,7 +140,7 @@ enum
 #define MD  0x40000000
 
 /* 29 bits */
-#define AM  0x1fffffff
+#define SH34_AM  0x1fffffff
 
 #define FLAGS   (MD|sRB|BL|FD|M|Q|I|S|T)
 

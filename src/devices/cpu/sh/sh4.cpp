@@ -313,7 +313,7 @@ inline uint8_t sh34_base_device::RB(offs_t A)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -325,18 +325,18 @@ inline uint8_t sh34_base_device::RB(offs_t A)
 		}
 		return m_program->read_byte(_A);
 #else
-		return m_program->read_byte(A & AM);
+		return m_program->read_byte(A & SH34_AM);
 #endif
 	}
 	else // P0 region
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_byte(A & AM);
+			return m_program->read_byte(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_byte(A);
 		}
 	}
@@ -351,7 +351,7 @@ inline uint16_t sh34_base_device::RW(offs_t A)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -363,18 +363,18 @@ inline uint16_t sh34_base_device::RW(offs_t A)
 		}
 		return m_program->read_word(_A);
 #else
-		return m_program->read_word(A & AM);
+		return m_program->read_word(A & SH34_AM);
 #endif
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_word(A & AM);
+			return m_program->read_word(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_word(A);
 		}
 	}
@@ -389,7 +389,7 @@ inline uint32_t sh34_base_device::RL(offs_t A)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -401,18 +401,18 @@ inline uint32_t sh34_base_device::RL(offs_t A)
 		}
 		return m_program->read_dword(_A);
 #else
-		return m_program->read_dword(A & AM);
+		return m_program->read_dword(A & SH34_AM);
 #endif
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_dword(A & AM);
+			return m_program->read_dword(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_dword(A);
 		}
 	}
@@ -430,7 +430,7 @@ inline void sh34_base_device::WB(offs_t A, uint8_t V)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -443,18 +443,18 @@ inline void sh34_base_device::WB(offs_t A, uint8_t V)
 		}
 		m_program->write_byte(_A, V);
 #else
-		m_program->write_byte(A & AM, V);
+		m_program->write_byte(A & SH34_AM, V);
 #endif
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_byte(A & AM, V);
+			m_program->write_byte(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_byte(A, V);
 		}
 	}
@@ -472,7 +472,7 @@ inline void sh34_base_device::WW(offs_t A, uint16_t V)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -485,18 +485,18 @@ inline void sh34_base_device::WW(offs_t A, uint16_t V)
 		}
 		m_program->write_word(_A, V);
 #else
-		m_program->write_word(A & AM, V);
+		m_program->write_word(A & SH34_AM, V);
 #endif
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_word(A & AM, V);
+			m_program->write_word(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_word(A, V);
 		}
 	}
@@ -514,7 +514,7 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
 #if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
+		const offs_t _A = A & SH34_AM;
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
 			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
@@ -527,18 +527,18 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 		}
 		m_program->write_dword(_A, V);
 #else
-		m_program->write_dword(A & AM, V);
+		m_program->write_dword(A & SH34_AM, V);
 #endif
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_dword(A & AM, V);
+			m_program->write_dword(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_dword(A, V);
 		}
 	}
@@ -1709,7 +1709,7 @@ void sh34_base_device::device_reset()
 	m_rtc_timer->adjust(attotime::from_hz(128));
 
 	m_sh2_state->pc = 0xa0000000;
-	m_ppc = m_sh2_state->pc & AM;
+	m_ppc = m_sh2_state->pc & SH34_AM;
 	m_sh2_state->r[15] = RL(4);
 	m_sh2_state->sr = 0x700000f0;
 	m_fpscr = 0x00040001;
@@ -2504,12 +2504,12 @@ void sh34_base_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
 		uint16_t opcode;
 
-		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD2_XOR_LE(0));
+		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD2_XOR_LE(0));
 		else opcode = RW(m_sh2_state->pc); // should probably use a different function as this needs to go through the ITLB
 
 		if (m_sh2_state->m_delay)
@@ -2541,10 +2541,10 @@ void sh3be_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 
 		if (m_sh2_state->m_delay)
 		{
@@ -2575,10 +2575,10 @@ void sh4be_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 
 		if (m_sh2_state->m_delay)
 		{
@@ -2999,7 +2999,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 	case STATE_GENPC:
-		m_debugger_temp = (m_sh2_state->pc & AM);
+		m_debugger_temp = (m_sh2_state->pc & SH34_AM);
 		break;
 	}
 }
