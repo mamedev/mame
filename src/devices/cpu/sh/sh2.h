@@ -78,7 +78,6 @@ enum
 #define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
 #define SH2DRC_FASTEST_OPTIONS  (0)
 
-#define SH2_MAX_FASTRAM       4
 
 class sh2_frontend;
 
@@ -106,7 +105,6 @@ public:
 	void sh2_set_frt_input(int state);
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);
-	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
 	void sh2_notify_dma_data_available();
 
@@ -222,15 +220,7 @@ private:
 	uml::code_handle *  m_nocode;                 /* nocode */
 	uml::code_handle *  m_out_of_cycles;              /* out of cycles exception handler */
 
-	/* fast RAM */
-	uint32_t              m_fastram_select;
-	struct
-	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
-	} m_fastram[SH2_MAX_FASTRAM];
+
 
 	uint32_t m_debugger_temp;
 

@@ -6,6 +6,8 @@
 /* size of the execution code cache */
 #define CACHE_SIZE                  (32 * 1024 * 1024)
 
+#define SH2_MAX_FASTRAM       4
+
 
 class sh_common_execution
 {
@@ -210,6 +212,20 @@ protected:
 	virtual void TRAPA(uint32_t i) = 0;
 	virtual	void ILLEGAL() = 0;
 
-
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
+
+public:
+	/* fast RAM */
+	uint32_t              m_fastram_select;
+	struct
+	{
+		offs_t              start;                      /* start of the RAM block */
+		offs_t              end;                        /* end of the RAM block */
+		bool                readonly;                   /* true if read-only */
+		void *              base;                       /* base in memory where the RAM lives */
+	} m_fastram[SH2_MAX_FASTRAM];
+
+	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
+
+
 };

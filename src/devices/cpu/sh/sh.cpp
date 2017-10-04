@@ -1698,6 +1698,28 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 	}
 }
 
+// DRC / UML related
+
+
+/*-------------------------------------------------
+    sh2drc_add_fastram - add a new fastram
+    region
+-------------------------------------------------*/
+
+void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
+{
+	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
+	{
+		m_fastram[m_fastram_select].start = start;
+		m_fastram[m_fastram_select].end = end;
+		m_fastram[m_fastram_select].readonly = readonly;
+		m_fastram[m_fastram_select].base = base;
+		m_fastram_select++;
+	}
+}
+
+
+
 
 #undef Rn
 #undef Rm

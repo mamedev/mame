@@ -17,10 +17,6 @@
 
 #include "sh.h"
 
-// doesn't actually seem to improve performance at all
-#define SH4_USE_FASTRAM_OPTIMIZATION 0
-#define SH4_MAX_FASTRAM       3
-
 #define SH4_INT_NONE    -1
 enum
 {
@@ -201,10 +197,6 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 class sh34_base_device : public cpu_device, public sh_common_execution
 {
 public:
-//#if SH4_USE_FASTRAM_OPTIMIZATION
-	void add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
-//#endif
-
 	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }
 	static void set_md1(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md1 = md0; }
 	static void set_md2(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md2 = md0; }
@@ -585,22 +577,6 @@ protected:
 	uint32_t sh4_handle_chcr2_addr_r(uint32_t mem_mask) { return m_SH4_CHCR2; }
 	uint32_t sh4_handle_chcr3_addr_r(uint32_t mem_mask) { return m_SH4_CHCR3; }
 	uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask) { return m_SH4_DMAOR; }
-
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	/* fast RAM */
-	bool            m_bigendian;
-	uint32_t          m_byte_xor;
-	uint32_t          m_word_xor;
-	uint32_t          m_dword_xor;
-	uint32_t              m_fastram_select;
-	struct
-	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
-	}       m_fastram[SH4_MAX_FASTRAM];
-#endif
 };
 
 
