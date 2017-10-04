@@ -719,18 +719,18 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
-	save_item(NAME(m_smpc.IOSEL1));
-	save_item(NAME(m_smpc.IOSEL2));
-	save_item(NAME(m_smpc.EXLE1));
-	save_item(NAME(m_smpc.EXLE2));
-	save_item(NAME(m_smpc.PDR1));
-	save_item(NAME(m_smpc.PDR2));
+//	save_item(NAME(m_smpc.IOSEL1));
+//	save_item(NAME(m_smpc.IOSEL2));
+//	save_item(NAME(m_smpc.EXLE1));
+//	save_item(NAME(m_smpc.EXLE2));
+//	save_item(NAME(m_smpc.PDR1));
+//	save_item(NAME(m_smpc.PDR2));
 //  save_item(NAME(m_port_sel));
 //  save_item(NAME(mux_data));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_smpc.intback_stage));
 	save_item(NAME(m_smpc.pmode));
-	save_item(NAME(m_smpc.SR));
+//	save_item(NAME(m_smpc.SR));
 	save_item(NAME(m_smpc.SMEM));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
@@ -767,7 +767,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	m_smpc.SR = 0x40;   // this bit is always on according to docs
+//	m_smpc.SR = 0x40;   // this bit is always on according to docs
 
 	scu_reset();
 
@@ -789,6 +789,97 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
+READ8_MEMBER( saturn_state::saturn_pdr1_direct_r )
+{
+	return saturn_direct_port_read(false);
+}
+
+READ8_MEMBER( saturn_state::saturn_pdr2_direct_r )
+{
+	return saturn_direct_port_read(true);
+}
+
+WRITE8_MEMBER( saturn_state::saturn_pdr1_direct_w )
+{
+	m_direct_mux[0] = data;
+}
+
+WRITE8_MEMBER( saturn_state::saturn_pdr2_direct_w )
+{
+	m_direct_mux[1] = data;
+}
+
+inline uint8_t saturn_state::saturn_direct_port_read(bool which)
+{
+	// bail out if direct mode is disabled
+	if(m_smpc_hle->get_iosel(which) == false)
+		return 0xff;
+
+	saturn_control_port_device *port = which == true ? m_ctrl2 : m_ctrl1;
+	uint8_t cur_mode = m_smpc_hle->get_ddr(which);
+	uint8_t res = 0;
+	uint16_t ctrl_read = port->read_direct();
+	
+//	check for control method
+	switch(cur_mode & 0x60)
+	{
+		case 0: break;
+		case 0x40: res = smpc_th_control_mode(ctrl_read,which); break;
+		case 0x60: res = smpc_direct_mode(ctrl_read,which); break;
+		default:
+			popmessage("SMPC: unemulated control method %02x, contact MAMEdev",cur_mode & 0x60);
+			break;
+	}
+
+	return res;
+}
+
+uint8_t saturn_state::smpc_th_control_mode(uint16_t in_value, bool which)
+{
+	uint8_t res = 0;
+	uint8_t th = (m_direct_mux[which] >> 5) & 3;
+
+	switch (th)
+	{
+		/* TODO: 3D Lemmings bogusly enables TH Control mode, wants this to return the ID, needs HW tests.  */
+		case 3:
+			res = th << 6;
+			res |= 0x14;
+			res |= (in_value & 8); // L
+			break;
+		case 2:
+			res = th << 6;
+			//  1 C B Right Left Down Up
+			//  WHP actually has a very specific code at 0x6015f30, doesn't like bits 0-1 active here ...
+			res|= ((in_value >>  4) & 0x30); // C & B
+			res|= ((in_value >> 12) & 0xc);
+			break;
+		case 1:
+			res = th << 6;
+			res |= 0x10;
+			res |= ((in_value >> 4) & 0xf); // R, X, Y, Z
+			break;
+		case 0:
+			res = th << 6;
+			//  0 Start A 0 0    Down Up
+			res |= ((in_value >>  6) & 0x30); // Start & A
+			res |= ((in_value >> 12) & 0x03);
+			//  ... and it actually wants bits 2 - 3 active here.
+			res |= 0xc;
+			break;
+	}
+
+	return res;
+}
+
+
+uint8_t saturn_state::smpc_direct_mode(uint16_t in_value,bool which)
+{
+	uint8_t hshake = (m_direct_mux[which] >> 5) & 3;
+	const int shift_bit[4] = { 4, 12, 8, 0 };
+
+	return 0x80 | 0x10 | ((in_value >> shift_bit[hshake]) & 0xf);
+}
 
 static MACHINE_CONFIG_START( saturn )
 
@@ -815,6 +906,11 @@ static MACHINE_CONFIG_START( saturn )
 
 //  SH-1
 
+	MCFG_SMPC_HLE_ADD("smpc")
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(saturn_state, saturn_pdr1_direct_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(saturn_state, saturn_pdr2_direct_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(saturn_state, saturn_pdr1_direct_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(saturn_state, saturn_pdr2_direct_w))
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)

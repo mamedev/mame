@@ -161,25 +161,223 @@ TODO:
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0
 
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-/********************************************
- *
- * Bankswitch code for ST-V Multi Cart mode
- *
- *******************************************/
+// device type definition
+DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (HD404920FS)")
 
-void saturn_state::stv_select_game(int gameno)
+// TODO: this is actually a DEVICE_ADDRESS_MAP, fix once everything is merged
+static ADDRESS_MAP_START( smpc_regs, 0, 8, smpc_hle_device )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x61, 0x61) AM_READ(status_register_r)
+	AM_RANGE(0x63, 0x63) AM_READWRITE(status_flag_r, status_flag_w)
+	AM_RANGE(0x75, 0x75) AM_READWRITE(pdr1_r, pdr1_w)
+	AM_RANGE(0x77, 0x77) AM_READWRITE(pdr2_r, pdr2_w)
+	AM_RANGE(0x79, 0x79) AM_WRITE(ddr1_w)
+	AM_RANGE(0x7b, 0x7b) AM_WRITE(ddr2_w)
+	AM_RANGE(0x7d, 0x7d) AM_WRITE(iosel_w)
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(exle_w)
+ADDRESS_MAP_END
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  smpc_hle_device - constructor
+//-------------------------------------------------
+
+smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
+	m_pdr1_read(*this),
+	m_pdr2_read(*this),
+	m_pdr1_write(*this),
+	m_pdr2_write(*this)
 {
-	if (m_prev_bankswitch != gameno)
-	{
-		if (m_cart_reg[gameno] && m_cart_reg[gameno]->base())
-			memcpy(memregion("abus")->base(), m_cart_reg[gameno]->base(), 0x3000000);
-		else
-			memset(memregion("abus")->base(), 0x00, 0x3000000); // TODO: 1-filled?
-
-		m_prev_bankswitch = gameno;
-	}
 }
+
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void smpc_hle_device::device_start()
+{
+	m_pdr1_read.resolve_safe(0xff);
+	m_pdr2_read.resolve_safe(0xff);
+	m_pdr1_write.resolve_safe();
+	m_pdr2_write.resolve_safe();
+	
+	save_item(NAME(m_sf));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_ddr1));
+	save_item(NAME(m_ddr2));
+	save_item(NAME(m_pdr1_readback));
+	save_item(NAME(m_pdr2_readback));
+	save_item(NAME(m_iosel1));
+	save_item(NAME(m_iosel2));
+	save_item(NAME(m_exle1));
+	save_item(NAME(m_exle2));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void smpc_hle_device::device_reset()
+{
+	m_sr = 0x40; // this bit is always on according to docs (?)
+	m_sf = false;
+	m_cd_sf = false;
+	m_ddr1 = 0;
+	m_ddr2 = 0;
+	m_pdr1_readback = 0;
+	m_pdr2_readback = 0;
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector smpc_hle_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+READ8_MEMBER( smpc_hle_device::status_register_r )
+{
+	return m_sr;
+}
+
+READ8_MEMBER( smpc_hle_device::status_flag_r )
+{
+	// bit 3: CD enable related?
+	return (m_sf<<0) | (m_cd_sf<<3);
+}
+
+WRITE8_MEMBER( smpc_hle_device::status_flag_w )
+{
+	m_sf = BIT(data,0);
+	m_cd_sf = false;
+}
+
+READ8_MEMBER( smpc_hle_device::pdr1_r )
+{
+	uint8_t res = (m_pdr1_read() & ~m_ddr1) | m_pdr1_readback;
+	
+	return res;
+}
+
+READ8_MEMBER( smpc_hle_device::pdr2_r )
+{
+	uint8_t res = (m_pdr2_read() & ~m_ddr2) | m_pdr2_readback;
+	
+	return res;
+}
+
+WRITE8_MEMBER( smpc_hle_device::pdr1_w )
+{
+//  pins defined as output returns in input
+	m_pdr1_readback = (data & m_ddr1);
+	m_pdr1_readback &= 0x7f;
+	m_pdr1_write(m_pdr1_readback);
+//  bit 7 can be read back apparently
+	m_pdr1_readback |= data & 0x80;
+}
+
+WRITE8_MEMBER( smpc_hle_device::pdr2_w )
+{
+//  pins defined as output returns in input
+	m_pdr2_readback = (data & m_ddr2);
+	m_pdr2_readback &= 0x7f;
+	m_pdr2_write(m_pdr2_readback);
+//  bit 7 can be read back apparently
+	m_pdr2_readback |= data & 0x80;
+}
+
+WRITE8_MEMBER( smpc_hle_device::ddr1_w )
+{
+	m_ddr1 = data & 0x7f;
+}
+
+WRITE8_MEMBER( smpc_hle_device::ddr2_w )
+{
+	m_ddr2 = data & 0x7f;
+}
+
+WRITE8_MEMBER( smpc_hle_device::iosel_w )
+{
+	m_iosel1 = BIT(data,0);
+	m_iosel2 = BIT(data,1);
+}
+
+WRITE8_MEMBER( smpc_hle_device::exle_w )
+{
+	m_exle1 = BIT(data,0);
+	m_exle2 = BIT(data,1);
+}
+
+inline void smpc_hle_device::sr_ack()
+{
+	m_sr &= 0x0f;
+}
+
+inline void smpc_hle_device::sr_set(uint8_t data)
+{
+	m_sr = data;
+}
+
+inline void smpc_hle_device::sf_ack(bool cd_enable)
+{
+	m_sf = false;
+	m_cd_sf = cd_enable;
+}
+
+inline void smpc_hle_device::sf_set()
+{
+	m_sf = true;
+}
+
+// Saturn Direct Mode polling check for delegate
+bool smpc_hle_device::get_iosel(bool which)
+{
+	return which == true ? m_iosel2 : m_iosel1;
+}
+
+uint8_t smpc_hle_device::get_ddr(bool which)
+{
+	return which == true ? m_ddr2 : m_ddr1;
+}
+
+
+// TODO: trampolines that needs to go away
+READ8_MEMBER( smpc_hle_device::read )
+{
+	return this->space().read_byte(offset);
+}
+
+WRITE8_MEMBER( smpc_hle_device::write )
+{
+	this->space().write_byte(offset,data);
+}
+
+
+
 
 /********************************************
  *
@@ -196,7 +394,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_slave_enable )
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
-	m_smpc.SF = 0x00; //clear hand-shake flag
+	m_smpc_hle->sf_ack(false);
 	m_smpc.slave_on = param;
 //  printf("%d %d\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 }
@@ -206,13 +404,13 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_sound_enable )
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = param ^ 1;
 	m_smpc.OREG[31] = param + 0x06; //read-back for last command issued
-	m_smpc.SF = 0x00; //clear hand-shake flag
+	m_smpc_hle->sf_ack(false);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_cd_enable )
 {
 	m_smpc.OREG[31] = param + 0x08; //read-back for last command issued
-	m_smpc.SF = 0x08; //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
+	m_smpc_hle->sf_ack(true); //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
 }
 
 void saturn_state::smpc_system_reset()
@@ -256,21 +454,20 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_change_clock )
 	/* put issued command in OREG31 */
 	m_smpc.OREG[31] = 0x0e + param;
 	/* clear hand-shake flag */
-	m_smpc.SF = 0x00;
-
+	m_smpc_hle->sf_ack(false);
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values? */
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
 {
 	if (m_smpc.intback_stage == 2)
-	{
-		m_smpc.SR = (0x80 | m_smpc.pmode);    // pad 2, no more data, echo back pad mode set by intback
+	{	
+		m_smpc_hle->sr_set(0x80 | m_smpc.pmode);     // pad 2, no more data, echo back pad mode set by intback
 		m_smpc.intback_stage = 0;
 	}
 	else
 	{
-		m_smpc.SR = (0xc0 | m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
+		m_smpc_hle->sr_set(0xc0 | m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
 		m_smpc.intback_stage ++;
 	}
 
@@ -280,7 +477,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
 		m_scu.ist |= (IRQ_SMPC);
 
 	m_smpc.OREG[31] = 0x10; /* callback for last command issued */
-	m_smpc.SF = 0x00;    /* clear hand-shake flag */
+	m_smpc_hle->sf_ack(false);
 }
 
 
@@ -318,7 +515,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
 			m_smpc.OREG[16+i]=0xff; // undefined
 
 		m_smpc.intback_stage = (m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
-		m_smpc.SR = 0x40 | m_smpc.intback_stage << 5;
+		m_smpc_hle->sr_set(0x40 | (m_smpc.intback_stage << 5));
 		m_smpc.pmode = m_smpc.intback_buf[0]>>4;
 
 		//  /*This is for RTC,cartridge code and similar stuff...*/
@@ -331,12 +528,12 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
 		/* put issued command in OREG31 */
 		m_smpc.OREG[31] = 0x10; // TODO: doc says 0?
 		/* clear hand-shake flag */
-		m_smpc.SF = 0x00;
+		m_smpc_hle->sf_ack(false);
 	}
 	else if(m_smpc.intback_buf[1] & 8)
 	{
 		m_smpc.intback_stage = (m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
-		m_smpc.SR = 0x40;
+		m_smpc_hle->sr_set(0x40);
 		m_smpc.OREG[31] = 0x10;
 		machine().scheduler().timer_set(attotime::from_usec(0), timer_expired_delegate(FUNC(saturn_state::stv_intback_peripheral),this),0);
 	}
@@ -344,7 +541,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
 	{
 		/* Shienryu calls this, it would be plainly illegal on Saturn, I'll just return the command and clear the hs flag for now. */
 		m_smpc.OREG[31] = 0x10;
-		m_smpc.SF = 0x00;
+		m_smpc_hle->sf_ack(false);
 	}
 }
 
@@ -416,12 +613,12 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 
 	if (m_smpc.intback_stage == 2)
 	{
-		m_smpc.SR = (0x80 | m_smpc.pmode);    // pad 2, no more data, echo back pad mode set by intback
+		m_smpc_hle->sr_set(0x80 | m_smpc.pmode);    // pad 2, no more data, echo back pad mode set by intback
 		m_smpc.intback_stage = 0;
 	}
 	else
 	{
-		m_smpc.SR = (0xc0 | m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
+		m_smpc_hle->sr_set(0xc0 | m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
 		m_smpc.intback_stage ++;
 	}
 
@@ -431,7 +628,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 		m_scu.ist |= (IRQ_SMPC);
 
 	m_smpc.OREG[31] = 0x10; /* callback for last command issued */
-	m_smpc.SF = 0x00;    /* clear hand-shake flag */
+	m_smpc_hle->sf_ack(false);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::saturn_smpc_intback )
@@ -468,7 +665,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::saturn_smpc_intback )
 		}
 
 		m_smpc.intback_stage = (m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
-		m_smpc.SR = 0x40 | m_smpc.intback_stage << 5;
+		m_smpc_hle->sr_set(0x40 | (m_smpc.intback_stage << 5));
 		m_smpc.pmode = m_smpc.intback_buf[0]>>4;
 
 		if(!(m_scu.ism & IRQ_SMPC))
@@ -479,12 +676,12 @@ TIMER_CALLBACK_MEMBER( saturn_state::saturn_smpc_intback )
 		/* put issued command in OREG31 */
 		m_smpc.OREG[31] = 0x10;
 		/* clear hand-shake flag */
-		m_smpc.SF = 0x00;
+		m_smpc_hle->sf_ack(false);
 	}
 	else if(m_smpc.intback_buf[1] & 8)
 	{
 		m_smpc.intback_stage = (m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
-		m_smpc.SR = 0x40;
+		m_smpc_hle->sr_set(0x40);
 		m_smpc.OREG[31] = 0x10;
 		machine().scheduler().timer_set(attotime::from_usec(0), timer_expired_delegate(FUNC(saturn_state::intback_peripheral),this),0);
 	}
@@ -525,7 +722,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_nmi_set )
 	/* put issued command in OREG31 */
 	m_smpc.OREG[31] = 0x19 + param;
 	/* clear hand-shake flag */
-	m_smpc.SF = 0x00;
+	m_smpc_hle->sf_ack(false);
 
 	//m_smpc.OREG[0] = (0x80) | ((m_NMI_reset & 1) << 6);
 }
@@ -663,7 +860,7 @@ void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t 
 READ8_MEMBER( saturn_state::stv_SMPC_r )
 {
 	int return_data = 0;
-
+	
 	if(!(offset & 1))
 		return 0;
 
@@ -671,22 +868,22 @@ READ8_MEMBER( saturn_state::stv_SMPC_r )
 		return_data = m_smpc.OREG[(offset-0x21) >> 1];
 
 	if (offset == 0x61) // TODO: SR
-		return_data = m_smpc.SR;
+		return_data = m_smpc_hle->read(space,offset);
 
 	if (offset == 0x63)
-		return_data = m_smpc.SF;
+		return_data = m_smpc_hle->read(space,offset);
 
 	if (offset == 0x75)//PDR1 read
-		return_data = ioport("DSW1")->read();
+		return_data = m_smpc_hle->read(space,offset); //ioport("DSW1")->read();
 
 	if (offset == 0x77)//PDR2 read
-		return_data = (0xfe | m_eeprom->do_read());
+		return_data = m_smpc_hle->read(space,offset); //(0xfe | m_eeprom->do_read());
 
 	return return_data;
 }
 
 WRITE8_MEMBER( saturn_state::stv_SMPC_w )
-{
+{	
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
 
@@ -702,7 +899,7 @@ WRITE8_MEMBER( saturn_state::stv_SMPC_w )
 			if(data & 0x40)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
-				m_smpc.SR &= 0x0f;
+				m_smpc_hle->sr_ack();
 				m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
@@ -710,7 +907,7 @@ WRITE8_MEMBER( saturn_state::stv_SMPC_w )
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
 				machine().scheduler().timer_set(attotime::from_usec(700), timer_expired_delegate(FUNC(saturn_state::stv_intback_peripheral),this),0); /* TODO: is timing correct? */
 				m_smpc.OREG[31] = 0x10;
-				m_smpc.SF = 0x01; //TODO: set hand-shake flag?
+				m_smpc_hle->sf_set();
 			}
 		}
 	}
@@ -723,65 +920,36 @@ WRITE8_MEMBER( saturn_state::stv_SMPC_w )
 		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0x08 && data != 0x09 && data != 0xe && data != 0xf && data != 0x19 && data != 0x1a)
 		{
 			m_smpc.OREG[31] = data; //read-back command
-			m_smpc.SF = 0x00;
+			m_smpc_hle->sf_ack(false);
 		}
 		/*TODO:emulate the timing of each command...*/
 	}
 
 	if(offset == 0x63)
-		m_smpc.SF = data & 1;
+		m_smpc_hle->write(space,offset,data);
 
+	// PDR1
 	if(offset == 0x75)
-	{
-		/*
-		-xx- ---- PDR1
-		---x ---- EEPROM write bit
-		---- x--- EEPROM CLOCK line
-		---- -x-- EEPROM CS line
-		---- --xx A-Bus bank bits
-		*/
-		m_eeprom->clk_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->di_write((data >> 4) & 1);
-		m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
-		m_stv_multi_bank = data & 3;
+		m_smpc_hle->write(space,offset,data);
 
-		stv_select_game(m_stv_multi_bank);
-
-		m_smpc.PDR1 = (data & 0x60);
-	}
-
+	// PDR2
 	if(offset == 0x77)
-	{
-		/*
-		    -xx- ---- PDR2
-		    ---x ---- Enable Sound System (ACTIVE LOW)
-		*/
-		//popmessage("PDR2 = %02x",m_smpc_ram[0x77]);
+		m_smpc_hle->write(space,offset,data);
 
-		if(LOG_SMPC) printf("SMPC: M68k %s\n",(data & 0x10) ? "off" : "on");
-		//machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_sound_enable),this),(m_smpc_ram[0x77] & 0x10) >> 4);
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		m_en_68k = ((data & 0x10) >> 4) ^ 1;
+	if(offset == 0x79)
+		m_smpc_hle->write(space,offset,data);
 
-		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",data);
-		m_smpc.PDR2 = (data & 0x60);
-	}
-
+	if(offset == 0x7b)
+		m_smpc_hle->write(space,offset,data);
+	
 	if(offset == 0x7d)
 	{
-		/*
-		---- --x- IOSEL2 direct (1) / control mode (0) port select
-		---- ---x IOSEL1 direct (1) / control mode (0) port select
-		*/
-		m_smpc.IOSEL1 = (data & 1) >> 0;
-		m_smpc.IOSEL2 = (data & 2) >> 1;
+		m_smpc_hle->write(space,offset,data);
 	}
 
 	if(offset == 0x7f)
 	{
-		//enable PAD irq & VDP2 external latch for port 1/2
-		m_smpc.EXLE1 = (data & 1) >> 0;
-		m_smpc.EXLE2 = (data & 2) >> 1;
+		m_smpc_hle->write(space,offset,data);
 	}
 }
 
@@ -791,67 +959,8 @@ WRITE8_MEMBER( saturn_state::stv_SMPC_w )
  *
  *******************************************/
 
-uint8_t saturn_state::smpc_th_control_mode(uint8_t pad_n)
-{
-	uint8_t res = 0;
-	int th = (pad_n == 0) ? ((m_smpc.PDR1 >> 5) & 3) : ((m_smpc.PDR2 >> 5) & 3);
 
-	uint16_t ctrl_read = 0;
-	if (m_ctrl1 && pad_n == 0)
-		ctrl_read = m_ctrl1->read_direct();
-	if (m_ctrl2 && pad_n == 1)
-		ctrl_read = m_ctrl2->read_direct();
 
-	if (LOG_SMPC) printf("SMPC: SH-2 TH control mode, returning pad data %d for phase %d\n", pad_n + 1, th);
-
-	switch (th)
-	{
-		/* TODO: 3D Lemmings bogusly enables TH Control mode, wants this to return the ID, needs HW tests.  */
-		case 3:
-			res = th << 6;
-			res |= 0x14;
-			res |= (ctrl_read & 8); // L
-			break;
-		case 2:
-			res = th << 6;
-			//  1 C B Right Left Down Up
-			//  WHP actually has a very specific code at 0x6015f30, doesn't like bits 0-1 active here ...
-			res|= ((ctrl_read >>  4) & 0x30); // C & B
-			res|= ((ctrl_read >> 12) & 0xc);
-			break;
-		case 1:
-			res = th << 6;
-			res |= 0x10;
-			res |= ((ctrl_read >> 4) & 0xf); // R, X, Y, Z
-			break;
-		case 0:
-			res = th << 6;
-			//  0 Start A 0 0    Down Up
-			res |= ((ctrl_read >>  6) & 0x30); // Start & A
-			res |= ((ctrl_read >> 12) & 0x03);
-			//  ... and it actually wants bits 2 - 3 active here.
-			res |= 0xc;
-			break;
-	}
-
-	return res;
-}
-
-uint8_t saturn_state::smpc_direct_mode(uint8_t pad_n)
-{
-	int hshake = (pad_n == 0) ? ((m_smpc.PDR1 >> 5) & 3) : ((m_smpc.PDR2 >> 5) & 3);
-	const int shift_bit[4] = { 4, 12, 8, 0 };
-
-	uint16_t ctrl_read = 0;
-	if (m_ctrl1 && pad_n == 0)
-		ctrl_read = m_ctrl1->read_direct();
-	if (m_ctrl2 && pad_n == 1)
-		ctrl_read = m_ctrl2->read_direct();
-
-	if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
-
-	return 0x80 | 0x10 | ((ctrl_read >> shift_bit[hshake]) & 0xf);
-}
 
 READ8_MEMBER( saturn_state::saturn_SMPC_r )
 {
@@ -864,16 +973,18 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 		return_data = m_smpc.OREG[(offset-0x21) >> 1];
 
 	if (offset == 0x61)
-		return_data = m_smpc.SR;
+		return_data = m_smpc_hle->read(space,offset);
 
 	if (offset == 0x63)
 	{
 		//printf("SF %d %d\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
-		return_data = m_smpc.SF;
+		return_data = m_smpc_hle->read(space,offset);
 	}
 
 	if (offset == 0x75 || offset == 0x77)//PDR1/2 read
 	{
+		return_data = m_smpc_hle->read(space,offset);
+		#if 0
 		if ((m_smpc.IOSEL1 && offset == 0x75) || (m_smpc.IOSEL2 && offset == 0x77))
 		{
 			uint8_t cur_ddr;
@@ -897,6 +1008,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 					break;
 			}
 		}
+		#endif
 	}
 
 	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag(), space.device().safe_pc(), offset, offset>>1, return_data);
@@ -921,7 +1033,7 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 			if(data & 0x40)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: BREAK request %02x\n",data);
-				m_smpc.SR &= 0x0f;
+				m_smpc_hle->sr_ack();
 				m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
@@ -929,7 +1041,7 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request %02x\n",data);
 				machine().scheduler().timer_set(attotime::from_usec(700), timer_expired_delegate(FUNC(saturn_state::intback_peripheral),this),0); /* TODO: is timing correct? */
 				m_smpc.OREG[31] = 0x10;
-				m_smpc.SF = 0x01; //TODO: set hand-shake flag?
+				m_smpc_hle->sf_set(); //TODO: set hand-shake flag?
 			}
 		}
 	}
@@ -942,36 +1054,48 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x08 && data != 0x09 && data != 0x0e && data != 0x0f && data != 0x19 && data != 0x1a)
 		{
 			m_smpc.OREG[31] = data; //read-back for last command issued
-			m_smpc.SF = 0x00; //clear hand-shake flag
+			m_smpc_hle->sf_ack(false); //clear hand-shake flag
 		}
-		/*TODO:emulate the timing of each command...*/
+		// TODO: emulate the timing of each command...
 	}
 
 	if (offset == 0x63)
-		m_smpc.SF = data & 1; // hand-shake flag
+		m_smpc_hle->write(space,offset,data);
 
 	if(offset == 0x75)  // PDR1
-		m_smpc.PDR1 = data & 0x7f;
+		m_smpc_hle->write(space,offset,data);
+
+		//m_smpc.PDR1 = data & 0x7f;
 
 	if(offset == 0x77)  // PDR2
-		m_smpc.PDR2 = data & 0x7f;
+		m_smpc_hle->write(space,offset,data);
+		
+		//m_smpc.PDR2 = data & 0x7f;
 
 	if(offset == 0x79)
-		m_smpc.DDR1 = data & 0x7f;
+		m_smpc_hle->write(space,offset,data);
+
+//		m_smpc.DDR1 = data & 0x7f;
 
 	if(offset == 0x7b)
-		m_smpc.DDR2 = data & 0x7f;
+		m_smpc_hle->write(space,offset,data);
+	
+//		m_smpc.DDR2 = data & 0x7f;
 
 	if(offset == 0x7d)
 	{
-		m_smpc.IOSEL1 = data & 1;
-		m_smpc.IOSEL2 = (data & 2) >> 1;
+		m_smpc_hle->write(space,offset,data);
+
+//		m_smpc.IOSEL1 = data & 1;
+//		m_smpc.IOSEL2 = (data & 2) >> 1;
 	}
 
 	if(offset == 0x7f)
 	{
+		m_smpc_hle->write(space,offset,data);
+
 		//enable PAD irq & VDP2 external latch for port 1/2
-		m_smpc.EXLE1 = (data & 1) >> 0;
-		m_smpc.EXLE2 = (data & 2) >> 1;
+//		m_smpc.EXLE1 = (data & 1) >> 0;
+//		m_smpc.EXLE2 = (data & 2) >> 1;
 	}
 }

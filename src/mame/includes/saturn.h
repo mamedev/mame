@@ -7,6 +7,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/scudsp/scudsp.h"
+#include "machine/smpc.h"
 #include "cpu/sh/sh2.h"
 
 #include "bus/sat_ctrl/ctrl.h"
@@ -38,12 +39,9 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_smpc_hle(*this, "smpc"),
 			m_scudsp(*this, "scudsp"),
 			m_eeprom(*this, "eeprom"),
-			m_cart1(*this, "stv_slot1"),
-			m_cart2(*this, "stv_slot2"),
-			m_cart3(*this, "stv_slot3"),
-			m_cart4(*this, "stv_slot4"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
 			m_ctrl1(*this, "ctrl1"),
@@ -130,16 +128,16 @@ public:
 	}m_vdp2;
 
 	struct {
-		uint8_t IOSEL1;
-		uint8_t IOSEL2;
-		uint8_t EXLE1;
-		uint8_t EXLE2;
-		uint8_t PDR1;
-		uint8_t PDR2;
-		uint8_t DDR1;
-		uint8_t DDR2;
-		uint8_t SF;
-		uint8_t SR;
+//		uint8_t IOSEL1;
+//		uint8_t IOSEL2;
+//		uint8_t EXLE1;
+//		uint8_t EXLE2;
+//		uint8_t PDR1;
+//		uint8_t PDR2;
+//		uint8_t DDR1;
+//		uint8_t DDR2;
+//		uint8_t SF;
+//		uint8_t SR;
 		uint8_t IREG[7];
 		uint8_t intback_buf[7];
 		uint8_t OREG[32];
@@ -157,8 +155,6 @@ public:
 	uint32_t *m_cart_dram;
 
 	/* ST-V specific */
-	uint8_t     m_stv_multi_bank;
-	uint8_t     m_prev_bankswitch;
 	emu_timer *m_stv_rtc_timer;
 	uint8_t     m_port_sel,m_mux_data;
 	uint8_t     m_system_output;
@@ -169,12 +165,9 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<scudsp_cpu_device> m_scudsp;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<generic_slot_device> m_cart1;
-	optional_device<generic_slot_device> m_cart2;
-	optional_device<generic_slot_device> m_cart3;
-	optional_device<generic_slot_device> m_cart4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<saturn_control_port_device> m_ctrl1;
@@ -210,8 +203,6 @@ public:
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
 
-	uint8_t smpc_direct_mode(uint8_t pad_n);
-	uint8_t smpc_th_control_mode(uint8_t pad_n);
 	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
 	DECLARE_READ8_MEMBER( saturn_SMPC_r );
 	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
@@ -673,7 +664,6 @@ public:
 	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
 	// FROM smpc.c
-	void stv_select_game(int gameno);
 	void smpc_master_on();
 	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
 	TIMER_CALLBACK_MEMBER( smpc_sound_enable );
@@ -692,11 +682,19 @@ public:
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
 
+	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
+	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
+	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
+	DECLARE_WRITE8_MEMBER(saturn_pdr2_direct_w);
+	uint8_t m_direct_mux[2];
+	uint8_t saturn_direct_port_read(bool which);
+	uint8_t smpc_direct_mode(uint16_t in_value, bool which);
+	uint8_t smpc_th_control_mode(uint16_t in_value, bool which);
+
 	void debug_scudma_command(int ref, const std::vector<std::string> &params);
 	void debug_scuirq_command(int ref, const std::vector<std::string> &params);
 	void debug_help_command(int ref, const std::vector<std::string> &params);
 	void debug_commands(int ref, const std::vector<std::string> &params);
-
 };
 
 

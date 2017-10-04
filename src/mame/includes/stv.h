@@ -10,6 +10,10 @@ class stv_state : public saturn_state
 public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: saturn_state(mconfig, type, tag),
+		m_cart1(*this, "stv_slot1"),
+		m_cart2(*this, "stv_slot2"),
+		m_cart3(*this, "stv_slot3"),
+		m_cart4(*this, "stv_slot4"),
 		m_rax(*this, "rax"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
@@ -88,6 +92,10 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart4 ) { return load_cart(image, m_cart4); }
+	optional_device<generic_slot_device> m_cart1;
+	optional_device<generic_slot_device> m_cart2;
+	optional_device<generic_slot_device> m_cart3;
+	optional_device<generic_slot_device> m_cart4;
 
 	void install_stvbios_speedups( void );
 
@@ -116,6 +124,13 @@ public:
 	uint16_t crypt_read_callback(uint32_t addr);
 	uint16_t crypt_read_callback_ch1(uint32_t addr);
 	uint16_t crypt_read_callback_ch2(uint32_t addr);
+	
+	DECLARE_READ8_MEMBER(pdr1_input_r);
+	DECLARE_READ8_MEMBER(pdr2_input_r);
+	DECLARE_WRITE8_MEMBER(pdr1_output_w);
+	DECLARE_WRITE8_MEMBER(pdr2_output_w);
+	void stv_select_game(int gameno);
+	uint8_t     m_prev_gamebank_select;
 };
 
 
