@@ -249,17 +249,12 @@ private:
 
 	inline void op0000(uint16_t opcode);
 	inline void op0001(uint16_t opcode);
-	inline void op0010(uint16_t opcode);
-	inline void op0011(uint16_t opcode);
 	inline void op0100(uint16_t opcode);
 	inline void op0101(uint16_t opcode);
-	inline void op0110(uint16_t opcode);
 	inline void op0111(uint16_t opcode);
-	inline void op1000(uint16_t opcode);
 	inline void op1001(uint16_t opcode);
 	inline void op1010(uint16_t opcode);
 	inline void op1011(uint16_t opcode);
-	inline void op1100(uint16_t opcode);
 	inline void op1101(uint16_t opcode);
 	inline void op1110(uint16_t opcode);
 	inline void op1111(uint16_t opcode);

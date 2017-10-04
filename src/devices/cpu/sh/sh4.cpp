@@ -2314,47 +2314,11 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x2000: // void sh2_device::op0010(uint16_t opcode)
-			switch (opcode & 0x0f)
-			{
-			case  0: MOVBS(Rm, Rn);                break;
-			case  1: MOVWS(Rm, Rn);                break;
-			case  2: MOVLS(Rm, Rn);                break;
-			case  3: ILLEGAL();                         break;
-			case  4: MOVBM(Rm, Rn);                break;
-			case  5: MOVWM(Rm, Rn);                break;
-			case  6: MOVLM(Rm, Rn);                break;
-			case  7: DIV0S(Rm, Rn);                break;
-			case  8: TST(Rm, Rn);                  break;
-			case  9: AND(Rm, Rn);                  break;
-			case 10: XOR(Rm, Rn);                  break;
-			case 11: OR(Rm, Rn);                   break;
-			case 12: CMPSTR(Rm, Rn);               break;
-			case 13: XTRCT(Rm, Rn);                break;
-			case 14: MULU(Rm, Rn);                 break;
-			case 15: MULS(Rm, Rn);                 break;
-			}
+			op0010(opcode);
 			break;
 
 		case 0x3000: // void sh2_device::op0011(uint16_t opcode)
-			switch (opcode & 0x0f)
-			{
-			case  0: CMPEQ(Rm, Rn);                break;
-			case  1: ILLEGAL();                         break;
-			case  2: CMPHS(Rm, Rn);                break;
-			case  3: CMPGE(Rm, Rn);                break;
-			case  4: DIV1(Rm, Rn);                 break;
-			case  5: DMULU(Rm, Rn);                break;
-			case  6: CMPHI(Rm, Rn);                break;
-			case  7: CMPGT(Rm, Rn);                break;
-			case  8: SUB(Rm, Rn);                  break;
-			case  9: ILLEGAL();                         break;
-			case 10: SUBC(Rm, Rn);                 break;
-			case 11: SUBV(Rm, Rn);                 break;
-			case 12: ADD(Rm, Rn);                  break;
-			case 13: DMULS(Rm, Rn);                break;
-			case 14: ADDC(Rm, Rn);                 break;
-			case 15: ADDV(Rm, Rn);                 break;
-			}
+			op0011(opcode);
 			break;
 
 		case 0x4000:
@@ -2366,51 +2330,15 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			break;
 
 		case 0x6000: // void sh2_device::op0110(uint16_t opcode)
-			switch (opcode & 0x0f)
-			{
-			case  0: MOVBL(Rm, Rn);                break;
-			case  1: MOVWL(Rm, Rn);                break;
-			case  2: MOVLL(Rm, Rn);                break;
-			case  3: MOV(Rm, Rn);                  break;
-			case  4: MOVBP(Rm, Rn);                break;
-			case  5: MOVWP(Rm, Rn);                break;
-			case  6: MOVLP(Rm, Rn);                break;
-			case  7: NOT(Rm, Rn);                  break;
-			case  8: SWAPB(Rm, Rn);                break;
-			case  9: SWAPW(Rm, Rn);                break;
-			case 10: NEGC(Rm, Rn);                 break;
-			case 11: NEG(Rm, Rn);                  break;
-			case 12: EXTUB(Rm, Rn);                break;
-			case 13: EXTUW(Rm, Rn);                break;
-			case 14: EXTSB(Rm, Rn);                break;
-			case 15: EXTSW(Rm, Rn);                break;
-			}
+			op0110(opcode);
 			break;
 
 		case 0x7000:
 			ADDI(opcode & 0xff, Rn);
 			break;
 
-		case 0x8000: // sh2_device::op1000(uint16_t opcode)
-			switch ((opcode >> 8) & 0x0f)
-			{
-			case  0: MOVBS4(opcode & 0x0f, Rm);   break;
-			case  1: MOVWS4(opcode & 0x0f, Rm);   break;
-			case  2: ILLEGAL();                 break;
-			case  3: ILLEGAL();                 break;
-			case  4: MOVBL4(Rm, opcode & 0x0f);    break;
-			case  5: MOVWL4(Rm, opcode & 0x0f);    break;
-			case  6: ILLEGAL();                 break;
-			case  7: ILLEGAL();                 break;
-			case  8: CMPIM(opcode & 0xff);     break;
-			case  9: BT(opcode & 0xff);        break;
-			case 10: ILLEGAL();                 break;
-			case 11: BF(opcode & 0xff);        break;
-			case 12: ILLEGAL();                 break;
-			case 13: BTS(opcode & 0xff);       break;
-			case 14: ILLEGAL();                 break;
-			case 15: BFS(opcode & 0xff);       break;
-			}
+		case 0x8000:
+			op1000(opcode);
 			break;
 
 		case 0x9000:
@@ -2425,27 +2353,8 @@ inline void sh34_base_device::execute_one(const uint16_t opcode)
 			BSR(opcode & 0xfff);
 			break;
 
-		case 0xc000: // void sh2_device::op1100(uint16_t opcode)
-			switch ((opcode >> 8) & 0x0f)
-			{
-
-			case  0: MOVBSG(opcode & 0xff);     break;
-			case  1: MOVWSG(opcode & 0xff);     break;
-			case  2: MOVLSG(opcode & 0xff);     break;
-			case  3: TRAPA(opcode & 0xff); break; // note SH4 implementation is different
-			case  4: MOVBLG(opcode & 0xff);     break;
-			case  5: MOVWLG(opcode & 0xff);     break;
-			case  6: MOVLLG(opcode & 0xff);     break;
-			case  7: MOVA(opcode & 0xff);       break;
-			case  8: TSTI(opcode & 0xff);       break;
-			case  9: ANDI(opcode & 0xff);       break;
-			case 10: XORI(opcode & 0xff);       break;
-			case 11: ORI(opcode & 0xff);            break;
-			case 12: TSTM(opcode & 0xff);       break;
-			case 13: ANDM(opcode & 0xff);       break;
-			case 14: XORM(opcode & 0xff);       break;
-			case 15: ORM(opcode & 0xff);            break;
-			}
+		case 0xc000:
+			op1100(opcode);
 			break;
 
 		case 0xd000:

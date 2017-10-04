@@ -456,51 +456,9 @@ void sh2_device::op0001(uint16_t opcode)
 	MOVLS4(Rm, opcode & 0x0f, Rn);
 }
 
-void sh2_device::op0010(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: MOVBS(Rm, Rn);                break;
-	case  1: MOVWS(Rm, Rn);                break;
-	case  2: MOVLS(Rm, Rn);                break;
-	case  3: ILLEGAL();                         break;
-	case  4: MOVBM(Rm, Rn);                break;
-	case  5: MOVWM(Rm, Rn);                break;
-	case  6: MOVLM(Rm, Rn);                break;
-	case  7: DIV0S(Rm, Rn);                break;
-	case  8: TST(Rm, Rn);                  break;
-	case  9: AND(Rm, Rn);                  break;
-	case 10: XOR(Rm, Rn);                  break;
-	case 11: OR(Rm, Rn);                   break;
-	case 12: CMPSTR(Rm, Rn);               break;
-	case 13: XTRCT(Rm, Rn);                break;
-	case 14: MULU(Rm, Rn);                 break;
-	case 15: MULS(Rm, Rn);                 break;
-	}
-}
 
-void sh2_device::op0011(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: CMPEQ(Rm, Rn);                break;
-	case  1: ILLEGAL();                         break;
-	case  2: CMPHS(Rm, Rn);                break;
-	case  3: CMPGE(Rm, Rn);                break;
-	case  4: DIV1(Rm, Rn);                 break;
-	case  5: DMULU(Rm, Rn);                break;
-	case  6: CMPHI(Rm, Rn);                break;
-	case  7: CMPGT(Rm, Rn);                break;
-	case  8: SUB(Rm, Rn);                  break;
-	case  9: ILLEGAL();                         break;
-	case 10: SUBC(Rm, Rn);                 break;
-	case 11: SUBV(Rm, Rn);                 break;
-	case 12: ADD(Rm, Rn);                  break;
-	case 13: DMULS(Rm, Rn);                break;
-	case 14: ADDC(Rm, Rn);                 break;
-	case 15: ADDV(Rm, Rn);                 break;
-	}
-}
+
+
 
 void sh2_device::op0100(uint16_t opcode)
 {
@@ -582,56 +540,13 @@ void sh2_device::op0101(uint16_t opcode)
 	MOVLL4(Rm, opcode & 0x0f, Rn);
 }
 
-void sh2_device::op0110(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: MOVBL(Rm, Rn);                break;
-	case  1: MOVWL(Rm, Rn);                break;
-	case  2: MOVLL(Rm, Rn);                break;
-	case  3: MOV(Rm, Rn);                  break;
-	case  4: MOVBP(Rm, Rn);                break;
-	case  5: MOVWP(Rm, Rn);                break;
-	case  6: MOVLP(Rm, Rn);                break;
-	case  7: NOT(Rm, Rn);                  break;
-	case  8: SWAPB(Rm, Rn);                break;
-	case  9: SWAPW(Rm, Rn);                break;
-	case 10: NEGC(Rm, Rn);                 break;
-	case 11: NEG(Rm, Rn);                  break;
-	case 12: EXTUB(Rm, Rn);                break;
-	case 13: EXTUW(Rm, Rn);                break;
-	case 14: EXTSB(Rm, Rn);                break;
-	case 15: EXTSW(Rm, Rn);                break;
-	}
-}
+
 
 void sh2_device::op0111(uint16_t opcode)
 {
 	ADDI(opcode & 0xff, Rn);
 }
 
-void sh2_device::op1000(uint16_t opcode)
-{
-	switch ( opcode  & (15<<8) )
-	{
-	case  0 << 8: MOVBS4(opcode & 0x0f, Rm);   break;
-	case  1 << 8: MOVWS4(opcode & 0x0f, Rm);   break;
-	case  2<< 8: ILLEGAL();                 break;
-	case  3<< 8: ILLEGAL();                 break;
-	case  4<< 8: MOVBL4(Rm, opcode & 0x0f);    break;
-	case  5<< 8: MOVWL4(Rm, opcode & 0x0f);    break;
-	case  6<< 8: ILLEGAL();                 break;
-	case  7<< 8: ILLEGAL();                 break;
-	case  8<< 8: CMPIM(opcode & 0xff);     break;
-	case  9<< 8: BT(opcode & 0xff);        break;
-	case 10<< 8: ILLEGAL();                 break;
-	case 11<< 8: BF(opcode & 0xff);        break;
-	case 12<< 8: ILLEGAL();                 break;
-	case 13<< 8: BTS(opcode & 0xff);       break;
-	case 14<< 8: ILLEGAL();                 break;
-	case 15<< 8: BFS(opcode & 0xff);       break;
-	}
-}
 
 
 void sh2_device::op1001(uint16_t opcode)
@@ -647,29 +562,6 @@ void sh2_device::op1010(uint16_t opcode)
 void sh2_device::op1011(uint16_t opcode)
 {
 	BSR(opcode & 0xfff);
-}
-
-void sh2_device::op1100(uint16_t opcode)
-{
-	switch (opcode & (15<<8))
-	{
-	case  0<<8: MOVBSG(opcode & 0xff);     break;
-	case  1<<8: MOVWSG(opcode & 0xff);     break;
-	case  2<<8: MOVLSG(opcode & 0xff);     break;
-	case  3<<8: TRAPA(opcode & 0xff);      break;
-	case  4<<8: MOVBLG(opcode & 0xff);     break;
-	case  5<<8: MOVWLG(opcode & 0xff);     break;
-	case  6<<8: MOVLLG(opcode & 0xff);     break;
-	case  7<<8: MOVA(opcode & 0xff);       break;
-	case  8<<8: TSTI(opcode & 0xff);       break;
-	case  9<<8: ANDI(opcode & 0xff);       break;
-	case 10<<8: XORI(opcode & 0xff);       break;
-	case 11<<8: ORI(opcode & 0xff);            break;
-	case 12<<8: TSTM(opcode & 0xff);       break;
-	case 13<<8: ANDM(opcode & 0xff);       break;
-	case 14<<8: XORM(opcode & 0xff);       break;
-	case 15<<8: ORM(opcode & 0xff);            break;
-	}
 }
 
 void sh2_device::op1101(uint16_t opcode)

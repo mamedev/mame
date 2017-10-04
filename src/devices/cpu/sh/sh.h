@@ -36,7 +36,6 @@ public:
 		int     icount;
 		uint8_t   sleep_mode;
 		uint32_t  arg0;              /* print_debug argument 1 */
-		// SH1/2 only?
 		uint32_t  gbr;
 		uint32_t  vbr;
 
@@ -192,6 +191,13 @@ protected:
 	void XORI(uint32_t i);
 	void XORM(uint32_t i);
 	void XTRCT(uint32_t m, uint32_t n);
+
+	void op0010(uint16_t opcode);
+	void op0011(uint16_t opcode);
+	void op0110(uint16_t opcode);
+	void op1000(uint16_t opcode);
+	void op1100(uint16_t opcode);
+
 
 	virtual void RTE() = 0;
 	virtual void LDCSR(const uint16_t opcode) = 0;
