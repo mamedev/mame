@@ -611,6 +611,13 @@ void sh2_device::execute_run()
 	} while( m_sh2_state->icount > 0 );
 }
 
+
+void sh2_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+
 void sh2_device::device_start()
 {
 	/* allocate the implementation-specific state from the full cache */
@@ -797,7 +804,7 @@ void sh2_device::device_start()
 	m_drcuml->symbol_add(&m_sh2_state->mach, sizeof(m_sh2_state->macl), "mach");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	init_drc_frontend();
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 16; regnum++)
@@ -1380,6 +1387,12 @@ void sh2_device::execute_run_drc()
     given mode at the specified pc
 -------------------------------------------------*/
 
+const opcode_desc* sh2_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+
 void sh2_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	drcuml_state *drcuml = m_drcuml.get();
@@ -1392,7 +1405,8 @@ void sh2_device::code_compile_block(uint8_t mode, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = m_drcfe->describe_code(pc);
+	desclist = get_desclist(pc);
+
 	if (drcuml->logging() || drcuml->logging_native())
 		log_opcode_desc(drcuml, desclist, 0);
 

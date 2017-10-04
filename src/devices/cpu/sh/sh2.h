@@ -261,6 +261,9 @@ private:
 
 	void code_flush_cache();
 	void execute_run_drc();
+
+	void init_drc_frontend();
+	const opcode_desc* get_desclist(offs_t pc);
 	void code_compile_block(uint8_t mode, offs_t pc);
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
