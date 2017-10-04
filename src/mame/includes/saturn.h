@@ -155,7 +155,6 @@ public:
 	uint32_t *m_cart_dram;
 
 	/* ST-V specific */
-	emu_timer *m_stv_rtc_timer;
 	uint8_t     m_port_sel,m_mux_data;
 	uint8_t     m_system_output;
 	uint8_t     m_ioga_mode;
@@ -198,7 +197,6 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
@@ -657,7 +655,6 @@ public:
 	int firstfile;           // first non-directory file
 
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-	int DectoBCD(int num);
 
 	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 	DECLARE_READ16_MEMBER(scudsp_dma_r);

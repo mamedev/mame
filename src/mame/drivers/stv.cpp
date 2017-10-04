@@ -1095,7 +1095,7 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
 	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
 
-	MCFG_SMPC_HLE_ADD("smpc")
+	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
@@ -1245,7 +1245,6 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 	stvcd_reset();
 
-	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	m_prev_gamebank_select = 0xff;
 
 	scu_reset();
@@ -1289,9 +1288,6 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 
 MACHINE_START_MEMBER(stv_state,stv)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
@@ -1314,16 +1310,6 @@ MACHINE_START_MEMBER(stv_state,stv)
 	stv_register_protection_savestates(); // machine/stvprot.c
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&stv_state::stvcd_exit, this));
-
-	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(stv_state::stv_rtc_increment),this));
 
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(stv_state::m68k_reset_callback),this));
 }

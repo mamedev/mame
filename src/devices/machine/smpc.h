@@ -11,14 +11,15 @@
 
 #pragma once
 
+#include "screen.h"
 
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SMPC_HLE_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), SMPC_HLE, (0))
+#define MCFG_SMPC_HLE_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), SMPC_HLE, (clock))
 
 #define MCFG_SMPC_HLE_PDR1_IN_CB(_devcb) \
 	devcb = &smpc_hle_device::set_pdr1_in_handler(*device, DEVCB_##_devcb);
@@ -75,6 +76,7 @@ public:
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( ireg_w );
+	DECLARE_WRITE8_MEMBER( command_register_w );
 	DECLARE_READ8_MEMBER( oreg_r );
 	DECLARE_READ8_MEMBER( status_register_r );
 	DECLARE_WRITE8_MEMBER( status_flag_w );
@@ -104,6 +106,7 @@ public:
 	void dot_select_request(bool state);
 	void system_halt_request(bool state);
 	void irq_request();
+	bool get_nmi_status();
 	
 	bool get_iosel(bool which);
 	uint8_t get_ddr(bool which);
@@ -129,6 +132,7 @@ public:
 	// interrupt handler
 	template <class Object> static devcb_base &set_interrupt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_irq_line.set_callback(std::forward<Object>(cb)); }
 
+	static void static_set_screentag(device_t &device, const char *tag);
 	
 protected:
 	// device-level overrides
@@ -136,10 +140,20 @@ protected:
 //	virtual void device_add_mconfig() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 
+	enum {
+		COMMAND_ID = 1,
+		RTC_ID,
+		INTBACK_ID
+	};
+
 	const address_space_config      m_space_config;
+	emu_timer *m_cmd_timer;
+	emu_timer *m_rtc_timer;
+	emu_timer *m_intback_timer;
 
 	bool m_sf;
 	bool m_cd_sf;
@@ -149,8 +163,36 @@ private:
 	bool m_iosel1, m_iosel2;
 	bool m_exle1, m_exle2;
 	uint8_t m_ireg[7];
+	uint8_t m_intback_buf[3];
 	uint8_t m_oreg[32];
-	
+	uint8_t m_rtc_data[7];
+	uint8_t m_comreg;
+	// in usec
+	// timing table, from manual in usec
+	const uint32_t m_cmd_table_timing[0x20] = 
+	{	
+		30, 30, // MASTER ON / OFF
+		30, 30, // SLAVE ON / OFF
+		10, 10, // <unknown>
+		30, 30, // SOUND ON / OFF
+		40, 40, // CD ON / OFF
+		30, 30, 30, // NETLINK ON / OFF / <unknown>
+		100*1000, 100*1000, 100*1000, // SYSTEM RESET / ClocK CHaNGe 352 / 320
+		320*1000, // INTBACK
+		30, 30, 30, 30, 30, // <unknown>
+		70, 40, 30, 30, 30, // SETTIME / SETSMEM / NMIREQ / RESENAB / RESDISA
+		30, 30, 30, 30 // <unknown>
+	};
+	bool m_command_in_progress;
+	bool m_NMI_reset;
+	bool m_cur_dotsel;
+	void resolve_intback();
+	void intback_continue_request();
+	void handle_rtc_increment();
+	int DectoBCD(int num);
+	int m_intback_stage;
+	int m_pmode;
+
 	devcb_write_line m_mshres;
 	devcb_write_line m_mshnmi;
 	devcb_write_line m_sshres;
@@ -165,6 +207,8 @@ private:
 	devcb_write8 m_pdr1_write;
 	devcb_write8 m_pdr2_write;
 	devcb_write_line m_irq_line;
+	
+	screen_device *m_screen;
 };
 
 

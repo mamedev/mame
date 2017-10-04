@@ -448,7 +448,6 @@ test1f diagnostic hacks:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "coreutil.h"
 
 
 class sat_console_state : public saturn_state
@@ -649,9 +648,6 @@ void saturn_state::debug_commands(int ref, const std::vector<std::string> &param
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
@@ -735,16 +731,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
 
-	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sat_console_state::stv_rtc_increment),this));
-
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(sat_console_state::m68k_reset_callback),this));
 }
 
@@ -785,8 +771,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
-
-	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 READ8_MEMBER( saturn_state::saturn_pdr1_direct_r )
@@ -906,7 +890,7 @@ static MACHINE_CONFIG_START( saturn )
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
-	MCFG_SMPC_HLE_ADD("smpc")
+	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(saturn_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(saturn_state, saturn_pdr2_direct_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(saturn_state, saturn_pdr1_direct_w))

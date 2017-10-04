@@ -54,23 +54,6 @@
 #define LOG_IRQ  0
 #define LOG_IOGA 0
 
-int saturn_state::DectoBCD(int num)
-{
-	int i, cnt = 0, tmp, res = 0;
-
-	while (num > 0) {
-		tmp = num;
-		while (tmp >= 10) tmp %= 10;
-		for (i=0; i<cnt; i++)
-			tmp *= 16;
-		res += tmp;
-		cnt++;
-		num /= 10;
-	}
-
-	return res;
-}
-
 /**************************************************************************************/
 
 /*
@@ -676,74 +659,6 @@ void saturn_state::scu_reset(void)
 	m_scu.status = 0;
 }
 
-TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
-{
-	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
-	static int year_num, year_count;
-
-	/*
-	    m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	    m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	    m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	    m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	    m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	    m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	    m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-	*/
-
-	m_smpc.rtc_data[6]++;
-
-	/* seconds from 9 -> 10*/
-	if((m_smpc.rtc_data[6] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[6]+=0x10; m_smpc.rtc_data[6]&=0xf0; }
-	/* seconds from 59 -> 0 */
-	if((m_smpc.rtc_data[6] & 0xf0) >= 0x60)         { m_smpc.rtc_data[5]++;     m_smpc.rtc_data[6] = 0; }
-	/* minutes from 9 -> 10 */
-	if((m_smpc.rtc_data[5] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[5]+=0x10; m_smpc.rtc_data[5]&=0xf0; }
-	/* minutes from 59 -> 0 */
-	if((m_smpc.rtc_data[5] & 0xf0) >= 0x60)         { m_smpc.rtc_data[4]++;     m_smpc.rtc_data[5] = 0; }
-	/* hours from 9 -> 10 */
-	if((m_smpc.rtc_data[4] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[4]+=0x10; m_smpc.rtc_data[4]&=0xf0; }
-	/* hours from 23 -> 0 */
-	if((m_smpc.rtc_data[4] & 0xff) >= 0x24)             { m_smpc.rtc_data[3]++; m_smpc.rtc_data[2]+=0x10; m_smpc.rtc_data[4] = 0; }
-	/* week day name sunday -> monday */
-	if((m_smpc.rtc_data[2] & 0xf0) >= 0x70)             { m_smpc.rtc_data[2]&=0x0f; }
-	/* day number 9 -> 10 */
-	if((m_smpc.rtc_data[3] & 0x0f) >= 0x0a)             { m_smpc.rtc_data[3]+=0x10; m_smpc.rtc_data[3]&=0xf0; }
-
-	// year BCD to dec conversion (for the leap year stuff)
-	{
-		year_num = (m_smpc.rtc_data[1] & 0xf);
-
-		for(year_count = 0; year_count < (m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
-			year_num += 0xa;
-
-		year_num += (m_smpc.rtc_data[0] & 0xf)*0x64;
-
-		for(year_count = 0; year_count < (m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
-			year_num += 0x3e8;
-	}
-
-	/* month +1 check */
-	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (m_smpc.rtc_data[2] & 0xf) == 2)
-	{
-		if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1+1)
-			{ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
-	}
-	else if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1){ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
-	/* year +1 check */
-	if((m_smpc.rtc_data[2] & 0x0f) > 12)                { m_smpc.rtc_data[1]++;  m_smpc.rtc_data[2] = (m_smpc.rtc_data[2] & 0xf0) | 0x01; }
-	/* year from 9 -> 10 */
-	if((m_smpc.rtc_data[1] & 0x0f) >= 0x0a)             { m_smpc.rtc_data[1]+=0x10; m_smpc.rtc_data[1]&=0xf0; }
-	/* year from 99 -> 100 */
-	if((m_smpc.rtc_data[1] & 0xf0) >= 0xa0)             { m_smpc.rtc_data[0]++; m_smpc.rtc_data[1] = 0; }
-
-	// probably not SO precise, here just for reference ...
-	/* year from 999 -> 1000 */
-	//if((m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { m_smpc.rtc_data[0]+=0x10; m_smpc.rtc_data[0]&=0xf0; }
-	/* year from 9999 -> 0 */
-	//if((m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { m_smpc.rtc_data[0] = 0; } //roll over
-}
 
 /* Official documentation says that the "RESET/TAS opcodes aren't supported", but Out Run definitely contradicts with it.
    Since that m68k can't reset itself via the RESET opcode I suppose that the SMPC actually do it by reading an i/o
