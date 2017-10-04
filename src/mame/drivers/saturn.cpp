@@ -773,7 +773,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 
 	m_en_68k = 0;
 	m_NMI_reset = 0;
-	m_smpc.slave_on = 0;
+//	m_smpc.slave_on = 0;
 
 	//memset(stv_m_workram_l, 0, 0x100000);
 	//memset(stv_m_workram_h, 0, 0x100000);
@@ -872,7 +872,6 @@ uint8_t saturn_state::smpc_th_control_mode(uint16_t in_value, bool which)
 	return res;
 }
 
-
 uint8_t saturn_state::smpc_direct_mode(uint16_t in_value,bool which)
 {
 	uint8_t hshake = (m_direct_mux[which] >> 5) & 3;
@@ -906,12 +905,20 @@ static MACHINE_CONFIG_START( saturn )
 
 //  SH-1
 
+//  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 	MCFG_SMPC_HLE_ADD("smpc")
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(saturn_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(saturn_state, saturn_pdr2_direct_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(saturn_state, saturn_pdr1_direct_w))
 	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(saturn_state, saturn_pdr2_direct_w))
-//  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
+	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)

@@ -1016,3 +1016,77 @@ WRITE16_MEMBER(saturn_state::scudsp_dma_w)
 
 	program.write_word(addr, data,mem_mask);
 }
+
+WRITE_LINE_MEMBER( saturn_state::master_sh2_reset_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(saturn_state::master_sh2_nmi_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( saturn_state::slave_sh2_reset_w )
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+//	m_smpc.slave_on = state;
+}
+
+WRITE_LINE_MEMBER( saturn_state::sound_68k_reset_w )
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	m_en_68k = state ^ 1;
+}
+
+// TODO: edge triggered?
+WRITE_LINE_MEMBER( saturn_state::system_reset_w )
+{
+	if(!state)
+		return;
+
+	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
+	memset(m_scu_regs.get() ,0x00,0x000100);
+	memset(m_scsp_regs.get(),0x00,0x001000);
+	memset(m_sound_ram,0x00,0x080000);
+	memset(m_workram_h,0x00,0x100000);
+	memset(m_workram_l,0x00,0x100000);
+	memset(m_vdp2_regs.get(),0x00,0x040000);
+	memset(m_vdp2_vram.get(),0x00,0x100000);
+	memset(m_vdp2_cram.get(),0x00,0x080000);
+	memset(m_vdp1_vram.get(),0x00,0x100000);
+	//A-Bus
+}
+
+WRITE_LINE_MEMBER(saturn_state::system_halt_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_slave->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(saturn_state::dot_select_w)
+{
+	uint32_t xtal;
+	
+	xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+
+	machine().device("maincpu")->set_unscaled_clock(xtal/2);
+	machine().device("slave")->set_unscaled_clock(xtal/2);
+
+	m_vdp2.dotsel = state ^ 1;
+	stv_vdp2_dynamic_res_change();
+}
+
+// TODO: to move into SCU device
+WRITE_LINE_MEMBER(saturn_state::smpc_irq_w)
+{
+	if(!state)
+		return;
+	
+	if(!(m_scu.ism & IRQ_SMPC))
+		m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
+	else
+		m_scu.ist |= (IRQ_SMPC);
+}
+

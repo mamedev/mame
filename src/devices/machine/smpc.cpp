@@ -193,10 +193,18 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
+	m_mshres(*this),
+	m_mshnmi(*this),
+	m_sshres(*this),
+	m_sndres(*this),
+	m_sysres(*this),
+	m_syshalt(*this),
+	m_dotsel(*this),
 	m_pdr1_read(*this),
 	m_pdr2_read(*this),
 	m_pdr1_write(*this),
-	m_pdr2_write(*this)
+	m_pdr2_write(*this),
+	m_irq_line(*this)
 {
 }
 
@@ -208,6 +216,15 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 
 void smpc_hle_device::device_start()
 {
+	m_mshres.resolve_safe();
+	m_mshnmi.resolve_safe();
+	m_sshres.resolve_safe();
+	m_sndres.resolve_safe();
+	m_sysres.resolve_safe();
+	m_syshalt.resolve_safe();
+	m_dotsel.resolve_safe();
+	m_irq_line.resolve_safe();
+	
 	m_pdr1_read.resolve_safe(0xff);
 	m_pdr2_read.resolve_safe(0xff);
 	m_pdr1_write.resolve_safe();
@@ -364,8 +381,49 @@ uint8_t smpc_hle_device::get_ddr(bool which)
 	return which == true ? m_ddr2 : m_ddr1;
 }
 
-
 // TODO: trampolines that needs to go away
+void smpc_hle_device::master_sh2_reset(bool state)
+{
+	m_mshres(state);
+}
+
+void smpc_hle_device::slave_sh2_reset(bool state)
+{
+	m_sshres(state);
+}
+
+void smpc_hle_device::sound_reset(bool state)
+{
+	m_sndres(state);
+}
+
+void smpc_hle_device::system_reset(bool state)
+{
+	m_sysres(state);
+}
+
+// actually a PLL connection, handled here for simplicity
+void smpc_hle_device::system_halt_request(bool state)
+{
+	m_syshalt(state);
+}
+
+void smpc_hle_device::dot_select_request(bool state)
+{
+	m_dotsel(state);
+}
+
+void smpc_hle_device::master_sh2_nmi(bool state)
+{
+	m_mshnmi(state);
+}
+
+void smpc_hle_device::irq_request()
+{
+	m_irq_line(1);
+	m_irq_line(0);
+}
+
 READ8_MEMBER( smpc_hle_device::read )
 {
 	return this->space().read_byte(offset);
@@ -387,75 +445,63 @@ WRITE8_MEMBER( smpc_hle_device::write )
 
 void saturn_state::smpc_master_on()
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_smpc_hle->master_sh2_reset(0);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_slave_enable )
 {
-	m_slave->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+	m_smpc_hle->slave_sh2_reset(param);
 	m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
 	m_smpc_hle->sf_ack(false);
-	m_smpc.slave_on = param;
 //  printf("%d %d\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_sound_enable )
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
-	m_en_68k = param ^ 1;
+	m_smpc_hle->sound_reset(param);
+	
 	m_smpc.OREG[31] = param + 0x06; //read-back for last command issued
 	m_smpc_hle->sf_ack(false);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_cd_enable )
 {
+//	...
 	m_smpc.OREG[31] = param + 0x08; //read-back for last command issued
 	m_smpc_hle->sf_ack(true); //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
 }
 
 void saturn_state::smpc_system_reset()
 {
-	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
-	memset(m_scu_regs.get() ,0x00,0x000100);
-	memset(m_scsp_regs.get(),0x00,0x001000);
-	memset(m_sound_ram,0x00,0x080000);
-	memset(m_workram_h,0x00,0x100000);
-	memset(m_workram_l,0x00,0x100000);
-	memset(m_vdp2_regs.get(),0x00,0x040000);
-	memset(m_vdp2_vram.get(),0x00,0x100000);
-	memset(m_vdp2_cram.get(),0x00,0x080000);
-	memset(m_vdp1_vram.get(),0x00,0x100000);
-	//A-Bus
-
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_smpc_hle->system_reset(1);
+	m_smpc_hle->system_reset(0);
+	
+	// send a 1 -> 0 transition to reset line (was PULSE_LINE)
+	m_smpc_hle->master_sh2_reset(1);
+	m_smpc_hle->master_sh2_reset(0);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_change_clock )
 {
-	uint32_t xtal;
-
 	if(LOG_SMPC) printf ("Clock change execute at (%d %d)\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 
-	xtal = param ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+	m_smpc_hle->dot_select_request(param);
 
-	machine().device("maincpu")->set_unscaled_clock(xtal/2);
-	machine().device("slave")->set_unscaled_clock(xtal/2);
-
-	m_vdp2.dotsel = param ^ 1;
-	stv_vdp2_dynamic_res_change();
-
-	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	if(!m_NMI_reset)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	m_slave->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	{
+		m_smpc_hle->master_sh2_nmi(1);
+		m_smpc_hle->master_sh2_nmi(0);
+	}
+
+	m_smpc_hle->slave_sh2_reset(1);
+
+	m_smpc_hle->system_halt_request(0);
 
 	/* put issued command in OREG31 */
 	m_smpc.OREG[31] = 0x0e + param;
 	/* clear hand-shake flag */
 	m_smpc_hle->sf_ack(false);
-	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values? */
+	// TODO: VDP1 / VDP2 / SCU / SCSP default power ON values???
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
@@ -470,11 +516,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
 		m_smpc_hle->sr_set(0xc0 | m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
 		m_smpc.intback_stage ++;
 	}
-
-	if(!(m_scu.ism & IRQ_SMPC))
-		m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
-	else
-		m_scu.ist |= (IRQ_SMPC);
+	m_smpc_hle->irq_request();
 
 	m_smpc.OREG[31] = 0x10; /* callback for last command issued */
 	m_smpc_hle->sf_ack(false);
@@ -518,13 +560,10 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
 		m_smpc_hle->sr_set(0x40 | (m_smpc.intback_stage << 5));
 		m_smpc.pmode = m_smpc.intback_buf[0]>>4;
 
-		//  /*This is for RTC,cartridge code and similar stuff...*/
 		//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-		if(!(m_scu.ism & IRQ_SMPC))
-			m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
-		else
-			m_scu.ist |= (IRQ_SMPC);
-
+		// send an interupt to the SCU
+		m_smpc_hle->irq_request();
+		
 		/* put issued command in OREG31 */
 		m_smpc.OREG[31] = 0x10; // TODO: doc says 0?
 		/* clear hand-shake flag */
@@ -622,10 +661,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 		m_smpc.intback_stage ++;
 	}
 
-	if(!(m_scu.ism & IRQ_SMPC))
-		m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
-	else
-		m_scu.ist |= (IRQ_SMPC);
+	m_smpc_hle->irq_request();
 
 	m_smpc.OREG[31] = 0x10; /* callback for last command issued */
 	m_smpc_hle->sf_ack(false);
@@ -667,11 +703,8 @@ TIMER_CALLBACK_MEMBER( saturn_state::saturn_smpc_intback )
 		m_smpc.intback_stage = (m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
 		m_smpc_hle->sr_set(0x40 | (m_smpc.intback_stage << 5));
 		m_smpc.pmode = m_smpc.intback_buf[0]>>4;
-
-		if(!(m_scu.ism & IRQ_SMPC))
-			m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
-		else
-			m_scu.ist |= (IRQ_SMPC);
+		
+		m_smpc_hle->irq_request();
 
 		/* put issued command in OREG31 */
 		m_smpc.OREG[31] = 0x10;
@@ -711,7 +744,8 @@ void saturn_state::smpc_memory_setting()
 void saturn_state::smpc_nmi_req()
 {
 	/*NMI is unconditionally requested */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_smpc_hle->master_sh2_nmi(1);
+	m_smpc_hle->master_sh2_nmi(0);
 }
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_nmi_set )
@@ -730,7 +764,8 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_nmi_set )
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_audio_reset_line_pulse )
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_smpc_hle->sound_reset(1);
+	m_smpc_hle->sound_reset(0);
 }
 
 /********************************************
@@ -779,15 +814,12 @@ void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t 
 			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 
 			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-			   My current theory is that SMPC first stops all CPUs until it executes the whole snippet for this,
-			   and restarts them when the screen is again ready for use. I really don't think that the system
-			   can do an usable mid-frame clock switching anyway.
-			   */
-
-			m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-			m_slave->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
+			 * My current theory is that the PLL device can halt the whole system until the frequency change occurs. 
+			 *  (cfr. diagram on page 3 of SMPC manual) 
+			 * I really don't think that the system can do an usable mid-frame clock switching anyway.
+			 */
+			m_smpc_hle->system_halt_request(1);
+			
 			machine().scheduler().timer_set(machine().first_screen()->time_until_pos(get_vblank_start_position()*get_ystep_count(), 0), timer_expired_delegate(FUNC(saturn_state::smpc_change_clock),this),data & 1);
 			break;
 		/*"Interrupt Back"*/

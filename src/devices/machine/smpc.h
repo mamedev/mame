@@ -32,6 +32,31 @@
 #define MCFG_SMPC_HLE_PDR2_OUT_CB(_devcb) \
 	devcb = &smpc_hle_device::set_pdr2_out_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_SMPC_HLE_MASTER_RESET_CB(_devcb) \
+	devcb = &smpc_hle_device::set_master_reset_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_MASTER_NMI_CB(_devcb) \
+	devcb = &smpc_hle_device::set_master_nmi_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_SLAVE_RESET_CB(_devcb) \
+	devcb = &smpc_hle_device::set_slave_reset_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_SOUND_RESET_CB(_devcb) \
+	devcb = &smpc_hle_device::set_sound_reset_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_SYSTEM_RESET_CB(_devcb) \
+	devcb = &smpc_hle_device::set_system_reset_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_SYSTEM_HALT_CB(_devcb) \
+	devcb = &smpc_hle_device::set_system_halt_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SMPC_HLE_DOT_SELECT_CB(_devcb) \
+	devcb = &smpc_hle_device::set_dot_select_handler(*device, DEVCB_##_devcb);
+
+// set_irq_handler doesn't work in Saturn driver???
+#define MCFG_SMPC_HLE_IRQ_HANDLER_CB(_devcb) \
+	devcb = &smpc_hle_device::set_interrupt_handler(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,15 +74,6 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-	// TODO: public stuff that should be internal to the device
-	void sr_set(uint8_t data);
-	void sr_ack();
-	void sf_ack(bool cd_enable);
-	void sf_set();
-	bool get_iosel(bool which);
-	uint8_t get_ddr(bool which);
 	DECLARE_READ8_MEMBER( status_register_r );
 	DECLARE_WRITE8_MEMBER( status_flag_w );
 	DECLARE_READ8_MEMBER( status_flag_r );
@@ -69,12 +85,44 @@ public:
 	DECLARE_WRITE8_MEMBER( ddr2_w );
 	DECLARE_WRITE8_MEMBER( iosel_w );
 	DECLARE_WRITE8_MEMBER( exle_w );
+
+	// TODO: public stuff & trampolines that should be internal to the device
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	void sr_set(uint8_t data);
+	void sr_ack();
+	void sf_ack(bool cd_enable);
+	void sf_set();
+	void master_sh2_reset(bool state);
+	void master_sh2_nmi(bool state);
+	void slave_sh2_reset(bool state);
+	void sound_reset(bool state);
+	void system_reset(bool state);
+	void dot_select_request(bool state);
+	void system_halt_request(bool state);
+	void irq_request();
 	
+	bool get_iosel(bool which);
+	uint8_t get_ddr(bool which);
+
+//	system delegation
+	template <class Object> static devcb_base &set_master_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshres.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_master_nmi_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshnmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_slave_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sshres.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sound_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sndres.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_system_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sysres.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_system_halt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_syshalt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dot_select_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_dotsel.set_callback(std::forward<Object>(cb)); }
+
+
+//	PDR delegation
 	template <class Object> static devcb_base &set_pdr1_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_read.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pdr2_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr2_read.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> static devcb_base &set_pdr1_out_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_write.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pdr2_out_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr2_write.set_callback(std::forward<Object>(cb)); }
+
+	// interrupt handler
+	template <class Object> static devcb_base &set_interrupt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_irq_line.set_callback(std::forward<Object>(cb)); }
 
 	
 protected:
@@ -95,10 +143,21 @@ private:
 	uint8_t m_pdr1_readback, m_pdr2_readback;
 	bool m_iosel1, m_iosel2;
 	bool m_exle1, m_exle2;
+	
+	devcb_write_line m_mshres;
+	devcb_write_line m_mshnmi;
+	devcb_write_line m_sshres;
+//	devcb_write_line m_sshnmi;
+	devcb_write_line m_sndres;
+	devcb_write_line m_sysres;
+//	devcb_write_line m_cdres;
+	devcb_write_line m_syshalt;
+	devcb_write_line m_dotsel;
 	devcb_read8 m_pdr1_read;
 	devcb_read8 m_pdr2_read;
 	devcb_write8 m_pdr1_write;
 	devcb_write8 m_pdr2_write;
+	devcb_write_line m_irq_line;
 };
 
 

@@ -146,7 +146,7 @@ public:
 		uint8_t SMEM[4];
 		uint8_t intback;
 		uint8_t rtc_data[7];
-		uint8_t slave_on;
+//		uint8_t slave_on;
 	}m_smpc;
 
 	/* Saturn specific*/
@@ -682,6 +682,15 @@ public:
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
 
+	// SMPC HLE delegates
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
+	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
 	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
 	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
 	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);

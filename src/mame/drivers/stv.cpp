@@ -1100,7 +1100,15 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
 	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(stv_state, pdr2_output_w))
-	
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
+//	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
+
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
@@ -1337,7 +1345,7 @@ static INPUT_PORTS_START( stv )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")
+	PORT_START("PDR2")
 	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
