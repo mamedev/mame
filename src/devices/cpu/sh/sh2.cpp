@@ -536,9 +536,10 @@ void sh2_device::device_reset()
 	m_sh2_state->pc = m_sh2_state->pr = m_sh2_state->sr = m_sh2_state->gbr = m_sh2_state->vbr = m_sh2_state->mach = m_sh2_state->macl = 0;
 	m_sh2_state->evec = m_sh2_state->irqsr = 0;
 	memset(&m_sh2_state->r[0], 0, sizeof(m_sh2_state->r[0])*16);
-	m_sh2_state->ea = m_sh2_state->m_delay = m_cpu_off = m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
+	m_sh2_state->ea = m_sh2_state->m_delay = m_cpu_off = 0;
+	//m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
 	m_sh2_state->pending_irq = m_test_irq = 0;
-	memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
+	//memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
 	memset(&m_irq_line_state[0], 0, sizeof(m_irq_line_state[0])*17);
 	m_frc = m_ocra = m_ocrb = m_icr = 0;
 	m_frc_base = 0;
@@ -617,6 +618,11 @@ void sh2_device::init_drc_frontend()
 	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 }
 
+void sh2_device::drc_start()
+{
+
+}
+
 
 void sh2_device::device_start()
 {
@@ -642,19 +648,22 @@ void sh2_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));
-	save_item(NAME(m_dvsr));
-	save_item(NAME(m_dvdnth));
-	save_item(NAME(m_dvdntl));
-	save_item(NAME(m_dvcr));
+	//save_item(NAME(m_dvsr));
+	//save_item(NAME(m_dvdnth));
+	//save_item(NAME(m_dvdntl));
+	//save_item(NAME(m_dvcr));
 	save_item(NAME(m_test_irq));
 
+	/*
 	for (int i = 0; i < 16; ++i)
 	{
 		save_item(NAME(m_irq_queue[i].irq_vector), i);
 		save_item(NAME(m_irq_queue[i].irq_priority), i);
 	}
+	*/
+
 	save_item(NAME(m_pcfsel));
-	save_item(NAME(m_maxpcfsel));
+	//save_item(NAME(m_maxpcfsel));
 	save_item(NAME(m_pcflushes));
 	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_m));
@@ -676,14 +685,14 @@ void sh2_device::device_start()
 
 	// Clear state
 	m_cpu_off = 0;
-	m_dvsr = 0;
-	m_dvdnth = 0;
-	m_dvdntl = 0;
-	m_dvcr = 0;
+	//m_dvsr = 0;
+	//m_dvdnth = 0;
+	//m_dvdntl = 0;
+	//m_dvcr = 0;
 	m_test_irq = 0;
 
-	memset(m_irq_queue, 0, sizeof(m_irq_queue));
-	m_maxpcfsel = 0;
+	//memset(m_irq_queue, 0, sizeof(m_irq_queue));
+	//m_maxpcfsel = 0;
 	memset(m_pcflushes, 0, sizeof(m_pcflushes));
 	memset(m_irq_line_state, 0, sizeof(m_irq_line_state));
 	memset(m_m, 0, sizeof(m_m));
@@ -712,7 +721,7 @@ void sh2_device::device_start()
 	m_wtcsr = 0;
 	m_numcycles = 0;
 	m_arg1 = 0;
-	m_irq = 0;
+	//m_irq = 0;
 	m_fastram_select = 0;
 	memset(m_fastram, 0, sizeof(m_fastram));
 

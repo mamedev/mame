@@ -135,18 +135,21 @@ private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
 	uint32_t  m_cpu_off;
-	uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
+	//uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
 	uint32_t  m_test_irq;
+	
+	/*
 	struct
 	{
 		int irq_vector;
 		int irq_priority;
 	} m_irq_queue[16];
+	*/
 
 	bool m_isdrc;
 
 	int m_pcfsel;                 // last pcflush entry set
-	int m_maxpcfsel;              // highest valid pcflush entry
+	//int m_maxpcfsel;              // highest valid pcflush entry
 	uint32_t m_pcflushes[16];           // pcflush entries
 
 	int8_t    m_irq_line_state[17];
@@ -193,7 +196,7 @@ private:
 	/* parameters for subroutines */
 	uint64_t              m_numcycles;              /* return value from gettotalcycles */
 	uint32_t              m_arg1;                   /* print_debug argument 2 */
-	uint32_t              m_irq;                /* irq we're taking */
+	//uint32_t              m_irq;                /* irq we're taking */
 
 	/* register mappings */
 	uml::parameter      m_regmap[16];                 /* parameter to register mappings for all 16 integer registers */
@@ -256,6 +259,7 @@ private:
 	void code_flush_cache();
 	void execute_run_drc();
 
+	void drc_start();
 	void init_drc_frontend();
 	const opcode_desc* get_desclist(offs_t pc);
 	void code_compile_block(uint8_t mode, offs_t pc);
