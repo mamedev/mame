@@ -545,7 +545,22 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 
 }
 
+/*  MOVCA.L     R0,@Rn */
+inline void sh34_base_device::MOVCAL(const uint16_t opcode)
+{
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	WL(m_sh2_state->ea, m_sh2_state->r[0] );
+}
 
+inline void sh34_base_device::CLRS(const uint16_t opcode)
+{
+	m_sh2_state->sr &= ~S;
+}
+
+inline void sh34_base_device::SETS(const uint16_t opcode)
+{
+	m_sh2_state->sr |= S;
+}
 
 /*  LDC     Rm,SR */
 inline void sh34_base_device::LDCSR(const uint16_t opcode)

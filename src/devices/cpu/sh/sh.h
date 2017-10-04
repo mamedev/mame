@@ -54,19 +54,6 @@ public:
 
 protected:
 
-	void TAS(const uint16_t opcode);
-	void TST(const uint16_t opcode);
-	void TSTI(const uint16_t opcode);
-	void TSTM(const uint16_t opcode);
-	void XOR(const uint16_t opcode);
-	void XORI(const uint16_t opcode);
-	void XORM(const uint16_t opcode);
-	void XTRCT(const uint16_t opcode);
-
-	void MOVCAL(const uint16_t opcode);
-	void CLRS(const uint16_t opcode);
-	void SETS(const uint16_t opcode);
-
 	void SH2ADD(uint32_t m, uint32_t n);
 	void SH2ADDI(uint32_t i, uint32_t n);
 	void SH2ADDC(uint32_t m, uint32_t n);

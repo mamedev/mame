@@ -1471,25 +1471,6 @@ void sh_common_execution::SH2TAS(uint32_t n)
 	m_sh2_state->icount -= 3;
 }
 
-/*  TAS.B   @Rn */
-void sh_common_execution::TAS(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	uint32_t temp;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	/* Bus Lock enable */
-	temp = RB( m_sh2_state->ea );
-	if (temp == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	temp |= 0x80;
-	/* Bus Lock disable */
-	WB(m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 3;
-}
-
 /*  TST     Rm,Rn */
 void sh_common_execution::SH2TST(uint32_t m, uint32_t n)
 {
@@ -1499,30 +1480,10 @@ void sh_common_execution::SH2TST(uint32_t m, uint32_t n)
 		m_sh2_state->sr &= ~T;
 }
 
-/*  TST     Rm,Rn */
-void sh_common_execution::TST(const uint16_t opcode)
-{
-	if ((m_sh2_state->r[Rn] & m_sh2_state->r[Rm]) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
 /*  TST     #imm,R0 */
 void sh_common_execution::SH2TSTI(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
-
-	if ((imm & m_sh2_state->r[0]) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  TST     #imm,R0 */
-void sh_common_execution::TSTI(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
 
 	if ((imm & m_sh2_state->r[0]) == 0)
 		m_sh2_state->sr |= T;
@@ -1543,42 +1504,16 @@ void sh_common_execution::SH2TSTM(uint32_t i)
 	m_sh2_state->icount -= 2;
 }
 
-/*  TST.B   #imm,@(R0,GBR) */
-void sh_common_execution::TSTM(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	if ((imm & RB( m_sh2_state->ea )) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	m_sh2_state->icount -= 2;
-}
-
 /*  XOR     Rm,Rn */
 void sh_common_execution::SH2XOR(uint32_t m, uint32_t n)
 {
 	m_sh2_state->r[n] ^= m_sh2_state->r[m];
 }
 
-/*  XOR     Rm,Rn */
-void sh_common_execution::XOR(const uint16_t opcode)
-{
-	m_sh2_state->r[Rn] ^= m_sh2_state->r[Rm];
-}
-
 /*  XOR     #imm,R0 */
 void sh_common_execution::SH2XORI(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
-	m_sh2_state->r[0] ^= imm;
-}
-
-/*  XOR     #imm,R0 */
-void sh_common_execution::XORI(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
 	m_sh2_state->r[0] ^= imm;
 }
 
@@ -1595,20 +1530,6 @@ void sh_common_execution::SH2XORM(uint32_t i)
 	m_sh2_state->icount -= 2;
 }
 
-
-/*  XOR.B   #imm,@(R0,GBR) */
-void sh_common_execution::XORM(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = RB( m_sh2_state->ea );
-	temp ^= imm;
-	WB(m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
-}
-
 /*  XTRCT   Rm,Rn */
 void sh_common_execution::SH2XTRCT(uint32_t m, uint32_t n)
 {
@@ -1619,37 +1540,9 @@ void sh_common_execution::SH2XTRCT(uint32_t m, uint32_t n)
 	m_sh2_state->r[n] |= temp;
 }
 
-/*  XTRCT   Rm,Rn */
-void sh_common_execution::XTRCT(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t temp;
-
-	temp = (m_sh2_state->r[m] << 16) & 0xffff0000;
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 16) & 0x0000ffff;
-	m_sh2_state->r[n] |= temp;
-}
-
-
 /* SH4 only */
 
-/*  MOVCA.L     R0,@Rn */
-void sh_common_execution::MOVCAL(const uint16_t opcode)
-{
-	m_sh2_state->ea = m_sh2_state->r[Rn];
-	WL(m_sh2_state->ea, m_sh2_state->r[0] );
-}
 
-void sh_common_execution::CLRS(const uint16_t opcode)
-{
-	m_sh2_state->sr &= ~S;
-}
-
-void sh_common_execution::SETS(const uint16_t opcode)
-{
-	m_sh2_state->sr |= S;
-}
 
 // SH2
 

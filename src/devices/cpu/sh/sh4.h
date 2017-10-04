@@ -275,22 +275,12 @@ protected:
 	int m_mmuhack;
 
 	uint32_t  m_ppc;
-	//uint32_t  m_sh2_state->pc;
 	uint32_t  m_spc;
-	//uint32_t  m_sh2_state->pr;
-	//uint32_t  m_sh2_state->sr;
 	uint32_t  m_ssr;
-	//uint32_t  m_sh2_state->gbr;
-	//uint32_t  m_sh2_state->vbr;
-	//uint32_t  m_sh2_state->mach;
-	//uint32_t  m_sh2_state->macl;
-	//uint32_t  m_sh2_state->r[16];
 	uint32_t  m_rbnk[2][8];
 	uint32_t  m_sgr;
 	uint32_t  m_fr[16];
 	uint32_t  m_xf[16];
-	//uint32_t  m_sh2_state->ea;
-	//uint32_t  m_sh2_state->m_delay;
 	uint32_t  m_cpu_off;
 	uint32_t  m_pending_irq;
 	uint32_t  m_test_irq;
@@ -427,21 +417,28 @@ protected:
 		}
 	}
 
-	void TODO(const uint16_t opcode);
+
+	// memory handlers
+
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
 	virtual void WB(offs_t A, uint8_t V) override;
 	virtual void WW(offs_t A, uint16_t V) override;
 	virtual void WL(offs_t A, uint32_t V) override;
 
+	// opcode handlers
 
-
-
+	void TODO(const uint16_t opcode);
+	void MOVCAL(const uint16_t opcode);
+	void CLRS(const uint16_t opcode);
+	void SETS(const uint16_t opcode);
 	void LDCSR(const uint16_t opcode);
 	void LDCMSR(const uint16_t opcode);
 	virtual void LDTLB(const uint16_t opcode);
 	void RTE(const uint16_t opcode);
 	void SLEEP(const uint16_t opcode);
 	void TRAPA(const uint16_t opcode);
-
 	void STCRBANK(const uint16_t opcode);
 	void STCMRBANK(const uint16_t opcode);
 	void STCSSR(const uint16_t opcode);
@@ -502,12 +499,11 @@ protected:
 	void FSSCA(const uint16_t opcode);
 	void FIPR(const uint16_t opcode);
 	void FTRV(const uint16_t opcode);
+
 	void op1111_0xf13(const uint16_t opcode);
 	void dbreak(const uint16_t opcode);
 	void op1111_0x13(uint16_t opcode);
-	virtual uint8_t RB(offs_t A) override;
-	virtual uint16_t RW(offs_t A) override;
-	virtual uint32_t RL(offs_t A) override;
+
 	void sh4_change_register_bank(int to);
 	void sh4_swap_fp_registers();
 	void sh4_swap_fp_couples();
