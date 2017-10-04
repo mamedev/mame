@@ -389,9 +389,10 @@ protected:
 	uint64_t m_debugger_temp;
 
 
-	void execute_one_0000(const uint16_t opcode);
-	void execute_one_4000(const uint16_t opcode);
-	void execute_one(const uint16_t opcode);
+	virtual void execute_one_0000(uint16_t opcode) override;
+	virtual void execute_one_4000(uint16_t opcode) override;
+	virtual void execute_one_f000(uint16_t opcode) override;
+
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
 		int a,irq,z;

@@ -198,6 +198,11 @@ protected:
 	void op1000(uint16_t opcode);
 	void op1100(uint16_t opcode);
 
+	void execute_one(const uint16_t opcode);
+
+	virtual void execute_one_0000(uint16_t opcode) = 0;
+	virtual void execute_one_4000(uint16_t opcode) = 0;
+	virtual void execute_one_f000(uint16_t opcode) = 0;
 
 	virtual void RTE() = 0;
 	virtual void LDCSR(const uint16_t opcode) = 0;

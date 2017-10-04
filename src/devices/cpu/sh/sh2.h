@@ -247,9 +247,10 @@ private:
 	virtual void RTE() override;
 	virtual	void ILLEGAL() override;
 
-	inline void op0000(uint16_t opcode);
-	inline void op0100(uint16_t opcode);
-	inline void op1111(uint16_t opcode);
+	virtual void execute_one_0000(uint16_t opcode) override;
+	virtual void execute_one_4000(uint16_t opcode) override;
+	virtual void execute_one_f000(uint16_t opcode) override;
+
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();

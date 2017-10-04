@@ -374,7 +374,7 @@ inline void sh2_device::ILLEGAL()
  *  OPCODE DISPATCHERS
  *****************************************************************************/
 
-void sh2_device::op0000(uint16_t opcode)
+void sh2_device::execute_one_0000(uint16_t opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -448,7 +448,7 @@ void sh2_device::op0000(uint16_t opcode)
 	}
 }
 
-void sh2_device::op0100(uint16_t opcode)
+void sh2_device::execute_one_4000(uint16_t opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -523,18 +523,7 @@ void sh2_device::op0100(uint16_t opcode)
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-void sh2_device::op1111(uint16_t opcode)
+void sh2_device::execute_one_f000(uint16_t opcode)
 {
 	ILLEGAL();
 }
@@ -600,11 +589,9 @@ void sh2_device::execute_run()
 
 	do
 	{
-		uint32_t opcode;
-
 		debugger_instruction_hook(this, m_sh2_state->pc);
 
-		opcode = m_program->read_word(m_sh2_state->pc & AM);
+		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & AM);
 
 		if (m_sh2_state->m_delay)
 		{
@@ -614,25 +601,7 @@ void sh2_device::execute_run()
 		else
 			m_sh2_state->pc += 2;
 
-		switch (opcode & ( 15 << 12))
-		{
-		case  0<<12: op0000(opcode); break;
-		case  1<<12: MOVLS4(Rm, opcode & 0x0f, Rn); break;
-		case  2<<12: op0010(opcode); break;
-		case  3<<12: op0011(opcode); break;
-		case  4<<12: op0100(opcode); break;
-		case  5<<12: MOVLL4(Rm, opcode & 0x0f, Rn); break;
-		case  6<<12: op0110(opcode); break;
-		case  7<<12: ADDI(opcode & 0xff, Rn); break;
-		case  8<<12: op1000(opcode); break;
-		case  9<<12: MOVWI(opcode & 0xff, Rn); break;
-		case 10<<12: BRA(opcode & 0xfff); break;
-		case 11<<12: BSR(opcode & 0xfff); break;
-		case 12<<12: op1100(opcode); break;
-		case 13<<12: MOVLI(opcode & 0xff, Rn); break;
-		case 14<<12: MOVI(opcode & 0xff, Rn); break;
-		default: op1111(opcode); break;
-		}
+		execute_one(opcode);
 
 		if(m_test_irq && !m_sh2_state->m_delay)
 		{

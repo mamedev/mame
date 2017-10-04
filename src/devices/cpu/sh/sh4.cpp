@@ -2344,94 +2344,30 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	}
 }
 
-
-inline void sh34_base_device::execute_one(const uint16_t opcode)
+inline void sh34_base_device::execute_one_f000(const uint16_t opcode)
 {
-	switch(opcode & 0xf000)
+	switch(opcode & 0x0f)
 	{
-		case 0x0000:
-			execute_one_0000(opcode);
-			break;
-
-		case 0x1000:
-			MOVLS4(Rm, opcode & 0x0f, Rn);
-			break;
-
-		case 0x2000: // void sh2_device::op0010(uint16_t opcode)
-			op0010(opcode);
-			break;
-
-		case 0x3000: // void sh2_device::op0011(uint16_t opcode)
-			op0011(opcode);
-			break;
-
-		case 0x4000:
-			execute_one_4000(opcode);
-			break;
-
-		case 0x5000:
-			MOVLL4(Rm, opcode & 0x0f, Rn);
-			break;
-
-		case 0x6000: // void sh2_device::op0110(uint16_t opcode)
-			op0110(opcode);
-			break;
-
-		case 0x7000:
-			ADDI(opcode & 0xff, Rn);
-			break;
-
-		case 0x8000:
-			op1000(opcode);
-			break;
-
-		case 0x9000:
-			MOVWI(opcode & 0xff, Rn);
-			break;
-
-		case 0xa000:
-			BRA(opcode & 0xfff);
-			break;
-
-		case 0xb000:
-			BSR(opcode & 0xfff);
-			break;
-
-		case 0xc000:
-			op1100(opcode);
-			break;
-
-		case 0xd000:
-			MOVLI(opcode & 0xff, Rn);
-			break;
-
-		case 0xe000:
-			MOVI(opcode & 0xff, Rn);
-			break;
-
-		case 0xf000: // sh4 only
-			switch(opcode & 0x0f)
-			{
-				case 0x00:  FADD(opcode); break;
-				case 0x01:  FSUB(opcode); break;
-				case 0x02:  FMUL(opcode); break;
-				case 0x03:  FDIV(opcode); break;
-				case 0x04:  FCMP_EQ(opcode); break;
-				case 0x05:  FCMP_GT(opcode); break;
-				case 0x06:  FMOVS0FR(opcode); break;
-				case 0x07:  FMOVFRS0(opcode); break;
-				case 0x08:  FMOVMRFR(opcode); break;
-				case 0x09:  FMOVMRIFR(opcode); break;
-				case 0x0a:  FMOVFRMR(opcode); break;
-				case 0x0b:  FMOVFRMDR(opcode); break;
-				case 0x0c:  FMOVFR(opcode); break;
-				case 0x0d:  op1111_0x13(opcode); break;
-				case 0x0e:  FMAC(opcode); break;
-				case 0x0f:  dbreak(opcode); break;
-			}
-			break;
+		case 0x00:  FADD(opcode); break;
+		case 0x01:  FSUB(opcode); break;
+		case 0x02:  FMUL(opcode); break;
+		case 0x03:  FDIV(opcode); break;
+		case 0x04:  FCMP_EQ(opcode); break;
+		case 0x05:  FCMP_GT(opcode); break;
+		case 0x06:  FMOVS0FR(opcode); break;
+		case 0x07:  FMOVFRS0(opcode); break;
+		case 0x08:  FMOVMRFR(opcode); break;
+		case 0x09:  FMOVMRIFR(opcode); break;
+		case 0x0a:  FMOVFRMR(opcode); break;
+		case 0x0b:  FMOVFRMDR(opcode); break;
+		case 0x0c:  FMOVFR(opcode); break;
+		case 0x0d:  op1111_0x13(opcode); break;
+		case 0x0e:  FMAC(opcode); break;
+		case 0x0f:  dbreak(opcode); break;
 	}
 }
+
+
 
 
 /* Execute cycles - returns number of cycles actually run */

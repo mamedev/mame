@@ -1675,6 +1675,30 @@ void sh_common_execution::op1100(uint16_t opcode)
 }
 
 
+void sh_common_execution::execute_one(const uint16_t opcode)
+{
+	switch(opcode & 0xf000)
+	{
+		case 0x0000: execute_one_0000(opcode); break;
+		case 0x1000: MOVLS4(Rm, opcode & 0x0f, Rn);	break;
+		case 0x2000: op0010(opcode); break;
+		case 0x3000: op0011(opcode); break;
+		case 0x4000: execute_one_4000(opcode); break;
+		case 0x5000: MOVLL4(Rm, opcode & 0x0f, Rn); break;
+		case 0x6000: op0110(opcode); break;
+		case 0x7000: ADDI(opcode & 0xff, Rn); break;
+		case 0x8000: op1000(opcode); break;
+		case 0x9000: MOVWI(opcode & 0xff, Rn); break;
+		case 0xa000: BRA(opcode & 0xfff); break;
+		case 0xb000: BSR(opcode & 0xfff); break;
+		case 0xc000: op1100(opcode); break;
+		case 0xd000: MOVLI(opcode & 0xff, Rn); break;
+		case 0xe000: MOVI(opcode & 0xff, Rn); break;
+		case 0xf000: execute_one_f000(opcode); break;
+	}
+}
+
+
 #undef Rn
 #undef Rm
 
