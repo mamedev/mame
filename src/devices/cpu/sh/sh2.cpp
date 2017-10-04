@@ -620,8 +620,7 @@ void sh2_device::init_drc_frontend()
 
 void sh2_device::device_start()
 {
-	/* allocate the implementation-specific state from the full cache */
-	m_sh2_state = (internal_sh2_state *)m_cache.alloc_near(sizeof(internal_sh2_state));
+	sh_common_execution::device_start();
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
 	m_timer->adjust(attotime::never);
@@ -642,28 +641,13 @@ void sh2_device::device_start()
 	m_direct = &m_decrypted_program->direct();
 	m_internal = &space(AS_PROGRAM);
 
-	save_item(NAME(m_sh2_state->pc));
-	save_item(NAME(m_sh2_state->sr));
-	save_item(NAME(m_sh2_state->pr));
-	save_item(NAME(m_sh2_state->gbr));
-	save_item(NAME(m_sh2_state->vbr));
-	save_item(NAME(m_sh2_state->mach));
-	save_item(NAME(m_sh2_state->macl));
-	save_item(NAME(m_sh2_state->r));
-	save_item(NAME(m_sh2_state->ea));
-	save_item(NAME(m_sh2_state->m_delay));
 	save_item(NAME(m_cpu_off));
 	save_item(NAME(m_dvsr));
 	save_item(NAME(m_dvdnth));
 	save_item(NAME(m_dvdntl));
 	save_item(NAME(m_dvcr));
-	save_item(NAME(m_sh2_state->pending_irq));
 	save_item(NAME(m_test_irq));
-	save_item(NAME(m_sh2_state->pending_nmi));
-	save_item(NAME(m_sh2_state->irqline));
-	save_item(NAME(m_sh2_state->evec));
-	save_item(NAME(m_sh2_state->irqsr));
-	save_item(NAME(m_sh2_state->target));
+
 	for (int i = 0; i < 16; ++i)
 	{
 		save_item(NAME(m_irq_queue[i].irq_vector), i);
@@ -681,13 +665,11 @@ void sh2_device::device_start()
 	save_item(NAME(m_icr));
 	save_item(NAME(m_frc_base));
 	save_item(NAME(m_frt_input));
-	save_item(NAME(m_sh2_state->internal_irq_level));
 	save_item(NAME(m_internal_irq_vector));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
 	save_item(NAME(m_wtcnt));
 	save_item(NAME(m_wtcsr));
-	save_item(NAME(m_sh2_state->sleep_mode));
 
 	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(AM).callimport();
 	state_add( SH2_SR,   "SR",   m_sh2_state->sr).callimport().formatstr("%08X");
@@ -721,28 +703,13 @@ void sh2_device::device_start()
 	m_icountptr = &m_sh2_state->icount;
 
 	// Clear state
-	m_sh2_state->pc = 0;
-	m_sh2_state->pr = 0;
-	m_sh2_state->sr = 0;
-	m_sh2_state->gbr = 0;
-	m_sh2_state->vbr = 0;
-	m_sh2_state->mach = 0;
-	m_sh2_state->macl = 0;
-	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
-	m_sh2_state->ea = 0;
-	m_sh2_state->m_delay = 0;
 	m_cpu_off = 0;
 	m_dvsr = 0;
 	m_dvdnth = 0;
 	m_dvdntl = 0;
 	m_dvcr = 0;
-	m_sh2_state->pending_irq = 0;
 	m_test_irq = 0;
-	m_sh2_state->pending_nmi = 0;
-	m_sh2_state->irqline = 0;
-	m_sh2_state->evec = 0;
-	m_sh2_state->irqsr = 0;
-	m_sh2_state->target = 0;
+
 	memset(m_irq_queue, 0, sizeof(m_irq_queue));
 	m_maxpcfsel = 0;
 	memset(m_pcflushes, 0, sizeof(m_pcflushes));
@@ -755,9 +722,8 @@ void sh2_device::device_start()
 	m_icr = 0;
 	m_frc_base = 0;
 	m_frt_input = 0;
-	m_sh2_state->internal_irq_level = 0;
 	m_internal_irq_vector = 0;
-	m_sh2_state->icount = 0;
+
 	for ( int i = 0; i < 2; i++ )
 	{
 		m_dma_timer_active[i] = 0;
@@ -772,9 +738,7 @@ void sh2_device::device_start()
 	}
 	m_wtcnt = 0;
 	m_wtcsr = 0;
-	m_sh2_state->sleep_mode = 0;
 	m_numcycles = 0;
-	m_sh2_state->arg0 = 0;
 	m_arg1 = 0;
 	m_irq = 0;
 	m_fastram_select = 0;

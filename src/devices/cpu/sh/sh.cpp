@@ -14,6 +14,58 @@
 
 #define BUSY_LOOP_HACKS 0 
 
+
+
+void sh_common_execution::device_start()
+{
+	/* allocate the implementation-specific state from the full cache */
+	m_sh2_state = (internal_sh2_state *)m_cache.alloc_near(sizeof(internal_sh2_state));
+
+	save_item(NAME(m_sh2_state->pc));
+	save_item(NAME(m_sh2_state->sr));
+	save_item(NAME(m_sh2_state->pr));
+	save_item(NAME(m_sh2_state->gbr));
+	save_item(NAME(m_sh2_state->vbr));
+	save_item(NAME(m_sh2_state->mach));
+	save_item(NAME(m_sh2_state->macl));
+	save_item(NAME(m_sh2_state->r));
+	save_item(NAME(m_sh2_state->ea));
+	save_item(NAME(m_sh2_state->m_delay));
+	save_item(NAME(m_sh2_state->pending_irq));
+	save_item(NAME(m_sh2_state->pending_nmi));
+	save_item(NAME(m_sh2_state->irqline));
+	save_item(NAME(m_sh2_state->evec));
+	save_item(NAME(m_sh2_state->irqsr));
+	save_item(NAME(m_sh2_state->target));
+	save_item(NAME(m_sh2_state->internal_irq_level));
+	save_item(NAME(m_sh2_state->sleep_mode));
+	save_item(NAME(m_sh2_state->icount));
+
+	m_sh2_state->pc = 0;
+	m_sh2_state->pr = 0;
+	m_sh2_state->sr = 0;
+	m_sh2_state->gbr = 0;
+	m_sh2_state->vbr = 0;
+	m_sh2_state->mach = 0;
+	m_sh2_state->macl = 0;
+	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
+	m_sh2_state->ea = 0;
+	m_sh2_state->m_delay = 0;
+	m_sh2_state->pending_irq = 0;
+	m_sh2_state->pending_nmi = 0;
+	m_sh2_state->irqline = 0;
+	m_sh2_state->evec = 0;
+	m_sh2_state->irqsr = 0;
+	m_sh2_state->target = 0;
+	m_sh2_state->internal_irq_level = 0;
+	m_sh2_state->icount = 0;
+	m_sh2_state->sleep_mode = 0;
+	m_sh2_state->arg0 = 0;
+
+
+}
+
+
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 1100  1       -
  *  ADD     Rm,Rn

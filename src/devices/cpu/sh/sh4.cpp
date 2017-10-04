@@ -179,20 +179,20 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 	logerror("using LDTLB to replace UTLB entry %02x\n", replace);
 
 	// these come from PTEH
-	m_utlb[replace].VPN =  (m_m[PTEH] & 0xfffffc00) >> 10;
-//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
-//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
+	m_utlb[replace].VPN = (m_m[PTEH] & 0xfffffc00) >> 10;
+	//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
+	//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
 	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
 	// these come from PTEL
 	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
-	m_utlb[replace].V =   (m_m[PTEL] & 0x00000100) >> 8;
+	m_utlb[replace].V = (m_m[PTEL] & 0x00000100) >> 8;
 	m_utlb[replace].PSZ = (m_m[PTEL] & 0x00000080) >> 6;
-	m_utlb[replace].PSZ |=(m_m[PTEL] & 0x00000010) >> 4;
-	m_utlb[replace].PPR=  (m_m[PTEL] & 0x00000060) >> 5;
-	m_utlb[replace].C =   (m_m[PTEL] & 0x00000008) >> 3;
-	m_utlb[replace].D =   (m_m[PTEL] & 0x00000004) >> 2;
-	m_utlb[replace].SH =  (m_m[PTEL] & 0x00000002) >> 1;
-	m_utlb[replace].WT =  (m_m[PTEL] & 0x00000001) >> 0;
+	m_utlb[replace].PSZ |= (m_m[PTEL] & 0x00000010) >> 4;
+	m_utlb[replace].PPR = (m_m[PTEL] & 0x00000060) >> 5;
+	m_utlb[replace].C = (m_m[PTEL] & 0x00000008) >> 3;
+	m_utlb[replace].D = (m_m[PTEL] & 0x00000004) >> 2;
+	m_utlb[replace].SH = (m_m[PTEL] & 0x00000002) >> 1;
+	m_utlb[replace].WT = (m_m[PTEL] & 0x00000001) >> 0;
 	// these come from PTEA
 	m_utlb[replace].TC = (m_m[PTEA] & 0x00000008) >> 3;
 	m_utlb[replace].SA = (m_m[PTEA] & 0x00000007) >> 0;
@@ -201,22 +201,22 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 #if 0
 int sign_of(int n)
 {
-	return(m_fr[n]>>31);
+	return(m_fr[n] >> 31);
 }
 
-void zero(int n,int sign)
+void zero(int n, int sign)
 {
-if (sign == 0)
-	m_fr[n] = 0x00000000;
-else
-	m_fr[n] = 0x80000000;
-if ((m_fpscr & PR) == 1)
-	m_fr[n+1] = 0x00000000;
+	if (sign == 0)
+		m_fr[n] = 0x00000000;
+	else
+		m_fr[n] = 0x80000000;
+	if ((m_fpscr & PR) == 1)
+		m_fr[n + 1] = 0x00000000;
 }
 
 int data_type_of(int n)
 {
-uint32_t abs;
+	uint32_t abs;
 
 	abs = m_fr[n] & 0x7fffffff;
 	if ((m_fpscr & PR) == 0) { /* Single-precision */
@@ -225,13 +225,16 @@ uint32_t abs;
 				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
-				} else {
+				}
+				else {
 					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else
+			}
+			else
 				return(SH4_FPU_DENORM);
-		} else
+		}
+		else
 			if (abs < 0x7f800000)
 				return(SH4_FPU_NORM);
 			else
@@ -240,33 +243,39 @@ uint32_t abs;
 						return(SH4_FPU_PINF);
 					else
 						return(SH4_FPU_NINF);
-				} else
+				}
+				else
 					if (abs < 0x7fc00000)
 						return(SH4_FPU_qNaN);
 					else
 						return(SH4_FPU_sNaN);
-	} else { /* Double-precision */
+	}
+	else { /* Double-precision */
 		if (abs < 0x00100000) {
-			if (((m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_fr[n+1] == 0x00000000))) {
-				if(sign_of(n) == 0) {
+			if (((m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_fr[n + 1] == 0x00000000))) {
+				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
-				} else {
+				}
+				else {
 					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else
+			}
+			else
 				return(SH4_FPU_DENORM);
-		} else
+		}
+		else
 			if (abs < 0x7ff00000)
 				return(SH4_FPU_NORM);
 			else
-				if ((abs == 0x7ff00000) && (m_fr[n+1] == 0x00000000)) {
+				if ((abs == 0x7ff00000) && (m_fr[n + 1] == 0x00000000)) {
 					if (sign_of(n) == 0)
 						return(SH4_FPU_PINF);
 					else
 						return(SH4_FPU_NINF);
-				} else
+				}
+				else
 					if (abs < 0x7ff80000)
 						return(SH4_FPU_qNaN);
 					else
@@ -297,7 +306,6 @@ inline uint8_t sh34_base_device::RB(offs_t A)
 			return m_program->read_byte(A);
 		}
 	}
-
 }
 
 inline uint16_t sh34_base_device::RW(offs_t A)
@@ -321,7 +329,6 @@ inline uint16_t sh34_base_device::RW(offs_t A)
 			return m_program->read_word(A);
 		}
 	}
-
 }
 
 inline uint32_t sh34_base_device::RL(offs_t A)
@@ -345,14 +352,13 @@ inline uint32_t sh34_base_device::RL(offs_t A)
 			return m_program->read_dword(A);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WB(offs_t A, uint8_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_byte(A,V);
+		m_program->write_byte(A, V);
 		return;
 	}
 
@@ -372,14 +378,13 @@ inline void sh34_base_device::WB(offs_t A, uint8_t V)
 			m_program->write_byte(A, V);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WW(offs_t A, uint16_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_word(A,V);
+		m_program->write_word(A, V);
 		return;
 	}
 
@@ -399,14 +404,13 @@ inline void sh34_base_device::WW(offs_t A, uint16_t V)
 			m_program->write_word(A, V);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WL(offs_t A, uint32_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_dword(A,V);
+		m_program->write_dword(A, V);
 		return;
 	}
 
@@ -426,7 +430,6 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 			m_program->write_dword(A, V);
 		}
 	}
-
 }
 
 inline void sh34_base_device::ILLEGAL()
@@ -438,7 +441,7 @@ inline void sh34_base_device::ILLEGAL()
 inline void sh34_base_device::MOVCAL(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	WL(m_sh2_state->ea, m_sh2_state->r[0] );
+	WL(m_sh2_state->ea, m_sh2_state->r[0]);
 }
 
 inline void sh34_base_device::CLRS(const uint16_t opcode)
@@ -474,7 +477,7 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 
 	old = m_sh2_state->sr;
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_sh2_state->sr = RL(m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->sr = RL(m_sh2_state->ea) & FLAGS;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((old & sRB) >> 29);
 	if ((old & sRB) != (m_sh2_state->sr & sRB))
@@ -567,7 +570,7 @@ inline void sh34_base_device::STCMSGR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_sgr );
+	WL(m_sh2_state->ea, m_sgr);
 }
 
 /*  STS.L   FPUL,@-Rn */
@@ -577,7 +580,7 @@ inline void sh34_base_device::STSMFPUL(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_fpul );
+	WL(m_sh2_state->ea, m_fpul);
 }
 
 /*  STS.L   FPSCR,@-Rn */
@@ -597,7 +600,7 @@ inline void sh34_base_device::STCMDBR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_dbr );
+	WL(m_sh2_state->ea, m_dbr);
 }
 
 /*  STC.L   SSR,@-Rn */
@@ -607,7 +610,7 @@ inline void sh34_base_device::STCMSSR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_ssr );
+	WL(m_sh2_state->ea, m_ssr);
 }
 
 /*  STC.L   SPC,@-Rn */
@@ -617,14 +620,14 @@ inline void sh34_base_device::STCMSPC(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_spc );
+	WL(m_sh2_state->ea, m_spc);
 }
 
 /*  LDS.L   @Rm+,FPUL */
 inline void sh34_base_device::LDSMFPUL(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_fpul = RL(m_sh2_state->ea );
+	m_fpul = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -635,7 +638,7 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 
 	s = m_fpscr;
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_fpscr = RL(m_sh2_state->ea );
+	m_fpscr = RL(m_sh2_state->ea);
 	m_fpscr &= 0x003FFFFF;
 	m_sh2_state->r[Rn] += 4;
 	if ((s & FR) != (m_fpscr & FR))
@@ -652,7 +655,7 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 inline void sh34_base_device::LDCMDBR(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_dbr = RL(m_sh2_state->ea );
+	m_dbr = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -662,7 +665,7 @@ inline void sh34_base_device::LDCMRBANK(const uint16_t opcode)
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	m_sh2_state->ea = m_sh2_state->r[n];
-	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = RL(m_sh2_state->ea );
+	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = RL(m_sh2_state->ea);
 	m_sh2_state->r[n] += 4;
 }
 
@@ -670,7 +673,7 @@ inline void sh34_base_device::LDCMRBANK(const uint16_t opcode)
 inline void sh34_base_device::LDCMSSR(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_ssr = RL(m_sh2_state->ea );
+	m_ssr = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -678,7 +681,7 @@ inline void sh34_base_device::LDCMSSR(const uint16_t opcode)
 inline void sh34_base_device::LDCMSPC(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_spc = RL(m_sh2_state->ea );
+	m_spc = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -760,8 +763,9 @@ inline void sh34_base_device::SHAD(const uint16_t opcode)
 			m_sh2_state->r[n] = 0;
 		else
 			m_sh2_state->r[n] = 0xFFFFFFFF;
-	} else
-		m_sh2_state->r[n]=(int32_t)m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F)+1);
+	}
+	else
+		m_sh2_state->r[n] = (int32_t)m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F) + 1);
 }
 
 /*  SHLD    Rm,Rn */
@@ -774,7 +778,7 @@ inline void sh34_base_device::SHLD(const uint16_t opcode)
 	else if ((m_sh2_state->r[m] & 0x1F) == 0)
 		m_sh2_state->r[n] = 0;
 	else
-		m_sh2_state->r[n] = m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F)+1);
+		m_sh2_state->r[n] = m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F) + 1);
 }
 
 /*  LDCRBANK   Rn,Rm_BANK */
@@ -801,7 +805,7 @@ inline void sh34_base_device::LDCSPC(const uint16_t opcode)
 inline void sh34_base_device::PREFM(const uint16_t opcode)
 {
 	int a;
-	uint32_t addr,dest,sq;
+	uint32_t addr, dest, sq;
 
 	addr = m_sh2_state->r[Rn]; // address
 	if ((addr >= 0xE0000000) && (addr <= 0xE3FFFFFF))
@@ -873,26 +877,28 @@ inline void sh34_base_device::FMOVMRIFR(const uint16_t opcode)
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea );
+			m_xf[n] = RL(m_sh2_state->ea);
 			m_sh2_state->r[m] += 4;
-			m_xf[n^1] = RL(m_sh2_state->ea+4 );
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
 			m_sh2_state->r[m] += 4;
-		} else {
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea );
+			m_fr[n] = RL(m_sh2_state->ea);
 			m_sh2_state->r[m] += 4;
-			m_fr[n^1] = RL(m_sh2_state->ea+4 );
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 			m_sh2_state->r[m] += 4;
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea );
+		m_fr[n] = RL(m_sh2_state->ea);
 		m_sh2_state->r[m] += 4;
 	}
 }
@@ -912,22 +918,24 @@ inline void sh34_base_device::FMOVFRMR(const uint16_t opcode)
 			m ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_xf[m] );
-			WL(m_sh2_state->ea+4,m_xf[m^1] );
-		} else {
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_fr[m] );
-			WL(m_sh2_state->ea+4,m_fr[m^1] );
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -947,24 +955,26 @@ inline void sh34_base_device::FMOVFRMDR(const uint16_t opcode)
 #endif
 			m_sh2_state->r[n] -= 8;
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_xf[m] );
-			WL(m_sh2_state->ea+4,m_xf[m^1] );
-		} else {
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
 			m_sh2_state->r[n] -= 8;
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_fr[m] );
-			WL(m_sh2_state->ea+4,m_fr[m^1] );
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->r[n] -= 4;
 		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -983,22 +993,24 @@ inline void sh34_base_device::FMOVFRS0(const uint16_t opcode)
 			m ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_xf[m] );
-			WL(m_sh2_state->ea+4,m_xf[m^1] );
-		} else {
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
-			WL(m_sh2_state->ea,m_fr[m] );
-			WL(m_sh2_state->ea+4,m_fr[m^1] );
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -1017,22 +1029,24 @@ inline void sh34_base_device::FMOVS0FR(const uint16_t opcode)
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea );
-			m_xf[n^1] = RL(m_sh2_state->ea+4 );
-		} else {
+			m_xf[n] = RL(m_sh2_state->ea);
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea );
-			m_fr[n^1] = RL(m_sh2_state->ea+4 );
+			m_fr[n] = RL(m_sh2_state->ea);
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea );
+		m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -1052,22 +1066,24 @@ inline void sh34_base_device::FMOVMRFR(const uint16_t opcode)
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea );
-			m_xf[n^1] = RL(m_sh2_state->ea+4 );
-		} else {
+			m_xf[n] = RL(m_sh2_state->ea);
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea );
-			m_fr[n^1] = RL(m_sh2_state->ea+4 );
+			m_fr[n] = RL(m_sh2_state->ea);
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
-	} else {              /* SZ = 0 */
+	}
+	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea );
+		m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -1080,7 +1096,7 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz == 0)  {  /* SZ = 0 */
+	if (m_fpu_sz == 0) {  /* SZ = 0 */
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 		m ^= m_fpu_pr;
@@ -1092,15 +1108,18 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 			if (n & 1) {
 				m_xf[n & 14] = m_xf[m & 14];
 				m_xf[n | 1] = m_xf[m | 1];
-			} else {
+			}
+			else {
 				m_fr[n] = m_xf[m & 14];
 				m_fr[n | 1] = m_xf[m | 1];
 			}
-		} else {
+		}
+		else {
 			if (n & 1) {
 				m_xf[n & 14] = m_fr[m];
 				m_xf[n | 1] = m_fr[m | 1]; // (a&14)+1 -> a|1
-			} else {
+			}
+			else {
 				m_fr[n] = m_fr[m];
 				m_fr[n | 1] = m_fr[m | 1];
 			}
@@ -1129,7 +1148,7 @@ inline void sh34_base_device::FLDI0(const uint16_t opcode)
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
-inline void sh34_base_device:: FLDS(const uint16_t opcode)
+inline void sh34_base_device::FLDS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
 	m_fpul = m_fr[Rn ^ m_fpu_pr];
@@ -1139,7 +1158,7 @@ inline void sh34_base_device:: FLDS(const uint16_t opcode)
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
-inline void sh34_base_device:: FSTS(const uint16_t opcode)
+inline void sh34_base_device::FSTS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
 	m_fr[Rn ^ m_fpu_pr] = m_fpul;
@@ -1169,13 +1188,14 @@ inline void sh34_base_device::FTRC(const uint16_t opcode)
 	uint32_t n = Rn;
 
 	if (m_fpu_pr) { /* PR = 1 */
-		if(n & 1)
-			fatalerror("SH-4: FTRC opcode used with n %d",n);
+		if (n & 1)
+			fatalerror("SH-4: FTRC opcode used with n %d", n);
 
 		n = n & 14;
 		*((int32_t *)&m_fpul) = (int32_t)FP_RFD(n);
-	} else {              /* PR = 0 */
-		/* read m_fr[n] as float -> truncate -> fpul(32) */
+	}
+	else {              /* PR = 0 */
+	 /* read m_fr[n] as float -> truncate -> fpul(32) */
 		*((int32_t *)&m_fpul) = (int32_t)FP_RFS(n);
 	}
 }
@@ -1187,12 +1207,13 @@ inline void sh34_base_device::FLOAT(const uint16_t opcode)
 	uint32_t n = Rn;
 
 	if (m_fpu_pr) { /* PR = 1 */
-		if(n & 1)
-			fatalerror("SH-4: FLOAT opcode used with n %d",n);
+		if (n & 1)
+			fatalerror("SH-4: FLOAT opcode used with n %d", n);
 
 		n = n & 14;
 		FP_RFD(n) = (double)*((int32_t *)&m_fpul);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = (float)*((int32_t *)&m_fpul);
 	}
 }
@@ -1205,7 +1226,8 @@ inline void sh34_base_device::FNEG(const uint16_t opcode)
 
 	if (m_fpu_pr) { /* PR = 1 */
 		FP_RFD(n) = -FP_RFD(n);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = -FP_RFS(n);
 	}
 }
@@ -1224,7 +1246,8 @@ inline void sh34_base_device::FABS(const uint16_t opcode)
 		n = n & 14;
 		m_fr[n] = m_fr[n] & 0x7fffffff;
 #endif
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		m_fr[n] = m_fr[n] & 0x7fffffff;
 	}
 }
@@ -1242,7 +1265,8 @@ inline void sh34_base_device::FCMP_EQ(const uint16_t opcode)
 			m_sh2_state->sr |= T;
 		else
 			m_sh2_state->sr &= ~T;
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) == FP_RFS(m))
 			m_sh2_state->sr |= T;
 		else
@@ -1263,7 +1287,8 @@ inline void sh34_base_device::FCMP_GT(const uint16_t opcode)
 			m_sh2_state->sr |= T;
 		else
 			m_sh2_state->sr &= ~T;
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) > FP_RFS(m))
 			m_sh2_state->sr |= T;
 		else
@@ -1279,7 +1304,7 @@ inline void sh34_base_device::FCNVDS(const uint16_t opcode)
 	if (m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		if (m_fpscr & RM)
-			m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0,1)] &= 0xe0000000; /* round toward zero*/
+			m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
 		*((float *)&m_fpul) = (float)FP_RFD(n);
 	}
 }
@@ -1305,7 +1330,8 @@ inline void sh34_base_device::FADD(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) + FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) + FP_RFS(m);
 	}
 }
@@ -1320,7 +1346,8 @@ inline void sh34_base_device::FSUB(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) - FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) - FP_RFS(m);
 	}
 }
@@ -1336,7 +1363,8 @@ inline void sh34_base_device::FMUL(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) * FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) * FP_RFS(m);
 	}
 }
@@ -1353,7 +1381,8 @@ inline void sh34_base_device::FDIV(const uint16_t opcode)
 		if (FP_RFD(m) == 0)
 			return;
 		FP_RFD(n) = FP_RFD(n) / FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(m) == 0)
 			return;
 		FP_RFS(n) = FP_RFS(n) / FP_RFS(m);
@@ -1381,7 +1410,8 @@ inline void sh34_base_device::FSQRT(const uint16_t opcode)
 		if (FP_RFD(n) < 0)
 			return;
 		FP_RFD(n) = sqrtf(FP_RFD(n));
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) < 0)
 			return;
 		FP_RFS(n) = sqrtf(FP_RFS(n));
@@ -1405,9 +1435,9 @@ void sh34_base_device::FSSCA(const uint16_t opcode)
 
 	float angle;
 
-	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float) M_PI;
+	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float)M_PI;
 	FP_RFS(n) = sinf(angle);
-	FP_RFS(n+1) = cosf(angle);
+	FP_RFS(n + 1) = cosf(angle);
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
@@ -1415,15 +1445,15 @@ inline void sh34_base_device::FIPR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-uint32_t m;
-float ml[4];
-int a;
+	uint32_t m;
+	float ml[4];
+	int a;
 
 	m = (n & 3) << 2;
 	n = n & 12;
 	for (a = 0;a < 4;a++)
-		ml[a] = FP_RFS(n+a) * FP_RFS(m+a);
-	FP_RFS(n+3) = ml[0] + ml[1] + ml[2] + ml[3];
+		ml[a] = FP_RFS(n + a) * FP_RFS(m + a);
+	FP_RFS(n + 3) = ml[0] + ml[1] + ml[2] + ml[3];
 }
 
 /* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
@@ -1431,13 +1461,13 @@ void sh34_base_device::FTRV(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-int i,j;
-float sum[4];
+	int i, j;
+	float sum[4];
 
 	n = n & 12;
 	for (i = 0;i < 4;i++) {
 		sum[i] = 0;
-		for (j=0;j < 4;j++)
+		for (j = 0;j < 4;j++)
 			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + j);
 	}
 	for (i = 0;i < 4;i++)
@@ -1447,25 +1477,27 @@ float sum[4];
 inline void sh34_base_device::op1111_0xf13(const uint16_t opcode)
 {
 	if (opcode & 0x100) {
-			if (opcode & 0x200) {
-				switch (opcode & 0xC00)
-				{
-					case 0x000:
-						FSCHG();
-						break;
-					case 0x800:
-						FRCHG();
-						break;
-					default:
-						machine().debug_break();
-						break;
-				}
-			} else {
-				FTRV(opcode);
+		if (opcode & 0x200) {
+			switch (opcode & 0xC00)
+			{
+			case 0x000:
+				FSCHG();
+				break;
+			case 0x800:
+				FRCHG();
+				break;
+			default:
+				machine().debug_break();
+				break;
 			}
-		} else {
-			FSSCA(opcode);
 		}
+		else {
+			FTRV(opcode);
+		}
+	}
+	else {
+		FSSCA(opcode);
+	}
 }
 
 void sh34_base_device::dbreak(const uint16_t opcode)
@@ -1476,24 +1508,24 @@ void sh34_base_device::dbreak(const uint16_t opcode)
 
 inline void sh34_base_device::op1111_0x13(uint16_t opcode)
 {
-	switch((opcode >> 4) & 0x0f)
+	switch ((opcode >> 4) & 0x0f)
 	{
-		case 0x00:  FSTS(opcode); break;
-		case 0x01:  FLDS(opcode); break;
-		case 0x02:  FLOAT(opcode); break;
-		case 0x03:  FTRC(opcode); break;
-		case 0x04:  FNEG(opcode); break;
-		case 0x05:  FABS(opcode); break;
-		case 0x06:  FSQRT(opcode); break;
-		case 0x07:  FSRRA(opcode); break;
-		case 0x08:  FLDI0(opcode); break;
-		case 0x09:  FLDI1(opcode); break;
-		case 0x0a:  FCNVSD(opcode); break;
-		case 0x0b:  FCNVDS(opcode); break;
-		case 0x0c:  dbreak(opcode); break;
-		case 0x0d:  dbreak(opcode); break;
-		case 0x0e:  FIPR(opcode); break;
-		case 0x0f:  op1111_0xf13(opcode); break;
+	case 0x00:  FSTS(opcode); break;
+	case 0x01:  FLDS(opcode); break;
+	case 0x02:  FLOAT(opcode); break;
+	case 0x03:  FTRC(opcode); break;
+	case 0x04:  FNEG(opcode); break;
+	case 0x05:  FABS(opcode); break;
+	case 0x06:  FSQRT(opcode); break;
+	case 0x07:  FSRRA(opcode); break;
+	case 0x08:  FLDI0(opcode); break;
+	case 0x09:  FLDI1(opcode); break;
+	case 0x0a:  FCNVSD(opcode); break;
+	case 0x0b:  FCNVDS(opcode); break;
+	case 0x0c:  dbreak(opcode); break;
+	case 0x0d:  dbreak(opcode); break;
+	case 0x0e:  FIPR(opcode); break;
+	case 0x0f:  op1111_0xf13(opcode); break;
 	}
 }
 
@@ -1628,631 +1660,628 @@ void sh4_base_device::device_reset()
 
 inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 {
-	switch(opcode & 0xff)
+	switch (opcode & 0xff)
 	{
 		// 0x00
-		case 0x00:  ILLEGAL(); break;
-		case 0x10:  ILLEGAL(); break;
-		case 0x20:  ILLEGAL(); break;
-		case 0x30:  ILLEGAL(); break;
-		case 0x40:  ILLEGAL(); break;
-		case 0x50:  ILLEGAL(); break;
-		case 0x60:  ILLEGAL(); break;
-		case 0x70:  ILLEGAL(); break;
-		case 0x80:  ILLEGAL(); break;
-		case 0x90:  ILLEGAL(); break;
-		case 0xa0:  ILLEGAL(); break;
-		case 0xb0:  ILLEGAL(); break;
-		case 0xc0:  ILLEGAL(); break;
-		case 0xd0:  ILLEGAL(); break;
-		case 0xe0:  ILLEGAL(); break;
-		case 0xf0:  ILLEGAL(); break;
+	case 0x00:  ILLEGAL(); break;
+	case 0x10:  ILLEGAL(); break;
+	case 0x20:  ILLEGAL(); break;
+	case 0x30:  ILLEGAL(); break;
+	case 0x40:  ILLEGAL(); break;
+	case 0x50:  ILLEGAL(); break;
+	case 0x60:  ILLEGAL(); break;
+	case 0x70:  ILLEGAL(); break;
+	case 0x80:  ILLEGAL(); break;
+	case 0x90:  ILLEGAL(); break;
+	case 0xa0:  ILLEGAL(); break;
+	case 0xb0:  ILLEGAL(); break;
+	case 0xc0:  ILLEGAL(); break;
+	case 0xd0:  ILLEGAL(); break;
+	case 0xe0:  ILLEGAL(); break;
+	case 0xf0:  ILLEGAL(); break;
 		// 0x10
-		case 0x01:  ILLEGAL(); break;
-		case 0x11:  ILLEGAL(); break;
-		case 0x21:  ILLEGAL(); break;
-		case 0x31:  ILLEGAL(); break;
-		case 0x41:  ILLEGAL(); break;
-		case 0x51:  ILLEGAL(); break;
-		case 0x61:  ILLEGAL(); break;
-		case 0x71:  ILLEGAL(); break;
-		case 0x81:  ILLEGAL(); break;
-		case 0x91:  ILLEGAL(); break;
-		case 0xa1:  ILLEGAL(); break;
-		case 0xb1:  ILLEGAL(); break;
-		case 0xc1:  ILLEGAL(); break;
-		case 0xd1:  ILLEGAL(); break;
-		case 0xe1:  ILLEGAL(); break;
-		case 0xf1:  ILLEGAL(); break;
+	case 0x01:  ILLEGAL(); break;
+	case 0x11:  ILLEGAL(); break;
+	case 0x21:  ILLEGAL(); break;
+	case 0x31:  ILLEGAL(); break;
+	case 0x41:  ILLEGAL(); break;
+	case 0x51:  ILLEGAL(); break;
+	case 0x61:  ILLEGAL(); break;
+	case 0x71:  ILLEGAL(); break;
+	case 0x81:  ILLEGAL(); break;
+	case 0x91:  ILLEGAL(); break;
+	case 0xa1:  ILLEGAL(); break;
+	case 0xb1:  ILLEGAL(); break;
+	case 0xc1:  ILLEGAL(); break;
+	case 0xd1:  ILLEGAL(); break;
+	case 0xe1:  ILLEGAL(); break;
+	case 0xf1:  ILLEGAL(); break;
 		// 0x20
-		case 0x02:  STCSR(Rn); break;
-		case 0x12:  STCGBR(Rn); break;
-		case 0x22:  STCVBR(Rn); break;
-		case 0x32:  STCSSR(opcode); break; // sh4 only
-		case 0x42:  STCSPC(opcode); break; // sh4 only
-		case 0x52:  ILLEGAL(); break;
-		case 0x62:  ILLEGAL(); break;
-		case 0x72:  ILLEGAL(); break;
-		case 0x82:  STCRBANK(opcode); break; // sh4 only
-		case 0x92:  STCRBANK(opcode); break;
-		case 0xa2:  STCRBANK(opcode); break;
-		case 0xb2:  STCRBANK(opcode); break;
-		case 0xc2:  STCRBANK(opcode); break;
-		case 0xd2:  STCRBANK(opcode); break;
-		case 0xe2:  STCRBANK(opcode); break;
-		case 0xf2:  STCRBANK(opcode); break;
+	case 0x02:  STCSR(Rn); break;
+	case 0x12:  STCGBR(Rn); break;
+	case 0x22:  STCVBR(Rn); break;
+	case 0x32:  STCSSR(opcode); break; // sh4 only
+	case 0x42:  STCSPC(opcode); break; // sh4 only
+	case 0x52:  ILLEGAL(); break;
+	case 0x62:  ILLEGAL(); break;
+	case 0x72:  ILLEGAL(); break;
+	case 0x82:  STCRBANK(opcode); break; // sh4 only
+	case 0x92:  STCRBANK(opcode); break;
+	case 0xa2:  STCRBANK(opcode); break;
+	case 0xb2:  STCRBANK(opcode); break;
+	case 0xc2:  STCRBANK(opcode); break;
+	case 0xd2:  STCRBANK(opcode); break;
+	case 0xe2:  STCRBANK(opcode); break;
+	case 0xf2:  STCRBANK(opcode); break;
 		// 0x30
-		case 0x03:  BSRF(Rn); break;
-		case 0x13:  ILLEGAL(); break;
-		case 0x23:  BRAF(Rn); break;
-		case 0x33:  ILLEGAL(); break;
-		case 0x43:  ILLEGAL(); break;
-		case 0x53:  ILLEGAL(); break;
-		case 0x63:  ILLEGAL(); break;
-		case 0x73:  ILLEGAL(); break;
-		case 0x83:  PREFM(opcode); break; // sh4 only
-		case 0x93:  TODO(opcode); break;
-		case 0xa3:  TODO(opcode); break;
-		case 0xb3:  TODO(opcode); break;
-		case 0xc3:  MOVCAL(opcode); break; // sh4 only
-		case 0xd3:  ILLEGAL(); break;
-		case 0xe3:  ILLEGAL(); break;
-		case 0xf3:  ILLEGAL(); break;
+	case 0x03:  BSRF(Rn); break;
+	case 0x13:  ILLEGAL(); break;
+	case 0x23:  BRAF(Rn); break;
+	case 0x33:  ILLEGAL(); break;
+	case 0x43:  ILLEGAL(); break;
+	case 0x53:  ILLEGAL(); break;
+	case 0x63:  ILLEGAL(); break;
+	case 0x73:  ILLEGAL(); break;
+	case 0x83:  PREFM(opcode); break; // sh4 only
+	case 0x93:  TODO(opcode); break;
+	case 0xa3:  TODO(opcode); break;
+	case 0xb3:  TODO(opcode); break;
+	case 0xc3:  MOVCAL(opcode); break; // sh4 only
+	case 0xd3:  ILLEGAL(); break;
+	case 0xe3:  ILLEGAL(); break;
+	case 0xf3:  ILLEGAL(); break;
 		// 0x40
-		case 0x04:  MOVBS0(Rm, Rn); break;
-		case 0x14:  MOVBS0(Rm, Rn); break;
-		case 0x24:  MOVBS0(Rm, Rn); break;
-		case 0x34:  MOVBS0(Rm, Rn); break;
-		case 0x44:  MOVBS0(Rm, Rn); break;
-		case 0x54:  MOVBS0(Rm, Rn); break;
-		case 0x64:  MOVBS0(Rm, Rn); break;
-		case 0x74:  MOVBS0(Rm, Rn); break;
-		case 0x84:  MOVBS0(Rm, Rn); break;
-		case 0x94:  MOVBS0(Rm, Rn); break;
-		case 0xa4:  MOVBS0(Rm, Rn); break;
-		case 0xb4:  MOVBS0(Rm, Rn); break;
-		case 0xc4:  MOVBS0(Rm, Rn); break;
-		case 0xd4:  MOVBS0(Rm, Rn); break;
-		case 0xe4:  MOVBS0(Rm, Rn); break;
-		case 0xf4:  MOVBS0(Rm, Rn); break;
+	case 0x04:  MOVBS0(Rm, Rn); break;
+	case 0x14:  MOVBS0(Rm, Rn); break;
+	case 0x24:  MOVBS0(Rm, Rn); break;
+	case 0x34:  MOVBS0(Rm, Rn); break;
+	case 0x44:  MOVBS0(Rm, Rn); break;
+	case 0x54:  MOVBS0(Rm, Rn); break;
+	case 0x64:  MOVBS0(Rm, Rn); break;
+	case 0x74:  MOVBS0(Rm, Rn); break;
+	case 0x84:  MOVBS0(Rm, Rn); break;
+	case 0x94:  MOVBS0(Rm, Rn); break;
+	case 0xa4:  MOVBS0(Rm, Rn); break;
+	case 0xb4:  MOVBS0(Rm, Rn); break;
+	case 0xc4:  MOVBS0(Rm, Rn); break;
+	case 0xd4:  MOVBS0(Rm, Rn); break;
+	case 0xe4:  MOVBS0(Rm, Rn); break;
+	case 0xf4:  MOVBS0(Rm, Rn); break;
 		// 0x50
-		case 0x05:  MOVWS0(Rm, Rn); break;
-		case 0x15:  MOVWS0(Rm, Rn); break;
-		case 0x25:  MOVWS0(Rm, Rn); break;
-		case 0x35:  MOVWS0(Rm, Rn); break;
-		case 0x45:  MOVWS0(Rm, Rn); break;
-		case 0x55:  MOVWS0(Rm, Rn); break;
-		case 0x65:  MOVWS0(Rm, Rn); break;
-		case 0x75:  MOVWS0(Rm, Rn); break;
-		case 0x85:  MOVWS0(Rm, Rn); break;
-		case 0x95:  MOVWS0(Rm, Rn); break;
-		case 0xa5:  MOVWS0(Rm, Rn); break;
-		case 0xb5:  MOVWS0(Rm, Rn); break;
-		case 0xc5:  MOVWS0(Rm, Rn); break;
-		case 0xd5:  MOVWS0(Rm, Rn); break;
-		case 0xe5:  MOVWS0(Rm, Rn); break;
-		case 0xf5:  MOVWS0(Rm, Rn); break;
+	case 0x05:  MOVWS0(Rm, Rn); break;
+	case 0x15:  MOVWS0(Rm, Rn); break;
+	case 0x25:  MOVWS0(Rm, Rn); break;
+	case 0x35:  MOVWS0(Rm, Rn); break;
+	case 0x45:  MOVWS0(Rm, Rn); break;
+	case 0x55:  MOVWS0(Rm, Rn); break;
+	case 0x65:  MOVWS0(Rm, Rn); break;
+	case 0x75:  MOVWS0(Rm, Rn); break;
+	case 0x85:  MOVWS0(Rm, Rn); break;
+	case 0x95:  MOVWS0(Rm, Rn); break;
+	case 0xa5:  MOVWS0(Rm, Rn); break;
+	case 0xb5:  MOVWS0(Rm, Rn); break;
+	case 0xc5:  MOVWS0(Rm, Rn); break;
+	case 0xd5:  MOVWS0(Rm, Rn); break;
+	case 0xe5:  MOVWS0(Rm, Rn); break;
+	case 0xf5:  MOVWS0(Rm, Rn); break;
 		// 0x60
-		case 0x06:  MOVLS0(Rm, Rn); break;
-		case 0x16:  MOVLS0(Rm, Rn); break;
-		case 0x26:  MOVLS0(Rm, Rn); break;
-		case 0x36:  MOVLS0(Rm, Rn); break;
-		case 0x46:  MOVLS0(Rm, Rn); break;
-		case 0x56:  MOVLS0(Rm, Rn); break;
-		case 0x66:  MOVLS0(Rm, Rn); break;
-		case 0x76:  MOVLS0(Rm, Rn); break;
-		case 0x86:  MOVLS0(Rm, Rn); break;
-		case 0x96:  MOVLS0(Rm, Rn); break;
-		case 0xa6:  MOVLS0(Rm, Rn); break;
-		case 0xb6:  MOVLS0(Rm, Rn); break;
-		case 0xc6:  MOVLS0(Rm, Rn); break;
-		case 0xd6:  MOVLS0(Rm, Rn); break;
-		case 0xe6:  MOVLS0(Rm, Rn); break;
-		case 0xf6:  MOVLS0(Rm, Rn); break;
+	case 0x06:  MOVLS0(Rm, Rn); break;
+	case 0x16:  MOVLS0(Rm, Rn); break;
+	case 0x26:  MOVLS0(Rm, Rn); break;
+	case 0x36:  MOVLS0(Rm, Rn); break;
+	case 0x46:  MOVLS0(Rm, Rn); break;
+	case 0x56:  MOVLS0(Rm, Rn); break;
+	case 0x66:  MOVLS0(Rm, Rn); break;
+	case 0x76:  MOVLS0(Rm, Rn); break;
+	case 0x86:  MOVLS0(Rm, Rn); break;
+	case 0x96:  MOVLS0(Rm, Rn); break;
+	case 0xa6:  MOVLS0(Rm, Rn); break;
+	case 0xb6:  MOVLS0(Rm, Rn); break;
+	case 0xc6:  MOVLS0(Rm, Rn); break;
+	case 0xd6:  MOVLS0(Rm, Rn); break;
+	case 0xe6:  MOVLS0(Rm, Rn); break;
+	case 0xf6:  MOVLS0(Rm, Rn); break;
 		// 0x70
-		case 0x07:  MULL(Rm, Rn); break;
-		case 0x17:  MULL(Rm, Rn); break;
-		case 0x27:  MULL(Rm, Rn); break;
-		case 0x37:  MULL(Rm, Rn); break;
-		case 0x47:  MULL(Rm, Rn); break;
-		case 0x57:  MULL(Rm, Rn); break;
-		case 0x67:  MULL(Rm, Rn); break;
-		case 0x77:  MULL(Rm, Rn); break;
-		case 0x87:  MULL(Rm, Rn); break;
-		case 0x97:  MULL(Rm, Rn); break;
-		case 0xa7:  MULL(Rm, Rn); break;
-		case 0xb7:  MULL(Rm, Rn); break;
-		case 0xc7:  MULL(Rm, Rn); break;
-		case 0xd7:  MULL(Rm, Rn); break;
-		case 0xe7:  MULL(Rm, Rn); break;
-		case 0xf7:  MULL(Rm, Rn); break;
+	case 0x07:  MULL(Rm, Rn); break;
+	case 0x17:  MULL(Rm, Rn); break;
+	case 0x27:  MULL(Rm, Rn); break;
+	case 0x37:  MULL(Rm, Rn); break;
+	case 0x47:  MULL(Rm, Rn); break;
+	case 0x57:  MULL(Rm, Rn); break;
+	case 0x67:  MULL(Rm, Rn); break;
+	case 0x77:  MULL(Rm, Rn); break;
+	case 0x87:  MULL(Rm, Rn); break;
+	case 0x97:  MULL(Rm, Rn); break;
+	case 0xa7:  MULL(Rm, Rn); break;
+	case 0xb7:  MULL(Rm, Rn); break;
+	case 0xc7:  MULL(Rm, Rn); break;
+	case 0xd7:  MULL(Rm, Rn); break;
+	case 0xe7:  MULL(Rm, Rn); break;
+	case 0xf7:  MULL(Rm, Rn); break;
 		// 0x80
-		case 0x08:  CLRT(); break;
-		case 0x88:  CLRT(); break;
+	case 0x08:  CLRT(); break;
+	case 0x88:  CLRT(); break;
 
-		case 0x18:  SETT(); break;
-		case 0x98:  SETT(); break;
+	case 0x18:  SETT(); break;
+	case 0x98:  SETT(); break;
 
-		case 0x28:  CLRMAC(); break;
-		case 0xa8:  CLRMAC(); break;
+	case 0x28:  CLRMAC(); break;
+	case 0xa8:  CLRMAC(); break;
 
-		case 0x38:  LDTLB(opcode); break; // sh4 only
-		case 0xb8:  LDTLB(opcode); break; // sh4 only
+	case 0x38:  LDTLB(opcode); break; // sh4 only
+	case 0xb8:  LDTLB(opcode); break; // sh4 only
 
-		case 0x48:  CLRS(opcode); break; // sh4 only
-		case 0xc8:  CLRS(opcode); break; // sh4 only
+	case 0x48:  CLRS(opcode); break; // sh4 only
+	case 0xc8:  CLRS(opcode); break; // sh4 only
 
-		case 0x58:  SETS(opcode); break; // sh4 only
-		case 0xd8:  SETS(opcode); break; // sh4 only
+	case 0x58:  SETS(opcode); break; // sh4 only
+	case 0xd8:  SETS(opcode); break; // sh4 only
 
-		case 0x68:  ILLEGAL(); break;
-		case 0xe8:  ILLEGAL(); break;
+	case 0x68:  ILLEGAL(); break;
+	case 0xe8:  ILLEGAL(); break;
 
-		case 0x78:  ILLEGAL(); break;
-		case 0xf8:  ILLEGAL(); break;
+	case 0x78:  ILLEGAL(); break;
+	case 0xf8:  ILLEGAL(); break;
 		// 0x90
-		case 0x09:  NOP(); break;
-		case 0x49:  NOP(); break;
-		case 0x89:  NOP(); break;
-		case 0xc9:  NOP(); break;
+	case 0x09:  NOP(); break;
+	case 0x49:  NOP(); break;
+	case 0x89:  NOP(); break;
+	case 0xc9:  NOP(); break;
 
-		case 0x19:  DIV0U(); break;
-		case 0x59:  DIV0U(); break;
-		case 0x99:  DIV0U(); break;
-		case 0xd9:  DIV0U(); break;
+	case 0x19:  DIV0U(); break;
+	case 0x59:  DIV0U(); break;
+	case 0x99:  DIV0U(); break;
+	case 0xd9:  DIV0U(); break;
 
-		case 0x29:  MOVT(Rn); break;
-		case 0x69:  MOVT(Rn); break;
-		case 0xa9:  MOVT(Rn); break;
-		case 0xe9:  MOVT(Rn); break;
+	case 0x29:  MOVT(Rn); break;
+	case 0x69:  MOVT(Rn); break;
+	case 0xa9:  MOVT(Rn); break;
+	case 0xe9:  MOVT(Rn); break;
 
-		case 0x39:  ILLEGAL(); break;
-		case 0x79:  ILLEGAL(); break;
-		case 0xb9:  ILLEGAL(); break;
-		case 0xf9:  ILLEGAL(); break;
-		
+	case 0x39:  ILLEGAL(); break;
+	case 0x79:  ILLEGAL(); break;
+	case 0xb9:  ILLEGAL(); break;
+	case 0xf9:  ILLEGAL(); break;
+
 		// 0xa0
-		case 0x0a:  STSMACH(Rn); break;
-		case 0x8a:  STSMACH(Rn); break;
+	case 0x0a:  STSMACH(Rn); break;
+	case 0x8a:  STSMACH(Rn); break;
 
-		case 0x1a:  STSMACL(Rn); break;
-		case 0x9a:  STSMACL(Rn); break;
+	case 0x1a:  STSMACL(Rn); break;
+	case 0x9a:  STSMACL(Rn); break;
 
-		case 0x2a:  STSPR(Rn); break;
-		case 0xaa:  STSPR(Rn); break;
+	case 0x2a:  STSPR(Rn); break;
+	case 0xaa:  STSPR(Rn); break;
 
-		case 0x3a:  STCSGR(opcode); break; // sh4 only
-		case 0xba:  STCSGR(opcode); break; // sh4 only
+	case 0x3a:  STCSGR(opcode); break; // sh4 only
+	case 0xba:  STCSGR(opcode); break; // sh4 only
 
-		case 0x4a:  ILLEGAL(); break;
-		case 0xca:  ILLEGAL(); break;
+	case 0x4a:  ILLEGAL(); break;
+	case 0xca:  ILLEGAL(); break;
 
-		case 0x5a:  STSFPUL(opcode); break; // sh4 only
-		case 0xda:  STSFPUL(opcode); break; // sh4only
+	case 0x5a:  STSFPUL(opcode); break; // sh4 only
+	case 0xda:  STSFPUL(opcode); break; // sh4only
 
-		case 0x6a:  STSFPSCR(opcode); break; // sh4 only
-		case 0xea:  STSFPSCR(opcode); break; // sh4only
+	case 0x6a:  STSFPSCR(opcode); break; // sh4 only
+	case 0xea:  STSFPSCR(opcode); break; // sh4only
 
-		case 0x7a:  STCDBR(opcode); break; // sh4 only
-		case 0xfa:  STCDBR(opcode); break; // sh4 only
-		// 0xb0
-		case 0x0b:  RTS(); break;
-		case 0x4b:  RTS(); break;
-		case 0x8b:  RTS(); break;
-		case 0xcb:  RTS(); break;
+	case 0x7a:  STCDBR(opcode); break; // sh4 only
+	case 0xfa:  STCDBR(opcode); break; // sh4 only
+	// 0xb0
+	case 0x0b:  RTS(); break;
+	case 0x4b:  RTS(); break;
+	case 0x8b:  RTS(); break;
+	case 0xcb:  RTS(); break;
 
-		case 0x1b:  SLEEP(); break;
-		case 0x5b:  SLEEP(); break;
-		case 0x9b:  SLEEP(); break;
-		case 0xdb:  SLEEP(); break;
+	case 0x1b:  SLEEP(); break;
+	case 0x5b:  SLEEP(); break;
+	case 0x9b:  SLEEP(); break;
+	case 0xdb:  SLEEP(); break;
 
-		case 0x2b:  RTE(); break;
-		case 0x6b:  RTE(); break;
-		case 0xab:  RTE(); break;
-		case 0xeb:  RTE(); break;
+	case 0x2b:  RTE(); break;
+	case 0x6b:  RTE(); break;
+	case 0xab:  RTE(); break;
+	case 0xeb:  RTE(); break;
 
-		case 0x3b:  ILLEGAL(); break;
-		case 0x7b:  ILLEGAL(); break;
-		case 0xbb:  ILLEGAL(); break;
-		case 0xfb:  ILLEGAL(); break;
+	case 0x3b:  ILLEGAL(); break;
+	case 0x7b:  ILLEGAL(); break;
+	case 0xbb:  ILLEGAL(); break;
+	case 0xfb:  ILLEGAL(); break;
 		// 0xc0
-		case 0x0c:  MOVBL0(Rm, Rn);  break;
-		case 0x1c:  MOVBL0(Rm, Rn);  break;
-		case 0x2c:  MOVBL0(Rm, Rn);  break;
-		case 0x3c:  MOVBL0(Rm, Rn);  break;
-		case 0x4c:  MOVBL0(Rm, Rn);  break;
-		case 0x5c:  MOVBL0(Rm, Rn);  break;
-		case 0x6c:  MOVBL0(Rm, Rn);  break;
-		case 0x7c:  MOVBL0(Rm, Rn);  break;
-		case 0x8c:  MOVBL0(Rm, Rn);  break;
-		case 0x9c:  MOVBL0(Rm, Rn);  break;
-		case 0xac:  MOVBL0(Rm, Rn);  break;
-		case 0xbc:  MOVBL0(Rm, Rn);  break;
-		case 0xcc:  MOVBL0(Rm, Rn);  break;
-		case 0xdc:  MOVBL0(Rm, Rn);  break;
-		case 0xec:  MOVBL0(Rm, Rn);  break;
-		case 0xfc:  MOVBL0(Rm, Rn);  break;
+	case 0x0c:  MOVBL0(Rm, Rn);  break;
+	case 0x1c:  MOVBL0(Rm, Rn);  break;
+	case 0x2c:  MOVBL0(Rm, Rn);  break;
+	case 0x3c:  MOVBL0(Rm, Rn);  break;
+	case 0x4c:  MOVBL0(Rm, Rn);  break;
+	case 0x5c:  MOVBL0(Rm, Rn);  break;
+	case 0x6c:  MOVBL0(Rm, Rn);  break;
+	case 0x7c:  MOVBL0(Rm, Rn);  break;
+	case 0x8c:  MOVBL0(Rm, Rn);  break;
+	case 0x9c:  MOVBL0(Rm, Rn);  break;
+	case 0xac:  MOVBL0(Rm, Rn);  break;
+	case 0xbc:  MOVBL0(Rm, Rn);  break;
+	case 0xcc:  MOVBL0(Rm, Rn);  break;
+	case 0xdc:  MOVBL0(Rm, Rn);  break;
+	case 0xec:  MOVBL0(Rm, Rn);  break;
+	case 0xfc:  MOVBL0(Rm, Rn);  break;
 		// 0xd0
-		case 0x0d:  MOVWL0(Rm, Rn); break;
-		case 0x1d:  MOVWL0(Rm, Rn); break;
-		case 0x2d:  MOVWL0(Rm, Rn); break;
-		case 0x3d:  MOVWL0(Rm, Rn); break;
-		case 0x4d:  MOVWL0(Rm, Rn); break;
-		case 0x5d:  MOVWL0(Rm, Rn); break;
-		case 0x6d:  MOVWL0(Rm, Rn); break;
-		case 0x7d:  MOVWL0(Rm, Rn); break;
-		case 0x8d:  MOVWL0(Rm, Rn); break;
-		case 0x9d:  MOVWL0(Rm, Rn); break;
-		case 0xad:  MOVWL0(Rm, Rn); break;
-		case 0xbd:  MOVWL0(Rm, Rn); break;
-		case 0xcd:  MOVWL0(Rm, Rn); break;
-		case 0xdd:  MOVWL0(Rm, Rn); break;
-		case 0xed:  MOVWL0(Rm, Rn); break;
-		case 0xfd:  MOVWL0(Rm, Rn); break;
+	case 0x0d:  MOVWL0(Rm, Rn); break;
+	case 0x1d:  MOVWL0(Rm, Rn); break;
+	case 0x2d:  MOVWL0(Rm, Rn); break;
+	case 0x3d:  MOVWL0(Rm, Rn); break;
+	case 0x4d:  MOVWL0(Rm, Rn); break;
+	case 0x5d:  MOVWL0(Rm, Rn); break;
+	case 0x6d:  MOVWL0(Rm, Rn); break;
+	case 0x7d:  MOVWL0(Rm, Rn); break;
+	case 0x8d:  MOVWL0(Rm, Rn); break;
+	case 0x9d:  MOVWL0(Rm, Rn); break;
+	case 0xad:  MOVWL0(Rm, Rn); break;
+	case 0xbd:  MOVWL0(Rm, Rn); break;
+	case 0xcd:  MOVWL0(Rm, Rn); break;
+	case 0xdd:  MOVWL0(Rm, Rn); break;
+	case 0xed:  MOVWL0(Rm, Rn); break;
+	case 0xfd:  MOVWL0(Rm, Rn); break;
 		// 0xe0
-		case 0x0e:  MOVLL0(Rm, Rn); break;
-		case 0x1e:  MOVLL0(Rm, Rn); break;
-		case 0x2e:  MOVLL0(Rm, Rn); break;
-		case 0x3e:  MOVLL0(Rm, Rn); break;
-		case 0x4e:  MOVLL0(Rm, Rn); break;
-		case 0x5e:  MOVLL0(Rm, Rn); break;
-		case 0x6e:  MOVLL0(Rm, Rn); break;
-		case 0x7e:  MOVLL0(Rm, Rn); break;
-		case 0x8e:  MOVLL0(Rm, Rn); break;
-		case 0x9e:  MOVLL0(Rm, Rn); break;
-		case 0xae:  MOVLL0(Rm, Rn); break;
-		case 0xbe:  MOVLL0(Rm, Rn); break;
-		case 0xce:  MOVLL0(Rm, Rn); break;
-		case 0xde:  MOVLL0(Rm, Rn); break;
-		case 0xee:  MOVLL0(Rm, Rn); break;
-		case 0xfe:  MOVLL0(Rm, Rn); break;
+	case 0x0e:  MOVLL0(Rm, Rn); break;
+	case 0x1e:  MOVLL0(Rm, Rn); break;
+	case 0x2e:  MOVLL0(Rm, Rn); break;
+	case 0x3e:  MOVLL0(Rm, Rn); break;
+	case 0x4e:  MOVLL0(Rm, Rn); break;
+	case 0x5e:  MOVLL0(Rm, Rn); break;
+	case 0x6e:  MOVLL0(Rm, Rn); break;
+	case 0x7e:  MOVLL0(Rm, Rn); break;
+	case 0x8e:  MOVLL0(Rm, Rn); break;
+	case 0x9e:  MOVLL0(Rm, Rn); break;
+	case 0xae:  MOVLL0(Rm, Rn); break;
+	case 0xbe:  MOVLL0(Rm, Rn); break;
+	case 0xce:  MOVLL0(Rm, Rn); break;
+	case 0xde:  MOVLL0(Rm, Rn); break;
+	case 0xee:  MOVLL0(Rm, Rn); break;
+	case 0xfe:  MOVLL0(Rm, Rn); break;
 		// 0xf0
-		case 0x0f:  MAC_L(Rm, Rn); break;
-		case 0x1f:  MAC_L(Rm, Rn); break;
-		case 0x2f:  MAC_L(Rm, Rn); break;
-		case 0x3f:  MAC_L(Rm, Rn); break;
-		case 0x4f:  MAC_L(Rm, Rn); break;
-		case 0x5f:  MAC_L(Rm, Rn); break;
-		case 0x6f:  MAC_L(Rm, Rn); break;
-		case 0x7f:  MAC_L(Rm, Rn); break;
-		case 0x8f:  MAC_L(Rm, Rn); break;
-		case 0x9f:  MAC_L(Rm, Rn); break;
-		case 0xaf:  MAC_L(Rm, Rn); break;
-		case 0xbf:  MAC_L(Rm, Rn); break;
-		case 0xcf:  MAC_L(Rm, Rn); break;
-		case 0xdf:  MAC_L(Rm, Rn); break;
-		case 0xef:  MAC_L(Rm, Rn); break;
-		case 0xff:  MAC_L(Rm, Rn); break;
+	case 0x0f:  MAC_L(Rm, Rn); break;
+	case 0x1f:  MAC_L(Rm, Rn); break;
+	case 0x2f:  MAC_L(Rm, Rn); break;
+	case 0x3f:  MAC_L(Rm, Rn); break;
+	case 0x4f:  MAC_L(Rm, Rn); break;
+	case 0x5f:  MAC_L(Rm, Rn); break;
+	case 0x6f:  MAC_L(Rm, Rn); break;
+	case 0x7f:  MAC_L(Rm, Rn); break;
+	case 0x8f:  MAC_L(Rm, Rn); break;
+	case 0x9f:  MAC_L(Rm, Rn); break;
+	case 0xaf:  MAC_L(Rm, Rn); break;
+	case 0xbf:  MAC_L(Rm, Rn); break;
+	case 0xcf:  MAC_L(Rm, Rn); break;
+	case 0xdf:  MAC_L(Rm, Rn); break;
+	case 0xef:  MAC_L(Rm, Rn); break;
+	case 0xff:  MAC_L(Rm, Rn); break;
 	}
 }
 
 inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 {
-	switch(opcode & 0xff)
+	switch (opcode & 0xff)
 	{
 		// 0x00
-		case 0x00:  SHLL(Rn); break;
-		case 0x40:  SHLL(Rn); break;
-		case 0x80:  SHLL(Rn); break;
-		case 0xc0:  SHLL(Rn); break;
+	case 0x00:  SHLL(Rn); break;
+	case 0x40:  SHLL(Rn); break;
+	case 0x80:  SHLL(Rn); break;
+	case 0xc0:  SHLL(Rn); break;
 
-		case 0x10:  DT(Rn); break;
-		case 0x50:  DT(Rn); break;
-		case 0x90:  DT(Rn); break;
-		case 0xd0:  DT(Rn); break;
+	case 0x10:  DT(Rn); break;
+	case 0x50:  DT(Rn); break;
+	case 0x90:  DT(Rn); break;
+	case 0xd0:  DT(Rn); break;
 
-		case 0x20:  SHAL(Rn); break;
-		case 0x60:  SHAL(Rn); break;
-		case 0xa0:  SHAL(Rn); break;
-		case 0xe0:  SHAL(Rn); break;
+	case 0x20:  SHAL(Rn); break;
+	case 0x60:  SHAL(Rn); break;
+	case 0xa0:  SHAL(Rn); break;
+	case 0xe0:  SHAL(Rn); break;
 
-		case 0x30:  ILLEGAL(); break;
-		case 0x70:  ILLEGAL(); break;
-		case 0xb0:  ILLEGAL(); break;
-		case 0xf0:  ILLEGAL(); break;
-		
+	case 0x30:  ILLEGAL(); break;
+	case 0x70:  ILLEGAL(); break;
+	case 0xb0:  ILLEGAL(); break;
+	case 0xf0:  ILLEGAL(); break;
+
 		// 0x10
-		case 0x01:  SHLR(Rn); break;
-		case 0x41:  SHLR(Rn); break;
-		case 0x81:  SHLR(Rn); break;
-		case 0xc1:  SHLR(Rn); break;
+	case 0x01:  SHLR(Rn); break;
+	case 0x41:  SHLR(Rn); break;
+	case 0x81:  SHLR(Rn); break;
+	case 0xc1:  SHLR(Rn); break;
 
-		case 0x11:  CMPPZ(Rn);  break;
-		case 0x51:  CMPPZ(Rn);  break;
-		case 0x91:  CMPPZ(Rn);  break;
-		case 0xd1:  CMPPZ(Rn);  break;
+	case 0x11:  CMPPZ(Rn);  break;
+	case 0x51:  CMPPZ(Rn);  break;
+	case 0x91:  CMPPZ(Rn);  break;
+	case 0xd1:  CMPPZ(Rn);  break;
 
-		case 0x21:  SHAR(Rn); break;
-		case 0x61:  SHAR(Rn); break;
-		case 0xa1:  SHAR(Rn); break;
-		case 0xe1:  SHAR(Rn); break;
+	case 0x21:  SHAR(Rn); break;
+	case 0x61:  SHAR(Rn); break;
+	case 0xa1:  SHAR(Rn); break;
+	case 0xe1:  SHAR(Rn); break;
 
-		case 0x31:  ILLEGAL(); break;
-		case 0x71:  ILLEGAL(); break;
-		case 0xb1:  ILLEGAL(); break;
-		case 0xf1:  ILLEGAL(); break;
+	case 0x31:  ILLEGAL(); break;
+	case 0x71:  ILLEGAL(); break;
+	case 0xb1:  ILLEGAL(); break;
+	case 0xf1:  ILLEGAL(); break;
 		// 0x20
-		case 0x02:  STSMMACH(Rn); break;
-		case 0x12:  STSMMACL(Rn);  break;
-		case 0x22:  STSMPR(Rn); break;
-		case 0x32:  STCMSGR(opcode); break; // sh4 only
-		case 0x42:  ILLEGAL(); break;
-		case 0x52:  STSMFPUL(opcode); break; // sh4 only
-		case 0x62:  STSMFPSCR(opcode); break; // sh4 only
-		case 0x72:  ILLEGAL(); break;
-		case 0x82:  ILLEGAL(); break;
-		case 0x92:  ILLEGAL(); break;
-		case 0xa2:  ILLEGAL(); break;
-		case 0xb2:  ILLEGAL(); break;
-		case 0xc2:  ILLEGAL(); break;
-		case 0xd2:  ILLEGAL(); break;
-		case 0xe2:  ILLEGAL(); break;
-		case 0xf2:  STCMDBR(opcode); break; // sh4 only
-		// 0x30
-		case 0x03:  STCMSR(Rn); break;
-		case 0x13:  STCMGBR(Rn);  break;
-		case 0x23:  STCMVBR(Rn); break;
-		case 0x33:  STCMSSR(opcode); break; // sh4 only
-		case 0x43:  STCMSPC(opcode); break; // sh4 only
-		case 0x53:  ILLEGAL(); break;
-		case 0x63:  ILLEGAL(); break;
-		case 0x73:  ILLEGAL(); break;
-		case 0x83:  STCMRBANK(opcode); break; // sh4 only
-		case 0x93:  STCMRBANK(opcode); break;
-		case 0xa3:  STCMRBANK(opcode); break;
-		case 0xb3:  STCMRBANK(opcode); break;
-		case 0xc3:  STCMRBANK(opcode); break;
-		case 0xd3:  STCMRBANK(opcode); break;
-		case 0xe3:  STCMRBANK(opcode); break;
-		case 0xf3:  STCMRBANK(opcode); break;
+	case 0x02:  STSMMACH(Rn); break;
+	case 0x12:  STSMMACL(Rn);  break;
+	case 0x22:  STSMPR(Rn); break;
+	case 0x32:  STCMSGR(opcode); break; // sh4 only
+	case 0x42:  ILLEGAL(); break;
+	case 0x52:  STSMFPUL(opcode); break; // sh4 only
+	case 0x62:  STSMFPSCR(opcode); break; // sh4 only
+	case 0x72:  ILLEGAL(); break;
+	case 0x82:  ILLEGAL(); break;
+	case 0x92:  ILLEGAL(); break;
+	case 0xa2:  ILLEGAL(); break;
+	case 0xb2:  ILLEGAL(); break;
+	case 0xc2:  ILLEGAL(); break;
+	case 0xd2:  ILLEGAL(); break;
+	case 0xe2:  ILLEGAL(); break;
+	case 0xf2:  STCMDBR(opcode); break; // sh4 only
+	// 0x30
+	case 0x03:  STCMSR(Rn); break;
+	case 0x13:  STCMGBR(Rn);  break;
+	case 0x23:  STCMVBR(Rn); break;
+	case 0x33:  STCMSSR(opcode); break; // sh4 only
+	case 0x43:  STCMSPC(opcode); break; // sh4 only
+	case 0x53:  ILLEGAL(); break;
+	case 0x63:  ILLEGAL(); break;
+	case 0x73:  ILLEGAL(); break;
+	case 0x83:  STCMRBANK(opcode); break; // sh4 only
+	case 0x93:  STCMRBANK(opcode); break;
+	case 0xa3:  STCMRBANK(opcode); break;
+	case 0xb3:  STCMRBANK(opcode); break;
+	case 0xc3:  STCMRBANK(opcode); break;
+	case 0xd3:  STCMRBANK(opcode); break;
+	case 0xe3:  STCMRBANK(opcode); break;
+	case 0xf3:  STCMRBANK(opcode); break;
 		// 0x40
-		case 0x04:  ROTL(Rn); break;
-		case 0x44:  ROTL(Rn); break;
-		case 0x84:  ROTL(Rn); break;
-		case 0xc4:  ROTL(Rn); break;
+	case 0x04:  ROTL(Rn); break;
+	case 0x44:  ROTL(Rn); break;
+	case 0x84:  ROTL(Rn); break;
+	case 0xc4:  ROTL(Rn); break;
 
-		case 0x14:  ILLEGAL(); break;
-		case 0x34:  ILLEGAL(); break;
-		case 0x74:  ILLEGAL(); break;
-		case 0xb4:  ILLEGAL(); break;
+	case 0x14:  ILLEGAL(); break;
+	case 0x34:  ILLEGAL(); break;
+	case 0x74:  ILLEGAL(); break;
+	case 0xb4:  ILLEGAL(); break;
 
-		case 0x24:  ROTCL(Rn); break;
-		case 0x64:  ROTCL(Rn); break;
-		case 0xa4:  ROTCL(Rn); break;
-		case 0xe4:  ROTCL(Rn); break;
+	case 0x24:  ROTCL(Rn); break;
+	case 0x64:  ROTCL(Rn); break;
+	case 0xa4:  ROTCL(Rn); break;
+	case 0xe4:  ROTCL(Rn); break;
 
-		case 0x54:  ILLEGAL(); break;
-		case 0x94:  ILLEGAL(); break;
-		case 0xd4:  ILLEGAL(); break;
-		case 0xf4:  ILLEGAL(); break;
+	case 0x54:  ILLEGAL(); break;
+	case 0x94:  ILLEGAL(); break;
+	case 0xd4:  ILLEGAL(); break;
+	case 0xf4:  ILLEGAL(); break;
 		// 0x50
-		case 0x05:  ROTR(Rn);  break;
-		case 0x45:  ROTR(Rn);  break;
-		case 0x85:  ROTR(Rn);  break;
-		case 0xc5:  ROTR(Rn);  break;
+	case 0x05:  ROTR(Rn);  break;
+	case 0x45:  ROTR(Rn);  break;
+	case 0x85:  ROTR(Rn);  break;
+	case 0xc5:  ROTR(Rn);  break;
 
-		case 0x15:  CMPPL(Rn); break;
-		case 0x55:  CMPPL(Rn); break;
-		case 0x95:  CMPPL(Rn); break;
-		case 0xd5:  CMPPL(Rn); break;
+	case 0x15:  CMPPL(Rn); break;
+	case 0x55:  CMPPL(Rn); break;
+	case 0x95:  CMPPL(Rn); break;
+	case 0xd5:  CMPPL(Rn); break;
 
-		case 0x25:  ROTCR(Rn); break;
-		case 0x65:  ROTCR(Rn); break;
-		case 0xa5:  ROTCR(Rn); break;
-		case 0xe5:  ROTCR(Rn); break;
+	case 0x25:  ROTCR(Rn); break;
+	case 0x65:  ROTCR(Rn); break;
+	case 0xa5:  ROTCR(Rn); break;
+	case 0xe5:  ROTCR(Rn); break;
 
-		case 0x35:  ILLEGAL(); break;
-		case 0x75:  ILLEGAL(); break;
-		case 0xb5:  ILLEGAL(); break;
-		case 0xf5:  ILLEGAL(); break;
-		
+	case 0x35:  ILLEGAL(); break;
+	case 0x75:  ILLEGAL(); break;
+	case 0xb5:  ILLEGAL(); break;
+	case 0xf5:  ILLEGAL(); break;
+
 		// 0x60
-		case 0x06:  LDSMMACH(Rn); break;
-		case 0x16:  LDSMMACL(Rn); break;
-		case 0x26:  LDSMPR(Rn);  break;
-		case 0x36:  ILLEGAL(); break;
-		case 0x46:  ILLEGAL(); break;
-		case 0x56:  LDSMFPUL(opcode); break; // sh4 only
-		case 0x66:  LDSMFPSCR(opcode); break; // sh4 only
-		case 0x76:  ILLEGAL(); break;
-		case 0x86:  ILLEGAL(); break;
-		case 0x96:  ILLEGAL(); break;
-		case 0xa6:  ILLEGAL(); break;
-		case 0xb6:  ILLEGAL(); break;
-		case 0xc6:  ILLEGAL(); break;
-		case 0xd6:  ILLEGAL(); break;
-		case 0xe6:  ILLEGAL(); break;
-		case 0xf6:  LDCMDBR(opcode); break; // sh4 only
-		// 0x70
-		case 0x07:  LDCMSR(opcode);  break; // sh2/4 flag difference
-		case 0x17:  LDCMGBR(Rn); break;
-		case 0x27:  LDCMVBR(Rn); break;
-		case 0x37:  LDCMSSR(opcode); break; // sh4 only
-		case 0x47:  LDCMSPC(opcode); break; // sh4 only
-		case 0x57:  ILLEGAL(); break;
-		case 0x67:  ILLEGAL(); break;
-		case 0x77:  ILLEGAL(); break;
-		case 0x87:  LDCMRBANK(opcode); break; // sh4 only
-		case 0x97:  LDCMRBANK(opcode); break;
-		case 0xa7:  LDCMRBANK(opcode); break;
-		case 0xb7:  LDCMRBANK(opcode); break;
-		case 0xc7:  LDCMRBANK(opcode); break;
-		case 0xd7:  LDCMRBANK(opcode); break;
-		case 0xe7:  LDCMRBANK(opcode); break;
-		case 0xf7:  LDCMRBANK(opcode); break;
+	case 0x06:  LDSMMACH(Rn); break;
+	case 0x16:  LDSMMACL(Rn); break;
+	case 0x26:  LDSMPR(Rn);  break;
+	case 0x36:  ILLEGAL(); break;
+	case 0x46:  ILLEGAL(); break;
+	case 0x56:  LDSMFPUL(opcode); break; // sh4 only
+	case 0x66:  LDSMFPSCR(opcode); break; // sh4 only
+	case 0x76:  ILLEGAL(); break;
+	case 0x86:  ILLEGAL(); break;
+	case 0x96:  ILLEGAL(); break;
+	case 0xa6:  ILLEGAL(); break;
+	case 0xb6:  ILLEGAL(); break;
+	case 0xc6:  ILLEGAL(); break;
+	case 0xd6:  ILLEGAL(); break;
+	case 0xe6:  ILLEGAL(); break;
+	case 0xf6:  LDCMDBR(opcode); break; // sh4 only
+	// 0x70
+	case 0x07:  LDCMSR(opcode);  break; // sh2/4 flag difference
+	case 0x17:  LDCMGBR(Rn); break;
+	case 0x27:  LDCMVBR(Rn); break;
+	case 0x37:  LDCMSSR(opcode); break; // sh4 only
+	case 0x47:  LDCMSPC(opcode); break; // sh4 only
+	case 0x57:  ILLEGAL(); break;
+	case 0x67:  ILLEGAL(); break;
+	case 0x77:  ILLEGAL(); break;
+	case 0x87:  LDCMRBANK(opcode); break; // sh4 only
+	case 0x97:  LDCMRBANK(opcode); break;
+	case 0xa7:  LDCMRBANK(opcode); break;
+	case 0xb7:  LDCMRBANK(opcode); break;
+	case 0xc7:  LDCMRBANK(opcode); break;
+	case 0xd7:  LDCMRBANK(opcode); break;
+	case 0xe7:  LDCMRBANK(opcode); break;
+	case 0xf7:  LDCMRBANK(opcode); break;
 		// 0x80
-		case 0x08:  SHLL2(Rn);  break;
-		case 0x48:  SHLL2(Rn);  break;
-		case 0x88:  SHLL2(Rn);  break;
-		case 0xc8:  SHLL2(Rn);  break;
+	case 0x08:  SHLL2(Rn);  break;
+	case 0x48:  SHLL2(Rn);  break;
+	case 0x88:  SHLL2(Rn);  break;
+	case 0xc8:  SHLL2(Rn);  break;
 
-		case 0x18:  SHLL8(Rn); break;
-		case 0x58:  SHLL8(Rn); break;
-		case 0x98:  SHLL8(Rn); break;
-		case 0xd8:  SHLL8(Rn); break;
+	case 0x18:  SHLL8(Rn); break;
+	case 0x58:  SHLL8(Rn); break;
+	case 0x98:  SHLL8(Rn); break;
+	case 0xd8:  SHLL8(Rn); break;
 
-		case 0x28:  SHLL16(Rn); break;
-		case 0x68:  SHLL16(Rn); break;
-		case 0xa8:  SHLL16(Rn); break;
-		case 0xe8:  SHLL16(Rn); break;
+	case 0x28:  SHLL16(Rn); break;
+	case 0x68:  SHLL16(Rn); break;
+	case 0xa8:  SHLL16(Rn); break;
+	case 0xe8:  SHLL16(Rn); break;
 
-		case 0x38:  ILLEGAL(); break;
-		case 0x78:  ILLEGAL(); break;
-		case 0xb8:  ILLEGAL(); break;
-		case 0xf8:  ILLEGAL(); break;
+	case 0x38:  ILLEGAL(); break;
+	case 0x78:  ILLEGAL(); break;
+	case 0xb8:  ILLEGAL(); break;
+	case 0xf8:  ILLEGAL(); break;
 		// 0x90
-		case 0x09:  SHLR2(Rn); break;
-		case 0x49:  SHLR2(Rn); break;
-		case 0x89:  SHLR2(Rn); break;
-		case 0xc9:  SHLR2(Rn); break;
+	case 0x09:  SHLR2(Rn); break;
+	case 0x49:  SHLR2(Rn); break;
+	case 0x89:  SHLR2(Rn); break;
+	case 0xc9:  SHLR2(Rn); break;
 
-		case 0x19:  SHLR8(Rn); break;
-		case 0x59:  SHLR8(Rn); break;
-		case 0x99:  SHLR8(Rn); break;
-		case 0xd9:  SHLR8(Rn); break;
+	case 0x19:  SHLR8(Rn); break;
+	case 0x59:  SHLR8(Rn); break;
+	case 0x99:  SHLR8(Rn); break;
+	case 0xd9:  SHLR8(Rn); break;
 
-		case 0x29:  SHLR16(Rn); break;
-		case 0x69:  SHLR16(Rn); break;
-		case 0xa9:  SHLR16(Rn); break;
-		case 0xe9:  SHLR16(Rn); break;
+	case 0x29:  SHLR16(Rn); break;
+	case 0x69:  SHLR16(Rn); break;
+	case 0xa9:  SHLR16(Rn); break;
+	case 0xe9:  SHLR16(Rn); break;
 
-		case 0x39:  ILLEGAL(); break;
-		case 0x79:  ILLEGAL(); break;
-		case 0xb9:  ILLEGAL(); break;
-		case 0xf9:  ILLEGAL(); break;
+	case 0x39:  ILLEGAL(); break;
+	case 0x79:  ILLEGAL(); break;
+	case 0xb9:  ILLEGAL(); break;
+	case 0xf9:  ILLEGAL(); break;
 		// 0xa0
-		case 0x0a:  LDSMACH(Rn); break;
-		case 0x1a:  LDSMACL(Rn); break;
-		case 0x2a:  LDSPR(Rn); break;
-		case 0x3a:  ILLEGAL(); break;
-		case 0x4a:  ILLEGAL(); break;
-		case 0x5a:  LDSFPUL(opcode); break; // sh4 only
-		case 0x6a:  LDSFPSCR(opcode); break; // sh4 only
-		case 0x7a:  ILLEGAL(); break;
-		case 0x8a:  ILLEGAL(); break;
-		case 0x9a:  ILLEGAL(); break;
-		case 0xaa:  ILLEGAL(); break;
-		case 0xba:  ILLEGAL(); break;
-		case 0xca:  ILLEGAL(); break;
-		case 0xda:  ILLEGAL(); break;
-		case 0xea:  ILLEGAL(); break;
-		case 0xfa:  LDCDBR(opcode); break; // sh4 only
-		// 0xb0
-		case 0x0b:  JSR(Rn);  break;
-		case 0x4b:  JSR(Rn);  break;
-		case 0x8b:  JSR(Rn);  break;
-		case 0xcb:  JSR(Rn);  break;
+	case 0x0a:  LDSMACH(Rn); break;
+	case 0x1a:  LDSMACL(Rn); break;
+	case 0x2a:  LDSPR(Rn); break;
+	case 0x3a:  ILLEGAL(); break;
+	case 0x4a:  ILLEGAL(); break;
+	case 0x5a:  LDSFPUL(opcode); break; // sh4 only
+	case 0x6a:  LDSFPSCR(opcode); break; // sh4 only
+	case 0x7a:  ILLEGAL(); break;
+	case 0x8a:  ILLEGAL(); break;
+	case 0x9a:  ILLEGAL(); break;
+	case 0xaa:  ILLEGAL(); break;
+	case 0xba:  ILLEGAL(); break;
+	case 0xca:  ILLEGAL(); break;
+	case 0xda:  ILLEGAL(); break;
+	case 0xea:  ILLEGAL(); break;
+	case 0xfa:  LDCDBR(opcode); break; // sh4 only
+	// 0xb0
+	case 0x0b:  JSR(Rn);  break;
+	case 0x4b:  JSR(Rn);  break;
+	case 0x8b:  JSR(Rn);  break;
+	case 0xcb:  JSR(Rn);  break;
 
-		case 0x1b:  TAS(Rn); break;
-		case 0x5b:  TAS(Rn); break;
-		case 0x9b:  TAS(Rn); break;
-		case 0xdb:  TAS(Rn); break;
+	case 0x1b:  TAS(Rn); break;
+	case 0x5b:  TAS(Rn); break;
+	case 0x9b:  TAS(Rn); break;
+	case 0xdb:  TAS(Rn); break;
 
-		case 0x2b:  JMP(Rn);  break;
-		case 0x6b:  JMP(Rn);  break;
-		case 0xab:  JMP(Rn);  break;
-		case 0xeb:  JMP(Rn);  break;
+	case 0x2b:  JMP(Rn);  break;
+	case 0x6b:  JMP(Rn);  break;
+	case 0xab:  JMP(Rn);  break;
+	case 0xeb:  JMP(Rn);  break;
 
-		case 0x3b:  ILLEGAL(); break;
-		case 0x7b:  ILLEGAL(); break;
-		case 0xbb:  ILLEGAL(); break;
-		case 0xfb:  ILLEGAL(); break;
+	case 0x3b:  ILLEGAL(); break;
+	case 0x7b:  ILLEGAL(); break;
+	case 0xbb:  ILLEGAL(); break;
+	case 0xfb:  ILLEGAL(); break;
 		// 0xc0
-		case 0x0c:  SHAD(opcode); break; // sh4 only
-		case 0x1c:  SHAD(opcode); break;
-		case 0x2c:  SHAD(opcode); break;
-		case 0x3c:  SHAD(opcode); break;
-		case 0x4c:  SHAD(opcode); break;
-		case 0x5c:  SHAD(opcode); break;
-		case 0x6c:  SHAD(opcode); break;
-		case 0x7c:  SHAD(opcode); break;
-		case 0x8c:  SHAD(opcode); break;
-		case 0x9c:  SHAD(opcode); break;
-		case 0xac:  SHAD(opcode); break;
-		case 0xbc:  SHAD(opcode); break;
-		case 0xcc:  SHAD(opcode); break;
-		case 0xdc:  SHAD(opcode); break;
-		case 0xec:  SHAD(opcode); break;
-		case 0xfc:  SHAD(opcode); break;
+	case 0x0c:  SHAD(opcode); break; // sh4 only
+	case 0x1c:  SHAD(opcode); break;
+	case 0x2c:  SHAD(opcode); break;
+	case 0x3c:  SHAD(opcode); break;
+	case 0x4c:  SHAD(opcode); break;
+	case 0x5c:  SHAD(opcode); break;
+	case 0x6c:  SHAD(opcode); break;
+	case 0x7c:  SHAD(opcode); break;
+	case 0x8c:  SHAD(opcode); break;
+	case 0x9c:  SHAD(opcode); break;
+	case 0xac:  SHAD(opcode); break;
+	case 0xbc:  SHAD(opcode); break;
+	case 0xcc:  SHAD(opcode); break;
+	case 0xdc:  SHAD(opcode); break;
+	case 0xec:  SHAD(opcode); break;
+	case 0xfc:  SHAD(opcode); break;
 		// 0xd0
-		case 0x0d:  SHLD(opcode); break; // sh4 only
-		case 0x1d:  SHLD(opcode); break;
-		case 0x2d:  SHLD(opcode); break;
-		case 0x3d:  SHLD(opcode); break;
-		case 0x4d:  SHLD(opcode); break;
-		case 0x5d:  SHLD(opcode); break;
-		case 0x6d:  SHLD(opcode); break;
-		case 0x7d:  SHLD(opcode); break;
-		case 0x8d:  SHLD(opcode); break;
-		case 0x9d:  SHLD(opcode); break;
-		case 0xad:  SHLD(opcode); break;
-		case 0xbd:  SHLD(opcode); break;
-		case 0xcd:  SHLD(opcode); break;
-		case 0xdd:  SHLD(opcode); break;
-		case 0xed:  SHLD(opcode); break;
-		case 0xfd:  SHLD(opcode); break;
+	case 0x0d:  SHLD(opcode); break; // sh4 only
+	case 0x1d:  SHLD(opcode); break;
+	case 0x2d:  SHLD(opcode); break;
+	case 0x3d:  SHLD(opcode); break;
+	case 0x4d:  SHLD(opcode); break;
+	case 0x5d:  SHLD(opcode); break;
+	case 0x6d:  SHLD(opcode); break;
+	case 0x7d:  SHLD(opcode); break;
+	case 0x8d:  SHLD(opcode); break;
+	case 0x9d:  SHLD(opcode); break;
+	case 0xad:  SHLD(opcode); break;
+	case 0xbd:  SHLD(opcode); break;
+	case 0xcd:  SHLD(opcode); break;
+	case 0xdd:  SHLD(opcode); break;
+	case 0xed:  SHLD(opcode); break;
+	case 0xfd:  SHLD(opcode); break;
 		// 0xe0
-		case 0x0e:  LDCSR(opcode); break; // sh2/4 flag difference
-		case 0x1e:  LDCGBR(Rn); break;
-		case 0x2e:  LDCVBR(Rn); break;
-		case 0x3e:  LDCSSR(opcode); break; // sh4 only
-		case 0x4e:  LDCSPC(opcode); break; // sh4 only
-		case 0x5e:  ILLEGAL(); break;
-		case 0x6e:  ILLEGAL(); break;
-		case 0x7e:  ILLEGAL(); break;
-		case 0x8e:  LDCRBANK(opcode); break; // sh4 only
-		case 0x9e:  LDCRBANK(opcode); break;
-		case 0xae:  LDCRBANK(opcode); break;
-		case 0xbe:  LDCRBANK(opcode); break;
-		case 0xce:  LDCRBANK(opcode); break;
-		case 0xde:  LDCRBANK(opcode); break;
-		case 0xee:  LDCRBANK(opcode); break;
-		case 0xfe:  LDCRBANK(opcode); break;
+	case 0x0e:  LDCSR(opcode); break; // sh2/4 flag difference
+	case 0x1e:  LDCGBR(Rn); break;
+	case 0x2e:  LDCVBR(Rn); break;
+	case 0x3e:  LDCSSR(opcode); break; // sh4 only
+	case 0x4e:  LDCSPC(opcode); break; // sh4 only
+	case 0x5e:  ILLEGAL(); break;
+	case 0x6e:  ILLEGAL(); break;
+	case 0x7e:  ILLEGAL(); break;
+	case 0x8e:  LDCRBANK(opcode); break; // sh4 only
+	case 0x9e:  LDCRBANK(opcode); break;
+	case 0xae:  LDCRBANK(opcode); break;
+	case 0xbe:  LDCRBANK(opcode); break;
+	case 0xce:  LDCRBANK(opcode); break;
+	case 0xde:  LDCRBANK(opcode); break;
+	case 0xee:  LDCRBANK(opcode); break;
+	case 0xfe:  LDCRBANK(opcode); break;
 		// 0xf0
-		case 0x0f:  MAC_W(Rm, Rn); break;
-		case 0x1f:  MAC_W(Rm, Rn); break;
-		case 0x2f:  MAC_W(Rm, Rn); break;
-		case 0x3f:  MAC_W(Rm, Rn); break;
-		case 0x4f:  MAC_W(Rm, Rn); break;
-		case 0x5f:  MAC_W(Rm, Rn); break;
-		case 0x6f:  MAC_W(Rm, Rn); break;
-		case 0x7f:  MAC_W(Rm, Rn); break;
-		case 0x8f:  MAC_W(Rm, Rn); break;
-		case 0x9f:  MAC_W(Rm, Rn); break;
-		case 0xaf:  MAC_W(Rm, Rn); break;
-		case 0xbf:  MAC_W(Rm, Rn); break;
-		case 0xcf:  MAC_W(Rm, Rn); break;
-		case 0xdf:  MAC_W(Rm, Rn); break;
-		case 0xef:  MAC_W(Rm, Rn); break;
-		case 0xff:  MAC_W(Rm, Rn); break;
+	case 0x0f:  MAC_W(Rm, Rn); break;
+	case 0x1f:  MAC_W(Rm, Rn); break;
+	case 0x2f:  MAC_W(Rm, Rn); break;
+	case 0x3f:  MAC_W(Rm, Rn); break;
+	case 0x4f:  MAC_W(Rm, Rn); break;
+	case 0x5f:  MAC_W(Rm, Rn); break;
+	case 0x6f:  MAC_W(Rm, Rn); break;
+	case 0x7f:  MAC_W(Rm, Rn); break;
+	case 0x8f:  MAC_W(Rm, Rn); break;
+	case 0x9f:  MAC_W(Rm, Rn); break;
+	case 0xaf:  MAC_W(Rm, Rn); break;
+	case 0xbf:  MAC_W(Rm, Rn); break;
+	case 0xcf:  MAC_W(Rm, Rn); break;
+	case 0xdf:  MAC_W(Rm, Rn); break;
+	case 0xef:  MAC_W(Rm, Rn); break;
+	case 0xff:  MAC_W(Rm, Rn); break;
 	}
 }
 
 inline void sh34_base_device::execute_one_f000(const uint16_t opcode)
 {
-	switch(opcode & 0x0f)
+	switch (opcode & 0x0f)
 	{
-		case 0x00:  FADD(opcode); break;
-		case 0x01:  FSUB(opcode); break;
-		case 0x02:  FMUL(opcode); break;
-		case 0x03:  FDIV(opcode); break;
-		case 0x04:  FCMP_EQ(opcode); break;
-		case 0x05:  FCMP_GT(opcode); break;
-		case 0x06:  FMOVS0FR(opcode); break;
-		case 0x07:  FMOVFRS0(opcode); break;
-		case 0x08:  FMOVMRFR(opcode); break;
-		case 0x09:  FMOVMRIFR(opcode); break;
-		case 0x0a:  FMOVFRMR(opcode); break;
-		case 0x0b:  FMOVFRMDR(opcode); break;
-		case 0x0c:  FMOVFR(opcode); break;
-		case 0x0d:  op1111_0x13(opcode); break;
-		case 0x0e:  FMAC(opcode); break;
-		case 0x0f:  dbreak(opcode); break;
+	case 0x00:  FADD(opcode); break;
+	case 0x01:  FSUB(opcode); break;
+	case 0x02:  FMUL(opcode); break;
+	case 0x03:  FDIV(opcode); break;
+	case 0x04:  FCMP_EQ(opcode); break;
+	case 0x05:  FCMP_GT(opcode); break;
+	case 0x06:  FMOVS0FR(opcode); break;
+	case 0x07:  FMOVFRS0(opcode); break;
+	case 0x08:  FMOVMRFR(opcode); break;
+	case 0x09:  FMOVMRIFR(opcode); break;
+	case 0x0a:  FMOVFRMR(opcode); break;
+	case 0x0b:  FMOVFRMDR(opcode); break;
+	case 0x0c:  FMOVFR(opcode); break;
+	case 0x0d:  op1111_0x13(opcode); break;
+	case 0x0e:  FMAC(opcode); break;
+	case 0x0f:  dbreak(opcode); break;
 	}
 }
-
-
-
 
 /* Execute cycles - returns number of cycles actually run */
 void sh34_base_device::execute_run()
@@ -2289,7 +2318,7 @@ void sh34_base_device::execute_run()
 		}
 
 		m_sh2_state->icount--;
-	} while( m_sh2_state->icount > 0 );
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh3be_device::execute_run()
@@ -2323,7 +2352,7 @@ void sh3be_device::execute_run()
 		}
 
 		m_sh2_state->icount--;
-	} while( m_sh2_state->icount > 0 );
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh4be_device::execute_run()
@@ -2357,7 +2386,7 @@ void sh4be_device::execute_run()
 		}
 
 		m_sh2_state->icount--;
-	} while( m_sh2_state->icount > 0 );
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh4_base_device::device_start()
@@ -2365,7 +2394,7 @@ void sh4_base_device::device_start()
 	sh34_base_device::device_start();
 
 	int i;
-	for (i=0;i<64;i++)
+	for (i = 0;i < 64;i++)
 	{
 		m_utlb[i].ASID = 0;
 		m_utlb[i].VPN = 0;
@@ -2381,7 +2410,7 @@ void sh4_base_device::device_start()
 		m_utlb[i].TC = 0;
 	}
 
-	for (i=0;i<64;i++)
+	for (i = 0;i < 64;i++)
 	{
 		save_item(NAME(m_utlb[i].ASID), i);
 		save_item(NAME(m_utlb[i].VPN), i);
@@ -2396,15 +2425,13 @@ void sh4_base_device::device_start()
 		save_item(NAME(m_utlb[i].SA), i);
 		save_item(NAME(m_utlb[i].TC), i);
 	}
-
 }
 
 
 
 void sh34_base_device::device_start()
 {
-	/* allocate the implementation-specific state from the full cache */
-	m_sh2_state = (internal_sh2_state *)m_cache.alloc_near(sizeof(internal_sh2_state));
+	sh_common_execution::device_start();
 
 	for (int i=0; i<3; i++)
 	{
@@ -2435,14 +2462,7 @@ void sh34_base_device::device_start()
 	m_irln = 15;
 	m_test_irq = 0;
 
-	save_item(NAME(m_sh2_state->pc));
-	save_item(NAME(m_sh2_state->r));
-	save_item(NAME(m_sh2_state->sr));
-	save_item(NAME(m_sh2_state->pr));
-	save_item(NAME(m_sh2_state->gbr));
-	save_item(NAME(m_sh2_state->vbr));
-	save_item(NAME(m_sh2_state->mach));
-	save_item(NAME(m_sh2_state->macl));
+
 	save_item(NAME(m_spc));
 	save_item(NAME(m_ssr));
 	save_item(NAME(m_sgr));
@@ -2450,8 +2470,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_rbnk));
 	save_item(NAME(m_fr));
 	save_item(NAME(m_xf));
-	save_item(NAME(m_sh2_state->ea));
-	save_item(NAME(m_sh2_state->m_delay));
+
 	save_item(NAME(m_cpu_off));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_test_irq));
@@ -2489,7 +2508,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_SH4_DMATCR3));
 	save_item(NAME(m_SH4_DMAOR));
 	save_item(NAME(m_nmi_line_state));
-	save_item(NAME(m_sh2_state->sleep_mode));
+
 	save_item(NAME(m_frt_input));
 	save_item(NAME(m_irln));
 	save_item(NAME(m_internal_irq_level));
@@ -2503,11 +2522,12 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_dma_source_increment));
 	save_item(NAME(m_dma_destination_increment));
 	save_item(NAME(m_dma_mode));
-	save_item(NAME(m_sh2_state->icount));
+
+
 	save_item(NAME(m_fpu_sz));
 	save_item(NAME(m_fpu_pr));
 	save_item(NAME(m_ioport16_pullup));
-	save_item(NAME( m_ioport16_direction));
+	save_item(NAME(m_ioport16_direction));
 	save_item(NAME(m_ioport4_pullup));
 	save_item(NAME(m_ioport4_direction));
 	save_item(NAME(m_sh4_mmu_enabled));

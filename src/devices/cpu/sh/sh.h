@@ -231,6 +231,9 @@ public:
 
 	direct_read_data *m_direct;
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 class sh_frontend : public drc_frontend
