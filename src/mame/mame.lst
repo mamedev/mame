@@ -20359,6 +20359,7 @@ phantasm                        // (c) 1991 (Japan)
 plusalph                        // (c) 1989
 rittam                          // Prototype or hack of Rod-Land
 rodland                         // (c) 1990
+rodlanda                        // (c) 1990
 rodlandj                        // (c) 1990 (Japan)
 rodlandjb                       // bootleg
 soldam                          // (c) 1992
@@ -33576,6 +33577,7 @@ sspirtfc                        // 1988.?? Scramble Spirits (FD1094)
 @source:segas32.cpp
 alien3                          // 1993.?? Aliens 3 (World)
 alien3u                         // 1993.11 Aliens 3 (US)
+alien3j                         // 1993.?? Aliens 3 (Japan)
 arabfgt                         // 1992.?? Arabian Fight (World)
 arabfgtj                        // 1992.03 Arabian Fight (Japan)
 arabfgtu                        // 1992.03 Arabian Fight (US)
@@ -38829,3 +38831,6 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
+
+@source:notechan.cpp
+notechan                        // (c) Banpresto

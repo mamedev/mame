@@ -958,7 +958,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 			break;
 		}
 	}
-	str << found ? _("Requires CHD\tYes\n") : _("Requires CHD\tNo\n");
+	str << (found ? _("Requires CHD\tYes\n") : _("Requires CHD\tNo\n"));
 
 	// audit the game first to see if we're going to work
 	if (ui().options().info_audit())

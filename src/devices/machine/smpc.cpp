@@ -572,7 +572,8 @@ void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t 
 		case 0x0a:
 		case 0x0b:
 			popmessage ("SMPC: NETLINK %s, contact MAMEdev",(data & 1) ? "off" : "on");
-			break;      case 0x0d:
+			break;      
+		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
 			smpc_system_reset();
 			break;

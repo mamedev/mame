@@ -66,6 +66,8 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/abcbus/abcbus.h",
 		MAME_DIR .. "src/devices/bus/abcbus/abc890.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/abc890.h",
+		MAME_DIR .. "src/devices/bus/abcbus/db411223.cpp",
+		MAME_DIR .. "src/devices/bus/abcbus/db411223.h",
 		MAME_DIR .. "src/devices/bus/abcbus/fd2.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/fd2.h",
 		MAME_DIR .. "src/devices/bus/abcbus/hdc.cpp",
@@ -86,10 +88,10 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/abcbus/sio.h",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.h",
-		MAME_DIR .. "src/devices/bus/abcbus/turbo.cpp",
-		MAME_DIR .. "src/devices/bus/abcbus/turbo.h",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.h",
+		MAME_DIR .. "src/devices/bus/abcbus/unidisk.cpp",
+		MAME_DIR .. "src/devices/bus/abcbus/unidisk.h",
 	}
 end
 
