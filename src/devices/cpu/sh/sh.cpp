@@ -92,7 +92,7 @@ void sh_common_execution::device_start()
 
 	m_icountptr = &m_sh2_state->icount;
 
-
+	m_program = &space(AS_PROGRAM);
 }
 
 
@@ -2122,6 +2122,241 @@ void sh_common_execution::log_add_disasm_comment(drcuml_block *block, uint32_t p
 	}
 }
 
+
+/*-------------------------------------------------
+    code_flush_cache - flush the cache and
+    regenerate static code
+-------------------------------------------------*/
+
+void sh_common_execution::code_flush_cache()
+{
+	drcuml_state *drcuml = m_drcuml.get();
+
+	/* empty the transient cache contents */
+	drcuml->reset();
+
+	try
+	{
+		/* generate the entry point and out-of-cycles handlers */
+		static_generate_nocode_handler();
+		static_generate_out_of_cycles();
+		static_generate_entry_point();
+
+		/* add subroutines for memory accesses */
+		static_generate_memory_accessor(1, false, "read8", &m_read8);
+		static_generate_memory_accessor(1, true,  "write8", &m_write8);
+		static_generate_memory_accessor(2, false, "read16", &m_read16);
+		static_generate_memory_accessor(2, true,  "write16", &m_write16);
+		static_generate_memory_accessor(4, false, "read32", &m_read32);
+		static_generate_memory_accessor(4, true,  "write32", &m_write32);
+	}
+	catch (drcuml_block::abort_compilation &)
+	{
+		fatalerror("Unable to generate SH2 static code\n");
+	}
+
+	m_cache_dirty = false;
+}
+
+/* Execute cycles - returns number of cycles actually run */
+void sh_common_execution::execute_run_drc()
+{
+	drcuml_state *drcuml = m_drcuml.get();
+	int execute_result;
+
+	/* reset the cache if dirty */
+	if (m_cache_dirty)
+		code_flush_cache();
+
+	/* execute */
+	do
+	{
+		/* run as much as we can */
+		execute_result = drcuml->execute(*m_entry);
+
+		/* if we need to recompile, do it */
+		if (execute_result == EXECUTE_MISSING_CODE)
+		{
+			code_compile_block(0, m_sh2_state->pc);
+		}
+		else if (execute_result == EXECUTE_UNMAPPED_CODE)
+		{
+			fatalerror("Attempted to execute unmapped code at PC=%08X\n", m_sh2_state->pc);
+		}
+		else if (execute_result == EXECUTE_RESET_CACHE)
+		{
+			code_flush_cache();
+		}
+	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
+}
+
+
+/*-------------------------------------------------
+    code_compile_block - compile a block of the
+    given mode at the specified pc
+-------------------------------------------------*/
+
+void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
+{
+	drcuml_state *drcuml = m_drcuml.get();
+	compiler_state compiler = { 0 };
+	const opcode_desc *seqhead, *seqlast;
+	const opcode_desc *desclist;
+	bool override = false;
+	drcuml_block *block;
+
+	g_profiler.start(PROFILER_DRC_COMPILE);
+
+	/* get a description of this sequence */
+	desclist = get_desclist(pc);
+
+	if (drcuml->logging() || drcuml->logging_native())
+		log_opcode_desc(drcuml, desclist, 0);
+
+	bool succeeded = false;
+	while (!succeeded)
+	{
+		try
+		{
+			/* start the block */
+			block = drcuml->begin_block(4096);
+
+			/* loop until we get through all instruction sequences */
+			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
+			{
+				const opcode_desc *curdesc;
+				uint32_t nextpc;
+
+				/* add a code log entry */
+				if (drcuml->logging())
+					block->append_comment("-------------------------");                 // comment
+
+				/* determine the last instruction in this sequence */
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
+					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+						break;
+				assert(seqlast != nullptr);
+
+				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
+				if (override || !drcuml->hash_exists(mode, seqhead->pc))
+					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
+
+				/* if we already have a hash, and this is the first sequence, assume that we */
+				/* are recompiling due to being out of sync and allow future overrides */
+				else if (seqhead == desclist)
+				{
+					override = true;
+					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
+				}
+
+				/* otherwise, redispatch to that fixed PC and skip the rest of the processing */
+				else
+				{
+					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
+					UML_HASHJMP(block, 0, seqhead->pc, *m_nocode);
+																							// hashjmp <mode>,seqhead->pc,nocode
+					continue;
+				}
+
+				/* validate this code block if we're not pointing into ROM */
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
+					generate_checksum_block(block, &compiler, seqhead, seqlast);
+
+				/* label this instruction, if it may be jumped to locally */
+				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				{
+					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
+				}
+
+				/* iterate over instructions in the sequence and compile them */
+				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
+				{
+					generate_sequence_instruction(block, &compiler, curdesc, 0xffffffff);
+				}
+
+				/* if we need to return to the start, do it */
+				if (seqlast->flags & OPFLAG_RETURN_TO_START)
+				{
+					nextpc = pc;
+				}
+				/* otherwise we just go to the next instruction */
+				else
+				{
+					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 2;
+				}
+
+				/* count off cycles and go there */
+				generate_update_cycles(block, &compiler, nextpc, true);                // <subtract cycles>
+
+				/* SH2 has no modes */
+				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
+				{
+					UML_HASHJMP(block, 0, nextpc, *m_nocode);
+				}
+																							// hashjmp <mode>,nextpc,nocode
+			}
+
+			/* end the sequence */
+			block->end();
+			g_profiler.stop();
+			succeeded = true;
+		}
+		catch (drcuml_block::abort_compilation &)
+		{
+			code_flush_cache();
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    static_generate_nocode_handler - generate an
+    exception handler for "out of code"
+-------------------------------------------------*/
+
+void sh_common_execution::static_generate_nocode_handler()
+{
+	drcuml_state *drcuml = m_drcuml.get();
+	drcuml_block *block;
+
+	/* begin generating */
+	block = drcuml->begin_block(10);
+
+	/* generate a hash jump via the current mode and PC */
+	alloc_handle(drcuml, &m_nocode, "nocode");
+	UML_HANDLE(block, *m_nocode);                                    // handle  nocode
+	UML_GETEXP(block, I0);                                  // getexp  i0
+	UML_MOV(block, mem(&m_sh2_state->pc), I0);                              // mov     [pc],i0
+	save_fast_iregs(block);
+	UML_EXIT(block, EXECUTE_MISSING_CODE);                          // exit    EXECUTE_MISSING_CODE
+
+	block->end();
+}
+
+
+/*-------------------------------------------------
+    static_generate_out_of_cycles - generate an
+    out of cycles exception handler
+-------------------------------------------------*/
+
+void sh_common_execution::static_generate_out_of_cycles()
+{
+	drcuml_state *drcuml = m_drcuml.get();
+	drcuml_block *block;
+
+	/* begin generating */
+	block = drcuml->begin_block(10);
+
+	/* generate a hash jump via the current mode and PC */
+	alloc_handle(drcuml, &m_out_of_cycles, "out_of_cycles");
+	UML_HANDLE(block, *m_out_of_cycles);                             // handle  out_of_cycles
+	UML_GETEXP(block, I0);                                  // getexp  i0
+	UML_MOV(block, mem(&m_sh2_state->pc), I0);                              // mov     <pc>,i0
+	save_fast_iregs(block);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                         // exit    EXECUTE_OUT_OF_CYCLES
+
+	block->end();
+}
 
 /*-------------------------------------------------
     generate_checksum_block - generate code to

@@ -116,7 +116,7 @@ protected:
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-	address_space *m_program, *m_decrypted_program;
+	address_space *m_decrypted_program;
 
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
@@ -207,17 +207,16 @@ private:
 
 
 
-	void code_flush_cache();
-	void execute_run_drc();
 
 	virtual void init_drc_frontend() override;
-	const opcode_desc* get_desclist(offs_t pc);
-	void code_compile_block(uint8_t mode, offs_t pc);
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+	
+	virtual void static_generate_entry_point() override;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
+	
+	virtual void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc) override;
+
+
 	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc) override;
 	virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;

@@ -100,6 +100,10 @@ enum
 	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA
 };
 
+
+
+
+
 class sh_common_execution : public cpu_device
 {
 
@@ -346,6 +350,7 @@ public:
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
 	direct_read_data *m_direct;
+	address_space *m_program;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	uint32_t              m_drcoptions;         /* configurable DRC options */
@@ -418,6 +423,26 @@ public:
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);
 
+	virtual void static_generate_entry_point()
+	{
+		fatalerror("static_generate_entry_point in base class\n");
+	}
+	
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr)
+	{
+		fatalerror("static_generate_memory_accessor in base class\n");
+	}
+
+	virtual void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+	{
+		fatalerror("generate_sequence_instruction in base class\n");
+	}
+
+	virtual const opcode_desc* get_desclist(offs_t pc)
+	{
+		fatalerror("get_desclist in base class\n");
+	}
+
 	uint32_t epc(const opcode_desc *desc);
 	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block *block);
@@ -427,6 +452,11 @@ public:
 	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void static_generate_nocode_handler();
+	void static_generate_out_of_cycles();
+	void code_flush_cache();
+	void execute_run_drc();
+	void code_compile_block(uint8_t mode, offs_t pc);
 
 
 protected:
