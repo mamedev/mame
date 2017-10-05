@@ -460,8 +460,9 @@ private:
 	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	
-	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
-	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
+protected:
+	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
+	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
 
 	sh_common_execution *m_sh;

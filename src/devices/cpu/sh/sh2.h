@@ -273,8 +273,8 @@ public:
 protected:
 
 private:
-	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
-	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	//virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	//virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
 
