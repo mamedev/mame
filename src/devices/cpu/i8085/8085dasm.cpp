@@ -339,8 +339,8 @@ CPU_DISASSEMBLE(i8085)
 		case 0x35: util::stream_format(stream, "dcr  m");                          break;
 		case 0x36: util::stream_format(stream, "mvi  m,$%02x", ARG(pc)); pc++;     break;
 		case 0x37: util::stream_format(stream, "stc");                             break;
-		case 0x38: util::stream_format(stream, "ldes $%02x", ARG(pc)); pc++;       break;
-		case 0x39: util::stream_format(stream, "dad sp");                          break;
+		case 0x38: util::stream_format(stream, "ldes $%02x (*)", ARG(pc)); pc++;   break;
+		case 0x39: util::stream_format(stream, "dad  sp");                         break;
 		case 0x3a: util::stream_format(stream, "ldax $%04x", ARGW(pc)); pc+=2;     break;
 		case 0x3b: util::stream_format(stream, "dcx  sp");                         break;
 		case 0x3c: util::stream_format(stream, "inr  a");                          break;
