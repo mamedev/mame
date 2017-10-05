@@ -2091,7 +2091,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 
 	case 0x42:  ILLEGAL(); break;
 	case 0x43:  STCMSPC(opcode); break; // sh4 only
-	
+
 	case 0x46:  ILLEGAL(); break;
 	case 0x47:  LDCMSPC(opcode); break; // sh4 only
 
@@ -2101,7 +2101,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 
 	case 0x52:  STSMFPUL(opcode); break; // sh4 only
 	case 0x53:  ILLEGAL(); break;
-	
+
 	case 0x56:  LDSMFPUL(opcode); break; // sh4 only
 	case 0x57:  ILLEGAL(); break;
 
@@ -2120,177 +2120,144 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0x6e:  ILLEGAL(); break;
 
 
-	
-
-
-
 
 
 	case 0x80:  SHLL(Rn); break;
-	case 0xc0:  SHLL(Rn); break;
+	case 0x81:  SHLR(Rn); break;
+	case 0x82:  ILLEGAL(); break;
+	case 0x83:  STCMRBANK(opcode); break; // sh4 only
+	case 0x84:  ROTL(Rn); break;
+	case 0x85:  ROTR(Rn);  break;
+	case 0x86:  ILLEGAL(); break;
+	case 0x87:  LDCMRBANK(opcode); break; // sh4 only
+	case 0x88:  SHLL2(Rn);  break;
+	case 0x89:  SHLR2(Rn); break;
+	case 0x8a:  ILLEGAL(); break;
+	case 0x8b:  JSR(Rn);  break;
+	case 0x8c:  SHAD(opcode); break;
+	case 0x8d:  SHLD(opcode); break;
+	case 0x8e:  LDCRBANK(opcode); break; // sh4 only
+	case 0x8f:  MAC_W(Rm, Rn); break;
+
 
 	case 0x90:  DT(Rn); break;
-	case 0xd0:  DT(Rn); break;
+	case 0x91:  CMPPZ(Rn);  break;
+	case 0x92:  ILLEGAL(); break;
+	case 0x93:  STCMRBANK(opcode); break;
+	case 0x94:  ILLEGAL(); break;
+	case 0x95:  CMPPL(Rn); break;
+	case 0x96:  ILLEGAL(); break;
+	case 0x97:  LDCMRBANK(opcode); break;
+	case 0x98:  SHLL8(Rn); break;
+	case 0x99:  SHLR8(Rn); break;
+	case 0x9a:  ILLEGAL(); break;
+	case 0x9b:  TAS(Rn); break;
+	case 0x9c:  SHAD(opcode); break;
+	case 0x9d:  SHLD(opcode); break;
+	case 0x9e:  LDCRBANK(opcode); break;
+	case 0x9f:  MAC_W(Rm, Rn); break;
+
 
 	case 0xa0:  SHAL(Rn); break;
-	case 0xe0:  SHAL(Rn); break;
+	case 0xa1:  SHAR(Rn); break;
+	case 0xa2:  ILLEGAL(); break;
+	case 0xa3:  STCMRBANK(opcode); break;
+	case 0xa4:  ROTCL(Rn); break;
+	case 0xa5:  ROTCR(Rn); break;
+	case 0xa6:  ILLEGAL(); break;
+	case 0xa7:  LDCMRBANK(opcode); break;
+	case 0xa8:  SHLL16(Rn); break;
+	case 0xa9:  SHLR16(Rn); break;
+	case 0xaa:  ILLEGAL(); break;
+	case 0xab:  JMP(Rn);  break;
+	case 0xac:  SHAD(opcode); break;
+	case 0xad:  SHLD(opcode); break;
+	case 0xae:  LDCRBANK(opcode); break;
+	case 0xaf:  MAC_W(Rm, Rn); break;
 
 	case 0xb0:  ILLEGAL(); break;
-	case 0xf0:  ILLEGAL(); break;
-
-		// 0x10
-	case 0x81:  SHLR(Rn); break;
-	case 0xc1:  SHLR(Rn); break;
-
-	case 0x91:  CMPPZ(Rn);  break;
-	case 0xd1:  CMPPZ(Rn);  break;
-
-	case 0xa1:  SHAR(Rn); break;
-	case 0xe1:  SHAR(Rn); break;
-
 	case 0xb1:  ILLEGAL(); break;
-	case 0xf1:  ILLEGAL(); break;
-		// 0x20
-	case 0x82:  ILLEGAL(); break;
-	case 0x92:  ILLEGAL(); break;
-	case 0xa2:  ILLEGAL(); break;
 	case 0xb2:  ILLEGAL(); break;
-	case 0xc2:  ILLEGAL(); break;
-	case 0xd2:  ILLEGAL(); break;
-	case 0xe2:  ILLEGAL(); break;
-	case 0xf2:  STCMDBR(opcode); break; // sh4 only
-	// 0x30
-	case 0x83:  STCMRBANK(opcode); break; // sh4 only
-	case 0x93:  STCMRBANK(opcode); break;
-	case 0xa3:  STCMRBANK(opcode); break;
 	case 0xb3:  STCMRBANK(opcode); break;
-	case 0xc3:  STCMRBANK(opcode); break;
-	case 0xd3:  STCMRBANK(opcode); break;
-	case 0xe3:  STCMRBANK(opcode); break;
-	case 0xf3:  STCMRBANK(opcode); break;
-		// 0x40
-	case 0x84:  ROTL(Rn); break;
-	case 0xc4:  ROTL(Rn); break;
-
 	case 0xb4:  ILLEGAL(); break;
-
-	case 0xa4:  ROTCL(Rn); break;
-	case 0xe4:  ROTCL(Rn); break;
-
-	case 0x94:  ILLEGAL(); break;
-	case 0xd4:  ILLEGAL(); break;
-	case 0xf4:  ILLEGAL(); break;
-		// 0x50
-	case 0x85:  ROTR(Rn);  break;
-	case 0xc5:  ROTR(Rn);  break;
-
-	case 0x95:  CMPPL(Rn); break;
-	case 0xd5:  CMPPL(Rn); break;
-
-	case 0xa5:  ROTCR(Rn); break;
-	case 0xe5:  ROTCR(Rn); break;
-
 	case 0xb5:  ILLEGAL(); break;
-	case 0xf5:  ILLEGAL(); break;
-
-		// 0x60
-	case 0x86:  ILLEGAL(); break;
-	case 0x96:  ILLEGAL(); break;
-	case 0xa6:  ILLEGAL(); break;
 	case 0xb6:  ILLEGAL(); break;
-	case 0xc6:  ILLEGAL(); break;
-	case 0xd6:  ILLEGAL(); break;
-	case 0xe6:  ILLEGAL(); break;
-	case 0xf6:  LDCMDBR(opcode); break; // sh4 only
-	// 0x70
-	case 0x87:  LDCMRBANK(opcode); break; // sh4 only
-	case 0x97:  LDCMRBANK(opcode); break;
-	case 0xa7:  LDCMRBANK(opcode); break;
 	case 0xb7:  LDCMRBANK(opcode); break;
-	case 0xc7:  LDCMRBANK(opcode); break;
-	case 0xd7:  LDCMRBANK(opcode); break;
-	case 0xe7:  LDCMRBANK(opcode); break;
-	case 0xf7:  LDCMRBANK(opcode); break;
-		// 0x80
-	case 0x88:  SHLL2(Rn);  break;
-	case 0xc8:  SHLL2(Rn);  break;
-
-	case 0x98:  SHLL8(Rn); break;
-	case 0xd8:  SHLL8(Rn); break;
-
-	case 0xa8:  SHLL16(Rn); break;
-	case 0xe8:  SHLL16(Rn); break;
-
 	case 0xb8:  ILLEGAL(); break;
-	case 0xf8:  ILLEGAL(); break;
-		// 0x90
-	case 0x89:  SHLR2(Rn); break;
-	case 0xc9:  SHLR2(Rn); break;
-
-	case 0x99:  SHLR8(Rn); break;
-	case 0xd9:  SHLR8(Rn); break;
-
-	case 0xa9:  SHLR16(Rn); break;
-	case 0xe9:  SHLR16(Rn); break;
-
 	case 0xb9:  ILLEGAL(); break;
-	case 0xf9:  ILLEGAL(); break;
-		// 0xa0
-	case 0x8a:  ILLEGAL(); break;
-	case 0x9a:  ILLEGAL(); break;
-	case 0xaa:  ILLEGAL(); break;
 	case 0xba:  ILLEGAL(); break;
-	case 0xca:  ILLEGAL(); break;
-	case 0xda:  ILLEGAL(); break;
-	case 0xea:  ILLEGAL(); break;
-	case 0xfa:  LDCDBR(opcode); break; // sh4 only
-	// 0xb0
-	case 0x8b:  JSR(Rn);  break;
-	case 0xcb:  JSR(Rn);  break;
-
-	case 0x9b:  TAS(Rn); break;
-	case 0xdb:  TAS(Rn); break;
-
-	case 0xab:  JMP(Rn);  break;
-	case 0xeb:  JMP(Rn);  break;
-
 	case 0xbb:  ILLEGAL(); break;
-	case 0xfb:  ILLEGAL(); break;
-		// 0xc0
-	case 0x8c:  SHAD(opcode); break;
-	case 0x9c:  SHAD(opcode); break;
-	case 0xac:  SHAD(opcode); break;
 	case 0xbc:  SHAD(opcode); break;
-	case 0xcc:  SHAD(opcode); break;
-	case 0xdc:  SHAD(opcode); break;
-	case 0xec:  SHAD(opcode); break;
-	case 0xfc:  SHAD(opcode); break;
-		// 0xd0
-	case 0x8d:  SHLD(opcode); break;
-	case 0x9d:  SHLD(opcode); break;
-	case 0xad:  SHLD(opcode); break;
 	case 0xbd:  SHLD(opcode); break;
-	case 0xcd:  SHLD(opcode); break;
-	case 0xdd:  SHLD(opcode); break;
-	case 0xed:  SHLD(opcode); break;
-	case 0xfd:  SHLD(opcode); break;
-		// 0xe0
-	case 0x8e:  LDCRBANK(opcode); break; // sh4 only
-	case 0x9e:  LDCRBANK(opcode); break;
-	case 0xae:  LDCRBANK(opcode); break;
 	case 0xbe:  LDCRBANK(opcode); break;
-	case 0xce:  LDCRBANK(opcode); break;
-	case 0xde:  LDCRBANK(opcode); break;
-	case 0xee:  LDCRBANK(opcode); break;
-	case 0xfe:  LDCRBANK(opcode); break;
-		// 0xf0
-	case 0x8f:  MAC_W(Rm, Rn); break;
-	case 0x9f:  MAC_W(Rm, Rn); break;
-	case 0xaf:  MAC_W(Rm, Rn); break;
 	case 0xbf:  MAC_W(Rm, Rn); break;
+
+	case 0xc0:  SHLL(Rn); break;
+	case 0xc1:  SHLR(Rn); break;
+	case 0xc2:  ILLEGAL(); break;
+	case 0xc3:  STCMRBANK(opcode); break;
+	case 0xc4:  ROTL(Rn); break;
+	case 0xc5:  ROTR(Rn);  break;
+	case 0xc6:  ILLEGAL(); break;
+	case 0xc7:  LDCMRBANK(opcode); break;
+	case 0xc8:  SHLL2(Rn);  break;
+	case 0xc9:  SHLR2(Rn); break;
+	case 0xca:  ILLEGAL(); break;
+	case 0xcb:  JSR(Rn);  break;
+	case 0xcc:  SHAD(opcode); break;
+	case 0xcd:  SHLD(opcode); break;
+	case 0xce:  LDCRBANK(opcode); break;
 	case 0xcf:  MAC_W(Rm, Rn); break;
+
+	case 0xd0:  DT(Rn); break;
+	case 0xd1:  CMPPZ(Rn);  break;
+	case 0xd2:  ILLEGAL(); break;
+	case 0xd3:  STCMRBANK(opcode); break;
+	case 0xd4:  ILLEGAL(); break;
+	case 0xd5:  CMPPL(Rn); break;
+	case 0xd6:  ILLEGAL(); break;
+	case 0xd7:  LDCMRBANK(opcode); break;
+	case 0xd8:  SHLL8(Rn); break;
+	case 0xd9:  SHLR8(Rn); break;
+	case 0xda:  ILLEGAL(); break;
+	case 0xdb:  TAS(Rn); break;
+	case 0xdc:  SHAD(opcode); break;
+	case 0xdd:  SHLD(opcode); break;
+	case 0xde:  LDCRBANK(opcode); break;
 	case 0xdf:  MAC_W(Rm, Rn); break;
+
+	case 0xe0:  SHAL(Rn); break;
+	case 0xe1:  SHAR(Rn); break;
+	case 0xe2:  ILLEGAL(); break;
+	case 0xe3:  STCMRBANK(opcode); break;
+	case 0xe4:  ROTCL(Rn); break;
+	case 0xe5:  ROTCR(Rn); break;
+	case 0xe6:  ILLEGAL(); break;
+	case 0xe7:  LDCMRBANK(opcode); break;
+	case 0xe8:  SHLL16(Rn); break;
+	case 0xe9:  SHLR16(Rn); break;
+	case 0xea:  ILLEGAL(); break;
+	case 0xeb:  JMP(Rn);  break;
+	case 0xec:  SHAD(opcode); break;
+	case 0xed:  SHLD(opcode); break;
+	case 0xee:  LDCRBANK(opcode); break;
 	case 0xef:  MAC_W(Rm, Rn); break;
+
+	case 0xf0:  ILLEGAL(); break;
+	case 0xf1:  ILLEGAL(); break;
+	case 0xf2:  STCMDBR(opcode); break; // sh4 only
+	case 0xf3:  STCMRBANK(opcode); break;
+	case 0xf4:  ILLEGAL(); break;
+	case 0xf5:  ILLEGAL(); break;
+	case 0xf6:  LDCMDBR(opcode); break; // sh4 only
+	case 0xf7:  LDCMRBANK(opcode); break;
+	case 0xf8:  ILLEGAL(); break;
+	case 0xf9:  ILLEGAL(); break;
+	case 0xfa:  LDCDBR(opcode); break; // sh4 only
+	case 0xfb:  ILLEGAL(); break;
+	case 0xfc:  SHAD(opcode); break;
+	case 0xfd:  SHLD(opcode); break;
+	case 0xfe:  LDCRBANK(opcode); break;
 	case 0xff:  MAC_W(Rm, Rn); break;
 	}
 }
