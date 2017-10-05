@@ -180,10 +180,10 @@ private:
 	bool m_command_in_progress;
 	bool m_NMI_reset;
 	bool m_cur_dotsel;
+	bool m_settime;
 
 	void master_sh2_nmi();
 	void irq_request();
-	bool get_nmi_status();
 
 	void resolve_intback();
 	void intback_continue_request();
@@ -199,7 +199,7 @@ private:
 	int m_pmode;
 	uint8_t m_region_code;
 
-	required_device<nvram_device> m_smpc_nv;
+	required_device<nvram_device> m_mini_nvram;
 	devcb_write_line m_mshres;
 	devcb_write_line m_mshnmi;
 	devcb_write_line m_sshres;
