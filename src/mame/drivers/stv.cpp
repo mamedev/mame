@@ -982,7 +982,7 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
+	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
@@ -1096,6 +1096,7 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
 
 	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
+	smpc_hle_device::static_set_region_code(*device, 0);
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
@@ -1236,7 +1237,6 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 	
 	m_en_68k = 0;
-	m_NMI_reset = 0;
 
 	m_port_sel = m_mux_data = 0;
 
@@ -1293,16 +1293,8 @@ MACHINE_START_MEMBER(stv_state,stv)
 	// save states
 	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
 	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
-	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
-//  save_item(NAME(scanline));
-//	save_item(NAME(m_smpc.IOSEL1));
-//	save_item(NAME(m_smpc.IOSEL2));
-//	save_item(NAME(m_smpc.EXLE1));
-//	save_item(NAME(m_smpc.EXLE2));
-//	save_item(NAME(m_smpc.PDR1));
-//	save_item(NAME(m_smpc.PDR2));
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_scsp_last_line));

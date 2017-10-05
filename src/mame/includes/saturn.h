@@ -43,9 +43,7 @@ public:
 			m_scudsp(*this, "scudsp"),
 			m_eeprom(*this, "eeprom"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_ctrl1(*this, "ctrl1"),
-			m_ctrl2(*this, "ctrl2")
+			m_palette(*this, "palette")
 	{
 	}
 
@@ -65,7 +63,6 @@ public:
 	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	uint8_t     m_NMI_reset;
 	uint8_t     m_en_68k;
 
 
@@ -127,28 +124,6 @@ public:
 		int       old_tvmd;
 	}m_vdp2;
 
-	struct {
-//		uint8_t IOSEL1;
-//		uint8_t IOSEL2;
-//		uint8_t EXLE1;
-//		uint8_t EXLE2;
-//		uint8_t PDR1;
-//		uint8_t PDR2;
-//		uint8_t DDR1;
-//		uint8_t DDR2;
-//		uint8_t SF;
-//		uint8_t SR;
-//		uint8_t IREG[7];
-		uint8_t intback_buf[7];
-//		uint8_t OREG[32];
-		int   intback_stage;
-		int   pmode;
-		uint8_t SMEM[4];
-		uint8_t intback;
-		uint8_t rtc_data[7];
-//		uint8_t slave_on;
-	}m_smpc;
-
 	/* Saturn specific*/
 	int m_saturn_region;
 	uint8_t m_cart_type;
@@ -169,8 +144,6 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<saturn_control_port_device> m_ctrl1;
-	optional_device<saturn_control_port_device> m_ctrl2;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
@@ -200,10 +173,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
-
-	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
-	DECLARE_READ8_MEMBER( saturn_SMPC_r );
-	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
 	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
@@ -660,25 +629,6 @@ public:
 	DECLARE_READ16_MEMBER(scudsp_dma_r);
 	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
-	// FROM smpc.c
-	void smpc_master_on();
-	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
-	TIMER_CALLBACK_MEMBER( smpc_sound_enable );
-	TIMER_CALLBACK_MEMBER( smpc_cd_enable );
-	void smpc_system_reset();
-	TIMER_CALLBACK_MEMBER( smpc_change_clock );
-	TIMER_CALLBACK_MEMBER( stv_intback_peripheral );
-	TIMER_CALLBACK_MEMBER( stv_smpc_intback );
-	TIMER_CALLBACK_MEMBER( intback_peripheral );
-	TIMER_CALLBACK_MEMBER( saturn_smpc_intback );
-	void smpc_rtc_write();
-	void smpc_memory_setting();
-	void smpc_nmi_req();
-	TIMER_CALLBACK_MEMBER( smpc_nmi_set );
-	void smpc_comreg_exec(address_space &space, uint8_t data, uint8_t is_stv);
-	DECLARE_READ8_MEMBER( stv_SMPC_r );
-	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
-
 	// SMPC HLE delegates
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
@@ -688,14 +638,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
 	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
 	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
-	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
-	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
-	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
-	DECLARE_WRITE8_MEMBER(saturn_pdr2_direct_w);
-	uint8_t m_direct_mux[2];
-	uint8_t saturn_direct_port_read(bool which);
-	uint8_t smpc_direct_mode(uint16_t in_value, bool which);
-	uint8_t smpc_th_control_mode(uint16_t in_value, bool which);
+
 
 	void debug_scudma_command(int ref, const std::vector<std::string> &params);
 	void debug_scuirq_command(int ref, const std::vector<std::string> &params);

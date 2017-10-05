@@ -12,6 +12,8 @@
 #pragma once
 
 #include "screen.h"
+#include "bus/sat_ctrl/ctrl.h"
+#include "machine/nvram.h"
 
 
 //**************************************************************************
@@ -72,9 +74,11 @@ public:
 	// construction/destruction
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual space_config_vector memory_space_config() const override;
-
 	// I/O operations
+//	DECLARE_ADDRESS_MAP( io_map, 8);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 	DECLARE_WRITE8_MEMBER( ireg_w );
 	DECLARE_WRITE8_MEMBER( command_register_w );
 	DECLARE_READ8_MEMBER( oreg_r );
@@ -89,29 +93,11 @@ public:
 	DECLARE_WRITE8_MEMBER( ddr2_w );
 	DECLARE_WRITE8_MEMBER( iosel_w );
 	DECLARE_WRITE8_MEMBER( exle_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
-	
-	// TODO: public stuff & trampolines that should be internal to the device
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-	void sr_set(uint8_t data);
-	void sr_ack();
-	void sf_ack(bool cd_enable);
-	void sf_set();
-	void master_sh2_reset(bool state);
-	void master_sh2_nmi();
-	void slave_sh2_reset(bool state);
-	void sound_reset(bool state);
-	void system_reset(bool state);
-	void dot_select_request(bool state);
-	void system_halt_request(bool state);
-	void irq_request();
-	bool get_nmi_status();
-	
+	void m68k_reset_trigger();	
 	bool get_iosel(bool which);
 	uint8_t get_ddr(bool which);
-	uint8_t get_ireg(uint8_t offset);
-	void set_oreg(uint8_t offset,uint8_t data);
 	
 //	system delegation
 	template <class Object> static devcb_base &set_master_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshres.set_callback(std::forward<Object>(cb)); }
@@ -132,29 +118,36 @@ public:
 	// interrupt handler
 	template <class Object> static devcb_base &set_interrupt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_irq_line.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_screentag(device_t &device, const char *tag);
-	
+	static void static_set_region_code(device_t &device, uint8_t rgn);
+	static void static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2);
+
 protected:
 	// device-level overrides
 //	virtual void device_validity_check(validity_checker &valid) const override;
-//	virtual void device_add_mconfig() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 
+	const address_space_config      m_space_config;
 	enum {
 		COMMAND_ID = 1,
 		RTC_ID,
-		INTBACK_ID
+		INTBACK_ID,
+		SNDRES_ID
 	};
 
-	const address_space_config      m_space_config;
 	emu_timer *m_cmd_timer;
 	emu_timer *m_rtc_timer;
 	emu_timer *m_intback_timer;
-
+	emu_timer *m_sndres_timer;
+	const char *m_ctrl1_tag;
+	const char *m_ctrl2_tag;
+	bool m_has_ctrl_ports;
+	
 	bool m_sf;
 	bool m_cd_sf;
 	uint8_t m_sr;
@@ -166,6 +159,7 @@ private:
 	uint8_t m_intback_buf[3];
 	uint8_t m_oreg[32];
 	uint8_t m_rtc_data[7];
+	uint8_t m_smem[4];
 	uint8_t m_comreg;
 	// in usec
 	// timing table, from manual in usec
@@ -186,13 +180,26 @@ private:
 	bool m_command_in_progress;
 	bool m_NMI_reset;
 	bool m_cur_dotsel;
+
+	void master_sh2_nmi();
+	void irq_request();
+	bool get_nmi_status();
+
 	void resolve_intback();
 	void intback_continue_request();
 	void handle_rtc_increment();
+	void read_saturn_ports();
+	
+	void sr_set(uint8_t data);
+	void sr_ack();
+	void sf_ack(bool cd_enable);
+	void sf_set();
 	int DectoBCD(int num);
 	int m_intback_stage;
 	int m_pmode;
+	uint8_t m_region_code;
 
+	required_device<nvram_device> m_smpc_nv;
 	devcb_write_line m_mshres;
 	devcb_write_line m_mshnmi;
 	devcb_write_line m_sshres;
@@ -207,7 +214,9 @@ private:
 	devcb_write8 m_pdr1_write;
 	devcb_write8 m_pdr2_write;
 	devcb_write_line m_irq_line;
-	
+	saturn_control_port_device *m_ctrl1;
+	saturn_control_port_device *m_ctrl2;
+
 	screen_device *m_screen;
 };
 
