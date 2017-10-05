@@ -2270,6 +2270,8 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 
 inline void sh34_base_device::execute_one_f000(const uint16_t opcode)
 {
+	// the SH3 doesn't have these?
+
 	switch (opcode & 0x0f)
 	{
 	case 0x00:  FADD(opcode); break;
@@ -2621,7 +2623,9 @@ void sh34_base_device::device_start()
 	state_add(SH4_XF15, "XF15", m_debugger_temp).callimport().formatstr("%25s");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
+	//state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
+
 
 	drc_start();
 	m_drcfe->set_xor(m_xor);
