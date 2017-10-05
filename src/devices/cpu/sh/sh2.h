@@ -148,9 +148,6 @@ private:
 
 	bool m_isdrc;
 
-	int m_pcfsel;                 // last pcflush entry set
-	//int m_maxpcfsel;              // highest valid pcflush entry
-	uint32_t m_pcflushes[16];           // pcflush entries
 
 	int8_t    m_irq_line_state[17];
 
@@ -186,32 +183,9 @@ private:
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
-	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
-	uint32_t              m_drcoptions;         /* configurable DRC options */
 
-	/* internal stuff */
-	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
 
-	/* parameters for subroutines */
-	uint64_t              m_numcycles;              /* return value from gettotalcycles */
-	uint32_t              m_arg1;                   /* print_debug argument 2 */
-	//uint32_t              m_irq;                /* irq we're taking */
-
-	/* register mappings */
-	uml::parameter      m_regmap[16];                 /* parameter to register mappings for all 16 integer registers */
-
-	uml::code_handle *  m_entry;                      /* entry point */
-	uml::code_handle *  m_read8;                  /* read byte */
-	uml::code_handle *  m_write8;                 /* write byte */
-	uml::code_handle *  m_read16;                 /* read half */
-	uml::code_handle *  m_write16;                    /* write half */
-	uml::code_handle *  m_read32;                 /* read word */
-	uml::code_handle *  m_write32;                    /* write word */
-
-	uml::code_handle *  m_interrupt;              /* interrupt */
-	uml::code_handle *  m_nocode;                 /* nocode */
-	uml::code_handle *  m_out_of_cycles;              /* out of cycles exception handler */
 
 
 
@@ -259,8 +233,7 @@ private:
 	void code_flush_cache();
 	void execute_run_drc();
 
-	void drc_start();
-	void init_drc_frontend();
+	virtual void init_drc_frontend() override;
 	const opcode_desc* get_desclist(offs_t pc);
 	void code_compile_block(uint8_t mode, offs_t pc);
 	void static_generate_entry_point();

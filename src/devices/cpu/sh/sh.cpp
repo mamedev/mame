@@ -96,6 +96,79 @@ void sh_common_execution::device_start()
 }
 
 
+void sh_common_execution::drc_start()
+{
+	//memset(m_irq_queue, 0, sizeof(m_irq_queue));
+	//m_maxpcfsel = 0;
+	memset(m_pcflushes, 0, sizeof(m_pcflushes));
+
+	//m_numcycles = 0;
+	//m_arg1 = 0;
+	//m_irq = 0;
+	m_fastram_select = 0;
+	memset(m_fastram, 0, sizeof(m_fastram));
+
+	/* reset per-driver pcflushes */
+	m_pcfsel = 0;
+
+	/* initialize the UML generator */
+	uint32_t flags = 0;
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1);
+
+	/* add symbols for our stuff */
+	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");
+	m_drcuml->symbol_add(&m_sh2_state->icount, sizeof(m_sh2_state->icount), "icount");
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		char buf[10];
+		sprintf(buf, "r%d", regnum);
+		m_drcuml->symbol_add(&m_sh2_state->r[regnum], sizeof(m_sh2_state->r[regnum]), buf);
+	}
+	m_drcuml->symbol_add(&m_sh2_state->pr, sizeof(m_sh2_state->pr), "pr");
+	m_drcuml->symbol_add(&m_sh2_state->sr, sizeof(m_sh2_state->sr), "sr");
+	m_drcuml->symbol_add(&m_sh2_state->gbr, sizeof(m_sh2_state->gbr), "gbr");
+	m_drcuml->symbol_add(&m_sh2_state->vbr, sizeof(m_sh2_state->vbr), "vbr");
+	m_drcuml->symbol_add(&m_sh2_state->macl, sizeof(m_sh2_state->macl), "macl");
+	m_drcuml->symbol_add(&m_sh2_state->mach, sizeof(m_sh2_state->macl), "mach");
+
+	/* initialize the front-end helper */
+	init_drc_frontend();
+
+	/* compute the register parameters */
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		m_regmap[regnum] = uml::mem(&m_sh2_state->r[regnum]);
+	}
+
+	/* if we have registers to spare, assign r0, r1, r2 to leftovers */
+	/* WARNING: do not use synthetic registers that are mapped here! */
+	if (!DISABLE_FAST_REGISTERS)
+	{
+		drcbe_info beinfo;
+		m_drcuml->get_backend_info(beinfo);
+		if (beinfo.direct_iregs > 4)
+		{
+			m_regmap[0] = uml::I4;
+		}
+		if (beinfo.direct_iregs > 5)
+		{
+			m_regmap[1] = uml::I5;
+		}
+		if (beinfo.direct_iregs > 6)
+		{
+			m_regmap[2] = uml::I6;
+		}
+	}
+
+	/* mark the cache dirty so it is updated on next execute */
+	m_cache_dirty = true;
+
+
+	save_item(NAME(m_pcfsel));
+	//save_item(NAME(m_maxpcfsel));
+	save_item(NAME(m_pcflushes));
+}
+
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 1100  1       -
  *  ADD     Rm,Rn

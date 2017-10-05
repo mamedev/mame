@@ -8,6 +8,26 @@
 
 #define SH2_MAX_FASTRAM       4
 
+
+/***************************************************************************
+    DEBUGGING
+**************************************************************************/
+
+#define DISABLE_FAST_REGISTERS              (0) // set to 1 to turn off usage of register caching
+#define SINGLE_INSTRUCTION_MODE             (0)
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         64
+#define COMPILE_FORWARDS_BYTES          256
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
+#define COMPILE_MAX_SEQUENCE            64
+
+
 enum
 {
 	SH4_PC = 1, SH_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,
@@ -20,9 +40,22 @@ class sh_common_execution : public cpu_device
 
 public:
 	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
-		: cpu_device(mconfig, type, tag, owner, clock) 	
+		: cpu_device(mconfig, type, tag, owner, clock)
 		, m_sh2_state(nullptr)
 		, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
+		, m_drcuml(nullptr)
+		//, m_drcuml(*this, m_cache, 0, 1, 32, 1)
+		, m_drcoptions(0)
+		, m_entry(nullptr)
+		, m_read8(nullptr)
+		, m_write8(nullptr)
+		, m_read16(nullptr)
+		, m_write16(nullptr)
+		, m_read32(nullptr)
+		, m_write32(nullptr)
+		, m_interrupt(nullptr)
+		, m_nocode(nullptr)
+		, m_out_of_cycles(nullptr)
 	{ }
 
 	// Data that needs to be stored close to the generated DRC code
@@ -233,9 +266,48 @@ public:
 		void *              base;                       /* base in memory where the RAM lives */
 	} m_fastram[SH2_MAX_FASTRAM];
 
+	int m_pcfsel;                 // last pcflush entry set
+	//int m_maxpcfsel;              // highest valid pcflush entry
+	uint32_t m_pcflushes[16];           // pcflush entries
+
+	virtual void init_drc_frontend()
+	{
+		fatalerror("init_drc_frontend base");
+	}
+
+	void drc_start();
+
+
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
 	direct_read_data *m_direct;
+
+	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
+	uint32_t              m_drcoptions;         /* configurable DRC options */
+
+	/* internal stuff */
+	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
+
+	/* parameters for subroutines */
+	//uint64_t              m_numcycles;              /* return value from gettotalcycles */
+	//uint32_t              m_arg1;                   /* print_debug argument 2 */
+	//uint32_t              m_irq;                /* irq we're taking */
+
+	/* register mappings */
+	uml::parameter      m_regmap[16];                 /* parameter to register mappings for all 16 integer registers */
+
+	uml::code_handle *  m_entry;                      /* entry point */
+	uml::code_handle *  m_read8;                  /* read byte */
+	uml::code_handle *  m_write8;                 /* write byte */
+	uml::code_handle *  m_read16;                 /* read half */
+	uml::code_handle *  m_write16;                    /* write half */
+	uml::code_handle *  m_read32;                 /* read word */
+	uml::code_handle *  m_write32;                    /* write word */
+
+	uml::code_handle *  m_interrupt;              /* interrupt */
+	uml::code_handle *  m_nocode;                 /* nocode */
+	uml::code_handle *  m_out_of_cycles;              /* out of cycles exception handler */
+
 
 protected:
 	// device-level overrides
