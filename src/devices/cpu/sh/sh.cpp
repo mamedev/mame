@@ -2403,6 +2403,108 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 
 
 
+/*-------------------------------------------------
+    generate_sequence_instruction - generate code
+    for a single instruction in a sequence
+-------------------------------------------------*/
+
+void sh_common_execution::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+{
+	offs_t expc;
+
+	/* add an entry for the log */
+	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
+
+	/* set the PC map variable */
+	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 1 : desc->pc;
+	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
+
+	/* accumulate total cycles */
+	compiler->cycles += desc->cycles;
+
+	/* update the icount map variable */
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
+
+	/* if we want a probe, add it here */
+	if (desc->pc == PROBE_ADDRESS)
+	{
+		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
+		UML_CALLC(block, cfunc_printf_probe, this);                                  // callc   cfunc_printf_probe,sh2
+	}
+
+	/* if we are debugging, call the debugger */
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	{
+		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
+		save_fast_iregs(block);
+		UML_DEBUG(block, desc->pc);                                         // debug   desc->pc
+	}
+	else    // not debug, see what other reasons there are for flushing the PC
+	{
+		if (m_drcoptions & SH2DRC_FLUSH_PC)  // always flush?
+		{
+			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);        // mov m_sh2_state->pc, desc->pc
+		}
+		else    // check for driver-selected flushes
+		{
+			int pcflush;
+
+			for (pcflush = 0; pcflush < m_pcfsel; pcflush++)
+			{
+				if (desc->pc == m_pcflushes[pcflush])
+				{
+					UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);        // mov m_sh2_state->pc, desc->pc
+				}
+			}
+		}
+	}
+
+
+	/* if we hit an unmapped address, fatal error */
+	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
+	{
+		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
+		save_fast_iregs(block);
+		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                             // exit    EXECUTE_UNMAPPED_CODE
+	}
+
+	/* if this is an invalid opcode, die */
+	if (desc->flags & OPFLAG_INVALID_OPCODE)
+	{
+		fatalerror("SH2DRC: invalid opcode!\n");
+	}
+
+	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
+	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	{
+		/* compile the instruction */
+		if (!generate_opcode(block, compiler, desc, ovrpc))
+		{
+			// handle an illegal op
+			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                            // mov     [pc],desc->pc
+			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);                  // mov     [arg0],opcode
+			UML_CALLC(block, cfunc_unimplemented, this);                             // callc   cfunc_unimplemented
+		}
+	}
+}
+
+/*------------------------------------------------------------------
+    generate_delay_slot
+------------------------------------------------------------------*/
+
+void sh_common_execution::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+{
+	compiler_state compiler_temp = *compiler;
+
+	/* compile the delay slot using temporary compiler state */
+	assert(desc->delay.first() != nullptr);
+	generate_sequence_instruction(block, &compiler_temp, desc->delay.first(), ovrpc);              // <next instruction>
+
+	/* update the label */
+	compiler->labelnum = compiler_temp.labelnum;
+}
+
 
 void cfunc_fastirq(void *param) { ((sh_common_execution *)param)->func_fastirq(); };
 void cfunc_unimplemented(void *param) { ((sh_common_execution *)param)->func_unimplemented(); }

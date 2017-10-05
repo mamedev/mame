@@ -2600,6 +2600,8 @@ void sh34_base_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
+
+	drc_start();
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -2924,3 +2926,247 @@ void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 }
 */
 
+
+void sh34_base_device::sh2_exception(const char *message, int irqline)
+{
+#if 0
+	int vector;
+
+	if (irqline != 16)
+	{
+		if (irqline <= ((m_sh2_state->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
+			return;
+
+		// if this is an sh2 internal irq, use its vector
+		if (m_sh2_state->internal_irq_level == irqline)
+		{
+			vector = m_internal_irq_vector;
+			/* avoid spurious irqs with this (TODO: needs a better fix) */
+			m_sh2_state->internal_irq_level = -1;
+			LOG("SH-2 exception #%d (internal vector: $%x) after [%s]\n", irqline, vector, message);
+		}
+		else
+		{
+			if(m_m[0x38] & 0x00010000)
+			{
+				vector = standard_irq_callback(irqline);
+				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
+			}
+			else
+			{
+				standard_irq_callback(irqline);
+				vector = 64 + irqline/2;
+				LOG("SH-2 exception #%d (autovector: $%x) after [%s]\n", irqline, vector, message);
+			}
+		}
+	}
+	else
+	{
+		vector = 11;
+		LOG("SH-2 nmi exception (autovector: $%x) after [%s]\n", vector, message);
+	}
+
+	if (m_isdrc)
+	{
+		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
+		m_sh2_state->evec &= AM;
+		m_sh2_state->irqsr = m_sh2_state->sr;
+
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+
+//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
+	} else {
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
+
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+
+		/* fetch PC */
+		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
+	}
+
+	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
+#endif
+}
+
+
+using namespace uml;
+
+const opcode_desc* sh34_base_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+
+void sh34_base_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+
+/*-------------------------------------------------
+    static_generate_entry_point - generate a
+    static entry point
+-------------------------------------------------*/
+
+void sh34_base_device::static_generate_entry_point()
+{
+#if 0
+	drcuml_state *drcuml = m_drcuml.get();
+	code_label skip = 1;
+	drcuml_block *block;
+
+	/* begin generating */
+	block = drcuml->begin_block(200);
+
+	/* forward references */
+	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(drcuml, &m_write32, "write32");     // necessary?
+	alloc_handle(drcuml, &m_entry, "entry");
+	UML_HANDLE(block, *m_entry);                         // handle  entry
+
+	/* load fast integer registers */
+	load_fast_iregs(block);
+
+	/* check for interrupts */
+	UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
+	UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
+	UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+
+	UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
+	UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
+
+	UML_LABEL(block, skip+2);                   // skip+2:
+	UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
+	UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
+	UML_AND(block, I1,  I0, 0xffff);                // and r1, 0xffff
+
+	UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, r1
+	UML_CMP(block, I1, 32);             // cmp r1, #32
+	UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
+
+	UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
+
+	UML_LABEL(block, skip+4);                   // skip+4:
+	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
+	UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
+	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
+	UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
+
+	UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
+
+	UML_LABEL(block, skip+3);                   // skip+3:
+	UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
+	UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
+	UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+
+	UML_LABEL(block, skip+1);                   // skip+1:
+
+	UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
+	UML_JMPc(block, COND_Z, skip);                  // jz skip
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
+	UML_CALLH(block, *m_write32);                    // call write32
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->pc));              // mov r1, pc
+	UML_CALLH(block, *m_write32);                    // call write32
+
+	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->evec));             // mov pc, evec
+
+	UML_LABEL(block, skip);                         // skip:
+
+	/* generate a hash jump via the current mode and PC */
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
+
+	block->end();
+#endif
+}
+
+
+/*------------------------------------------------------------------
+    static_generate_memory_accessor
+------------------------------------------------------------------*/
+
+void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
+{
+#if 0
+	/* on entry, address is in I0; data for writes is in I1 */
+	/* on exit, read result is in I0 */
+	/* routine trashes I0 */
+	drcuml_state *drcuml = m_drcuml.get();
+	drcuml_block *block;
+	int label = 1;
+
+	/* begin generating */
+	block = drcuml->begin_block(1024);
+
+	/* add a global entry for this */
+	alloc_handle(drcuml, handleptr, name);
+	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
+
+	// with internal handlers this becomes easier.
+	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
+	UML_TEST(block, I0, 0x80000000);        // test r0, #0x80000000
+	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+
+	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
+	UML_JMPc(block, COND_AE, label);            // bae label
+
+	UML_AND(block, I0, I0, AM);     // and r0, r0, #AM (0xc7ffffff)
+
+	UML_LABEL(block, label++);              // label:
+
+	if (iswrite)
+	{
+		switch (size)
+		{
+			case 1:
+				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM); // write r0, r1, program_byte
+				break;
+
+			case 2:
+				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM); // write r0, r1, program_word
+				break;
+
+			case 4:
+				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);    // write r0, r1, program_dword
+				break;
+		}
+	}
+	else
+	{
+		switch (size)
+		{
+			case 1:
+				UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);  // read r0, program_byte
+				break;
+
+			case 2:
+				UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);  // read r0, program_word
+				break;
+
+			case 4:
+				UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM); // read r0, program_dword
+				break;
+		}
+	}
+
+	UML_RET(block);                         // ret
+
+	block->end();
+#endif
+}

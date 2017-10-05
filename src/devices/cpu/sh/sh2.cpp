@@ -544,18 +544,6 @@ void sh2_device::execute_run()
 		return;
 	}
 
-	// run any active DMAs now
-#ifndef USE_TIMER_FOR_DMA
-	for ( int i = 0; i < m_sh2_state->icount ; i++)
-	{
-		for( int dma=0;dma<1;dma++)
-		{
-			if (m_dma_timer_active[dma])
-				sh2_do_dma(dma);
-		}
-	}
-#endif
-
 	do
 	{
 		debugger_instruction_hook(this, m_sh2_state->pc);
@@ -584,11 +572,8 @@ void sh2_device::execute_run()
 
 void sh2_device::init_drc_frontend()
 {
-	printf("good\n");
 	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 }
-
-
 
 void sh2_device::device_start()
 {
@@ -1070,108 +1055,6 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	UML_RET(block);                         // ret
 
 	block->end();
-}
-
-/*-------------------------------------------------
-    generate_sequence_instruction - generate code
-    for a single instruction in a sequence
--------------------------------------------------*/
-
-void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
-{
-	offs_t expc;
-
-	/* add an entry for the log */
-	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
-
-	/* set the PC map variable */
-	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 1 : desc->pc;
-	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
-
-	/* accumulate total cycles */
-	compiler->cycles += desc->cycles;
-
-	/* update the icount map variable */
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
-
-	/* if we want a probe, add it here */
-	if (desc->pc == PROBE_ADDRESS)
-	{
-		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
-		UML_CALLC(block, cfunc_printf_probe, this);                                  // callc   cfunc_printf_probe,sh2
-	}
-
-	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-	{
-		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
-		save_fast_iregs(block);
-		UML_DEBUG(block, desc->pc);                                         // debug   desc->pc
-	}
-	else    // not debug, see what other reasons there are for flushing the PC
-	{
-		if (m_drcoptions & SH2DRC_FLUSH_PC)  // always flush?
-		{
-			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);        // mov m_sh2_state->pc, desc->pc
-		}
-		else    // check for driver-selected flushes
-		{
-			int pcflush;
-
-			for (pcflush = 0; pcflush < m_pcfsel; pcflush++)
-			{
-				if (desc->pc == m_pcflushes[pcflush])
-				{
-					UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);        // mov m_sh2_state->pc, desc->pc
-				}
-			}
-		}
-	}
-
-
-	/* if we hit an unmapped address, fatal error */
-	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
-	{
-		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
-		save_fast_iregs(block);
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                             // exit    EXECUTE_UNMAPPED_CODE
-	}
-
-	/* if this is an invalid opcode, die */
-	if (desc->flags & OPFLAG_INVALID_OPCODE)
-	{
-		fatalerror("SH2DRC: invalid opcode!\n");
-	}
-
-	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
-	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
-	{
-		/* compile the instruction */
-		if (!generate_opcode(block, compiler, desc, ovrpc))
-		{
-			// handle an illegal op
-			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                            // mov     [pc],desc->pc
-			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);                  // mov     [arg0],opcode
-			UML_CALLC(block, cfunc_unimplemented, this);                             // callc   cfunc_unimplemented
-		}
-	}
-}
-
-/*------------------------------------------------------------------
-    generate_delay_slot
-------------------------------------------------------------------*/
-
-void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
-{
-	compiler_state compiler_temp = *compiler;
-
-	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay.first() != nullptr);
-	generate_sequence_instruction(block, &compiler_temp, desc->delay.first(), ovrpc);              // <next instruction>
-
-	/* update the label */
-	compiler->labelnum = compiler_temp.labelnum;
 }
 
 

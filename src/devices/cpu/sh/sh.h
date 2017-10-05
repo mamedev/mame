@@ -339,10 +339,7 @@ public:
 	//int m_maxpcfsel;              // highest valid pcflush entry
 	uint32_t m_pcflushes[16];           // pcflush entries
 
-	virtual void init_drc_frontend()
-	{
-		fatalerror("init_drc_frontend base");
-	}
+	virtual void init_drc_frontend() = 0;
 
 	void drc_start();
 
@@ -386,16 +383,8 @@ public:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 	
-	virtual void sh2_exception(const char *message, int irqline)
-	{
-		fatalerror("sh2_exception in base class\n");
-	}
+	virtual void sh2_exception(const char *message, int irqline) = 0;
 
-	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
-	{
-		fatalerror("generate_delay_slot in base class\n");
-	}
-	
 	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
@@ -423,25 +412,9 @@ public:
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);
 
-	virtual void static_generate_entry_point()
-	{
-		fatalerror("static_generate_entry_point in base class\n");
-	}
-	
-	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr)
-	{
-		fatalerror("static_generate_memory_accessor in base class\n");
-	}
-
-	virtual void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
-	{
-		fatalerror("generate_sequence_instruction in base class\n");
-	}
-
-	virtual const opcode_desc* get_desclist(offs_t pc)
-	{
-		fatalerror("get_desclist in base class\n");
-	}
+	virtual void static_generate_entry_point() = 0;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) = 0;
+	virtual const opcode_desc* get_desclist(offs_t pc) = 0;
 
 	uint32_t epc(const opcode_desc *desc);
 	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
@@ -451,7 +424,9 @@ public:
 	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
+	void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void code_flush_cache();

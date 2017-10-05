@@ -190,10 +190,14 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 #define MCFG_MMU_HACK_TYPE(_hacktype) \
 	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
 
+class sh4_frontend;
 
 class sh34_base_device : public sh_common_execution
 {
 public:
+
+	friend class sh4_frontend;
+
 	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }
 	static void set_md1(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md1 = md0; }
 	static void set_md2(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md2 = md0; }
@@ -583,6 +587,15 @@ protected:
 		return true;
 	};
 
+	virtual void static_generate_entry_point() override;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
+	virtual void sh2_exception(const char *message, int irqline) override;
+
+	virtual void init_drc_frontend() override;
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+
+	private:
+		std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 };
 
 
@@ -665,6 +678,20 @@ protected:
 	virtual void execute_run() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
+
+class sh4_frontend : public sh_frontend
+{
+public:
+	sh4_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+
+protected:
+
+private:
+	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
+};
+
 
 
 DECLARE_DEVICE_TYPE(SH3LE, sh3_device)
