@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /**************************************************************************************************************************************
 
-        Intel SDK-85
+        Intel MCS-85 System Design Kit (SDK-85)
 
         09/12/2009 Skeleton driver.
 
@@ -183,4 +183,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY    FULLNAME  FLAGS */
-COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,  0,    "Intel",   "SDK-85", MACHINE_NO_SOUND_HW)
+COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,  0,    "Intel",   "MCS-85 System Design Kit", MACHINE_NO_SOUND_HW)
