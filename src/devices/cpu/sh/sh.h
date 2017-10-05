@@ -464,7 +464,6 @@ private:
 // cfunc callbacks for the UML DRC
 extern void cfunc_fastirq(void *param);
 extern void cfunc_unimplemented(void *param);
-extern void cfunc_fastirq(void *param);
 extern void cfunc_MAC_W(void *param);
 extern void cfunc_MAC_L(void *param);
 extern void cfunc_DIV1(void *param);

@@ -25,12 +25,12 @@ sh4_frontend::sh4_frontend(sh_common_execution *device, uint32_t window_start, u
 
 bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	return false;
+	return true;//false;
 }
 
 bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	return false;
+	return true;//false;
 }
 
 bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)

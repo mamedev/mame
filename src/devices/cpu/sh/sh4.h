@@ -589,7 +589,10 @@ protected:
 
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
-	virtual void sh2_exception(const char *message, int irqline) override;
+	virtual void sh2_exception(const char *message, int irqline) override
+	{
+
+	}
 
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;

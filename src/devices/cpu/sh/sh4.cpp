@@ -105,7 +105,7 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 {
 	m_cpu_type = CPU_TYPE_SH3;
 	m_am = SH34_AM;
-	m_isdrc = 0;
+	m_isdrc = allow_drc();
 }
 
 
@@ -114,7 +114,7 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 {
 	m_cpu_type = CPU_TYPE_SH4;
 	m_am = SH34_AM;
-	m_isdrc = 0;
+	m_isdrc = allow_drc();
 }
 
 
@@ -2290,6 +2290,12 @@ inline void sh34_base_device::execute_one_f000(const uint16_t opcode)
 /* Execute cycles - returns number of cycles actually run */
 void sh34_base_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
@@ -2327,6 +2333,12 @@ void sh34_base_device::execute_run()
 
 void sh3be_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
@@ -2361,6 +2373,12 @@ void sh3be_device::execute_run()
 
 void sh4be_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
@@ -2926,80 +2944,6 @@ void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 }
 */
 
-
-void sh34_base_device::sh2_exception(const char *message, int irqline)
-{
-#if 0
-	int vector;
-
-	if (irqline != 16)
-	{
-		if (irqline <= ((m_sh2_state->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
-			return;
-
-		// if this is an sh2 internal irq, use its vector
-		if (m_sh2_state->internal_irq_level == irqline)
-		{
-			vector = m_internal_irq_vector;
-			/* avoid spurious irqs with this (TODO: needs a better fix) */
-			m_sh2_state->internal_irq_level = -1;
-			LOG("SH-2 exception #%d (internal vector: $%x) after [%s]\n", irqline, vector, message);
-		}
-		else
-		{
-			if(m_m[0x38] & 0x00010000)
-			{
-				vector = standard_irq_callback(irqline);
-				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
-			}
-			else
-			{
-				standard_irq_callback(irqline);
-				vector = 64 + irqline/2;
-				LOG("SH-2 exception #%d (autovector: $%x) after [%s]\n", irqline, vector, message);
-			}
-		}
-	}
-	else
-	{
-		vector = 11;
-		LOG("SH-2 nmi exception (autovector: $%x) after [%s]\n", vector, message);
-	}
-
-	if (m_isdrc)
-	{
-		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
-		m_sh2_state->evec &= AM;
-		m_sh2_state->irqsr = m_sh2_state->sr;
-
-		/* set I flags in SR */
-		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
-		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
-
-//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
-	} else {
-		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
-		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
-
-		/* set I flags in SR */
-		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
-		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
-
-		/* fetch PC */
-		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
-	}
-
-	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
-#endif
-}
-
-
 using namespace uml;
 
 const opcode_desc* sh34_base_device::get_desclist(offs_t pc)
@@ -3021,7 +2965,7 @@ void sh34_base_device::init_drc_frontend()
 
 void sh34_base_device::static_generate_entry_point()
 {
-#if 0
+
 	drcuml_state *drcuml = m_drcuml.get();
 	code_label skip = 1;
 	drcuml_block *block;
@@ -3037,7 +2981,7 @@ void sh34_base_device::static_generate_entry_point()
 
 	/* load fast integer registers */
 	load_fast_iregs(block);
-
+#if 0
 	/* check for interrupts */
 	UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
 	UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
@@ -3068,7 +3012,7 @@ void sh34_base_device::static_generate_entry_point()
 	UML_LABEL(block, skip+3);                   // skip+3:
 	UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
 	UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
-	UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+	UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq (calls sh2_exception)
 
 	UML_LABEL(block, skip+1);                   // skip+1:
 
@@ -3086,6 +3030,7 @@ void sh34_base_device::static_generate_entry_point()
 	UML_CALLH(block, *m_write32);                    // call write32
 
 	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->evec));             // mov pc, evec
+#endif
 
 	UML_LABEL(block, skip);                         // skip:
 
@@ -3093,7 +3038,7 @@ void sh34_base_device::static_generate_entry_point()
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
 	block->end();
-#endif
+
 }
 
 
@@ -3103,7 +3048,6 @@ void sh34_base_device::static_generate_entry_point()
 
 void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
 {
-#if 0
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0 */
@@ -3126,7 +3070,7 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
 	UML_JMPc(block, COND_AE, label);            // bae label
 
-	UML_AND(block, I0, I0, AM);     // and r0, r0, #AM (0xc7ffffff)
+	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0xc7ffffff)
 
 	UML_LABEL(block, label++);              // label:
 
@@ -3168,5 +3112,4 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 	UML_RET(block);                         // ret
 
 	block->end();
-#endif
 }
