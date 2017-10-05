@@ -426,7 +426,6 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_sinit_boost_timeslice = attotime::zero;
 
 	m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
-	m_scsp_regs  = std::make_unique<uint16_t[]>(0x1000/2);
 	m_backupram = std::make_unique<uint8_t[]>(0x8000);
 	memset(m_backupram.get(), 0, sizeof(uint8_t) * 0x8000);
 
@@ -1292,7 +1291,6 @@ MACHINE_START_MEMBER(stv_state,stv)
 
 	// save states
 	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
-	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));

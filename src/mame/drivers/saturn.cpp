@@ -710,7 +710,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	// save states
 	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
-	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 
@@ -1002,7 +1001,6 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_sinit_boost_timeslice = attotime::zero;
 
 	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
-	m_scsp_regs = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

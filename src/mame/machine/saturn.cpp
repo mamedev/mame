@@ -960,7 +960,6 @@ WRITE_LINE_MEMBER( saturn_state::system_reset_w )
 
 	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
 	memset(m_scu_regs.get() ,0x00,0x000100);
-	memset(m_scsp_regs.get(),0x00,0x001000);
 	memset(m_sound_ram,0x00,0x080000);
 	memset(m_workram_h,0x00,0x100000);
 	memset(m_workram_l,0x00,0x100000);

@@ -56,7 +56,6 @@ public:
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
 	std::unique_ptr<uint32_t[]>    m_scu_regs;
-	std::unique_ptr<uint16_t[]>    m_scsp_regs;
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
