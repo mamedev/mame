@@ -346,7 +346,7 @@ CPU_DISASSEMBLE(i8085)
 		case 0x3c: util::stream_format(stream, "inr  a");                          break;
 		case 0x3d: util::stream_format(stream, "dcr  a");                          break;
 		case 0x3e: util::stream_format(stream, "mvi  a,$%02x", ARG(pc)); pc++;     break;
-		case 0x3f: util::stream_format(stream, "cmf");                             break;
+		case 0x3f: util::stream_format(stream, "cmc");                             break;
 		case 0x40: util::stream_format(stream, "mov  b,b");                        break;
 		case 0x41: util::stream_format(stream, "mov  b,c");                        break;
 		case 0x42: util::stream_format(stream, "mov  b,d");                        break;
@@ -524,11 +524,11 @@ CPU_DISASSEMBLE(i8085)
 		case 0xee: util::stream_format(stream, "xri  $%02x", ARG(pc)); pc++;       break;
 		case 0xef: util::stream_format(stream, "rst  5"); flags = DASMFLAG_STEP_OVER; break;
 		case 0xf0: util::stream_format(stream, "rp"); flags = DASMFLAG_STEP_OUT;   break;
-		case 0xf1: util::stream_format(stream, "pop  a");                          break;
+		case 0xf1: util::stream_format(stream, "pop  psw");                        break;
 		case 0xf2: util::stream_format(stream, "jp   $%04x", ARGW(pc)); pc+=2;     break;
 		case 0xf3: util::stream_format(stream, "di");                              break;
 		case 0xf4: util::stream_format(stream, "cp   $%04x", ARGW(pc)); pc+=2;     break;
-		case 0xf5: util::stream_format(stream, "push a");                          break;
+		case 0xf5: util::stream_format(stream, "push psw");                        break;
 		case 0xf6: util::stream_format(stream, "ori  $%02x", ARG(pc)); pc++;       break;
 		case 0xf7: util::stream_format(stream, "rst  6"); flags = DASMFLAG_STEP_OVER; break;
 		case 0xf8: util::stream_format(stream, "rm"); flags = DASMFLAG_STEP_OUT;   break;
