@@ -40,8 +40,6 @@
 
 #define SET_EA                      (0) // makes slower but "shows work" in the EA fake register like the interpreter
 
-#define ADDSUBV_DIRECT              (0)
-
 #if SET_EA
 #define SETEA(x) UML_MOV(block, mem(&m_sh2_state->ea), ireg(x))
 #else
@@ -64,6 +62,10 @@
 
 #define PROBE_ADDRESS                   ~0
 
+#define CPU_TYPE_SH1    (0)
+#define CPU_TYPE_SH2    (1)
+#define CPU_TYPE_SH3    (2)
+#define CPU_TYPE_SH4    (3)
 
 
 enum
@@ -359,10 +361,42 @@ public:
 		fatalerror("sh2_exception in base class\n");
 	}
 
+	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+	{
+		fatalerror("generate_delay_slot in base class\n");
+	}
+	
+	virtual void load_fast_iregs(drcuml_block *block)
+	{
+		fatalerror("load_fast_iregs in base class\n");
+	}
+
+	virtual void save_fast_iregs(drcuml_block *block)
+	{
+		fatalerror("save_fast_iregs in base class\n");
+	}
+
+
 	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+
 	bool generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
+	bool generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 
 	void func_fastirq();
+	void func_printf_probe();
+	void func_unimplemented();
+	void func_MAC_W();
+	void func_MAC_L();
+	void func_DIV1();
+	void func_ADDV();
+	void func_SUBV();
+
+	int m_cpu_type;
+	uint32_t m_am;
+	bool m_isdrc;
 
 protected:
 	// device-level overrides
@@ -393,4 +427,12 @@ private:
 
 // cfunc callbacks for the UML DRC
 extern void cfunc_fastirq(void *param);
+extern void cfunc_unimplemented(void *param);
+extern void cfunc_fastirq(void *param);
+extern void cfunc_MAC_W(void *param);
+extern void cfunc_MAC_L(void *param);
+extern void cfunc_DIV1(void *param);
+extern void cfunc_ADDV(void *param);
+extern void cfunc_SUBV(void *param);
+extern void cfunc_printf_probe(void *param);
 

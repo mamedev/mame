@@ -368,8 +368,6 @@ protected:
 	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
 	uint8_t m_sh4_mmu_enabled;
 
-	int m_cpu_type;
-
 	// sh3 internal
 	uint32_t  m_sh3internal_upper[0x3000/4];
 	uint32_t  m_sh3internal_lower[0x1000];

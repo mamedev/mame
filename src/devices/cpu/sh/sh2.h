@@ -146,7 +146,6 @@ private:
 	} m_irq_queue[16];
 	*/
 
-	bool m_isdrc;
 
 
 	int8_t    m_irq_line_state[17];
@@ -178,7 +177,7 @@ private:
 	uint16_t m_wtcnt;
 	uint8_t m_wtcsr;
 
-	int     m_is_slave, m_cpu_type;
+	int     m_is_slave;
 	dma_kludge_delegate              m_dma_kludge_cb;
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
@@ -221,8 +220,9 @@ private:
 
 	inline uint32_t epc(const opcode_desc *desc);
 	inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
-	inline void load_fast_iregs(drcuml_block *block);
-	inline void save_fast_iregs(drcuml_block *block);
+	
+	virtual void load_fast_iregs(drcuml_block *block) override;
+	virtual void save_fast_iregs(drcuml_block *block) override;
 
 	void code_flush_cache();
 	void execute_run_drc();
@@ -240,23 +240,11 @@ private:
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
-	void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
+	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc) override;
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
 	bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 
-public:
-	void func_printf_probe();
-	void func_unimplemented();
-	void func_MAC_W();
-	void func_MAC_L();
-	void func_DIV1();
-	void func_ADDV();
-	void func_SUBV();
 };
 
 class sh2a_device : public sh2_device

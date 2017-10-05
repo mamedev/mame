@@ -41,8 +41,7 @@ enum
 #define Rn  ((opcode>>8)&15)
 #define Rm  ((opcode>>4)&15)
 
-#define CPU_TYPE_SH1    (0)
-#define CPU_TYPE_SH2    (1)
+
 
 #define REGFLAG_R(n)                                        (1 << (n))
 

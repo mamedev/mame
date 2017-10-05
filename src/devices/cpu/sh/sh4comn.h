@@ -15,9 +15,6 @@
 
 #define VERBOSE 0
 
-#define CPU_TYPE_SH3    (2)
-#define CPU_TYPE_SH4    (3)
-
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #define EXPPRI(pl,po,p,n)   (((4-(pl)) << 24) | ((15-(po)) << 16) | ((p) << 8) | (255-(n)))

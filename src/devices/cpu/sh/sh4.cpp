@@ -104,6 +104,8 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH3;
+	m_am = SH34_AM;
+	m_isdrc = 0;
 }
 
 
@@ -111,6 +113,8 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH4;
+	m_am = SH34_AM;
+	m_isdrc = 0;
 }
 
 
