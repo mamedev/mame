@@ -1259,8 +1259,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 
 static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
-	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(  0x6000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD("aysnd", ay8910_device, data_r)       // AY8910
 	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE("aysnd", ay8910_device, data_w) //
