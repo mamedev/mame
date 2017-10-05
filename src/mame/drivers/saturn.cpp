@@ -429,7 +429,6 @@ test1f diagnostic hacks:
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh2.h"
 #include "imagedev/chd_cd.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"

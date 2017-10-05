@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 
 #include "cdrom.h"
-#include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -41,7 +40,6 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_smpc_hle(*this, "smpc"),
 			m_scudsp(*this, "scudsp"),
-			m_eeprom(*this, "eeprom"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{
@@ -128,19 +126,11 @@ public:
 	uint8_t m_cart_type;
 	uint32_t *m_cart_dram;
 
-	/* ST-V specific */
-	uint8_t     m_port_sel,m_mux_data;
-	uint8_t     m_system_output;
-	uint8_t     m_ioga_mode;
-	uint8_t     m_ioga_portg;
-	uint16_t    m_serial_tx;
-
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<scudsp_cpu_device> m_scudsp;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
