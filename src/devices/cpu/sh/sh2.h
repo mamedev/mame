@@ -190,8 +190,8 @@ private:
 	virtual void RTE() override;
 	virtual	void ILLEGAL() override;
 
-	virtual void execute_one_0000(uint16_t opcode) override;
-	virtual void execute_one_4000(uint16_t opcode) override;
+	//virtual void execute_one_0000(uint16_t opcode) override;
+	//virtual void execute_one_4000(uint16_t opcode) override;
 	virtual void execute_one_f000(uint16_t opcode) override;
 
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
