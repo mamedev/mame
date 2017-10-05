@@ -2091,6 +2091,160 @@ void sh_common_execution::generate_update_cycles(drcuml_block *block, compiler_s
 	compiler->cycles = 0;
 }
 
+
+
+/*-------------------------------------------------
+    generate_opcode - generate code for a specific
+    opcode
+-------------------------------------------------*/
+
+bool sh_common_execution::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
+{
+	uint32_t scratch, scratch2;
+	int32_t disp;
+	uint16_t opcode = desc->opptr.w[0];
+	uint8_t opswitch = opcode >> 12;
+	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+
+	switch (opswitch)
+	{
+		case  0:
+			return generate_group_0(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+		case  1:    // MOVLS4
+			scratch = (opcode & 0x0f) * 4;
+			UML_ADD(block, I0, R32(Rn), scratch);   // add r0, Rn, scratch
+			UML_MOV(block, I1, R32(Rm));        // mov r1, Rm
+			SETEA(0);                       // set ea for debug
+			UML_CALLH(block, *m_write32);
+
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
+
+		case  2:
+			return generate_group_2(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+		case  3:
+			return generate_group_3(block, compiler, desc, opcode, ovrpc);
+		case  4:
+			return generate_group_4(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+		case  5:    // MOVLL4
+			scratch = (opcode & 0x0f) * 4;
+			UML_ADD(block, I0, R32(Rm), scratch);       // add r0, Rm, scratch
+			SETEA(0);                       // set ea for debug
+			UML_CALLH(block, *m_read32);             // call read32
+			UML_MOV(block, R32(Rn), I0);            // mov Rn, r0
+
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
+
+		case  6:
+			return generate_group_6(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+		case  7:    // ADDI
+			scratch = opcode & 0xff;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
+			UML_ADD(block, R32(Rn), R32(Rn), scratch2); // add Rn, Rn, scratch2
+			return true;
+
+		case  8:
+			return generate_group_8(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+		case  9:    // MOVWI
+			if (ovrpc == 0xffffffff)
+			{
+				scratch = (desc->pc + 2) + ((opcode & 0xff) * 2) + 2;
+			}
+			else
+			{
+				scratch = (ovrpc + 2) + ((opcode & 0xff) * 2) + 2;
+			}
+
+			if (m_drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, I0, scratch);            // mov r0, scratch
+				SETEA(0);                       // set ea for debug
+				UML_CALLH(block, *m_read16);             // read16(r0, r1)
+				UML_SEXT(block, R32(Rn), I0, SIZE_WORD);            // sext Rn, r0, WORD
+			}
+			else
+			{
+				scratch2 = (uint32_t)(int32_t)(int16_t) RW(scratch);
+				UML_MOV(block, R32(Rn), scratch2);          // mov Rn, scratch2
+			}
+
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
+
+		case 10:    // BRA
+			disp = ((int32_t)opcode << 20) >> 20;
+			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
+
+			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
+
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // hashjmp m_sh2_state->ea
+			return true;
+
+		case 11:    // BSR
+			// panicstr @ 403da22 relies on the delay slot clobbering the PR set by a BSR, so
+			// do this before running the delay slot
+			UML_ADD(block, mem(&m_sh2_state->pr), desc->pc, 4); // add m_pr, desc->pc, #4 (skip the current insn & delay slot)
+
+			disp = ((int32_t)opcode << 20) >> 20;
+			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
+
+			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
+
+			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // hashjmp m_sh2_state->ea
+			return true;
+
+		case 12:
+			return generate_group_12(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+		case 13:    // MOVLI
+			if (ovrpc == 0xffffffff)
+			{
+				scratch = ((desc->pc + 4) & ~3) + ((opcode & 0xff) * 4);
+			}
+			else
+			{
+				scratch = ((ovrpc + 4) & ~3) + ((opcode & 0xff) * 4);
+			}
+
+			if (m_drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, I0, scratch);            // mov r0, scratch
+				UML_CALLH(block, *m_read32);             // read32(r0, r1)
+				UML_MOV(block, R32(Rn), I0);            // mov Rn, r0
+			}
+			else
+			{
+				scratch2 = RL(scratch);
+				UML_MOV(block, R32(Rn), scratch2);          // mov Rn, scratch2
+			}
+
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 2, true);
+			return true;
+
+		case 14:    // MOVI
+			scratch = opcode & 0xff;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
+			UML_MOV(block, R32(Rn), scratch2);
+			return true;
+
+		case 15:
+			return false;
+	}
+
+	return false;
+}
+
 bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
@@ -2801,6 +2955,36 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 
 	return false;
 }
+
+
+/***************************************************************************
+    CORE CALLBACKS
+***************************************************************************/
+
+/*-------------------------------------------------
+    sh2drc_set_options - configure DRC options
+-------------------------------------------------*/
+
+void sh_common_execution::sh2drc_set_options(uint32_t options)
+{
+	if (!allow_drc()) return;
+	m_drcoptions = options;
+}
+
+
+/*-------------------------------------------------
+    sh2drc_add_pcflush - add a new address where
+    the PC must be flushed for speedups to work
+-------------------------------------------------*/
+
+void sh_common_execution::sh2drc_add_pcflush(offs_t address)
+{
+	if (!allow_drc()) return;
+
+	if (m_pcfsel < ARRAY_LENGTH(m_pcflushes))
+		m_pcflushes[m_pcfsel++] = address;
+}
+
 
 
 

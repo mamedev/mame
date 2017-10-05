@@ -61,16 +61,6 @@
 	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
-/***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
-***************************************************************************/
-
-#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
-#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
-#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
-
-#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
-#define SH2DRC_FASTEST_OPTIONS  (0)
 
 
 class sh2_frontend;
@@ -97,9 +87,6 @@ public:
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
 	void sh2_set_frt_input(int state);
-	void sh2drc_set_options(uint32_t options);
-	void sh2drc_add_pcflush(offs_t address);
-
 	void sh2_notify_dma_data_available();
 
 protected:
@@ -241,9 +228,8 @@ private:
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc) override;
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
-	bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
+	virtual bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 
 };
 

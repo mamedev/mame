@@ -67,6 +67,18 @@
 #define CPU_TYPE_SH3    (2)
 #define CPU_TYPE_SH4    (3)
 
+/***************************************************************************
+    COMPILER-SPECIFIC OPTIONS
+***************************************************************************/
+
+#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
+#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
+#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+
+#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
+#define SH2DRC_FASTEST_OPTIONS  (0)
+
+
 
 enum
 {
@@ -379,8 +391,11 @@ public:
 
 	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
+	virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) = 0;
 	bool generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
+	virtual bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) = 0;
 	bool generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
@@ -397,6 +412,9 @@ public:
 	int m_cpu_type;
 	uint32_t m_am;
 	bool m_isdrc;
+
+	void sh2drc_set_options(uint32_t options);
+	void sh2drc_add_pcflush(offs_t address);
 
 protected:
 	// device-level overrides
