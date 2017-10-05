@@ -89,7 +89,10 @@
 #define REGFLAG_VBR                     (1 << 4)
 #define REGFLAG_SR                      (1 << 5)
 
-#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
+#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)) // sh2
+#define SH34LE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6)) // naomi
+#define SH34BE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0)) // cave
+
 
 extern unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode);
 
@@ -125,6 +128,7 @@ public:
 		, m_interrupt(nullptr)
 		, m_nocode(nullptr)
 		, m_out_of_cycles(nullptr)
+		, m_xor(0)
 	{ }
 
 	// Data that needs to be stored close to the generated DRC code
@@ -408,6 +412,7 @@ public:
 	int m_cpu_type;
 	uint32_t m_am;
 	bool m_isdrc;
+	int m_xor;
 
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);
@@ -443,6 +448,7 @@ class sh_frontend : public drc_frontend
 {
 public:
 	sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	void set_xor(int intxor) { m_xor = intxor; }
 
 protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
@@ -459,6 +465,7 @@ private:
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
 
 	sh_common_execution *m_sh;
+	int m_xor;
 };
 
 // cfunc callbacks for the UML DRC

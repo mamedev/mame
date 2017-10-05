@@ -121,24 +121,28 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
+	m_xor = 1;
 }
 
 
 sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
 {
+	m_xor = 2;
 }
 
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
+	m_xor = 1;
 }
 
 
 sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
 {
+	m_xor = 2;
 }
 
 
@@ -2620,6 +2624,7 @@ void sh34_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 
 	drc_start();
+	m_drcfe->set_xor(m_xor);
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)

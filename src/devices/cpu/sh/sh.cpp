@@ -2374,7 +2374,11 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+			void *base;
+			if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+			else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0));
+			else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0));
+
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);                          // load    i0,base,word
 			UML_CMP(block, I0, seqhead->opptr.w[0]);                        // cmp     i0,*opptr
 			UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));       // exne    nocode,seqhead->pc
@@ -2385,13 +2389,20 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 	else
 	{
 		uint32_t sum = 0;
-		void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+		void *base;	
+		if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0)); 
+		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0)); 
+
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_ptr(curdesc->physpc, SH2_CODE_XOR(0));
+				if (m_xor == 0) base = m_direct->read_ptr(curdesc->physpc, SH2_CODE_XOR(0));
+				else if (m_xor == 1) base = m_direct->read_ptr(curdesc->physpc, SH34LE_CODE_XOR(0));
+				else base = m_direct->read_ptr(curdesc->physpc, SH34BE_CODE_XOR(0));
+
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);                      // load    i1,*opptr,word
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.w[0];
@@ -2736,6 +2747,8 @@ bool sh_common_execution::generate_opcode(drcuml_block *block, compiler_state *c
 	uint16_t opcode = desc->opptr.w[0];
 	uint8_t opswitch = opcode >> 12;
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+
+	//printf("generating %04x\n", opcode);
 
 	switch (opswitch)
 	{
