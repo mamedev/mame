@@ -79,6 +79,19 @@
 #define SH2DRC_FASTEST_OPTIONS  (0)
 
 
+#define REGFLAG_R(n)                                        (1 << (n))
+
+/* register flags 1 */
+#define REGFLAG_PR                      (1 << 0)
+#define REGFLAG_MACL                        (1 << 1)
+#define REGFLAG_MACH                        (1 << 2)
+#define REGFLAG_GBR                     (1 << 3)
+#define REGFLAG_VBR                     (1 << 4)
+#define REGFLAG_SR                      (1 << 5)
+
+#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
+
+extern unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode);
 
 enum
 {
@@ -378,17 +391,6 @@ public:
 		fatalerror("generate_delay_slot in base class\n");
 	}
 	
-	virtual void load_fast_iregs(drcuml_block *block)
-	{
-		fatalerror("load_fast_iregs in base class\n");
-	}
-
-	virtual void save_fast_iregs(drcuml_block *block)
-	{
-		fatalerror("save_fast_iregs in base class\n");
-	}
-
-
 	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
@@ -415,6 +417,17 @@ public:
 
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);
+
+	uint32_t epc(const opcode_desc *desc);
+	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void load_fast_iregs(drcuml_block *block);
+	void save_fast_iregs(drcuml_block *block);
+	const char *log_desc_flags_to_string(uint32_t flags);
+	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
+	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
+	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+
 
 protected:
 	// device-level overrides

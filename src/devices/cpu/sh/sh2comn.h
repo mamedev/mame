@@ -18,8 +18,6 @@
 // do we use a timer for the DMA, or have it in CPU_EXECUTE
 #define USE_TIMER_FOR_DMA
 
-#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
-
 enum
 {
 	ICF  = 0x00800000,
@@ -43,15 +41,6 @@ enum
 
 
 
-#define REGFLAG_R(n)                                        (1 << (n))
-
-/* register flags 1 */
-#define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                        (1 << 1)
-#define REGFLAG_MACH                        (1 << 2)
-#define REGFLAG_GBR                     (1 << 3)
-#define REGFLAG_VBR                     (1 << 4)
-#define REGFLAG_SR                      (1 << 5)
 
 #define CHECK_PENDING_IRQ(message)              \
 do {                                            \

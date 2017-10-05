@@ -205,11 +205,7 @@ private:
 
 
 
-	inline uint32_t epc(const opcode_desc *desc);
-	inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
-	
-	virtual void load_fast_iregs(drcuml_block *block) override;
-	virtual void save_fast_iregs(drcuml_block *block) override;
+
 
 	void code_flush_cache();
 	void execute_run_drc();
@@ -221,11 +217,6 @@ private:
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
-	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	virtual void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc) override;
 	virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
