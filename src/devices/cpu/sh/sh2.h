@@ -213,17 +213,11 @@ private:
 	void sh2_timer_resync();
 	void sh2_timer_activate();
 	void sh2_do_dma(int dma);
-	void sh2_exception(const char *message, int irqline);
+	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();
 
-	/* internal compiler state */
-	struct compiler_state
-	{
-		uint32_t          cycles;                     /* accumulated cycles */
-		uint8_t           checkints;                  /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;                   /* index for local labels */
-	};
+
 
 	inline uint32_t epc(const opcode_desc *desc);
 	inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
@@ -244,13 +238,11 @@ private:
 	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
 	bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
 	bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
@@ -260,7 +252,6 @@ private:
 public:
 	void func_printf_probe();
 	void func_unimplemented();
-	void func_fastirq();
 	void func_MAC_W();
 	void func_MAC_L();
 	void func_DIV1();

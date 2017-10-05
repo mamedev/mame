@@ -13,20 +13,7 @@
 #ifndef __SH4COMN_H__
 #define __SH4COMN_H__
 
-//#define USE_SH4DRC
-
-/* speed up delay loops, bail out of tight loops */
-#define BUSY_LOOP_HACKS     0
-
 #define VERBOSE 0
-
-#ifdef USE_SH4DRC
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
-
-class sh4_frontend;
-#endif
 
 #define CPU_TYPE_SH3    (2)
 #define CPU_TYPE_SH4    (3)
@@ -48,73 +35,6 @@ class sh4_frontend;
 #define FP_RFS2(r) *( (float  *)(m_fr+((r) ^ m_fpu_pr)) )
 #define FP_XS2(r) m_xf[(r) ^ m_fpu_pr]
 #define FP_XFS2(r) *( (float  *)(m_xf+((r) ^ m_fpu_pr)) )
-#endif
-
-
-#ifdef USE_SH4DRC
-struct sh4_state
-{
-	int icount;
-
-	int pcfsel;                 // last pcflush entry set
-	int maxpcfsel;              // highest valid pcflush entry
-	uint32_t pcflushes[16];       // pcflush entries
-
-	drc_cache *         cache;              /* pointer to the DRC code cache */
-	drcuml_state *      drcuml;             /* DRC UML generator state */
-	sh4_frontend *      drcfe;              /* pointer to the DRC front-end class */
-	uint32_t              drcoptions;         /* configurable DRC options */
-
-	/* internal stuff */
-	uint8_t               cache_dirty;        /* true if we need to flush the cache */
-
-	/* parameters for subroutines */
-	uint64_t              numcycles;          /* return value from gettotalcycles */
-	uint32_t              arg0;               /* print_debug argument 1 */
-	uint32_t              arg1;               /* print_debug argument 2 */
-	uint32_t              irq;                /* irq we're taking */
-
-	/* register mappings */
-	uml::parameter  regmap[16];                 /* parameter to register mappings for all 16 integer registers */
-
-	uml::code_handle *  entry;                      /* entry point */
-	uml::code_handle *  read8;                  /* read byte */
-	uml::code_handle *  write8;                 /* write byte */
-	uml::code_handle *  read16;                 /* read half */
-	uml::code_handle *  write16;                    /* write half */
-	uml::code_handle *  read32;                 /* read word */
-	uml::code_handle *  write32;                    /* write word */
-
-	uml::code_handle *  interrupt;              /* interrupt */
-	uml::code_handle *  nocode;                 /* nocode */
-	uml::code_handle *  out_of_cycles;              /* out of cycles exception handler */
-
-	uint32_t prefadr;
-	uint32_t target;
-};
-#endif
-
-#ifdef USE_SH4DRC
-class sh4_frontend : public drc_frontend
-{
-public:
-	sh4_frontend(sh4_state &state, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
-
-private:
-	bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-
-	sh4_state &m_context;
-};
 #endif
 
 

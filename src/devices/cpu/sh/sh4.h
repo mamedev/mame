@@ -214,7 +214,7 @@ public:
 
 	void sh4_set_frt_input(int state);
 	void sh4_set_irln_input(int value);
-	void sh4_set_ftcsr_callback(sh4_ftcsr_callback callback);
+	//void sh4_set_ftcsr_callback(sh4_ftcsr_callback callback);
 	int sh4_dma_data(struct sh4_device_dma *s);
 	void sh4_dma_ddt(struct sh4_ddt_dma *s);
 
@@ -363,7 +363,7 @@ protected:
 	int     m_ioport4_pullup;
 	int     m_ioport4_direction;
 
-	void    (*m_ftcsr_read_callback)(uint32_t data);
+	//void    (*m_ftcsr_read_callback)(uint32_t data);
 
 	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
 	uint8_t m_sh4_mmu_enabled;

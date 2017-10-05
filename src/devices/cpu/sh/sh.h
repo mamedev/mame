@@ -2,6 +2,7 @@
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+#include "cpu/drcumlsh.h"
 
 /* size of the execution code cache */
 #define CACHE_SIZE                  (32 * 1024 * 1024)
@@ -26,6 +27,43 @@
 #define COMPILE_FORWARDS_BYTES          256
 #define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
 #define COMPILE_MAX_SEQUENCE            64
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define R32(reg)        m_regmap[reg]
+
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define SET_EA                      (0) // makes slower but "shows work" in the EA fake register like the interpreter
+
+#define ADDSUBV_DIRECT              (0)
+
+#if SET_EA
+#define SETEA(x) UML_MOV(block, mem(&m_sh2_state->ea), ireg(x))
+#else
+#define SETEA(x)
+#endif
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* map variables */
+#define MAPVAR_PC                   M0
+#define MAPVAR_CYCLES                   M1
+
+/* exit codes */
+#define EXECUTE_OUT_OF_CYCLES           0
+#define EXECUTE_MISSING_CODE            1
+#define EXECUTE_UNMAPPED_CODE           2
+#define EXECUTE_RESET_CACHE         3
+
+#define PROBE_ADDRESS                   ~0
+
 
 
 enum
@@ -308,6 +346,23 @@ public:
 	uml::code_handle *  m_nocode;                 /* nocode */
 	uml::code_handle *  m_out_of_cycles;              /* out of cycles exception handler */
 
+	/* internal compiler state */
+	struct compiler_state
+	{
+		uint32_t          cycles;                     /* accumulated cycles */
+		uint8_t           checkints;                  /* need to check interrupts before next instruction */
+		uml::code_label  labelnum;                   /* index for local labels */
+	};
+	
+	virtual void sh2_exception(const char *message, int irqline)
+	{
+		fatalerror("sh2_exception in base class\n");
+	}
+
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	bool generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+
+	void func_fastirq();
 
 protected:
 	// device-level overrides
@@ -335,3 +390,7 @@ private:
 
 	sh_common_execution *m_sh;
 };
+
+// cfunc callbacks for the UML DRC
+extern void cfunc_fastirq(void *param);
+

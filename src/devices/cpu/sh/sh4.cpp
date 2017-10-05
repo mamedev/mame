@@ -2913,8 +2913,10 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-
+/*
 void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 {
 	m_ftcsr_read_callback = callback;
 }
+*/
+

@@ -18,9 +18,6 @@
 // do we use a timer for the DMA, or have it in CPU_EXECUTE
 #define USE_TIMER_FOR_DMA
 
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
-
 #define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
 
 enum
