@@ -1212,6 +1212,9 @@ draw88pkr                       // 1988, BTE, Inc.
 @source:amust.cpp
 amust                           //
 
+@source:anes.cpp
+tonpuu                          // 200?, ANES
+
 @source:angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
 spcpostn                        // (c) 1986 Sega / Nasco"

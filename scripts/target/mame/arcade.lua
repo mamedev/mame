@@ -4414,6 +4414,7 @@ files {
 	MAME_DIR .. "src/mame/includes/amspdwy.h",
 	MAME_DIR .. "src/mame/video/amspdwy.cpp",
 	MAME_DIR .. "src/mame/drivers/amusco.cpp",
+	MAME_DIR .. "src/mame/drivers/anes.cpp",
 	MAME_DIR .. "src/mame/drivers/arachnid.cpp",
 	MAME_DIR .. "src/mame/drivers/artmagic.cpp",
 	MAME_DIR .. "src/mame/includes/artmagic.h",
