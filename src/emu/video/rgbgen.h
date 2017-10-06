@@ -136,6 +136,11 @@ public:
 		m_b *= b;
 	}
 
+	inline void mul_imm_alpha(const rgbaint_t& color) { mul_imm(color.get_a32()); }
+	inline void mul_imm_red(const rgbaint_t& color) { mul_imm(color.get_r32()); }
+	inline void mul_imm_green(const rgbaint_t& color) { mul_imm(color.get_g32()); }
+	inline void mul_imm_blue(const rgbaint_t& color) { mul_imm(color.get_b32()); }
+
 	inline void shl(const rgbaint_t& shift)
 	{
 		m_a <<= shift.m_a;

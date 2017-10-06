@@ -149,6 +149,11 @@ public:
 		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
 	}
 
+	inline void mul_imm_alpha(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(3, 3, 3, 3))); }
+	inline void mul_imm_red(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(2, 2, 2, 2))); }
+	inline void mul_imm_green(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(1, 1, 1, 1))); }
+	inline void mul_imm_blue(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(0, 0, 0, 0))); }
+
 	inline void shl(const rgbaint_t& shift)
 	{
 		rgbaint_t areg(*this);

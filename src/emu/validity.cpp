@@ -770,6 +770,38 @@ void validity_checker::validate_rgb()
 	rgb.mul_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::mul_imm_rgba");
 
+	// test immediate alpha element multiplication
+	expected_a *= actual_a = random_i32();
+	expected_r *= actual_a;
+	expected_g *= actual_a;
+	expected_b *= actual_a;
+	rgb.mul_imm_alpha(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::mul_imm_alpha");
+
+	// test immediate red element multiplication
+	expected_a *= actual_r = random_i32();
+	expected_r *= actual_r;
+	expected_g *= actual_r;
+	expected_b *= actual_r;
+	rgb.mul_imm_red(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::mul_imm_red");
+
+	// test immediate green element multiplication
+	expected_a *= actual_g = random_i32();
+	expected_r *= actual_g;
+	expected_g *= actual_g;
+	expected_b *= actual_g;
+	rgb.mul_imm_green(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::mul_imm_green");
+
+	// test immediate blue element multiplication
+	expected_a *= actual_b = random_i32();
+	expected_r *= actual_b;
+	expected_g *= actual_b;
+	expected_b *= actual_b;
+	rgb.mul_imm_blue(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::mul_imm_blue");
+
 	// test RGB and not
 	expected_a &= ~(actual_a = random_i32());
 	expected_r &= ~(actual_r = random_i32());
