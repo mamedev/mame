@@ -119,6 +119,9 @@
 #include "sound/okim6295.h"
 #include "speaker.h"
 
+#include "test24sl.lh"
+
+
 #define MASTER_CLOCK     XTAL_8_448MHz
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
 #define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
@@ -140,12 +143,6 @@ public:
 
 
 /*********************************************
-*            Read/Write Handlers             *
-*********************************************/
-
-
-
-/*********************************************
 *           Memory Map Definition            *
 *********************************************/
 
@@ -164,20 +161,53 @@ static ADDRESS_MAP_START( notechan_port_map, AS_IO, 8, notechan_state )
 	AM_RANGE(0xff, 0xff) AM_WRITENOP    // watchdog reset? (written immediately upon reset, INT and NMI)
 ADDRESS_MAP_END
 
+
+/*********************************************
+*           Output Ports / Lamps             *
+*********************************************/
+
 WRITE8_MEMBER(notechan_state::out_f8_w)
 {
+	output().set_lamp_value(0, data & 1 );
+	output().set_lamp_value(1, data >> 1 & 1);
+	output().set_lamp_value(2, data >> 2 & 1);
+	output().set_lamp_value(3, data >> 3 & 1);
+	output().set_lamp_value(4, data >> 4 & 1);
+	output().set_lamp_value(5, data >> 5 & 1);
+	output().set_lamp_value(6, data >> 6 & 1);
+	output().set_lamp_value(7, data >> 7 & 1);
+
 	logerror("Output %02X to $F8\n", data);
 }
 
 WRITE8_MEMBER(notechan_state::out_f9_w)
 {
+	output().set_lamp_value(8, data & 1 );
+	output().set_lamp_value(9, data >> 1 & 1);
+	output().set_lamp_value(10, data >> 2 & 1);
+	output().set_lamp_value(11, data >> 3 & 1);
+	output().set_lamp_value(12, data >> 4 & 1);
+	output().set_lamp_value(13, data >> 5 & 1);
+	output().set_lamp_value(14, data >> 6 & 1);
+	output().set_lamp_value(15, data >> 7 & 1);
+
 	logerror("Output %02X to $F9\n", data);
 }
 
 WRITE8_MEMBER(notechan_state::out_fa_w)
 {
+	output().set_lamp_value(16, data & 1 );
+	output().set_lamp_value(17, data >> 1 & 1);
+	output().set_lamp_value(18, data >> 2 & 1);
+	output().set_lamp_value(19, data >> 3 & 1);
+	output().set_lamp_value(20, data >> 4 & 1);
+	output().set_lamp_value(21, data >> 5 & 1);
+	output().set_lamp_value(22, data >> 6 & 1);
+	output().set_lamp_value(23, data >> 7 & 1);
+
 	logerror("Output %02X to $FA\n", data);
 }
+
 
 /*********************************************
 *          Input Ports Definitions           *
@@ -199,9 +229,9 @@ static INPUT_PORTS_START( notechan )
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)  // pulsed under reset, activates lamp 21 with 'boing' sound.
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)  // pulsing this input lites lamp 17 with 'cling' sound. 
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
@@ -284,5 +314,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY      FULLNAME      FLAGS
-GAME( 199?, notechan, 0,      notechan, notechan, notechan_state, 0,    ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY      FULLNAME      FLAGS                 LAYOUT
+GAMEL( 199?, notechan, 0,      notechan, notechan, notechan_state, 0,    ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_test24sl )
