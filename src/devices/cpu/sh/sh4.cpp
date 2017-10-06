@@ -476,7 +476,15 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	sh4_exception_recompute();
 }
 
+/*
+inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
+{
+	uint32_t x = Rn;
 
+	m_sh2_state->sr = m_sh2_state->r[x] & FLAGS;
+	m_test_irq = 1;
+}
+*/
 
 /*  LDC.L   @Rm+,SR */
 inline void sh34_base_device::LDCMSR(const uint16_t opcode)
@@ -2662,15 +2670,36 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
 
-	// with internal handlers this becomes easier.
-	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
-	UML_TEST(block, I0, 0x80000000);        // test r0, #0x80000000
-	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+#if 0
+	if (A >= 0xe0000000)
+	{
+		m_program->write_word(A, V);
+		return;
+	}
 
-	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
-	UML_JMPc(block, COND_AE, label);            // bae label
+	if (A >= 0x80000000) // P1/P2/P3 region
+	{
+		m_program->write_word(A & SH34_AM, V);
+	}
+	else
+	{
+		// MMU handling
+		m_program->write_word(A & SH34_AM, V);
+	}
+#endif
 
-	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0xc7ffffff)
+//	UML_TEST(block, I0, 0x80000000);        // test r0, #0x80000000
+//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+//	UML_TEST(block, I0, 0x40000000);        // test r0, #0x80000000
+//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+//	UML_TEST(block, I0, 0x20000000);        // test r0, #0x80000000
+//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+
+	UML_CMP(block, I0, 0xe0000000);
+	UML_JMPc(block, COND_AE, label); 
+
+
+	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0x1fffffff)
 
 	UML_LABEL(block, label++);              // label:
 

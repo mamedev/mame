@@ -173,7 +173,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_debugger_temp(0)
 {
 	m_cpu_type = cpu_type;
-	m_am = AM;
+	m_am = SH12_AM;
 	m_isdrc = allow_drc();
 }
 
@@ -213,7 +213,7 @@ offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uin
 uint8_t sh2_device::RB(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_byte(A & AM);
+		return m_program->read_byte(A & SH12_AM);
 
 	return m_program->read_byte(A);
 }
@@ -221,7 +221,7 @@ uint8_t sh2_device::RB(offs_t A)
 uint16_t sh2_device::RW(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_word(A & AM);
+		return m_program->read_word(A & SH12_AM);
 
 	return m_program->read_word(A);
 }
@@ -231,7 +231,7 @@ uint32_t sh2_device::RL(offs_t A)
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_dword(A & AM);
+		return m_program->read_dword(A & SH12_AM);
 
 	return m_program->read_dword(A);
 }
@@ -240,7 +240,7 @@ void sh2_device::WB(offs_t A, uint8_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_byte(A & AM,V);
+		m_program->write_byte(A & SH12_AM,V);
 		return;
 	}
 
@@ -251,7 +251,7 @@ void sh2_device::WW(offs_t A, uint16_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_word(A & AM,V);
+		m_program->write_word(A & SH12_AM,V);
 		return;
 	}
 
@@ -262,7 +262,7 @@ void sh2_device::WL(offs_t A, uint32_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_dword(A & AM,V);
+		m_program->write_dword(A & SH12_AM,V);
 		return;
 	}
 
@@ -400,7 +400,7 @@ void sh2_device::execute_run()
 	{
 		debugger_instruction_hook(this, m_sh2_state->pc);
 
-		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & AM);
+		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & SH12_AM);
 
 		if (m_sh2_state->m_delay)
 		{
@@ -480,7 +480,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_wtcnt));
 	save_item(NAME(m_wtcsr));
 
-	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(AM).callimport();
+	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(SH12_AM).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 
 	// Clear state
@@ -646,7 +646,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 	if (m_isdrc)
 	{
 		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
-		m_sh2_state->evec &= AM;
+		m_sh2_state->evec &= SH12_AM;
 		m_sh2_state->irqsr = m_sh2_state->sr;
 
 		/* set I flags in SR */
@@ -807,7 +807,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
 	UML_JMPc(block, COND_AE, label);            // bae label
 
-	UML_AND(block, I0, I0, AM);     // and r0, r0, #AM (0xc7ffffff)
+	UML_AND(block, I0, I0, SH12_AM);     // and r0, r0, #AM (0xc7ffffff)
 
 	UML_LABEL(block, label++);              // label:
 

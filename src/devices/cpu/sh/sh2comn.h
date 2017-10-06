@@ -31,7 +31,7 @@ enum
 #define Q   0x00000100
 #define M   0x00000200
 
-#define AM  0xc7ffffff
+#define SH12_AM  0xc7ffffff
 
 #define FLAGS   (M|Q|I|S|T)
 

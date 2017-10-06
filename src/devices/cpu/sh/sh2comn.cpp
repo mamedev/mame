@@ -409,8 +409,8 @@ void sh2_device::sh2_dmac_check(int dma)
 
 			m_dma_timer_active[dma] = 1;
 
-			m_active_dma_src[dma] &= AM;
-			m_active_dma_dst[dma] &= AM;
+			m_active_dma_src[dma] &= SH12_AM;
+			m_active_dma_dst[dma] &= SH12_AM;
 
 			switch(m_active_dma_size[dma])
 			{

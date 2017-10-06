@@ -149,7 +149,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xdc:
 	case 0xec:
 	case 0xfc:
-		return false; // SHAD(opcode); break; // sh4 only
+		return true; // SHAD(opcode); break; // sh3/4 only  needed
 
 	case 0x0d:
 	case 0x1d:
@@ -167,7 +167,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xdd:
 	case 0xed:
 	case 0xfd:
-		return false; // SHLD(opcode); break; // sh4 only
+		return true; // SHLD(opcode); break; // sh3/4 only  needed
 
 	case 0x8e:
 	case 0x9e:
