@@ -55,24 +55,24 @@ bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xd2:
 	case 0xe2:
 	case 0xf2:
-		return false; // STCRBANK(opcode); break; // sh4 only
+		return true; // STCRBANK(opcode); break; // sh3/4 only
 
-	case 0x32:  return false; // STCSSR(opcode); break; // sh4 only
-	case 0x42:  return false; // STCSPC(opcode); break; // sh4 only
-	case 0x83:  return false; // PREFM(opcode); break; // sh4 only
+	case 0x32:  return false; // STCSSR(opcode); break; // sh3/4 only
+	case 0x42:  return false; // STCSPC(opcode); break; // sh3/4 only
+	case 0x83:  return false; // PREFM(opcode); break; // sh3/4 only
 	case 0xc3:  return false; // MOVCAL(opcode); break; // sh4 only
 
 	case 0x38:
 	case 0xb8:
-		return false; // LDTLB(opcode); break; // sh4 only
+		return false; // LDTLB(opcode); break; // sh3/4 only
 
 	case 0x48:
 	case 0xc8:
-		return false; // CLRS(opcode); break; // sh4 only
+		return false; // CLRS(opcode); break; // sh3/4 only
 
 	case 0x58:
 	case 0xd8:
-		return false; // SETS(opcode); break; // sh4 only
+		return false; // SETS(opcode); break; // sh3/4 only
 
 	case 0x3a:
 	case 0xba:
@@ -177,7 +177,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xde:
 	case 0xee:
 	case 0xfe:
-		return false; // LDCRBANK(opcode); break; // sh4 only
+		return false; // LDCRBANK(opcode); break; // sh3/4 only
 
 	case 0x83:
 	case 0x93:
@@ -187,7 +187,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xd3:
 	case 0xe3:
 	case 0xf3:
-		return false; // STCMRBANK(opcode); break; // sh4 only
+		return false; // STCMRBANK(opcode); break; // sh3/4 only
 
 	case 0x87:
 	case 0x97:
@@ -197,15 +197,15 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xd7:
 	case 0xe7:
 	case 0xf7:
-		return false; // LDCMRBANK(opcode); break; // sh4 only
+		return false; // LDCMRBANK(opcode); break; // sh3/4 only
 
 	case 0x32:  return false; // STCMSGR(opcode); break; // sh4 only
 	case 0x33:  return false; // STCMSSR(opcode); break; // sh4 only
-	case 0x37:  return false; // LDCMSSR(opcode); break; // sh4 only
-	case 0x3e:  return false; // LDCSSR(opcode); break; // sh4 only
-	case 0x43:  return false; // STCMSPC(opcode); break; // sh4 only
-	case 0x47:  return false; // LDCMSPC(opcode); break; // sh4 only
-	case 0x4e:  return false; // LDCSPC(opcode); break; // sh4 only
+	case 0x37:  return false; // LDCMSSR(opcode); break; // sh3/4 only
+	case 0x3e:  return false; // LDCSSR(opcode); break; // sh3/4 only
+	case 0x43:  return false; // STCMSPC(opcode); break; // sh3/4 only
+	case 0x47:  return false; // LDCMSPC(opcode); break; // sh3/4 only
+	case 0x4e:  return false; // LDCSPC(opcode); break; // sh3/4 only
 	case 0x52:  return false; // STSMFPUL(opcode); break; // sh4 only
 	case 0x56:  return false; // LDSMFPUL(opcode); break; // sh4 only
 	case 0x5a:  return false; // LDSFPUL(opcode); break; // sh4 only

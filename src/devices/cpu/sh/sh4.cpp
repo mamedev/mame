@@ -534,6 +534,12 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
 
+	printf("trapa imm = %04x\n", imm);
+
+	printf("m_sh2_state->sr IN = %08x\n", m_sh2_state->sr);
+	printf("m_sh2_state->pc IN = %08x\n", m_sh2_state->pc);
+
+
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		m_m[TRA] = imm << 2;
@@ -567,6 +573,10 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 	}
 
 	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
+
+	printf("m_sh2_state->sr OUT = %08x\n", m_sh2_state->sr);
+	printf("m_sh2_state->pc OUT = %08x\n", m_sh2_state->pc);
+
 
 	m_sh2_state->icount -= 7;
 }
@@ -781,7 +791,7 @@ inline void sh34_base_device::STCDBR(const uint16_t opcode)
 /*  SHAD    Rm,Rn */
 inline void sh34_base_device::SHAD(const uint16_t opcode)
 {
-	printf("SHAD %08x\n", m_sh2_state->pc);
+	//printf("SHAD %08x\n", m_sh2_state->pc);
 
 	uint32_t m = Rm; uint32_t n = Rn;
 
@@ -2911,10 +2921,88 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 	return false;
 }
 
+
+
+#if 0
+/*  TRAPA   #imm */
+inline void sh34_base_device::TRAPA(uint32_t i)
+{
+	uint32_t imm = i & 0xff;
+
+	if (m_cpu_type == CPU_TYPE_SH4)
+	{
+		m_m[TRA] = imm << 2;
+	}
+	else /* SH3 */
+	{
+		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
+	}
+
+
+	m_ssr = m_sh2_state->sr;
+	m_spc = m_sh2_state->pc;
+	m_sgr = m_sh2_state->r[15];
+
+	m_sh2_state->sr |= MD;
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+	if (!(m_sh2_state->sr & sRB))
+		sh4_change_register_bank(1);
+	m_sh2_state->sr |= sRB;
+	m_sh2_state->sr |= BL;
+	sh4_exception_recompute();
+
+	if (m_cpu_type == CPU_TYPE_SH4)
+	{
+		m_m[EXPEVT] = 0x00000160;
+	}
+	else /* SH3 */
+	{
+		m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
+	}
+
+	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
+
+	m_sh2_state->icount -= 7;
+}
+
+/*  TRAPA   #imm */
+inline void sh2_device::TRAPA(uint32_t i)
+{
+	uint32_t imm = i & 0xff;
+
+	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
+
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->sr );
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->pc );
+
+	m_sh2_state->pc = RL( m_sh2_state->ea );
+
+	m_sh2_state->icount -= 7;
+}
+
+#endif
+
+
+void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
+void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
+
+void sh34_base_device::func_LDCSR() { LDCSR(m_sh2_state->arg0); }
+void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
+
+void sh34_base_device::func_LDCMSR() { LDCMSR(m_sh2_state->arg0); }
+void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
+
+void sh34_base_device::func_RTE() { RTE(); }
+void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
+
+
 bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	printf("generate_group_0_RTE\n");
-	/*
+	
 	generate_delay_slot(block, compiler, desc, 0xffffffff);
 
 	UML_MOV(block, I0, R32(15));            // mov r0, R15
@@ -2931,13 +3019,21 @@ bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state 
 	UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
 	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
-	*/
+	
 	return true;
 }
 
 bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	printf("generate_group_12_TRAPA\n");
+
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_TRAPA, this);
+	load_fast_iregs(block);
+	
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); 
+
 	/*
 	uint32_t scratch = (opcode & 0xff) * 4;
 	UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch

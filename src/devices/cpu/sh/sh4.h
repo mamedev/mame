@@ -576,9 +576,12 @@ protected:
 	uint32_t sh4_handle_chcr3_addr_r(uint32_t mem_mask) { return m_SH4_CHCR3; }
 	uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask) { return m_SH4_DMAOR; }
 
+
+
 	// DRC 
 
 	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) override;
+
 
 	virtual bool generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
@@ -604,6 +607,14 @@ protected:
 
 	private:
 		std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
+
+public:
+	// DRC C-substitute ops
+	void func_TRAPA();
+	void func_LDCSR();
+	void func_LDCMSR();
+	void func_RTE();
+
 };
 
 
