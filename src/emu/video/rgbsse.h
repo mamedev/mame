@@ -297,7 +297,7 @@ public:
 		// Set mult a 16 bit inputs to scale
 		__m128i immv = _mm_set1_epi16(scale);
 		// Pack color into mult b 16 bit inputs
-		m_value = _mm_packus_epi32(m_value, _mm_setzero_si128());
+		m_value = _mm_packs_epi32(m_value, _mm_setzero_si128());
 		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
 		m_value = _mm_mullo_epi16(m_value, immv);
 		// Shift 16 bit values right by 8
@@ -318,9 +318,9 @@ public:
 	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
 		// Pack scale into mult a 16 bits
-		__m128i tmp1 = _mm_packus_epi32(scale.m_value, _mm_setzero_si128());
+		__m128i tmp1 = _mm_packs_epi32(scale.m_value, _mm_setzero_si128());
 		// Pack color into mult b 16 bit inputs
-		m_value = _mm_packus_epi32(m_value, _mm_setzero_si128());
+		m_value = _mm_packs_epi32(m_value, _mm_setzero_si128());
 		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
 		m_value = _mm_mullo_epi16(m_value, tmp1);
 		// Shift 16 bit values right by 8
@@ -335,9 +335,9 @@ public:
 	inline void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 	{
 		// Pack both scale values into mult a 16 bits
-		__m128i tmp1 = _mm_packus_epi32(scale.m_value, scale2.m_value);
+		__m128i tmp1 = _mm_packs_epi32(scale.m_value, scale2.m_value);
 		// Pack both color values into mult b 16 bit inputs
-		m_value = _mm_packus_epi32(m_value, other.m_value);
+		m_value = _mm_packs_epi32(m_value, other.m_value);
 		// Do the 16 bit multiply, top and bottom 64 bits will contain 16 bit truncated results
 		tmp1 = _mm_mullo_epi16(m_value, tmp1);
 		// Unpack the results
