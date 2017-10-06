@@ -55,7 +55,7 @@ bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xd2:
 	case 0xe2:
 	case 0xf2:
-		return true; // STCRBANK(opcode); break; // sh3/4 only
+		return true; // STC RBANK(opcode); break; // sh3/4 only
 
 	case 0x32:  return false; // STCSSR(opcode); break; // sh3/4 only
 	case 0x42:  return false; // STCSPC(opcode); break; // sh3/4 only
