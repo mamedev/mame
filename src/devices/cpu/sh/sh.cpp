@@ -3590,6 +3590,28 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 	return false;
 }
 
+bool sh_common_execution::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	uint32_t scratch = (opcode & 0xff) * 4;
+	UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->sr));              // mov r1, sr
+	UML_CALLH(block, *m_write32);                    // write32
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, desc->pc + 2);             // mov r1, pc+2
+	UML_CALLH(block, *m_write32);                    // write32
+
+	UML_MOV(block, I0, mem(&m_sh2_state->ea));              // mov r0, ea
+	UML_CALLH(block, *m_read32);                 // read32
+	UML_HASHJMP(block, 0, I0, *m_nocode);        // jmp (r0)
+
+	return true;
+}
+
 bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	uint32_t scratch;
@@ -3627,24 +3649,7 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 		return true;
 
 	case  3<<8: // TRAPA(opcode & 0xff);
-		scratch = (opcode & 0xff) * 4;
-		UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, mem(&m_sh2_state->sr));              // mov r1, sr
-		UML_CALLH(block, *m_write32);                    // write32
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, desc->pc+2);             // mov r1, pc+2
-		UML_CALLH(block, *m_write32);                    // write32
-
-		UML_MOV(block, I0, mem(&m_sh2_state->ea));              // mov r0, ea
-		UML_CALLH(block, *m_read32);                 // read32
-		UML_HASHJMP(block, 0, I0, *m_nocode);        // jmp (r0)
-
-		return true;
+		return generate_group_12_TRAPA(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 
 	case  4<<8: // MOVBLG(opcode & 0xff);
 		scratch = (opcode & 0xff);
@@ -3754,6 +3759,28 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 	}
 
 	return false;
+}
+
+bool sh_common_execution::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	generate_delay_slot(block, compiler, desc, 0xffffffff);
+
+	UML_MOV(block, I0, R32(15));            // mov r0, R15
+	UML_CALLH(block, *m_read32);             // call read32
+	UML_MOV(block, mem(&m_sh2_state->pc), I0);          // mov pc, r0
+	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
+
+	UML_MOV(block, I0, R32(15));            // mov r0, R15
+	UML_CALLH(block, *m_read32);             // call read32
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
+	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
+
+	compiler->checkints = true;
+	UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
+	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
+
+	return true;
 }
 
 
@@ -3981,24 +4008,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x2b: // RTE();
-		generate_delay_slot(block, compiler, desc, 0xffffffff);
-
-		UML_MOV(block, I0, R32(15));            // mov r0, R15
-		UML_CALLH(block, *m_read32);             // call read32
-		UML_MOV(block, mem(&m_sh2_state->pc), I0);          // mov pc, r0
-		UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
-
-		UML_MOV(block, I0, R32(15));            // mov r0, R15
-		UML_CALLH(block, *m_read32);             // call read32
-		UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
-		UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
-
-		compiler->checkints = true;
-		UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
-		generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
-		UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
-
-		return true;
+		return generate_group_0_RTE(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 	}
 
 	return false;

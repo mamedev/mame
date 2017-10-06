@@ -2911,6 +2911,53 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 	return false;
 }
 
+bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_0_RTE\n");
+	/*
+	generate_delay_slot(block, compiler, desc, 0xffffffff);
+
+	UML_MOV(block, I0, R32(15));            // mov r0, R15
+	UML_CALLH(block, *m_read32);             // call read32
+	UML_MOV(block, mem(&m_sh2_state->pc), I0);          // mov pc, r0
+	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
+
+	UML_MOV(block, I0, R32(15));            // mov r0, R15
+	UML_CALLH(block, *m_read32);             // call read32
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
+	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
+
+	compiler->checkints = true;
+	UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
+	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
+	*/
+	return true;
+}
+
+bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_12_TRAPA\n");
+	/*
+	uint32_t scratch = (opcode & 0xff) * 4;
+	UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->sr));              // mov r1, sr
+	UML_CALLH(block, *m_write32);                    // write32
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, desc->pc + 2);             // mov r1, pc+2
+	UML_CALLH(block, *m_write32);                    // write32
+
+	UML_MOV(block, I0, mem(&m_sh2_state->ea));              // mov r0, ea
+	UML_CALLH(block, *m_read32);                 // read32
+	UML_HASHJMP(block, 0, I0, *m_nocode);        // jmp (r0)
+	*/
+	return true;
+}
 
 bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2948,6 +2995,17 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_sta
 }
 
 
+bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_SHAD\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_SHLD\n");
+	return true;
+}
 
 bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3003,7 +3061,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xdc:
 	case 0xec:
 	case 0xfc:
-		return false; // SHAD(opcode); break; // sh4 only
+		return generate_group_4_SHAD(block, compiler, desc, opcode, in_delay_slot, ovrpc); break;
 
 	case 0x0d:
 	case 0x1d:
@@ -3021,7 +3079,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xdd:
 	case 0xed:
 	case 0xfd:
-		return false; // SHLD(opcode); break; // sh4 only
+		return generate_group_4_SHLD(block, compiler, desc, opcode, in_delay_slot, ovrpc); break;
 
 	case 0x8e:
 	case 0x9e:
