@@ -476,7 +476,7 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	sh4_exception_recompute();
 }
 
-/*
+/* for reference
 inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
 	uint32_t x = Rn;
@@ -503,7 +503,18 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 	sh4_exception_recompute();
 }
 
+/* for reference
+inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
+{
+	uint32_t x = Rn;
 
+	m_sh2_state->ea = m_sh2_state->r[x];
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->r[x] += 4;
+	m_sh2_state->icount -= 2;
+	m_test_irq = 1;
+}
+*/
 
 /*  RTE */
 inline void sh34_base_device::RTE()
@@ -770,6 +781,8 @@ inline void sh34_base_device::STCDBR(const uint16_t opcode)
 /*  SHAD    Rm,Rn */
 inline void sh34_base_device::SHAD(const uint16_t opcode)
 {
+	printf("SHAD %08x\n", m_sh2_state->pc);
+
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	if ((m_sh2_state->r[m] & 0x80000000) == 0)
@@ -787,6 +800,8 @@ inline void sh34_base_device::SHAD(const uint16_t opcode)
 /*  SHLD    Rm,Rn */
 inline void sh34_base_device::SHLD(const uint16_t opcode)
 {
+	//printf("SHLD %08x\n", m_sh2_state->pc);
+
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	if ((m_sh2_state->r[m] & 0x80000000) == 0)
@@ -2567,6 +2582,87 @@ void sh34_base_device::init_drc_frontend()
 
 
 /*-------------------------------------------------
+    generate_update_cycles - generate code to
+    subtract cycles from the icount and generate
+    an exception if out
+-------------------------------------------------*/
+void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+{
+#if 0
+	/* check full interrupts if pending */
+	if (compiler->checkints)
+	{
+		code_label skip = compiler->labelnum++;
+
+		compiler->checkints = false;
+		compiler->labelnum += 4;
+
+		/* check for interrupts */
+		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
+		UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
+		UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+
+		UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
+		UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
+
+		UML_LABEL(block, skip+2);                   // skip+2:
+		UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
+		UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
+		UML_AND(block, I1,  I0, 0xffff);                // and r1, r0, 0xffff
+
+		UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, pending_irq
+		UML_CMP(block, I1, 32);             // cmp r1, #32
+		UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
+
+		UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
+
+		UML_LABEL(block, skip+4);                   // skip+4:
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
+		UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
+		UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
+
+		UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
+
+		UML_LABEL(block, skip+3);                   // skip+3:
+		UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
+		UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
+		UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+
+		UML_LABEL(block, skip+1);                   // skip+1:
+		UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
+		UML_JMPc(block, COND_Z, skip);                  // jz skip
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, param);              // mov r1, nextpc
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_HASHJMP(block, 0, mem(&m_sh2_state->evec), *m_nocode);       // hashjmp m_sh2_state->evec
+
+		UML_LABEL(block, skip);                         // skip:
+	}
+#endif
+	/* account for cycles */
+	if (compiler->cycles > 0)
+	{
+		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
+		if (allow_exception)
+			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
+																					// exh     out_of_cycles,nextpc
+	}
+	compiler->cycles = 0;
+}
+
+
+
+/*-------------------------------------------------
     static_generate_entry_point - generate a
     static entry point
 -------------------------------------------------*/
@@ -2813,6 +2909,42 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 	}
 
 	return false;
+}
+
+
+bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCSR\n");
+
+	/*
+	// needs to be different on SH2 / 4
+	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
+	UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);
+
+	compiler->checkints = true;
+	*/
+
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCMSR\n");
+
+	/*
+	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
+	SETEA(0);
+	UML_CALLH(block, *m_read32);         // call read32
+	UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
+
+	compiler->checkints = true;
+	if (!in_delay_slot)
+		generate_update_cycles(block, compiler, desc->pc + 2, true);
+	*/
+
+	return true;
 }
 
 

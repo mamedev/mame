@@ -4004,7 +4004,30 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 	return false;
 }
 
+bool sh_common_execution::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	// needs to be different on SH2 / 4
+	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
+	UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);
 
+	compiler->checkints = true;
+	return true;
+}
+
+bool sh_common_execution::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
+	SETEA(0);
+	UML_CALLH(block, *m_read32);         // call read32
+	UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
+	UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
+
+	compiler->checkints = true;
+	if (!in_delay_slot)
+		generate_update_cycles(block, compiler, desc->pc + 2, true);
+	return true;
+}
 
 bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -4068,17 +4091,7 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x07: // LDCMSR(Rn);
-		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
-		SETEA(0);
-		UML_CALLH(block, *m_read32);         // call read32
-		UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
-		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
-
-		compiler->checkints = true;
-		if (!in_delay_slot)
-			generate_update_cycles(block, compiler, desc->pc + 2, true);
-		return true;
-
+		return generate_group_4_LDCMSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 
 	case 0x08: // SHLL2(Rn);
 		UML_SHL(block, R32(Rn), R32(Rn), 2);
@@ -4120,13 +4133,7 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x0e: // LDCSR(Rn);
-		// needs to be different on SH2 / 4
-		UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
-		UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
-		UML_MOV(block, mem(&m_sh2_state->sr), I0);
-
-		compiler->checkints = true;
-		return true;
+		return generate_group_4_LDCSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 
 	case 0x0f: // MAC_W(Rm, Rn);
 	case 0x1f: // MAC_W(Rm, Rn);
