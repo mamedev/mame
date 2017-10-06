@@ -378,11 +378,6 @@ protected:
 
 	uint64_t m_debugger_temp;
 
-
-	virtual void execute_one_0000(uint16_t opcode) override;
-	virtual void execute_one_4000(uint16_t opcode) override;
-	virtual void execute_one_f000(uint16_t opcode) override;
-
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
 		int a,irq,z;
@@ -405,95 +400,6 @@ protected:
 			sh4_exception(message, irq);
 		}
 	}
-
-
-	// memory handlers
-
-	virtual uint8_t RB(offs_t A) override;
-	virtual uint16_t RW(offs_t A) override;
-	virtual uint32_t RL(offs_t A) override;
-	virtual void WB(offs_t A, uint8_t V) override;
-	virtual void WW(offs_t A, uint16_t V) override;
-	virtual void WL(offs_t A, uint32_t V) override;
-
-	// opcode handlers	
-	virtual void LDCSR(const uint16_t opcode) override;
-	virtual void LDCMSR(const uint16_t opcode) override;
-	virtual void RTE() override;
-	virtual void TRAPA(uint32_t i) override;
-	virtual	void ILLEGAL() override;
-
-	virtual void LDTLB(const uint16_t opcode);
-
-	void TODO(const uint16_t opcode);
-	void MOVCAL(const uint16_t opcode);
-	void CLRS(const uint16_t opcode);
-	void SETS(const uint16_t opcode);
-
-	void STCRBANK(const uint16_t opcode);
-	void STCMRBANK(const uint16_t opcode);
-	void STCSSR(const uint16_t opcode);
-	void STCSPC(const uint16_t opcode);
-	void STCSGR(const uint16_t opcode);
-	void STSFPUL(const uint16_t opcode);
-	void STSFPSCR(const uint16_t opcode);
-	void STCDBR(const uint16_t opcode);
-	void STCMSGR(const uint16_t opcode);
-	void STSMFPUL(const uint16_t opcode);
-	void STSMFPSCR(const uint16_t opcode);
-	void STCMDBR(const uint16_t opcode);
-	void STCMSSR(const uint16_t opcode);
-	void STCMSPC(const uint16_t opcode);
-	void LDSMFPUL(const uint16_t opcode);
-	void LDSMFPSCR(const uint16_t opcode);
-	void LDCMDBR(const uint16_t opcode);
-	void LDCMRBANK(const uint16_t opcode);
-	void LDCMSSR(const uint16_t opcode);
-	void LDCMSPC(const uint16_t opcode);
-	void LDSFPUL(const uint16_t opcode);
-	void LDSFPSCR(const uint16_t opcode);
-	void LDCDBR(const uint16_t opcode);
-	void SHAD(const uint16_t opcode);
-	void SHLD(const uint16_t opcode);
-	void LDCRBANK(const uint16_t opcode);
-	void LDCSSR(const uint16_t opcode);
-	void LDCSPC(const uint16_t opcode);
-	void PREFM(const uint16_t opcode);
-	void FMOVMRIFR(const uint16_t opcode);
-	void FMOVFRMR(const uint16_t opcode);
-	void FMOVFRMDR(const uint16_t opcode);
-	void FMOVFRS0(const uint16_t opcode);
-	void FMOVS0FR(const uint16_t opcode);
-	void FMOVMRFR(const uint16_t opcode);
-	void FMOVFR(const uint16_t opcode);
-	void FLDI1(const uint16_t opcode);
-	void FLDI0(const uint16_t opcode);
-	void FLDS(const uint16_t opcode);
-	void FSTS(const uint16_t opcode);
-	void FRCHG();
-	void FSCHG();
-	void FTRC(const uint16_t opcode);
-	void FLOAT(const uint16_t opcode);
-	void FNEG(const uint16_t opcode);
-	void FABS(const uint16_t opcode);
-	void FCMP_EQ(const uint16_t opcode);
-	void FCMP_GT(const uint16_t opcode);
-	void FCNVDS(const uint16_t opcode);
-	void FCNVSD(const uint16_t opcode);
-	void FADD(const uint16_t opcode);
-	void FSUB(const uint16_t opcode);
-	void FMUL(const uint16_t opcode);
-	void FDIV(const uint16_t opcode);
-	void FMAC(const uint16_t opcode);
-	void FSQRT(const uint16_t opcode);
-	void FSRRA(const uint16_t opcode);
-	void FSSCA(const uint16_t opcode);
-	void FIPR(const uint16_t opcode);
-	void FTRV(const uint16_t opcode);
-
-	void op1111_0xf13(const uint16_t opcode);
-	void dbreak(const uint16_t opcode);
-	void op1111_0x13(uint16_t opcode);
 
 	void sh4_change_register_bank(int to);
 	void sh4_swap_fp_registers();
@@ -576,7 +482,96 @@ protected:
 	uint32_t sh4_handle_chcr3_addr_r(uint32_t mem_mask) { return m_SH4_CHCR3; }
 	uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask) { return m_SH4_DMAOR; }
 
+	// memory handlers
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
+	virtual void WB(offs_t A, uint8_t V) override;
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
+	// regular handlers for opcodes which need to differ on sh3/4 due to different interrupt / exception handling and register banking
+	virtual void LDCSR(const uint16_t opcode) override;
+	virtual void LDCMSR(const uint16_t opcode) override;
+	virtual void RTE() override;
+	virtual void TRAPA(uint32_t i) override;
+	virtual	void ILLEGAL() override;
+
+	// regular handelrs for sh3/4 specific opcodes
+	virtual void LDTLB(const uint16_t opcode);
+	void TODO(const uint16_t opcode);
+	void MOVCAL(const uint16_t opcode);
+	void CLRS(const uint16_t opcode);
+	void SETS(const uint16_t opcode);
+	void STCRBANK(const uint16_t opcode);
+	void STCMRBANK(const uint16_t opcode);
+	void STCSSR(const uint16_t opcode);
+	void STCSPC(const uint16_t opcode);
+	void STCSGR(const uint16_t opcode);
+	void STSFPUL(const uint16_t opcode);
+	void STSFPSCR(const uint16_t opcode);
+	void STCDBR(const uint16_t opcode);
+	void STCMSGR(const uint16_t opcode);
+	void STSMFPUL(const uint16_t opcode);
+	void STSMFPSCR(const uint16_t opcode);
+	void STCMDBR(const uint16_t opcode);
+	void STCMSSR(const uint16_t opcode);
+	void STCMSPC(const uint16_t opcode);
+	void LDSMFPUL(const uint16_t opcode);
+	void LDSMFPSCR(const uint16_t opcode);
+	void LDCMDBR(const uint16_t opcode);
+	void LDCMRBANK(const uint16_t opcode);
+	void LDCMSSR(const uint16_t opcode);
+	void LDCMSPC(const uint16_t opcode);
+	void LDSFPUL(const uint16_t opcode);
+	void LDSFPSCR(const uint16_t opcode);
+	void LDCDBR(const uint16_t opcode);
+	void SHAD(const uint16_t opcode);
+	void SHLD(const uint16_t opcode);
+	void LDCRBANK(const uint16_t opcode);
+	void LDCSSR(const uint16_t opcode);
+	void LDCSPC(const uint16_t opcode);
+	void PREFM(const uint16_t opcode);
+	void FMOVMRIFR(const uint16_t opcode);
+	void FMOVFRMR(const uint16_t opcode);
+	void FMOVFRMDR(const uint16_t opcode);
+	void FMOVFRS0(const uint16_t opcode);
+	void FMOVS0FR(const uint16_t opcode);
+	void FMOVMRFR(const uint16_t opcode);
+	void FMOVFR(const uint16_t opcode);
+	void FLDI1(const uint16_t opcode);
+	void FLDI0(const uint16_t opcode);
+	void FLDS(const uint16_t opcode);
+	void FSTS(const uint16_t opcode);
+	void FRCHG();
+	void FSCHG();
+	void FTRC(const uint16_t opcode);
+	void FLOAT(const uint16_t opcode);
+	void FNEG(const uint16_t opcode);
+	void FABS(const uint16_t opcode);
+	void FCMP_EQ(const uint16_t opcode);
+	void FCMP_GT(const uint16_t opcode);
+	void FCNVDS(const uint16_t opcode);
+	void FCNVSD(const uint16_t opcode);
+	void FADD(const uint16_t opcode);
+	void FSUB(const uint16_t opcode);
+	void FMUL(const uint16_t opcode);
+	void FDIV(const uint16_t opcode);
+	void FMAC(const uint16_t opcode);
+	void FSQRT(const uint16_t opcode);
+	void FSRRA(const uint16_t opcode);
+	void FSSCA(const uint16_t opcode);
+	void FIPR(const uint16_t opcode);
+	void FTRV(const uint16_t opcode);
+
+	void op1111_0xf13(const uint16_t opcode);
+	void dbreak(const uint16_t opcode);
+	void op1111_0x13(uint16_t opcode);
+
+	// group dispatchers to allow for new opcodes	
+	virtual void execute_one_0000(uint16_t opcode) override;
+	virtual void execute_one_4000(uint16_t opcode) override;
+	virtual void execute_one_f000(uint16_t opcode) override;
 
 	// DRC related parts
 
@@ -598,7 +593,26 @@ protected:
 
 	bool generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	
+	bool generate_group_4_LDCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STCMSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_STCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_4_LDCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+
 	// code generators for opcodes which need to differ on sh3/4 due to different interrupt / exception handling and register banking
 	virtual bool generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;

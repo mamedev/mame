@@ -2922,7 +2922,6 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 	return false;
 }
 
-
 bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	printf("generate_group_0_STCSSR\n");
@@ -2988,8 +2987,6 @@ bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_sta
 	printf("generate_group_0_STCDBR\n");
 	return true;
 }
-
-
 
 
 #if 0
@@ -3261,7 +3258,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xde:
 	case 0xee:
 	case 0xfe:
-		return false; // LDCRBANK(opcode); break; // sh4 only
+		return generate_group_4_LDCRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
 
 	case 0x83:
 	case 0x93:
@@ -3271,7 +3268,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xd3:
 	case 0xe3:
 	case 0xf3:
-		return false; // STCMRBANK(opcode); break; // sh4 only
+		return generate_group_4_STCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
 
 	case 0x87:
 	case 0x97:
@@ -3281,27 +3278,141 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xd7:
 	case 0xe7:
 	case 0xf7:
-		return false; // LDCMRBANK(opcode); break; // sh4 only
+		return generate_group_4_LDCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
 
-	case 0x32:  return false; // STCMSGR(opcode); break; // sh4 only
-	case 0x33:  return false; // STCMSSR(opcode); break; // sh4 only
-	case 0x37:  return false; // LDCMSSR(opcode); break; // sh4 only
-	case 0x3e:  return false; // LDCSSR(opcode); break; // sh4 only
-	case 0x43:  return false; // STCMSPC(opcode); break; // sh4 only
-	case 0x47:  return false; // LDCMSPC(opcode); break; // sh4 only
-	case 0x4e:  return false; // LDCSPC(opcode); break; // sh4 only
-	case 0x52:  return false; // STSMFPUL(opcode); break; // sh4 only
-	case 0x56:  return false; // LDSMFPUL(opcode); break; // sh4 only
-	case 0x5a:  return false; // LDSFPUL(opcode); break; // sh4 only
-	case 0x62:  return false; // STSMFPSCR(opcode); break; // sh4 only
-	case 0x66:  return false; // LDSMFPSCR(opcode); break; // sh4 only
-	case 0x6a:  return false; // LDSFPSCR(opcode); break; // sh4 only
-	case 0xf2:  return false; // STCMDBR(opcode); break; // sh4 only
-	case 0xf6:  return false; // LDCMDBR(opcode); break; // sh4 only
-	case 0xfa:  return false; // LDCDBR(opcode); break; // sh4 only
+	case 0x32:  return generate_group_4_STCMSGR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x33:  return generate_group_4_STCMSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x37:  return generate_group_4_LDCMSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x3e:  return generate_group_4_LDCSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x43:  return generate_group_4_STCMSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x47:  return generate_group_4_LDCMSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x4e:  return generate_group_4_LDCSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x52:  return generate_group_4_STSMFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x56:  return generate_group_4_LDSMFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x5a:  return generate_group_4_LDSFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x62:  return generate_group_4_STSMFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x66:  return generate_group_4_LDSMFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x6a:  return generate_group_4_LDSFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xf2:  return generate_group_4_STCMDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xf6:  return generate_group_4_LDCMDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xfa:  return generate_group_4_LDCDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 
 	}
 
 	return false;
+}
+
+bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCRBANK\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STCMRBANK\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCMRBANK\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STCMSGR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STCMSSR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCMSSR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCSSR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STCMSPC\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCMSPC\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCSPC\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STSMFPUL\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDSMFPUL\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDSFPUL\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STSMFPSCR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDSMFPSCR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDSFPSCR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_STCMDBR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCMDBR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_4_LDCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_4_LDCDBR\n");
+	return true;
 }
 
