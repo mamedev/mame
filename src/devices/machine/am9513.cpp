@@ -289,7 +289,7 @@ void am9513_device::set_master_mode(u16 data)
 	u16 old_mmr = m_mmr;
 	m_mmr = data;
 
-	// Time-of-Day options (TODO: not implemented yet)
+	// Time-of-Day options
 	if ((m_mmr & 0x0003) != (old_mmr & 0x0003))
 	{
 		switch (m_mmr & 0x0003)
@@ -369,6 +369,23 @@ bool am9513_device::counter_is_mode_x(int c) const
 {
 	// Am9513A only: CM7-CM5 = 1, CM15-CM13 = EDGE
 	return m_is_am9513a && (m_counter_mode[c] & 0xc0e0) == 0xc0e0;
+}
+
+
+//-------------------------------------------------
+//  compare_count - determine comparator output
+//  for Counter 1 or Counter 2
+//-------------------------------------------------
+
+bool am9513_device::compare_count(int c) const
+{
+	assert(c == 0 || c == 1);
+
+	// TOD special case: Comparator 2 does 32-bit comparison when Comparator 1 is also activated
+	if (c == 1 && BIT(m_mmr, 2) && (m_mmr & 0x0003) != 0)
+		return m_count[0] == m_alarm[0] && m_count[1] == m_alarm[1];
+	else
+		return m_count[c] == m_alarm[c];
 }
 
 
@@ -454,7 +471,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 
 		case 0x0001:
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] == m_alarm[c]);
+				set_output(c, compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output active high TC pulse\n", c + 1);
@@ -464,7 +481,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 
 		case 0x0005:
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] != m_alarm[c]);
+				set_output(c, !compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output active low TC pulse\n", c + 1);
@@ -475,7 +492,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 		case 0x0002:
 		case 0x0003: // SCP-300F sets this up; why?
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] == m_alarm[c]);
+				set_output(c, compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output toggle on TC\n", c + 1);
@@ -717,12 +734,51 @@ void am9513_device::step_counter(int c, bool force_load)
 		{
 			if ((m_count[c] & 0x000f) >= 0x000a)
 				m_count[c] += 0x0006;
-			if ((m_count[c] & 0x00f0) >= 0x00a0)
-				m_count[c] += 0x0060;
+
+			if (c == 0 && (m_mmr & 0x0003) == 0x0001)
+			{
+				// TOD: 50Hz
+				if ((m_count[c] & 0x00f0) >= 0x0050)
+					m_count[c] += 0x00b0;
+			}
+			else if (c == 0 && (m_mmr & 0x0003) == 0x0002)
+			{
+				// TOD: 60Hz
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] += 0x00a0;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: minutes
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] += 0x00a0;
+			}
+			else
+			{
+				if ((m_count[c] & 0x00f0) >= 0x00a0)
+					m_count[c] += 0x0060;
+			}
+
 			if ((m_count[c] & 0x0f00) >= 0x0a00)
 				m_count[c] += 0x0600;
-			if ((m_count[c] & 0xf000) >= 0xa000)
-				m_count[c] += 0x6000;
+
+			if (c == 0 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: seconds
+				if ((m_count[c] & 0xf000) >= 0x6000)
+					m_count[c] += 0xa000;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: hours
+				if ((m_count[c] & 0xff00) >= 0x2400)
+					m_count[c] += 0xdc00;
+			}
+			else
+			{
+				if ((m_count[c] & 0xf000) >= 0xa000)
+					m_count[c] += 0x6000;
+			}
 		}
 	}
 	else
@@ -735,12 +791,51 @@ void am9513_device::step_counter(int c, bool force_load)
 		{
 			if ((m_count[c] & 0x000f) >= 0x000a)
 				m_count[c] -= 0x0006;
-			if ((m_count[c] & 0x00f0) >= 0x00a0)
-				m_count[c] -= 0x0060;
+
+			if (c == 0 && (m_mmr & 0x0003) == 0x0001)
+			{
+				// TOD: 50Hz
+				if ((m_count[c] & 0x00f0) >= 0x0050)
+					m_count[c] -= 0x00b0;
+			}
+			else if (c == 0 && (m_mmr & 0x0003) == 0x0002)
+			{
+				// TOD: 60Hz
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] -= 0x00a0;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: minutes
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] -= 0x00a0;
+			}
+			else
+			{
+				if ((m_count[c] & 0x00f0) >= 0x00a0)
+					m_count[c] -= 0x0060;
+			}
+
 			if ((m_count[c] & 0x0f00) >= 0x0a00)
 				m_count[c] -= 0x0600;
-			if ((m_count[c] & 0xf000) >= 0xa000)
-				m_count[c] -= 0x6000;
+
+			if (c == 0 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: seconds
+				if ((m_count[c] & 0xf000) >= 0x6000)
+					m_count[c] -= 0xa000;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: hours
+				if ((m_count[c] & 0xff00) >= 0x2400)
+					m_count[c] -= 0xdc00;
+			}
+			else
+			{
+				if ((m_count[c] & 0xf000) >= 0xa000)
+					m_count[c] -= 0x6000;
+			}
 		}
 	}
 
@@ -781,10 +876,19 @@ void am9513_device::step_counter(int c, bool force_load)
 	// Active comparators
 	if (c < 2 && BIT(m_mmr, c + 2))
 	{
-		if (BIT(m_counter_mode[c], 2))
-			set_output(c, m_count[c] == m_alarm[c]);
-		else
-			set_output(c, m_count[c] != m_alarm[c]);
+		switch (m_counter_mode[c] & 0x0007)
+		{
+		case 0x0001:
+		case 0x0002:
+			// Active high comparator output
+			set_output(c, compare_count(c));
+			break;
+
+		case 0x0005:
+			// Active low comparator output
+			set_output(c, !compare_count(c));
+			break;
+		}
 	}
 }
 
