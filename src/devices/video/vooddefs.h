@@ -1433,7 +1433,7 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			/* otherwise this just becomes the new color */
 			else
 			{
-				fogColorLocal.scale_imm_and_clamp(fogblend);
+				fogColorLocal.scale_imm_and_clamp((int16_t)fogblend);
 				//color = fog;
 				//(RR) = fr;
 				//(GG) = fg;

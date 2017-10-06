@@ -67,7 +67,7 @@ public:
 	u8 get_a() const { return u8(unsigned(_mm_extract_epi16(m_value, 6))); }
 	u8 get_r() const { return u8(unsigned(_mm_extract_epi16(m_value, 4))); }
 	u8 get_g() const { return u8(unsigned(_mm_extract_epi16(m_value, 2))); }
-	u8 get_b() const { return u8(unsigned(_mm_extract_epi16(m_value, 0))); }
+	u8 get_b() const { return u8(unsigned(_mm_cvtsi128_si32(m_value))); }
 
 #ifdef __SSE4_1__
 	s32 get_a32() const { return _mm_extract_epi32(m_value, 3); }
@@ -75,10 +75,10 @@ public:
 	s32 get_g32() const { return _mm_extract_epi32(m_value, 1); }
 	s32 get_b32() const { return _mm_extract_epi32(m_value, 0); }
 #else
-	s32 get_a32() const { return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6); }
-	s32 get_r32() const { return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4); }
-	s32 get_g32() const { return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2); }
-	s32 get_b32() const { return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0); }
+	s32 get_a32() const { return (_mm_cvtsi128_si32(_mm_shuffle_epi32(m_value, _MM_SHUFFLE(0, 0, 0, 3)))); }
+	s32 get_r32() const { return (_mm_cvtsi128_si32(_mm_shuffle_epi32(m_value, _MM_SHUFFLE(0, 0, 0, 2)))); }
+	s32 get_g32() const { return (_mm_cvtsi128_si32(_mm_shuffle_epi32(m_value, _MM_SHUFFLE(0, 0, 0, 1)))); }
+	s32 get_b32() const { return (_mm_cvtsi128_si32(m_value)); }
 #endif
 
 	inline void add(const rgbaint_t& color2)
@@ -283,36 +283,69 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 
-	inline void scale_imm_and_clamp(const s32 scale)
+	// Leave this here in case Model3 blows up...
+	//inline void scale_imm_and_clamp(const s32 scale)
+	//{
+	//	mul_imm(scale);
+	//	sra_imm(8);
+	//	clamp_to_uint8();
+	//}
+
+	// This version needs scale to be between 0-256 and color values to be 0-255
+	inline void scale_imm_and_clamp(const s16 scale)
 	{
-		mul_imm(scale);
-		sra_imm(8);
-		clamp_to_uint8();
+		// Set mult a 16 bit inputs to scale
+		__m128i immv = _mm_set1_epi16(scale);
+		// Pack color into mult b 16 bit inputs
+		m_value = _mm_packus_epi32(m_value, _mm_setzero_si128());
+		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
+		m_value = _mm_mullo_epi16(m_value, immv);
+		// Shift 16 bit values right by 8
+		m_value = _mm_srli_epi16(m_value, 8);
+		// Unpack into 32 bit values, these are already clamped to 8 bits
+		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 	}
 
-	inline void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
+	// This function needs scale to be between 0-256 and color values to be 0-255
+	inline void scale_imm_add_and_clamp(const s16 scale, const rgbaint_t& other)
 	{
-		mul_imm(scale);
-		sra_imm(8);
+		scale_imm_and_clamp(scale);
 		add(other);
 		clamp_to_uint8();
 	}
 
+	// This function needs scale values to be between 0-256 and color values to be 0-255
 	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
-		mul(scale);
-		sra_imm(8);
+		// Pack scale into mult a 16 bits
+		__m128i tmp1 = _mm_packus_epi32(scale.m_value, _mm_setzero_si128());
+		// Pack color into mult b 16 bit inputs
+		m_value = _mm_packus_epi32(m_value, _mm_setzero_si128());
+		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
+		m_value = _mm_mullo_epi16(m_value, tmp1);
+		// Shift 16 bit values right by 8
+		m_value = _mm_srli_epi16(m_value, 8);
+		// Unpack into 32 bit values
+		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 		add(other);
 		clamp_to_uint8();
 	}
 
+	// This function needs scale values to be between 0-256 and color values to be 0-255
 	inline void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 	{
-		rgbaint_t color2(other);
-		color2.mul(scale2);
-
-		mul(scale);
-		add(color2);
+		// Pack both scale values into mult a 16 bits
+		__m128i tmp1 = _mm_packus_epi32(scale.m_value, scale2.m_value);
+		// Pack both color values into mult b 16 bit inputs
+		m_value = _mm_packus_epi32(m_value, other.m_value);
+		// Do the 16 bit multiply, top and bottom 64 bits will contain 16 bit truncated results
+		tmp1 = _mm_mullo_epi16(m_value, tmp1);
+		// Unpack the results
+		m_value = _mm_unpacklo_epi16(tmp1, _mm_setzero_si128());
+		tmp1 = _mm_unpackhi_epi16(tmp1, _mm_setzero_si128());
+		// Add the results
+		m_value = _mm_add_epi32(m_value, tmp1);
+		// Shift values right by 8
 		sra_imm(8);
 		clamp_to_uint8();
 	}
