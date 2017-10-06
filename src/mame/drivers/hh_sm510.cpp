@@ -9,8 +9,6 @@
 
   TODO:
   - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
-  - SVG background/foreground vector graphics where possible. Doesn't apply to eg. the
-    Konami games where MAME's SVG renderer needs to add support for embedded images.
   - confirm gnw_mc25/gnw_eg26 rom (dumped from Soviet clone, but pretty confident that it's same)
 
 ***************************************************************************/
@@ -2320,8 +2318,8 @@ ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 202839, "svg", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 202839, CRC(4c8a38ce) SHA1(cdb5cbbef0f71584d89a5acfea73dd21a72d2318) )
+	ROM_REGION( 156974, "svg", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 156974, CRC(8d522ec6) SHA1(67afeca5eebd16449353ea43070a6b919f7ba408) )
 ROM_END
 
 ROM_START( exospace )
@@ -2337,11 +2335,11 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 207524, "svg_top", 0)
-	ROM_LOAD( "gnw_dm53_top.svg", 0, 207524, CRC(07a19adb) SHA1(605b73d79639bbe6a2e88e3186d677ad0e0a5a86) )
+	ROM_REGION( 126434, "svg_top", 0)
+	ROM_LOAD( "gnw_dm53_top.svg", 0, 126434, CRC(ff05f489) SHA1(2a533c7b5d7249d79f8d7795a0d57fd3e32d3d32) )
 
-	ROM_REGION( 227954, "svg_bottom", 0)
-	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 227954, CRC(906121e9) SHA1(1319226f9259cc179e2336308e1ab279d6b4097e) )
+	ROM_REGION( 122870, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dm53_bottom.svg", 0, 122870, CRC(8f06ddf1) SHA1(69d4b785781600abcdfc01b3902df1d0ae3608cf) )
 ROM_END
 
 
@@ -2361,11 +2359,11 @@ ROM_START( gnw_mw56 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
 
-	ROM_REGION( 172381, "svg_left", 0)
-	ROM_LOAD( "gnw_mw56_left.svg", 0, 172381, CRC(6000f1c2) SHA1(7395d89d62cc77f59b9ce12c200cd6748f287f9d) )
+	ROM_REGION( 154874, "svg_left", 0)
+	ROM_LOAD( "gnw_mw56_left.svg", 0, 154874, CRC(73ba4f4a) SHA1(d5df39808a1af8e8ad5e397b4a50313221ab6e3b) )
 
-	ROM_REGION( 229866, "svg_right", 0)
-	ROM_LOAD( "gnw_mw56_right.svg", 0, 229866, CRC(7c58f0c2) SHA1(6dd975ecd52ab6fc436b671b6a31007f94628e3d) )
+	ROM_REGION( 202863, "svg_right", 0)
+	ROM_LOAD( "gnw_mw56_right.svg", 0, 202863, CRC(dd2473c9) SHA1(51aca37abf8e4959b84c441aa2d114e16c7d6010) )
 ROM_END
 
 
@@ -2382,8 +2380,8 @@ ROM_START( gnw_ml102 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ml-102_577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
 
-	ROM_REGION( 361742, "svg", 0)
-	ROM_LOAD( "gnw_ml102.svg", 0, 361742, CRC(a9fe2c05) SHA1(ec16081a7444cccd7fa90fda9a94dbcb037c5c67) )
+	ROM_REGION( 302931, "svg", 0)
+	ROM_LOAD( "gnw_ml102.svg", 0, 302931, CRC(5517ae80) SHA1(1902e36d0470ee5548addeb087ea3e7d2c2520a2) )
 ROM_END
 
 
