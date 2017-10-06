@@ -81,6 +81,12 @@ public:
 	s32 get_b32() const { return (_mm_cvtsi128_si32(m_value)); }
 #endif
 
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return (rgbaint_t)_mm_shuffle_epi32(m_value, _MM_SHUFFLE(3, 3, 3, 3)); }
+	rgbaint_t select_red32() const { return (rgbaint_t)_mm_shuffle_epi32(m_value, _MM_SHUFFLE(2, 2, 2, 2)); }
+	rgbaint_t select_green32() const { return (rgbaint_t)_mm_shuffle_epi32(m_value, _MM_SHUFFLE(1, 1, 1, 1)); }
+	rgbaint_t select_blue32() const { return (rgbaint_t)_mm_shuffle_epi32(m_value, _MM_SHUFFLE(0, 0, 0, 0)); }
+
 	inline void add(const rgbaint_t& color2)
 	{
 		m_value = _mm_add_epi32(m_value, color2.m_value);
@@ -148,11 +154,6 @@ public:
 		__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4));
 		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
 	}
-
-	inline void mul_imm_alpha(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(3, 3, 3, 3))); }
-	inline void mul_imm_red(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(2, 2, 2, 2))); }
-	inline void mul_imm_green(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(1, 1, 1, 1))); }
-	inline void mul_imm_blue(const rgbaint_t& color) { mul((rgbaint_t)_mm_shuffle_epi32(color.m_value, _MM_SHUFFLE(0, 0, 0, 0))); }
 
 	inline void shl(const rgbaint_t& shift)
 	{

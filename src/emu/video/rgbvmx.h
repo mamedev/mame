@@ -205,6 +205,12 @@ public:
 		return result;
 	}
 
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
+	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
+	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
+	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
+
 	inline void add(const rgbaint_t& color2)
 	{
 		m_value = vec_add(m_value, color2.m_value);
@@ -306,11 +312,6 @@ public:
 		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(value))));
 #endif
 	}
-
-	inline void mul_imm_alpha(const rgbaint_t& color) { mul_imm(color.get_a32()); }
-	inline void mul_imm_red(const rgbaint_t& color) { mul_imm(color.get_r32()); }
-	inline void mul_imm_green(const rgbaint_t& color) { mul_imm(color.get_g32()); }
-	inline void mul_imm_blue(const rgbaint_t& color) { mul_imm(color.get_b32()); }
 
 	inline void shl(const rgbaint_t& shift)
 	{
