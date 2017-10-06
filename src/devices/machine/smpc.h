@@ -159,7 +159,7 @@ private:
 	uint8_t m_intback_buf[3];
 	uint8_t m_oreg[32];
 	uint8_t m_rtc_data[7];
-	uint8_t m_smem[4];
+	uint8_t m_smem[5];
 	uint8_t m_comreg;
 	// in usec
 	// timing table, from manual in usec
@@ -180,7 +180,6 @@ private:
 	bool m_command_in_progress;
 	bool m_NMI_reset;
 	bool m_cur_dotsel;
-	bool m_settime;
 
 	void master_sh2_nmi();
 	void irq_request();

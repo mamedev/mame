@@ -205,7 +205,7 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
-    m_mini_nvram(*this, "nvram"),
+    m_mini_nvram(*this, "smem"),
 	m_mshres(*this),
 	m_mshnmi(*this),
 	m_sshres(*this),
@@ -248,7 +248,7 @@ void smpc_hle_device::static_set_control_port_tags(device_t &device, const char 
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER(smpc_hle_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("smem")
 	
 	// TODO: custom RTC subdevice
 MACHINE_CONFIG_END
@@ -262,7 +262,9 @@ void smpc_hle_device::device_start()
 	system_time systime;
 	machine().base_datetime(systime);
 	
-	m_mini_nvram->set_base(&m_smem, 4);
+//	check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail 
+//  (-> call the RTC / Language select menu for Saturn)
+	m_mini_nvram->set_base(&m_smem, 5);
 	
 	m_mshres.resolve_safe();
 	m_mshnmi.resolve_safe();
@@ -346,9 +348,6 @@ void smpc_hle_device::device_reset()
 	m_cur_dotsel = false;
 	
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
-	
-//	check if SMEM has valid data (default 1 filled), if not then simulate a battery backup fail (-> call the RTC / Language select menu for Saturn)
-	m_settime = m_smem[0] != 0xff;
 }
 
 device_memory_interface::space_config_vector smpc_hle_device::memory_space_config() const
@@ -656,9 +655,6 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	
 				case 0x16: // SETTIME
 				{
-					// setting this up will clear the set time in case of battery backed died
-					m_settime = true;
-
 					for(int i=0;i<7;i++)
 						m_rtc_data[i] = m_ireg[i];
 					break;
@@ -669,6 +665,8 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					for(int i=0;i<4;i++)
 						m_smem[i] = m_ireg[i];
 
+					// clear the SETIME variable, simulate a cr2032 battery alive in the system
+					m_smem[4] = 0xff;
 					break;
 				}
 				
@@ -716,7 +714,7 @@ void smpc_hle_device::resolve_intback()
 
 	if(m_intback_buf[0] != 0)
 	{	
-		m_oreg[0] = ((m_settime << 7) | ((m_NMI_reset & 1) << 6));
+		m_oreg[0] = ((m_smem[4] & 0x80) | ((m_NMI_reset & 1) << 6));
 
 		for(i=0;i<7;i++)
 			m_oreg[1+i] = m_rtc_data[i];
