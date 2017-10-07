@@ -620,16 +620,16 @@ void am9513_device::set_tc(int c, bool state)
 		}
 	}
 
-	if (c < 4)
-	{
-		// TC cascading
-		if ((m_counter_mode[c + 1] & 0x1f00) == (state ? 0x0000 : 0x1000))
-			count_edge(c + 1);
+	// TCn-1 = TC5 for Counter 1
+	int d = (c + 1) % 5;
 
-		// TC gating
-		if ((m_counter_mode[c + 1] & 0xe000) == 0x2000)
-			gate_count(c + 1, state && (bus_is_16_bit() || m_gate_alt[c + 1]));
-	}
+	// TC cascading
+	if ((m_counter_mode[d] & 0x1f00) == (state ? 0x0000 : 0x1000))
+		count_edge(d);
+
+	// TC gating
+	if ((m_counter_mode[d] & 0xe000) == 0x2000)
+		gate_count(d, state && (bus_is_16_bit() || m_gate_alt[d]));
 }
 
 
@@ -947,20 +947,26 @@ void am9513_device::write_gate(int g, bool level)
 
 	m_gate[g] = level;
 
+	// Check for selection of GATE n as source for any counter
 	for (int c = 0; c < 5; c++)
 	{
 		if ((m_counter_mode[c] & 0x0f00) >> 8 == (g + 6) && BIT(m_counter_mode[c], 12) == !level)
 			count_edge(c);
 	}
 
+	// Check for selection of GATE n as control for same-numbered counter
 	if (BIT(m_counter_mode[g], 15))
 		gate_count(g, level && (bus_is_16_bit() || m_gate_alt[g]));
-	if (g > 0 && (m_counter_mode[g - 1] & 0xe000) == 0x4000)
-		gate_count(g - 1, level && (bus_is_16_bit() || m_gate_alt[g - 1]));
-	if (g < 4 && (m_counter_mode[g + 1] & 0xe000) == 0x6000)
-		gate_count(g + 1, level && (bus_is_16_bit() || m_gate_alt[g + 1]));
 
-	// FOUT Source = GATE n
+	// Check for selection of GATE n as control for previous counter
+	if ((m_counter_mode[(g + 4) % 5] & 0xe000) == 0x4000)
+		gate_count((g + 4) % 5, level && (bus_is_16_bit() || m_gate_alt[(g + 4) % 5]));
+
+	// Check for selection of GATE n as control for next counter
+	if ((m_counter_mode[(g + 1) % 5] & 0xe000) == 0x6000)
+		gate_count((g + 1) % 5, level && (bus_is_16_bit() || m_gate_alt[(g + 1) % 5]));
+
+	// Check for selection of GATE n as source for FOUT
 	if ((m_mmr & 0x00f0) >> 4 == (g + 6))
 		fout_tick();
 }
@@ -984,18 +990,15 @@ void am9513_device::write_gate_alt(int c, bool level)
 	switch (m_counter_mode[c] & 0xe000)
 	{
 	case 0x2000:
-		if (c > 0)
-			gate_count(c, level && m_tc[c - 1]);
+		gate_count(c, level && m_tc[(c + 4) % 5]);
 		break;
 
 	case 0x4000:
-		if (c < 4)
-			gate_count(c + 1, level && m_gate[c + 1]);
+		gate_count((c + 1) % 5, level && m_gate[(c + 1) % 5]);
 		break;
 
 	case 0x6000:
-		if (c > 0)
-			gate_count(c - 1, level && m_gate[c - 1]);
+		gate_count((c + 4) % 5, level && m_gate[(c + 4) % 5]);
 		break;
 
 	case 0x8000:
