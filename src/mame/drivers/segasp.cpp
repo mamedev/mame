@@ -560,7 +560,7 @@ GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "S
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
-GAME( 2009, ochaken, segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
+GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 // These use a CF card
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
