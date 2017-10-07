@@ -115,7 +115,15 @@ static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
 	AM_RANGE(0x00000600, 0x00000607) AM_READ8( sound_r, 0x0000ffff) //AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff) 
 
 	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("ipl", 0)
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("ipl", 0) AM_WRITENOP // emjjoshi attempts to write there?
+	// following are likely to be Seibu CATS specific
+	AM_RANGE(0x01200000, 0x01200007) AM_NOP // address/data 8-bit r/w
+	AM_RANGE(0x01200100, 0x01200103) AM_WRITENOP
+	AM_RANGE(0x01200104, 0x01200107) AM_READNOP
+	AM_RANGE(0x01200200, 0x01200203) AM_READNOP
+	AM_RANGE(0x01200204, 0x01200207) AM_NOP
+	AM_RANGE(0x01200300, 0x01200303) AM_READNOP
+	AM_RANGE(0x01200304, 0x01200307) AM_NOP
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -254,6 +262,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( emjjoshi )
+	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
+    ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(e69bed6d) SHA1(e9626e704c5d28419cfa6a7a2c1b13b4b46f941c) )
+    ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(1082ede1) SHA1(0d1a682f37ede5c9070c14d1c3491a3082ad0759) )
+    ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(df85a8f7) SHA1(83226767b0c33e8cc3baee6f6bb17e4f1a6c9c27) )
+    ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(6fe7fd41) SHA1(e7ea9cb83bdeed4872f9e423b8294b9ca4b29b6b) )
+	
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms - none! */
+
+	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
+
+	ROM_REGION( 0x600000, "gfx3", 0)   
+	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
+	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
+//  obj4.u0234 empty slot
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "At the Girls Dorm SKTP-10002", 0, SHA1(be47c105089d6ef4ce05a6e1ba2ec7a3101015dc) )
+ROM_END
+
+
 // MJ1-1537
 ROM_START( emjscanb )
 	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
@@ -297,5 +327,33 @@ ROM_START( emjtrapz )
 	DISK_IMAGE_READONLY( "Trap Zone SKTP-00009", 0, SHA1(b4a51f42eeaeefc329031651859caa108418a96e) )
 ROM_END
 
+// Gravure Collection
+// Pakkun Ball TV
+/* 01 */ // Mahjong Shichau zo!
+/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 03 */ // Lingerie DE Ikou
+/* 04 */ // Marumie Network
+/* 05 */ // BINKAN Lips
 /* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 08 */ // Poison
+/* 09 */ // Nurse Call
+/* 10 */ // Secret Love
+/* 11 */ // Venus Shot
+/* 12 */ // Platina Selection
+/* 13 */ // Gal Jong
+/* 14 */ // Yakin Jantou
+/* 15 */ // Collector
+/* 16 */ // Digicute
+/* 17 */ // Gal Jong 2
+/* 18 */ // Midnight Lovers
+/* 19 */ // Sexual
+/* 20 */ // Gekisha!
+/* 21 */ // Fetish Navi
+/* 22 */ // Venus On Line / Beauty On Line
+/* 23 */ // Nurse Mania
+/* 24 */ // Sexy Beach
+/* 25 */ // Oshioki
+/* 26 */ // Private Eyes
+/* 27 */ // Gal Jong Kakutou Club
+/* 28 */ // BINKAN Lips Plus 

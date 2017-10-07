@@ -33724,6 +33724,7 @@ strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
 
 @source:seibucats.cpp
+emjjoshi						// (c) 1999 Seibu Kaihatsu / CATS
 emjscanb						// (c) 2001 Seibu Kaihatsu / CATS
 emjtrapz						// (c) 2001 Seibu Kaihatsu / CATS
 
