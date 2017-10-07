@@ -2508,7 +2508,8 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
 			sub_val.set_a(0);
 
-		c_other.sub(sub_val);
+		// Need to check this, manual states 9 bits
+		c_other.sub_u8(sub_val);
 	}
 
 	/* blend RGB */
@@ -3038,7 +3039,8 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 			sub_val.set_a(0);
 
-		c_other.sub(sub_val);
+		// Need to check this, manual states 9 bits
+		c_other.sub_u8(sub_val);
 	}
 
 	/* blend RGB */
