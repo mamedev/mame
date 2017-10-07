@@ -23,21 +23,17 @@
 #include "emu.h"
 #include "vme_hcpu30.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
