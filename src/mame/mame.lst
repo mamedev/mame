@@ -33362,6 +33362,9 @@ pengo5                          // 834-0386 (c) 1982 Sega
 pengob                          // bootleg
 penta                           // bootleg
 
+@source:pensebem.cpp
+pbem2017                        // 2017 TecToy Pense Bem
+
 @source:pentagon.cpp
 pent1024                        //
 pentagon                        //
