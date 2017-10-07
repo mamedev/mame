@@ -3409,6 +3409,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/seibuspi.cpp",
 	MAME_DIR .. "src/mame/includes/seibuspi.h",
 	MAME_DIR .. "src/mame/video/seibuspi.cpp",
+	MAME_DIR .. "src/mame/drivers/seibucats.cpp",
 	MAME_DIR .. "src/mame/drivers/sengokmj.cpp",
 	MAME_DIR .. "src/mame/drivers/stfight.cpp",
 	MAME_DIR .. "src/mame/video/stfight_dev.cpp",
