@@ -1296,6 +1296,7 @@ MACHINE_START_MEMBER(stv_state,stv)
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_scsp_last_line));
+	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates(); // machine/stvprot.c
 

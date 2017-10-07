@@ -113,6 +113,7 @@ public:
 		bitmap_rgb32 roz_bitmap[2];
 		uint8_t     dotsel;
 		uint8_t     pal;
+		uint8_t     odd;
 		uint16_t    h_count;
 		uint16_t    v_count;
 		uint8_t     exltfg;
