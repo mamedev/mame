@@ -93,6 +93,16 @@ public:
 		sub_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
+	// Subtract using 8 bit arithmetic
+	inline void sub_u8(const rgbaint_t& color)
+	{
+		sub_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
+		m_a &= 0xff;
+		m_r &= 0xff;
+		m_g &= 0xff;
+		m_b &= 0xff;
+	}
+
 	inline void sub_imm(const s32 imm)
 	{
 		sub_imm_rgba(imm, imm, imm, imm);

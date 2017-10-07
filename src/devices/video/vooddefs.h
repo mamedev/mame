@@ -1366,7 +1366,8 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
-				fogColorLocal.sub(color);
+				// Need to check this, manual states 9 bits
+				fogColorLocal.sub_u8(color);
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
 				//fg -= (GG);

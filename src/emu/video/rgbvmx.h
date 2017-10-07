@@ -237,6 +237,14 @@ public:
 		m_value = vec_sub(m_value, color2.m_value);
 	}
 
+	// Subtract using 8 bit arithmetic
+	inline void sub_u8(const rgbaint_t& color)
+	{
+		m_value = vec_sub(m_value, color.m_value);
+		const VECU32 limit = { 255, 255, 255, 255 };
+		m_value = vec_and(m_value, limit);
+	}
+
 	inline void sub_imm(const s32 imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };

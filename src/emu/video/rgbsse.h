@@ -107,6 +107,12 @@ public:
 		m_value = _mm_sub_epi32(m_value, color2.m_value);
 	}
 
+	// Subtract using 8 bit arithmetic
+	inline void sub_u8(const rgbaint_t& color)
+	{
+		m_value = _mm_sub_epi8(m_value, color.m_value);
+	}
+
 	inline void sub_imm(const s32 imm)
 	{
 		m_value = _mm_sub_epi32(m_value, _mm_set1_epi32(imm));
