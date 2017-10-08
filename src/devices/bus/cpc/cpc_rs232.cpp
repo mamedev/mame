@@ -42,7 +42,7 @@ MACHINE_CONFIG_MEMBER( cpc_rs232_device::device_add_mconfig )
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cpc_rs232_device, pit_out1_w))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cpc_rs232_device, pit_out2_w))
 
-	MCFG_Z80DART_ADD("dart", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_4MHz)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))

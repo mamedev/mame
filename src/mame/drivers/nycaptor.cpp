@@ -715,7 +715,7 @@ void nycaptor_state::machine_start()
 
 void nycaptor_state::machine_reset()
 {
-//	MACHINE_RESET_CALL_MEMBER(ta7630);
+//  MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	m_generic_control_reg = 0;
 

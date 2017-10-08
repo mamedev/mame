@@ -438,7 +438,7 @@ WRITE16_MEMBER(psx1_state::parallel_w)
 			m_maincpu->set_state_int(PSXCPU_DELAYR, PSXCPU_DELAYR_PC);
 			m_maincpu->set_state_int(PSXCPU_DELAYV, m_maincpu->state_int(PSXCPU_PC));
 
-			// workround to fix controller in amidog tests that do not initialise the sio registers 
+			// workround to fix controller in amidog tests that do not initialise the sio registers
 			m_maincpu->space(AS_PROGRAM).write_word(0x1f80104e, 0x0088);
 			m_maincpu->space(AS_PROGRAM).write_word(0x1f801048, 0x000d);
 

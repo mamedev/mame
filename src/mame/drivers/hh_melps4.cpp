@@ -10,6 +10,7 @@
 #include "emu.h"
 
 #include "cpu/melps4/m58846.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "rendlay.h"

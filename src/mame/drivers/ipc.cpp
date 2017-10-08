@@ -41,8 +41,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -69,6 +69,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ipc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
@@ -92,14 +93,16 @@ static MACHINE_CONFIG_START( ipc )
 	MCFG_CPU_PROGRAM_MAP(ipc_mem)
 	MCFG_CPU_IO_MAP(ipc_io)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_19_6608MHz / 16)
+	MCFG_PIT8253_CLK1(XTAL_19_6608MHz / 16)
+	MCFG_PIT8253_CLK2(XTAL_19_6608MHz / 16)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart2", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0) // 8 data bits, no parity, 1 stop bit
+	MCFG_DEVICE_ADD("uart1", I8251, 0) // 8 data bits, no parity, 1 stop bit, 9600 baud
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
@@ -109,7 +112,7 @@ static MACHINE_CONFIG_START( ipc )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0) // 8 data bits, no parity, 2 stop bits
+	MCFG_DEVICE_ADD("uart2", I8251, 0) // 8 data bits, no parity, 2 stop bits, 2400 baud
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))

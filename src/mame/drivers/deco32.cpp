@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x1000000, 0x1000007) AM_READ(unk_video_r)
 	AM_RANGE(0x1000100, 0x1007fff) AM_RAM
 	AM_RANGE(0x10b0000, 0x10b01ff) AM_RAM
-	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are																	// as a result it ends up writing what looks like pointers to the frame data in the ram area above
+	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are                                                                 // as a result it ends up writing what looks like pointers to the frame data in the ram area above
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lockloadu_map, AS_PROGRAM, 32, dragngun_state )
@@ -935,9 +935,9 @@ DECO16IC_BANK_CB_MEMBER( deco32_state::tattass_bank_callback )
 //  INPUTS
 //**************************************************************************
 
-READ8_MEMBER( deco32_state::captaven_dsw1_r ) {	return ioport("DSW1")->read(); }
-READ8_MEMBER( deco32_state::captaven_dsw2_r ) {	return ioport("DSW2")->read(); }
-READ8_MEMBER( deco32_state::captaven_dsw3_r ) {	return ioport("DSW3")->read(); }
+READ8_MEMBER( deco32_state::captaven_dsw1_r ) { return ioport("DSW1")->read(); }
+READ8_MEMBER( deco32_state::captaven_dsw2_r ) { return ioport("DSW2")->read(); }
+READ8_MEMBER( deco32_state::captaven_dsw3_r ) { return ioport("DSW3")->read(); }
 
 READ16_MEMBER( deco32_state::fghthist_in0_r ) { return ioport("IN0")->read(); }
 READ16_MEMBER( deco32_state::fghthist_in1_r ) { return ioport("IN1")->read(); }

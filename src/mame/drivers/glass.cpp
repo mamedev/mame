@@ -426,7 +426,7 @@ DRIVER_INIT_MEMBER(glass_state, glass)
 /*
  ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
  The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but this is not the case.
- 
+
  Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
  The protected version 1.1 also doesn't show any kind of attract gameplay, looks like it was patched out? (should be verified on an untouched original 1.1 using it's original SRAM tho)
  The unprotected version appears to be a Korean set, is censored, and has different girl pictures.

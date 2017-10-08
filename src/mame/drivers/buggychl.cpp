@@ -17,7 +17,7 @@ TODO:
   background, and the gradient can move around (the latter doesn't seem to
   be used except for making it cover the whole screen on the title screen,
   and start at the middle during gameplay)
-  Update: stage 2 is supposed to have a different gradient, how/where 
+  Update: stage 2 is supposed to have a different gradient, how/where
   this is located is unknown (pen 0x20?)
 - Video driver is largely unoptimized
 - Support for the 7630's controlling the sound chip outputs (bass/treble,
@@ -25,7 +25,7 @@ TODO:
 - The sound Z80 seems to write answers for the main Z80, but the latter doesn't
   seem to read them.
 - videoram and spriteram garbage occurs when entering into cross hatch test and exiting.
-  Game attempts to transfer content of videoram into spriteram/scrollram, then transfer 
+  Game attempts to transfer content of videoram into spriteram/scrollram, then transfer
   back again into videoram. Maybe the host CPU cannot read contents of VRAM at all?
 
 Notes:
@@ -219,11 +219,11 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd603, 0xd603) AM_MIRROR(0x00e4) AM_READ_PORT("IN0")    /* player inputs */
 	AM_RANGE(0xd608, 0xd608) AM_MIRROR(0x00e4) AM_READ_PORT("WHEEL")
 	AM_RANGE(0xd609, 0xd609) AM_MIRROR(0x00e4) AM_READ_PORT("IN1")    /* coin + accelerator */
-//	AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
-//	AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
+//  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
+//  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_MIRROR(0x00e4) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd611, 0xd611) AM_MIRROR(0x00e4) AM_READ(sound_status_main_r)
-//	AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
+//  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xd618, 0xd618) AM_MIRROR(0x00e7) AM_WRITENOP    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd820, 0xd83f) AM_RAM // TODO
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( buggychl )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( buggychl )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_TA7630_ADD("ta7630")
-	
+
 	MCFG_SOUND_ADD("ay1", YM2149, XTAL_8MHz/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))

@@ -8,6 +8,7 @@
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
+#include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
 

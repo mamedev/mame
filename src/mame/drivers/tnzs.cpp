@@ -2319,10 +2319,10 @@ Taito: K1100416A J1100332A
 Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
-	  Graphics ROMs are 23C1000/TC531000 MASK ROMs
+      Graphics ROMs are 23C1000/TC531000 MASK ROMs
 
 
-Chuka Taisen 'later' version: 
+Chuka Taisen 'later' version:
    Seta: PO-025-A
   Taito: K1100241A J1100107A
 Sticker: K1100364A CHUKA TAISEN
@@ -2353,7 +2353,7 @@ PROMs are AM27S29
 
 ROM Board
 ---------
-K9100189A J9100141A ROM7PCB 
+K9100189A J9100141A ROM7PCB
 Sticker: K9100189A CHUUKA TAISEN
 
 All EPROMs are Toshiba TC571000D-20

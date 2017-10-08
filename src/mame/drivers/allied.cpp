@@ -47,6 +47,7 @@ ToDo:
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "allied.lh"
 
 class allied_state : public genpin_class

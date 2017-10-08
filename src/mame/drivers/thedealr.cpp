@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"

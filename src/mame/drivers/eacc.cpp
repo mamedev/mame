@@ -52,6 +52,7 @@
 #include "eacc.lh"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 
 class eacc_state : public driver_device

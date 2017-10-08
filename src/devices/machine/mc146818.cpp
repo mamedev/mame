@@ -489,7 +489,7 @@ void mc146818_device::update_irq()
 	}
 	else
 	{
-		m_data[REG_C] &= REG_C_IRQF;
+		m_data[REG_C] &= ~REG_C_IRQF;
 		m_write_irq(ASSERT_LINE);
 	}
 }

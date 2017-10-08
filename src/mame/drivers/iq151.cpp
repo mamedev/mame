@@ -49,6 +49,7 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 // cartridge slot

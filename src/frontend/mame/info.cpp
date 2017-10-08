@@ -158,11 +158,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ELEMENT driver EMPTY>\n"
 "\t\t\t<!ATTLIST driver status (good|imperfect|preliminary) #REQUIRED>\n"
 "\t\t\t<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver color (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver sound (good|imperfect|preliminary) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver graphic (good|imperfect|preliminary) #REQUIRED>\n"
 "\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
-"\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 "\t\t<!ELEMENT feature EMPTY>\n"
 "\t\t\t<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>\n"
@@ -224,7 +220,7 @@ void info_xml_creator::output(FILE *out, std::vector<std::string> const &pattern
 	driver_enumerator drivlist(m_lookup_options);
 	std::vector<bool> matched(patterns.size(), false);
 	size_t exact_matches = 0;
-	auto const included = [&patterns, &drivlist, &matched, &exact_matches] (char const *const name) -> bool
+	auto const included = [&patterns, &matched, &exact_matches] (char const *const name) -> bool
 	{
 		if (patterns.empty())
 			return true;
@@ -1583,17 +1579,6 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	emulation problems.
 	*/
 
-	auto const print_feature =
-			[this, unemulated, imperfect] (device_t::feature_type feature, char const *name, bool show_good)
-			{
-				if (unemulated & feature)
-					fprintf(m_output, " %s=\"preliminary\"", name);
-				else if (imperfect & feature)
-					fprintf(m_output, " %s=\"imperfect\"", name);
-				else if (show_good)
-					fprintf(m_output, " %s=\"good\"", name);
-			};
-
 	u32 const flags = driver.flags;
 	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
@@ -1611,14 +1596,8 @@ void info_xml_creator::output_driver(game_driver const &driver, device_t::featur
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	print_feature(device_t::feature::PALETTE, "color", true);
-	print_feature(device_t::feature::SOUND, "sound", true);
-	print_feature(device_t::feature::GRAPHICS, "graphic", true);
-
 	if (flags & machine_flags::NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
-
-	print_feature(device_t::feature::PROTECTION, "protection", false);
 
 	if (flags & machine_flags::SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");

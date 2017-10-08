@@ -10,6 +10,7 @@
 #include "sound/beep.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"

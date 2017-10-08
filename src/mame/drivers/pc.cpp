@@ -282,7 +282,7 @@ Options: 8087 FPU
 
 Ericsson PC
 ===========
-Links: https://youtu.be/6uilOdMJc24 
+Links: https://youtu.be/6uilOdMJc24
 Form Factor: Desktop
 CPU: 8088 @ 4.77MHz
 RAM: 256K
@@ -319,8 +319,8 @@ RAM: 768K, not sure how to address the area above 640K
 Bus: 8x ISA:    1) NEC V20 Slot CPU with 786K RAM, TI TACT80181FT chip
                 2) Z180 CP/M emulation card, needed to run the proprietary Olytext 30 word processor)
                 3) Monochrome graphics/color graphics card (possibly EGA capable) ICs: Chips P82C441 and P82A442A
-				4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223, 
-				5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
+                4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223,
+                5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
 Video: MDA/Hercules/CGA, possibly EGA
 Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
 On board ports: speaker

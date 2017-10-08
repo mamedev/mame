@@ -22,6 +22,7 @@ Other:  BMC B816140 (CPLD)
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

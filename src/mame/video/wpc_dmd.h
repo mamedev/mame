@@ -8,6 +8,8 @@
 #ifndef MAME_VIDEO_WPC_DMD_H
 #define MAME_VIDEO_WPC_DMD_H
 
+#include "machine/timer.h"
+
 #define MCFG_WPC_DMD_ADD( _tag, _scanline_cb ) \
 	MCFG_DEVICE_ADD( _tag, WPC_DMD, 0 ) \
 	devcb = &wpc_dmd_device::set_scanline_cb(*device, DEVCB_##_scanline_cb);

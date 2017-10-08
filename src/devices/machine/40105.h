@@ -96,6 +96,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(CD40105, cmos_40105_device)
-extern const device_type HC40105;
 
 #endif // MAME_MACHINE_40105_H

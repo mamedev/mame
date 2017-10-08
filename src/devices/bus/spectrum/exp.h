@@ -11,29 +11,29 @@
         A15   1  A14
         A13   2  A12
          D7   3  +5v
-        ¬OE   4  NC
+        Â¬OE   4  NC
        SLOT   5  SLOT
          D0   6  0v
          D1   7  0v
-         D2   8  ¬CK
+         D2   8  Â¬CK
          D6   9  A0
          D5  10  A1
          D3  11  A2
          D4  12  A3
-       ¬INT  13  NC
-       ¬NMI  14  0v
-      ¬HALT  15  ¬OE
-      ¬MREQ  16  NC
-      ¬IORQ  17  NC
-        ¬RD  18  NC
-        ¬WR  19  ¬BUSRQ
-         NC  20  ¬RESET
-      ¬WAIT  21  A7
+       Â¬INT  13  NC
+       Â¬NMI  14  0v
+      Â¬HALT  15  Â¬OE
+      Â¬MREQ  16  NC
+      Â¬IORQ  17  NC
+        Â¬RD  18  NC
+        Â¬WR  19  Â¬BUSRQ
+         NC  20  Â¬RESET
+      Â¬WAIT  21  A7
        +12v  22  A6
          NC  23  A5
-        ¬M1  24  A4
-      ¬RFSH  25  ¬ROMCS
-         A8  26  ¬BUSACK
+        Â¬M1  24  A4
+      Â¬RFSH  25  Â¬ROMCS
+         A8  26  Â¬BUSACK
         A10  27  A9
          NC  28  A11
 

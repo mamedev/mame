@@ -603,28 +603,28 @@ WRITE8_MEMBER( vicdual_state::brdrline_audio_w )
 {
 	uint8_t res = data ^ 0xff;
 
-//	if(res & 2) // low fuel, MISSING
-	
+//  if(res & 2) // low fuel, MISSING
+
 	if(res & 8) // end level
 		m_samples->start(3, 3);
-	
+
 	if(res & 0x10)  // moving in the brush
 		m_samples->start(5, 5);
-	
+
 	if(res & 0x20) // fire
 		m_samples->start(6, 6);
-	
+
 	if(res & 0x40)  // car engine noise
 		m_samples->start(4, 4);
 
 	if(res & 0x80)  // crashes
 		m_samples->start(2, 2);
-		
+
 	//printf("%02x\n",res);
 }
 
 WRITE8_MEMBER( vicdual_state::brdrline_audio_aux_w )
-{	
+{
 	if(data & 0xfc) // coin, unknown which is the trigger
 		m_samples->start(1, 1);
 	else // boot sample

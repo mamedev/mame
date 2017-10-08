@@ -1,6 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
+
 #include "machine/msm6242.h"
+#include "machine/timer.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
 #include "sound/l7a1045_l6028_dsp_a.h"

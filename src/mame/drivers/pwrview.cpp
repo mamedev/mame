@@ -370,7 +370,9 @@ static MACHINE_CONFIG_START( pwrview )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_Z80SIO2_ADD("sio", 4000000, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
+
 	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)

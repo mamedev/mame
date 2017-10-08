@@ -207,7 +207,7 @@ READ8_MEMBER( deco_irq_device::status_r )
 	data |= 0 << 3;
 	data |= 0 << 2;
 	data |= m_screen->vblank() << 1;
-//	data |= (m_screen->hblank() & m_screen->vblank()) << 0;
+//  data |= (m_screen->hblank() & m_screen->vblank()) << 0;
 	data |= m_screen->hblank() << 0;
 
 	return data;

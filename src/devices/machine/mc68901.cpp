@@ -789,7 +789,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_TCDCR:
-		m_tcdcr = data & 0x6f;
+		m_tcdcr = data & 0x77;
 
 		switch (m_tcdcr & 0x07)
 		{

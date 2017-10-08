@@ -3,6 +3,7 @@
 
 #include "includes/saturn.h"
 #include "audio/rax.h"
+#include "machine/eepromser.h"
 #include "machine/ticket.h"
 
 class stv_state : public saturn_state
@@ -10,7 +11,12 @@ class stv_state : public saturn_state
 public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: saturn_state(mconfig, type, tag),
+		m_cart1(*this, "stv_slot1"),
+		m_cart2(*this, "stv_slot2"),
+		m_cart3(*this, "stv_slot3"),
+		m_cart4(*this, "stv_slot4"),
 		m_rax(*this, "rax"),
+		m_eeprom(*this, "eeprom"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
 		m_hopper(*this, "hopper")
@@ -88,6 +94,10 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart4 ) { return load_cart(image, m_cart4); }
+	optional_device<generic_slot_device> m_cart1;
+	optional_device<generic_slot_device> m_cart2;
+	optional_device<generic_slot_device> m_cart3;
+	optional_device<generic_slot_device> m_cart4;
 
 	void install_stvbios_speedups( void );
 
@@ -97,6 +107,12 @@ public:
 	DECLARE_MACHINE_RESET(batmanfr);
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
 	optional_device<acclaim_rax_device> m_rax;
+
+	uint8_t     m_port_sel,m_mux_data;
+	uint8_t     m_system_output;
+	uint8_t     m_ioga_mode;
+	uint8_t     m_ioga_portg;
+	uint16_t    m_serial_tx;
 
 	// protection specific variables and functions (see machine/stvprot.c)
 	uint32_t m_abus_protenable;
@@ -110,12 +126,20 @@ public:
 	void install_common_protection();
 	void stv_register_protection_savestates();
 
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
 	uint16_t crypt_read_callback(uint32_t addr);
 	uint16_t crypt_read_callback_ch1(uint32_t addr);
 	uint16_t crypt_read_callback_ch2(uint32_t addr);
+	
+	DECLARE_READ8_MEMBER(pdr1_input_r);
+	DECLARE_READ8_MEMBER(pdr2_input_r);
+	DECLARE_WRITE8_MEMBER(pdr1_output_w);
+	DECLARE_WRITE8_MEMBER(pdr2_output_w);
+	void stv_select_game(int gameno);
+	uint8_t     m_prev_gamebank_select;
 };
 
 

@@ -14,6 +14,7 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 

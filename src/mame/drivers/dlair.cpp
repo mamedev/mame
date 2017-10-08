@@ -755,7 +755,7 @@ static MACHINE_CONFIG_START( dleuro )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
 
-	MCFG_Z80SIO0_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO0, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// TODO: hook up tx and rx callbacks
 

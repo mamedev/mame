@@ -228,6 +228,7 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"

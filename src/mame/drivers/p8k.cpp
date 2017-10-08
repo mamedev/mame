@@ -42,8 +42,10 @@
     TODO:
       * properly implement Z80 daisy chain in 16 bit board
       * Find out how to enter hardware check on 16 bit board
-      * hook the sio back up when it becomes usable
-
+      * Find out how interrupts work on 16 bit board, an attempt to use Z8000_VI
+        (needed for daisy-chain) results in a crash. Once that is fixed and working,
+        then the use of sio0 can be attempted.
+      * Need full 16-bit schematics.
 
 ****************************************************************************/
 
@@ -59,46 +61,42 @@
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "speaker.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
-
-#define TERMINAL_TAG "terminal"
 
 class p8k_state : public driver_device
 {
 public:
 	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	DECLARE_READ8_MEMBER(p8k_port24_r);
-	DECLARE_WRITE8_MEMBER(p8k_port24_w);
 	DECLARE_READ16_MEMBER(portff82_r);
 	DECLARE_WRITE16_MEMBER(portff82_w);
-	void kbd_put(u8 data);
-	void kbd_put_16(u8 data);
-	uint8_t m_term_data;
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_DRIVER_INIT(p8k);
 	DECLARE_MACHINE_RESET(p8k);
 	DECLARE_MACHINE_RESET(p8k_16);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-
-	virtual void machine_start() override;
-
-	DECLARE_WRITE_LINE_MEMBER( p8k_daisy_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( p8k_dma_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( p8k_16_daisy_interrupt );
+	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(p8k_dma_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(p8k_16_daisy_interrupt );
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+	void kbd_put_16(u8 data);
+
+private:
+	uint8_t m_term_data;
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	optional_device<generic_terminal_device> m_terminal;
 };
 
 /***************************************************************************
@@ -129,16 +127,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80pio_0", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x20, 0x21) AM_DEVICE("i8272", i8272a_device, map)
-	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
-	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
+	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio0", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio1", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
+	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -173,38 +170,6 @@ WRITE8_MEMBER( p8k_state::p8k_port0_w )
 		printf("Invalid data %X for bank %d\n",data,breg);
 }
 
-READ8_MEMBER( p8k_state::p8k_port24_r )
-{
-	if (offset == 3)
-		return 0xff;
-	if (offset == 2)
-		return m_term_data;
-
-	return 0;
-}
-
-WRITE8_MEMBER( p8k_state::p8k_port24_w )
-{
-	if (offset == 2)
-		m_terminal->write(space, 0, data);
-}
-
-void p8k_state::kbd_put(u8 data)
-{
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	m_term_data = data;
-	// This is a dreadful hack..
-	// simulate interrupt by saving current pc on
-	// the stack and jumping to interrupt handler.
-	uint16_t spreg = m_maincpu->state_int(Z80_SP);
-	uint16_t pcreg = m_maincpu->state_int(Z80_PC);
-	spreg--;
-	mem.write_byte(spreg, pcreg >> 8);
-	spreg--;
-	mem.write_byte(spreg, pcreg);
-	m_maincpu->set_state_int(Z80_SP, spreg);
-	m_maincpu->set_state_int(Z80_PC, 0x078A);
-}
 
 /***************************************************************************
 
@@ -256,14 +221,14 @@ WRITE8_MEMBER(p8k_state::io_write_byte)
 
 static const z80_daisy_config p8k_daisy_chain[] =
 {
-	{ "z80dma" },   /* FDC related */
-	{ "z80pio_2" },
-	{ "z80ctc_0" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80ctc_1" },
+	{ "dma" },   /* FDC related */
+	{ "pio2" },
+	{ "ctc0" },
+	{ "sio0" },
+	{ "sio1" },
+	{ "pio0" },
+	{ "pio1" },
+	{ "ctc1" },
 	{ nullptr }
 };
 
@@ -271,8 +236,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
 {
-	z80pio_device *z80pio = machine().device<z80pio_device>("z80pio_2");
-
+	z80pio_device *z80pio = machine().device<z80pio_device>("pio2");
 	z80pio->port_b_write(state ? 0x10 : 0x00);
 }
 
@@ -392,14 +356,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
 //  AM_RANGE(0x0fef0, 0x0feff) // clock
-	//AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE8("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w, 0xff)
+	//AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE8("sio0", z80sio0_device, cd_ba_r, cd_ba_w, 0xff)
 	AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(portff82_r,portff82_w)
-	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE8("z80sio_1", z80sio0_device, ba_cd_r, ba_cd_w, 0xff)          //"z80sio_1",
-	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE8("z80pio_0", z80pio_device, read_alt, write_alt, 0xff)          //"z80pio_0",
-	AM_RANGE(0x0ff98, 0x0ff9f) AM_DEVREADWRITE8("z80pio_1", z80pio_device, read_alt, write_alt, 0xff)          //"z80pio_1",
-	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE8("z80pio_2", z80pio_device, read_alt, write_alt, 0xff)          //"z80pio_2",
-	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE8("z80ctc_0", z80ctc_device, read, write, 0xff)        //"z80ctc_0",
-	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE8("z80ctc_1", z80ctc_device, read, write, 0xff)        //"z80ctc_1",
+	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE8("sio1", z80sio0_device, cd_ba_r, cd_ba_w, 0xff)
+	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE8("pio0", z80pio_device, read_alt, write_alt, 0xff)
+	AM_RANGE(0x0ff98, 0x0ff9f) AM_DEVREADWRITE8("pio1", z80pio_device, read_alt, write_alt, 0xff)
+	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE8("pio2", z80pio_device, read_alt, write_alt, 0xff)
+	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE8("ctc0", z80ctc_device, read, write, 0xff)
+	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE8("ctc1", z80ctc_device, read, write, 0xff)
 //  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
 //  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
 //  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
@@ -419,6 +383,7 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 {
 	// this must be studied a little bit more :-)
+	//m_maincpu->set_input_line(Z8000_VI, ASSERT_LINE);  // This I believe should signal the cpu about a IM2 event, but MAME crashes.
 }
 
 
@@ -426,13 +391,13 @@ WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 
 static const z80_daisy_config p8k_16_daisy_chain[] =
 {
-	{ "z80ctc_0" },
-	{ "z80ctc_1" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80pio_2" },
+	{ "ctc0" },
+	{ "ctc1" },
+	{ "sio0" },
+	{ "sio1" },
+	{ "pio0" },
+	{ "pio1" },
+	{ "pio2" },
 	{ nullptr }
 };
 
@@ -474,7 +439,7 @@ static MACHINE_CONFIG_START( p8k )
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_4MHz)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_4MHz)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(p8k_state, p8k_dma_irq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(p8k_state, memory_read_byte))
@@ -482,35 +447,47 @@ static MACHINE_CONFIG_START( p8k )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(p8k_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(p8k_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, 1229000)    /* 1.22MHz clock */
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio0", z80sio0_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio0", z80sio0_device, rxcb_w))
+
+	MCFG_DEVICE_ADD("ctc0", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!
 	// manual states the callbacks should go to
 	// Baud Gen 3, FDC, System-Kanal
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, 1229000)    /* 1.22MHz clock */
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!
 	// manual states the callbacks should go to
 	// Baud Gen 0, Baud Gen 1, Baud Gen 2,
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("z80sio_0", XTAL_4MHz, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO0_ADD("z80sio_1", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio0", Z80SIO0, XTAL_4MHz)
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, 1229000)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80sio0_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", z80sio0_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("sio1", Z80SIO0, XTAL_4MHz)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("pio0", Z80PIO, 1229000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 1229000)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, 1229000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, 1229000)
+	MCFG_DEVICE_ADD("pio2", Z80PIO, 1229000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(IOPORT("DSW"))
 
 	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -519,10 +496,6 @@ static MACHINE_CONFIG_START( p8k )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(p8k_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( p8k_16 )
@@ -534,25 +507,37 @@ static MACHINE_CONFIG_START( p8k_16 )
 	MCFG_CPU_IO_MAP(p8k_16_iomap)
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k_16)
 
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio0", z80sio0_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio0", z80sio0_device, rxcb_w))
+
 	/* peripheral hardware */
-	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc0", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_Z80SIO0_ADD("z80sio_0", XTAL_4MHz, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO0_ADD("z80sio_1", XTAL_4MHz, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio0", Z80SIO0, XTAL_4MHz)
+	//MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_4MHz)
+	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80sio0_device, rxb_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", z80sio0_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("sio1", Z80SIO0, XTAL_4MHz)
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+
+	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
 	/* sound hardware */
@@ -561,7 +546,7 @@ static MACHINE_CONFIG_START( p8k_16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(p8k_state, kbd_put_16))
 MACHINE_CONFIG_END
 

@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
 #include "cpu/m6805/m68705.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 

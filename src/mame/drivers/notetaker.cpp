@@ -41,7 +41,7 @@
    * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms,\
      and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively]
      and dump registers to alto screen, etc)
-   
+
    * In 1980-1981 an Ethernet card with another 8086 on it was developed, but unclear if this ever fully worked.
 
  * Prototypes only, 10 units[2] manufactured 1978-1980
@@ -677,16 +677,16 @@ read from 0x44 (byte wide) to check input fifo status
 
 /* WRITE16_MEMBER(notetaker_state::EPConReg_w)
 {
-	m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 4k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
-	m_EP_LED2 = (data&0x40)?1:0;
-	m_EP_LED3 = (data&0x20)?1:0;
-	m_EP_LED4 = (data&0x10)?1:0;
-	m_EP_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, and may just drive an LED
-	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
-	m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
-	m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
-	m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 4k of local memory is disabled and accesses the shared memory instead.
-	popmessage("EP LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x80)>>2, (data&0x40)>>3, (data&0x20)>>1, (data&0x10));
+    m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 4k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
+    m_EP_LED2 = (data&0x40)?1:0;
+    m_EP_LED3 = (data&0x20)?1:0;
+    m_EP_LED4 = (data&0x10)?1:0;
+    m_EP_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, and may just drive an LED
+    // originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
+    m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
+    m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
+    m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 4k of local memory is disabled and accesses the shared memory instead.
+    popmessage("EP LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x80)>>2, (data&0x40)>>3, (data&0x20)>>1, (data&0x10));
 }
 */
 

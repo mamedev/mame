@@ -363,6 +363,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/clock.h"
 #include "machine/dec_lk201.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "machine/ds1315.h"
 #include "softlist.h"
@@ -3284,7 +3285,7 @@ MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL_5_0688MHz) // Baud rate generator B
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 
-MCFG_UPD7201_ADD("upd7201", XTAL_2_5MHz, 0, 0, 0, 0)    // 2.5 Mhz from schematics
+MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL_2_5MHz)    // 2.5 Mhz from schematics
 MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
 
 MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))

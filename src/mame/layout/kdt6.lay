@@ -19,7 +19,7 @@
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
-	
+
 	<view name="Default Layout">
 		<screen index="0">
 			<bounds x="61" y="0" width="1024" height="768" />
@@ -36,6 +36,6 @@
 		<bezel name="label21" element="DRIVE1">
 			<bounds x="0" y="14" width="15" height="16" />
 		</bezel>
-		
+
 	</view>
 </mamelayout>

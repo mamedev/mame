@@ -7,7 +7,7 @@ Device for Mazer Blazer/Great Guns custom Video Controller Unit
 Written by Angelo Salese, based off old implementation by Jarek Burczynski
 
 TODO:
-- priority, especially noticeable in Great Guns sprites and Mazer Blazer 
+- priority, especially noticeable in Great Guns sprites and Mazer Blazer
   bonus stages;
 - bit 0 of m_mode;
 - first byte of parameter info;
@@ -19,7 +19,7 @@ TODO:
 - Understand how transparent pens are handled aka is 0x0f always transparent or
   there's some clut gimmick? Great Guns title screen makes me think of the
   latter option;
-- Mazer Blazer collision detection parameters are a complete guesswork 
+- Mazer Blazer collision detection parameters are a complete guesswork
 
 ***************************************************************************/
 
@@ -286,9 +286,9 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	uint8_t pen = 0;
 	uint8_t cur_layer;
 	uint8_t opaque_pen;
-	
-//	printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
-	
+
+//  printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
+
 //  cur_layer = (m_mode & 0x3);
 	cur_layer = (m_mode & 2) >> 1;
 	opaque_pen = (cur_layer == 1);
@@ -308,7 +308,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
 
-						
+
 						if(dot != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
@@ -366,7 +366,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 								pen = m_color2 >> 4;
 								break;
 						}
-						
+
 						if(pen != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
@@ -397,7 +397,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	int xi,yi;
 	int dstx,dsty;
 //  uint8_t dot;
-	
+
 	switch(m_mode)
 	{
 		case 0x13:
@@ -405,16 +405,16 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 			//int16_t srcx = m_ram[m_param_offset_latch + 1];
 			//int16_t srcy = m_ram[m_param_offset_latch + 3];
 			//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
-	        //uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
+			//uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
 			int collision_flag = 0;
-			
+
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
 				{
 					dstx = (m_xpos + xi);
 					dsty = (m_ypos + yi);
-					
+
 					if(dstx < 256 && dsty < 256)
 					{
 						uint8_t res = read_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18);
@@ -426,15 +426,15 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 						if(res == 5)
 						{
 							collision_flag++;
-//							test++;
+//                          test++;
 						}
 					}
-					
+
 					//srcx++;
 				}
 				//srcy++;
 			}
-			
+
 			// threshold for collision, necessary to avoid bogus collision hits
 			// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
 			// at some point the top right hatch will bogusly detect a collision without this.
@@ -446,9 +446,9 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 				m_ram[m_param_offset_latch] &= ~8;
 			break;
 		}
-		
+
 		case 0x03:
-		{			
+		{
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
@@ -508,12 +508,12 @@ READ8_MEMBER( mb_vcu_device::status_r )
 }
 
 WRITE8_MEMBER( mb_vcu_device::vbank_w )
-{	
+{
 	m_vbank = (data & 0x40) >> 6;
 }
 
 WRITE8_MEMBER( mb_vcu_device::vbank_clear_w )
-{	
+{
 	m_vbank = (data & 0x40) >> 6;
 
 	// setting vbank clears VRAM in the setted bank, applies to Great Guns only since it never ever access the RMW stuff

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "video/jalblend.h"
 
 class psychic5_state : public driver_device

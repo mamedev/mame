@@ -49,6 +49,7 @@
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"

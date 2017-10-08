@@ -14,6 +14,7 @@
 #include "includes/mw8080bw.h"
 
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 

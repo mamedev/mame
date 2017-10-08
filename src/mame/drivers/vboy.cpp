@@ -32,6 +32,7 @@
 #include "cpu/v810/v810.h"
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

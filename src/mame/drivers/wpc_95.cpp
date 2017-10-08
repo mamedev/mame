@@ -7,6 +7,7 @@
 #include "cpu/m6809/m6809.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "video/wpc_dmd.h"
 #include "machine/wpc_pic.h"
 #include "machine/wpc_shift.h"

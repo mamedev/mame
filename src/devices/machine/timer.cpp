@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 

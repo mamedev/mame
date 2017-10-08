@@ -29,6 +29,7 @@ ToDo:
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "softlist.h"
 
 class ampro_state : public driver_device
@@ -161,7 +162,7 @@ static MACHINE_CONFIG_START( ampro )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))   // SIO Ch B
 
-	MCFG_Z80DART_ADD("dart", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))

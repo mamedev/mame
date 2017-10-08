@@ -2,41 +2,61 @@
 // copyright-holders:Angelo Salese, Robbbert
 /************************************************************************************************************
 
-    Gundam RX-78 (c) 1983 Bandai
+Gundam RX-78 (c) 1983 Bandai
 
-    driver by Angelo Salese & Robbbert.
+Driver by Angelo Salese & Robbbert.
 
-    TODO:
-    - implement printer
+TODO:
+- implement printer;
+- Challenge Golf: has gfx and input bugs (starts with home/end keys!?);
+- Colours are incorrect
 
-    Notes:
-    - BS-BASIC v1.0 have a graphic bug with the RX-78 logo, it doesn't set the read bank so all of the color
-      info minus plane 1 is lost when the screen scrolls vertically. Almost certainly a btanb.
-    - To stop a cmt load, press STOP + SHIFT keys
+Notes:
+- BS-BASIC v1.0 notes:
+  -- COLOR x doesn't do anything. It sets a memory location with x, but does nothing with it.
+  -- COLOR x,y where y sets the background colour. This part works.
+  -- When BASIC is first started, it sets the colours but doesn't save the information. So when
+     COLOR x is entered, although x has no effect, it also sets the background colour, which not
+     having been set, sets the background black.
+  -- At the first scroll, the display memory is disrupted in the logo area, probably another
+     btanb. After that, scrolling works correctly.
+  -- Need a real machine to confirm these problems, but if true, one can only wonder how such
+     obvious issues made it out the door.
+- To stop a cmt load, press STOP + SHIFT keys
+
+Known programs:
+- BS_BASIC V1.0
+- Challenge Golf
+- Excite Tennis
+- Excite Baseball
+- Perfect Mah-Jongg
+- Mobile Suit (says Mobil Suit on the start screen)
+- The ProWrestling
+- 3-dimension graphics
 
 ==============================================================================================================
-    Summary of Monitor commands.
-    - The monitor is entered at bootup. The prompt is the * character. This is followed by a command
-      letter (upper case). Some commands require hex parameters. You must enter all 4 characters of
-      these. No spaces allowed except where shown.
-    - While in BASIC, you may enter the monitor by using the MON command. After you have finished,
-      you can return to BASIC by entering the command *J2005.
+Summary of Monitor commands.
+- The monitor is entered at bootup. The prompt is the * character. This is followed by a command
+  letter (upper case). Some commands require hex parameters. You must enter all 4 characters of
+  these. No spaces allowed except where shown.
+- While in BASIC, you may enter the monitor by using the MON command. After you have finished,
+  you can return to BASIC by entering the command *J2005.
 
-    - Tape commands:
-    *L Load a tape
-    *V Verify a tape
-    *S Save a block of memory to tape. You are asked for a filename (blank is allowed), the start address,
-       the end address, and the Jump address (where it should begin execution)
+- Tape commands:
+*L Load a tape
+*V Verify a tape
+*S Save a block of memory to tape. You are asked for a filename (blank is allowed), the start address,
+   the end address, and the Jump address (where it should begin execution)
 
-    - Memory commands:
-    *Dnnnn nnnn Displays a hex dump in the address range entered
-    *Mnnnn      Allows you to examine and modify memory. Enter to skip to next, period (.) to quit.
-    *Jnnnn      Transfer execution (Jump) to a program in memory at the specified address
+- Memory commands:
+*Dnnnn nnnn Displays a hex dump in the address range entered
+*Mnnnn      Allows you to examine and modify memory. Enter to skip to next, period (.) to quit.
+*Jnnnn      Transfer execution (Jump) to a program in memory at the specified address
 
-    - Other:
-    *R          This is a block transfer load from a mystery parallel device, using ports E0 and E1,
-                using handshaking similar to a centronics printer. The incoming file is loaded into
-                memory and it appears that the operator is not provided any information of what happened.
+- Other:
+*R          This is a block transfer load from a mystery parallel device, using ports E0 and E1,
+            using handshaking similar to a centronics printer. The incoming file is loaded into
+            memory and it appears that the operator is not provided any information of what happened.
 
 *************************************************************************************************************/
 
@@ -56,77 +76,73 @@ class rx78_state : public driver_device
 {
 public:
 	rx78_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cass(*this, "cassette"),
-		m_cart(*this, "cartslot"),
-		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_cart(*this, "cartslot")
+		, m_ram(*this, RAM_TAG)
+		, m_palette(*this, "palette")
+		{ }
 
 	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_READ8_MEMBER( rx78_f0_r );
-	DECLARE_READ8_MEMBER( rx78_vram_r );
-	DECLARE_WRITE8_MEMBER( rx78_f0_w );
-	DECLARE_WRITE8_MEMBER( rx78_vram_w );
+	DECLARE_READ8_MEMBER( cass_r );
+	DECLARE_READ8_MEMBER( vram_r );
+	DECLARE_WRITE8_MEMBER( cass_w );
+	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_WRITE8_MEMBER( vram_read_bank_w );
 	DECLARE_WRITE8_MEMBER( vram_write_bank_w );
 	DECLARE_WRITE8_MEMBER( key_w );
 	DECLARE_WRITE8_MEMBER( vdp_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
+	DECLARE_DRIVER_INIT(rx78);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];
 	uint8_t m_pri_mask;
 	uint8_t m_key_mux;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
 };
 
 
 #define MASTER_CLOCK XTAL_28_63636MHz
 
 
-WRITE8_MEMBER( rx78_state::rx78_f0_w )
+WRITE8_MEMBER( rx78_state::cass_w )
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( rx78_state::rx78_f0_r )
+READ8_MEMBER( rx78_state::cass_r )
 {
 	return (m_cass->input() > 0.03);
 }
 
 
-void rx78_state::video_start()
-{
-}
-
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *vram = memregion("vram")->base();
-	int x,y,count;
+	int color,pen[3];
+	const int borderx = 32, bordery = 20;
 
 	bitmap.fill(16, cliprect);
 
-	count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
+	int count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
 
-	for(y=0;y<184;y++)
+	for(u8 y=0; y<184; y++)
 	{
-		for(x=0;x<192;x+=8)
+		for(u8 x=0; x<192; x+=8)
 		{
-			int color,pen[3],i;
-
-			for (i = 0; i < 8; i++)
+			for (u8 i = 0; i < 8; i++)
 			{
 				/* bg color */
 				pen[0] = (m_pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
@@ -138,7 +154,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y, x+i) = color;
+					bitmap.pix16(y+bordery, x+i+borderx) = color | 8;
 
 				/* fg color */
 				pen[0] = (m_pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
@@ -150,7 +166,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					bitmap.pix16(y, x+i) = color;
+					bitmap.pix16(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}
@@ -169,10 +185,8 @@ READ8_MEMBER( rx78_state::key_r )
 
 	if(m_key_mux == 0x30) //status read
 	{
-		int res,i;
-
-		res = 0;
-		for(i=0;i<15;i++)
+		u8 res = 0;
+		for(u8 i=0; i<15; i++)
 			res |= ioport(keynames[i])->read();
 
 		return res;
@@ -189,7 +203,7 @@ WRITE8_MEMBER( rx78_state::key_w )
 	m_key_mux = data;
 }
 
-READ8_MEMBER( rx78_state::rx78_vram_r )
+READ8_MEMBER( rx78_state::vram_r )
 {
 	uint8_t *vram = memregion("vram")->base();
 
@@ -199,16 +213,13 @@ READ8_MEMBER( rx78_state::rx78_vram_r )
 	return vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
 }
 
-WRITE8_MEMBER( rx78_state::rx78_vram_w )
+WRITE8_MEMBER( rx78_state::vram_w )
 {
 	uint8_t *vram = memregion("vram")->base();
 
-	if(m_vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
-	if(m_vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
-	if(m_vram_write_bank & 0x04) { vram[offset + 2 * 0x2000] = data; }
-	if(m_vram_write_bank & 0x08) { vram[offset + 3 * 0x2000] = data; }
-	if(m_vram_write_bank & 0x10) { vram[offset + 4 * 0x2000] = data; }
-	if(m_vram_write_bank & 0x20) { vram[offset + 5 * 0x2000] = data; }
+	for (u8 i = 0; i < 6; i++)
+		if (BIT(m_vram_write_bank, i))
+			vram[offset + i * 0x2000] = data;
 }
 
 WRITE8_MEMBER( rx78_state::vram_read_bank_w )
@@ -260,11 +271,11 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 
 static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
 	AM_RANGE(0xb000, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xffff) AM_READWRITE(rx78_vram_r, rx78_vram_w)
+	AM_RANGE(0xec00, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rx78_io, AS_IO, 8, rx78_state)
@@ -272,10 +283,10 @@ static ADDRESS_MAP_START(rx78_io, AS_IO, 8, rx78_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(rx78_f0_r,rx78_f0_w) //cmt
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(cass_r, cass_w) //cmt
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
-	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r,key_w) //keyboard
+	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r, key_w) //keyboard
 	AM_RANGE(0xf5, 0xfb) AM_WRITE(vdp_reg_w) //vdp
 	AM_RANGE(0xfc, 0xfc) AM_WRITE(vdp_bg_reg_w) //vdp
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(vdp_pri_mask_w)
@@ -350,7 +361,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME / CLR") PORT_CODE(KEYCODE_HOME)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CLR / HOME") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INST / DEL") PORT_CODE(KEYCODE_BACKSPACE)
 
@@ -360,7 +371,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 
 	PORT_START("KEY8")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) //kana shift?
@@ -447,7 +458,7 @@ static const gfx_layout rx78_charlayout =
 };
 
 static GFXDECODE_START( rx78 )
-	GFXDECODE_ENTRY( "maincpu", 0x1a27, rx78_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -460,11 +471,14 @@ static MACHINE_CONFIG_START( rx78 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_SIZE(192, 184)
+//	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	/* guess: generic NTSC video timing at 256x224, system runs at 192x184, suppose with some border area to compensate */
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224) 
 	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
-	MCFG_SCREEN_SIZE(192, 184)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
@@ -494,7 +508,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rx78 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "roms", 0 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
 
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
@@ -512,4 +526,4 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS       INIT   COMPANY     FULLNAME     FLAGS */
-COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", 0)
+COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )

@@ -427,9 +427,8 @@ test1f diagnostic hacks:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "imagedev/chd_cd.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
@@ -448,7 +447,6 @@ test1f diagnostic hacks:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "coreutil.h"
 
 
 class sat_console_state : public saturn_state
@@ -458,10 +456,10 @@ public:
 		: saturn_state(mconfig, type, tag)
 		, m_exp(*this, "exp")
 		, m_nvram(*this, "nvram")
-		, m_smpc_nv(*this, "smpc_nv")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 
@@ -478,12 +476,23 @@ public:
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
-
+	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
+	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
+	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
+	DECLARE_WRITE8_MEMBER(saturn_pdr2_direct_w);
+	uint8_t m_direct_mux[2];
+	uint8_t saturn_direct_port_read(bool which);
+	uint8_t smpc_direct_mode(uint16_t in_value, bool which);
+	uint8_t smpc_th_control_mode(uint16_t in_value, bool which);
+	
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
-	required_device<nvram_device> m_smpc_nv;    // TODO: move this in the base class saturn_state and add it to stv in MAME
+	
+	required_device<saturn_control_port_device> m_ctrl1;
+	required_device<saturn_control_port_device> m_ctrl2;
+
 };
 
 
@@ -504,7 +513,7 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
 
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  AM_WRITENOP // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
+	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(saturn_minit_w)
@@ -548,18 +557,6 @@ static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, sat_console_state )
 ADDRESS_MAP_END
 
 
-
-INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
-{
-	/* TODO: correct? */
-	if(!m_NMI_reset)
-		return;
-
-	/* TODO: NMI doesn't stay held on SH-2 core so we can't use ASSERT_LINE/CLEAR_LINE with that yet */
-	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
 	if(newval)
@@ -574,7 +571,7 @@ INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 
 static INPUT_PORTS_START( saturn )
 	PORT_START("RESET") /* hardwired buttons */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, sat_console_state, nmi_reset,0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER("smpc", smpc_hle_device, trigger_nmi_r, 0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, sat_console_state, tray_open,0) PORT_NAME("Tray Open Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, sat_console_state, tray_close,0) PORT_NAME("Tray Close")
 
@@ -649,9 +646,6 @@ void saturn_state::debug_commands(int ref, const std::vector<std::string> &param
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
@@ -667,7 +661,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	m_slave->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 
 	m_nvram->set_base(m_backupram.get(), 0x8000);
-	m_smpc_nv->set_base(&m_smpc.SMEM, 4);
 
 	if (m_exp)
 	{
@@ -716,36 +709,14 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	// save states
 	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
-	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
-	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
-	save_item(NAME(m_smpc.IOSEL1));
-	save_item(NAME(m_smpc.IOSEL2));
-	save_item(NAME(m_smpc.EXLE1));
-	save_item(NAME(m_smpc.EXLE2));
-	save_item(NAME(m_smpc.PDR1));
-	save_item(NAME(m_smpc.PDR2));
-//  save_item(NAME(m_port_sel));
-//  save_item(NAME(mux_data));
 	save_item(NAME(m_scsp_last_line));
-	save_item(NAME(m_smpc.intback_stage));
-	save_item(NAME(m_smpc.pmode));
-	save_item(NAME(m_smpc.SR));
-	save_item(NAME(m_smpc.SMEM));
+	save_item(NAME(m_vdp2.odd));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
 
-	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sat_console_state::stv_rtc_increment),this));
-
-	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(sat_console_state::m68k_reset_callback),this));
+	// TODO: trampoline
+	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(saturn_state::m68k_reset_callback),this));
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
@@ -767,13 +738,9 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	m_smpc.SR = 0x40;   // this bit is always on according to docs
-
 	scu_reset();
 
 	m_en_68k = 0;
-	m_NMI_reset = 0;
-	m_smpc.slave_on = 0;
 
 	//memset(stv_m_workram_l, 0, 0x100000);
 	//memset(stv_m_workram_h, 0, 0x100000);
@@ -785,10 +752,98 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
-
-	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
+READ8_MEMBER( sat_console_state::saturn_pdr1_direct_r )
+{
+	return saturn_direct_port_read(false);
+}
+
+READ8_MEMBER( sat_console_state::saturn_pdr2_direct_r )
+{
+	return saturn_direct_port_read(true);
+}
+
+WRITE8_MEMBER( sat_console_state::saturn_pdr1_direct_w )
+{
+	m_direct_mux[0] = data;
+}
+
+WRITE8_MEMBER( sat_console_state::saturn_pdr2_direct_w )
+{
+	m_direct_mux[1] = data;
+}
+
+inline uint8_t sat_console_state::saturn_direct_port_read(bool which)
+{
+	// bail out if direct mode is disabled
+	if(m_smpc_hle->get_iosel(which) == false)
+		return 0xff;
+
+	saturn_control_port_device *port = which == true ? m_ctrl2 : m_ctrl1;
+	uint8_t cur_mode = m_smpc_hle->get_ddr(which);
+	uint8_t res = 0;
+	uint16_t ctrl_read = port->read_direct();
+	
+//	check for control method
+	switch(cur_mode & 0x60)
+	{
+		case 0: break;
+		case 0x40: res = smpc_th_control_mode(ctrl_read,which); break;
+		case 0x60: res = smpc_direct_mode(ctrl_read,which); break;
+		default:
+			popmessage("SMPC: unemulated control method %02x, contact MAMEdev",cur_mode & 0x60);
+			break;
+	}
+
+	return res;
+}
+
+uint8_t sat_console_state::smpc_th_control_mode(uint16_t in_value, bool which)
+{
+	uint8_t res = 0;
+	uint8_t th = (m_direct_mux[which] >> 5) & 3;
+
+	switch (th)
+	{
+		/* TODO: 3D Lemmings bogusly enables TH Control mode, wants this to return the ID, needs HW tests.  */
+		case 3:
+			res = th << 6;
+			res |= 0x14;
+			res |= (in_value & 8); // L
+			break;
+		case 2:
+			res = th << 6;
+			//  1 C B Right Left Down Up
+			//  WHP actually has a very specific code at 0x6015f30, doesn't like bits 0-1 active here ...
+			res|= ((in_value >>  4) & 0x30); // C & B
+			res|= ((in_value >> 12) & 0xc);
+			break;
+		case 1:
+			res = th << 6;
+			res |= 0x10;
+			res |= ((in_value >> 4) & 0xf); // R, X, Y, Z
+			break;
+		case 0:
+			res = th << 6;
+			//  0 Start A 0 0    Down Up
+			res |= ((in_value >>  6) & 0x30); // Start & A
+			res |= ((in_value >> 12) & 0x03);
+			//  ... and it actually wants bits 2 - 3 active here.
+			res |= 0xc;
+			break;
+	}
+
+	return res;
+}
+
+uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
+{
+	uint8_t hshake = (m_direct_mux[which] >> 5) & 3;
+	const int shift_bit[4] = { 4, 12, 8, 0 };
+
+	return 0x80 | 0x10 | ((in_value >> shift_bit[hshake]) & 0xf);
+}
 
 static MACHINE_CONFIG_START( saturn )
 
@@ -816,12 +871,25 @@ static MACHINE_CONFIG_START( saturn )
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
+	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
+	smpc_hle_device::static_set_control_port_tags(*device, "ctrl1", "ctrl2");
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(sat_console_state, saturn_pdr1_direct_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(sat_console_state, saturn_pdr2_direct_w))
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
+	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
-	MCFG_NVRAM_ADD_0FILL("smpc_nv") // TODO: default for each region (+ move it inside SMPC when converted to device)
 
 	MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
@@ -874,6 +942,9 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
+	MCFG_DEVICE_MODIFY("smpc")
+	smpc_hle_device::static_set_region_code(*device, 4);
+	
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturneu, saturn )
@@ -887,6 +958,8 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
+	MCFG_DEVICE_MODIFY("smpc")
+	smpc_hle_device::static_set_region_code(*device, 12);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturnjp, saturn )
@@ -900,12 +973,14 @@ MACHINE_CONFIG_DERIVED( saturnjp, saturn )
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
+	MCFG_DEVICE_MODIFY("smpc")
+	smpc_hle_device::static_set_region_code(*device, 1);
 MACHINE_CONFIG_END
 
 
 void sat_console_state::saturn_init_driver(int rgn)
 {
-	m_saturn_region = rgn;
+//	m_saturn_region = rgn;
 	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
@@ -926,7 +1001,6 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_sinit_boost_timeslice = attotime::zero;
 
 	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
-	m_scsp_regs = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

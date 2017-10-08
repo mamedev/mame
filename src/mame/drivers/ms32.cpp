@@ -341,7 +341,7 @@ WRITE32_MEMBER(ms32_state::pip_w)
 WRITE32_MEMBER(ms32_state::coin_counter_w)
 {
 	// desertwr/p47aces sets 4 here
-	// f1superb sets 2	
+	// f1superb sets 2
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
@@ -1253,7 +1253,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(    0x0c, "7" )
 	PORT_DIPSETTING(    0x0e, "8" )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 /********** GFX DECODE **********/

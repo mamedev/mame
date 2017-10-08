@@ -206,10 +206,10 @@ void osd_sleep(osd_ticks_t duration)
 
 //============================================================
 //  osd_get_command_line - returns command line arguments
-//	in an std::vector<std::string> in UTF-8
+//  in an std::vector<std::string> in UTF-8
 //
-//	The real purpose of this call is to hide details necessary
-//	on Windows (provided that one wants to avoid using wmain)
+//  The real purpose of this call is to hide details necessary
+//  on Windows (provided that one wants to avoid using wmain)
 //============================================================
 
 std::vector<std::string> osd_get_command_line(int argc, char *argv[])

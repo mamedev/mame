@@ -22,6 +22,7 @@
 #include "machine/mc146818.h"
 #include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"

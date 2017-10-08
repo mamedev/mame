@@ -120,21 +120,6 @@ bool menu_select_launch::reselect_last::s_reselect = false;
 std::mutex menu_select_launch::s_cache_guard;
 menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
-// this needs to be here to allow the names from the data plugin to be localised
-// it can't have static linkage, and it can't be private or clang will complain
-// it also has to be kept in sync with the data plugin
-char const *const menu_select_launch::s_info_titles[] = {
-		__("Command"),
-		__("Gameinit"),
-		__("High Scores"),
-		__("History"),
-		__("MAMEinfo"),
-		__("MARPScore"),
-		__("MESSinfo"),
-		__("Mamescore"),
-		__("Sysinfo") };
-
-
 // instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);

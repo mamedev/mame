@@ -28,6 +28,7 @@
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/i8279.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "video/ef9364.h"
 #include "video/mc6845.h"

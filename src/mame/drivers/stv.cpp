@@ -40,7 +40,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "imagedev/chd_cd.h"
 #include "machine/eepromser.h"
 #include "machine/smpc.h"
@@ -426,7 +426,6 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_sinit_boost_timeslice = attotime::zero;
 
 	m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
-	m_scsp_regs  = std::make_unique<uint16_t[]>(0x1000/2);
 	m_backupram = std::make_unique<uint8_t[]>(0x8000);
 	memset(m_backupram.get(), 0, sizeof(uint8_t) * 0x8000);
 
@@ -982,7 +981,7 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
+	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
@@ -1021,6 +1020,57 @@ static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
 ADDRESS_MAP_END
 
 
+
+/********************************************
+ *
+ * SMPC outputs
+ *
+ *******************************************/
+
+void stv_state::stv_select_game(int gameno)
+{
+	if (m_prev_gamebank_select != gameno)
+	{
+		if (m_cart_reg[gameno] && m_cart_reg[gameno]->base())
+			memcpy(memregion("abus")->base(), m_cart_reg[gameno]->base(), 0x3000000);
+		else
+			memset(memregion("abus")->base(), 0x00, 0x3000000); // TODO: 1-filled?
+
+		m_prev_gamebank_select = gameno;
+	}
+}
+
+READ8_MEMBER( stv_state::pdr1_input_r )
+{
+	return (ioport("PDR1")->read() & 0x40) | 0x3f;
+}
+
+
+READ8_MEMBER( stv_state::pdr2_input_r )
+{
+	return (ioport("PDR2")->read() & ~0x19) | 0x18 | (m_eeprom->do_read()<<0);
+}
+
+
+WRITE8_MEMBER( stv_state::pdr1_output_w )
+{
+	m_eeprom->clk_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data >> 4) & 1);
+	m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+
+	stv_select_game(data & 3);
+}
+
+WRITE8_MEMBER( stv_state::pdr2_output_w )
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_en_68k = ((data & 0x10) >> 4) ^ 1;
+
+	if(data & 8)
+		logerror("PDR2: data 0x8 active!\n");
+}
+
+
 static MACHINE_CONFIG_START( stv )
 
 	/* basic machine hardware */
@@ -1043,6 +1093,21 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(saturn_state, scudsp_end_w))
 	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
 	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
+
+	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
+	smpc_hle_device::static_set_region_code(*device, 0);
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(stv_state, pdr2_output_w))
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
+//	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
@@ -1158,13 +1223,19 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 		m_cart_reg[0] = memregion("cart");
 	if (m_cart2)
 		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[1] = nullptr;
 	if (m_cart3)
 		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[2] = nullptr;
 	if (m_cart4)
 		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	else
+		m_cart_reg[3] = nullptr;
 
+	
 	m_en_68k = 0;
-	m_NMI_reset = 0;
 
 	m_port_sel = m_mux_data = 0;
 
@@ -1173,8 +1244,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 	stvcd_reset();
 
-	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
-	m_prev_bankswitch = 0xff;
+	m_prev_gamebank_select = 0xff;
 
 	scu_reset();
 
@@ -1217,40 +1287,20 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 
 MACHINE_START_MEMBER(stv_state,stv)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
 	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
-	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
-	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
-//  save_item(NAME(scanline));
-	save_item(NAME(m_smpc.IOSEL1));
-	save_item(NAME(m_smpc.IOSEL2));
-	save_item(NAME(m_smpc.EXLE1));
-	save_item(NAME(m_smpc.EXLE2));
-	save_item(NAME(m_smpc.PDR1));
-	save_item(NAME(m_smpc.PDR2));
+	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_scsp_last_line));
+	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates(); // machine/stvprot.c
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&stv_state::stvcd_exit, this));
-
-	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(stv_state::stv_rtc_increment),this));
 
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(stv_state::m68k_reset_callback),this));
 }
@@ -1267,56 +1317,26 @@ MACHINE_START_MEMBER(stv_state,stv)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(_n_)
 
 static INPUT_PORTS_START( stv )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "PDR1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_START("PDR1")
+	PORT_DIPNAME( 0x40, 0x40, "PDR1" ) // P1 Gun Trigger
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")
+	PORT_START("PDR2")
 	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // test mode mirror
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // service button mirror
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // P2 Gun Trigger
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("PORTA")
@@ -1332,8 +1352,8 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch (Multi Cart Select)") PORT_CODE(KEYCODE_7) // selects game in multi-cart mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch (Pause)") PORT_CODE(KEYCODE_8) // for games that supports it, most of them needs to be enabled in game assignment first
 
 	PORT_START("PORTE")
 	STV_PLAYER_INPUTS(3, BUTTON1, BUTTON2, BUTTON3, START)

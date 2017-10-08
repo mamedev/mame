@@ -45,7 +45,7 @@
 
 #include "emu.h"
 #include "includes/saturn.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "cpu/scudsp/scudsp.h"
 
 /* TODO: do this in a verboselog style */
@@ -53,23 +53,6 @@
 #define LOG_SCU  1
 #define LOG_IRQ  0
 #define LOG_IOGA 0
-
-int saturn_state::DectoBCD(int num)
-{
-	int i, cnt = 0, tmp, res = 0;
-
-	while (num > 0) {
-		tmp = num;
-		while (tmp >= 10) tmp %= 10;
-		for (i=0; i<cnt; i++)
-			tmp *= 16;
-		res += tmp;
-		cnt++;
-		num /= 10;
-	}
-
-	return res;
-}
 
 /**************************************************************************************/
 
@@ -676,81 +659,11 @@ void saturn_state::scu_reset(void)
 	m_scu.status = 0;
 }
 
-TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
-{
-	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
-	static int year_num, year_count;
 
-	/*
-	    m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	    m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	    m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	    m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	    m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	    m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	    m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-	*/
 
-	m_smpc.rtc_data[6]++;
-
-	/* seconds from 9 -> 10*/
-	if((m_smpc.rtc_data[6] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[6]+=0x10; m_smpc.rtc_data[6]&=0xf0; }
-	/* seconds from 59 -> 0 */
-	if((m_smpc.rtc_data[6] & 0xf0) >= 0x60)         { m_smpc.rtc_data[5]++;     m_smpc.rtc_data[6] = 0; }
-	/* minutes from 9 -> 10 */
-	if((m_smpc.rtc_data[5] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[5]+=0x10; m_smpc.rtc_data[5]&=0xf0; }
-	/* minutes from 59 -> 0 */
-	if((m_smpc.rtc_data[5] & 0xf0) >= 0x60)         { m_smpc.rtc_data[4]++;     m_smpc.rtc_data[5] = 0; }
-	/* hours from 9 -> 10 */
-	if((m_smpc.rtc_data[4] & 0x0f) >= 0x0a)         { m_smpc.rtc_data[4]+=0x10; m_smpc.rtc_data[4]&=0xf0; }
-	/* hours from 23 -> 0 */
-	if((m_smpc.rtc_data[4] & 0xff) >= 0x24)             { m_smpc.rtc_data[3]++; m_smpc.rtc_data[2]+=0x10; m_smpc.rtc_data[4] = 0; }
-	/* week day name sunday -> monday */
-	if((m_smpc.rtc_data[2] & 0xf0) >= 0x70)             { m_smpc.rtc_data[2]&=0x0f; }
-	/* day number 9 -> 10 */
-	if((m_smpc.rtc_data[3] & 0x0f) >= 0x0a)             { m_smpc.rtc_data[3]+=0x10; m_smpc.rtc_data[3]&=0xf0; }
-
-	// year BCD to dec conversion (for the leap year stuff)
-	{
-		year_num = (m_smpc.rtc_data[1] & 0xf);
-
-		for(year_count = 0; year_count < (m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
-			year_num += 0xa;
-
-		year_num += (m_smpc.rtc_data[0] & 0xf)*0x64;
-
-		for(year_count = 0; year_count < (m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
-			year_num += 0x3e8;
-	}
-
-	/* month +1 check */
-	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (m_smpc.rtc_data[2] & 0xf) == 2)
-	{
-		if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1+1)
-			{ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
-	}
-	else if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1){ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
-	/* year +1 check */
-	if((m_smpc.rtc_data[2] & 0x0f) > 12)                { m_smpc.rtc_data[1]++;  m_smpc.rtc_data[2] = (m_smpc.rtc_data[2] & 0xf0) | 0x01; }
-	/* year from 9 -> 10 */
-	if((m_smpc.rtc_data[1] & 0x0f) >= 0x0a)             { m_smpc.rtc_data[1]+=0x10; m_smpc.rtc_data[1]&=0xf0; }
-	/* year from 99 -> 100 */
-	if((m_smpc.rtc_data[1] & 0xf0) >= 0xa0)             { m_smpc.rtc_data[0]++; m_smpc.rtc_data[1] = 0; }
-
-	// probably not SO precise, here just for reference ...
-	/* year from 999 -> 1000 */
-	//if((m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { m_smpc.rtc_data[0]+=0x10; m_smpc.rtc_data[0]&=0xf0; }
-	/* year from 9999 -> 0 */
-	//if((m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { m_smpc.rtc_data[0] = 0; } //roll over
-}
-
-/* Official documentation says that the "RESET/TAS opcodes aren't supported", but Out Run definitely contradicts with it.
-   Since that m68k can't reset itself via the RESET opcode I suppose that the SMPC actually do it by reading an i/o
-   connected to this opcode. */
 WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
 {
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_audio_reset_line_pulse), this));
+	m_smpc_hle->m68k_reset_trigger();
 
 	printf("m68k RESET opcode triggered\n");
 }
@@ -844,6 +757,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		else
 			m_scu.ist |= (IRQ_VBLANK_IN);
 
+		// flip odd bit here
+		m_vdp2.odd ^= 1;
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		video_update_vdp1();
 	}
@@ -1016,3 +931,77 @@ WRITE16_MEMBER(saturn_state::scudsp_dma_w)
 
 	program.write_word(addr, data,mem_mask);
 }
+
+WRITE_LINE_MEMBER( saturn_state::master_sh2_reset_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(saturn_state::master_sh2_nmi_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( saturn_state::slave_sh2_reset_w )
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+//	m_smpc.slave_on = state;
+}
+
+WRITE_LINE_MEMBER( saturn_state::sound_68k_reset_w )
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	m_en_68k = state ^ 1;
+}
+
+// TODO: edge triggered?
+WRITE_LINE_MEMBER( saturn_state::system_reset_w )
+{
+	if(!state)
+		return;
+
+	// TODO: actually send a device reset signal to the connected devices
+	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
+	memset(m_scu_regs.get() ,0x00,0x000100);
+	memset(m_sound_ram,0x00,0x080000);
+	memset(m_workram_h,0x00,0x100000);
+	memset(m_workram_l,0x00,0x100000);
+	memset(m_vdp2_regs.get(),0x00,0x040000);
+	memset(m_vdp2_vram.get(),0x00,0x100000);
+	memset(m_vdp2_cram.get(),0x00,0x080000);
+	memset(m_vdp1_vram.get(),0x00,0x100000);
+	//A-Bus
+}
+
+WRITE_LINE_MEMBER(saturn_state::system_halt_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_slave->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(saturn_state::dot_select_w)
+{
+	uint32_t xtal;
+	
+	xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+
+	machine().device("maincpu")->set_unscaled_clock(xtal/2);
+	machine().device("slave")->set_unscaled_clock(xtal/2);
+
+	m_vdp2.dotsel = state ^ 1;
+	stv_vdp2_dynamic_res_change();
+}
+
+// TODO: to move into SCU device
+WRITE_LINE_MEMBER(saturn_state::smpc_irq_w)
+{
+	if(!state)
+		return;
+	
+	if(!(m_scu.ism & IRQ_SMPC))
+		m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
+	else
+		m_scu.ist |= (IRQ_SMPC);
+}
+

@@ -85,6 +85,7 @@ function cheat.startplugin()
 	local perodicset = false
 	local watches = {}
 	local breaks = {}
+	local inputs = {}
 
 	local function load_cheats()
 		local filename = emu.romname()
@@ -321,6 +322,55 @@ function cheat.startplugin()
 		end
 	end
 
+	local function input_trans(list)
+		local xlate = { start = {}, stop = {}, last = 0 }
+		local function errout(port, field)
+			cheat.enabled = false
+			error(port .. field .. " not found")
+			return
+		end
+
+		for num, entry in ipairs(list) do
+			if entry.port:sub(1, 1) ~= ":" then
+				entry.port = ":" .. entry.port
+			end
+			local port = manager:machine():ioport().ports[entry.port]
+			if not port then
+				errout(entry.port, entry.field)
+			end
+			local field = port.fields[entry.field]
+			if not field then
+				errout(entry.port, entry.field)
+			end
+			if not xlate.start[entry.start] then
+				xlate.start[entry.start] = {}
+			end
+			if not xlate.stop[entry.stop] then
+				xlate.stop[entry.stop] = {}
+			end
+			local start = xlate.start[entry.start]
+			local stop = xlate.stop[entry.stop]
+			local ent = { port = port, field = field }
+			stop[#stop + 1] = ent
+			start[#start + 1] = ent
+			if entry.stop > xlate.last then
+				xlate.last = entry.stop
+			end
+		end
+		return xlate
+	end
+
+	local function input_run(cheat, list)
+		if not is_oneshot(cheat) then
+			cheat.enabled = false
+			error("input_run only allowed in one shot cheats")
+			return
+		end
+		local _, screen = next(manager:machine().screens)
+		list.begin = screen:frame_number()
+		inputs[#inputs + 1] = list
+	end
+
 	local function parse_cheat(cheat)
 		cheat.cheat_env = { draw_text = draw_text,
 					draw_line = draw_line,
@@ -331,7 +381,9 @@ function cheat.startplugin()
 					ipairs = ipairs,
 					outputs = manager:machine():outputs(),
 					time = time,
-						table =
+					input_trans = input_trans,
+					input_run = function(list) input_run(cheat, list) end,
+					table =
 					{ insert = table.insert,
 						  remove = table.remove } }
 		cheat.enabled = false
@@ -598,7 +650,7 @@ function cheat.startplugin()
 		end
 		if event == "up" or event == "down" or event == "comment" then
 			if cheat.comment then
-				manager:machine():popmessage(_("Cheat Comment:\n") .. cheat.comment)
+				manager:machine():popmessage(string.format(_("Cheat Comment:\n%s"), cheat.comment))
 			end
 		elseif event == "left" then
 			if cheat.parameter then
@@ -665,10 +717,10 @@ function cheat.startplugin()
 					else
 						subtext = cheat.parameter.value
 					end
-					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc .. " = " .. subtext)
+					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, subtext))
 				elseif not cheat.parameter and cheat.script.on then
 					cheat.script.on()
-					manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
+					manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 				end
 			end
 		end
@@ -726,16 +778,16 @@ function cheat.startplugin()
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
-							manager:machine():popmessage(_("Activated") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 						elseif not cheat.enabled then
 							cheat.enabled = true
 							run_if(cheat, cheat.script.on)
-							manager:machine():popmessage(_("Enabled") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Enabled: %s"), cheat.desc))
 						else
 							cheat.enabled = false
 							run_if(cheat, cheat.script.off)
 							bwpclr(cheat)
-							manager:machine():popmessage(_("Disabled") .. ": " .. cheat.desc)
+							manager:machine():popmessage(string.format(_("Disabled: %s"), cheat.desc))
 						end
 					end
 					cheat.hotkeys.pressed = true
@@ -744,6 +796,27 @@ function cheat.startplugin()
 				end
 			end
 		end
+		for num, input in pairs(inputs) do
+			local _, screen = next(manager:machine().screens)
+			local framenum = screen:frame_number() - input.begin 
+			local enttab = input.start[framenum]
+			if enttab then
+				for num, entry in pairs(enttab) do
+					entry.field:set_value(1)
+				end
+			end
+			enttab = input.stop[framenum]
+			if enttab then
+				for num, entry in pairs(enttab) do
+					entry.field:set_value(0)
+
+				end
+			end
+			if framenum >= input.last then
+				table.remove(inputs, num)
+			end
+		end
+
 	end)
 
 	emu.register_frame_done(function()
@@ -773,7 +846,7 @@ function cheat.startplugin()
 	function ce.inject(newcheat)
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
-		manager:machine():popmessage(newcheat.desc .. _(" added"))
+		manager:machine():popmessage(string.format(_("%s added"), newcheat.desc))
 	end
 
 	function ce.get(index)

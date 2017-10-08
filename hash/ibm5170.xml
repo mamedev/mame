@@ -6064,6 +6064,25 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="crashcrs">
+		<description>Crash Course</description>
+		<year>1990</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="developer" value="Sphere" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- has modified setting/log files -->
+				<rom name="[PC] Crash Course [3.5DD] [Disk 1 of 2].img" size="737280" crc="c8ff847d" sha1="0aae4750e886a068d6bf9c39e22b891e364b7b72" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- has modified setting/log files -->
+				<rom name="[PC] Crash Course [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9131789" sha1="fcfff6f5a01534550f9ddaf423e1519319a864a5" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="creepers">
 		<!-- Dumped via Kryoflux, track 0 shows as modified -->
 		<description>Creepers</description>

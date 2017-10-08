@@ -6000,22 +6000,16 @@ uint8_t saturn_state::get_vblank( void )
 	return 0;
 }
 
-// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition, assume following disp bit.
-//       this is actually wrong for finlarch/sasissu/magzun so it needs to be tested on real HW.
 uint8_t saturn_state::get_odd_bit( void )
 {
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
 		return 1;
 
-	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
-	{
-		if((STV_VDP2_HRES & 1) == 0)
-			return STV_VDP2_DISP;
-
-		return 1;
-	}
-
-	return machine().first_screen()->frame_number() & 1;
+// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition.
+//       But the documentation claims that "non-interlaced" mode is always 1.
+//       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
+//       Assume documentation is wrong and actually always flip this bit.
+	return m_vdp2.odd;//machine().first_screen()->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position( void )
@@ -6205,6 +6199,8 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 	int horz_res,vert_res;
 	int vres_mask;
 
+	// reset odd bit if a dynamic resolution change occurs, seabass ST-V cares!
+	m_vdp2.odd = 1;
 	vres_mask = (m_vdp2.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
 	vert_res = d_vres[STV_VDP2_VRES & vres_mask];
 

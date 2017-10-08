@@ -1988,7 +1988,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					popmessage ("VDP1: Sprite List Illegal %02x, contact MAMEdev",stv2_current_sprite.CMDCTRL & 0xf);
 					m_vdp1.lopr = (position * 0x20) >> 3;
 					//m_vdp1.copr = (position * 0x20) >> 3;
-					// prematurely kill the VDP1 process if an illegal opcode is executed 
+					// prematurely kill the VDP1 process if an illegal opcode is executed
 					// Sexy Parodius calls multiple illegals and expects VDP1 irq to be fired anyway!
 					goto end;
 			}

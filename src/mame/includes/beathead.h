@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "cpu/asap/asap.h"
 #include "audio/atarijsa.h"
 

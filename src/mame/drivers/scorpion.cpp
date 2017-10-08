@@ -6,6 +6,7 @@
 #include "includes/spec128.h"
 
 #include "machine/beta.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 
 #include "formats/tzx_cas.h"

@@ -471,6 +471,16 @@ void voodoo_device::init_fbi(voodoo_device* vd,fbi_state *f, void *memory, int f
 			vd->fbi.clut[pen] = rgb_t(pen,pen,pen);
 	}
 
+	// build static 16-bit rgb565 to rgb888 conversion table
+	for (int val = 0; val < 65536; val++)
+	{
+		int r, g, b;
+
+		/* table 10 = 16-bit RGB (5-6-5) */
+		EXTRACT_565_TO_888(val, r, g, b);
+		vd->fbi.rgb565[val] = rgb_t(0xff, r, g, b);
+	}
+
 	/* allocate a VBLANK timer */
 	f->vblank_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
 	f->vblank = false;
@@ -513,8 +523,7 @@ void voodoo_device::tmu_shared_state::init()
 		int r, g, b, a;
 
 		/* table 10 = 16-bit RGB (5-6-5) */
-		EXTRACT_565_TO_888(val, r, g, b);
-		rgb565[val] = rgb_t(0xff, r, g, b);
+		// Use frame buffer table
 
 		/* table 11 = 16 ARGB (1-5-5-5) */
 		EXTRACT_1555_TO_8888(val, a, r, g, b);
@@ -2951,9 +2960,11 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 {
 	uint16_t *dest, *depth;
 	uint32_t destmax, depthmax;
-	int sr[2], sg[2], sb[2], sa[2], sz[2];
+	int sa[2], sz[2];
+	uint8_t sr[2], sg[2], sb[2];
 	int x, y, scry, mask;
 	int pix, destbuf;
+	rgb_t sourceColor;
 
 	/* statistics */
 	vd->stats.lfb_writes++;
@@ -2981,15 +2992,23 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 	{
 		case 16*0 + 0:      /* ARGB, 16-bit RGB 5-6-5 */
 		case 16*2 + 0:      /* RGBA, 16-bit RGB 5-6-5 */
-			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
-			EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
+			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			//EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
+			sourceColor = vd->fbi.rgb565[data >> 16];
+			sourceColor.expand_rgb(sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 		case 16*1 + 0:      /* ABGR, 16-bit RGB 5-6-5 */
 		case 16*3 + 0:      /* BGRA, 16-bit RGB 5-6-5 */
-			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
-			EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
+			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			//EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
+			sourceColor = vd->fbi.rgb565[data >> 16];
+			sourceColor.expand_rgb(sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
@@ -3081,13 +3100,17 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 		case 16*0 + 12:     /* ARGB, 32-bit depth+RGB 5-6-5 */
 		case 16*2 + 12:     /* RGBA, 32-bit depth+RGB 5-6-5 */
 			sz[0] = data >> 16;
-			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*1 + 12:     /* ABGR, 32-bit depth+RGB 5-6-5 */
 		case 16*3 + 12:     /* BGRA, 32-bit depth+RGB 5-6-5 */
 			sz[0] = data >> 16;
-			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
@@ -5113,6 +5136,8 @@ void voodoo_device::device_start()
 
 	/* build shared TMU tables */
 	tmushare.init();
+	// Point the rgb565 table to the frame buffer table
+	tmushare.rgb565 = fbi.rgb565;
 
 	/* set up the TMUs */
 	tmu[0].init(vd_type, tmushare, &reg[0x100], tmumem[0], tmumem0 << 20);

@@ -11,6 +11,7 @@
 #include "screen.h"
 #include "cpu/capricorn/capricorn.h"
 #include "speaker.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

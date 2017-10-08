@@ -13,6 +13,7 @@
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"

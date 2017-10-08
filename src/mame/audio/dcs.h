@@ -14,6 +14,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "sound/dmadac.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 
 #define MCFG_DCS2_AUDIO_DRAM_IN_MB(_dram_in_mb) \
 	dcs_audio_device::static_set_dram_in_mb(*device, _dram_in_mb);

@@ -180,33 +180,33 @@ WRITE16_MEMBER( cgc7900_state::keyboard_w )
 
 static const int int_levels[16] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
 static const int int_vectors[16] = {
-	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48 
+	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48
 };
 
 WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 {
 	/*
 
-	    bit     description		vec	level
+	    bit     description     vec level
 
-	     0      real time clock	4b	5
-	     1      RS-449 Tx ready	44	4
-	     2      BINT 2			4c	5
-	     3      RS-232 Tx ready	43	4
-	     4      disk			42	4
-	     5      BINT 3			4d	5
-	     6      bezel keys		45	4
-	     7      keyboard		4a	5
-	     8      RS-449 Rx ready	49	5
-	     9      light pen		46	4
-	    10      BINT 4			4e	5
-	    11      joystick		41	4
-	    12      vert. retrace	40	4
-	    13      BINT 5			4f	5
-	    14      BINT 1			47	4
-	    15      RS-232 Rx ready	48	5
+	     0      real time clock 4b  5
+	     1      RS-449 Tx ready 44  4
+	     2      BINT 2          4c  5
+	     3      RS-232 Tx ready 43  4
+	     4      disk            42  4
+	     5      BINT 3          4d  5
+	     6      bezel keys      45  4
+	     7      keyboard        4a  5
+	     8      RS-449 Rx ready 49  5
+	     9      light pen       46  4
+	    10      BINT 4          4e  5
+	    11      joystick        41  4
+	    12      vert. retrace   40  4
+	    13      BINT 5          4f  5
+	    14      BINT 1          47  4
+	    15      RS-232 Rx ready 48  5
 
-		default mask is 0x7e3f -- RS232 Rx, RS449 Rx, keyboard, bezel.
+	    default mask is 0x7e3f -- RS232 Rx, RS449 Rx, keyboard, bezel.
 	*/
 
 	if (m_int_mask != data)

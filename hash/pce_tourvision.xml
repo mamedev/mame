@@ -363,7 +363,7 @@
 		</part>
 	</software>
 
-	
+
 	<!--Dodge Ball -->
 	<software name="nekdodge">
 		<description>Dodge Ball (Tourvision PCE bootleg)</description>
@@ -619,7 +619,7 @@ Notes:
 		</part>
 	</software>
 
-	
+
 	<!--Image Fight -->
 	<software name="imagefgt">
 		<description>Image Fight (Tourvision PCE bootleg)</description>
@@ -703,7 +703,7 @@ Notes:
 		</part>
 	</software>
 
-	
+
 	<!--Ledgnd of Hero Tonma -->
 	<software name="loht">
 		<description>Legend of Hero Tonma (Tourvision PCE bootleg)</description>

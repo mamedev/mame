@@ -26,6 +26,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
 #include "screen.h"

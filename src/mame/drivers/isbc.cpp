@@ -417,8 +417,8 @@ static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
+//	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
+//	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(isbc_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(isbc_state, override_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(isbc_state, bus_intr_out1_w))
@@ -467,8 +467,8 @@ static MACHINE_CONFIG_START( isbc286 )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, 0, 0, 0, 0)
 #if 0
+	MCFG_DEVICE_ADD("uart8274", I8274, XTAL_16MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
@@ -477,6 +477,7 @@ static MACHINE_CONFIG_START( isbc286 )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
 #else
+	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL_16MHz/4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))

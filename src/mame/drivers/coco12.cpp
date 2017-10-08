@@ -385,6 +385,7 @@ static MACHINE_CONFIG_START( coco )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")
+	MCFG_SOFTWARE_LIST_FILTER("coco_cart_list", "COCO")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
 MACHINE_CONFIG_END
 
@@ -495,4 +496,4 @@ COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,  coco12_state, 0,    
 COMP(  1984,    cp400,      coco,   0,      cp400,   coco,  coco12_state, 0,    "Prologica",         "CP400",                               0 )
 COMP(  1984,    lzcolor64,  coco,   0,      coco,    coco,  coco12_state, 0,    "Digiponto",         "LZ Color64",                          0 )
 COMP(  1984,    mx1600,     coco,   0,      coco,    coco,  coco12_state, 0,    "Dynacom",           "MX-1600",                             0 )
-COMP(  1986,    t4426,      coco,   0,      t4426,   coco,  coco12_state, 0,    "Terco AB",          "Terco 4426 CNC Programming station",  MACHINE_NOT_WORKING )
+COMP(  1986,    t4426,      coco,   0,      t4426,   coco,  coco12_state, 0,    "Terco AB",          "Terco 4426 CNC Programming station",  0 )

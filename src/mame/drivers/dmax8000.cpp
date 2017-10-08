@@ -163,7 +163,7 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart2", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart1", z80dart_device, rxtxcb_w))
 
-	MCFG_Z80DART_ADD("dart1",  XTAL_4MHz, 0, 0, 0, 0 ) // A = terminal; B = aux
+	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL_4MHz) // A = terminal; B = aux
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart1", z80dart_device, ria_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart1", z80dart_device, ctsa_w))
 
-	MCFG_Z80DART_ADD("dart2",  XTAL_4MHz, 0, 0, 0, 0 ) // RS232 ports
+	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL_4MHz) // RS232 ports
 
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(dmax8000_state, port0c_w))

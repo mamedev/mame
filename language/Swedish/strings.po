@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-25 23:41+1000\n"
+"POT-Creation-Date: 2017-10-03 10:32+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -17,48 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/frontend/mame/ui/auditmenu.cpp:96
+#: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
-msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr "Granskning av ROMs för %1$u maskiner markerade som ej tillgängliga?"
+msgid "%s [internal]"
+msgstr "%s [intern]"
 
-#: src/frontend/mame/ui/auditmenu.cpp:99
-#, c-format
-msgid "Audit ROMs for all %1$u machines?"
-msgstr "Granskning av ROMs för alla %1$u maskiner?"
+#: src/frontend/mame/ui/slotopt.cpp:203 src/frontend/mame/ui/inputmap.cpp:625
+#: src/frontend/mame/ui/miscmenu.cpp:96
+msgid "Reset"
+msgstr "Återställ"
 
-#: src/frontend/mame/ui/auditmenu.cpp:104
-#, c-format
-msgid "(results will be saved to %1$s)"
-msgstr "(resultat kommer att sparas som %1$s)"
-
-#: src/frontend/mame/ui/auditmenu.cpp:130
-#, c-format
-msgid ""
-"Auditing ROMs for machine %2$u of %3$u...\n"
-"%1$s"
-msgstr ""
-"Granskning av ROMs för maskin %2$u av %3$u...\n"
-"%1$s"
-
-#: src/frontend/mame/ui/auditmenu.cpp:142
-msgid "Start Audit"
-msgstr "Starta Granskning"
-
-#: src/frontend/mame/ui/imgcntrl.cpp:116
-msgid "Cannot save over directory"
-msgstr "Kan inte spara på katalog"
-
-#: src/frontend/mame/ui/imgcntrl.cpp:149
-msgid ""
-"The software selected is missing one or more required ROM or CHD images. "
-"Please select a different one."
-msgstr ""
-"Den markerade mjukvaran saknar en eller flera nödvändiga ROM eller CHD "
-"avbildningar. Välj en annan."
-
-#: src/frontend/mame/ui/filesel.cpp:257 src/frontend/mame/ui/swlist.cpp:83
-#: src/frontend/mame/ui/slotopt.cpp:220
+#: src/frontend/mame/ui/slotopt.cpp:220 src/frontend/mame/ui/filesel.cpp:257
+#: src/frontend/mame/ui/swlist.cpp:83
 msgid "[empty slot]"
 msgstr "[tom plats]"
 
@@ -89,163 +59,6 @@ msgstr "Läs denna skivavbildning, skriv kopia till en annan"
 #: src/frontend/mame/ui/filesel.cpp:530
 msgid "Read this image, write to diff"
 msgstr "Läs denna skivavbildning, skriv skillnader till en annan"
-
-#: src/frontend/mame/ui/dirmenu.cpp:35
-msgid "ROMs"
-msgstr "ROMs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:36
-msgid "Software Media"
-msgstr "Mjukvaru Media"
-
-#: src/frontend/mame/ui/dirmenu.cpp:37
-msgid "UI"
-msgstr "UI"
-
-#: src/frontend/mame/ui/dirmenu.cpp:38 src/frontend/mame/ui/custui.cpp:157
-msgid "Language"
-msgstr "Språk"
-
-#: src/frontend/mame/ui/dirmenu.cpp:39
-msgid "Samples"
-msgstr "Samples"
-
-#: src/frontend/mame/ui/dirmenu.cpp:40
-msgid "DATs"
-msgstr "DATs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:41
-msgid "INIs"
-msgstr "INIs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:42
-msgid "Category INIs"
-msgstr "Kategori INIs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:43
-msgid "Icons"
-msgstr "Ikoner"
-
-#: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
-msgid "Cheats"
-msgstr "Fusk"
-
-#: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
-msgid "Snapshots"
-msgstr "Skärmklipp"
-
-#: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:50
-msgid "Cabinets"
-msgstr "Kabinett"
-
-#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:53
-msgid "Flyers"
-msgstr "Flygblad"
-
-#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:54
-msgid "Titles"
-msgstr "Titlar"
-
-#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:55
-msgid "Ends"
-msgstr "Slutar"
-
-#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:52
-msgid "PCBs"
-msgstr "PCBs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/videoopt.cpp:224
-#: src/frontend/mame/ui/selmenu.cpp:64
-msgid "Marquees"
-msgstr "Draperier"
-
-#: src/frontend/mame/ui/dirmenu.cpp:52
-msgid "Controls Panels"
-msgstr "Kontrollpaneler"
-
-#: src/frontend/mame/ui/dirmenu.cpp:53
-msgid "Crosshairs"
-msgstr "Hårkors"
-
-#: src/frontend/mame/ui/dirmenu.cpp:54
-msgid "Artworks"
-msgstr "Grafisk Layout"
-
-#: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:57
-msgid "Bosses"
-msgstr "Bossar"
-
-#: src/frontend/mame/ui/dirmenu.cpp:56
-msgid "Artworks Preview"
-msgstr "Förhandsvisning Grafisk Layout"
-
-#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:63
-msgid "Select"
-msgstr "Välj"
-
-#: src/frontend/mame/ui/dirmenu.cpp:58
-msgid "GameOver"
-msgstr "GameOver"
-
-#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:61
-msgid "HowTo"
-msgstr "HowTo"
-
-#: src/frontend/mame/ui/dirmenu.cpp:60 src/frontend/mame/ui/selmenu.cpp:58
-msgid "Logos"
-msgstr "Logotyper"
-
-#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:62
-msgid "Scores"
-msgstr "Poäng"
-
-#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
-msgid "Versus"
-msgstr "Mot"
-
-#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:65
-msgid "Covers"
-msgstr "Omslagsbilder"
-
-#: src/frontend/mame/ui/dirmenu.cpp:116
-msgid "Folders Setup"
-msgstr "Katalogkonfiguration"
-
-#: src/frontend/mame/ui/dirmenu.cpp:167
-#, c-format
-msgid "Current %1$s Folders"
-msgstr "Nuvarande %1$s Kataloger"
-
-#: src/frontend/mame/ui/dirmenu.cpp:179
-msgid "Change Folder"
-msgstr "Ändra Katalog"
-
-#: src/frontend/mame/ui/dirmenu.cpp:179
-msgid "Add Folder"
-msgstr "Lägg Till Katalog"
-
-#: src/frontend/mame/ui/dirmenu.cpp:182
-msgid "Remove Folder"
-msgstr "Tabort Katalog"
-
-#: src/frontend/mame/ui/dirmenu.cpp:418
-#, c-format
-msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Ändra %1$s Katalog - Sök: %2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:418
-#, c-format
-msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "Lägg till %1$s Katalog - Sök: %2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:429
-msgid "Press TAB to set"
-msgstr "Tryck TAB för att välja"
-
-#: src/frontend/mame/ui/dirmenu.cpp:513
-#, c-format
-msgid "Remove %1$s Folder"
-msgstr "Tabort %1$s Katalog"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
@@ -303,7 +116,7 @@ msgstr "WAN"
 msgid "timing"
 msgstr "timing"
 
-#: src/frontend/mame/ui/info.cpp:177
+#: src/frontend/mame/ui/info.cpp:180
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
@@ -311,7 +124,7 @@ msgstr ""
 "En eller flera ROMs/CHDs för denna maskin är felaktiga. Maskinen kan uppvisa "
 "fel vid körning.\n"
 
-#: src/frontend/mame/ui/info.cpp:187
+#: src/frontend/mame/ui/info.cpp:190
 msgid ""
 "There are known problems with this machine\n"
 "\n"
@@ -319,41 +132,41 @@ msgstr ""
 "Det finns kända problem med denna maskin\n"
 "\n"
 
-#: src/frontend/mame/ui/info.cpp:192
+#: src/frontend/mame/ui/info.cpp:195
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
 "En eller flera ROMs/CHDs för denna maskin har inte blivit avbildade "
 "korrekt.\n"
 
-#: src/frontend/mame/ui/info.cpp:197
+#: src/frontend/mame/ui/info.cpp:200
 msgid "Completely unemulated features: "
 msgstr "Helt oemulerade funktioner: "
 
-#: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
+#: src/frontend/mame/ui/info.cpp:206 src/frontend/mame/ui/info.cpp:222
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/frontend/mame/ui/info.cpp:203 src/frontend/mame/ui/info.cpp:219
-#: src/frontend/mame/ui/info.cpp:264
+#: src/frontend/mame/ui/info.cpp:206 src/frontend/mame/ui/info.cpp:222
+#: src/frontend/mame/ui/info.cpp:267
 #, c-format
 msgid ", %s"
 msgstr ", %s"
 
-#: src/frontend/mame/ui/info.cpp:213
+#: src/frontend/mame/ui/info.cpp:216
 msgid "Imperfectly emulated features: "
 msgstr "Bristfälligt emulerade funtioner: "
 
-#: src/frontend/mame/ui/info.cpp:228
+#: src/frontend/mame/ui/info.cpp:231
 msgid "Screen flipping in cocktail mode is not supported.\n"
 msgstr "Skärm flippning i cocktail läge stöds ej.\n"
 
-#: src/frontend/mame/ui/info.cpp:230
+#: src/frontend/mame/ui/info.cpp:233
 msgid "This machine requires external artwork files.\n"
 msgstr "Denna maskin kräver extra filer med grafisk layout.\n"
 
-#: src/frontend/mame/ui/info.cpp:232
+#: src/frontend/mame/ui/info.cpp:235
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
@@ -362,7 +175,7 @@ msgstr ""
 "konstigt eller sakna delar som därför inte är felprogrammering i "
 "emuleringen.\n"
 
-#: src/frontend/mame/ui/info.cpp:234
+#: src/frontend/mame/ui/info.cpp:237
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
@@ -370,7 +183,7 @@ msgstr ""
 "Den här maskinen har ingen ljudhårdvara, MAME producerar därför inget ljud "
 "och detta är korrekt beteende.\n"
 
-#: src/frontend/mame/ui/info.cpp:238
+#: src/frontend/mame/ui/info.cpp:241
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
@@ -382,7 +195,7 @@ msgstr ""
 "Det finns inget du kan göra för att fixa detta problem, förutom att vänta på "
 "att utvecklarna förbättrar emuleringen.\n"
 
-#: src/frontend/mame/ui/info.cpp:240
+#: src/frontend/mame/ui/info.cpp:243
 msgid ""
 "\n"
 "Elements of this machine cannot be emulated as they requires physical "
@@ -394,7 +207,7 @@ msgstr ""
 "eller består av mekaniska delar. Det är därför inte möjligt att fullt ut "
 "uppleva denna maskin.\n"
 
-#: src/frontend/mame/ui/info.cpp:262
+#: src/frontend/mame/ui/info.cpp:265
 #, c-format
 msgid ""
 "\n"
@@ -405,7 +218,7 @@ msgstr ""
 "\n"
 "Det finns fungerande varianter av denna maskin: %s"
 
-#: src/frontend/mame/ui/info.cpp:275
+#: src/frontend/mame/ui/info.cpp:278
 msgid ""
 "\n"
 "\n"
@@ -415,7 +228,7 @@ msgstr ""
 "\n"
 "Tryck på valfri tangent för att fortsätta"
 
-#: src/frontend/mame/ui/info.cpp:290
+#: src/frontend/mame/ui/info.cpp:293
 #, c-format
 msgid ""
 "%1$s\n"
@@ -430,15 +243,15 @@ msgstr ""
 "\n"
 "CPU:\n"
 
-#: src/frontend/mame/ui/info.cpp:325 src/frontend/mame/ui/info.cpp:363
+#: src/frontend/mame/ui/info.cpp:328 src/frontend/mame/ui/info.cpp:366
 msgid "MHz"
 msgstr "MHz"
 
-#: src/frontend/mame/ui/info.cpp:325 src/frontend/mame/ui/info.cpp:363
+#: src/frontend/mame/ui/info.cpp:328 src/frontend/mame/ui/info.cpp:366
 msgid "kHz"
 msgstr "kHz"
 
-#: src/frontend/mame/ui/info.cpp:339
+#: src/frontend/mame/ui/info.cpp:342
 msgid ""
 "\n"
 "Sound:\n"
@@ -446,7 +259,7 @@ msgstr ""
 "\n"
 "Ljud:\n"
 
-#: src/frontend/mame/ui/info.cpp:367
+#: src/frontend/mame/ui/info.cpp:370
 msgid ""
 "\n"
 "Video:\n"
@@ -454,74 +267,46 @@ msgstr ""
 "\n"
 "Video:\n"
 
-#: src/frontend/mame/ui/info.cpp:371
+#: src/frontend/mame/ui/info.cpp:374
 msgid "None\n"
 msgstr "None\n"
 
-#: src/frontend/mame/ui/info.cpp:378
+#: src/frontend/mame/ui/info.cpp:381
 msgid "Vector"
 msgstr "Vektor"
 
-#: src/frontend/mame/ui/info.cpp:389
+#: src/frontend/mame/ui/info.cpp:392
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:389
+#: src/frontend/mame/ui/info.cpp:392
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:435
+#: src/frontend/mame/ui/info.cpp:438
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "Skärm '%1$s'"
 
-#: src/frontend/mame/ui/info.cpp:437
+#: src/frontend/mame/ui/info.cpp:440
 msgid "Screen"
 msgstr "Skärm"
 
-#: src/frontend/mame/ui/info.cpp:522
+#: src/frontend/mame/ui/info.cpp:525
 msgid "Not supported"
 msgstr "Stöds Ej"
 
-#: src/frontend/mame/ui/info.cpp:525
+#: src/frontend/mame/ui/info.cpp:528
 msgid "Partially supported"
 msgstr "Stöds Delvis"
 
-#: src/frontend/mame/ui/info.cpp:533
+#: src/frontend/mame/ui/info.cpp:536
 msgid "[empty]"
 msgstr "[tom]"
 
-#: src/frontend/mame/ui/optsmenu.cpp:193
-msgid "Filter"
-msgstr "Filter"
-
-#: src/frontend/mame/ui/optsmenu.cpp:206
-msgid "Customize UI"
-msgstr "Skräddarsy UI"
-
-#: src/frontend/mame/ui/optsmenu.cpp:207
-msgid "Configure Directories"
-msgstr "Konfigurera Kataloger"
-
-#: src/frontend/mame/ui/optsmenu.cpp:210 src/frontend/mame/ui/sndmenu.cpp:149
-msgid "Sound Options"
-msgstr "Ljudalternativ"
-
-#: src/frontend/mame/ui/optsmenu.cpp:213
-msgid "General Inputs"
-msgstr "Generell Indata"
-
-#: src/frontend/mame/ui/optsmenu.cpp:216
-msgid "Save Configuration"
-msgstr "Spara Konfiguration"
-
-#: src/frontend/mame/ui/optsmenu.cpp:228
-msgid "Settings"
-msgstr "Inställningar"
-
-#: src/frontend/mame/ui/cheatopt.cpp:92
-#, c-format
+#: src/frontend/mame/ui/cheatopt.cpp:92 plugins/cheat/init.lua:601
+#, c-format, lua-format
 msgid ""
 "Cheat Comment:\n"
 "%s"
@@ -537,11 +322,11 @@ msgstr "Alla fusk uppdaterade"
 msgid "Autofire Settings"
 msgstr "Autofire Inställningar"
 
-#: src/frontend/mame/ui/cheatopt.cpp:157
+#: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:529
 msgid "Reset All"
 msgstr "Återställ Alla"
 
-#: src/frontend/mame/ui/cheatopt.cpp:160
+#: src/frontend/mame/ui/cheatopt.cpp:160 plugins/cheat/init.lua:530
 msgid "Reload All"
 msgstr "Ladda Om Alla"
 
@@ -564,14 +349,17 @@ msgid "Enabled"
 msgstr "Aktiverad"
 
 #: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/menu.cpp:724 src/frontend/mame/ui/miscmenu.cpp:902
+#: src/frontend/mame/ui/menu.cpp:736 src/frontend/mame/ui/miscmenu.cpp:894
 #: src/frontend/mame/ui/sndmenu.cpp:135 src/frontend/mame/ui/sndmenu.cpp:137
+#: plugins/cheat/init.lua:499 plugins/cheatfind/init.lua:589
 msgid "On"
 msgstr "På"
 
 #: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
-#: src/frontend/mame/ui/menu.cpp:727 src/frontend/mame/ui/miscmenu.cpp:902
+#: src/frontend/mame/ui/menu.cpp:739 src/frontend/mame/ui/miscmenu.cpp:894
 #: src/frontend/mame/ui/sndmenu.cpp:135 src/frontend/mame/ui/sndmenu.cpp:137
+#: plugins/cheat/init.lua:502 plugins/cheat/init.lua:511
+#: plugins/cheatfind/init.lua:586
 msgid "Off"
 msgstr "Av"
 
@@ -582,896 +370,6 @@ msgstr "Inga knappar funna för denna maskin!"
 #: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
 msgid "Autofire Delay"
 msgstr "Autofire Fördröjning"
-
-#: src/frontend/mame/ui/tapectrl.cpp:85
-msgid "stopped"
-msgstr "stoppad"
-
-#: src/frontend/mame/ui/tapectrl.cpp:87
-msgid "playing"
-msgstr "spelar upp"
-
-#: src/frontend/mame/ui/tapectrl.cpp:87
-msgid "(playing)"
-msgstr "(spelar upp)"
-
-#: src/frontend/mame/ui/tapectrl.cpp:88
-msgid "recording"
-msgstr "spelar in"
-
-#: src/frontend/mame/ui/tapectrl.cpp:88
-msgid "(recording)"
-msgstr "(spelar in)"
-
-#: src/frontend/mame/ui/tapectrl.cpp:95
-msgid "Pause/Stop"
-msgstr "Paus/Stopp"
-
-#: src/frontend/mame/ui/tapectrl.cpp:98
-msgid "Play"
-msgstr "Spela"
-
-#: src/frontend/mame/ui/tapectrl.cpp:101
-msgid "Record"
-msgstr "Spela in"
-
-#: src/frontend/mame/ui/tapectrl.cpp:104
-msgid "Rewind"
-msgstr "Spola tillbaka"
-
-#: src/frontend/mame/ui/tapectrl.cpp:107
-msgid "Fast Forward"
-msgstr "Snabbspola framåt"
-
-#: src/frontend/mame/ui/inputmap.cpp:53
-msgid "User Interface"
-msgstr "Användergränssnitt"
-
-#: src/frontend/mame/ui/inputmap.cpp:59
-msgid "Other Controls"
-msgstr "Andra kontroller"
-
-#: src/frontend/mame/ui/inputmap.cpp:625 src/frontend/mame/ui/slotopt.cpp:203
-#: src/frontend/mame/ui/miscmenu.cpp:97
-msgid "Reset"
-msgstr "Återställ"
-
-#: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
-msgid "Unfiltered"
-msgstr "Ofiltrerat"
-
-#: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
-msgid "Available"
-msgstr "Tillgängliga"
-
-#: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
-msgid "Unavailable"
-msgstr "Ej tillgängliga"
-
-#: src/frontend/mame/ui/utils.cpp:60
-msgid "Working"
-msgstr "Fungerar"
-
-#: src/frontend/mame/ui/utils.cpp:61
-msgid "Not Working"
-msgstr "Fungerar ej"
-
-#: src/frontend/mame/ui/utils.cpp:62
-msgid "Mechanical"
-msgstr "Mekaniska"
-
-#: src/frontend/mame/ui/utils.cpp:63
-msgid "Not Mechanical"
-msgstr "Ej Mekaniska"
-
-#: src/frontend/mame/ui/utils.cpp:64
-msgid "Category"
-msgstr "Kategori"
-
-#: src/frontend/mame/ui/utils.cpp:65
-msgid "Favorites"
-msgstr "Favoriter"
-
-#: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:762
-msgid "BIOS"
-msgstr "BIOS"
-
-#: src/frontend/mame/ui/utils.cpp:67
-msgid "Not BIOS"
-msgstr "Ej BIOS"
-
-#: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
-msgid "Parents"
-msgstr "Har Kloner"
-
-#: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
-msgid "Clones"
-msgstr "Är Kloner"
-
-#: src/frontend/mame/ui/utils.cpp:70
-msgid "Manufacturer"
-msgstr "Tillverkare"
-
-#: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
-msgid "Year"
-msgstr "År"
-
-#: src/frontend/mame/ui/utils.cpp:72
-msgid "Save Supported"
-msgstr "Spara Stödda"
-
-#: src/frontend/mame/ui/utils.cpp:73
-msgid "Save Unsupported"
-msgstr "Spara Ej Stödda"
-
-#: src/frontend/mame/ui/utils.cpp:74
-msgid "CHD Required"
-msgstr "CHD avbildning krävs"
-
-#: src/frontend/mame/ui/utils.cpp:75
-msgid "No CHD Required"
-msgstr "Ingen CHD avbildning krävs"
-
-#: src/frontend/mame/ui/utils.cpp:76
-msgid "Vertical Screen"
-msgstr "Vertikal skärm"
-
-#: src/frontend/mame/ui/utils.cpp:77
-msgid "Horizontal Screen"
-msgstr "Horisontell skärm"
-
-#: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
-msgid "Custom Filter"
-msgstr "Eget filter"
-
-#: src/frontend/mame/ui/utils.cpp:87
-msgid "Publisher"
-msgstr "Utgivare"
-
-#: src/frontend/mame/ui/utils.cpp:88
-msgid "Supported"
-msgstr "Stödd"
-
-#: src/frontend/mame/ui/utils.cpp:89
-msgid "Partially Supported"
-msgstr "Partiellt Stöd"
-
-#: src/frontend/mame/ui/utils.cpp:90
-msgid "Unsupported"
-msgstr "Ej Stödda"
-
-#: src/frontend/mame/ui/utils.cpp:91
-msgid "Release Region"
-msgstr "Utgivningsområde"
-
-#: src/frontend/mame/ui/utils.cpp:92
-msgid "Device Type"
-msgstr "Typ av apparat"
-
-#: src/frontend/mame/ui/utils.cpp:93
-msgid "Software List"
-msgstr "Mjukvarulista"
-
-#: src/frontend/mame/ui/utils.cpp:244
-msgid "<set up filters>"
-msgstr "<skapa filter>"
-
-#: src/frontend/mame/ui/utils.cpp:352
-msgid "Select custom filters:"
-msgstr "Välj eget filter"
-
-#: src/frontend/mame/ui/utils.cpp:503
-#, c-format
-msgid "Filter %1$u"
-msgstr "Filter %1$u"
-
-#: src/frontend/mame/ui/utils.cpp:518
-msgid "Remove last filter"
-msgstr "Ta bort senaste filtret"
-
-#: src/frontend/mame/ui/utils.cpp:520
-msgid "Add filter"
-msgstr "Lägg till filter"
-
-#: src/frontend/mame/ui/utils.cpp:960
-msgid "Select category:"
-msgstr "Välj kategori:"
-
-#: src/frontend/mame/ui/utils.cpp:991
-msgid "[no category INI files]"
-msgstr "[ingen kategori INI filer]"
-
-#: src/frontend/mame/ui/utils.cpp:999
-msgid "[no groups in INI file]"
-msgstr "[inga grupper i INI fil]"
-
-#: src/frontend/mame/ui/utils.cpp:1033
-msgid "No category INI files found"
-msgstr "Inga kategorier INI filer funna"
-
-#: src/frontend/mame/ui/utils.cpp:1038
-msgid "File"
-msgstr "Fil"
-
-#: src/frontend/mame/ui/utils.cpp:1042
-msgid "No groups found in category file"
-msgstr "Inga grupper funna i kategorifil"
-
-#: src/frontend/mame/ui/utils.cpp:1047
-msgid "Group"
-msgstr "Grupp"
-
-#: src/frontend/mame/ui/utils.cpp:1048
-msgid "Include clones"
-msgstr "Inkludera kloner"
-
-#: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/selgame.cpp:948
-#: src/frontend/mame/ui/selgame.cpp:949 src/frontend/mame/ui/selgame.cpp:950
-#: src/frontend/mame/ui/selgame.cpp:951 src/frontend/mame/ui/selgame.cpp:952
-#: src/frontend/mame/ui/selgame.cpp:953 src/frontend/mame/ui/selgame.cpp:963
-#: src/frontend/mame/ui/filecreate.cpp:82
-msgid "Yes"
-msgstr "Ja"
-
-#: src/frontend/mame/ui/utils.cpp:1048 src/frontend/mame/ui/selgame.cpp:948
-#: src/frontend/mame/ui/selgame.cpp:949 src/frontend/mame/ui/selgame.cpp:950
-#: src/frontend/mame/ui/selgame.cpp:951 src/frontend/mame/ui/selgame.cpp:952
-#: src/frontend/mame/ui/selgame.cpp:953 src/frontend/mame/ui/selgame.cpp:963
-#: src/frontend/mame/ui/filecreate.cpp:81
-msgid "No"
-msgstr "Nej"
-
-#: src/frontend/mame/ui/selector.cpp:116
-msgid "Selection List - Search: "
-msgstr "Urvalslista - Sök: "
-
-#: src/frontend/mame/ui/selector.cpp:124
-#, c-format
-msgid "Double click or press %1$s to select"
-msgstr "Dubbelklicka eller tryck %1$s för att välja"
-
-#: src/frontend/mame/ui/swlist.cpp:88
-msgid "[file manager]"
-msgstr "[filhanterare]"
-
-#: src/frontend/mame/ui/swlist.cpp:228
-msgid "Switch Item Ordering"
-msgstr "Byt Sortering"
-
-#: src/frontend/mame/ui/swlist.cpp:259
-#, c-format
-msgid "Switched Order: entries now ordered by %s"
-msgstr "Bytt Sortering: poster sorteras på %s"
-
-#: src/frontend/mame/ui/swlist.cpp:259
-msgid "shortname"
-msgstr "kortnamn"
-
-#: src/frontend/mame/ui/swlist.cpp:259
-msgid "description"
-msgstr "beskrivning"
-
-#: src/frontend/mame/ui/swlist.cpp:389
-msgid "[compatible lists]"
-msgstr "[kompatibla listor]"
-
-#: src/frontend/mame/ui/selgame.cpp:313 src/frontend/mame/ui/selsoft.cpp:211
-#, c-format
-msgid ""
-"%s\n"
-" added to favorites list."
-msgstr ""
-"%s\n"
-" tillagd i favoritlistan."
-
-#: src/frontend/mame/ui/selgame.cpp:318 src/frontend/mame/ui/selgame.cpp:324
-#: src/frontend/mame/ui/selsoft.cpp:216
-#, c-format
-msgid ""
-"%s\n"
-" removed from favorites list."
-msgstr ""
-"%s\n"
-" borttagen från favoritlistan."
-
-#: src/frontend/mame/ui/selgame.cpp:440
-#: src/frontend/mame/ui/simpleselgame.cpp:271
-msgid "Configure Options"
-msgstr "Konfigurationsalternativ"
-
-#: src/frontend/mame/ui/selgame.cpp:441
-msgid "Configure Machine"
-msgstr "Maskinkonfiguration"
-
-#: src/frontend/mame/ui/selgame.cpp:445 src/frontend/mame/ui/miscmenu.cpp:916
-msgid "Plugins"
-msgstr "Tillägg"
-
-#: src/frontend/mame/ui/selgame.cpp:856
-#, c-format
-msgid "Romset\t%1$-.100s\n"
-msgstr "Romdistribution\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:857
-#, c-format
-msgid "Year\t%1$s\n"
-msgstr "År\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:858
-#, c-format
-msgid "Manufacturer\t%1$-.100s\n"
-msgstr "Tillverkare\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:862
-#, c-format
-msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr "Drivrutinen är klon av\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:864
-msgid "Driver is Parent\t\n"
-msgstr "Drivrutinen är oberoende\t\n"
-
-#: src/frontend/mame/ui/selgame.cpp:867
-msgid "Analog Controls\tYes\n"
-msgstr "Analoga kontroller\tJa\n"
-
-#: src/frontend/mame/ui/selgame.cpp:869
-msgid "Keyboard Inputs\tYes\n"
-msgstr "Tangentbord\tJa\n"
-
-#: src/frontend/mame/ui/selgame.cpp:872
-msgid "Overall\tNOT WORKING\n"
-msgstr "Status\tFUNGERAR EJ\n"
-
-#: src/frontend/mame/ui/selgame.cpp:874
-msgid "Overall\tUnemulated Protection\n"
-msgstr "Status\tOemulerad skyddsmekanism\n"
-
-#: src/frontend/mame/ui/selgame.cpp:876
-msgid "Overall\tWorking\n"
-msgstr "Status\tFungerar\n"
-
-#: src/frontend/mame/ui/selgame.cpp:879
-msgid "Graphics\tUnimplemented\n"
-msgstr "Grafik\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:881
-msgid "Graphics\tWrong Colors\n"
-msgstr "Grafik\tFel Färger\n"
-
-#: src/frontend/mame/ui/selgame.cpp:883
-msgid "Graphics\tImperfect Colors\n"
-msgstr "Grafik\tBristfälliga färger\n"
-
-#: src/frontend/mame/ui/selgame.cpp:885
-msgid "Graphics\tImperfect\n"
-msgstr "Grafik\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:887
-msgid "Graphics\tOK\n"
-msgstr "Grafik\tOK\n"
-
-#: src/frontend/mame/ui/selgame.cpp:890
-msgid "Sound\tNone\n"
-msgstr "Ljud\tInget\n"
-
-#: src/frontend/mame/ui/selgame.cpp:892
-msgid "Sound\tUnimplemented\n"
-msgstr "Ljud\tEj implementerat\n"
-
-#: src/frontend/mame/ui/selgame.cpp:894
-msgid "Sound\tImperfect\n"
-msgstr "Ljud\tBristfälligt\n"
-
-#: src/frontend/mame/ui/selgame.cpp:896
-msgid "Sound\tOK\n"
-msgstr "Ljud\tOK\n"
-
-#: src/frontend/mame/ui/selgame.cpp:899
-msgid "Controls\tUnimplemented\n"
-msgstr "Kontroller\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:901
-msgid "Controls\tImperfect\n"
-msgstr "Kontroller\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:904
-msgid "Keyboard\tUnimplemented\n"
-msgstr "Tangentbord\tEj implementerat\n"
-
-#: src/frontend/mame/ui/selgame.cpp:906
-msgid "Keyboard\tImperfect\n"
-msgstr "Tangentbord\tBristfälligt\n"
-
-#: src/frontend/mame/ui/selgame.cpp:909
-msgid "Mouse\tUnimplemented\n"
-msgstr "Mus\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:911
-msgid "Mouse\tImperfect\n"
-msgstr "Mus\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:914
-msgid "Microphone\tUnimplemented\n"
-msgstr "Mikrofon\tEj implememterad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:916
-msgid "Microphone\tImperfect\n"
-msgstr "Mikrofon\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:919
-msgid "Camera\tUnimplemented\n"
-msgstr "Kamera\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:921
-msgid "Camera\tImperfect\n"
-msgstr "Kamera\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:924
-msgid "Disk\tUnimplemented\n"
-msgstr "Disk\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:926
-msgid "Disk\tImperfect\n"
-msgstr "Disk\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:929
-msgid "Printer\tUnimplemented\n"
-msgstr "Printer\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:931
-msgid "Printer\tImperfect\n"
-msgstr "Printer\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:934
-msgid "LAN\tUnimplemented\n"
-msgstr "LAN\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:936
-msgid "LAN\tImperfect\n"
-msgstr "LAN\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:939
-msgid "WAN\tUnimplemented\n"
-msgstr "WAN\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:941
-msgid "WAN\tImperfect\n"
-msgstr "WAN\tBristfälligt\n"
-
-#: src/frontend/mame/ui/selgame.cpp:944
-msgid "Timing\tUnimplemented\n"
-msgstr "Timing\tEj implementerad\n"
-
-#: src/frontend/mame/ui/selgame.cpp:946
-msgid "Timing\tImperfect\n"
-msgstr "Timing\tBristfällig\n"
-
-#: src/frontend/mame/ui/selgame.cpp:948
-#, c-format
-msgid "Mechanical Machine\t%1$s\n"
-msgstr "Mekanisk Maskin\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:949
-#, c-format
-msgid "Requires Artwork\t%1$s\n"
-msgstr "Kräver Grafisk Layout"
-
-#: src/frontend/mame/ui/selgame.cpp:950
-#, c-format
-msgid "Requires Clickable Artwork\t%1$s\n"
-msgstr "Kräver Klickbar Grafisk layout\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:951
-#, c-format
-msgid "Support Cocktail\t%1$s\n"
-msgstr "Stödjer Cocktail\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:952
-#, c-format
-msgid "Driver is BIOS\t%1$s\n"
-msgstr "Drivrutinen är BIOS\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:953
-#, c-format
-msgid "Support Save\t%1$s\n"
-msgstr "Stödjer Spara\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:954
-#, c-format
-msgid "Screen Orientation\t%1$s\n"
-msgstr "Skärm Orientering\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:954
-msgid "Vertical"
-msgstr "Vertikal"
-
-#: src/frontend/mame/ui/selgame.cpp:954
-msgid "Horizontal"
-msgstr "Horisontal"
-
-#: src/frontend/mame/ui/selgame.cpp:963
-#, c-format
-msgid "Requires CHD\t%1$s\n"
-msgstr "Kräver CHD\t%1$s\n"
-
-#: src/frontend/mame/ui/selgame.cpp:976
-msgid "Roms Audit Pass\tOK\n"
-msgstr "Granskning Av Romdistribution\tOK\n"
-
-#: src/frontend/mame/ui/selgame.cpp:978
-msgid "Roms Audit Pass\tBAD\n"
-msgstr "Granskning Av Romdistribution\tFEL\n"
-
-#: src/frontend/mame/ui/selgame.cpp:981
-msgid "Samples Audit Pass\tNone Needed\n"
-msgstr "Granskning av Prover\tBehövs Ej\n"
-
-#: src/frontend/mame/ui/selgame.cpp:983
-msgid "Samples Audit Pass\tOK\n"
-msgstr "Granskning av Prover\tOK\n"
-
-#: src/frontend/mame/ui/selgame.cpp:985
-msgid "Samples Audit Pass\tBAD\n"
-msgstr "Granskning av Prover\tFEL\n"
-
-#: src/frontend/mame/ui/selgame.cpp:988
-msgid ""
-"Roms Audit Pass\tDisabled\n"
-"Samples Audit Pass\tDisabled\n"
-msgstr ""
-"Granskning Av Romdistribution\tDeaktiverat\n"
-"Granskning av Prover\tDeaktiverat\n"
-
-#: src/frontend/mame/ui/selgame.cpp:1171
-#, c-format
-msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr "%1$s %2$s ( %3$d / %4$d maskiner (%5$d BIOS) )"
-
-#: src/frontend/mame/ui/selgame.cpp:1187 src/frontend/mame/ui/selsoft.cpp:555
-#, c-format
-msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s: %2$s - Sök: %3$s_"
-
-#: src/frontend/mame/ui/selgame.cpp:1189 src/frontend/mame/ui/selsoft.cpp:557
-#, c-format
-msgid "Search: %1$s_"
-msgstr "Sök: %1$s_"
-
-#: src/frontend/mame/ui/selgame.cpp:1199
-#, c-format
-msgid "Romset: %1$-.100s"
-msgstr "Romdistribution: %1$-.100s"
-
-#: src/frontend/mame/ui/selgame.cpp:1206
-#, c-format
-msgid "System: %1$-.100s"
-msgstr "System: %1$-.100s"
-
-#: src/frontend/mame/ui/selgame.cpp:1243
-msgid ""
-"The selected machine is missing one or more required ROM or CHD images. "
-"Please select a different machine.\n"
-"\n"
-msgstr ""
-"Den valda maskinen saknar en eller flera obligtoriska ROM eller CHD "
-"avbildningar. Välj en annan maskin.\n"
-"\n"
-
-#: src/frontend/mame/ui/selgame.cpp:1249 src/frontend/mame/ui/selsoft.cpp:462
-msgid "Press any key to continue."
-msgstr "Tryck på valfri tangent för att fortsätta."
-
-#: src/frontend/mame/ui/videoopt.cpp:56
-#, c-format
-msgid "Screen #%d"
-msgstr "Skärm #%d"
-
-#: src/frontend/mame/ui/videoopt.cpp:204 src/frontend/mame/ui/submenu.cpp:48
-msgid "Rotate"
-msgstr "Rotera"
-
-#: src/frontend/mame/ui/videoopt.cpp:208
-msgid "Backdrops"
-msgstr "Bakgrunder"
-
-#: src/frontend/mame/ui/videoopt.cpp:212
-msgid "Overlays"
-msgstr "Överlägg"
-
-#: src/frontend/mame/ui/videoopt.cpp:216
-msgid "Bezels"
-msgstr "Infattningar"
-
-#: src/frontend/mame/ui/videoopt.cpp:220
-msgid "CPanels"
-msgstr "CPaneler"
-
-#: src/frontend/mame/ui/videoopt.cpp:228
-msgid "View"
-msgstr "Vy"
-
-#: src/frontend/mame/ui/videoopt.cpp:228
-msgid "Cropped"
-msgstr "Beskärd"
-
-#: src/frontend/mame/ui/videoopt.cpp:228
-msgid "Full"
-msgstr "Full"
-
-#: src/frontend/mame/ui/filecreate.cpp:79
-msgid "File Already Exists - Override?"
-msgstr "Fil Finns Redan - Skriv Över?"
-
-#: src/frontend/mame/ui/filecreate.cpp:171
-msgid "New Image Name:"
-msgstr "Nytt Namn på Avbildning:"
-
-#: src/frontend/mame/ui/filecreate.cpp:177
-msgid "Image Format:"
-msgstr "Avbildningsformat:"
-
-#: src/frontend/mame/ui/filecreate.cpp:183
-msgid "Create"
-msgstr "Skapa"
-
-#: src/frontend/mame/ui/filecreate.cpp:214
-msgid "Please enter a file extension too"
-msgstr "Skriv in en filändelse också"
-
-#: src/frontend/mame/ui/filecreate.cpp:266
-msgid "Select image format"
-msgstr "Välj avbildningsformat"
-
-#: src/frontend/mame/ui/menu.cpp:294
-msgid "Return to Machine"
-msgstr "Tillbaka till Emuleringen"
-
-#: src/frontend/mame/ui/menu.cpp:299 src/frontend/mame/ui/menu.cpp:301
-msgid "Exit"
-msgstr "Hoppa ur"
-
-#: src/frontend/mame/ui/menu.cpp:306 src/frontend/mame/ui/menu.cpp:308
-msgid "Return to Previous Menu"
-msgstr "Tillbaka till Föregående Meny"
-
-#: src/frontend/mame/ui/menu.cpp:730
-msgid "Auto"
-msgstr "Automatisk"
-
-#: src/frontend/mame/ui/barcode.cpp:74
-msgid "New Barcode:"
-msgstr "Ny streckkod"
-
-#: src/frontend/mame/ui/barcode.cpp:78
-msgid "Enter Code"
-msgstr "Ange kod"
-
-#: src/frontend/mame/ui/barcode.cpp:119
-msgid "Barcode length invalid!"
-msgstr "Streckkodens längd är felaktig!"
-
-#: src/frontend/mame/ui/datmenu.cpp:80
-msgid "Software Usage"
-msgstr "Mjukvaruanvändning"
-
-#: src/frontend/mame/ui/datmenu.cpp:362
-msgid "Revision: "
-msgstr "Revision: "
-
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:99
-msgid "Pseudo terminals"
-msgstr "Låtsasterminaler"
-
-#: src/frontend/mame/ui/info_pty.cpp:39
-msgid "[failed]"
-msgstr "[misslyckad]"
-
-#: src/frontend/mame/ui/mainmenu.cpp:60
-msgid "Input (general)"
-msgstr "Input (generell)"
-
-#: src/frontend/mame/ui/mainmenu.cpp:62
-msgid "Input (this Machine)"
-msgstr "Input (denna Maskin)"
-
-#: src/frontend/mame/ui/mainmenu.cpp:66
-msgid "Analog Controls"
-msgstr "Analog Kontroller"
-
-#: src/frontend/mame/ui/mainmenu.cpp:68
-msgid "Dip Switches"
-msgstr "Dip Switchar"
-
-#: src/frontend/mame/ui/mainmenu.cpp:71
-msgid "Machine Configuration"
-msgstr "Maskin Konfiguration"
-
-#: src/frontend/mame/ui/mainmenu.cpp:75
-msgid "Bookkeeping Info"
-msgstr "Bokföringsstatus"
-
-#: src/frontend/mame/ui/mainmenu.cpp:78
-msgid "Machine Information"
-msgstr "Maskininformation"
-
-#: src/frontend/mame/ui/mainmenu.cpp:85
-msgid "Image Information"
-msgstr "Avbildningsinformation"
-
-#: src/frontend/mame/ui/mainmenu.cpp:88
-msgid "File Manager"
-msgstr "Filhanterare"
-
-#: src/frontend/mame/ui/mainmenu.cpp:96
-msgid "Tape Control"
-msgstr "Bandkontroll"
-
-#: src/frontend/mame/ui/mainmenu.cpp:102
-msgid "BIOS Selection"
-msgstr "BIOS val"
-
-#: src/frontend/mame/ui/mainmenu.cpp:106
-msgid "Slot Devices"
-msgstr "Slitsenheter"
-
-#: src/frontend/mame/ui/mainmenu.cpp:110
-msgid "Barcode Reader"
-msgstr "Streckkodsläsare"
-
-#: src/frontend/mame/ui/mainmenu.cpp:114
-msgid "Network Devices"
-msgstr "Nätverksenheter"
-
-#: src/frontend/mame/ui/mainmenu.cpp:118
-msgid "Keyboard Mode"
-msgstr "Tangenbordsläge"
-
-#: src/frontend/mame/ui/mainmenu.cpp:121
-msgid "Slider Controls"
-msgstr "Reglage Kontroller"
-
-#: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
-msgid "Video Options"
-msgstr "Videoalternativ"
-
-#: src/frontend/mame/ui/mainmenu.cpp:128
-msgid "Crosshair Options"
-msgstr "Hårkorsalternativ"
-
-#: src/frontend/mame/ui/mainmenu.cpp:132
-msgid "Cheat"
-msgstr "Fusk"
-
-#: src/frontend/mame/ui/mainmenu.cpp:135
-msgid "Plugin Options"
-msgstr "Pluginalternativ"
-
-#: src/frontend/mame/ui/mainmenu.cpp:139
-msgid "External DAT View"
-msgstr "Extern DAT vy"
-
-#: src/frontend/mame/ui/mainmenu.cpp:145 src/frontend/mame/ui/miscmenu.cpp:778
-msgid "Add To Favorites"
-msgstr "Lägg Till Favoriter"
-
-#: src/frontend/mame/ui/mainmenu.cpp:147 src/frontend/mame/ui/miscmenu.cpp:780
-msgid "Remove From Favorites"
-msgstr "Tabort Från Favoriter"
-
-#: src/frontend/mame/ui/mainmenu.cpp:154
-msgid "Select New Machine"
-msgstr "Välj Ny Maskin"
-
-#: src/frontend/mame/ui/selsoft.cpp:456
-msgid ""
-"The selected software is missing one or more required files. Please select a "
-"different software.\n"
-"\n"
-msgstr ""
-"Den valda mjukvaran saknar en eller flera nödvändiga filer. Välj en annan "
-"mjukvara.\n"
-"\n"
-
-#: src/frontend/mame/ui/selsoft.cpp:549
-#, c-format
-msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr "%1$s %2$s ( %3$d / %4$d mjukvarupaket )"
-
-#: src/frontend/mame/ui/selsoft.cpp:550
-#, c-format
-msgid "Driver: \"%1$s\" software list "
-msgstr "Drivrutin: \"%1$s\" mjukvarulista "
-
-#: src/frontend/mame/ui/selsoft.cpp:564 src/frontend/mame/ui/selsoft.cpp:571
-#: src/frontend/mame/ui/simpleselgame.cpp:308
-#, c-format
-msgid "%1$-.100s"
-msgstr "%1$-.100s"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:149
-msgid ""
-"The selected game is missing one or more required ROM or CHD images. Please "
-"select a different game.\n"
-"\n"
-"Press any key to continue."
-msgstr ""
-"Det valda spelet saknar en eller flera ROM eller CHS avbildningar. Välj ett "
-"annat spel.\n"
-"\n"
-"Tryck på valfri tangent för att fortsätta."
-
-#: src/frontend/mame/ui/simpleselgame.cpp:241
-#, c-format
-msgid ""
-"No machines found. Please check the rompath specified in the %1$s.ini file.\n"
-"\n"
-"If this is your first time using %2$s, please see the config.txt file in the "
-"docs directory for information on configuring %2$s."
-msgstr ""
-"Inga maskiner funna. Kontrollera sökvägar till ROMar i %1$s.ini filen.\n"
-"\n"
-"Om det här är första gången du använder %2$s, läs config.txt filen i docs "
-"katalogen för information hur man konfigurerar %2$s."
-
-#: src/frontend/mame/ui/simpleselgame.cpp:292
-#, c-format
-msgid "Type name or select: %1$s_"
-msgstr "Knappa in namn eller välj; %1$s_"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:294
-msgid "Type name or select: (random)"
-msgstr "Knappa in namn eller välj: (slumpmässig)"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:311
-#: src/frontend/mame/ui/selmenu.cpp:585 src/frontend/mame/ui/selmenu.cpp:621
-#, c-format
-msgid "%1$s, %2$-.100s"
-msgstr "%1$s, %2$-.100s"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:314
-#, c-format
-msgid "Driver: %1$-.100s"
-msgstr "Drivrutin: %1$_.100s"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:330
-#: src/frontend/mame/ui/selmenu.cpp:634
-msgid "Overall: NOT WORKING"
-msgstr "Status: FUNGERAR EJ"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:332
-#: src/frontend/mame/ui/selmenu.cpp:636
-msgid "Overall: Unemulated Protection"
-msgstr "Status: Oemulerad skyddsmekanism"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:334
-#: src/frontend/mame/ui/selmenu.cpp:638
-msgid "Overall: Working"
-msgstr "Status: Fungerar"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:339
-#: src/frontend/mame/ui/simpleselgame.cpp:349
-msgid "Unimplemented"
-msgstr "Ej implementerad"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:341
-#: src/frontend/mame/ui/simpleselgame.cpp:351
-msgid "Imperfect"
-msgstr "Bristfällig"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:343
-#: src/frontend/mame/ui/simpleselgame.cpp:353
-msgid "OK"
-msgstr "OK"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:347
-msgid "None"
-msgstr "Ingen"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:355
-#, c-format
-msgid "Gfx: %s, Sound: %s"
-msgstr "Gfx: %s, Ljud: %s"
 
 #: src/frontend/mame/ui/custui.cpp:31
 msgid "Show All"
@@ -1496,6 +394,10 @@ msgstr "Typsnitt"
 #: src/frontend/mame/ui/custui.cpp:152
 msgid "Colors"
 msgstr "Färger"
+
+#: src/frontend/mame/ui/custui.cpp:157 src/frontend/mame/ui/dirmenu.cpp:38
+msgid "Language"
+msgstr "Språk"
 
 #: src/frontend/mame/ui/custui.cpp:161
 msgid "Show side panels"
@@ -1693,6 +595,1233 @@ msgstr "Gul"
 msgid "Violet"
 msgstr "Lila"
 
+#: src/frontend/mame/ui/state.cpp:388
+msgid "Load State"
+msgstr "Ladda läge"
+
+#: src/frontend/mame/ui/state.cpp:388
+msgid "Select position to load from"
+msgstr "Välj position att ladda från"
+
+#: src/frontend/mame/ui/state.cpp:412
+msgid "Save State"
+msgstr "Spara läge"
+
+#: src/frontend/mame/ui/state.cpp:412
+msgid "Select position to save to"
+msgstr "Välj position att spara till"
+
+#: src/frontend/mame/ui/tapectrl.cpp:85
+msgid "stopped"
+msgstr "stoppad"
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "playing"
+msgstr "spelar upp"
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "(playing)"
+msgstr "(spelar upp)"
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "recording"
+msgstr "spelar in"
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "(recording)"
+msgstr "(spelar in)"
+
+#: src/frontend/mame/ui/tapectrl.cpp:95
+msgid "Pause/Stop"
+msgstr "Paus/Stopp"
+
+#: src/frontend/mame/ui/tapectrl.cpp:98
+msgid "Play"
+msgstr "Spela"
+
+#: src/frontend/mame/ui/tapectrl.cpp:101
+msgid "Record"
+msgstr "Spela in"
+
+#: src/frontend/mame/ui/tapectrl.cpp:104
+msgid "Rewind"
+msgstr "Spola tillbaka"
+
+#: src/frontend/mame/ui/tapectrl.cpp:107
+msgid "Fast Forward"
+msgstr "Snabbspola framåt"
+
+#: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
+msgid "Unfiltered"
+msgstr "Ofiltrerat"
+
+#: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
+msgid "Available"
+msgstr "Tillgängliga"
+
+#: src/frontend/mame/ui/utils.cpp:59 src/frontend/mame/ui/utils.cpp:83
+msgid "Unavailable"
+msgstr "Ej tillgängliga"
+
+#: src/frontend/mame/ui/utils.cpp:60
+msgid "Working"
+msgstr "Fungerar"
+
+#: src/frontend/mame/ui/utils.cpp:61
+msgid "Not Working"
+msgstr "Fungerar ej"
+
+#: src/frontend/mame/ui/utils.cpp:62
+msgid "Mechanical"
+msgstr "Mekaniska"
+
+#: src/frontend/mame/ui/utils.cpp:63
+msgid "Not Mechanical"
+msgstr "Ej Mekaniska"
+
+#: src/frontend/mame/ui/utils.cpp:64
+msgid "Category"
+msgstr "Kategori"
+
+#: src/frontend/mame/ui/utils.cpp:65
+msgid "Favorites"
+msgstr "Favoriter"
+
+#: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:759
+msgid "BIOS"
+msgstr "BIOS"
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgid "Not BIOS"
+msgstr "Ej BIOS"
+
+#: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
+msgid "Parents"
+msgstr "Har Kloner"
+
+#: src/frontend/mame/ui/utils.cpp:69 src/frontend/mame/ui/utils.cpp:85
+msgid "Clones"
+msgstr "Är Kloner"
+
+#: src/frontend/mame/ui/utils.cpp:70
+msgid "Manufacturer"
+msgstr "Tillverkare"
+
+#: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
+msgid "Year"
+msgstr "År"
+
+#: src/frontend/mame/ui/utils.cpp:72
+msgid "Save Supported"
+msgstr "Spara Stödda"
+
+#: src/frontend/mame/ui/utils.cpp:73
+msgid "Save Unsupported"
+msgstr "Spara Ej Stödda"
+
+#: src/frontend/mame/ui/utils.cpp:74
+msgid "CHD Required"
+msgstr "CHD avbildning krävs"
+
+#: src/frontend/mame/ui/utils.cpp:75
+msgid "No CHD Required"
+msgstr "Ingen CHD avbildning krävs"
+
+#: src/frontend/mame/ui/utils.cpp:76
+msgid "Vertical Screen"
+msgstr "Vertikal skärm"
+
+#: src/frontend/mame/ui/utils.cpp:77
+msgid "Horizontal Screen"
+msgstr "Horisontell skärm"
+
+#: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
+msgid "Custom Filter"
+msgstr "Eget filter"
+
+#: src/frontend/mame/ui/utils.cpp:87
+msgid "Publisher"
+msgstr "Utgivare"
+
+#: src/frontend/mame/ui/utils.cpp:88
+msgid "Supported"
+msgstr "Stödd"
+
+#: src/frontend/mame/ui/utils.cpp:89
+msgid "Partially Supported"
+msgstr "Partiellt Stöd"
+
+#: src/frontend/mame/ui/utils.cpp:90
+msgid "Unsupported"
+msgstr "Ej Stödda"
+
+#: src/frontend/mame/ui/utils.cpp:91
+msgid "Release Region"
+msgstr "Utgivningsområde"
+
+#: src/frontend/mame/ui/utils.cpp:92
+msgid "Device Type"
+msgstr "Typ av apparat"
+
+#: src/frontend/mame/ui/utils.cpp:93
+msgid "Software List"
+msgstr "Mjukvarulista"
+
+#: src/frontend/mame/ui/utils.cpp:244
+msgid "<set up filters>"
+msgstr "<skapa filter>"
+
+#: src/frontend/mame/ui/utils.cpp:352
+msgid "Select custom filters:"
+msgstr "Välj eget filter"
+
+#: src/frontend/mame/ui/utils.cpp:503
+#, c-format
+msgid "Filter %1$u"
+msgstr "Filter %1$u"
+
+#: src/frontend/mame/ui/utils.cpp:518
+msgid "Remove last filter"
+msgstr "Ta bort senaste filtret"
+
+#: src/frontend/mame/ui/utils.cpp:520
+msgid "Add filter"
+msgstr "Lägg till filter"
+
+#: src/frontend/mame/ui/utils.cpp:959
+msgid "Select category:"
+msgstr "Välj kategori:"
+
+#: src/frontend/mame/ui/utils.cpp:990
+msgid "[no category INI files]"
+msgstr "[ingen kategori INI filer]"
+
+#: src/frontend/mame/ui/utils.cpp:998
+msgid "[no groups in INI file]"
+msgstr "[inga grupper i INI fil]"
+
+#: src/frontend/mame/ui/utils.cpp:1032
+msgid "No category INI files found"
+msgstr "Inga kategorier INI filer funna"
+
+#: src/frontend/mame/ui/utils.cpp:1037
+msgid "File"
+msgstr "Fil"
+
+#: src/frontend/mame/ui/utils.cpp:1041
+msgid "No groups found in category file"
+msgstr "Inga grupper funna i kategorifil"
+
+#: src/frontend/mame/ui/utils.cpp:1046
+msgid "Group"
+msgstr "Grupp"
+
+#: src/frontend/mame/ui/utils.cpp:1047
+msgid "Include clones"
+msgstr "Inkludera kloner"
+
+#: src/frontend/mame/ui/utils.cpp:1047 src/frontend/mame/ui/filecreate.cpp:82
+msgid "Yes"
+msgstr "Ja"
+
+#: src/frontend/mame/ui/utils.cpp:1047 src/frontend/mame/ui/filecreate.cpp:81
+msgid "No"
+msgstr "Nej"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:149
+msgid ""
+"The selected game is missing one or more required ROM or CHD images. Please "
+"select a different game.\n"
+"\n"
+"Press any key to continue."
+msgstr ""
+"Det valda spelet saknar en eller flera ROM eller CHS avbildningar. Välj ett "
+"annat spel.\n"
+"\n"
+"Tryck på valfri tangent för att fortsätta."
+
+#: src/frontend/mame/ui/simpleselgame.cpp:241
+#, c-format
+msgid ""
+"No machines found. Please check the rompath specified in the %1$s.ini file.\n"
+"\n"
+"If this is your first time using %2$s, please see the config.txt file in the "
+"docs directory for information on configuring %2$s."
+msgstr ""
+"Inga maskiner funna. Kontrollera sökvägar till ROMar i %1$s.ini filen.\n"
+"\n"
+"Om det här är första gången du använder %2$s, läs config.txt filen i docs "
+"katalogen för information hur man konfigurerar %2$s."
+
+#: src/frontend/mame/ui/simpleselgame.cpp:271
+#: src/frontend/mame/ui/selgame.cpp:440
+msgid "Configure Options"
+msgstr "Konfigurationsalternativ"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:292
+#, c-format
+msgid "Type name or select: %1$s_"
+msgstr "Knappa in namn eller välj; %1$s_"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:294
+msgid "Type name or select: (random)"
+msgstr "Knappa in namn eller välj: (slumpmässig)"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:308
+#: src/frontend/mame/ui/selsoft.cpp:564 src/frontend/mame/ui/selsoft.cpp:571
+#, c-format
+msgid "%1$-.100s"
+msgstr "%1$-.100s"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:311
+#: src/frontend/mame/ui/selmenu.cpp:570 src/frontend/mame/ui/selmenu.cpp:606
+#, c-format
+msgid "%1$s, %2$-.100s"
+msgstr "%1$s, %2$-.100s"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:314
+#, c-format
+msgid "Driver: %1$-.100s"
+msgstr ""
+
+#: src/frontend/mame/ui/simpleselgame.cpp:330
+#: src/frontend/mame/ui/selmenu.cpp:619
+msgid "Overall: NOT WORKING"
+msgstr "Status: FUNGERAR EJ"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:332
+#: src/frontend/mame/ui/selmenu.cpp:621
+msgid "Overall: Unemulated Protection"
+msgstr "Status: Oemulerad skyddsmekanism"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:334
+#: src/frontend/mame/ui/selmenu.cpp:623
+msgid "Overall: Working"
+msgstr "Status: Fungerar"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:338
+#: src/frontend/mame/ui/selmenu.cpp:627
+msgid "Graphics: Unimplemented, "
+msgstr "Grafik: Ej implementerad, "
+
+#: src/frontend/mame/ui/simpleselgame.cpp:340
+#: src/frontend/mame/ui/selmenu.cpp:629
+msgid "Graphics: Imperfect, "
+msgstr "Grafik: Bristfällig, "
+
+#: src/frontend/mame/ui/simpleselgame.cpp:342
+#: src/frontend/mame/ui/selmenu.cpp:631
+msgid "Graphics: OK, "
+msgstr "Grafik: OK, "
+
+#: src/frontend/mame/ui/simpleselgame.cpp:345
+#: src/frontend/mame/ui/selmenu.cpp:634
+msgid "Sound: None"
+msgstr "Ljud: Inget"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:347
+#: src/frontend/mame/ui/selmenu.cpp:636
+msgid "Sound: Unimplemented"
+msgstr "Ljud: Ej implementerat"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:349
+#: src/frontend/mame/ui/selmenu.cpp:638
+msgid "Sound: Imperfect"
+msgstr "Ljud: Bristfälligt"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:351
+#: src/frontend/mame/ui/selmenu.cpp:640
+msgid "Sound: OK"
+msgstr "Ljud: OK"
+
+#: src/frontend/mame/ui/inputmap.cpp:53
+msgid "User Interface"
+msgstr "Användergränssnitt"
+
+#: src/frontend/mame/ui/inputmap.cpp:59
+msgid "Other Controls"
+msgstr "Andra kontroller"
+
+#: src/frontend/mame/ui/menu.cpp:294
+msgid "Return to Machine"
+msgstr "Tillbaka till Emuleringen"
+
+#: src/frontend/mame/ui/menu.cpp:299 src/frontend/mame/ui/menu.cpp:301
+msgid "Exit"
+msgstr "Hoppa ur"
+
+#: src/frontend/mame/ui/menu.cpp:306 src/frontend/mame/ui/menu.cpp:308
+msgid "Return to Previous Menu"
+msgstr "Tillbaka till Föregående Meny"
+
+#: src/frontend/mame/ui/menu.cpp:742
+msgid "Auto"
+msgstr "Automatisk"
+
+#: src/frontend/mame/ui/swlist.cpp:88
+msgid "[file manager]"
+msgstr "[filhanterare]"
+
+#: src/frontend/mame/ui/swlist.cpp:228
+msgid "Switch Item Ordering"
+msgstr "Byt Sortering"
+
+#: src/frontend/mame/ui/swlist.cpp:259
+#, c-format
+msgid "Switched Order: entries now ordered by %s"
+msgstr "Bytt Sortering: poster sorteras på %s"
+
+#: src/frontend/mame/ui/swlist.cpp:259
+msgid "shortname"
+msgstr "kortnamn"
+
+#: src/frontend/mame/ui/swlist.cpp:259
+msgid "description"
+msgstr "beskrivning"
+
+#: src/frontend/mame/ui/swlist.cpp:389
+msgid "[compatible lists]"
+msgstr "[kompatibla listor]"
+
+#: src/frontend/mame/ui/videoopt.cpp:56
+#, c-format
+msgid "Screen #%d"
+msgstr "Skärm #%d"
+
+#: src/frontend/mame/ui/videoopt.cpp:204 src/frontend/mame/ui/submenu.cpp:48
+msgid "Rotate"
+msgstr "Rotera"
+
+#: src/frontend/mame/ui/videoopt.cpp:208
+msgid "Backdrops"
+msgstr "Bakgrunder"
+
+#: src/frontend/mame/ui/videoopt.cpp:212
+msgid "Overlays"
+msgstr "Överlägg"
+
+#: src/frontend/mame/ui/videoopt.cpp:216
+msgid "Bezels"
+msgstr "Infattningar"
+
+#: src/frontend/mame/ui/videoopt.cpp:220
+msgid "CPanels"
+msgstr "CPaneler"
+
+#: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/dirmenu.cpp:51
+#: src/frontend/mame/ui/selmenu.cpp:64
+msgid "Marquees"
+msgstr "Draperier"
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "View"
+msgstr "Vy"
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "Cropped"
+msgstr "Beskärd"
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "Full"
+msgstr "Full"
+
+#: src/frontend/mame/ui/filecreate.cpp:79
+msgid "File Already Exists - Override?"
+msgstr "Fil Finns Redan - Skriv Över?"
+
+#: src/frontend/mame/ui/filecreate.cpp:171
+msgid "New Image Name:"
+msgstr "Nytt Namn på Avbildning:"
+
+#: src/frontend/mame/ui/filecreate.cpp:177
+msgid "Image Format:"
+msgstr "Avbildningsformat:"
+
+#: src/frontend/mame/ui/filecreate.cpp:183
+msgid "Create"
+msgstr "Skapa"
+
+#: src/frontend/mame/ui/filecreate.cpp:214
+msgid "Please enter a file extension too"
+msgstr "Skriv in en filändelse också"
+
+#: src/frontend/mame/ui/filecreate.cpp:266
+msgid "Select image format"
+msgstr "Välj avbildningsformat"
+
+#: src/frontend/mame/ui/barcode.cpp:74
+msgid "New Barcode:"
+msgstr "Ny streckkod"
+
+#: src/frontend/mame/ui/barcode.cpp:78
+msgid "Enter Code"
+msgstr "Ange kod"
+
+#: src/frontend/mame/ui/barcode.cpp:119
+msgid "Barcode length invalid!"
+msgstr "Streckkodens längd är felaktig!"
+
+#: src/frontend/mame/ui/selector.cpp:116
+msgid "Selection List - Search: "
+msgstr "Urvalslista - Sök: "
+
+#: src/frontend/mame/ui/selector.cpp:124
+#, c-format
+msgid "Double click or press %1$s to select"
+msgstr "Dubbelklicka eller tryck %1$s för att välja"
+
+#: src/frontend/mame/ui/selgame.cpp:313 src/frontend/mame/ui/selsoft.cpp:211
+#, c-format
+msgid ""
+"%s\n"
+" added to favorites list."
+msgstr ""
+"%s\n"
+" tillagd i favoritlistan."
+
+#: src/frontend/mame/ui/selgame.cpp:318 src/frontend/mame/ui/selgame.cpp:324
+#: src/frontend/mame/ui/selsoft.cpp:216
+#, c-format
+msgid ""
+"%s\n"
+" removed from favorites list."
+msgstr ""
+"%s\n"
+" borttagen från favoritlistan."
+
+#: src/frontend/mame/ui/selgame.cpp:441
+msgid "Configure Machine"
+msgstr "Maskinkonfiguration"
+
+#: src/frontend/mame/ui/selgame.cpp:445 src/frontend/mame/ui/miscmenu.cpp:908
+msgid "Plugins"
+msgstr "Tillägg"
+
+#: src/frontend/mame/ui/selgame.cpp:853
+#, c-format
+msgid "Romset\t%1$-.100s\n"
+msgstr "Romdistribution\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selgame.cpp:854
+#, c-format
+msgid "Year\t%1$s\n"
+msgstr "År\t%1$s\n"
+
+#: src/frontend/mame/ui/selgame.cpp:855
+#, c-format
+msgid "Manufacturer\t%1$-.100s\n"
+msgstr "Tillverkare\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selgame.cpp:859
+#, c-format
+msgid "Driver is Clone of\t%1$-.100s\n"
+msgstr "Drivrutinen är klon av\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selgame.cpp:861
+msgid "Driver is Parent\t\n"
+msgstr "Drivrutinen är oberoende\t\n"
+
+#: src/frontend/mame/ui/selgame.cpp:864
+msgid "Analog Controls\tYes\n"
+msgstr "Analoga kontroller\tJa\n"
+
+#: src/frontend/mame/ui/selgame.cpp:866
+msgid "Keyboard Inputs\tYes\n"
+msgstr "Tangentbord\tJa\n"
+
+#: src/frontend/mame/ui/selgame.cpp:869
+msgid "Overall\tNOT WORKING\n"
+msgstr "Status\tFUNGERAR EJ\n"
+
+#: src/frontend/mame/ui/selgame.cpp:871
+msgid "Overall\tUnemulated Protection\n"
+msgstr "Status\tOemulerad skyddsmekanism\n"
+
+#: src/frontend/mame/ui/selgame.cpp:873
+msgid "Overall\tWorking\n"
+msgstr "Status\tFungerar\n"
+
+#: src/frontend/mame/ui/selgame.cpp:876
+msgid "Graphics\tUnimplemented\n"
+msgstr "Grafik\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:878
+msgid "Graphics\tWrong Colors\n"
+msgstr "Grafik\tFel Färger\n"
+
+#: src/frontend/mame/ui/selgame.cpp:880
+msgid "Graphics\tImperfect Colors\n"
+msgstr "Grafik\tBristfälliga färger\n"
+
+#: src/frontend/mame/ui/selgame.cpp:882
+msgid "Graphics\tImperfect\n"
+msgstr "Grafik\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:884
+msgid "Graphics\tOK\n"
+msgstr "Grafik\tOK\n"
+
+#: src/frontend/mame/ui/selgame.cpp:887
+msgid "Sound\tNone\n"
+msgstr "Ljud\tInget\n"
+
+#: src/frontend/mame/ui/selgame.cpp:889
+msgid "Sound\tUnimplemented\n"
+msgstr "Ljud\tEj implementerat\n"
+
+#: src/frontend/mame/ui/selgame.cpp:891
+msgid "Sound\tImperfect\n"
+msgstr "Ljud\tBristfälligt\n"
+
+#: src/frontend/mame/ui/selgame.cpp:893
+msgid "Sound\tOK\n"
+msgstr "Ljud\tOK\n"
+
+#: src/frontend/mame/ui/selgame.cpp:896
+msgid "Controls\tUnimplemented\n"
+msgstr "Kontroller\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:898
+msgid "Controls\tImperfect\n"
+msgstr "Kontroller\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:901
+msgid "Keyboard\tUnimplemented\n"
+msgstr "Tangentbord\tEj implementerat\n"
+
+#: src/frontend/mame/ui/selgame.cpp:903
+msgid "Keyboard\tImperfect\n"
+msgstr "Tangentbord\tBristfälligt\n"
+
+#: src/frontend/mame/ui/selgame.cpp:906
+msgid "Mouse\tUnimplemented\n"
+msgstr "Mus\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:908
+msgid "Mouse\tImperfect\n"
+msgstr "Mus\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:911
+msgid "Microphone\tUnimplemented\n"
+msgstr "Mikrofon\tEj implememterad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:913
+msgid "Microphone\tImperfect\n"
+msgstr "Mikrofon\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:916
+msgid "Camera\tUnimplemented\n"
+msgstr "Kamera\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:918
+msgid "Camera\tImperfect\n"
+msgstr "Kamera\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:921
+msgid "Disk\tUnimplemented\n"
+msgstr "Disk\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:923
+msgid "Disk\tImperfect\n"
+msgstr "Disk\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:926
+msgid "Printer\tUnimplemented\n"
+msgstr "Printer\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:928
+msgid "Printer\tImperfect\n"
+msgstr "Printer\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:931
+msgid "LAN\tUnimplemented\n"
+msgstr "LAN\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:933
+msgid "LAN\tImperfect\n"
+msgstr "LAN\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:936
+msgid "WAN\tUnimplemented\n"
+msgstr "WAN\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:938
+msgid "WAN\tImperfect\n"
+msgstr "WAN\tBristfälligt\n"
+
+#: src/frontend/mame/ui/selgame.cpp:941
+msgid "Timing\tUnimplemented\n"
+msgstr "Timing\tEj implementerad\n"
+
+#: src/frontend/mame/ui/selgame.cpp:943
+msgid "Timing\tImperfect\n"
+msgstr "Timing\tBristfällig\n"
+
+#: src/frontend/mame/ui/selgame.cpp:945
+msgid "Mechanical Machine\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:945
+msgid "Mechanical Machine\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:946
+msgid "Requires Artwork\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:946
+msgid "Requires Artwork\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:947
+msgid "Requires Clickable Artwork\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:947
+msgid "Requires Clickable Artwork\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:948
+msgid "Support Cocktail\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:948
+msgid "Support Cocktail\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:949
+msgid "Driver is BIOS\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:949
+msgid "Driver is BIOS\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:950
+msgid "Support Save\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:950
+msgid "Support Save\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:951
+msgid "Screen Orientation\tVertical\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:951
+msgid "Screen Orientation\tHorizontal\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:961
+msgid "Requires CHD\tYes\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:961
+msgid "Requires CHD\tNo\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:974
+msgid "ROM Audit Result\tOK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:976
+msgid "ROM Audit Result\tBAD\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:979
+msgid "Samples Audit Result\tNone Needed\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:981
+msgid "Samples Audit Result\tOK\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:983
+msgid "Samples Audit Result\tBAD\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:987
+msgid ""
+"ROM Audit Disabled\t\n"
+"Samples Audit Disabled\t\n"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:1171
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
+msgstr "%1$s %2$s ( %3$d / %4$d maskiner (%5$d BIOS) )"
+
+#: src/frontend/mame/ui/selgame.cpp:1187 src/frontend/mame/ui/selsoft.cpp:555
+#, c-format
+msgid "%1$s: %2$s - Search: %3$s_"
+msgstr "%1$s: %2$s - Sök: %3$s_"
+
+#: src/frontend/mame/ui/selgame.cpp:1189 src/frontend/mame/ui/selsoft.cpp:557
+#, c-format
+msgid "Search: %1$s_"
+msgstr "Sök: %1$s_"
+
+#: src/frontend/mame/ui/selgame.cpp:1199
+#, c-format
+msgid "Romset: %1$-.100s"
+msgstr "Romdistribution: %1$-.100s"
+
+#: src/frontend/mame/ui/selgame.cpp:1206
+#, c-format
+msgid "System: %1$-.100s"
+msgstr "System: %1$-.100s"
+
+#: src/frontend/mame/ui/selgame.cpp:1243
+msgid ""
+"The selected machine is missing one or more required ROM or CHD images. "
+"Please select a different machine.\n"
+"\n"
+msgstr ""
+"Den valda maskinen saknar en eller flera obligtoriska ROM eller CHD "
+"avbildningar. Välj en annan maskin.\n"
+"\n"
+
+#: src/frontend/mame/ui/selgame.cpp:1249 src/frontend/mame/ui/selsoft.cpp:462
+msgid "Press any key to continue."
+msgstr "Tryck på valfri tangent för att fortsätta."
+
+#: src/frontend/mame/ui/dirmenu.cpp:35
+msgid "ROMs"
+msgstr "ROMs"
+
+#: src/frontend/mame/ui/dirmenu.cpp:36
+msgid "Software Media"
+msgstr "Mjukvaru Media"
+
+#: src/frontend/mame/ui/dirmenu.cpp:37
+msgid "UI"
+msgstr "UI"
+
+#: src/frontend/mame/ui/dirmenu.cpp:39
+msgid "Samples"
+msgstr "Samples"
+
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgid "DATs"
+msgstr "DATs"
+
+#: src/frontend/mame/ui/dirmenu.cpp:41
+msgid "INIs"
+msgstr "INIs"
+
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgid "Category INIs"
+msgstr "Kategori INIs"
+
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgid "Icons"
+msgstr "Ikoner"
+
+#: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
+msgid "Cheats"
+msgstr "Fusk"
+
+#: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
+msgid "Snapshots"
+msgstr "Skärmklipp"
+
+#: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:50
+msgid "Cabinets"
+msgstr "Kabinett"
+
+#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:53
+msgid "Flyers"
+msgstr "Flygblad"
+
+#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:54
+msgid "Titles"
+msgstr "Titlar"
+
+#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:55
+msgid "Ends"
+msgstr "Slutar"
+
+#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:52
+msgid "PCBs"
+msgstr "PCBs"
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgid "Controls Panels"
+msgstr "Kontrollpaneler"
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgid "Crosshairs"
+msgstr "Hårkors"
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgid "Artworks"
+msgstr "Grafisk Layout"
+
+#: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:57
+msgid "Bosses"
+msgstr "Bossar"
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgid "Artworks Preview"
+msgstr "Förhandsvisning Grafisk Layout"
+
+#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:63
+msgid "Select"
+msgstr "Välj"
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgid "GameOver"
+msgstr "GameOver"
+
+#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:61
+msgid "HowTo"
+msgstr "HowTo"
+
+#: src/frontend/mame/ui/dirmenu.cpp:60 src/frontend/mame/ui/selmenu.cpp:58
+msgid "Logos"
+msgstr "Logotyper"
+
+#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:62
+msgid "Scores"
+msgstr "Poäng"
+
+#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
+msgid "Versus"
+msgstr "Mot"
+
+#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:65
+msgid "Covers"
+msgstr "Omslagsbilder"
+
+#: src/frontend/mame/ui/dirmenu.cpp:116
+msgid "Folders Setup"
+msgstr "Katalogkonfiguration"
+
+#: src/frontend/mame/ui/dirmenu.cpp:167
+#, c-format
+msgid "Current %1$s Folders"
+msgstr "Nuvarande %1$s Kataloger"
+
+#: src/frontend/mame/ui/dirmenu.cpp:179
+msgid "Change Folder"
+msgstr "Ändra Katalog"
+
+#: src/frontend/mame/ui/dirmenu.cpp:179
+msgid "Add Folder"
+msgstr "Lägg Till Katalog"
+
+#: src/frontend/mame/ui/dirmenu.cpp:182
+msgid "Remove Folder"
+msgstr "Tabort Katalog"
+
+#: src/frontend/mame/ui/dirmenu.cpp:418
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr "Ändra %1$s Katalog - Sök: %2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:418
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr "Lägg till %1$s Katalog - Sök: %2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:429
+msgid "Press TAB to set"
+msgstr "Tryck TAB för att välja"
+
+#: src/frontend/mame/ui/dirmenu.cpp:513
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr "Tabort %1$s Katalog"
+
+#: src/frontend/mame/ui/miscmenu.cpp:43
+msgid "Keyboard Mode:"
+msgstr "Tangentbordsläge:"
+
+#: src/frontend/mame/ui/miscmenu.cpp:43
+msgid "Natural"
+msgstr "Naturligt"
+
+#: src/frontend/mame/ui/miscmenu.cpp:43
+msgid "Emulated"
+msgstr "Emulerat"
+
+#: src/frontend/mame/ui/miscmenu.cpp:236
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d:%3$02d\n"
+"\n"
+msgstr ""
+"Drifttid: %1$d:%2$02d:%3$02d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:238
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d\n"
+"\n"
+msgstr ""
+"Drifttid: %1$d:%2$02d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:242
+#, c-format
+msgid ""
+"Tickets dispensed: %1$d\n"
+"\n"
+msgstr ""
+"Biljetter fördelade: %1$d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:253
+msgid "Coin %1$c: NA%3$s\n"
+msgstr "Mynt %1$c: NA%3$s\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:253
+#, c-format
+msgid "Coin %1$c: %2$d%3$s\n"
+msgstr "Mynt %1$c: %2$d%3$s\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:256
+msgid " (locked)"
+msgstr " (låst)"
+
+#: src/frontend/mame/ui/miscmenu.cpp:503
+msgid "Visible Delay"
+msgstr "Synlig Fördröjning"
+
+#: src/frontend/mame/ui/miscmenu.cpp:601
+#, c-format
+msgid "%s.xml saved under ui folder."
+msgstr "%s.xml sparad i ui katalog."
+
+#: src/frontend/mame/ui/miscmenu.cpp:627
+msgid "Name:             Description:\n"
+msgstr "Namn:             Beskrivning:\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:638
+#, c-format
+msgid "%s.txt saved under ui folder."
+msgstr "%s.txt sparad i ui katalog."
+
+#: src/frontend/mame/ui/miscmenu.cpp:655
+msgid "Export list in XML format (like -listxml)"
+msgstr "Exportlista i XML format (som -listxml)"
+
+#: src/frontend/mame/ui/miscmenu.cpp:656
+msgid "Export list in XML format (like -listxml, but exclude devices)"
+msgstr "Exportlista i XML format (som -listxml, men utan enheter)"
+
+#: src/frontend/mame/ui/miscmenu.cpp:657
+msgid "Export list in TXT format (like -listfull)"
+msgstr "Exportera lista i TXT format (som -listfull)"
+
+#: src/frontend/mame/ui/miscmenu.cpp:709 src/frontend/mame/ui/ui.cpp:2217
+msgid ""
+"\n"
+"    Configuration saved    \n"
+"\n"
+msgstr ""
+"\n"
+"    Konfiguration sparad   \n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:763
+msgid "Driver"
+msgstr "Drivrutin"
+
+#: src/frontend/mame/ui/miscmenu.cpp:766
+msgid "This machine has no BIOS."
+msgstr "Den här maskinen saknar BIOS."
+
+#: src/frontend/mame/ui/miscmenu.cpp:775 src/frontend/mame/ui/mainmenu.cpp:145
+msgid "Add To Favorites"
+msgstr "Lägg Till Favoriter"
+
+#: src/frontend/mame/ui/miscmenu.cpp:777 src/frontend/mame/ui/mainmenu.cpp:147
+msgid "Remove From Favorites"
+msgstr "Tabort Från Favoriter"
+
+#: src/frontend/mame/ui/miscmenu.cpp:780
+msgid "Save machine configuration"
+msgstr "Spara maskinkonfiguration"
+
+#: src/frontend/mame/ui/miscmenu.cpp:791
+msgid "Configure machine:"
+msgstr "Konfigurera maskin:"
+
+#: src/frontend/mame/ui/miscmenu.cpp:825 src/frontend/mame/ui/selmenu.cpp:2386
+msgid " (default)"
+msgstr " (standard)"
+
+#: src/frontend/mame/ui/imgcntrl.cpp:116
+msgid "Cannot save over directory"
+msgstr "Kan inte spara på katalog"
+
+#: src/frontend/mame/ui/imgcntrl.cpp:149
+msgid ""
+"The software selected is missing one or more required ROM or CHD images. "
+"Please select a different one."
+msgstr ""
+"Den markerade mjukvaran saknar en eller flera nödvändiga ROM eller CHD "
+"avbildningar. Välj en annan."
+
+#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:99
+msgid "Pseudo terminals"
+msgstr "Låtsasterminaler"
+
+#: src/frontend/mame/ui/info_pty.cpp:39
+msgid "[failed]"
+msgstr "[misslyckad]"
+
+#: src/frontend/mame/ui/mainmenu.cpp:60
+msgid "Input (general)"
+msgstr "Input (generell)"
+
+#: src/frontend/mame/ui/mainmenu.cpp:62
+msgid "Input (this Machine)"
+msgstr "Input (denna Maskin)"
+
+#: src/frontend/mame/ui/mainmenu.cpp:66
+msgid "Analog Controls"
+msgstr "Analog Kontroller"
+
+#: src/frontend/mame/ui/mainmenu.cpp:68
+msgid "Dip Switches"
+msgstr "Dip Switchar"
+
+#: src/frontend/mame/ui/mainmenu.cpp:71
+msgid "Machine Configuration"
+msgstr "Maskin Konfiguration"
+
+#: src/frontend/mame/ui/mainmenu.cpp:75
+msgid "Bookkeeping Info"
+msgstr "Bokföringsstatus"
+
+#: src/frontend/mame/ui/mainmenu.cpp:78
+msgid "Machine Information"
+msgstr "Maskininformation"
+
+#: src/frontend/mame/ui/mainmenu.cpp:85
+msgid "Image Information"
+msgstr "Avbildningsinformation"
+
+#: src/frontend/mame/ui/mainmenu.cpp:88
+msgid "File Manager"
+msgstr "Filhanterare"
+
+#: src/frontend/mame/ui/mainmenu.cpp:96
+msgid "Tape Control"
+msgstr "Bandkontroll"
+
+#: src/frontend/mame/ui/mainmenu.cpp:102
+msgid "BIOS Selection"
+msgstr "BIOS val"
+
+#: src/frontend/mame/ui/mainmenu.cpp:106
+msgid "Slot Devices"
+msgstr "Slitsenheter"
+
+#: src/frontend/mame/ui/mainmenu.cpp:110
+msgid "Barcode Reader"
+msgstr "Streckkodsläsare"
+
+#: src/frontend/mame/ui/mainmenu.cpp:114
+msgid "Network Devices"
+msgstr "Nätverksenheter"
+
+#: src/frontend/mame/ui/mainmenu.cpp:118
+msgid "Keyboard Mode"
+msgstr "Tangenbordsläge"
+
+#: src/frontend/mame/ui/mainmenu.cpp:121
+msgid "Slider Controls"
+msgstr "Reglage Kontroller"
+
+#: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
+msgid "Video Options"
+msgstr "Videoalternativ"
+
+#: src/frontend/mame/ui/mainmenu.cpp:128
+msgid "Crosshair Options"
+msgstr "Hårkorsalternativ"
+
+#: src/frontend/mame/ui/mainmenu.cpp:132 plugins/cheat/init.lua:683
+msgid "Cheat"
+msgstr "Fusk"
+
+#: src/frontend/mame/ui/mainmenu.cpp:135
+msgid "Plugin Options"
+msgstr "Pluginalternativ"
+
+#: src/frontend/mame/ui/mainmenu.cpp:139
+msgid "External DAT View"
+msgstr "Extern DAT vy"
+
+#: src/frontend/mame/ui/mainmenu.cpp:154
+msgid "Select New Machine"
+msgstr "Välj Ny Maskin"
+
+#: src/frontend/mame/ui/sndmenu.cpp:135
+msgid "Sound"
+msgstr "Ljud"
+
+#: src/frontend/mame/ui/sndmenu.cpp:136
+msgid "Sample Rate"
+msgstr "Samplingshastighet"
+
+#: src/frontend/mame/ui/sndmenu.cpp:137
+msgid "Use External Samples"
+msgstr "Använd Externa Samplingar"
+
+#: src/frontend/mame/ui/sndmenu.cpp:149 src/frontend/mame/ui/optsmenu.cpp:210
+msgid "Sound Options"
+msgstr "Ljudalternativ"
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " COLORS"
+msgstr " FÄRGER"
+
+#: src/frontend/mame/ui/viewgfx.cpp:406
+msgid " PENS"
+msgstr " PENNOR"
+
+#: src/frontend/mame/ui/auditmenu.cpp:96
+#, c-format
+msgid "Audit ROMs for %1$u machines marked unavailable?"
+msgstr "Granskning av ROMs för %1$u maskiner markerade som ej tillgängliga?"
+
+#: src/frontend/mame/ui/auditmenu.cpp:99
+#, c-format
+msgid "Audit ROMs for all %1$u machines?"
+msgstr "Granskning av ROMs för alla %1$u maskiner?"
+
+#: src/frontend/mame/ui/auditmenu.cpp:104
+#, c-format
+msgid "(results will be saved to %1$s)"
+msgstr "(resultat kommer att sparas som %1$s)"
+
+#: src/frontend/mame/ui/auditmenu.cpp:130
+#, c-format
+msgid ""
+"Auditing ROMs for machine %2$u of %3$u...\n"
+"%1$s"
+msgstr ""
+"Granskning av ROMs för maskin %2$u av %3$u...\n"
+"%1$s"
+
+#: src/frontend/mame/ui/auditmenu.cpp:142
+msgid "Start Audit"
+msgstr "Starta Granskning"
+
+#: src/frontend/mame/ui/datmenu.cpp:80
+msgid "Software Usage"
+msgstr "Mjukvaruanvändning"
+
+#: src/frontend/mame/ui/datmenu.cpp:362
+msgid "Revision: "
+msgstr "Revision: "
+
 #: src/frontend/mame/ui/selmenu.cpp:51
 msgid "Control Panels"
 msgstr "Kontrollpaneler"
@@ -1717,510 +1846,69 @@ msgstr "Exportera listan till fil"
 msgid "Show DATs view"
 msgstr "Visa DATs vy"
 
-#: src/frontend/mame/ui/selmenu.cpp:127
-msgid "Command"
-msgstr "Kommando"
-
-#: src/frontend/mame/ui/selmenu.cpp:128
-msgid "Gameinit"
-msgstr "Spelstart"
-
-#: src/frontend/mame/ui/selmenu.cpp:129
-msgid "High Scores"
-msgstr "Ranking"
-
-#: src/frontend/mame/ui/selmenu.cpp:130
-msgid "History"
-msgstr "Historia"
-
-#: src/frontend/mame/ui/selmenu.cpp:131
-msgid "MAMEinfo"
-msgstr "MAMEinfo"
-
-#: src/frontend/mame/ui/selmenu.cpp:132
-msgid "MARPScore"
-msgstr "MARPScore"
-
-#: src/frontend/mame/ui/selmenu.cpp:133
-msgid "MESSinfo"
-msgstr "MESSinfo"
-
-#: src/frontend/mame/ui/selmenu.cpp:134
-msgid "Mamescore"
-msgstr "Mamescore"
-
-#: src/frontend/mame/ui/selmenu.cpp:135
-msgid "Sysinfo"
-msgstr "Systeminfo"
-
-#: src/frontend/mame/ui/selmenu.cpp:252
+#: src/frontend/mame/ui/selmenu.cpp:237
 msgid "Software part selection:"
 msgstr "Val av mjukvarudel:"
 
-#: src/frontend/mame/ui/selmenu.cpp:358
+#: src/frontend/mame/ui/selmenu.cpp:343
 msgid "BIOS selection:"
 msgstr "BIOS val:"
 
-#: src/frontend/mame/ui/selmenu.cpp:589
+#: src/frontend/mame/ui/selmenu.cpp:574
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "Mjukvaran är klonad från: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:591
+#: src/frontend/mame/ui/selmenu.cpp:576
 msgid "Software is parent"
 msgstr "Mjukvaran har kloner"
 
-#: src/frontend/mame/ui/selmenu.cpp:596
+#: src/frontend/mame/ui/selmenu.cpp:581
 msgid "Supported: No"
 msgstr "Stöd: Nej"
 
-#: src/frontend/mame/ui/selmenu.cpp:601
+#: src/frontend/mame/ui/selmenu.cpp:586
 msgid "Supported: Partial"
 msgstr "Stöd: Delvis"
 
-#: src/frontend/mame/ui/selmenu.cpp:606
+#: src/frontend/mame/ui/selmenu.cpp:591
 msgid "Supported: Yes"
 msgstr "Stöd: Ja"
 
-#: src/frontend/mame/ui/selmenu.cpp:611
+#: src/frontend/mame/ui/selmenu.cpp:596
 #, c-format
 msgid "romset: %1$-.100s"
 msgstr "romdistribution: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:627
+#: src/frontend/mame/ui/selmenu.cpp:612
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "Drivrutinen är klon av: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:629
+#: src/frontend/mame/ui/selmenu.cpp:614
 msgid "Driver is parent"
 msgstr "Drivrutinen har kloner"
 
-#: src/frontend/mame/ui/selmenu.cpp:642
-msgid "Graphics: Unimplemented, "
-msgstr "Grafik: Ej implementerad, "
-
-#: src/frontend/mame/ui/selmenu.cpp:644
-msgid "Graphics: Imperfect, "
-msgstr "Grafik: Bristfällig, "
-
-#: src/frontend/mame/ui/selmenu.cpp:646
-msgid "Graphics: OK, "
-msgstr "Grafik: OK, "
-
-#: src/frontend/mame/ui/selmenu.cpp:649
-msgid "Sound: None"
-msgstr "Ljud: Inget"
-
-#: src/frontend/mame/ui/selmenu.cpp:651
-msgid "Sound: Unimplemented"
-msgstr "Ljud: Ej implementerat"
-
-#: src/frontend/mame/ui/selmenu.cpp:653
-msgid "Sound: Imperfect"
-msgstr "Ljud: Bristfälligt"
-
-#: src/frontend/mame/ui/selmenu.cpp:655
-msgid "Sound: OK"
-msgstr "Ljud: OK"
-
-#: src/frontend/mame/ui/selmenu.cpp:665
+#: src/frontend/mame/ui/selmenu.cpp:650
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:1995
+#: src/frontend/mame/ui/selmenu.cpp:1975
 msgid "Images"
 msgstr "Bilder"
 
-#: src/frontend/mame/ui/selmenu.cpp:1996
+#: src/frontend/mame/ui/selmenu.cpp:1976
 msgid "Infos"
 msgstr "Information"
 
-#: src/frontend/mame/ui/selmenu.cpp:2416 src/frontend/mame/ui/miscmenu.cpp:831
-msgid " (default)"
-msgstr " (standard)"
-
-#: src/frontend/mame/ui/selmenu.cpp:2483
+#: src/frontend/mame/ui/selmenu.cpp:2454
 msgid "Usage"
 msgstr "Användning"
 
-#: src/frontend/mame/ui/selmenu.cpp:2518
+#: src/frontend/mame/ui/selmenu.cpp:2489
 msgid "General Info"
 msgstr "Generell Information"
-
-#: src/frontend/mame/ui/ui.cpp:337
-msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
-"Den här emuleringen kräver att avbildningar laddas i följande apparat(er): "
-
-#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
-msgid "Keyboard Emulation Status"
-msgstr "Status för Tangentbordsemulering"
-
-#: src/frontend/mame/ui/ui.cpp:1086
-msgid "Mode: PARTIAL Emulation"
-msgstr "Läge: PARTIELL Emulering"
-
-#: src/frontend/mame/ui/ui.cpp:1087
-msgid "UI:   Enabled"
-msgstr "UI:   Aktiverat"
-
-#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
-msgid "**Use ScrLock to toggle**"
-msgstr "**Använd ScrLock för att växla**"
-
-#: src/frontend/mame/ui/ui.cpp:1096
-msgid "Mode: FULL Emulation"
-msgstr "Läge: FULL Emulering"
-
-#: src/frontend/mame/ui/ui.cpp:1097
-msgid "UI:   Disabled"
-msgstr "UI:   Inaktiverad"
-
-#: src/frontend/mame/ui/ui.cpp:1240
-msgid "Autofire can't be enabled"
-msgstr "Autofire kan inte aktiveras"
-
-#: src/frontend/mame/ui/ui.cpp:1293
-#, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press ''%1$s'' to quit,\n"
-"Press ''%2$s'' to return to emulation."
-msgstr ""
-"Är du säker på att du vill avsluta?\n"
-"\n"
-"Tryck ''%1$s'' för att avsluta,\n"
-"Tryck ''%2$s'' för att återgå till emuleringen."
-
-#: src/frontend/mame/ui/ui.cpp:1366
-msgid "Master Volume"
-msgstr "Huvud Volym"
-
-#: src/frontend/mame/ui/ui.cpp:1375
-#, c-format
-msgid "%1$s Volume"
-msgstr "%1$s Volym"
-
-#: src/frontend/mame/ui/ui.cpp:1399
-#, c-format
-msgid "Overclock CPU %1$s"
-msgstr "Överklocka CPU %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1408
-#, c-format
-msgid "Overclock %1$s sound"
-msgstr "Överklocka %1$s ljud"
-
-#: src/frontend/mame/ui/ui.cpp:1429
-#, c-format
-msgid "%1$s Refresh Rate"
-msgstr "%1$s Uppdateringsfrekvens"
-
-#: src/frontend/mame/ui/ui.cpp:1434
-#, c-format
-msgid "%1$s Brightness"
-msgstr "%1$s Ljusstyrka"
-
-#: src/frontend/mame/ui/ui.cpp:1436
-#, c-format
-msgid "%1$s Contrast"
-msgstr "%1$s Kontrast"
-
-#: src/frontend/mame/ui/ui.cpp:1438
-#, c-format
-msgid "%1$s Gamma"
-msgstr "%1$s Gamma"
-
-#: src/frontend/mame/ui/ui.cpp:1442
-#, c-format
-msgid "%1$s Horiz Stretch"
-msgstr "%1$s Horisontell utsträckning"
-
-#: src/frontend/mame/ui/ui.cpp:1444
-#, c-format
-msgid "%1$s Horiz Position"
-msgstr "%1$s Horisontell Position"
-
-#: src/frontend/mame/ui/ui.cpp:1446
-#, c-format
-msgid "%1$s Vert Stretch"
-msgstr "%1$s Vertikal utsträckning"
-
-#: src/frontend/mame/ui/ui.cpp:1448
-#, c-format
-msgid "%1$s Vert Position"
-msgstr "%1$s Vertikal Position"
-
-#: src/frontend/mame/ui/ui.cpp:1467
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Laserdisk '%1$s' Horisontell utsträckning"
-
-#: src/frontend/mame/ui/ui.cpp:1469
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Laserdisk '%1$s' Horisontell Position"
-
-#: src/frontend/mame/ui/ui.cpp:1471
-#, c-format
-msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Laserdisk '%1$s' Vertikal utsträckning"
-
-#: src/frontend/mame/ui/ui.cpp:1473
-#, c-format
-msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Laserdisk '%1$s' Vertikal Position"
-
-#: src/frontend/mame/ui/ui.cpp:1485
-msgid "Vector Flicker"
-msgstr "Vektor Flimmer"
-
-#: src/frontend/mame/ui/ui.cpp:1486
-msgid "Beam Width Minimum"
-msgstr "Stråle Bredd Minimum"
-
-#: src/frontend/mame/ui/ui.cpp:1487
-msgid "Beam Width Maximum"
-msgstr "Elektronstråle Bredd Maximum"
-
-#: src/frontend/mame/ui/ui.cpp:1488
-msgid "Beam Intensity Weight"
-msgstr "Elektronstråle Intensitet"
-
-#: src/frontend/mame/ui/ui.cpp:1503
-#, c-format
-msgid "Crosshair Scale %1$s"
-msgstr "Hårkors Skala %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1503 src/frontend/mame/ui/ui.cpp:1505
-msgid "X"
-msgstr "X"
-
-#: src/frontend/mame/ui/ui.cpp:1503 src/frontend/mame/ui/ui.cpp:1505
-msgid "Y"
-msgstr "Y"
-
-#: src/frontend/mame/ui/ui.cpp:1505
-#, c-format
-msgid "Crosshair Offset %1$s"
-msgstr "Hårkors Offset %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1593
-#, c-format
-msgid "%1$3ddB"
-msgstr "%1$3ddB"
-
-#: src/frontend/mame/ui/ui.cpp:1637
-#, c-format
-msgid "%1$d%%"
-msgstr "%1$d%%"
-
-#: src/frontend/mame/ui/ui.cpp:1653
-#, c-format
-msgid "%1$3.0f%%"
-msgstr "%1$3.0f%%"
-
-#: src/frontend/mame/ui/ui.cpp:1676
-#, c-format
-msgid "%1$.3ffps"
-msgstr "%1$.3ffps"
-
-#: src/frontend/mame/ui/ui.cpp:1699 src/frontend/mame/ui/ui.cpp:1721
-#: src/frontend/mame/ui/ui.cpp:1742 src/frontend/mame/ui/ui.cpp:1764
-#: src/frontend/mame/ui/ui.cpp:1786 src/frontend/mame/ui/ui.cpp:1808
-#: src/frontend/mame/ui/ui.cpp:1830 src/frontend/mame/ui/ui.cpp:1852
-#: src/frontend/mame/ui/ui.cpp:1874 src/frontend/mame/ui/ui.cpp:1896
-#: src/frontend/mame/ui/ui.cpp:1918
-#, c-format
-msgid "%1$.3f"
-msgstr "%1$.3f"
-
-#: src/frontend/mame/ui/ui.cpp:1933 src/frontend/mame/ui/ui.cpp:1948
-#: src/frontend/mame/ui/ui.cpp:1963 src/frontend/mame/ui/ui.cpp:1978
-#, c-format
-msgid "%1$1.2f"
-msgstr "%1$1.2f"
-
-#: src/frontend/mame/ui/ui.cpp:1996
-#, c-format
-msgid "Crosshair Scale X %1$1.3f"
-msgstr "Hårkors Skala X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:1996
-#, c-format
-msgid "Crosshair Scale Y %1$1.3f"
-msgstr "Hårkors Skala Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2015
-#, c-format
-msgid "Crosshair Offset X %1$1.3f"
-msgstr "Hårkors Offset X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2015
-#, c-format
-msgid "Crosshair Offset Y %1$1.3f"
-msgstr "Hårkors Offset Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2158
-msgid "**Error saving ui.ini**"
-msgstr "**Fel uppstod när ui.ini sparades**"
-
-#: src/frontend/mame/ui/ui.cpp:2214
-#, c-format
-msgid "**Error saving %s.ini**"
-msgstr "**Fel uppstod när %s.ini sparades**"
-
-#: src/frontend/mame/ui/ui.cpp:2218 src/frontend/mame/ui/miscmenu.cpp:712
-msgid ""
-"\n"
-"    Configuration saved    \n"
-"\n"
-msgstr ""
-"\n"
-"    Konfiguration sparad   \n"
-"\n"
-
-#: src/frontend/mame/ui/slotopt.cpp:192
-#, c-format
-msgid "%s [internal]"
-msgstr "%s [intern]"
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " COLORS"
-msgstr " FÄRGER"
-
-#: src/frontend/mame/ui/viewgfx.cpp:406
-msgid " PENS"
-msgstr " PENNOR"
-
-#: src/frontend/mame/ui/miscmenu.cpp:43
-msgid "Keyboard Mode:"
-msgstr "Tangentbordsläge:"
-
-#: src/frontend/mame/ui/miscmenu.cpp:43
-msgid "Natural"
-msgstr "Naturligt"
-
-#: src/frontend/mame/ui/miscmenu.cpp:43
-msgid "Emulated"
-msgstr "Emulerat"
-
-#: src/frontend/mame/ui/miscmenu.cpp:239
-#, c-format
-msgid ""
-"Uptime: %1$d:%2$02d:%3$02d\n"
-"\n"
-msgstr ""
-"Drifttid: %1$d:%2$02d:%3$02d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:241
-#, c-format
-msgid ""
-"Uptime: %1$d:%2$02d\n"
-"\n"
-msgstr ""
-"Drifttid: %1$d:%2$02d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:245
-#, c-format
-msgid ""
-"Tickets dispensed: %1$d\n"
-"\n"
-msgstr ""
-"Biljetter fördelade: %1$d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:256
-msgid "Coin %1$c: NA%3$s\n"
-msgstr "Mynt %1$c: NA%3$s\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:256
-#, c-format
-msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Mynt %1$c: %2$d%3$s\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:259
-msgid " (locked)"
-msgstr " (låst)"
-
-#: src/frontend/mame/ui/miscmenu.cpp:506
-msgid "Visible Delay"
-msgstr "Synlig Fördröjning"
-
-#: src/frontend/mame/ui/miscmenu.cpp:604
-#, c-format
-msgid "%s.xml saved under ui folder."
-msgstr "%s.xml sparad i ui katalog."
-
-#: src/frontend/mame/ui/miscmenu.cpp:630
-msgid "Name:             Description:\n"
-msgstr "Namn:             Beskrivning:\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:641
-#, c-format
-msgid "%s.txt saved under ui folder."
-msgstr "%s.txt sparad i ui katalog."
-
-#: src/frontend/mame/ui/miscmenu.cpp:658
-msgid "Export list in XML format (like -listxml)"
-msgstr "Exportlista i XML format (som -listxml)"
-
-#: src/frontend/mame/ui/miscmenu.cpp:659
-msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "Exportlista i XML format (som -listxml, men utan enheter)"
-
-#: src/frontend/mame/ui/miscmenu.cpp:660
-msgid "Export list in TXT format (like -listfull)"
-msgstr "Exportera lista i TXT format (som -listfull)"
-
-#: src/frontend/mame/ui/miscmenu.cpp:766
-msgid "Driver"
-msgstr "Drivrutin"
-
-#: src/frontend/mame/ui/miscmenu.cpp:769
-msgid "This machine has no BIOS."
-msgstr "Den här maskinen saknar BIOS."
-
-#: src/frontend/mame/ui/miscmenu.cpp:783
-msgid "Save machine configuration"
-msgstr "Spara maskinkonfiguration"
-
-#: src/frontend/mame/ui/miscmenu.cpp:794
-msgid "Configure machine:"
-msgstr "Konfigurera maskin:"
-
-#: src/frontend/mame/ui/sndmenu.cpp:135
-msgid "Sound"
-msgstr "Ljud"
-
-#: src/frontend/mame/ui/sndmenu.cpp:136
-msgid "Sample Rate"
-msgstr "Samplingshastighet"
-
-#: src/frontend/mame/ui/sndmenu.cpp:137
-msgid "Use External Samples"
-msgstr "Använd Externa Samplingar"
-
-#: src/frontend/mame/ui/state.cpp:388
-msgid "Load State"
-msgstr "Ladda läge"
-
-#: src/frontend/mame/ui/state.cpp:388
-msgid "Select position to load from"
-msgstr "Välj position att ladda från"
-
-#: src/frontend/mame/ui/state.cpp:412
-msgid "Save State"
-msgstr "Spara läge"
-
-#: src/frontend/mame/ui/state.cpp:412
-msgid "Select position to save to"
-msgstr "Välj position att spara till"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
@@ -2517,6 +2205,648 @@ msgstr "Synkroniserad Uppdatering"
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Wait Vertical Sync"
 msgstr "Vänta på Vertikal Synkronisering"
+
+#: src/frontend/mame/ui/selsoft.cpp:456
+msgid ""
+"The selected software is missing one or more required files. Please select a "
+"different software.\n"
+"\n"
+msgstr ""
+"Den valda mjukvaran saknar en eller flera nödvändiga filer. Välj en annan "
+"mjukvara.\n"
+"\n"
+
+#: src/frontend/mame/ui/selsoft.cpp:549
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d software packages )"
+msgstr "%1$s %2$s ( %3$d / %4$d mjukvarupaket )"
+
+#: src/frontend/mame/ui/selsoft.cpp:550
+#, c-format
+msgid "Driver: \"%1$s\" software list "
+msgstr "Drivrutin: \"%1$s\" mjukvarulista "
+
+#: src/frontend/mame/ui/ui.cpp:337
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr ""
+"Den här emuleringen kräver att avbildningar laddas i följande apparat(er): "
+
+#: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
+msgid "Keyboard Emulation Status"
+msgstr "Status för Tangentbordsemulering"
+
+#: src/frontend/mame/ui/ui.cpp:1086
+msgid "Mode: PARTIAL Emulation"
+msgstr "Läge: PARTIELL Emulering"
+
+#: src/frontend/mame/ui/ui.cpp:1087
+msgid "UI:   Enabled"
+msgstr "UI:   Aktiverat"
+
+#: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
+msgid "**Use ScrLock to toggle**"
+msgstr "**Använd ScrLock för att växla**"
+
+#: src/frontend/mame/ui/ui.cpp:1096
+msgid "Mode: FULL Emulation"
+msgstr "Läge: FULL Emulering"
+
+#: src/frontend/mame/ui/ui.cpp:1097
+msgid "UI:   Disabled"
+msgstr "UI:   Inaktiverad"
+
+#: src/frontend/mame/ui/ui.cpp:1240
+msgid "Autofire can't be enabled"
+msgstr "Autofire kan inte aktiveras"
+
+#: src/frontend/mame/ui/ui.cpp:1293
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%1$s'' to quit,\n"
+"Press ''%2$s'' to return to emulation."
+msgstr ""
+"Är du säker på att du vill avsluta?\n"
+"\n"
+"Tryck ''%1$s'' för att avsluta,\n"
+"Tryck ''%2$s'' för att återgå till emuleringen."
+
+#: src/frontend/mame/ui/ui.cpp:1365
+msgid "Master Volume"
+msgstr "Huvud Volym"
+
+#: src/frontend/mame/ui/ui.cpp:1374
+#, c-format
+msgid "%1$s Volume"
+msgstr "%1$s Volym"
+
+#: src/frontend/mame/ui/ui.cpp:1398
+#, c-format
+msgid "Overclock CPU %1$s"
+msgstr "Överklocka CPU %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1407
+#, c-format
+msgid "Overclock %1$s sound"
+msgstr "Överklocka %1$s ljud"
+
+#: src/frontend/mame/ui/ui.cpp:1428
+#, c-format
+msgid "%1$s Refresh Rate"
+msgstr "%1$s Uppdateringsfrekvens"
+
+#: src/frontend/mame/ui/ui.cpp:1433
+#, c-format
+msgid "%1$s Brightness"
+msgstr "%1$s Ljusstyrka"
+
+#: src/frontend/mame/ui/ui.cpp:1435
+#, c-format
+msgid "%1$s Contrast"
+msgstr "%1$s Kontrast"
+
+#: src/frontend/mame/ui/ui.cpp:1437
+#, c-format
+msgid "%1$s Gamma"
+msgstr "%1$s Gamma"
+
+#: src/frontend/mame/ui/ui.cpp:1441
+#, c-format
+msgid "%1$s Horiz Stretch"
+msgstr "%1$s Horisontell utsträckning"
+
+#: src/frontend/mame/ui/ui.cpp:1443
+#, c-format
+msgid "%1$s Horiz Position"
+msgstr "%1$s Horisontell Position"
+
+#: src/frontend/mame/ui/ui.cpp:1445
+#, c-format
+msgid "%1$s Vert Stretch"
+msgstr "%1$s Vertikal utsträckning"
+
+#: src/frontend/mame/ui/ui.cpp:1447
+#, c-format
+msgid "%1$s Vert Position"
+msgstr "%1$s Vertikal Position"
+
+#: src/frontend/mame/ui/ui.cpp:1466
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Stretch"
+msgstr "Laserdisk '%1$s' Horisontell utsträckning"
+
+#: src/frontend/mame/ui/ui.cpp:1468
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Position"
+msgstr "Laserdisk '%1$s' Horisontell Position"
+
+#: src/frontend/mame/ui/ui.cpp:1470
+#, c-format
+msgid "Laserdisc '%1$s' Vert Stretch"
+msgstr "Laserdisk '%1$s' Vertikal utsträckning"
+
+#: src/frontend/mame/ui/ui.cpp:1472
+#, c-format
+msgid "Laserdisc '%1$s' Vert Position"
+msgstr "Laserdisk '%1$s' Vertikal Position"
+
+#: src/frontend/mame/ui/ui.cpp:1484
+msgid "Vector Flicker"
+msgstr "Vektor Flimmer"
+
+#: src/frontend/mame/ui/ui.cpp:1485
+msgid "Beam Width Minimum"
+msgstr "Stråle Bredd Minimum"
+
+#: src/frontend/mame/ui/ui.cpp:1486
+msgid "Beam Width Maximum"
+msgstr "Elektronstråle Bredd Maximum"
+
+#: src/frontend/mame/ui/ui.cpp:1487
+msgid "Beam Intensity Weight"
+msgstr "Elektronstråle Intensitet"
+
+#: src/frontend/mame/ui/ui.cpp:1502
+#, c-format
+msgid "Crosshair Scale %1$s"
+msgstr "Hårkors Skala %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1502 src/frontend/mame/ui/ui.cpp:1504
+msgid "X"
+msgstr "X"
+
+#: src/frontend/mame/ui/ui.cpp:1502 src/frontend/mame/ui/ui.cpp:1504
+msgid "Y"
+msgstr "Y"
+
+#: src/frontend/mame/ui/ui.cpp:1504
+#, c-format
+msgid "Crosshair Offset %1$s"
+msgstr "Hårkors Offset %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1592
+#, c-format
+msgid "%1$3ddB"
+msgstr "%1$3ddB"
+
+#: src/frontend/mame/ui/ui.cpp:1636
+#, c-format
+msgid "%1$d%%"
+msgstr "%1$d%%"
+
+#: src/frontend/mame/ui/ui.cpp:1652
+#, c-format
+msgid "%1$3.0f%%"
+msgstr "%1$3.0f%%"
+
+#: src/frontend/mame/ui/ui.cpp:1675
+#, c-format
+msgid "%1$.3ffps"
+msgstr "%1$.3ffps"
+
+#: src/frontend/mame/ui/ui.cpp:1698 src/frontend/mame/ui/ui.cpp:1720
+#: src/frontend/mame/ui/ui.cpp:1741 src/frontend/mame/ui/ui.cpp:1763
+#: src/frontend/mame/ui/ui.cpp:1785 src/frontend/mame/ui/ui.cpp:1807
+#: src/frontend/mame/ui/ui.cpp:1829 src/frontend/mame/ui/ui.cpp:1851
+#: src/frontend/mame/ui/ui.cpp:1873 src/frontend/mame/ui/ui.cpp:1895
+#: src/frontend/mame/ui/ui.cpp:1917
+#, c-format
+msgid "%1$.3f"
+msgstr "%1$.3f"
+
+#: src/frontend/mame/ui/ui.cpp:1932 src/frontend/mame/ui/ui.cpp:1947
+#: src/frontend/mame/ui/ui.cpp:1962 src/frontend/mame/ui/ui.cpp:1977
+#, c-format
+msgid "%1$1.2f"
+msgstr "%1$1.2f"
+
+#: src/frontend/mame/ui/ui.cpp:1995
+#, c-format
+msgid "Crosshair Scale X %1$1.3f"
+msgstr "Hårkors Skala X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:1995
+#, c-format
+msgid "Crosshair Scale Y %1$1.3f"
+msgstr "Hårkors Skala Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2014
+#, c-format
+msgid "Crosshair Offset X %1$1.3f"
+msgstr "Hårkors Offset X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2014
+#, c-format
+msgid "Crosshair Offset Y %1$1.3f"
+msgstr "Hårkors Offset Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2157
+msgid "**Error saving ui.ini**"
+msgstr "**Fel uppstod när ui.ini sparades**"
+
+#: src/frontend/mame/ui/ui.cpp:2213
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr "**Fel uppstod när %s.ini sparades**"
+
+#: src/frontend/mame/ui/optsmenu.cpp:193
+msgid "Filter"
+msgstr "Filter"
+
+#: src/frontend/mame/ui/optsmenu.cpp:206
+msgid "Customize UI"
+msgstr "Skräddarsy UI"
+
+#: src/frontend/mame/ui/optsmenu.cpp:207
+msgid "Configure Directories"
+msgstr "Konfigurera Kataloger"
+
+#: src/frontend/mame/ui/optsmenu.cpp:213
+msgid "General Inputs"
+msgstr "Generell Indata"
+
+#: src/frontend/mame/ui/optsmenu.cpp:216
+msgid "Save Configuration"
+msgstr "Spara Konfiguration"
+
+#: src/frontend/mame/ui/optsmenu.cpp:228
+msgid "Settings"
+msgstr "Inställningar"
+
+#: plugins/timer/init.lua:94
+msgid "Current time"
+msgstr ""
+
+#: plugins/timer/init.lua:96
+msgid "Total time"
+msgstr ""
+
+#: plugins/timer/init.lua:98
+msgid "Play Count"
+msgstr ""
+
+#: plugins/timer/init.lua:106
+msgid "Timer"
+msgstr ""
+
+#: plugins/cheat/init.lua:458
+msgid "Select cheat to set hotkey"
+msgstr ""
+
+#: plugins/cheat/init.lua:464
+msgid "Press button for hotkey or wait to clear"
+msgstr ""
+
+#: plugins/cheat/init.lua:476
+msgid "None"
+msgstr "Ingen"
+
+#: plugins/cheat/init.lua:481
+msgid "Done"
+msgstr ""
+
+#: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
+msgid "Set"
+msgstr ""
+
+#: plugins/cheat/init.lua:528
+msgid "Set hotkeys"
+msgstr ""
+
+#: plugins/cheat/init.lua:668
+#, lua-format
+msgid "Activated: %s = %s"
+msgstr ""
+
+#: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
+#, lua-format
+msgid "Activated: %s"
+msgstr ""
+
+#: plugins/cheat/init.lua:733
+#, lua-format
+msgid "Enabled: %s"
+msgstr ""
+
+#: plugins/cheat/init.lua:738
+#, lua-format
+msgid "Disabled: %s"
+msgstr ""
+
+#: plugins/cheat/init.lua:776
+#, lua-format
+msgid "%s added"
+msgstr ""
+
+#: plugins/data/data_command.lua:19
+msgid "Command"
+msgstr "Kommando"
+
+#: plugins/data/data_gameinit.lua:16
+msgid "Gameinit"
+msgstr "Spelstart"
+
+#: plugins/data/data_hiscore.lua:770 plugins/data/data_hiscore.lua:818
+msgid "High Scores"
+msgstr "Ranking"
+
+#: plugins/data/data_history.lua:15
+msgid "History"
+msgstr "Historia"
+
+#: plugins/data/data_mameinfo.lua:18 plugins/data/data_messinfo.lua:19
+msgid ""
+"\n"
+"\n"
+"--- DRIVER INFO ---\n"
+"Driver: "
+msgstr ""
+
+#: plugins/data/data_mameinfo.lua:20
+msgid "MAMEinfo"
+msgstr "MAMEinfo"
+
+#: plugins/data/data_messinfo.lua:21
+msgid "MESSinfo"
+msgstr "MESSinfo"
+
+#: plugins/data/data_story.lua:22
+msgid "Mamescore"
+msgstr "Mamescore"
+
+#: plugins/data/data_sysinfo.lua:15
+msgid "Sysinfo"
+msgstr "Systeminfo"
+
+#: plugins/data/data_marp.lua:129
+msgid "MARPScore"
+msgstr "MARPScore"
+
+#: plugins/cheatfind/init.lua:344
+msgid "Save Cheat"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:347
+msgid "Default"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:347
+msgid "Custom"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:348
+msgid "Cheat Name"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:354
+#, lua-format
+msgid "Default name is %s"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:362
+msgid "Player"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:367
+msgid "Type"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:373
+msgid "Save"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:399
+#, lua-format
+msgid "Cheat written to %s and added to cheat.simple"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:407
+msgid "Cheat added to cheat.simple"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:412
+msgid ""
+"Unable to write file\n"
+"Ensure that cheatpath folder exists"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:421
+msgid "Cancel"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:426
+msgid "CPU or RAM"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:430
+msgid "Changes to this only take effect when \"Start new search\" is selected"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:449
+msgid "Data cleared and current state saved"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:457
+msgid "Start new search"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:467
+msgid "Current state saved"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:474
+msgid "Save current -- #"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:506
+msgid " total matches found"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:513
+msgid "Compare"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:516
+msgid "Left operand"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:519
+msgid "Current"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:524
+msgid "Operator"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:531
+msgid "Left less than right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:533
+msgid "Left greater than right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:535
+msgid "Left equal to right"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:537
+msgid "Left not equal to right, value is difference"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:539
+msgid "Left equal to right with bitmask"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:541
+msgid "Left not equal to right with bitmask"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:543
+msgid "Left less than value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:545
+msgid "Left greater than value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:547
+msgid "Left equal to value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:549
+msgid "Left not equal to value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:560
+msgid "Right operand"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:568
+msgid "Value"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:572
+msgid "Any"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:578
+msgid "Data Format"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:602
+msgid "Undo last search -- #"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:606
+msgid "Match block"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:609
+msgid "All"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:660
+#, lua-format
+msgid "Test cheat at addr %08X"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:692
+msgid "Cheat engine not available"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:718
+msgid "Default name is "
+msgstr ""
+
+#: plugins/cheatfind/init.lua:741
+msgid "Test"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:741
+msgid "Write"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:741
+msgid "Watch"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:758
+msgid "Page"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:776
+msgid "Clear Watches"
+msgstr ""
+
+#: plugins/cheatfind/init.lua:786
+msgid "Cheat Finder"
+msgstr ""
+
+#~ msgid "Mechanical Machine\t%1$s\n"
+#~ msgstr "Mekanisk Maskin\t%1$s\n"
+
+#~ msgid "Requires Artwork\t%1$s\n"
+#~ msgstr "Kräver Grafisk Layout"
+
+#~ msgid "Requires Clickable Artwork\t%1$s\n"
+#~ msgstr "Kräver Klickbar Grafisk layout\t%1$s\n"
+
+#~ msgid "Support Cocktail\t%1$s\n"
+#~ msgstr "Stödjer Cocktail\t%1$s\n"
+
+#~ msgid "Driver is BIOS\t%1$s\n"
+#~ msgstr "Drivrutinen är BIOS\t%1$s\n"
+
+#~ msgid "Support Save\t%1$s\n"
+#~ msgstr "Stödjer Spara\t%1$s\n"
+
+#~ msgid "Screen Orientation\t%1$s\n"
+#~ msgstr "Skärm Orientering\t%1$s\n"
+
+#~ msgid "Vertical"
+#~ msgstr "Vertikal"
+
+#~ msgid "Horizontal"
+#~ msgstr "Horisontal"
+
+#~ msgid "Requires CHD\t%1$s\n"
+#~ msgstr "Kräver CHD\t%1$s\n"
+
+#~ msgid "Roms Audit Pass\tOK\n"
+#~ msgstr "Granskning Av Romdistribution\tOK\n"
+
+#~ msgid "Roms Audit Pass\tBAD\n"
+#~ msgstr "Granskning Av Romdistribution\tFEL\n"
+
+#~ msgid "Samples Audit Pass\tNone Needed\n"
+#~ msgstr "Granskning av Prover\tBehövs Ej\n"
+
+#~ msgid "Samples Audit Pass\tOK\n"
+#~ msgstr "Granskning av Prover\tOK\n"
+
+#~ msgid "Samples Audit Pass\tBAD\n"
+#~ msgstr "Granskning av Prover\tFEL\n"
+
+#~ msgid ""
+#~ "Roms Audit Pass\tDisabled\n"
+#~ "Samples Audit Pass\tDisabled\n"
+#~ msgstr ""
+#~ "Granskning Av Romdistribution\tDeaktiverat\n"
+#~ "Granskning av Prover\tDeaktiverat\n"
+
+#~ msgid "Unimplemented"
+#~ msgstr "Ej implementerad"
+
+#~ msgid "Imperfect"
+#~ msgstr "Bristfällig"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+
+#~ msgid "Gfx: %s, Sound: %s"
+#~ msgstr "Gfx: %s, Ljud: %s"
 
 #~ msgid "Main filter"
 #~ msgstr "Huvudfilter"

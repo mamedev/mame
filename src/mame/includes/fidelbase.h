@@ -12,6 +12,7 @@
 #ifndef DRIVERS_FIDELBASE_H
 #define DRIVERS_FIDELBASE_H
 
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
 #include "bus/generic/slot.h"

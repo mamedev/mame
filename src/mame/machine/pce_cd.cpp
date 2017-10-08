@@ -442,14 +442,14 @@ void pce_cd_device::nec_set_audio_start_position()
 	m_cdda_status = PCE_CD_CDDA_PAUSED;
 
 	// old code for reference, seems unlikely that this puts status in standby (and breaks Snatcher at the title screen)
-//	if (m_cdda_status == PCE_CD_CDDA_PAUSED)
-//	{
-//		m_cdda_status = PCE_CD_CDDA_OFF;
-//		m_cdda->stop_audio();
-//		m_end_frame = m_last_frame;
-//		m_end_mark = 0;
-//	}
-//	else
+//  if (m_cdda_status == PCE_CD_CDDA_PAUSED)
+//  {
+//      m_cdda_status = PCE_CD_CDDA_OFF;
+//      m_cdda->stop_audio();
+//      m_end_frame = m_last_frame;
+//      m_end_mark = 0;
+//  }
+//  else
 	{
 		if (m_command_buffer[1] & 0x03)
 		{

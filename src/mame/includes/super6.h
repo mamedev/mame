@@ -9,6 +9,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -51,7 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER( bank0_w );
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( baud_w );
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 

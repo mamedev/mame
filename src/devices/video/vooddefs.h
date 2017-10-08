@@ -607,7 +607,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chromaKeyTest(voodoo_device *vd, st
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
 		rgb_union color;
-		color.u = (rgbaIntColor.get_a()<<24) | (rgbaIntColor.get_r()<<16) | (rgbaIntColor.get_g()<<8) | rgbaIntColor.get_b();
+		color.u = rgbaIntColor.to_rgba();
 		/* non-range version */
 		if (!CHROMARANGE_ENABLE(vd->reg[chromaRange].u))
 		{
@@ -1006,13 +1006,15 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHAMODE, int32_t x, const uint8_t *dither, int dpix, uint16_t *depth, rgbaint_t &preFog, rgbaint_t &srcColor)
+static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHAMODE, int32_t x, const uint8_t *dither, int dpix, uint16_t *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
 {
 	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))
 	{
 		//int dpix = dest[XX];
 		int dr, dg, db;
-		EXTRACT_565_TO_888(dpix, dr, dg, db);
+		//EXTRACT_565_TO_888(dpix, dr, dg, db);
+		rgb_t drgb = convTable[dpix];
+		drgb.expand_rgb(dr, dg, db);
 		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depth[x] : 0xff;
 		//int sr = (RR);
 		//int sg = (GG);
@@ -2049,7 +2051,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depthTest(uint16_t zaColorReg, stat
 	preFog.set(color); \
 	applyFogging(vd, FOGMODE, FBZCOLORPATH, XX, DITHER4, fogdepth, color, ITERZ, ITERW, ITERAXXX.get_a()); \
 	/* perform alpha blending */                                                \
-	alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color); \
+	alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color, vd->fbi.rgb565); \
 	a = color.get_a(); r = color.get_r(); g = color.get_g(); b = color.get_b();                     \
 	/* modify the pixel for debugging purposes */                               \
 	MODIFY_PIXEL(VV);                                                           \

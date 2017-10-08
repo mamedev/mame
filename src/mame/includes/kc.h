@@ -12,6 +12,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 // Components
 #include "cpu/z80/z80.h"

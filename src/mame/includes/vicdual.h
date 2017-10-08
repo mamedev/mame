@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"

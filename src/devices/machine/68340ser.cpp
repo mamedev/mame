@@ -49,7 +49,7 @@ READ8_MEMBER( mc68340_serial_module_device::read )
 	  or external clock and SCLK), except for the clock from the IMB. The clock from the IMB
 	  remains active to allow CPU32 access to the MCR. The clock stops on the low phase of the
 	  clock and remains stopped until the STP bit is cleared by the CPU32 or a hardware reset.
-	  Accesses to serial module registers while in stop mode produce a bus error.	*/
+	  Accesses to serial module registers while in stop mode produce a bus error.   */
 	if ( (m_mcrh & REG_MCRH_STP) && offset != REG_MCRH && offset != REG_MCRL)
 	{
 		logerror("Attempt to access timer registers while timer clocks are stopped, STP bit in MCR is set!");
@@ -79,8 +79,8 @@ READ8_MEMBER( mc68340_serial_module_device::read )
 
 	LOGR(" * Reg %02x -> %02x - %s\n", offset, val,
 		(offset > 0x21) ? "Error - should not happen" :
-	     std::array<char const *, 0x22>
-	     {{
+		 std::array<char const *, 0x22>
+		 {{
 		 "MCRH", "MCRL", "n/a",  "n/a",  "ILR",  "IVR",  "hole", "hole", // 0x00 - 0x07
 		 "hole", "hole", "hole", "hole", "hole", "hole", "hole", "hole", // 0x08 - 0x0f
 		 "MR1A", "SRA",  "n/a",  "RBA",  "IPCR", "ISR",  "n/a",  "n/a",  // 0x10 - 0x17
@@ -97,17 +97,17 @@ WRITE8_MEMBER( mc68340_serial_module_device::write )
 		 (offset > 0x21) ? "Error - should not happen" :
 		 std::array<char const *, 0x22>
 		 {{
-		     "MCRH", "MCRL", "n/a",  "n/a",  "ILR",  "IVR",  "hole", "hole", // 0x00 - 0x07
-		     "hole", "hole", "hole", "hole", "hole", "hole", "hole", "hole", // 0x08 - 0x0f
-		     "MR1A", "CSRA", "CRA",  "TBA",  "ACR",  "IER",  "n/a",  "n/a",  // 0x10 - 0x17
-		     "MR1B", "CSRB", "CRB",  "TBB",  "n/a",  "OPCR", "OPS",  "OPR",  // 0x18 - 0x1f
-		     "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
+			 "MCRH", "MCRL", "n/a",  "n/a",  "ILR",  "IVR",  "hole", "hole", // 0x00 - 0x07
+			 "hole", "hole", "hole", "hole", "hole", "hole", "hole", "hole", // 0x08 - 0x0f
+			 "MR1A", "CSRA", "CRA",  "TBA",  "ACR",  "IER",  "n/a",  "n/a",  // 0x10 - 0x17
+			 "MR1B", "CSRB", "CRB",  "TBB",  "n/a",  "OPCR", "OPS",  "OPR",  // 0x18 - 0x1f
+			 "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 
 	/*Setting the STP bit stops all clocks within the serial module (including the crystal
 	  or external clock and SCLK), except for the clock from the IMB. The clock from the IMB
 	  remains active to allow CPU32 access to the MCR. The clock stops on the low phase of the
 	  clock and remains stopped until the STP bit is cleared by the CPU32 or a hardware reset.
-	  Accesses to serial module registers while in stop mode produce a bus error.	*/
+	  Accesses to serial module registers while in stop mode produce a bus error.   */
 	if ( (m_mcrh & REG_MCRH_STP) && offset != REG_MCRH && offset != REG_MCRL)
 	{
 		logerror("Attempt to access timer registers while timer clocks are stopped, STP bit in MCR is set!");

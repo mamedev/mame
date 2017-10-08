@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/alpha8201.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 
 

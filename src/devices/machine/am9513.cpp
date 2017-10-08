@@ -6,8 +6,12 @@
 
     The Am9513 is a five-channel counter/timer circuit introduced by
     AMD around 1980. (It was also sold as the AmZ8073, apparently due
-    to a licensing deal with Zilog.) Clock source, edge selection,
-    gating and retriggering are programmable for each channel.
+    to a licensing deal with Zilog to develop Z8000 peripherals. No
+    company is known to have second-sourced the device, however.)
+    Clock source, edge selection, gating and retriggering are
+    programmable for each channel. There is also a frequency divider
+    which can take any of the 15 normal counter inputs and divide it
+    by any number between 1 and 16.
 
     All internal counters are 16 bits wide (except the internal 4-bit
     counter for the FOUT divider, which is not externally accessible).
@@ -161,8 +165,8 @@ void am9513_device::master_reset()
 {
 	LOGMASKED(LOG_MODE, "Master reset\n");
 
-	// Clear master mode register to all zeroes
-	m_mmr = 0;
+	// Clear master mode register
+	set_master_mode(0);
 
 	// Enable prefetch for write
 	m_write_prefetch = true;
@@ -171,9 +175,13 @@ void am9513_device::master_reset()
 	std::fill(std::begin(m_tc), std::end(m_tc), false);
 	std::fill(std::begin(m_toggle), std::end(m_toggle), false);
 
-	// Initialize counter mode registers
+	// Initialize counter mode, load and hold registers
 	for (int c = 0; c < 5; c++)
+	{
 		set_counter_mode(c, 0x0b00);
+		m_counter_load[c] = 0;
+		m_counter_hold[c] = 0;
+	}
 }
 
 
@@ -281,7 +289,7 @@ void am9513_device::set_master_mode(u16 data)
 	u16 old_mmr = m_mmr;
 	m_mmr = data;
 
-	// Time-of-Day options (TODO: not implemented yet)
+	// Time-of-Day options
 	if ((m_mmr & 0x0003) != (old_mmr & 0x0003))
 	{
 		switch (m_mmr & 0x0003)
@@ -365,6 +373,23 @@ bool am9513_device::counter_is_mode_x(int c) const
 
 
 //-------------------------------------------------
+//  compare_count - determine comparator output
+//  for Counter 1 or Counter 2
+//-------------------------------------------------
+
+bool am9513_device::compare_count(int c) const
+{
+	assert(c == 0 || c == 1);
+
+	// TOD special case: Comparator 2 does 32-bit comparison when Comparator 1 is also activated
+	if (c == 1 && BIT(m_mmr, 2) && (m_mmr & 0x0003) != 0)
+		return m_count[0] == m_alarm[0] && m_count[1] == m_alarm[1];
+	else
+		return m_count[c] == m_alarm[c];
+}
+
+
+//-------------------------------------------------
 //  set_counter_mode - handle counter mode changes
 //-------------------------------------------------
 
@@ -372,18 +397,44 @@ void am9513_device::set_counter_mode(int c, u16 data)
 {
 	if ((data & 0xe0e0) != (m_counter_mode[c] & 0xe0e0))
 	{
-		// Mode selection and gating control
+		// CM15-CM13, CM7-CM5: Mode selection and gating control
 		int mode = ((data >> 5) & 7) * 3;
-		if ((data & 0xc000) == 0xc000)
-			mode += 2; // Edge gating
-		else if ((data & 0xe000) != 0)
-			mode += 1; // Level gating
-		LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected\n", c + 1, mode + 'A');
+		switch (data & 0xe000)
+		{
+		case 0x0000:
+			mode += 'A';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (no gating)\n", c + 1, mode);
+			break;
+
+		case 0x2000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active high TC%d)\n", c + 1, mode, c);
+			break;
+
+		case 0x4000:
+		case 0x6000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active high GATE %d)\n", c + 1, mode, BIT(data, 13) ? c + 2 : c);
+			break;
+
+		case 0x8000:
+		case 0xa000:
+			mode += 'B';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (active %s GATE %d)\n", c + 1, mode, BIT(data, 13) ? "low" : "high", c + 1);
+			break;
+
+		case 0xc000:
+		case 0xe000:
+			mode += 'C';
+			LOGMASKED(LOG_MODE, "Counter %d: Mode %c selected (%s edge GATE %d)\n", c + 1, mode, BIT(data, 13) ? "falling" : "rising", c + 1);
+			break;
+		}
 	}
 
 	if ((data & 0x1f00) != (m_counter_mode[c] & 0x1f00))
 	{
-		// Source selection and edge control
+		// CM11-CM8: Source selection
+		// CM12: Source edge control
 		int source = (data >> 8) & 15;
 		int old_source = (m_counter_mode[c] >> 8) & 15;
 		if (old_source >= 11 && old_source <= 15 && source != old_source)
@@ -404,9 +455,9 @@ void am9513_device::set_counter_mode(int c, u16 data)
 	if ((data & 0x0018) != (m_counter_mode[c] & 0x0018))
 		LOGMASKED(LOG_MODE, "Counter %d: %s %s count\n", c + 1, BIT(data, 4) ? "BCD" : "Binary", BIT(data, 3) ? "up" : "down");
 
-	// Output forms
 	if ((data & 0x0007) != (m_counter_mode[c] & 0x0007))
 	{
+		// CM2-CM0: Output form
 		switch (data & 0x0007)
 		{
 		case 0x0000:
@@ -420,7 +471,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 
 		case 0x0001:
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] == m_alarm[c]);
+				set_output(c, compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output active high TC pulse\n", c + 1);
@@ -430,7 +481,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 
 		case 0x0005:
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] != m_alarm[c]);
+				set_output(c, !compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output active low TC pulse\n", c + 1);
@@ -439,8 +490,9 @@ void am9513_device::set_counter_mode(int c, u16 data)
 			break;
 
 		case 0x0002:
+		case 0x0003: // SCP-300F sets this up; why?
 			if (c < 2 && BIT(m_mmr, c + 2))
-				set_output(c, m_count[c] == m_alarm[c]);
+				set_output(c, compare_count(c));
 			else
 			{
 				LOGMASKED(LOG_MODE, "Counter %d: Output toggle on TC\n", c + 1);
@@ -533,7 +585,7 @@ void am9513_device::set_output(int c, bool state)
 void am9513_device::set_toggle(int c, bool state)
 {
 	m_toggle[c] = state;
-	if ((m_counter_mode[c] & 0x0007) == 0x0002)
+	if ((m_counter_mode[c] & 0x0006) == 0x0002)
 		set_output(c, state);
 }
 
@@ -556,6 +608,7 @@ void am9513_device::set_tc(int c, bool state)
 			set_output(c, state);
 			break;
 		case 0x0002:
+		case 0x0003: // SCP-300F sets this up; why?
 			// TC toggled output
 			if (!state)
 				set_toggle(c, !m_toggle[c]);
@@ -567,16 +620,16 @@ void am9513_device::set_tc(int c, bool state)
 		}
 	}
 
-	if (c < 4)
-	{
-		// TC cascading
-		if ((m_counter_mode[c + 1] & 0x1f00) == (state ? 0x0000 : 0x1000))
-			count_edge(c + 1);
+	// TCn-1 = TC5 for Counter 1
+	int d = (c + 1) % 5;
 
-		// TC gating
-		if ((m_counter_mode[c + 1] & 0xe000) == 0x2000)
-			gate_count(c + 1, state && (bus_is_16_bit() || m_gate_alt[c + 1]));
-	}
+	// TC cascading
+	if ((m_counter_mode[d] & 0x1f00) == (state ? 0x0000 : 0x1000))
+		count_edge(d);
+
+	// TC gating
+	if ((m_counter_mode[d] & 0xe000) == 0x2000)
+		gate_count(d, state && (bus_is_16_bit() || m_gate_alt[d]));
 }
 
 
@@ -681,12 +734,51 @@ void am9513_device::step_counter(int c, bool force_load)
 		{
 			if ((m_count[c] & 0x000f) >= 0x000a)
 				m_count[c] += 0x0006;
-			if ((m_count[c] & 0x00f0) >= 0x00a0)
-				m_count[c] += 0x0060;
+
+			if (c == 0 && (m_mmr & 0x0003) == 0x0001)
+			{
+				// TOD: 50Hz
+				if ((m_count[c] & 0x00f0) >= 0x0050)
+					m_count[c] += 0x00b0;
+			}
+			else if (c == 0 && (m_mmr & 0x0003) == 0x0002)
+			{
+				// TOD: 60Hz
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] += 0x00a0;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: minutes
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] += 0x00a0;
+			}
+			else
+			{
+				if ((m_count[c] & 0x00f0) >= 0x00a0)
+					m_count[c] += 0x0060;
+			}
+
 			if ((m_count[c] & 0x0f00) >= 0x0a00)
 				m_count[c] += 0x0600;
-			if ((m_count[c] & 0xf000) >= 0xa000)
-				m_count[c] += 0x6000;
+
+			if (c == 0 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: seconds
+				if ((m_count[c] & 0xf000) >= 0x6000)
+					m_count[c] += 0xa000;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: hours
+				if ((m_count[c] & 0xff00) >= 0x2400)
+					m_count[c] += 0xdc00;
+			}
+			else
+			{
+				if ((m_count[c] & 0xf000) >= 0xa000)
+					m_count[c] += 0x6000;
+			}
 		}
 	}
 	else
@@ -699,12 +791,51 @@ void am9513_device::step_counter(int c, bool force_load)
 		{
 			if ((m_count[c] & 0x000f) >= 0x000a)
 				m_count[c] -= 0x0006;
-			if ((m_count[c] & 0x00f0) >= 0x00a0)
-				m_count[c] -= 0x0060;
+
+			if (c == 0 && (m_mmr & 0x0003) == 0x0001)
+			{
+				// TOD: 50Hz
+				if ((m_count[c] & 0x00f0) >= 0x0050)
+					m_count[c] -= 0x00b0;
+			}
+			else if (c == 0 && (m_mmr & 0x0003) == 0x0002)
+			{
+				// TOD: 60Hz
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] -= 0x00a0;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: minutes
+				if ((m_count[c] & 0x00f0) >= 0x0060)
+					m_count[c] -= 0x00a0;
+			}
+			else
+			{
+				if ((m_count[c] & 0x00f0) >= 0x00a0)
+					m_count[c] -= 0x0060;
+			}
+
 			if ((m_count[c] & 0x0f00) >= 0x0a00)
 				m_count[c] -= 0x0600;
-			if ((m_count[c] & 0xf000) >= 0xa000)
-				m_count[c] -= 0x6000;
+
+			if (c == 0 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: seconds
+				if ((m_count[c] & 0xf000) >= 0x6000)
+					m_count[c] -= 0xa000;
+			}
+			else if (c == 1 && (m_mmr & 0x0003) != 0)
+			{
+				// TOD: hours
+				if ((m_count[c] & 0xff00) >= 0x2400)
+					m_count[c] -= 0xdc00;
+			}
+			else
+			{
+				if ((m_count[c] & 0xf000) >= 0xa000)
+					m_count[c] -= 0x6000;
+			}
 		}
 	}
 
@@ -745,10 +876,19 @@ void am9513_device::step_counter(int c, bool force_load)
 	// Active comparators
 	if (c < 2 && BIT(m_mmr, c + 2))
 	{
-		if (BIT(m_counter_mode[c], 2))
-			set_output(c, m_count[c] == m_alarm[c]);
-		else
-			set_output(c, m_count[c] != m_alarm[c]);
+		switch (m_counter_mode[c] & 0x0007)
+		{
+		case 0x0001:
+		case 0x0002:
+			// Active high comparator output
+			set_output(c, compare_count(c));
+			break;
+
+		case 0x0005:
+			// Active low comparator output
+			set_output(c, !compare_count(c));
+			break;
+		}
 	}
 }
 
@@ -807,20 +947,26 @@ void am9513_device::write_gate(int g, bool level)
 
 	m_gate[g] = level;
 
+	// Check for selection of GATE n as source for any counter
 	for (int c = 0; c < 5; c++)
 	{
 		if ((m_counter_mode[c] & 0x0f00) >> 8 == (g + 6) && BIT(m_counter_mode[c], 12) == !level)
 			count_edge(c);
 	}
 
+	// Check for selection of GATE n as control for same-numbered counter
 	if (BIT(m_counter_mode[g], 15))
 		gate_count(g, level && (bus_is_16_bit() || m_gate_alt[g]));
-	if (g > 0 && (m_counter_mode[g - 1] & 0xe000) == 0x4000)
-		gate_count(g - 1, level && (bus_is_16_bit() || m_gate_alt[g - 1]));
-	if (g < 4 && (m_counter_mode[g + 1] & 0xe000) == 0x6000)
-		gate_count(g + 1, level && (bus_is_16_bit() || m_gate_alt[g + 1]));
 
-	// FOUT Source = GATE n
+	// Check for selection of GATE n as control for previous counter
+	if ((m_counter_mode[(g + 4) % 5] & 0xe000) == 0x4000)
+		gate_count((g + 4) % 5, level && (bus_is_16_bit() || m_gate_alt[(g + 4) % 5]));
+
+	// Check for selection of GATE n as control for next counter
+	if ((m_counter_mode[(g + 1) % 5] & 0xe000) == 0x6000)
+		gate_count((g + 1) % 5, level && (bus_is_16_bit() || m_gate_alt[(g + 1) % 5]));
+
+	// Check for selection of GATE n as source for FOUT
 	if ((m_mmr & 0x00f0) >> 4 == (g + 6))
 		fout_tick();
 }
@@ -844,18 +990,15 @@ void am9513_device::write_gate_alt(int c, bool level)
 	switch (m_counter_mode[c] & 0xe000)
 	{
 	case 0x2000:
-		if (c > 0)
-			gate_count(c, level && m_tc[c - 1]);
+		gate_count(c, level && m_tc[(c + 4) % 5]);
 		break;
 
 	case 0x4000:
-		if (c < 4)
-			gate_count(c + 1, level && m_gate[c + 1]);
+		gate_count((c + 1) % 5, level && m_gate[(c + 1) % 5]);
 		break;
 
 	case 0x6000:
-		if (c > 0)
-			gate_count(c - 1, level && m_gate[c - 1]);
+		gate_count((c + 4) % 5, level && m_gate[(c + 4) % 5]);
 		break;
 
 	case 0x8000:

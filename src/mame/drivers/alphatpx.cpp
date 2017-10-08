@@ -4,7 +4,7 @@
 
     Triumph-Adler Alphatronic Px series
 
-	TODO: Doesn't do much more than showing the initial boot message
+    TODO: Doesn't do much more than showing the initial boot message
 
 ***************************************************************************/
 
