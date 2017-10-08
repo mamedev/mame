@@ -437,7 +437,7 @@
 -->
 
 	<view name="Button Lamps">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="4" bottom="4" />
 
 <!--
 	****** 1st row ******

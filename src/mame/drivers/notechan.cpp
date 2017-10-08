@@ -144,6 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out_f8_w);
 	DECLARE_WRITE8_MEMBER(out_f9_w);
 	DECLARE_WRITE8_MEMBER(out_fa_w);
+	DECLARE_WRITE8_MEMBER(out_ff_w);
 };
 
 
@@ -163,7 +164,7 @@ static ADDRESS_MAP_START( notechan_port_map, AS_IO, 8, notechan_state )
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN1") AM_WRITE(out_f9_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN2") AM_WRITE(out_fa_w)
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
-	AM_RANGE(0xff, 0xff) AM_WRITENOP    // watchdog reset? (written immediately upon reset, INT and NMI)
+	AM_RANGE(0xff, 0xff) AM_WRITE(out_ff_w)  // watchdog reset? (written immediately upon reset, INT and NMI)
 ADDRESS_MAP_END
 
 
@@ -211,6 +212,20 @@ WRITE8_MEMBER(notechan_state::out_fa_w)
 	output().set_lamp_value(23, data >> 7 & 1);
 
 	logerror("Output %02X to $FA\n", data);
+}
+
+WRITE8_MEMBER(notechan_state::out_ff_w)
+{
+	output().set_lamp_value(24, data & 1 );
+	output().set_lamp_value(25, data >> 1 & 1);
+	output().set_lamp_value(26, data >> 2 & 1);
+	output().set_lamp_value(27, data >> 3 & 1);
+	output().set_lamp_value(28, data >> 4 & 1);
+	output().set_lamp_value(29, data >> 5 & 1);
+	output().set_lamp_value(30, data >> 6 & 1);
+	output().set_lamp_value(31, data >> 7 & 1);
+
+	logerror("Output %02X to $FF\n", data);
 }
 
 
