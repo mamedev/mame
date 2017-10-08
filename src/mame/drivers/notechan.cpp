@@ -315,15 +315,18 @@ static INPUT_PORTS_START( notechan )
 
   Port FAh:
   
-  (1) Pulsed under reset, activates lamp 21 and triggers sample #20 (boing). Maybe it's
-      the 'start' button.
+  (1) Pulsed under reset, activates port FAh-D5 (lamp 21) and triggers sample #20 (boing
+      or FX sound, depending of the OKI bank). Maybe it's the 'start' button.
 
   (2) Pulsing and keep pressed under reset, triggers the sample #01 (cling) and starts
-      a sequence of lamps (24-25-26). Then triggers sample #04 (voice). After a little
-	  while also triggers sample #05 (voice).
+      a sequence of 4-lines output through port FFh D3-D2-D1-D0 (lamps 27-26-25-24)
+	  that seems a 4-bits countdown (maybe related to the 7segment LED that counts the
+	  credits). Then triggers sample #04 (voice or effect depending of the OKI bank).
+	  After a little while also triggers sample #05 (voice).
+	  Maybe it's some kind of hardware testing mode...
 
-  (3) Pulsing this input lites lamp 17 and triggers sample #01 (cling). Maybe it's
-      the 'coin-in' button. 
+  (3) Pulsing this input activates port FAh-D1 (lamp 17) and triggers sample #01 (cling).
+      Maybe it's the 'coin-in' button. 
 
 */  
 	PORT_START("DSW")
