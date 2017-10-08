@@ -581,7 +581,7 @@ msgstr "Crna"
 
 #: src/frontend/mame/ui/custui.cpp:899
 msgid "Orange"
-msgstr "Narandžasta"
+msgstr "Naranǆasta"
 
 #: src/frontend/mame/ui/custui.cpp:900
 msgid "Yellow"
