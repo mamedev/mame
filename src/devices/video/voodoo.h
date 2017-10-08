@@ -1035,6 +1035,23 @@ static const uint8_t dither_matrix_2x2[16] =
 	11, 9, 11, 9
 };
 
+// Dither 4x4 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_4x4[16] =
+{
+	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
+	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
+	(15 - 3) >> 1, (15 - 11) >> 1,  (15 - 1) >> 1,  (15 - 9) >> 1,
+	(15 - 15) >> 1,  (15 - 7) >> 1, (15 - 13) >> 1,  (15 - 5) >> 1
+};
+
+// Dither 2x2 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_2x2[16] =
+{
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1
+};
 
 /*************************************
  *
@@ -1791,7 +1808,6 @@ protected:
 
 
 	static const raster_info predef_raster_table[];
-
 
 	// not all of these need to be static, review.
 
