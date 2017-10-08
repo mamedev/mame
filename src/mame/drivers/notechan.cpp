@@ -175,9 +175,11 @@ class notechan_state : public driver_device
 public:
 	notechan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
 
 	DECLARE_WRITE8_MEMBER(out_f8_w);
 	DECLARE_WRITE8_MEMBER(out_f9_w);
@@ -240,6 +242,8 @@ WRITE8_MEMBER(notechan_state::out_f9_w)
 
 WRITE8_MEMBER(notechan_state::out_fa_w)
 {
+	m_oki->set_rom_bank(BIT(data, 5));
+
 	output().set_lamp_value(16, data & 1 );
 	output().set_lamp_value(17, data >> 1 & 1);
 	output().set_lamp_value(18, data >> 2 & 1);
