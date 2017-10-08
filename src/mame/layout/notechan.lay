@@ -2,7 +2,7 @@
 <mamelayout version="2">
 
 <!--
-		24-Lamps test panel
+		Test panel for Note Chance.
 		Written by Roberto Fresca.
 -->
 
@@ -327,13 +327,117 @@
 	</element>
 
 
+	<element name="L24" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 24">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L25" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 25">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L26" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 26">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L27" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 27">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L28" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 28">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L29" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 29">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L30" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 30">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L31" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 31">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+
 <!--
 	****** Screen & Position ******
 -->
 
 	<view name="Button Lamps">
-			<bounds left="0" top="0" right="4" bottom="4" />
-
+			<bounds left="0" top="0" right="4" bottom="3" />
 
 <!--
 	****** 1st row ******
@@ -420,6 +524,35 @@
 		</bezel>
 		<bezel name="lamp23" element="L23">
 			<bounds x="3.5" y="3.54" width="0.40" height="0.24" />
+		</bezel>
+
+<!--
+	****** 4th row ******
+-->
+
+		<bezel name="lamp24" element="L24">
+			<bounds x="0" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp25" element="L25">
+			<bounds x="0.5" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp26" element="L26">
+			<bounds x="1.0" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp27" element="L27">
+			<bounds x="1.5" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp28" element="L28">
+			<bounds x="2.0" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp29" element="L29">
+			<bounds x="2.5" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp30" element="L30">
+			<bounds x="3.0" y="3.8" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp31" element="L31">
+			<bounds x="3.5" y="3.8" width="0.40" height="0.24" />
 		</bezel>
 
 	</view>
