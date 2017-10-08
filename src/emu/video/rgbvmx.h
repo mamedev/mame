@@ -441,13 +441,6 @@ public:
 #endif
 	}
 
-	// Mask values to 9 bits
-	inline void mask_to_9bits()
-	{
-		const VECU32 mask = { 0x1ff, 0x1ff, 0x1ff, 0x1ff };
-		m_value = vec_and(m_value, mask);
-	}
-
 	inline void sign_extend(const u32 compare, const u32 sign)
 	{
 		const VECS32 compare_vec = { s32(compare), s32(compare), s32(compare), s32(compare) };
@@ -472,14 +465,6 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const s32 scale);
-
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
-	{
-		mul_imm(scale);
-		sra_imm(8);
-		add(other);
-		clamp_to_uint8();
-	}
 
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{

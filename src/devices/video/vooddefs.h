@@ -1368,7 +1368,6 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			{
 				// Need to check this, manual states 9 bits
 				fogColorLocal.sub(color);
-				fogColorLocal.mask_to_9bits();
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
 				//fg -= (GG);
@@ -1423,9 +1422,11 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			//fg = (fg * fogblend) >> 8;
 			//fb = (fb * fogblend) >> 8;
 			/* if fog_mult is 0, we add this to the original color */
+			fogColorLocal.scale_imm_and_clamp((int16_t)fogblend);
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				fogColorLocal.scale_imm_add_and_clamp(fogblend, color);
+				fogColorLocal.add(color);
+				fogColorLocal.clamp_to_uint8();
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -1435,7 +1436,6 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			/* otherwise this just becomes the new color */
 			else
 			{
-				fogColorLocal.scale_imm_and_clamp((int16_t)fogblend);
 				//color = fog;
 				//(RR) = fr;
 				//(GG) = fg;
@@ -2509,9 +2509,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
 			sub_val.set_a(0);
 
-		// Need to check this, manual states 9 bits
 		c_other.sub(sub_val);
-		c_other.mask_to_9bits();
 	}
 
 	/* blend RGB */
@@ -3041,9 +3039,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 			sub_val.set_a(0);
 
-		// Need to check this, manual states 9 bits
 		c_other.sub(sub_val);
-		c_other.mask_to_9bits();
 	}
 
 	/* blend RGB */

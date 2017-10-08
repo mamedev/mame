@@ -273,15 +273,6 @@ public:
 		m_b = (m_b < 0) ? 0 : (m_b > 255) ? 255 : m_b;
 	}
 
-	// Mask values to 9 bits
-	inline void mask_to_9bits()
-	{
-		m_a &= 0x1ff;
-		m_r &= 0x1ff;
-		m_g &= 0x1ff;
-		m_b &= 0x1ff;
-	}
-
 	inline void sign_extend(const u32 compare, const u32 sign)
 	{
 		if ((m_a & compare) == compare)
@@ -319,7 +310,6 @@ public:
 	void scale_imm_and_clamp(const s32 scale);
 	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other);
 
 	void cmpeq(const rgbaint_t& value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
 	void cmpgt(const rgbaint_t& value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
