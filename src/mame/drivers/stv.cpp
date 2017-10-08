@@ -3698,8 +3698,8 @@ GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 /*
 This is the known list of undumped ST-V games:
