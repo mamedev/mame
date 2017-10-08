@@ -538,6 +538,7 @@ public:
 	int get_track_index(uint32_t fad);
 	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
 	void cr_standard_return(uint16_t cur_status);
+	void mpeg_standard_return(uint16_t cur_status);
 	void cd_free_block(blockT *blktofree);
 	void cd_defragblocks(partitionT *part);
 	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
