@@ -98,7 +98,7 @@ TODO:
 #include "softlist.h"
 
 
-#define MAIN_CLOCK  15974400
+#define MAIN_CLOCK  XTAL_15_9744MHz
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
