@@ -107,12 +107,6 @@ public:
 		m_value = _mm_sub_epi32(m_value, color2.m_value);
 	}
 
-	// Subtract using 8 bit arithmetic
-	inline void sub_u8(const rgbaint_t& color)
-	{
-		m_value = _mm_sub_epi8(m_value, color.m_value);
-	}
-
 	inline void sub_imm(const s32 imm)
 	{
 		m_value = _mm_sub_epi32(m_value, _mm_set1_epi32(imm));
@@ -257,6 +251,12 @@ public:
 		m_value = _mm_packus_epi16(m_value, _mm_setzero_si128());
 		m_value = _mm_unpacklo_epi8(m_value, _mm_setzero_si128());
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
+	}
+
+	// Mask values to 9 bits
+	inline void mask_to_9bits()
+	{
+		m_value = _mm_and_si128(m_value, _mm_set1_epi32(0x1ff));
 	}
 
 	inline void sign_extend(const u32 compare, const u32 sign)

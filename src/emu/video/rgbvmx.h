@@ -237,14 +237,6 @@ public:
 		m_value = vec_sub(m_value, color2.m_value);
 	}
 
-	// Subtract using 8 bit arithmetic
-	inline void sub_u8(const rgbaint_t& color)
-	{
-		m_value = vec_sub(m_value, color.m_value);
-		const VECU32 limit = { 255, 255, 255, 255 };
-		m_value = vec_and(m_value, limit);
-	}
-
 	inline void sub_imm(const s32 imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
@@ -447,6 +439,13 @@ public:
 		m_value = VECS32(vec_mergeh(VECU8(zero), VECU8(m_value)));
 		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(m_value)));
 #endif
+	}
+
+	// Mask values to 9 bits
+	inline void mask_to_9bits()
+	{
+		const VECU32 mask = { 0x1ff, 0x1ff, 0x1ff, 0x1ff };
+		m_value = vec_and(m_value, mask);
 	}
 
 	inline void sign_extend(const u32 compare, const u32 sign)

@@ -1367,7 +1367,8 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
 				// Need to check this, manual states 9 bits
-				fogColorLocal.sub_u8(color);
+				fogColorLocal.sub(color);
+				fogColorLocal.mask_to_9bits();
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
 				//fg -= (GG);
@@ -2509,7 +2510,8 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 			sub_val.set_a(0);
 
 		// Need to check this, manual states 9 bits
-		c_other.sub_u8(sub_val);
+		c_other.sub(sub_val);
+		c_other.mask_to_9bits();
 	}
 
 	/* blend RGB */
@@ -3040,7 +3042,8 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 			sub_val.set_a(0);
 
 		// Need to check this, manual states 9 bits
-		c_other.sub_u8(sub_val);
+		c_other.sub(sub_val);
+		c_other.mask_to_9bits();
 	}
 
 	/* blend RGB */

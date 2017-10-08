@@ -93,16 +93,6 @@ public:
 		sub_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
-	// Subtract using 8 bit arithmetic
-	inline void sub_u8(const rgbaint_t& color)
-	{
-		sub_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
-		m_a &= 0xff;
-		m_r &= 0xff;
-		m_g &= 0xff;
-		m_b &= 0xff;
-	}
-
 	inline void sub_imm(const s32 imm)
 	{
 		sub_imm_rgba(imm, imm, imm, imm);
@@ -281,6 +271,15 @@ public:
 		m_r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;
 		m_g = (m_g < 0) ? 0 : (m_g > 255) ? 255 : m_g;
 		m_b = (m_b < 0) ? 0 : (m_b > 255) ? 255 : m_b;
+	}
+
+	// Mask values to 9 bits
+	inline void mask_to_9bits()
+	{
+		m_a &= 0x1ff;
+		m_r &= 0x1ff;
+		m_g &= 0x1ff;
+		m_b &= 0x1ff;
 	}
 
 	inline void sign_extend(const u32 compare, const u32 sign)
