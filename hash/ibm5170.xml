@@ -5734,6 +5734,48 @@ Missing files come here
 
 <!-- Game Disks -->
 
+	<software name="amazon">
+		<description>Amazon - Guardians of Eden</description>
+		<year>1992</year>
+		<publisher>Access Software</publisher>
+		<info name="developer" value="Access Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Amazon [Access Software] [1992] [3.5DD] [Disk 1 of 7].img" size="737280" crc="115b0ef9" sha1="a14bed2f2c1d87b376af765b96504579b6e6f109" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="8ddc4139" sha1="5fe9a81420c6385140e89fba96203f76c39520be" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="4174195b" sha1="13824eca4c7a9c332630b5507b2af5a5896e4915" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="3c509eb1" sha1="01d0ac1d53b35082dcca216fd8149a6676c6bd48" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="1b45eab6" sha1="95be46ca19e4b72c01b69c685f6acfd9fc816bae" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="9e1d32a2" sha1="4b988e31b5fdd579c8307a43dd894239d475b1dd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="e0812686" sha1="6a1948de3a11be14589a4d290a3be8ec535d4ec3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amd80gad">
 		<description>AMD 80C287 Game and Demo</description>
 		<year>199?</year>
@@ -8583,6 +8625,18 @@ Missing files come here
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="X-COM - Terror from the Deep (Europe) (Disk 4).img" size="1474560" crc="9a0c4b32" sha1="f896427120ff68cf560d295c5d898172f669f87a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zool2">
+		<description>Zool 2</description>
+		<year>1994</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Gremlin Graphics" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Zool 2 [Gremlin Graphics] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="86d3b79b" sha1="21c13abb1b5a6e2cc4c8542de39f6897058633a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

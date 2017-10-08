@@ -5436,6 +5436,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="captcom">
+		<description>The Adventures of Captain Comic</description>
+		<year>1988</year>
+		<publisher>Michael Denio</publisher>
+		<info name="user_notes" value="Requires EGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] The Adventures of Captain Comic [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6e6c920" sha1="57b2273a52f3b519768027fcf603ca6fce981e4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aaow">
 		<description>The Ancient Art of War</description>
 		<year>1984</year>
@@ -5531,6 +5543,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="B.A.T. [Ubi Soft] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="355d6947" sha1="0905d60a8887dbbf2d8f1e5c20a065bb7b6a6d03" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bttf2">
+		<description>Back to the Future Part II</description>
+		<year>1990</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="Images Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Back to the Future Part II [3.5DD] [Disk 1 of 1].img" size="737280" crc="1c100c7e" sha1="3328852909d9e15896ca8dfe3d103415b6f7ac4b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6066,6 +6090,21 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- bad graphics in CGA mode -->
+	<software name="drgnflam" supported="partial">
+		<description>Dragons of Flame</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="U.S. Gold" />
+		<info name="version" value="1.1" />
+		<info name="user_notes" value="Requires EGA or Tandy" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Dragons of Flame [3.5DD] [Disk 1 of 1].img" size="737280" crc="0684051f" sha1="58ab0c9460ab9249a999ab00aba930ec92ebe744" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="earlweav">
 		<description>Earl Weaver Baseball</description>
 		<year>1989</year>
@@ -6562,7 +6601,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="kotb">
-		<description>Kings of the Beach</description>
+		<description>Kings of the Beach (5.25")</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts" />
@@ -6574,6 +6613,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Kings of the Beach [Electronic Arts] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="fd79aea4" sha1="0e0f145db7a47a66670b02c88f7f641622771281" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kotb35" cloneof="kotb">
+		<description>Kings of the Beach (3.5")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Kings of the Beach [3.5DD] [Disk 1 of 1].img" size="737280" crc="aa00a72d" sha1="e4580a9604e3cf447bbd95435cecad3c57987d4e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6624,6 +6675,32 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="lsl3fr">
+		<description>Leisure Suit Larry 3: Patti la Passion à la Poursuite des Pectoraux Puissants (French)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Leisure Suit Larry III [3.5DD] [Disk 1 of 4].img" size="737280" crc="24cf75ad" sha1="c5493da42f73aac83009def3c55f9a96d38c29ec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Leisure Suit Larry III [3.5DD] [Disk 2 of 4].img" size="737280" crc="6b8c3569" sha1="bedd44302f3b6a89480d3862ed80880ab33a9625" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Leisure Suit Larry III [3.5DD] [Disk 3 of 4].img" size="737280" crc="bbdcb9ec" sha1="774a6c3c530ab69af55956155796f76541f0f8e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Leisure Suit Larry III [3.5DD] [Disk 4 of 4].img" size="737280" crc="296a93ce" sha1="69ecb28dec2f58226aa1ace523fc1631bb584d8d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lic2kill">
 		<description>Licence to Kill</description>
 		<year>1989</year>
@@ -6631,64 +6708,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Licence To Kill [5.25].img" size="368640" crc="725f268e" sha1="7e908d1cd8c10109859638113f99a5c0655b08ac" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="infocom">
-		<description>The Lost Treasures of Infocom</description>
-		<year>1991</year>
-		<publisher>Infocom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom, The (USA) (Disk 1).img" size="737280" crc="a492f4fd" sha1="939ca3d32761b7293cf7d3219603568a1647df46" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom, The (USA) (Disk 2).img" size="737280" crc="7ee8846b" sha1="7bc3ed5dede7cdc9cf25b4ed82deb415a84cd197" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom, The (USA) (Disk 3).img" size="737280" crc="7bef3a8f" sha1="b9372196640db8a6f1fd294d384c1408a6a1c9c0" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom, The (USA) (Disk 4).img" size="737280" crc="7a129d8d" sha1="7c0b07f1dfedb03cb8ddab679a5246eb2780d5bb" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom, The (USA) (Disk 5).img" size="737280" crc="ef482956" sha1="79570daae5786ceacffd16698512c7ae9b036b1c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="infocom2">
-		<description>The Lost Treasures of Infocom II</description>
-		<year>1992</year>
-		<publisher>Infocom</publisher>
-		<info name="version" value="1.00" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 1).img" size="737280" crc="596566c7" sha1="e01a35d006435c1f70d17b3f25496c6b64b846bd" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 2).img" size="737280" crc="ef055a56" sha1="a41b1947b604e60ae8db82f27e70cf84844982f4" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 3).img" size="737280" crc="658fb10e" sha1="4fd25943edb3d2fde097fb782320325e1608ce6d" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 4).img" size="737280" crc="5cf5d235" sha1="e5b8756f2de8140ae5475fe5843c0c28dcf7574b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6763,6 +6782,64 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="infocom">
+		<description>The Lost Treasures of Infocom</description>
+		<year>1991</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 1).img" size="737280" crc="a492f4fd" sha1="939ca3d32761b7293cf7d3219603568a1647df46" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 2).img" size="737280" crc="7ee8846b" sha1="7bc3ed5dede7cdc9cf25b4ed82deb415a84cd197" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 3).img" size="737280" crc="7bef3a8f" sha1="b9372196640db8a6f1fd294d384c1408a6a1c9c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 4).img" size="737280" crc="7a129d8d" sha1="7c0b07f1dfedb03cb8ddab679a5246eb2780d5bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 5).img" size="737280" crc="ef482956" sha1="79570daae5786ceacffd16698512c7ae9b036b1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infocom2">
+		<description>The Lost Treasures of Infocom II</description>
+		<year>1992</year>
+		<publisher>Infocom</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 1).img" size="737280" crc="596566c7" sha1="e01a35d006435c1f70d17b3f25496c6b64b846bd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 2).img" size="737280" crc="ef055a56" sha1="a41b1947b604e60ae8db82f27e70cf84844982f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 3).img" size="737280" crc="658fb10e" sha1="4fd25943edb3d2fde097fb782320325e1608ce6d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 4).img" size="737280" crc="5cf5d235" sha1="e5b8756f2de8140ae5475fe5843c0c28dcf7574b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lurkingh">
 		<description>The Lurking Horror</description>
 		<year>1987</year>
@@ -6775,12 +6852,23 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="mortviel">
-		<description>Le Manoir de Mortevielle</description>
+		<description>Le Manoir de Mortevielle (5.25")</description>
 		<year>1988</year>
 		<publisher>Lankhor</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Le Manoir de Mortevielle [5.25].img" size="368640" crc="4eebc049" sha1="1f9a8fe4978b76bf14c674a8f681c58e18fa4443" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mortviel35" cloneof="mortviel">
+		<description>Le Manoir de Mortevielle (3.5")</description>
+		<year>1988</year>
+		<publisher>Lankhor</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Le Manoir de Mortevielle [3.5DD] [Disk 1 of 1].img" size="737280" crc="b5bb2ea0" sha1="2fd1ef9cf2646ef6c6111b2b6c5a225faab9a243" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7463,6 +7551,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Super C (1990)(Konami)(Disk 2 of 2).dsk" size="368640" crc="c52c1b46" sha1="3e3f341b074e291c6847670409617b23764b3554" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski">
+		<description>Super Ski</description>
+		<year>1988</year>
+		<publisher>Microïds</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Super Ski [3.5DD] [Disk 1 of 1].img" size="737280" crc="d1a5e858" sha1="9dea0f4e447c1e1569543a2f333cd16bad469c7c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
