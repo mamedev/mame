@@ -1003,6 +1003,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
+	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
@@ -2875,6 +2876,7 @@ ROM_START( sfish2 )
 
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
+	ROM_FILL( 0x809c, 1, 'U' ) // TODO: hardcoded country code???
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
@@ -2887,9 +2889,9 @@ ROM_START( sfish2 )
 	ROM_LOAD16_WORD_SWAP( "mpr-18275.ic4",    0x0c00000, 0x0200000, CRC(7691deca) SHA1(aabb6b098963caf51f66aefa0a97aed7eb86c308) ) // good
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "cdp-00428", 0, SHA1(166cb5518fa5e0ab15d40dade70fa8913089dcd2) )
+	DISK_IMAGE_READONLY( "cdp-00428", 0, SHA1(166cb5518fa5e0ab15d40dade70fa8913089dcd2) )
 
-	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */ \
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */ 
 ROM_END
 
 ROM_START( sfish2j )
@@ -2897,6 +2899,8 @@ ROM_START( sfish2j )
 
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
+	ROM_FILL( 0x809c, 1, 'J' ) // TODO: hardcoded country code???
+
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
@@ -2908,7 +2912,7 @@ ROM_START( sfish2j )
 	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "cdp-00386b", 0, SHA1(2cb357a930bb7fa668949717ec6daaad2669d137) )
+	DISK_IMAGE_READONLY( "cdp-00386b", 0, SHA1(2cb357a930bb7fa668949717ec6daaad2669d137) )
 
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
@@ -3694,8 +3698,8 @@ GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 /*
 This is the known list of undumped ST-V games:
