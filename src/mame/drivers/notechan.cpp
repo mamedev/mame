@@ -81,35 +81,35 @@
 
   $000400-$0013B2:    Sample #01    'cling' sound. (credits)
   $0013B3-$0090B1:    Sample #02    music #1.
-  $0090B2-$00DD8D:    Sample #03
-  $00DD8E-$00EF2F:    Sample #04
-  $00EF30-$0101D0:    Sample #05
-  $0101D1-$011713:    Sample #06
-  $011714-$0129FF:    Sample #07
-  $012A00-$014136:    Sample #08
-  $014137-$015B57:    Sample #09
-  $015B58-$018E0E:    Sample #10
-  $018E0F-$01BB61:    Sample #11
-  $01BB62-$01F25C:    Sample #12
-  $01F25D-$01FA35:    Sample #13
-  $01FA36-$020372:    Sample #14
-  $020373-$0227E2:    Sample #15
-  $0227E3-$023E8D:    Sample #16
+  $0090B2-$00DD8D:    Sample #03    voice: unknown.
+  $00DD8E-$00EF2F:    Sample #04    voice: unknown.
+  $00EF30-$0101D0:    Sample #05    voice: unknown.
+  $0101D1-$011713:    Sample #06    voice: unknown.
+  $011714-$0129FF:    Sample #07    voice: unknown.
+  $012A00-$014136:    Sample #08    voice: unknown.
+  $014137-$015B57:    Sample #09    voice: unknown.
+  $015B58-$018E0E:    Sample #10    voice: unknown.
+  $018E0F-$01BB61:    Sample #11    voice: unknown.
+  $01BB62-$01F25C:    Sample #12    voice: unknown.
+  $01F25D-$01FA35:    Sample #13    voice: unknown.
+  $01FA36-$020372:    Sample #14    voice: unknown.
+  $020373-$0227E2:    Sample #15    voice: unknown.
+  $0227E3-$023E8D:    Sample #16    voice: unknown.
   $023E8E-$026FF7:    Sample #17    music #2
   $026FF8-$02A649:    Sample #18    music #3
   $02A64A-$02D8E9:    Sample #19    music #4
   $02D8EA-$02E635:    Sample #20    'boing' sound. (start)
-  $02E636-$02FFB6:    Sample #21
-  $02FFB7-$03171E:    Sample #22
-  $03171F-$031EC9:    Sample #23
-  $031ECA-$032A0D:    Sample #24
-  $032A0E-$0336E2:    Sample #25
-  $0336E3-$034748:    Sample #26
-  $034749-$03523C:    Sample #27
-  $03523D-$035B00:    Sample #28
+  $02E636-$02FFB6:    Sample #21    voice: unknown.
+  $02FFB7-$03171E:    Sample #22    voice: unknown.
+  $03171F-$031EC9:    Sample #23    voice: unknown.
+  $031ECA-$032A0D:    Sample #24    voice: unknown.
+  $032A0E-$0336E2:    Sample #25    voice: unknown.
+  $0336E3-$034748:    Sample #26    voice: unknown.
+  $034749-$03523C:    Sample #27    voice: unknown.
+  $03523D-$035B00:    Sample #28    voice: unknown.
   $035B01-$03BBE9:    Sample #29    music #5
-  $03BBEA-$03E9E1:    Sample #30
-  $03E9E2-$03F872:    Sample #31
+  $03BBEA-$03E9E1:    Sample #30    voice: unknown.
+  $03E9E2-$03F872:    Sample #31    voice: unknown.
 
 ****************************************************************************
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER(notechan_state::out_ff_w)
 *********************************************/
 
 static INPUT_PORTS_START( notechan )
-	PORT_START("IN0")
+	PORT_START("IN0")  // Port F8h
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
@@ -244,21 +244,21 @@ static INPUT_PORTS_START( notechan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
 
-	PORT_START("IN1")
+	PORT_START("IN1")  // Port F9h
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)  // Pulsed under reset, activates lamp 21 with 'boing' sound. Maybe it's 'start' button.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)  // Pulsing this input lites lamp 17 with 'cling' sound. Maybe it's 'coin-in' button. 
+	PORT_START("IN2")  // Port FAh
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)  // Note (1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)  // Note (2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)  // Note (3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_K)
 
-	PORT_START("IN3")
+	PORT_START("IN3")  // Port FBh
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
@@ -268,6 +268,22 @@ static INPUT_PORTS_START( notechan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
 
+/*
+  Inputs notes...
+
+  Port FAh:
+  
+  (1) Pulsed under reset, activates lamp 21 and triggers sample #20 (boing). Maybe it's
+      the 'start' button.
+
+  (2) Pulsing and keep pressed under reset, triggers the sample #01 (cling) and starts
+      a sequence of lamps (24-25-26). Then triggers sample #04 (voice). After a little
+	  while also triggers sample #05 (voice).
+
+  (3) Pulsing this input lites lamp 17 and triggers sample #01 (cling). Maybe it's
+      the 'coin-in' button. 
+
+*/  
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
