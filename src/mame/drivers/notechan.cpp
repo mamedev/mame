@@ -73,13 +73,15 @@
   
 ****************************************************************************
 
-  General Notes...
-
   Samples:
-  The waveform is ADPCM 4-bit mono, 8000 Hz.
-  Sampleset has sounds, music and voices at the following rom offsets:
 
-  $000400-$0013B2:    Sample #01    'cling' sound. (credits)
+  The waveform is ADPCM 4-bit mono, 8000 Hz.
+  There are two banks. The sampleset has sounds, music and voices
+  at the following rom offsets:
+
+  Bank #01 (00000-3FFFF)
+
+  $000400-$0013B2:    Sample #01    FX sound: 'cling' (credits).
   $0013B3-$0090B1:    Sample #02    music #1.
   $0090B2-$00DD8D:    Sample #03    voice: unknown.
   $00DD8E-$00EF2F:    Sample #04    voice: unknown.
@@ -98,7 +100,7 @@
   $023E8E-$026FF7:    Sample #17    music #2
   $026FF8-$02A649:    Sample #18    music #3
   $02A64A-$02D8E9:    Sample #19    music #4
-  $02D8EA-$02E635:    Sample #20    'boing' sound. (start)
+  $02D8EA-$02E635:    Sample #20    FX sound: 'boing' (start).
   $02E636-$02FFB6:    Sample #21    voice: unknown.
   $02FFB7-$03171E:    Sample #22    voice: unknown.
   $03171F-$031EC9:    Sample #23    voice: unknown.
