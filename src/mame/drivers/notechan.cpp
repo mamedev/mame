@@ -113,6 +113,42 @@
   $03BBEA-$03E9E1:    Sample #30    voice: unknown.
   $03E9E2-$03F872:    Sample #31    voice: unknown.
 
+  Bank #02 (40000-7FFFF)
+
+  $000400-$0013B2:    Sample #32    FX sound: 'cling' (credits).
+  $0013B3-$001B81:    Sample #33    FX sound.
+  $001B82-$0035CA:    Sample #34    voice: unknown.
+  $0035CB-$003D99:    Sample #35    FX sound.
+  $003D9A-$004C09:    Sample #36    voice: unknown.
+  $004C0A-$004ED7:    Sample #37    FX sound.
+  $004ED8-$0050CD:    Sample #38    FX sound.
+  $0050CE-$005DC9:    Sample #39    voice: unknown.
+  $005DCA-$00729A:    Sample #40    voice: unknown.
+  $00729B-$008A02:    Sample #41    voice: unknown.
+  $008A03-$00974E:    Sample #42    FX sound: 'boing' (start).
+  $00974F-$009E5E:    Sample #43    voice: unknown.
+  $009E5F-$00D476:    Sample #44    music #6
+  $00D477-$00F156:    Sample #45    music #7
+  $00F157-$00F90A:    Sample #46    voice: unknown.
+  $00F90B-$011032:    Sample #47    voice: unknown.
+  $011033-$01194B:    Sample #48    voice: unknown.
+  $01194C-$012E94:    Sample #49    voice: unknown.
+  $012E95-$01429D:    Sample #50    voice: unknown.
+  $01429E-$015D2E:    Sample #51    FX sound.
+  $015D2F-$0194AE:    Sample #52    FX sound.
+  $0194AF-$01B0FE:    Sample #53    voice: unknown.
+  $01B0FF-$01D362:    Sample #54    voice: unknown.
+  $01D363-$020087:    Sample #55    voice: unknown.
+  $020088-$02305F:    Sample #56    voice: unknown.
+  $023060-$025F98:    Sample #57    voice: unknown.
+  $025F99-$027EE0:    Sample #58    FX sound.
+  $027EE1-$029B08:    Sample #59    music #8
+  $029B09-$02C6CF:    Sample #60    music #9
+  $02C6D0-$02E370:    Sample #61    voice: unknown.
+  $02E371-$030EDE:    Sample #62    voice: unknown.
+  $030EDF-$0333F8:    Sample #63    voice: unknown.
+
+ 
 ****************************************************************************
 
   About lamps...
