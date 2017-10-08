@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-Compiled by K1W1 and Telanus
+Initial compilation work by K1W1 and Telanus
 -->
 
 <!--
@@ -48,6 +48,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
  - Voodoo Island*
  - Wizard and the Princess
  - Word Spinner
+
+-->
+<!--
+
+    IPF Dumps Missing
+    Rick Dangerous (SPS 3042)
 
 -->
 <softwarelist name="ibm5150" description="IBM PC disk images">
@@ -5329,7 +5335,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- Dos based Games -->
+	<!-- DOS-based games -->
 
 	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
 		<description>2400 A.D.</description>
@@ -5432,6 +5438,30 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Ace of Aces [Accolade] [1987] [3.5].img" size="737280" crc="9f5d1734" sha1="db70bf0ede554db32c8bf3142b199e627f7ecebd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actionfg">
+		<description>Action Fighter (Kixx)</description>
+		<year>1989</year>
+		<publisher>KIXX</publisher>
+		<info name="SPS Release" value="3040" />
+		<!-- budget, standalone -->
+		<!-- (Amiga, OCS, PAL) -->
+		<!-- (PC, PAL) -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="978321">
+				<rom name="(sps3040)actionfighter (amiga + pc disk).ipf" size="978321" crc="795e1dfd" sha1="8fa4beb3cd9150249821f2d90b3c572bab4b3e11" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="918252">
+				<rom name="(sps3040)actionfighter (pc disk).ipf" size="918252" crc="809bfb3b" sha1="a6b2a61b6fd30f671706bf3da37f479bf24fd0d3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5693,6 +5723,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Battle Chess (1988)(Interplay)(Disk 2 of 2)[cp codebook].dsk" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibpaint">
+		<description>Bible Paint and Learn</description>
+		<year>1992</year>
+		<publisher>Ark Multimedia Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="paint_learn.img" size="737280" crc="4e9572cd" sha1="9073a9858bd94ec23ca1b3cd4497e106268568ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6119,6 +6160,27 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="f19">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>F-19 Stealth Fighter (Version 435.04)</description>
+		<year>1988</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="4341A" />
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="737280">
+				<rom name="diska.img" size="737280" crc="a12af0f0" sha1="bcc52d222f1067fb90b2c9c53c8da14b350e60d6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="disk_serial" value="4341B" />
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="737280">
+				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferrarf1">
 		<description>Ferrari Formula One</description>
 		<year>1989</year>
@@ -6338,6 +6400,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Home Alone [Capstone] [1991] [3.5].img" size="737280" crc="4cb8e8c4" sha1="27929ce82de6cbfaa5e45ce3afcde086efe8244a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rylvania">
+		<description>Horror of Rylvania</description>
+		<year>1993</year>
+		<publisher>Adventions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="rylvania.img" size="737280" crc="ea106aa8" sha1="4fe870233b521ccdc912e5a4476e52bdc03d6f5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7381,6 +7454,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="simcityc">
+		<description>SimCity Classic</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simearth">
 		<description>SimEarth: The Living Planet</description>
 		<year>1990</year>
@@ -7519,6 +7608,40 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Strike Force.img" size="368640" crc="285ff956" sha1="d7d364682d17ca3958f100cb82f544af5807ca43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf">
+		<description>Street Fighter</description>
+		<year>1988</year>
+		<publisher>Capcom Co., Ltd.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="street fighter.img" size="737280" crc="838baa9e" sha1="ef14c9638208e04fcc819ebc7908c7611a929624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfa" cloneof="sf">
+		<description>Street Fighter (Kixx)</description>
+		<!-- budget, standalone -->
+		<!-- (Amiga, OCS, PAL) -->
+		<!-- (PC, PAL) -->
+		<year>1988</year>
+		<publisher>KIXX</publisher>
+		<info name="SPS Release" value="3041" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="991457">
+				<rom name="(sps3041)streetfighter (amiga + pc disk).ipf" size="991457" crc="218d38da" sha1="045b4c14dc1523f33b55e2986357a07908caa8a6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="918252">
+				<rom name="(sps3041)streetfighter (pc disk).ipf" size="918252" crc="ae97b7e1" sha1="9fc6cebe832e0e19192c428fb93f4ad9a827b2a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7709,6 +7832,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="unnkulia">
+		<description>Unnkulia Zero: The Search for Amanda</description>
+		<year>1993</year>
+		<publisher>Adventions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="unnkulia.img" size="737280" crc="b5332f4b" sha1="052d7068981bfef95fb6b6bd1d35e6f3e3c22e61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wayneg">
 		<description>Wayne Gretzky Hockey (5.25")</description>
 		<year>1989</year>
@@ -7775,6 +7909,39 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wndrland">
+		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
+		<description>Wonderland</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="developer" value="Magnetic Scrolls" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="d2cccf93" sha1="1749b90c93d9b9971fe0105db33698cf235ab917" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="cee9a425" sha1="d875185535f46cb51a0ce290c0e56859ab9ed8d3" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="67d63e0a" sha1="698497d30cbff3057a232ba94f818417b216791f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk4.img" size="737280" crc="3d98b783" sha1="a45ba0faea1e62757582449ce86c3b76e36a4b10" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

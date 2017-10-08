@@ -1,12 +1,5 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!--
-Missing files come here
-
-    IPF Dumps Missing
-    Rick Dangerous (SPS 3042)
-
--->
 <softwarelist name="ibm5170" description="IBM PC/AT disk images">
 
 	<software name="advdiags">
@@ -5866,17 +5859,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="bibpaint">
-		<description>Bible Paint and Learn</description>
-		<year>1992</year>
-		<publisher>Ark Multimedia Publishing</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="paint_learn.img" size="737280" crc="4e9572cd" sha1="9073a9858bd94ec23ca1b3cd4497e106268568ea" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bmenace">
 		<description>Bio Menace</description>
 		<year>1993</year>
@@ -6667,27 +6649,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="f19">
-		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>F-19 Stealth Fighter (Version 435.04)</description>
-		<year>1988</year>
-		<publisher>MicroProse</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="disk_serial" value="4341A" />
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="737280">
-				<rom name="diska.img" size="737280" crc="a12af0f0" sha1="bcc52d222f1067fb90b2c9c53c8da14b350e60d6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="disk_serial" value="4341B" />
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="737280">
-				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -6857,17 +6818,6 @@ Missing files come here
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk4.img" size="1474560" crc="969dae3c" sha1="0627faa028b550c931b73de88598cecce138e443" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rylvania">
-		<description>Horror of Rylvania</description>
-		<year>1993</year>
-		<publisher>Adventions</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="rylvania.img" size="737280" crc="ea106aa8" sha1="4fe870233b521ccdc912e5a4476e52bdc03d6f5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7750,17 +7700,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="sf">
-		<description>Street Fighter</description>
-		<year>1988</year>
-		<publisher>Capcom Co., Ltd.</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="street fighter.img" size="737280" crc="838baa9e" sha1="ef14c9638208e04fcc819ebc7908c7611a929624" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="simant">
 		<description>SimAnt</description>
 		<year>1991</year>
@@ -7773,22 +7712,6 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simantd2.img" size="737280" crc="77b35cd5" sha1="4283c141e768cc27f2b1d5d8d33a8181a23f89ce" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simcityc">
-		<description>SimCity Classic</description>
-		<year>1992</year>
-		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8221,17 +8144,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="unnkulia">
-		<description>Unnkulia Zero: The Search for Amanda</description>
-		<year>1993</year>
-		<publisher>Adventions</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="unnkulia.img" size="737280" crc="b5332f4b" sha1="052d7068981bfef95fb6b6bd1d35e6f3e3c22e61" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vanslug">
 		<!-- Marked as bad, could do with another dump to make sure it's correct-->
 		<description>Vanslug: X Mission - The Way of Super Warrior</description>
@@ -8566,39 +8478,6 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wndrland" supported="no">
-		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
-		<description>Wonderland</description>
-		<year>1990</year>
-		<publisher>Virgin Mastertronic</publisher>
-		<info name="developer" value="Magnetic Scrolls" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="d2cccf93" sha1="1749b90c93d9b9971fe0105db33698cf235ab917" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="cee9a425" sha1="d875185535f46cb51a0ce290c0e56859ab9ed8d3" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk3.img" size="737280" crc="67d63e0a" sha1="698497d30cbff3057a232ba94f818417b216791f" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk4.img" size="737280" crc="3d98b783" sha1="a45ba0faea1e62757582449ce86c3b76e36a4b10" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -9034,54 +8913,6 @@ Missing files come here
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- IPF's Dual format-->
-	<software name="actfgkix" supported="no">
-		<description>Action Fighter (Kixx)</description>
-		<year>1989</year>
-		<publisher>KIXX</publisher>
-		<info name="SPS Release" value="3040" />
-		<!-- budget, standalone -->
-		<!-- (Amiga, OCS, PAL) -->
-		<!-- (PC, PAL) -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="978321">
-				<rom name="(sps3040)actionfighter (amiga + pc disk).ipf" size="978321" crc="795e1dfd" sha1="8fa4beb3cd9150249821f2d90b3c572bab4b3e11" offset="0"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="918252">
-				<rom name="(sps3040)actionfighter (pc disk).ipf" size="918252" crc="809bfb3b" sha1="a6b2a61b6fd30f671706bf3da37f479bf24fd0d3" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sf1" supported="no">
-		<description>Street Fighter (Kixx)</description>
-		<!-- budget, standalone -->
-		<!-- (Amiga, OCS, PAL) -->
-		<!-- (PC, PAL) -->
-		<year>199?</year>
-		<publisher>KIXX</publisher>
-		<info name="SPS Release" value="3041" />
-
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="991457">
-				<rom name="(sps3041)streetfighter (amiga + pc disk).ipf" size="991457" crc="218d38da" sha1="045b4c14dc1523f33b55e2986357a07908caa8a6" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="918252">
-				<rom name="(sps3041)streetfighter (pc disk).ipf" size="918252" crc="ae97b7e1" sha1="9fc6cebe832e0e19192c428fb93f4ad9a827b2a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
