@@ -43,6 +43,14 @@
             http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
             (page 39,40 of pdf contain memory map)
 
+        This "Draft Version 1.0" reference claims a 10MHz clock for the
+        MC68000 and a 5MHz clock for the Am9513; though the original design
+        may have specified a 10MHz CPU, and though this speed may have been
+        realized in later models, schematics suggest the system's core
+        devices actually run at 8/4MHz (divided from a 16MHz XTAL), which
+        lets the 1.0 monitor ROM's Am9513 configuration generate a more
+        plausible baud rate.
+
         04/12/2009 Skeleton driver.
 
         04/04/2011 Modernised, added terminal keyboard.
@@ -109,10 +117,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( sun1 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-	MCFG_DEVICE_ADD("timer", AM9513, 4000000) // supposedly XTAL_10MHz / 2, but that produces blatantly incorrect output rates
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL_16MHz / 4)
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Watchdog; generates BERR/Reset
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // User timer
@@ -122,7 +130,7 @@ static MACHINE_CONFIG_START( sun1 )
 	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txcb_w))
 
-	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, 0)
+	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, XTAL_16MHz / 4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
