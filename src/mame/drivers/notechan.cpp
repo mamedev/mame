@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( notechan )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH)  // match the real sounds
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
