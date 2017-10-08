@@ -2,12 +2,17 @@
 // copyright-holders:Roberto Fresca
 /***************************************************************************
 
-  Note Chance
-  Banpresto, 199?
-
-  Screenless system.
+  NOTE CHANCE
+  Banpresto, 1995
 
   Driver by Roberto Fresca.
+
+  System type:       Screenless prize machine.
+  Manufacturer:      BANDAI NAMCO Entertainment (Banpresto Label).
+  Release:           1995.
+  Number of players: 1 (single player).
+
+  Reference video: https://www.youtube.com/watch?v=TSIWO75udL8
 
 ****************************************************************************
 
@@ -74,7 +79,7 @@
   The waveform is ADPCM 4-bit mono, 8000 Hz.
   Sampleset has sounds, music and voices at the following rom offsets:
 
-  $000400-$0013B2:    Sample #01    'cling' sound.
+  $000400-$0013B2:    Sample #01    'cling' sound. (credits)
   $0013B3-$0090B1:    Sample #02    music #1.
   $0090B2-$00DD8D:    Sample #03
   $00DD8E-$00EF2F:    Sample #04
@@ -93,7 +98,7 @@
   $023E8E-$026FF7:    Sample #17    music #2
   $026FF8-$02A649:    Sample #18    music #3
   $02A64A-$02D8E9:    Sample #19    music #4
-  $02D8EA-$02E635:    Sample #20    'boing' sound.
+  $02D8EA-$02E635:    Sample #20    'boing' sound. (start)
   $02E636-$02FFB6:    Sample #21
   $02FFB7-$03171E:    Sample #22
   $03171F-$031EC9:    Sample #23
@@ -229,9 +234,9 @@ static INPUT_PORTS_START( notechan )
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)  // pulsed under reset, activates lamp 21 with 'boing' sound.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)  // Pulsed under reset, activates lamp 21 with 'boing' sound. Maybe it's 'start' button.
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)  // pulsing this input lites lamp 17 with 'cling' sound. 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)  // Pulsing this input lites lamp 17 with 'cling' sound. Maybe it's 'coin-in' button. 
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
@@ -315,4 +320,4 @@ ROM_END
 *********************************************/
 
 //     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY      FULLNAME      FLAGS                 LAYOUT
-GAMEL( 199?, notechan, 0,      notechan, notechan, notechan_state, 0,    ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_test24sl )
+GAMEL( 1995, notechan, 0,      notechan, notechan, notechan_state, 0,    ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_test24sl )
