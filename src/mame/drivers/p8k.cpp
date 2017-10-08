@@ -42,10 +42,8 @@
     TODO:
       * properly implement Z80 daisy chain in 16 bit board
       * Find out how to enter hardware check on 16 bit board
-      * Find out how interrupts work on 16 bit board, an attempt to use Z8000_VI
-        (needed for daisy-chain) results in a crash. Once that is fixed and working,
-        then the use of sio0 can be attempted.
-      * Need full 16-bit schematics.
+      * Vectored interrupts use Z8000_VI, but this results in a crash. Once
+        that is fixed and working, then the use of sio0 can be attempted.
 
 ****************************************************************************/
 
