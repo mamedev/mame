@@ -2016,7 +2016,7 @@ ROM_START( glocr360j )
 	ROMX_LOAD( "epr-13065.107", 0xc00007, 0x80000, CRC(8937a655) SHA1(d38726a8a6fe68a002ac8d17f70ab83c2f814aa2), ROM_SKIP(7) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )        // Z80 sound CPU
-	ROM_LOAD( "epr-13328.102",  0x008000, 0x08000, BAD_DUMP CRC(33baec38) SHA1(4faf3b0c244267bc34fb36a420b84035599f4e51) ) // dumped at half size should be 27c512 (64k)
+	ROM_LOAD( "epr-13328.102",  0x010000, 0x08000, CRC(751cb2b1) SHA1(bf8aa50e3b9be6d63a3fe9d7b565fad95128f6f4) )
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
 	ROM_LOAD( "epr-13036.107",  0x000000, 0x80000, CRC(7890c26c) SHA1(97e0678bb571de5cf732804f8909e5cbd24980f1) )
@@ -2813,7 +2813,7 @@ GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, gforce2
 GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // BAD_DUMP Z80 sound CPU rom
+GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
 GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
