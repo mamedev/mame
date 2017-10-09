@@ -2373,6 +2373,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_SCU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
+		MAME_DIR .. "src/devices/machine/sega_scu.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
 ---------------------------------------------------
 

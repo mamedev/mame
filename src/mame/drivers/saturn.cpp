@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 //  AM_RANGE(0x22000000, 0x24ffffff) AM_ROM // Cartridge area mirror
@@ -546,14 +546,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, sat_console_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, sat_console_state )
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, sat_console_state )
-	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -595,63 +587,9 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
-void saturn_state::debug_scuirq_command(int ref, const std::vector<std::string> &params)
-{
-	debugger_console con = machine().debugger().console();
-	const char *const irqnames[16] = {
-		"VBlank-in", "VBlank-out", "HBlank-in", "Timer 0", "Timer 1", "SCU DSP end", "Sound request", "SMPC", "Pad", "DMA lv 2", "DMA lv 1", "DMA lv 0", "DMA illegal", "VDP1 end", "A-Bus" };
-
-
-	for(int irq_lv = 0;irq_lv<16;irq_lv++)
-		con.printf("%s irq enabled: %s\n",irqnames[irq_lv],(m_scu.ism & (1 << irq_lv)) == 0 ? "1" : "0");
-}
-
-void saturn_state::debug_scudma_command(int ref, const std::vector<std::string> &params)
-{
-	debugger_console con = machine().debugger().console();
-
-	for(int ch=0;ch<3;ch++)
-	{
-		con.printf("DMA LV%02d: src = %08x dst = %08x size = %08x\n",ch,m_scu.src[ch],m_scu.dst[ch],m_scu.size[ch]);
-		con.printf("    adds: src = %08x dst = %08x\n",m_scu.src_add[ch],m_scu.dst_add[ch]);
-		con.printf("indirect: index = %08x\n",m_scu.index[ch]);
-		con.printf("  enable: mask = %08x start factor = %08x\n",m_scu.enable_mask[ch],m_scu.start_factor[ch]);
-	}
-}
-
-void saturn_state::debug_help_command(int ref, const std::vector<std::string> &params)
-{
-	debugger_console con = machine().debugger().console();
-
-	con.printf("Available Saturn commands:\n");
-	con.printf("   saturn scudma -- pretty prints current state of SCU DMA registers\n");
-	con.printf("   saturn scuirq -- pretty prints current state of SCU IRQ registers\n");
-	con.printf("   saturn help -- this list\n");
-}
-
-
-void saturn_state::debug_commands(int ref, const std::vector<std::string> &params)
-{
-	if (params.size() < 1)
-		return;
-
-	if (params[0] == "scudma")
-		debug_scudma_command(ref, params);
-	else if (params[0] == "scuirq")
-		debug_scuirq_command(ref, params);
-	else if (params[0] == "help")
-		debug_help_command(ref, params);
-}
-
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
-{
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		using namespace std::placeholders;
-		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2));
-	}
-
+{	
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
@@ -708,7 +646,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
@@ -736,9 +674,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	// don't let the slave cpu and the 68k go anywhere
 	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	scu_reset();
 
 	m_en_68k = 0;
 
@@ -861,12 +796,8 @@ static MACHINE_CONFIG_START( saturn )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
-	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
-	MCFG_CPU_DATA_MAP(scudsp_data)
-	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(saturn_state, scudsp_end_w))
-	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
-	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
+	MCFG_SEGA_SCU_ADD("scu")
+	sega_scu_device::static_set_hostcpu(*device, "maincpu");
 
 //  SH-1
 
@@ -884,7 +815,7 @@ static MACHINE_CONFIG_START( saturn )
 	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
 	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
 	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(DEVWRITELINE("scu", sega_scu_device, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
@@ -908,7 +839,7 @@ static MACHINE_CONFIG_START( saturn )
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
 	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(saturn_state, scsp_to_main_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1000,7 +931,7 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
+//	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

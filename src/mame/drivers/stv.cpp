@@ -425,7 +425,7 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
+//	m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
 	m_backupram = std::make_unique<uint8_t[]>(0x8000);
 	memset(m_backupram.get(), 0, sizeof(uint8_t) * 0x8000);
 
@@ -999,7 +999,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
@@ -1010,14 +1010,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, stv_state )
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
-	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -1088,12 +1080,8 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
-	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
-	MCFG_CPU_DATA_MAP(scudsp_data)
-	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(saturn_state, scudsp_end_w))
-	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
-	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
+	MCFG_SEGA_SCU_ADD("scu")
+	sega_scu_device::static_set_hostcpu(*device, "maincpu");
 
 	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
 	smpc_hle_device::static_set_region_code(*device, 0);
@@ -1108,7 +1096,7 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
 	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
 	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE(saturn_state, smpc_irq_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(DEVWRITELINE("scu", sega_scu_device, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
@@ -1133,7 +1121,7 @@ static MACHINE_CONFIG_START( stv )
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
 	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(saturn_state, scsp_to_main_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1215,7 +1203,6 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	// don't let the slave cpu and the 68k go anywhere
 	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	std::string region_tag;
 	if (m_cart1)
@@ -1246,8 +1233,6 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	stvcd_reset();
 
 	m_prev_gamebank_select = 0xff;
-
-	scu_reset();
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
@@ -1291,7 +1276,7 @@ MACHINE_START_MEMBER(stv_state,stv)
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
-	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));
