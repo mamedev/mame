@@ -27,17 +27,9 @@ public:
 	// construction/destruction
 	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 	DECLARE_READ8_MEMBER(hw_input_gate_r);
 	DECLARE_WRITE8_MEMBER(fdd_select_w);
 	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
 protected:
 	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -47,6 +39,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0xa7; }
 	virtual void control_w(uint8_t data) override;
@@ -55,6 +51,10 @@ protected:
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+
 	static const device_timer_id TIMER_RESET = 0;
 
 	required_device<cpu_device> m_cpu;
@@ -87,16 +87,16 @@ public:
 	// construction/destruction
 	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_READ8_MEMBER(gide_r);
 	DECLARE_WRITE8_MEMBER(gide_w);
 
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_device<ata_interface_device> m_ata;

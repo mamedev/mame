@@ -44,6 +44,7 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6801.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 

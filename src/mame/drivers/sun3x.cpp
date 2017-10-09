@@ -137,6 +137,7 @@
 #include "formats/pc_dsk.h"
 #include "machine/ncr539x.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 

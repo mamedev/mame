@@ -347,8 +347,8 @@ ROM_END
 /* Driver */
 //   YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME                FLAGS
 COMP(1978, rm380z,     0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D",    MACHINE_BTANB_FLAGS)
-COMP(1978, rm380z34e,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E",    MACHINE_BTANB_FLAGS)
+COMP(1978, rm380z34d,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
 COMP(1981, rm480z,     rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP(1981, rm480za,    rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 

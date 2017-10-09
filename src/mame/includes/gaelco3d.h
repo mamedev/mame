@@ -12,6 +12,8 @@
 #include "video/poly.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "screen.h"
 
@@ -69,6 +71,7 @@ public:
 		m_tms(*this, "tms"),
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
 		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
@@ -85,14 +88,19 @@ public:
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
 	optional_ioport_array<4> m_analog;
 
-	uint16_t m_sound_data;
 	uint8_t m_sound_status;
 	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
+	uint32_t m_fp_analog_ports[2];
+	uint32_t m_fp_lenght[2];
+	uint8_t m_fp_clock;
+	uint8_t m_fp_state;
 	uint8_t m_framenum;
 	timer_device *m_adsp_autobuffer_timer;
 	uint8_t m_adsp_ireg;
@@ -107,35 +115,28 @@ public:
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE32_MEMBER(irq_ack32_w);
-	DECLARE_WRITE16_MEMBER(sound_data_w);
-	DECLARE_READ16_MEMBER(sound_data_r);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
-	DECLARE_WRITE16_MEMBER(analog_port_clock_w);
-	DECLARE_WRITE16_MEMBER(analog_port_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
 	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
 	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
 	DECLARE_WRITE8_MEMBER(tms_iack_w);
-	DECLARE_WRITE16_MEMBER(tms_reset_w);
-	DECLARE_WRITE16_MEMBER(tms_irq_w);
-	DECLARE_WRITE16_MEMBER(tms_control3_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
 	DECLARE_WRITE16_MEMBER(tms_comm_w);
 	DECLARE_WRITE16_MEMBER(adsp_control_w);
 	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
-	DECLARE_WRITE32_MEMBER(radikalb_lamp_w);
-	DECLARE_WRITE32_MEMBER(unknown_137_w);
-	DECLARE_WRITE32_MEMBER(unknown_13a_w);
+	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_137_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_13a_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
 	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
 	DECLARE_READ16_MEMBER(eeprom_data_r);
-	DECLARE_READ32_MEMBER(eeprom_data32_r);
-	DECLARE_WRITE16_MEMBER(eeprom_data_w);
-	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
-	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
 	DECLARE_DRIVER_INIT(gaelco3d);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -144,8 +145,9 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
+	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
 };

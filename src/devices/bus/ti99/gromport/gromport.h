@@ -25,12 +25,12 @@ struct pcb_type
 class ti99_cartridge_device;
 class cartridge_connector_device;
 
-class gromport_device : public bus8z_device, public device_slot_interface
+class gromport_device : public device_t, public device_slot_interface
 {
 public:
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
@@ -61,9 +61,13 @@ private:
 	int m_romgq;
 };
 
-class cartridge_connector_device : public bus8z_device
+class cartridge_connector_device : public device_t
 {
 public:
+	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
+	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
+
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 

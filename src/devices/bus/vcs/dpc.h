@@ -73,11 +73,6 @@ public:
 	// construction/destruction
 	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_reset() override;
-
 	required_device<dpc_device> m_dpc;
 
 	// reading and writing
@@ -85,6 +80,12 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 	virtual void setup_addon_ptr(uint8_t *ptr) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
 };
 
 

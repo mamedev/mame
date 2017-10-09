@@ -14,6 +14,7 @@
 #include "softlist.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "formats/kim1_cas.h"
 

@@ -143,7 +143,7 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
 	device_slot_option *option(const char *name) const;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
-	device_t *get_card_device() { return m_card_device; }
+	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	const char *slot_name() const { return device().tag() + 1; }
 

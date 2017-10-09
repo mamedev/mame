@@ -4715,6 +4715,17 @@
 		</part>
 	</software>
 
+	<software name="hangit">
+		<description>Hang It!</description>
+		<year>1982</year>
+		<publisher>Peaksoft</publisher>
+		<part name="cass1" interface="dragon_cass">
+			<dataarea name="cass" size="15854">
+				<rom name="Hang It (198x)(Peaksoft)[!].cas" size="15854" crc="050a0a95" sha1="05974556843c454c9814535bdabc55eb11d3ecec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hbdaydrgn">
 		<description>Happy Birthday Dragon</description>
 		<year>1983</year>

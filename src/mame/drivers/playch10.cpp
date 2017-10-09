@@ -296,6 +296,7 @@ Notes & Todo:
 
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
 
@@ -307,9 +308,9 @@ Notes & Todo:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(playch10_state::up8w_w)
+WRITE_LINE_MEMBER(playch10_state::up8w_w)
 {
-	m_up_8w = data & 1;
+	m_up_8w = state;
 }
 
 READ8_MEMBER(playch10_state::ram_8w_r)
@@ -361,18 +362,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS") AM_WRITE(pc10_SDCS_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1") AM_WRITE(pc10_CNTRLMASK_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SW2") AM_WRITE(pc10_DISPMASK_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(pc10_detectclr_r, pc10_SOUNDMASK_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(pc10_GAMERES_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(pc10_GAMESTOP_w)
-	AM_RANGE(0x06, 0x07) AM_WRITENOP
-	AM_RANGE(0x08, 0x08) AM_WRITE(pc10_NMIENABLE_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(pc10_DOGDI_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(pc10_PPURES_w)
-	AM_RANGE(0x0b, 0x0e) AM_WRITE(pc10_CARTSEL_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(up8w_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("SW2")
+	AM_RANGE(0x03, 0x03) AM_READ(pc10_detectclr_r)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
+	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
 	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_SHARE("timedata")
 ADDRESS_MAP_END
 
@@ -655,6 +650,20 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
 
+	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, sdcs_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, cntrl_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, disp_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(playch10_state, sound_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
+
+	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, dog_di_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, ppu_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(playch10_state, up8w_w))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)

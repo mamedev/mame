@@ -224,12 +224,6 @@ WRITE8_MEMBER(xain_state::cpuB_bankswitch_w)
 	membank("bank2")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(xain_state::sound_command_w)
-{
-	m_soundlatch->write(space,offset,data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
-
 WRITE8_MEMBER(xain_state::main_irq_w)
 {
 	switch (offset)
@@ -303,7 +297,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(scrollyP0_w)
-	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(sound_command_w)
+	AM_RANGE(0x3a08, 0x3a08) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
@@ -485,6 +479,7 @@ static MACHINE_CONFIG_START( xsleena )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))

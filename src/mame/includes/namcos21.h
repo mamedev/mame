@@ -6,6 +6,7 @@
 
 #include "namcos2.h"
 #include "machine/namcoio_gearbox.h"
+#include "machine/timer.h"
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480

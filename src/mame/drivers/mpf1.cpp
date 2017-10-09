@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8, mpf1_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1_step, AS_DECRYPTED_OPCODES, 8, mpf1_state )
+static ADDRESS_MAP_START( mpf1_step, AS_OPCODES, 8, mpf1_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(step_r)
 ADDRESS_MAP_END
 

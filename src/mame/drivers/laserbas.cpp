@@ -62,6 +62,7 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"

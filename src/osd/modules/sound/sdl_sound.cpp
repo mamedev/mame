@@ -359,6 +359,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 		if (LOG_SOUND)
 			fprintf(sound_log, "Underflow at sdl_callback: SPP=%d SBI=%d(%d) Len=%d\n", (int)thiz->stream_playpos, (int)sb_in, (int)thiz->stream_buffer_in, (int)len);
 
+		memset(stream, 0, len);
 		return;
 	}
 	else if ((thiz->stream_playpos+len) > thiz->stream_buffer_size)

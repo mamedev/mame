@@ -45,30 +45,35 @@ enum
 
 DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
 DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
-
+DEFINE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device, "fe2010_pit", "Faraday FE2010 PIT")
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pit8253_device(mconfig, PIT8253, tag, owner, clock)
+	pit8253_device(mconfig, PIT8253, tag, owner, clock, I8253)
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int chip_type) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_clk0(0),
 	m_clk1(0),
 	m_clk2(0),
 	m_out0_handler(*this),
 	m_out1_handler(*this),
-	m_out2_handler(*this)
+	m_out2_handler(*this),
+	m_type(chip_type)
 {
 }
 
 
-pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pit8253_device(mconfig, PIT8254, tag, owner, clock)
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, PIT8254, tag, owner, clock, I8254)
 {
 }
 
+fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, FE2010_PIT, tag, owner, clock, FE2010)
+{
+}
 
 pit8253_device::pit8253_timer *pit8253_device::get_timer(int which)
 {
@@ -550,6 +555,8 @@ void pit8253_device::simulate2(pit8253_timer *timer, int64_t elapsed_cycles)
 			/* Gate low or mode control write forces output high */
 			set_output(timer, 1);
 			cycles_to_output = CYCLES_NEVER;
+			if(m_type == FE2010)
+				load_counter_value(timer);
 		}
 		else
 		{
@@ -734,7 +741,7 @@ void pit8253_device::update(pit8253_timer *timer)
 uint16_t pit8253_device::masked_value(pit8253_timer *timer)
 {
 	LOG2(("masked_value\n"));
-	if (CTRL_MODE(timer->control) == 3)
+	if ((CTRL_MODE(timer->control) == 3) && (m_type != FE2010))
 		return timer->value & 0xfffe;
 	return timer->value;
 }

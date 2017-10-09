@@ -26,9 +26,10 @@ public:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
-	const uint16_t *m_mpProtData;
+	// move to 1412m2
 	uint8_t m_mAmazonProtCmd;
 	uint8_t m_mAmazonProtReg[6];
+
 	uint16_t m_xscroll;
 	uint16_t m_yscroll;
 	tilemap_t *m_background;
@@ -42,9 +43,6 @@ public:
 	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrolly_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrollx_w);
-	DECLARE_DRIVER_INIT(amazon);
-	DECLARE_DRIVER_INIT(amatelas);
-	DECLARE_DRIVER_INIT(horekid);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;

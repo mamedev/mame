@@ -12,9 +12,9 @@
 #include "includes/spcforce.h"
 
 
-WRITE8_MEMBER(spcforce_state::flip_screen_w)
+WRITE_LINE_MEMBER(spcforce_state::flip_screen_w)
 {
-	flip_screen_set(~data & 0x01);
+	flip_screen_set(!state);
 }
 
 

@@ -49,7 +49,7 @@ ES-9209B
 |                 6116      |       |  AS7C256  |
 |                 6116      +-------+  AS7C256  |
 |J                                     AS7C256  |
-|A                            AS7C256  AS7C256  |
+|A  MB3773                    AS7C256  AS7C256  |
 |M  TSW1*               +-------+          U13* |
 |M   PAL          32MHz |ES-9303|          U11  |
 |A   PAL     68000P-16  +-------+               |
@@ -146,6 +146,8 @@ WRITE8_MEMBER(gcpinbal_state::bank_w)
 
 	m_bg0_gfxset = (data & 0x04) ? 0x1000 : 0;
 	m_bg1_gfxset = (data & 0x08) ? 0x1000 : 0;
+
+	m_watchdog->write_line_ck(BIT(data, 7));
 
 //          machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 //          machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -456,6 +458,8 @@ static MACHINE_CONFIG_START( gcpinbal )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -482,7 +486,7 @@ static MACHINE_CONFIG_START( gcpinbal )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
-	MCFG_MSM6585_VCLK_CB(WRITELINE(gcpinbal_state, gcp_adpcm_int))      /* VCK function */
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE(gcpinbal_state, gcp_adpcm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

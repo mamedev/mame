@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"

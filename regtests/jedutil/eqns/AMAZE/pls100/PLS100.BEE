@@ -1,0 +1,92 @@
+@DEVICE TYPE
+PLS100
+@DRAWING
+@REVISION
+@DATE
+@SYMBOL
+@COMPANY
+MAMEDev
+@NAME
+@DESCRIPTION
+@PINLIST
+
+"<--------FUNCTION-------->   <--REFERENCE-->"
+"PINLABEL    PIN #  PIN_FCT   PIN_ID     OE_CTRL"
+N/C           1       FE        FE         -  ;
+INPUT2        2       I         I7         -  ;
+INPUT3        3       I         I6         -  ;
+INPUT4        4       I         I5         -  ;
+INPUT5        5       I         I4         -  ;
+INPUT6        6       I         I3         -  ;
+INPUT7        7       I         I2         -  ;
+INPUT8        8       I         I1         -  ;
+INPUT9        9       I         I0         -  ;
+OUTPUT10     10       O         F7         CE ;
+OUTPUT11     11       O         F6         CE ;
+OUTPUT12     12       O         F5         CE ;
+OUTPUT13     13       /O        F4         CE ;
+GND          14       0V        GND        -  ;
+OUTPUT15     15       O         F3         CE ;
+OUTPUT16     16       O         F2         CE ;
+OUTPUT17     17       O         F1         CE ;
+OUTPUT18     18       /O        F0         CE ;
+N/C          19       /CE       /CE        -  ;
+INPUT20      20       I         I15        -  ;
+INPUT21      21       I         I14        -  ;
+INPUT22      22       I         I13        -  ;
+INPUT23      23       I         I12        -  ;
+INPUT24      24       I         I11        -  ;
+INPUT25      25       I         I10        -  ;
+INPUT26      26       I         I9         -  ;
+INPUT27      27       I         I8         -  ;
+VCC          28       +5V       VCC        -  ;
+
+@COMMON PRODUCT TERM  "CPT_label = (expression)"
+TERM1=INPUT2 * /INPUT3 * /INPUT4 * /INPUT5 * INPUT6 * INPUT7 * /INPUT8 ;
+TERM2=/INPUT9 * INPUT20 * INPUT21 * /INPUT22 * /INPUT23 * /INPUT24 * INPUT25 ;
+TERM3=/INPUT26 * /INPUT27 ;
+TERM4=/INPUT4 ;
+TERM5=/INPUT2 * INPUT3 * INPUT4 * INPUT5 * /INPUT6 * /INPUT7 * INPUT8 ;
+TERM6=INPUT9 * /INPUT20 * /INPUT21 * INPUT22 * INPUT23 * INPUT24 * /INPUT25 ;
+TERM7=INPUT26 * INPUT27 ;
+TERM8=INPUT20 * INPUT21 * INPUT22 * INPUT23 * INPUT24 * INPUT25 ;
+TERM9=INPUT26 * INPUT27 ;
+TERM10=/INPUT26 * /INPUT27 ;
+TERM11=/INPUT20 * /INPUT21 * INPUT25 ;
+TERM12=/INPUT22 * /INPUT24 * /INPUT27 ;
+TERM13=INPUT22 * INPUT23 * /INPUT25 * /INPUT26 ;
+TERM14=/INPUT2 * INPUT24 ;
+TERM15=/INPUT6 * /INPUT7 ;
+TERM16=/INPUT5 * INPUT9 ;
+TERM17=/INPUT8 * INPUT9 ;
+TERM18=INPUT3 * INPUT7 ;
+TERM19=INPUT4 * /INPUT6 ;
+TERM20=/INPUT4 * INPUT6 ;
+TERM21=INPUT2 * /INPUT27 ;
+TERM22=INPUT3 * /INPUT26 ;
+TERM23=INPUT4 * /INPUT25 ;
+TERM24=INPUT5 * /INPUT24 ;
+TERM25=INPUT6 * /INPUT23 ;
+TERM26=INPUT7 * /INPUT22 ;
+TERM27=INPUT8 * /INPUT21 ;
+TERM28=INPUT9 * /INPUT20 ;
+TERM29=INPUT20 * /INPUT3 ;
+TERM30=INPUT21 * /INPUT9 ;
+TERM31=INPUT22 * /INPUT8 ;
+TERM32=INPUT23 * /INPUT7 ;
+TERM33=INPUT24 * /INPUT6 ;
+TERM34=INPUT25 * /INPUT5 ;
+TERM35=INPUT26 * /INPUT4 ;
+TERM36=INPUT27 * /INPUT3 ;
+TERM37=/INPUT2 ;
+
+
+@LOGIC EQUATION
+OUTPUT10 = ( TERM1 + TERM2 + TERM3 + TERM8 + TERM20 + TERM31 + TERM34 ) ;
+OUTPUT11 = (TERM2 * TERM3 + TERM9 + TERM19 + TERM32 + TERM33 ) ;
+OUTPUT12 = (TERM3 * TERM1 + TERM7 + TERM10 + TERM18 + TERM29 + TERM30 ) ;
+OUTPUT13 = /( TERM3 + TERM11 + TERM17 + TERM16 + TERM26 + TERM27 ) ;
+OUTPUT15 = (TERM3 + TERM6 + TERM12 + TERM25 + TERM28 + TERM37 ) ;
+OUTPUT16 = (TERM3 + TERM13 + TERM15 + TERM23 + TERM24 + TERM36 ) ;
+OUTPUT17 = ( TERM4 + TERM5 + TERM14 + TERM22 + TERM35 + TERM37 ) ;
+OUTPUT18 = /( TERM4 + TERM15 + TERM17 + TERM21 + TERM23 + TERM37 ) ;

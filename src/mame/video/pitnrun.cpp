@@ -53,13 +53,10 @@ WRITE8_MEMBER(pitnrun_state::videoram2_w)
 	m_bg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::char_bank_select)
+WRITE_LINE_MEMBER(pitnrun_state::char_bank_select_w)
 {
-	if(m_char_bank!=data)
-	{
-		m_bg ->mark_all_dirty();
-		m_char_bank=data;
-	}
+	m_char_bank = state;
+	m_bg->mark_all_dirty();
 }
 
 
@@ -67,6 +64,11 @@ WRITE8_MEMBER(pitnrun_state::scroll_w)
 {
 	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	m_bg->set_scrollx(0, m_scroll);
+}
+
+WRITE8_MEMBER(pitnrun_state::scroll_y_w)
+{
+	m_bg->set_scrolly(0, data);
 }
 
 WRITE8_MEMBER(pitnrun_state::ha_w)
@@ -84,16 +86,16 @@ WRITE8_MEMBER(pitnrun_state::v_heed_w)
 	m_v_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::color_select_w)
+WRITE_LINE_MEMBER(pitnrun_state::color_select_w)
 {
-	m_color_select=data;
+	m_color_select = state;
 	machine().tilemap().mark_all_dirty();
 }
 
 void pitnrun_state::spotlights()
 {
 	int x,y,i,b,datapix;
-	uint8_t *ROM = memregion("user1")->base();
+	uint8_t *ROM = memregion("spot")->base();
 	for(i=0;i<4;i++)
 		for(y=0;y<128;y++)
 		for(x=0;x<16;x++)
@@ -184,7 +186,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		pal=spriteram[offs+2]&0x3;
 
 		sy = 256-spriteram[offs+0]-16;
-		sx = spriteram[offs+3];
+		sx = spriteram[offs+3]+1; // +1 needed to properly align Jump Kun
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 

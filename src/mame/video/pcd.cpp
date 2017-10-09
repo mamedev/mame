@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pcx_vid_io, AS_IO, 8, pcx_video_device )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_vram, AS_0, 8, pcx_video_device )
+static ADDRESS_MAP_START( pcx_vram, 0, 8, pcx_video_device )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -162,7 +162,7 @@ MACHINE_CONFIG_MEMBER( pcx_video_device::device_add_mconfig )
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcx_video_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, pcx_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcx_vram)
 MACHINE_CONFIG_END
 
 
@@ -467,9 +467,4 @@ void pcx_video_device::rcv_complete()
 	receive_register_extract();
 	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-}
-
-void pcx_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }

@@ -82,26 +82,14 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( ql_trump_card )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ql_trump_card )
+MACHINE_CONFIG_MEMBER( ql_trump_card_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", ql_trump_card_floppies, "35dd", ql_trump_card_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", ql_trump_card_floppies, nullptr, ql_trump_card_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ql_trump_card_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ql_trump_card );
-}
-
 
 
 //**************************************************************************

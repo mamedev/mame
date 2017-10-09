@@ -2,6 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/taito68705interface.h"
 
 class lkage_state : public driver_device
@@ -18,7 +19,8 @@ public:
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundnmi(*this, "soundnmi") { }
 
 	required_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_scroll;
@@ -35,10 +37,6 @@ public:
 
 	int m_sprite_dx;
 
-	/* misc */
-	int m_sound_nmi_enable;
-	int m_pending_nmi;
-
 	/* lkageb fake mcu */
 	uint8_t m_mcu_val;
 	int m_mcu_ready;    /* cpu data/mcu ready status */
@@ -50,8 +48,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
@@ -71,6 +69,5 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

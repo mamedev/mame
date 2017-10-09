@@ -21,6 +21,8 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_spriteram16(*this, "spriteram16"),
+		m_paletteram(*this, "palette"),
+		m_paletteram_ext(*this, "palette_ext"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -37,6 +39,8 @@ public:
 	required_shared_ptr<uint16_t> m_pf3_rowscroll;
 	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram16;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram_ext;
 	optional_device<decospr_device> m_sprgen;
 
 	uint16_t    m_spriteram16_buffer[0x400];
@@ -61,4 +65,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECLARE_WRITE16_MEMBER(cbuster_palette_w);
+	DECLARE_WRITE16_MEMBER(cbuster_palette_ext_w);
+	void update_palette(int offset);
 };

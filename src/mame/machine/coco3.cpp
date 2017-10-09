@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco3.c
+    coco3.cpp
 
     TRS-80 Radio Shack Color Computer 3
 

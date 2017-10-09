@@ -25,7 +25,6 @@
 
 DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "MPS802/C1526 Printer")
 DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "C4023 Printer")
-const device_type MPS802 = C1526;
 
 
 //-------------------------------------------------
@@ -85,45 +84,23 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1526 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1526 )
+MACHINE_CONFIG_MEMBER( c1526_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor c1526_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1526 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c4023 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c4023 )
+MACHINE_CONFIG_MEMBER( c4023_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c4023_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c4023 );
-}
 
 
 //-------------------------------------------------

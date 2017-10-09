@@ -116,9 +116,11 @@ void mcs96_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-const address_space_config *mcs96_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mcs96_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config)
+	};
 }
 
 void mcs96_device::state_import(const device_state_entry &entry)

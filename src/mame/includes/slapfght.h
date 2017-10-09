@@ -47,8 +47,8 @@ public:
 	enum getstar_id
 	{
 		GETSTUNK = 0, /* unknown for inclusion of possible new sets */
-		GETSTAR,
-		GETSTARJ,
+		//GETSTAR,
+		//GETSTARJ,
 		GETSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
 		GETSTARB2     /* "lame" bootleg with lots of ingame bugs */
 	} m_getstar_id;
@@ -72,9 +72,8 @@ public:
 	uint8_t m_tigerhb_cmd;
 
 	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(prg_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -84,8 +83,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	DECLARE_WRITE8_MEMBER(scroll_from_mcu_w);
 
@@ -98,11 +97,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(getstar);
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarj);
-	DECLARE_DRIVER_INIT(getstar);
 	DECLARE_DRIVER_INIT(getstarb1);
 	DECLARE_DRIVER_INIT(slapfigh);
 	DECLARE_DRIVER_INIT(getstarb2);

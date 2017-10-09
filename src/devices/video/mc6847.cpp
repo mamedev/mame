@@ -281,9 +281,9 @@ inline void mc6847_friend_device::new_frame()
 //  scanline_zone_string
 //-------------------------------------------------
 
-const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
+std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 {
-	const char *result;
+	std::string result;
 	switch(zone)
 	{
 		case SCANLINE_ZONE_TOP_BORDER:      result = "SCANLINE_ZONE_TOP_BORDER";    break;
@@ -526,14 +526,12 @@ void mc6847_friend_device::video_flush()
 //  describe_context
 //-------------------------------------------------
 
-const char *mc6847_friend_device::describe_context()
+std::string mc6847_friend_device::describe_context() const
 {
-	static char buffer[128];
-	snprintf(buffer, ARRAY_LENGTH(buffer), "%s (scanline %s:%d)",
+	return string_format("%s (scanline %s:%d)",
 		machine().describe_context(),
 		scanline_zone_string((scanline_zone) m_logical_scanline_zone),
 		m_logical_scanline);
-	return buffer;
 }
 
 
@@ -910,6 +908,8 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 		m_text_fontdata_lower_case[i]           = text_fontdata[i + (i < 32*12 ? 64*12 : 0)] ^ (i < 32*12 ? 0xFF : 0x00);
 		m_text_fontdata_lower_case_inverse[i]   = m_text_fontdata_lower_case[i] ^ 0xFF;
 	}
+	for (int i = 0; i < 128*12; i++)
+		m_stripes[i] = ~(i / 12);
 
 	// loop through all modes
 	for (mode = 0; mode < ARRAY_LENGTH(m_entries); mode++)
@@ -923,7 +923,17 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 		uint16_t color_base_0;
 		uint16_t color_base_1;
 
-		if ((mode & MODE_INTEXT) && !is_mc6847t1)
+		if ((mode & ((is_mc6847t1 ? 0 : MODE_INTEXT) | MODE_AS)) == MODE_AS)
+		{
+			// semigraphics 4
+			fontdata = semigraphics4_fontdata8x12;
+			character_mask      = 0x0F;
+			color_base_0        = 8;
+			color_base_1        = 0;
+			color_shift_1       = 4;
+			color_mask_1        = 0x07;
+		}
+		else if (((mode & (MODE_INTEXT | MODE_AS)) == (MODE_INTEXT | MODE_AS)) && !is_mc6847t1)
 		{
 			// semigraphics 6
 			fontdata            = semigraphics6_fontdata8x12;
@@ -933,15 +943,14 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 			color_shift_1       = 6;
 			color_mask_1        = 0x03;
 		}
-		else if (mode & MODE_AS)
+		else if (((mode & (MODE_INTEXT | MODE_AS)) == MODE_INTEXT) && !is_mc6847t1)
 		{
-			// semigraphics 4
-			fontdata            = semigraphics4_fontdata8x12;
-			character_mask      = 0x0F;
-			color_base_0        = 8;
-			color_base_1        = 0;
-			color_shift_1       = 4;
-			color_mask_1        = 0x07;
+			// so-called "stripe" mode - this is when INTEXT is specified but we don't have
+			// an external ROM nor are we on an MC6847T1
+			fontdata            = m_stripes;
+			character_mask      = 0x7F;
+			color_base_0        = (mode & MODE_CSS ? 14 : 12);
+			color_base_1        = (mode & MODE_CSS ? 15 : 13);
 		}
 		else
 		{

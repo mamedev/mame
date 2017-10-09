@@ -25,11 +25,12 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDebugConsole
 
 - (id)initWithMachine:(running_machine &)m {
-	NSSplitView     *regSplit, *dasmSplit;
 	NSScrollView    *regScroll, *dasmScroll, *consoleScroll;
 	NSView          *consoleContainer;
 	NSPopUpButton   *actionButton;
@@ -376,6 +377,83 @@
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification {
 	[auxiliaryWindows removeObjectIdenticalTo:[notification object]];
 }
+
+
+- (void)loadConfiguration:(util::xml::data_node const *)parentnode {
+	util::xml::data_node const *node = nullptr;
+	for (node = parentnode->get_child("window"); node; node = node->get_next_sibling("window"))
+	{
+		MAMEDebugWindowHandler *win = nil;
+		switch (node->get_attribute_int("type", -1))
+		{
+		case MAME_DEBUGGER_WINDOW_TYPE_CONSOLE:
+			[self restoreConfigurationFromNode:node];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER:
+			win = [[MAMEMemoryViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = [[MAMEDisassemblyViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER:
+			win = [[MAMEPointsViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER:
+			win = [[MAMEDevicesViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER:
+			// FIXME: needs device info on init, make another variant
+			//win = [[MAMEDeviceInfoViewer alloc] initWithMachine:*machine console:self];
+			break;
+		default:
+			break;
+		}
+		if (win)
+		{
+			[auxiliaryWindows addObject:win];
+			[win restoreConfigurationFromNode:node];
+			[win release];
+			[win activate];
+		}
+	}
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_CONSOLE);
+	util::xml::data_node *const splits = node->add_child("splits", nullptr);
+	if (splits)
+	{
+		splits->set_attribute_float("state",
+									[regSplit isSubviewCollapsed:[[regSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]));
+		splits->set_attribute_float("disassembly",
+									[dasmSplit isSubviewCollapsed:[[dasmSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]));
+	}
+	[dasmView saveConfigurationToNode:node];
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	util::xml::data_node const *const splits = node->get_child("splits");
+	if (splits)
+	{
+		[regSplit setPosition:splits->get_attribute_float("state", NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]))
+			 ofDividerAtIndex:0];
+		[dasmSplit setPosition:splits->get_attribute_float("disassembly", NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]))
+			  ofDividerAtIndex:0];
+	}
+	[dasmView restoreConfigurationFromNode:node];
+}
+
 
 
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {

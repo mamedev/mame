@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "machine/mb14241.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/sn76477.h"

@@ -27,13 +27,8 @@ public:
 	// construction/destruction
 	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(perror_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(fault_w);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -42,6 +37,11 @@ protected:
 	virtual void pb_w(uint8_t data) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	DECLARE_WRITE_LINE_MEMBER(perror_w);
+	DECLARE_WRITE_LINE_MEMBER(select_w);
+	DECLARE_WRITE_LINE_MEMBER(fault_w);
+
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 

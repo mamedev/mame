@@ -30,7 +30,6 @@ public:
 
 	optional_shared_ptr<uint8_t> m_sharedram;
 
-	int m_coin_count; /* coin count increments on startup ? , so don't count it */
 	int m_intenable;
 
 	/* Demon world */
@@ -175,7 +174,10 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
 	DECLARE_VIDEO_START(rallybik);
 	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

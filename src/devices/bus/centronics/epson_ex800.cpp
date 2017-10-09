@@ -207,15 +207,14 @@ static ADDRESS_MAP_START( ex800_mem, AS_PROGRAM, 8, epson_ex800_device )
 	AM_RANGE(0xf000, 0xf001) AM_MIRROR(0x07fc) AM_READ(gate7a_r)
 	AM_RANGE(0xf002, 0xf003) AM_MIRROR(0x07fc) AM_WRITE(gate7a_w)
 	AM_RANGE(0xf800, 0xfeff) AM_NOP /* not connected */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( epson_ex800 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( epson_ex800 )
+MACHINE_CONFIG_MEMBER( epson_ex800_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ex800_mem)
@@ -233,17 +232,6 @@ static MACHINE_CONFIG_START( epson_ex800 )
 	MCFG_SOUND_ADD("beeper", BEEP, 4000) /* measured at 4000 Hz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor epson_ex800_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( epson_ex800 );
-}
 
 
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */

@@ -52,8 +52,6 @@ protected:
 	required_ioport m_dips;
 
 private:
-	// device_serial_interface uses 10'000 range
-	// device_matrix_keyboard_interface uses 20'000 range
 	enum {
 		CLICK_TIMER_ID = 30'000
 	};

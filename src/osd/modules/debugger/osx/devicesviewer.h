@@ -26,4 +26,6 @@
 
 - (IBAction)showDeviceDetail:(id)sender;
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+
 @end

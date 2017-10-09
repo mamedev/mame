@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG_START( wangpc_wdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc_wdc )
+MACHINE_CONFIG_MEMBER( wangpc_wdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL_10MHz / ?
 	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
@@ -101,17 +101,6 @@ static MACHINE_CONFIG_START( wangpc_wdc )
 
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_wdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_wdc );
-}
 
 
 

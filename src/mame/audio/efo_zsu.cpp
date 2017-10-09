@@ -12,8 +12,8 @@
    sound generators are 2 AY-3-8910As and 1 OKI MSM5205, and 2 MF10s and
    1 HC4066 are used to mix their outputs. The timing circuits are rather
    intricate, using Z80-CTCs, HC74s and HC393s and various other gates to
-   drive both the 5205 and the SGS HCF40105BE through which its samples
-   are funneled.
+   drive both the 5205 and the SGS HCF40105BE (equivalent to CD40105B)
+   through which its samples are funneled.
 
    There are no available schematics for the Cedar Magnet video game
    system (also designed by E.F.O.), but its sound board is believed to be
@@ -194,13 +194,13 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in0_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(efo_zsu_device, ctc0_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(efo_zsu_device, ctc0_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(efo_zsu_device, ctc0_z2_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in0_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(efo_zsu_device, ctc1_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(efo_zsu_device, ctc1_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(efo_zsu_device, ctc1_z2_w))
@@ -213,9 +213,9 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 #endif
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in1_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<2>))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("soundirq") // 74HC03 NAND gate
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq") // 74HC03 NAND gate
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -228,7 +228,7 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(efo_zsu_device, ay1_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_ADD("fifo", HC40105, 0)
+	MCFG_DEVICE_ADD("fifo", CD40105, 0)
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(efo_zsu_device, fifo_dor_w))
 	MCFG_40105_DATA_OUT_CB(DEVWRITELINE("adpcm", msm5205_device, data_w))
 

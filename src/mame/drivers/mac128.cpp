@@ -90,6 +90,7 @@ c0   8 data bits, Rx disabled
 #include "machine/mackbd.h"
 #include "machine/macrtc.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "formats/ap_dsk35.h"

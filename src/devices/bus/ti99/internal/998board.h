@@ -20,7 +20,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "bus/ti99/gromport/gromport.h"
-#include "bus/ti99/hexbus/hexbus.h"
+#include "bus/hexbus/hexbus.h"
 
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
@@ -29,12 +29,62 @@
 #include "sound/tms5220.h"
 #include "video/tms9928a.h"
 
-namespace bus { namespace ti99 { namespace internal {
+// -------------- Defines ------------------------------------
 
-#define VAQUERRO_TAG "vaquerro"
-#define MOFETTA_TAG "mofetta"
-#define AMIGO_TAG "amigo"
-#define OSO_TAG "oso"
+#define TI998_SRAM_TAG        "sram8"
+#define TI998_DRAM_TAG        "dram8"
+#define TI998_MAPPER_TAG      "mapper"
+#define TI998_MAINBOARD_TAG  "mainboard8"
+#define TI998_SPEECHSYN_TAG     "speech"
+
+#define TI998_ROM0_REG        "rom0_region"
+#define TI998_ROM1_REG        "rom1_region"
+#define TI998_PASCAL_REG      "pascal_region"
+#define TI998_SYSGROM_REG     "sysgrom_region"
+#define TI998_GROMLIB1_REG    "gromlib1_region"
+#define TI998_GROMLIB2_REG    "gromlib2_region"
+#define TI998_GROMLIB3_REG    "gromlib3_region"
+#define TI998_SPEECHROM_REG       "speech_region"
+
+#define TI998_GROMLIB_TAG "gromlib"
+#define TI998_SYSGROM_TAG TI998_GROMLIB_TAG "0"
+#define TI998_SYSGROM0_TAG TI998_SYSGROM_TAG "_0"
+#define TI998_SYSGROM1_TAG TI998_SYSGROM_TAG "_1"
+#define TI998_SYSGROM2_TAG TI998_SYSGROM_TAG "_2"
+
+#define TI998_GLIB1_TAG TI998_GROMLIB_TAG "1"
+#define TI998_GLIB10_TAG TI998_GLIB1_TAG "_0"
+#define TI998_GLIB11_TAG TI998_GLIB1_TAG "_1"
+#define TI998_GLIB12_TAG TI998_GLIB1_TAG "_2"
+#define TI998_GLIB13_TAG TI998_GLIB1_TAG "_3"
+#define TI998_GLIB14_TAG TI998_GLIB1_TAG "_4"
+#define TI998_GLIB15_TAG TI998_GLIB1_TAG "_5"
+#define TI998_GLIB16_TAG TI998_GLIB1_TAG "_6"
+#define TI998_GLIB17_TAG TI998_GLIB1_TAG "_7"
+
+#define TI998_GLIB2_TAG TI998_GROMLIB_TAG "2"
+#define TI998_GLIB20_TAG TI998_GLIB2_TAG "_0"
+#define TI998_GLIB21_TAG TI998_GLIB2_TAG "_1"
+#define TI998_GLIB22_TAG TI998_GLIB2_TAG "_2"
+#define TI998_GLIB23_TAG TI998_GLIB2_TAG "_3"
+#define TI998_GLIB24_TAG TI998_GLIB2_TAG "_4"
+#define TI998_GLIB25_TAG TI998_GLIB2_TAG "_5"
+#define TI998_GLIB26_TAG TI998_GLIB2_TAG "_6"
+#define TI998_GLIB27_TAG TI998_GLIB2_TAG "_7"
+
+#define TI998_GLIB3_TAG TI998_GROMLIB_TAG "3"
+#define TI998_GLIB30_TAG TI998_GLIB3_TAG "_0"
+#define TI998_GLIB31_TAG TI998_GLIB3_TAG "_1"
+#define TI998_GLIB32_TAG TI998_GLIB3_TAG "_2"
+
+#define TI998_VAQUERRO_TAG "vaquerro"
+#define TI998_MOFETTA_TAG "mofetta"
+#define TI998_AMIGO_TAG "amigo"
+#define TI998_OSO_TAG "oso"
+
+// --------------------------------------------------
+
+namespace bus { namespace ti99 { namespace internal {
 
 class mainboard8_device;
 
@@ -372,13 +422,19 @@ private:
 /*
     Custom chip: OSO
 */
-class oso_device : public bus::ti99::hexbus::hexbus_attached_device
+class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
+	// Don't add a hexbus connector; we use the one from the driver instance
+	virtual void device_add_mconfig(machine_config &config) override { };
+
+	void hexbus_value_changed(uint8_t data) override;
+
+	WRITE_LINE_MEMBER( clock_in );
 
 private:
 	uint8_t m_data;
@@ -386,7 +442,9 @@ private:
 	uint8_t m_control;
 	uint8_t m_xmit;
 
-	bus::ti99::hexbus::hexbus_device* m_hexbus;
+	int m_clkcount;
+
+	int m_xmit_send;
 };
 
 class mainboard8_device : public device_t
@@ -448,7 +506,7 @@ public:
 protected:
 	void device_start() override;
 	void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// Holds the state of the A14 line

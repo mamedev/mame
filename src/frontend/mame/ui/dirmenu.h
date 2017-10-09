@@ -60,7 +60,7 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	std::string              m_tempbuf, m_searchpath;
+	std::string              m_heading[1], m_searchpath;
 	std::vector<std::string> m_folders;
 	int                      m_ref;
 };

@@ -66,7 +66,7 @@ const tiny_rom_entry *cbm2_hrg_device::device_rom_region() const
 //  ADDRESS_MAP( hrg_a_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_a_map, AS_0, 8, cbm2_hrg_a_device )
+static ADDRESS_MAP_START( hrg_a_map, 0, 8, cbm2_hrg_a_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -76,17 +76,17 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hrg_b_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_b_map, AS_0, 8, cbm2_hrg_b_device )
+static ADDRESS_MAP_START( hrg_b_map, 0, 8, cbm2_hrg_b_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( cbm2_hrg_a )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2_hrg_a )
+MACHINE_CONFIG_MEMBER( cbm2_hrg_a_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
@@ -96,18 +96,13 @@ static MACHINE_CONFIG_START( cbm2_hrg_a )
 
 	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_a_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, hrg_a_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( cbm2_hrg_b )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( cbm2_hrg_b )
+MACHINE_CONFIG_MEMBER( cbm2_hrg_b_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
@@ -117,27 +112,11 @@ static MACHINE_CONFIG_START( cbm2_hrg_b )
 
 	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_b_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, hrg_b_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x256);
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cbm2_hrg_a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cbm2_hrg_a );
-}
-
-machine_config_constructor cbm2_hrg_b_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cbm2_hrg_b );
-}
 
 
 

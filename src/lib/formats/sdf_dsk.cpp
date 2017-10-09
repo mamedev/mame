@@ -6,7 +6,7 @@
 
     SDF disk images. Format created by Darren Atkinson for use with
     his CoCoSDC floppy disk emulator.
-    
+
     http://cocosdc.blogspot.com/p/sd-card-socket-sd-card-socket-is-push.html
 
 *********************************************************************/
@@ -47,7 +47,7 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 	{
 		return 0;
 	}
-	
+
 	io_generic_read(io, header, 0, HEADER_SIZE);
 
 	int tracks = header[4];
@@ -64,7 +64,7 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 	{
 		return 0;
 	}
-	
+
 	if (size == HEADER_SIZE + heads * tracks * TOTAL_TRACK_SIZE)
 	{
 		return 100;
@@ -102,14 +102,14 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			int idam_location[SECTOR_SLOT_COUNT+1];
 			int dam_location[SECTOR_SLOT_COUNT+1];
 			raw_track_data.clear();
-			
+
 			// Read track
 			io_generic_read(io, &track_data[0], HEADER_SIZE + ( heads * track + head ) * TOTAL_TRACK_SIZE, TOTAL_TRACK_SIZE);
-			
+
 			int sector_count = track_data[0];
-			
+
 			if (sector_count > SECTOR_SLOT_COUNT) return false;
-			
+
 			// Transfer IDAM and DAM locations to table
 			for (int i = 0; i < SECTOR_SLOT_COUNT+1; i++)
 			{
@@ -117,7 +117,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				{
 					idam_location[i] = ((track_data[ 8 * (i+1) + 1] << 8 | track_data[ 8 * (i+1)]) & 0x3FFF) - 4;
 					dam_location[i] = ((track_data[ 8 * (i+1) + 1 + 2] << 8 | track_data[ 8 * (i+1) + 2]) & 0x3FFF) - 4;
-					
+
 					if (idam_location[i] > TOTAL_TRACK_SIZE) return false;
 					if (dam_location[i] > TOTAL_TRACK_SIZE) return false;
 				}

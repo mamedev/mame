@@ -123,11 +123,12 @@
 #include "machine/mb89352.h"
 #include "machine/nvram.h"
 
-#include "bus/x68k/x68kexp.h"
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
+#include "bus/x68k/x68k_midi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "bus/scsi/scsicd.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -727,7 +728,7 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
 
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
-	m_okim6258->set_clock(data & 0x02 ? 4000000 : 8000000);
+	m_okim6258->set_unscaled_clock(data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -1473,9 +1474,17 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 
 }
 
+WRITE_LINE_MEMBER(x68k_state::x68k_irq4_line)
+{
+	m_current_vector[4] = m_expansion->vector();
+	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
+	logerror("EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
+}
+
 static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
 	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
+	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
 SLOT_INTERFACE_END
 
 MACHINE_RESET_MEMBER(x68k_state,x68000)
@@ -1725,7 +1734,7 @@ static MACHINE_CONFIG_START( x68000 )
 	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
 	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(x68k_state, x68k_irq2_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(x68k_state, x68k_irq4_line))
 	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* internal ram */
@@ -1751,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "cdrom", SCSICD, SCSI_ID_6)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")

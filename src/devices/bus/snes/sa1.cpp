@@ -1142,12 +1142,7 @@ static ADDRESS_MAP_START( sa1_map, AS_PROGRAM, 8, sns_sa1_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( snes_sa1 )
+MACHINE_CONFIG_MEMBER( sns_sa1_device::device_add_mconfig )
 	MCFG_CPU_ADD("sa1cpu", G65816, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sa1_map)
 MACHINE_CONFIG_END
-
-machine_config_constructor sns_sa1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_sa1 );
-}

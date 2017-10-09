@@ -33,6 +33,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -98,6 +99,7 @@ private:
 
 	void init_state();
 	void init_tables();
+	void calculate_clock_correction();
 	void calculate_step(YMF271Slot *slot);
 	void update_envelope(YMF271Slot *slot);
 	void init_envelope(YMF271Slot *slot);
@@ -117,6 +119,7 @@ private:
 	inline int get_internal_keycode(int block, int fns);
 	inline int get_external_keycode(int block, int fns);
 	inline bool check_envelope_end(YMF271Slot *slot);
+	inline void calculate_status_end(int slotnum, bool state);
 
 	// lookup tables
 	std::unique_ptr<int16_t[]> m_lut_waves[8];
@@ -139,6 +142,7 @@ private:
 	uint32_t m_timerB;
 	uint8_t m_irqstate;
 	uint8_t m_status;
+	uint16_t m_end_status;
 	uint8_t m_enable;
 
 	uint32_t m_ext_address;
@@ -147,7 +151,6 @@ private:
 
 	optional_region_ptr<uint8_t> m_mem_base;
 	uint32_t m_mem_size;
-	uint32_t m_clock;
 
 	emu_timer *m_timA;
 	emu_timer *m_timB;

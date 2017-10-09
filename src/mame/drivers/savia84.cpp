@@ -38,22 +38,24 @@ class savia84_state : public driver_device
 {
 public:
 	savia84_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi8255(*this, "ppi8255")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi8255(*this, "ppi8255")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi8255;
 	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
+
+private:
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi8255;
 };
 
 static ADDRESS_MAP_START( savia84_mem, AS_PROGRAM, 8, savia84_state )
@@ -183,7 +185,6 @@ static MACHINE_CONFIG_START( savia84 )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(savia84_state, savia84_8255_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(savia84_state, savia84_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(savia84_state, savia84_8255_portc_w))
-
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -12,7 +12,7 @@
   Improvements to match real hardware         Wilbert Pol        2006-2008
 
   Timing is not accurate enough:
-  - Mode 3 takes 172 cycles (measuered with logic analyzer by costis)
+  - Mode 3 takes 172 cycles (measured with logic analyzer by costis)
 
 The following timing of the first frame when the LCD is turned on, is with
 no sprites being displayed. If sprites are displayed then the timing of mode
@@ -322,7 +322,6 @@ dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_lr35902(*this, finder_base::DUMMY_TAG)
-	, m_sgb_border_hack(0)
 	, m_enable_experimental_engine(false)
 	, m_oam_size(0x100)
 	, m_vram_size(vram_size)
@@ -1395,19 +1394,8 @@ void sgb_ppu_device::refresh_border()
 				pal = 1;
 			pal <<= 4;
 
-			if (m_sgb_border_hack)
-			{ /* A few games do weird stuff */
-				uint8_t tileno = map[xidx];
-				if (tileno >= 128) tileno = ((64 + tileno) % 128) + 128;
-				else tileno = (64 + tileno) % 128;
-				data = tiles[tileno * 32] | (tiles[(tileno * 32) + 1] << 8);
-				data2 = tiles2[tileno * 32] | (tiles2[(tileno * 32) + 1] << 8);
-			}
-			else
-			{
-				data = tiles[map[xidx] * 32] | (tiles[(map[xidx] * 32) + 1] << 8);
-				data2 = tiles2[map[xidx] * 32] | (tiles2[(map[xidx] * 32) + 1] << 8);
-			}
+			data = tiles[map[xidx] * 32] | (tiles[(map[xidx] * 32) + 1] << 8);
+			data2 = tiles2[map[xidx] * 32] | (tiles2[(map[xidx] * 32) + 1] << 8);
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -3508,6 +3496,42 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 
 // Super Game Boy
 
+/* Super Game Boys transfer VRAM data using the display signals.
+ * That means not DMG VRAM is copied from 0x8800 to SNES VRAM
+ * but displayed BG contents.
+ * Things to consider: LCDC (0xFF40) and SCY/SCX (0xFF42/3)
+ *  - LCD must be on
+ *  - TODO: Window might or might not influence result
+ *  - CHR and BG likely influence result
+ *  - BG must be on
+ *  - BG should not be scrolled, but likely does influence transfer
+ *  - TODO: are BG attributes (hflip, vflip) ignored?
+ */
+/**
+ * Copy DMG VRAM data to SGM VRAM
+ * @param dst       Destination Pointer
+ * @param start     Logical Start Tile index inside display area.
+ * @param num_tiles Number of DMG tiles (0x10U bytes) to copy.
+ */
+void sgb_ppu_device::sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles)
+{
+	uint16_t bg_ix = (start / 0x14U) * 0x20U + (start % 0x14U);
+	const uint8_t *const map = m_layer[0].bg_map;
+	const uint8_t *const tiles = m_layer[0].bg_tiles;
+	const uint8_t mod = m_gb_tile_no_mod;
+
+	for (size_t i = 0x00U; i < num_tiles && i < 0x100U; ++i)
+	{
+		const uint8_t tile_ix = map[bg_ix] ^ mod;
+		std::copy_n(&tiles[tile_ix << 4], 0x10U, dst);
+		dst += 0x10U;
+
+		++bg_ix;
+		if ((bg_ix & 0x1fU) == 0x14U)
+			bg_ix += 0x20U - 0x14U; /* advance to next start of line */
+	}
+}
+
 void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 {
 	switch (offs)
@@ -3819,40 +3843,34 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 		case 0x10:  /* DATA_TRN */
 			/* Not Implemented */
 			break;
+		case 0x11:  /* MLT_REQ */
+			/* MLT_REQ currently handled inside gb.cpp logic */
+			break;
 		case 0x12:  /* JUMP */
 			/* Not Implemented */
 			break;
 		case 0x13:  /* CHR_TRN */
-			if (data[1] & 0x1)
-				memcpy(m_sgb_tile_data.get() + 4096, m_vram.get() + 0x0800, 4096);
+			if (data[1] & 0x01U)
+				sgb_vram_memcpy(m_sgb_tile_data.get() + 0x1000U, 0x00U, 0x100U);
 			else
-				memcpy(m_sgb_tile_data.get(), m_vram.get() + 0x0800, 4096);
+				sgb_vram_memcpy(m_sgb_tile_data.get(), 0x00U, 0x100U);
 			break;
 		case 0x14:  /* PCT_TRN */
 		{
 			uint16_t col;
-			if (m_sgb_border_hack)
+			uint8_t sgb_pal[0x80U];
+
+			sgb_vram_memcpy(m_sgb_tile_map, 0x00U, 0x80U);
+			sgb_vram_memcpy(sgb_pal, 0x80U, 0x08U);
+			for (int i = 0; i < 4 * 16 /* 4 pals at 16 colors each */; i++)
 			{
-				memcpy(m_sgb_tile_map, m_vram.get() + 0x1000, 2048);
-				for (int i = 0; i < 64; i++)
-				{
-					col = (m_vram[0x0800 + (i * 2) + 1 ] << 8) | m_vram[0x0800 + (i * 2)];
-					m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
-				}
-			}
-			else /* Do things normally */
-			{
-				memcpy(m_sgb_tile_map, m_vram.get() + 0x0800, 2048);
-				for (int i = 0; i < 64; i++)
-				{
-					col = (m_vram[0x1000 + (i * 2) + 1] << 8) | m_vram[0x1000 + (i * 2)];
-					m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
-				}
+				col = (sgb_pal[(i * 2) + 1] << 8) | sgb_pal[i * 2];
+				m_sgb_pal[SGB_BORDER_PAL_OFFSET + i] = col;
 			}
 		}
 			break;
 		case 0x15:  /* ATTR_TRN */
-			memcpy(m_sgb_atf_data, m_vram.get() + 0x0800, 4050);
+			sgb_vram_memcpy(m_sgb_atf_data, 0x00U, 0x100U);
 			break;
 		case 0x16:  /* ATTR_SET */
 		{
@@ -3876,11 +3894,10 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 			m_sgb_window_mask = data[1];
 			break;
 		case 0x18:  /* OBJ_TRN */
-			/* Not Implemnted */
+			/* Not Implemented */
 			break;
-		case 0x19:  /* ? */
-			/* Called by: dkl,dkl2,dkl3,zeldadx
-			 But I don't know what it is for. */
+		case 0x19:  /* PAL_PRI */
+			/* Called by: dkl,dkl2,dkl3,zeldadx */
 			/* Not Implemented */
 			break;
 		case 0x1E:  /* Used by bootrom to transfer the gb cart header */

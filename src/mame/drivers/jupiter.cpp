@@ -5,30 +5,90 @@
 Wave Mate Jupiter
 
 
+Jupiter 2
+*********
+Status: Preliminary
+Doesn't show anything until a disk is loaded
+
+
 
 Jupiter 3
 *********
-
 Status: Preliminary
 Hangs if your input line starts with 'k'.
 
-ToDo:
+
+
+ToDo: (both)
 - Connect all devices
 - Everything!
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jupiter.h"
-
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
 #include "machine/ram.h"
-#include "machine/terminal.h"
 #include "machine/wd_fdc.h"
-
 #include "screen.h"
+
+#define MCM6571AP_TAG   "vid125_6c"
+#define S6820_TAG       "vid125_4a"
+#define Z80_TAG         "cpu126_4c"
+#define INS1771N1_TAG   "fdi027_4c"
+#define MC6820P_TAG     "fdi027_4b"
+#define MC6850P_TAG     "rsi068_6a"
+#define MC6821P_TAG     "sdm058_4b"
+
+class jupiter2_state : public driver_device
+{
+public:
+	jupiter2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, MCM6571AP_TAG)
+		, m_acia0(*this, "acia0")
+		, m_acia1(*this, "acia1")
+	{ }
+
+	DECLARE_DRIVER_INIT(jupiter2);
+
+private:
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia0;
+	required_device<acia6850_device> m_acia1;
+};
+
+class jupiter3_state : public driver_device
+{
+public:
+	jupiter3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_p_videoram(*this, "videoram")
+		, m_p_ram(*this, "ram")
+		, m_p_chargen(*this, "chargen")
+	{ }
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(jupiter3);
+	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_READ8_MEMBER(ff_r);
+
+private:
+	virtual void machine_reset() override;
+	uint8_t m_term_data;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_region_ptr<u8> m_p_chargen;
+};
+
 
 
 //**************************************************************************
@@ -39,10 +99,10 @@ ToDo:
 //  ADDRESS_MAP( jupiter_m6800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter_m6800_mem, AS_PROGRAM, 8, jupiter2_state )
+static ADDRESS_MAP_START( jupiter2_mem, AS_PROGRAM, 8, jupiter2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
-//  AM_RANGE(0xc000, 0xcfff) Video RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM  // Video RAM
+	AM_RANGE(0xf000, 0xff00) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
 //  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
 //  AM_RANGE(0xff60, 0xff76) DMA Controller
 //  AM_RANGE(0xff80, 0xff83) Floppy PIA
@@ -50,23 +110,19 @@ static ADDRESS_MAP_START( jupiter_m6800_mem, AS_PROGRAM, 8, jupiter2_state )
 //  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
 //  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
 //  AM_RANGE(0xffb0, 0xffb3) Video PIA
-//  AM_RANGE(0xffc0, 0xffc1) Serial Port 0 ACIA
-//  AM_RANGE(0xffc4, 0xffc5) Serial Port 1 ACIA
+	AM_RANGE(0xffc0, 0xffc0) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // Serial Port 0 ACIA
+	AM_RANGE(0xffc1, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // Serial Port 1 ACIA
+	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
 //  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
 //  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
 //  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
 //  AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
 //  AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
 //  AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
+	AM_RANGE(0xfff8, 0xffff) AM_ROM AM_REGION(MCM6571AP_TAG, 0x0ff8) // vectors
 ADDRESS_MAP_END
 
-
-//-------------------------------------------------
-//  ADDRESS_MAP( jupiter_m6800_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( jupiter_m6800_io, AS_IO, 8, jupiter2_state )
-ADDRESS_MAP_END
 
 
 //-------------------------------------------------
@@ -213,18 +269,31 @@ void jupiter3_state::machine_reset()
 //  MACHINE_CONFIG( jupiter )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( jupiter )
+static MACHINE_CONFIG_START( jupiter2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
-	MCFG_CPU_PROGRAM_MAP(jupiter_m6800_mem)
-	MCFG_CPU_IO_MAP(jupiter_m6800_io)
+	MCFG_CPU_PROGRAM_MAP(jupiter2_mem)
 
 	// devices
 	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("serial0", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("serial1", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -312,7 +381,7 @@ ROM_END
 //  DRIVER_INIT( jupiter )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter2_state,jupiter)
+DRIVER_INIT_MEMBER(jupiter2_state,jupiter2)
 {
 	uint8_t *rom = memregion(MCM6571AP_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -355,6 +424,6 @@ DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT     COMPANY      FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,       jupiter,   jupiter, jupiter2_state, jupiter, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3_state, jupiter3,"Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT       COMPANY      FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,       jupiter2,  jupiter, jupiter2_state, jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3_state, jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

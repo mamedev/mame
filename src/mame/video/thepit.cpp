@@ -167,13 +167,11 @@ WRITE8_MEMBER(thepit_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::flip_screen_x_w)
+WRITE_LINE_MEMBER(thepit_state::flip_screen_x_w)
 {
-	int flip;
+	m_flip_x = state;
 
-	m_flip_x = data & 0x01;
-
-	flip = m_flip_x ? TILEMAP_FLIPX : 0;
+	int flip = m_flip_x ? TILEMAP_FLIPX : 0;
 	if (m_flip_y)
 		flip |= TILEMAP_FLIPY ;
 
@@ -183,13 +181,11 @@ WRITE8_MEMBER(thepit_state::flip_screen_x_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::flip_screen_y_w)
+WRITE_LINE_MEMBER(thepit_state::flip_screen_y_w)
 {
-	int flip;
+	m_flip_y = state;
 
-	m_flip_y = data & 0x01;
-
-	flip = m_flip_x ? TILEMAP_FLIPX : 0;
+	int flip = m_flip_x ? TILEMAP_FLIPX : 0;
 	if (m_flip_y)
 		flip |= TILEMAP_FLIPY ;
 
@@ -199,14 +195,11 @@ WRITE8_MEMBER(thepit_state::flip_screen_y_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
+WRITE_LINE_MEMBER(thepit_state::intrepid_graphics_bank_w)
 {
-	if (m_graphics_bank != (data & 0x01))
-	{
-		m_graphics_bank = data & 0x01;
+	m_graphics_bank = state;
 
-		m_tilemap->mark_all_dirty();
-	}
+	m_tilemap->mark_all_dirty();
 }
 
 

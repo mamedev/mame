@@ -272,28 +272,21 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 	return m_open_bus;   // open bus
 }
 
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( sub_slot )
-//-------------------------------------------------
 
 static SLOT_INTERFACE_START(ntb_cart)
 	SLOT_INTERFACE_INTERNAL("ntbrom", NES_NTB_ROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sub_slot )
+
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_sunsoft_dcs_device::device_add_mconfig )
 	MCFG_NTB_MINICART_ADD("ntb_slot", ntb_cart)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_sunsoft_dcs_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sub_slot );
-}
 
 
 //-------------------------------------------------

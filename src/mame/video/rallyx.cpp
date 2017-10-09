@@ -406,9 +406,9 @@ WRITE8_MEMBER(rallyx_state::rallyx_scrolly_w)
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(rallyx_state::tactcian_starson_w)
+WRITE_LINE_MEMBER(rallyx_state::stars_enable_w)
 {
-	m_stars_enable = data & 1;
+	m_stars_enable = state;
 }
 
 

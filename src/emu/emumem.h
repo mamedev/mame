@@ -25,29 +25,18 @@
 
 enum { TOTAL_MEMORY_BANKS = 512 };
 
-// address spaces
-enum address_spacenum
-{
-	AS_0,                           // first address space
-	AS_1,                           // second address space
-	AS_2,                           // third address space
-	AS_3,                           // fourth address space
-	ADDRESS_SPACES,                 // maximum number of address spaces
-
-	// alternate address space names for common use
-	AS_PROGRAM = AS_0,              // program address space
-	AS_DATA = AS_1,                 // data address space
-	AS_IO = AS_2,                   // I/O address space
-	AS_DECRYPTED_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
-};
-DECLARE_ENUM_OPERATORS(address_spacenum)
+// address space names for common use
+constexpr int AS_PROGRAM = 0; // program address space
+constexpr int AS_DATA    = 1; // data address space
+constexpr int AS_IO      = 2; // I/O address space
+constexpr int AS_OPCODES = 3; // (decrypted) opcodes, when separate from data accesses
 
 // read or write constants
-enum read_or_write
+enum class read_or_write
 {
-	ROW_READ = 1,
-	ROW_WRITE = 2,
-	ROW_READWRITE = 3
+	READ = 1,
+	WRITE = 2,
+	READWRITE = 3
 };
 
 
@@ -233,19 +222,17 @@ class address_space
 
 protected:
 	// construction/destruction
-	address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large);
+	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum, bool large);
 
 public:
 	virtual ~address_space();
-	// public allocator
-	static void allocate(std::vector<std::unique_ptr<address_space>> &space_list, memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
 
 	// getters
 	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
-	address_spacenum spacenum() const { return m_spacenum; }
+	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
 
 	direct_read_data &direct() const { return *m_direct; }
@@ -318,12 +305,12 @@ public:
 	offs_t byte_to_address_end(offs_t address) const { return m_config.byte2addr_end(address); }
 
 	// umap ranges (short form)
-	void unmap_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_READ, false); }
-	void unmap_write(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_WRITE, false); }
-	void unmap_readwrite(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_READWRITE, false); }
-	void nop_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_READ, true); }
-	void nop_write(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_WRITE, true); }
-	void nop_readwrite(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_READWRITE, true); }
+	void unmap_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::READ, false); }
+	void unmap_write(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::WRITE, false); }
+	void unmap_readwrite(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::READWRITE, false); }
+	void nop_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::READ, true); }
+	void nop_write(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::WRITE, true); }
+	void nop_readwrite(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, read_or_write::READWRITE, true); }
 
 	// install ports, banks, RAM (short form)
 	void install_read_port(offs_t addrstart, offs_t addrend, const char *rtag) { install_read_port(addrstart, addrend, 0, rtag); }
@@ -349,9 +336,9 @@ public:
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, bank, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank)  { install_bank_generic(addrstart, addrend, addrmirror, bank, bank); }
-	void install_rom(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, ROW_READ, baseptr); }
-	void install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, ROW_WRITE, baseptr); }
-	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, ROW_READWRITE, baseptr); }
+	void install_rom(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READ, baseptr); }
+	void install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::WRITE, baseptr); }
+	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, read_or_write::READWRITE, baseptr); }
 
 	// install device memory maps
 	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map), int bits = 0, u64 unitmask = 0) {
@@ -431,7 +418,7 @@ protected:
 	offs_t                  m_logaddrmask;      // logical address mask
 	offs_t                  m_logbytemask;      // byte-converted logical address mask
 	u64                     m_unmap;            // unmapped value
-	address_spacenum        m_spacenum;         // address space index
+	int        m_spacenum;         // address space index
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
 	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
@@ -498,7 +485,7 @@ class memory_bank
 		// does this reference match the space+read/write combination?
 		bool matches(const address_space &space, read_or_write readorwrite) const
 		{
-			return (&space == &m_space && (readorwrite == ROW_READWRITE || readorwrite == m_readorwrite));
+			return (&space == &m_space && (readorwrite == read_or_write::READWRITE || readorwrite == m_readorwrite));
 		}
 
 	private:
@@ -662,9 +649,6 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
-	// dump the internal memory tables to the given file
-	void dump(FILE *file);
-
 	// pointers to a bank pointer (internal usage only)
 	u8 **bank_pointer_addr(u8 index) { return &m_bank_ptr[index]; }
 
@@ -684,7 +668,6 @@ private:
 
 	u8 *                        m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
 
-	std::vector<std::unique_ptr<address_space>>  m_spacelist;            // list of address spaces
 	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
 
 	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank

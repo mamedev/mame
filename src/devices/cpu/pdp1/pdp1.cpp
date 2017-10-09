@@ -387,6 +387,12 @@ pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_
 	m_program_config.m_is_octal = true;
 }
 
+device_memory_interface::space_config_vector pdp1_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void pdp1_device::device_config_complete()
 {

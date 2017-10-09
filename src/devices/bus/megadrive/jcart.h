@@ -48,18 +48,18 @@ public:
 	// construction/destruction
 	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-
 protected:
 	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 
@@ -76,8 +76,9 @@ public:
 	// construction/destruction
 	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

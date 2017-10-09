@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER( econet_e01_device::clk_en_w )
 	m_clk_en = state;
 }
 
-FLOPPY_FORMATS_MEMBER( floppy_formats_afs )
+FLOPPY_FORMATS_MEMBER( econet_e01_device::floppy_formats_afs )
 	FLOPPY_AFS_FORMAT
 FLOPPY_FORMATS_END0
 
@@ -238,10 +238,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( e01 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( e01 )
+MACHINE_CONFIG_MEMBER( econet_e01_device::device_add_mconfig )
 	// basic machine hardware
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
 	MCFG_CPU_PROGRAM_MAP(e01_mem)
@@ -289,17 +289,6 @@ static MACHINE_CONFIG_START( e01 )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor econet_e01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( e01 );
-}
 
 
 //-------------------------------------------------

@@ -18,7 +18,9 @@
 class driver_enumerator;
 
 namespace ui {
-class simple_menu_select_game : public menu {
+
+class simple_menu_select_game : public menu
+{
 public:
 	simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename);
 	virtual ~simple_menu_select_game();
@@ -43,14 +45,21 @@ private:
 	void inkey_special(const event *menu_event);
 
 	// internal state
-	uint8_t                   m_error;
+	bool                    m_error;
 	bool                    m_rerandomize;
 	std::string             m_search;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
-	std::vector<const game_driver *> m_driverlist;
-	std::unique_ptr<driver_enumerator> m_drivlist;
+	std::vector<const game_driver *>    m_driverlist;
+	std::unique_ptr<driver_enumerator>  m_drivlist;
+
+	// cached driver flags
+	const game_driver *     m_cached_driver;
+	machine_flags::type     m_cached_flags;
+	device_t::feature_type  m_cached_unemulated;
+	device_t::feature_type  m_cached_imperfect;
+	rgb_t                   m_cached_color;
 };
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_SIMPLESELGAME_H */
+#endif // MAME_FRONTEND_UI_SIMPLESELGAME_H

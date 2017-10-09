@@ -82,6 +82,13 @@ v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+device_memory_interface::space_config_vector v25_common_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
 {
@@ -532,6 +539,8 @@ void v25_common_device::device_start()
 	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
+	state_add( V25_IDB,   "IDB", m_IDB).mask(0xffe00).callimport();
+
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
@@ -633,6 +642,10 @@ void v25_common_device::state_import(const device_state_entry &entry)
 
 		case V25_DS:
 			Sreg(DS0) = m_debugger_temp;
+			break;
+
+		case V25_IDB:
+			m_IDB |= 0xe00;
 			break;
 	}
 }

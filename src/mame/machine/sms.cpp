@@ -331,7 +331,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 	else
 	{
 		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it (even in SMS mode?).
+		// for the Game Gear because has no effect on it, even in SMS mode.
 		if (m_mem_ctrl_reg & IO_CHIP)
 			return 0xff;
 	}
@@ -376,7 +376,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	else
 	{
 		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it (even in SMS mode?).
+		// for the Game Gear because has no effect on it, even in SMS mode.
 		if (m_mem_ctrl_reg & IO_CHIP)
 			return 0xff;
 	}

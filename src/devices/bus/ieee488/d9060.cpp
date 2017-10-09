@@ -86,12 +86,12 @@ ROM_START( d9060 )
 	ROM_LOAD( "300515-001.4c", 0x000, 0x800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) ) // Revision A
 	ROM_LOAD( "300515-002.4c", 0x000, 0x800, CRC(49adf4fb) SHA1(59dafbd4855083074ba8dc96a04d4daa5b76e0d6) ) // Revision B
 
-	ROM_REGION( 0x5000, AM2910_TAG, 0 )
-	ROM_LOAD( "441.5b", 0x0000, 0x1000, NO_DUMP ) // 82S137
-	ROM_LOAD( "442.6b", 0x1000, 0x1000, NO_DUMP ) // 82S137
-	ROM_LOAD( "573.7b", 0x2000, 0x1000, NO_DUMP ) // 82S137
-	ROM_LOAD( "444.8b", 0x3000, 0x1000, NO_DUMP ) // 82S137
-	ROM_LOAD( "445.9b", 0x4000, 0x1000, NO_DUMP ) // 82S137
+	ROM_REGION( 0x1400, AM2910_TAG, 0 )
+	ROM_LOAD( "44_1.5b", 0x0000, 0x0400, CRC(67a49dd3) SHA1(be39f55bc0ff9a508ec55224c52549856ad3270a) ) // 82S137
+	ROM_LOAD( "44_2.6b", 0x0400, 0x0400, CRC(f6d1bdbc) SHA1(bca7a96a60144c36eff1124485ec26df7cfa8143) ) // 82S137
+	ROM_LOAD( "44_3.7b", 0x0800, 0x0400, CRC(68af3a1f) SHA1(d3823a0d23e828a2dff6d89211fbcd7034112298) ) // 82S137
+	ROM_LOAD( "44_4.8b", 0x0c00, 0x0400, CRC(a767b1dc) SHA1(fff11b662c74040981822ccdcc8cbd0e22b517a9) ) // 82S137
+	ROM_LOAD( "44_5.9b", 0x1000, 0x0400, CRC(85743073) SHA1(95a48835bc2bd1c79fb1a63778de3807fb731ac6) ) // 82S137
 ROM_END
 
 
@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( d9060_hdc_mem, AS_PROGRAM, 8, d9060_device_base )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x380) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x370) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -365,10 +365,10 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( d9060 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( d9060 )
+MACHINE_CONFIG_MEMBER( d9060_device_base::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)
@@ -414,17 +414,6 @@ static MACHINE_CONFIG_START( d9060 )
 
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", D9060HD, SCSI_ID_0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor d9060_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( d9060 );
-}
 
 
 //-------------------------------------------------

@@ -29,12 +29,7 @@ void scsihd_device::device_start()
 	scsihle_device::device_start();
 }
 
-static MACHINE_CONFIG_START(scsi_harddisk)
+MACHINE_CONFIG_MEMBER(scsihd_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
-
-machine_config_constructor scsihd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_harddisk);
-}

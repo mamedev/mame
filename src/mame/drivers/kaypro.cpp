@@ -190,8 +190,7 @@ FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kaypro_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_DD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 
@@ -243,16 +242,16 @@ static MACHINE_CONFIG_START( kayproii )
 	MCFG_Z80PIO_IN_PA_CB(READ8(kaypro_state, pio_system_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kayproii_pio_system_w))
 
-	MCFG_Z80SIO0_ADD("z80sio", XTAL_20MHz / 8, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("z80sio", Z80SIO0, XTAL_20MHz / 8)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_FD1793_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525qd", kaypro_state::kayproii_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525qd", kaypro_state::kayproii_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
@@ -306,18 +305,20 @@ static MACHINE_CONFIG_START( kaypro2x )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_Z80SIO0_ADD("z80sio", XTAL_16MHz / 4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("z80sio", Z80SIO0, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO0_ADD("z80sio_2x", XTAL_16MHz / 4, 0, 0, 0, 0)   /* extra sio for modem and printer */
+
+	MCFG_DEVICE_ADD("z80sio_2x", Z80SIO0, XTAL_16MHz / 4)   /* extra sio for modem and printer */
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
 	MCFG_FD1793_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525qd", kaypro_state::kaypro2x_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525qd", kaypro_state::kaypro2x_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

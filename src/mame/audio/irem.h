@@ -27,7 +27,6 @@ public:
 	DECLARE_READ8_MEMBER( soundlatch_r );
 	DECLARE_WRITE8_MEMBER( ay8910_45M_portb_w );
 	DECLARE_WRITE8_MEMBER( ay8910_45L_porta_w );
-	void adpcm_int(int st);
 
 protected:
 	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

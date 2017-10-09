@@ -81,7 +81,10 @@ Bprom dump by f205v
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -127,9 +130,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
-	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank0_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
@@ -274,25 +277,22 @@ WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank0_w)
+WRITE_LINE_MEMBER(stuntair_state::spritebank0_w)
 {
-	m_spritebank0 = data&0x01;
-	// other bits are unused
+	m_spritebank0 = state;
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank1_w)
+WRITE_LINE_MEMBER(stuntair_state::spritebank1_w)
 {
-	m_spritebank1 = data&0x01;
-	// other bits are unused
+	m_spritebank1 = state;
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
+WRITE_LINE_MEMBER(stuntair_state::nmi_enable_w)
 {
-	m_nmi_enable = data&0x01;
+	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	// other bits are unused
 }
 
 WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
@@ -309,27 +309,25 @@ WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 
 WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
+	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
+	// the 3 highest bits are ignored by the sound program
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 // main Z80
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB") AM_WRITE(stuntair_coin_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_nmienable_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READNOP AM_WRITE(stuntair_spritebank1_w)
-//  AM_RANGE(0xf004, 0xf004) AM_WRITENOP
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w)
-//  AM_RANGE(0xf006, 0xf006) AM_WRITENOP
-//  AM_RANGE(0xf007, 0xf007) AM_WRITENOP
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+	AM_RANGE(0xf000, 0xf007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(stuntair_sound_w)
 ADDRESS_MAP_END
@@ -356,7 +354,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( stuntair )
-	PORT_START("DSWB") // the bit order is scrambled, but this matches the text above
+	PORT_START("DSWB") // the bit order is scrambled (see table at 05B0), but this matches the text above
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -378,7 +376,7 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x81, "5" )
 
-	PORT_START("DSWA") // the bit order is scrambled, not sure if the dip locations are correct
+	PORT_START("DSWA") // the bit order is scrambled (table at 05B0 also used), not sure if the dip locations are correct
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" ) // test related? $05c7
 	PORT_DIPNAME( 0x28, 0x08, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SWA:2,3") // $298f
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -519,6 +517,20 @@ static MACHINE_CONFIG_START( stuntair )
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type and location not verified
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // set but never cleared
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stuntair_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stuntair_state, spritebank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stuntair_state, spritebank0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // cleared at start
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

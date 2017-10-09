@@ -23,14 +23,14 @@ class msx_cart_disk_device : public device_t, public msx_cart_interface
 public:
 	virtual void initialize_cartridge() override;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 protected:
 	msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };
 
 
@@ -92,7 +92,8 @@ class msx_cart_vy0010_device : public msx_cart_disk_type1_device
 public:
 	msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -101,7 +102,8 @@ class msx_cart_fsfd1_device : public msx_cart_disk_type1_device
 public:
 	msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -110,7 +112,8 @@ class msx_cart_fscf351_device : public msx_cart_disk_type2_device
 public:
 	msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -128,15 +131,15 @@ class msx_cart_fsfd1a_device : public msx_cart_disk_tc8566_device
 public:
 	msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 };
 
 

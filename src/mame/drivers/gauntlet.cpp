@@ -124,6 +124,7 @@
 #include "includes/gauntlet.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
@@ -190,12 +191,10 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 		if ((oldword ^ m_sound_reset_val) & 1)
 		{
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_soundctl->clear_w(m_sound_reset_val & 1);
 			m_soundcomm->sound_cpu_reset();
 			if (m_sound_reset_val & 1)
 			{
-				m_ym2151->reset();
-				m_tms5220->reset();
-				m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / 11);
 				m_ym2151->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_pokey->set_output_gain(ALL_OUTPUTS, 0.0f);
 				m_tms5220->set_output_gain(ALL_OUTPUTS, 0.0f);
@@ -231,27 +230,22 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
+WRITE_LINE_MEMBER(gauntlet_state::speech_squeak_w)
 {
-	switch (offset & 7)
-	{
-		case 0: /* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) m_ym2151->reset();
-			break;
+	uint8_t data = 5 | (state ? 2 : 0);
+	m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
+}
 
-		case 1: /* speech write, bit D7, active low */
-			m_tms5220->wsq_w(data >> 7);
-			break;
+WRITE_LINE_MEMBER(gauntlet_state::coin_counter_left_w)
+{
+	// coins 1 & 2 combined
+	machine().bookkeeping().coin_counter_w(0, state);
+}
 
-		case 2: /* speech reset, bit D7, active low */
-			m_tms5220->rsq_w(data >> 7);
-			break;
-
-		case 3: /* speech squeak, bit D7 */
-			data = 5 | ((data >> 6) & 2);
-			m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
-			break;
-	}
+WRITE_LINE_MEMBER(gauntlet_state::coin_counter_right_w)
+{
+	// coins 3 & 4 combined
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -286,7 +280,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
@@ -296,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 
 	/* VBUS */
@@ -325,7 +319,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
-	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
+	AM_RANGE(0x1030, 0x1030) AM_MIRROR(0x27cf) AM_READ(switch_6502_r)
+	AM_RANGE(0x1030, 0x1037) AM_MIRROR(0x27c8) AM_DEVWRITE("soundctl", ls259_device, write_d7)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE("tms", tms5220_device, data_w)
@@ -504,7 +499,8 @@ static MACHINE_CONFIG_START( gauntlet_base )
 	MCFG_MACHINE_START_OVERRIDE(gauntlet_state,gauntlet)
 	MCFG_MACHINE_RESET_OVERRIDE(gauntlet_state,gauntlet)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -544,6 +540,14 @@ static MACHINE_CONFIG_START( gauntlet_base )
 	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+
+	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(gauntlet_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gauntlet_state, coin_counter_left_w))
 MACHINE_CONFIG_END
 
 
@@ -589,7 +593,7 @@ ROM_START( gauntlets )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -622,7 +626,7 @@ ROM_START( gauntlet )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -655,7 +659,7 @@ ROM_START( gauntletj )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -688,7 +692,7 @@ ROM_START( gauntletj12 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -721,7 +725,7 @@ ROM_START( gauntletg )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -754,7 +758,7 @@ ROM_START( gauntletr9 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -787,7 +791,7 @@ ROM_START( gauntletgr8 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -820,7 +824,7 @@ ROM_START( gauntletr7 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -853,7 +857,7 @@ ROM_START( gauntletgr6 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -886,7 +890,7 @@ ROM_START( gauntletr5 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -919,7 +923,7 @@ ROM_START( gauntletr4 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -952,7 +956,7 @@ ROM_START( gauntletgr3 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -985,7 +989,7 @@ ROM_START( gauntletr2 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1018,7 +1022,7 @@ ROM_START( gauntletr1 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1051,7 +1055,7 @@ ROM_START( gauntlet2p )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1084,7 +1088,7 @@ ROM_START( gauntlet2pj )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1117,7 +1121,7 @@ ROM_START( gauntlet2pg )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1150,7 +1154,7 @@ ROM_START( gauntlet2pr3 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1183,7 +1187,7 @@ ROM_START( gauntlet2pj2 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
@@ -1216,7 +1220,7 @@ ROM_START( gauntlet2pg1 )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136037-104.6p",   0x000000, 0x002000, CRC(9e2a5b59) SHA1(3bbaa92e4612b0a26837ca67cfa4e36d0f2295fa) )
+	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )

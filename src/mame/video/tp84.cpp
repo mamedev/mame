@@ -183,8 +183,8 @@ uint32_t tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bit
 		m_bg_tilemap->set_scrollx(0, *m_scroll_x);
 		m_bg_tilemap->set_scrolly(0, *m_scroll_y);
 
-		machine().tilemap().set_flip_all(((*m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
-										((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
+		machine().tilemap().set_flip_all((m_flipscreen_x ? TILEMAP_FLIPX : 0) |
+										(m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

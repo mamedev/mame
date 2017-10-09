@@ -195,14 +195,9 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keyboard );
 }
 
-static MACHINE_CONFIG_START( keyboard_components )
+MACHINE_CONFIG_MEMBER( apricot_keyboard_hle_device::device_add_mconfig )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 MACHINE_CONFIG_END
-
-machine_config_constructor apricot_keyboard_hle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keyboard_components );
-}
 
 
 //**************************************************************************
@@ -229,7 +224,6 @@ apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &m
 
 void apricot_keyboard_hle_device::device_start()
 {
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
 //-------------------------------------------------
@@ -352,14 +346,4 @@ void apricot_keyboard_hle_device::key_break(uint8_t row, uint8_t column)
 void apricot_keyboard_hle_device::out_w(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
-}
-
-//-------------------------------------------------
-//  device_timer - device-specific timer
-//-------------------------------------------------
-
-void apricot_keyboard_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
 }

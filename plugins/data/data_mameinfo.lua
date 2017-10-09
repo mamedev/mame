@@ -15,9 +15,9 @@ function dat.check(set, softlist)
 	local sourcefile = emu.driver_find(set).source_file:match("[^/\\]*$")
 	status, drvinfo = pcall(datread, "drv", "info", sourcefile)
 	if drvinfo then
-		info = info .. "\n\n--- DRIVER INFO ---\nDriver: " .. sourcefile .. "\n\n" .. drvinfo
+		info = info .. _("\n\n--- DRIVER INFO ---\nDriver: ") .. sourcefile .. "\n\n" .. drvinfo
 	end
-	return "Mameinfo"
+	return _("MAMEinfo")
 end
 
 function dat.get()

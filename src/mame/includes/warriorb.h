@@ -56,6 +56,7 @@ public:
 	/* misc */
 	int        m_pandata[4];
 
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(sound_r);

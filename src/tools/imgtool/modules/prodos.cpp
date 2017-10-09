@@ -1813,13 +1813,12 @@ static imgtoolerr_t prodos_diskimage_deletefile(imgtool::partition &partition, c
 
 
 
-static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
 	prodos_dirent ent;
 	prodos_direnum direnum;
-	int fork_num = 0;
 
 	err = prodos_lookup_path(image, path, CREATE_NONE, &direnum, &ent);
 	if (err)
@@ -1828,22 +1827,15 @@ static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, co
 	if (is_dir_storagetype(ent.storage_type))
 		return IMGTOOLERR_FILENOTFOUND;
 
-	/* specify data fork */
-	ents[fork_num].type = FORK_DATA;
-	ents[fork_num].forkname[0] = '\0';
-	ents[fork_num].size = ent.filesize[0];
-	fork_num++;
+	// specify data fork
+	forks.emplace_back(ent.filesize[0], imgtool::fork_entry::type_t::DATA);
 
 	if (is_extendedfile_storagetype(ent.storage_type))
 	{
-		/* specify the resource fork */
-		ents[fork_num].type = FORK_RESOURCE;
-		strcpy(ents[fork_num].forkname, "RESOURCE_FORK");
-		ents[fork_num].size = ent.filesize[1];
-		fork_num++;
+		// specify the resource fork
+		forks.emplace_back(ent.filesize[1], imgtool::fork_entry::type_t::RESOURCE);
 	}
 
-	ents[fork_num].type = FORK_END;
 	return IMGTOOLERR_SUCCESS;
 }
 

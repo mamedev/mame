@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood,Paul Priest
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class ms32_state : public driver_device
@@ -90,6 +91,7 @@ public:
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE32_MEMBER(ms32_brightness_w);
 	DECLARE_WRITE32_MEMBER(ms32_gfxctrl_w);
+	DECLARE_WRITE32_MEMBER(coin_counter_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 	DECLARE_DRIVER_INIT(ms32_common);
 	DECLARE_DRIVER_INIT(ss92047_01);

@@ -18,16 +18,15 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-
-	// devices
+private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
 
 static ADDRESS_MAP_START( mmm_map, AS_PROGRAM, 8, mmm_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x40ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -44,10 +43,10 @@ MACHINE_CONFIG_END
 
 ROM_START( mmm_ldip )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ld1.bin", 0x0000, 0x001000, CRC(5a3c2402) SHA1(4972d309e6aabef4f9277ea851e45981d0cb3dbb) )
-	ROM_LOAD( "ld2.bin", 0x1000, 0x001000, CRC(ff82643b) SHA1(0e47cdc9c0eb6f05a420d2ffeb2ebf22acbda15b) )
-	ROM_LOAD( "ld3.bin", 0x2000, 0x001000, CRC(9e7158ae) SHA1(7f3b8730add127ed0608365875be3042fb2e3e7a) )
-	ROM_LOAD( "ld4.bin", 0x3000, 0x001000, CRC(970b749f) SHA1(fe6da7abc699db69c0761304f588b5bed899c674) )
+	ROM_LOAD( "ld1.bin", 0x0000, 0x1000, CRC(5a3c2402) SHA1(4972d309e6aabef4f9277ea851e45981d0cb3dbb) )
+	ROM_LOAD( "ld2.bin", 0x1000, 0x1000, CRC(ff82643b) SHA1(0e47cdc9c0eb6f05a420d2ffeb2ebf22acbda15b) )
+	ROM_LOAD( "ld3.bin", 0x2000, 0x1000, CRC(9e7158ae) SHA1(7f3b8730add127ed0608365875be3042fb2e3e7a) )
+	ROM_LOAD( "ld4.bin", 0x3000, 0x1000, CRC(970b749f) SHA1(fe6da7abc699db69c0761304f588b5bed899c674) )
 ROM_END
 
 

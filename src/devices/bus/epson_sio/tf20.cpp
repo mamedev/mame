@@ -76,26 +76,25 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( tf20 )
+MACHINE_CONFIG_MEMBER( epson_tf20_device::device_add_mconfig )
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
 
 	// 64k internal ram
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	// upd7201 serial interface
-	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("3a", UPD7201, XTAL_CR1 / 2)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(epson_tf20_device, txda_w))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(epson_tf20_device, dtra_w))
 
@@ -112,11 +111,6 @@ static MACHINE_CONFIG_START( tf20 )
 	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, rxc_w))
 	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, pinc_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor epson_tf20_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tf20 );
-}
 
 
 //**************************************************************************

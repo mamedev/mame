@@ -22,10 +22,6 @@ public:
 	// construction/destruction
 	sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	READ8_MEMBER( mpu401_r );
 	WRITE8_MEMBER( mpu401_w );
 
@@ -78,6 +74,11 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;
 	uint16_t dack16_r(int line) override;

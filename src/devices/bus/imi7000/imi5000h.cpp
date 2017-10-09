@@ -337,10 +337,10 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( imi5000h )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( imi5000h )
+MACHINE_CONFIG_MEMBER( imi5000h_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(imi5000h_mem)
@@ -379,17 +379,6 @@ static MACHINE_CONFIG_START( imi5000h )
 
 	//MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor imi5000h_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( imi5000h );
-}
 
 
 //-------------------------------------------------

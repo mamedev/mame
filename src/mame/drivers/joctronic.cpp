@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:AJR
 // PINBALL
 // Skeleton driver for Joctronic pinballs.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
@@ -23,6 +24,7 @@ public:
 		, m_soundcpu(*this, "soundcpu")
 		, m_oki(*this, "oki")
 		, m_adpcm_select(*this, "adpcm_select")
+		, m_driver_latch(*this, "drivers%u", 1)
 		, m_soundbank(*this, "soundbank")
 	{ }
 
@@ -35,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(display_a_w);
 	DECLARE_WRITE8_MEMBER(drivers_l_w);
 	DECLARE_WRITE8_MEMBER(drivers_b_w);
-	DECLARE_WRITE8_MEMBER(drivers_a_w);
 
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_READ8_MEMBER(ports_r);
@@ -53,7 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(soundlatch_nmi_r);
 	DECLARE_WRITE8_MEMBER(resint_w);
 	DECLARE_WRITE8_MEMBER(slalom03_oki_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(vclk_w);
+	DECLARE_WRITE_LINE_MEMBER(vck_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -63,6 +64,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_oki;
 	optional_device<ls157_device> m_adpcm_select;
+	optional_device_array<addressable_latch_device, 6> m_driver_latch;
 	optional_memory_bank m_soundbank;
 	u8 m_soundlatch;
 	bool m_adpcm_toggle;
@@ -114,25 +116,20 @@ WRITE8_MEMBER(joctronic_state::drivers_b_w)
 	logerror("drivers_b[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::drivers_a_w)
-{
-	logerror("drivers_a[%d] = $%02X\n", offset, data);
-}
-
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, joctronic_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x9007) AM_MIRROR(0x0ff8) AM_READ(csin_r) // CSIN
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0ff8) AM_WRITE(control_port_w) // PORTDS
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0ff8) AM_DEVWRITE("mainlatch", ls259_device, write_d0) // PORTDS
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0fc7) AM_WRITE(display_1_w) // CSD1
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x0fc7) AM_WRITE(display_2_w) // CSD2
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0fc7) AM_WRITE(display_3_w) // CSD3
 	AM_RANGE(0xc018, 0xc018) AM_MIRROR(0x0fc7) AM_WRITE(display_4_w) // CSD4
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0fc7) AM_WRITE(display_a_w) // CSDA
-	AM_RANGE(0xc028, 0xc02f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_l_w) // OL
-	AM_RANGE(0xc030, 0xc037) AM_MIRROR(0x0fc0) AM_WRITE(drivers_b_w) // OB
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_a_w) // OA
+	AM_RANGE(0xc028, 0xc028) AM_MIRROR(0x0fc7) AM_WRITE(drivers_l_w) // OL
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0fc7) AM_WRITE(drivers_b_w) // OB
+	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_w) // OA
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_nmi_w) // PSON
 ADDRESS_MAP_END
 
@@ -159,7 +156,9 @@ WRITE8_MEMBER(joctronic_state::display_strobe_w)
 
 WRITE8_MEMBER(joctronic_state::drivers_w)
 {
-	logerror("drivers[%d] = $%02X\n", offset, data);
+	for (int i = 0; i < 6; ++i)
+		if (m_driver_latch[i].found())
+			m_driver_latch[i]->write_bit(offset, BIT(data, i));
 }
 
 WRITE8_MEMBER(joctronic_state::display_ck_w)
@@ -171,7 +170,7 @@ static ADDRESS_MAP_START( slalom03_maincpu_map, AS_PROGRAM, 8, joctronic_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x9007) AM_MIRROR(0x0ff8) AM_WRITE(control_port_w) // CSPORT
+	AM_RANGE(0x9000, 0x9007) AM_MIRROR(0x0ff8) AM_DEVWRITE("mainlatch", ls259_device, write_d0) // CSPORT
 	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x0fc7) AM_WRITE(display_strobe_w) // STROBE
 	AM_RANGE(0xa010, 0xa017) AM_MIRROR(0x0fc0) AM_WRITE(drivers_w)
 	AM_RANGE(0xa018, 0xa018) AM_MIRROR(0x0fc7) AM_WRITE(display_ck_w) // CKD
@@ -240,12 +239,15 @@ WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
 	m_oki->reset_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(joctronic_state::vclk_w)
+WRITE_LINE_MEMBER(joctronic_state::vck_w)
 {
-	m_adpcm_toggle = !m_adpcm_toggle;
-	m_adpcm_select->select_w(m_adpcm_toggle);
-	if (m_adpcm_toggle)
-		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	if (state)
+	{
+		m_adpcm_toggle = !m_adpcm_toggle;
+		m_adpcm_select->select_w(m_adpcm_toggle);
+		if (m_adpcm_toggle)
+			m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
 }
 
 static ADDRESS_MAP_START( joctronic_sound_map, AS_PROGRAM, 8, joctronic_state )
@@ -323,9 +325,19 @@ static MACHINE_CONFIG_START( joctronic )
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC4 - exact type unknown
+	//MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(joctronic_state, display_select_w)) MCFG_DEVCB_MASK(0x07)
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(4)
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(joctronic_state, display_reset_w))
+
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_12MHz/4) // 3 MHz
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+
+	MCFG_DEVICE_ADD("drivers1", LS259, 0) // IC4
+	MCFG_DEVICE_ADD("drivers2", LS259, 0) // IC3
+	MCFG_DEVICE_ADD("drivers3", LS259, 0) // IC2
+	MCFG_DEVICE_ADD("drivers4", LS259, 0) // IC1
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -359,9 +371,21 @@ static MACHINE_CONFIG_START( slalom03 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC6 - exact type unknown
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(joctronic_state, cont_w))
+	//MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(3) MCFG_DEVCB_MASK(0x38)
+	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(joctronic_state, slalom03_reset_w))
+
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_12MHz/2) // 6 MHz
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+
+	MCFG_DEVICE_ADD("drivers1", HC259, 0) // IC1
+	MCFG_DEVICE_ADD("drivers2", HC259, 0) // IC2
+	MCFG_DEVICE_ADD("drivers3", HC259, 0) // IC3
+	MCFG_DEVICE_ADD("drivers4", HC259, 0) // IC4
+	MCFG_DEVICE_ADD("drivers5", HC259, 0) // IC5
+	MCFG_DEVICE_ADD("drivers6", HC259, 0) // IC6
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -383,7 +407,7 @@ static MACHINE_CONFIG_START( slalom03 )
 
 	MCFG_SOUND_ADD("oki", MSM5205, XTAL_12MHz/2/16) // 375 kHz
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B) // frequency modifiable during operation
-	MCFG_MSM5205_VCLK_CB(WRITELINE(joctronic_state, vclk_w))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(joctronic_state, vck_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -398,9 +422,9 @@ MACHINE_CONFIG_END
 /-------------------------------------------------------------------*/
 ROM_START(punkywil)
 	// Both ROMs are 27128, according to a text file accompanying
-	// the bad dump (which had a 512K overdump of the sound ROM)
+	// the previous bad dump (which had a 512K overdump of the sound ROM)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // 0c6c (???)
+	ROM_LOAD("pw_game.bin", 0x0000, 0x4000, CRC(f408367a) SHA1(967ab8a16e64273abf8e8cc4faab60e2c9a4856b)) // 0c6c (???)
 
 	ROM_REGION(0x4000, "soundcpu", 0)
 	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee)) // d55c (???)

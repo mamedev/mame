@@ -1,24 +1,5 @@
-local sql = require("lsqlite3")
 local datfile = {}
-local db
-do
-	local dbpath = lfs.env_replace(mame_manager:ui():options().entries.historypath:value():match("([^;]+)"))
-	db = sql.open(dbpath .. "/history.db")
-	if not db then
-		lfs.mkdir(dbpath)
-		db = sql.open(dbpath .. "/history.db")
-	end
-end
-if db then
-	local found = false
-	db:exec("select * from sqllite_master where name = version", function() found = true return 0 end)
-	if not found then
-		db:exec([[
-			CREATE TABLE version (
-				version VARCHAR NOT NULL,
-				datfile VARCHAR UNIQUE NOT NULL)]])
-	end
-end
+local db, sql = require("data/database")()
 
 function datfile.open(file, vertag, fixupcb)
 	if not db then
@@ -85,6 +66,7 @@ function datfile.open(file, vertag, fixupcb)
 		ver = tostring(lfs.attributes(filepath, "change"))
 	end
 	if ver == dbver then
+		fh:close()
 		return read, dbver
 	end
 
@@ -140,6 +122,7 @@ function datfile.open(file, vertag, fixupcb)
 				set:gsub("([^,]+)", function(s) sets[#sets + 1] = s end)
 				if #tags > 0 and #sets > 0 then
 					local tag1 = info2:match("^$([^%s]*)")
+					data = data:gsub("\r", "") -- strip crs
 					if fixupcb then
 						data = fixupcb(data)
 					end

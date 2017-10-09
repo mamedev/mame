@@ -22,15 +22,17 @@ public:
 	// construction/destruction
 	isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// called back by the MPU401 core to set the IRQ line state
-	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
-
-	// optional information overrides
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	// called back by the MPU401 core to set the IRQ line state
+	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
 
 	required_device<mpu401_device> m_mpu401;
 };

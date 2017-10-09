@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Vas Crabb
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     SITCOM (known as Sitcom, Sitcom85, Sitcom8085)

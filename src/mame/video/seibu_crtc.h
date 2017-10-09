@@ -55,10 +55,8 @@ public:
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_WRITE16_MEMBER( write_alt );
-	DECLARE_WRITE16_MEMBER( write_xor );
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_READ16_MEMBER( read_alt );
-	DECLARE_READ16_MEMBER( read_xor );
 	DECLARE_WRITE16_MEMBER(decrypt_key_w);
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_READ16_MEMBER(reg_1a_r);
@@ -71,7 +69,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	devcb_write16       m_decrypt_key_cb;

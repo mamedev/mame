@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( lcdc_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lcdc_map, AS_0, 8, bw2_state )
+static ADDRESS_MAP_START( lcdc_map, 0, 8, bw2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -496,12 +496,6 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 WRITE_LINE_MEMBER( bw2_state::mtron_w )
 {
 	m_mtron = state;
@@ -595,7 +589,8 @@ static MACHINE_CONFIG_START( bw2 )
 	// devices
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz/4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw2_state, pit_out0_w))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_TAG, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
@@ -608,7 +603,7 @@ static MACHINE_CONFIG_START( bw2 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(bw2_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, XTAL_16MHz)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, lcdc_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")

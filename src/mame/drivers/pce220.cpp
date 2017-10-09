@@ -31,6 +31,7 @@
 #include "machine/nvram.h"
 #include "machine/pce220_ser.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "rendlay.h"
 #include "screen.h"

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
@@ -108,6 +109,8 @@ public:
 	DECLARE_WRITE8_MEMBER( frogs_audio_w );
 	DECLARE_WRITE8_MEMBER( headon_audio_w );
 	DECLARE_WRITE8_MEMBER( invho2_audio_w );
+	DECLARE_WRITE8_MEMBER( brdrline_audio_w );
+	DECLARE_WRITE8_MEMBER( brdrline_audio_aux_w );
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/carnival.c -----------*/

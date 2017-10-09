@@ -39,7 +39,7 @@ public:
 	uint32_t m_fg_tile_offset;
 
 	// common
-	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
 	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 

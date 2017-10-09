@@ -42,6 +42,7 @@ the "America" release.
 #include "includes/tsamurai.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -73,9 +74,9 @@ MACHINE_START_MEMBER(tsamurai_state, vsgongf)
 	machine_start();
 }
 
-WRITE8_MEMBER(tsamurai_state::nmi_enable_w)
+WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 {
-	m_nmi_enabled = data;
+	m_nmi_enabled = state;
 }
 
 INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
@@ -126,14 +127,19 @@ WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
 	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::flip_screen_w)
+WRITE_LINE_MEMBER(tsamurai_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(tsamurai_state::coincounter_w)
+WRITE_LINE_MEMBER(tsamurai_state::coin1_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(tsamurai_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -164,10 +170,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(textbank1_w)
-	AM_RANGE(0xfc03, 0xfc04) AM_WRITE(coincounter_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
@@ -198,11 +201,7 @@ static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(textbank1_w)
-	AM_RANGE(0xfc03, 0xfc04) AM_WRITE(coincounter_w)
-	AM_RANGE(0xfc07, 0xfc07) AM_WRITE(m660_textbank2_w)/* Mission 660 uses a bit here */
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, tsamurai_state )
@@ -354,10 +353,7 @@ static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* vreg? always 0 */
 	AM_RANGE(0xf803, 0xf803) AM_WRITENOP /* vreg? always 0 */
-	AM_RANGE(0xfc00, 0xfc00) AM_RAM /* vreg? always 0 */
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xfc02, 0xfc03) AM_WRITE(coincounter_w)
-	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(textbank1_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
@@ -722,6 +718,13 @@ static MACHINE_CONFIG_START( tsamurai )
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -762,6 +765,13 @@ static MACHINE_CONFIG_START( vsgongf )
 	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 4L
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // vreg? always 0
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -811,6 +821,14 @@ static MACHINE_CONFIG_START( m660 )
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tsamurai_state, textbank2_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -839,18 +857,18 @@ MACHINE_CONFIG_END
 
 /*******************************************************************************/
 
-ROM_START( tsamurai )
+ROM_START( tsamurai ) // there's a protection device labeled B5 at location l3 on the main board
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "01.3r",      0x0000, 0x4000, CRC(d09c8609) SHA1(66b51897704250f520b4c58cb6f6f3aef8913459) )
-	ROM_LOAD( "02.3t",      0x4000, 0x4000, CRC(d0f2221c) SHA1(6cfa9a52b35d17776cfa3e14e679b1a6218d54fa) )
-	ROM_LOAD( "03.3v",      0x8000, 0x4000, CRC(eee8b0c9) SHA1(91dd47cdcd36d804e178b70d4338292ac36517f0) )
+	ROM_LOAD( "a35-01-1.3r", 0x0000, 0x4000, CRC(d09c8609) SHA1(66b51897704250f520b4c58cb6f6f3aef8913459) )
+	ROM_LOAD( "a35-02-1.3t", 0x4000, 0x4000, CRC(d0f2221c) SHA1(6cfa9a52b35d17776cfa3e14e679b1a6218d54fa) )
+	ROM_LOAD( "a35.03-1.3v", 0x8000, 0x4000, CRC(eee8b0c9) SHA1(91dd47cdcd36d804e178b70d4338292ac36517f0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
-	ROM_LOAD( "14.4e",      0x0000, 0x2000, CRC(220e9c04) SHA1(660351c866995147d2ba69940707879d6cf11718) )
+	ROM_LOAD( "a35-14.4e",  0x0000, 0x2000, CRC(220e9c04) SHA1(660351c866995147d2ba69940707879d6cf11718) )
 	ROM_LOAD( "a35-15.4c",  0x2000, 0x2000, CRC(1e0d1e33) SHA1(02612f10c264f06f59f61f0de4df0ef84249e963) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player#2 */
-	ROM_LOAD( "13.4j",      0x0000, 0x2000, CRC(73feb0e2) SHA1(7c650d0cdc517a60e14614083ab42aa934338556) )
+	ROM_LOAD( "a35-13.4j",      0x0000, 0x2000, CRC(73feb0e2) SHA1(7c650d0cdc517a60e14614083ab42aa934338556) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "a35-04.10a", 0x0000, 0x2000, CRC(b97ce9b1) SHA1(3993001bd98758fd5673d91786846ae019c64027) ) // tiles
@@ -1009,9 +1027,9 @@ ROM_START( yamagchi )
 	ROM_LOAD( "mb7114e.2m", 0x200, 0x100, CRC(938d0fce) SHA1(9aa14fdee23b1ed50300fe8f82525bb363914d93) )
 ROM_END
 
-ROM_START( ladymstr )
+ROM_START( ladymstr ) // there's a protection device labeled 6 at location l3 on the main board
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "a49-01-1.3r",0x0000, 0x4000, CRC(acbd0b64) SHA1(00a95ad28b6923dab808dd94af10cb1d70123d3e) )
+	ROM_LOAD( "a49-01-1.3r",0x0000, 0x4000, CRC(acbd0b64) SHA1(00a95ad28b6923dab808dd94af10cb1d70123d3e) ) // believed to be newer because of the -01 suffix
 	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
 	ROM_LOAD( "a49-03.3v",  0x8000, 0x4000, CRC(641c94ed) SHA1(494502d2478f9d8ad29be6c1815a5e4639d6ba3a) )
 
@@ -1043,6 +1061,39 @@ ROM_START( ladymstr )
 	ROM_LOAD( "a49-18.2m",  0x200, 0x0100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
 ROM_END
 
+ROM_START( ladymstr2 ) // there's a protection device labeled 6 at location l3 on the main board
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
+	ROM_LOAD( "a49-01.3r",  0x0000, 0x4000, CRC(8729e50e) SHA1(0b75dd6da26e71b32cfd1dfc1160e35f928286c4) )
+	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
+	ROM_LOAD( "a49-03.3v",  0x8000, 0x4000, CRC(641c94ed) SHA1(494502d2478f9d8ad29be6c1815a5e4639d6ba3a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
+	ROM_LOAD( "a49-14.4e",  0x0000, 0x2000, CRC(d83a3c02) SHA1(43f49d8f57726a629533d37a11338fd071e2e2d7) )
+	ROM_LOAD( "a49-15.4c",  0x2000, 0x2000, CRC(d24ee5fd) SHA1(f35a602cd24427687580f80d4c045c42557cdf06) )
+
+	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player#2 */
+	ROM_LOAD( "a49-13.4j",  0x0000, 0x2000, CRC(7942bd7c) SHA1(71a10db610a4eaf2e30a7ace4473d9eeb3239dc9) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "a49-04.10a", 0x0000, 0x2000, CRC(1fed96e6) SHA1(47c44def272a94e11d06948841c414568acc832a) ) // tiles
+	ROM_LOAD( "a49-05.10c", 0x2000, 0x2000, CRC(e0fce676) SHA1(f374ab8de8157327fdd48438d74c1bf7a5bf156d) )
+	ROM_LOAD( "a49-06.10d", 0x4000, 0x2000, CRC(f895672e) SHA1(f6ee81663850db025484b39c683ff992a0c84877) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "a49-10.11n", 0x0000, 0x1000, CRC(a7a361ba) SHA1(f142f78ac2434b22240202a9763c921db2d42fdb) ) // characters
+	ROM_LOAD( "a49-11.11q", 0x2000, 0x1000, CRC(801902e3) SHA1(abbcc2c6d805ab158f94ef60125eeea4d5041f71) )
+	ROM_LOAD( "a49-12.11r", 0x4000, 0x1000, CRC(cef75565) SHA1(9325effa7bd920af4997858bf26ebb01eeb858cd) )
+
+	ROM_REGION( 0xc000, "gfx3", 0 )
+	ROM_LOAD( "a49-07.12h", 0x0000, 0x4000, CRC(8c749828) SHA1(118057c1364d996f1445214c6aff749d6aa30a22) ) // sprites
+	ROM_LOAD( "a49-08.12j", 0x4000, 0x4000, CRC(03c10aed) SHA1(65b28bd724d9812d58ee5e0a4d0b5b0f9c2723b4) )
+	ROM_LOAD( "a49-09.12k", 0x8000, 0x4000, CRC(f61316d2) SHA1(b07eec0f4a2fe971ea3f4d56739981aef5ff4d0a) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "a49-16.2j",  0x000, 0x0100, CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
+	ROM_LOAD( "a49-17.2l",  0x100, 0x0100, CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
+	ROM_LOAD( "a49-18.2m",  0x200, 0x0100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
+ROM_END
 
 ROM_START( m660 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
@@ -1281,7 +1332,8 @@ GAME( 1985, tsamurai,  0,        tsamurai, tsamurai, tsamurai_state, 0, ROT90, "
 GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, ladymstr,  0,        tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr,  0,        tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 1, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr2, ladymstr, tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 2, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, yamagchi,  0,        tsamurai, yamagchi, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -5741,13 +5741,12 @@ static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const cha
 
 
 
-static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	uint32_t parID;
 	mac_str255 filename;
 	mac_dirent cat_info;
-	int fork_num = 0;
 	imgtool::image &img(partition.image());
 	struct mac_l2_imgref *image = get_imgref(img);
 
@@ -5758,22 +5757,15 @@ static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const cha
 	if (cat_info.dataRecType != hcrt_File)
 		return IMGTOOLERR_FILENOTFOUND;
 
-	/* specify data fork */
-	ents[fork_num].type = FORK_DATA;
-	ents[fork_num].forkname[0] = '\0';
-	ents[fork_num].size = cat_info.dataLogicalSize;
-	fork_num++;
+	// specify data fork
+	forks.emplace_back(cat_info.dataLogicalSize, imgtool::fork_entry::type_t::DATA);
 
 	if (cat_info.rsrcLogicalSize > 0)
 	{
-		/* specify the resource fork */
-		ents[fork_num].type = FORK_RESOURCE;
-		strcpy(ents[fork_num].forkname, "RESOURCE_FORK");
-		ents[fork_num].size = cat_info.rsrcLogicalSize;
-		fork_num++;
+		// specify the resource fork
+		forks.emplace_back(cat_info.rsrcLogicalSize, imgtool::fork_entry::type_t::RESOURCE);
 	}
 
-	ents[fork_num].type = FORK_END;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -6048,7 +6040,7 @@ static int bundle_discriminator(const void *resource, uint16_t id, uint32_t leng
 
 
 
-static int get_pixel(const uint8_t *src, int width, int height, int bpp,
+static uint8_t get_pixel(const uint8_t *src, int width, int height, int bpp,
 	int x, int y)
 {
 	uint8_t byte, mask;
@@ -6062,46 +6054,44 @@ static int get_pixel(const uint8_t *src, int width, int height, int bpp,
 
 
 
-static int load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
+static bool load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
 	uint32_t resource_type, uint16_t resource_id, int width, int height, int bpp,
-	const uint32_t *palette, int has_mask)
+	const uint32_t *palette, bool has_mask)
 {
-	int success = false;
-	int y, x, color, is_masked;
-	uint32_t pixel;
-	const uint8_t *src;
+	bool success = false;
+	uint32_t frame_length = width * height * bpp / 8;
+	uint32_t total_length = frame_length * (has_mask ? 2 : 1);
 	uint32_t resource_length;
-	uint32_t frame_length;
-	uint32_t total_length;
 
-	frame_length = width * height * bpp / 8;
-	total_length = frame_length * (has_mask ? 2 : 1);
-
-	/* attempt to fetch resource */
-	src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
+	// attempt to fetch resource
+	const uint8_t *src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
 		resource_id, &resource_length);
 	if (src && (resource_length == total_length))
 	{
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (x = 0; x < width; x ++)
+			for (int x = 0; x < width; x ++)
 			{
-				/* first check mask bit */
-				if (has_mask)
-					is_masked = get_pixel(src + frame_length, width, height, bpp, x, y);
-				else
-					is_masked = dest[y * width + x] >= 0x80000000;
+				// check the color
+				uint8_t color = get_pixel(src, width, height, bpp, x, y);
 
-				if (is_masked)
+				// then check the mask
+				bool is_masked = has_mask
+					? get_pixel(src + frame_length, width, height, bpp, x, y) != 0
+					: dest[y * width + x] >= 0x80000000;
+
+				// is this actually masked?  (note there is a special case when bpp == 1; Mac B&W icons
+				// had a XOR effect, and this cannot be blocked by the mask)
+				uint32_t pixel;
+				if (is_masked || (color && bpp == 1))
 				{
-					/* mask is ok; check the actual icon */
-					color = get_pixel(src, width, height, bpp, x, y);
+					// mask is ok; check the actual icon
 					pixel = palette[color] | 0xFF000000;
 				}
 				else
 				{
-					/* masked out; nothing */
-					pixel = 0;
+					// masked out; nothing
+					pixel = 0x00000000;
 				}
 
 				dest[y * width + x] = pixel;

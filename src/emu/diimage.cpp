@@ -96,7 +96,8 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_create_format(0),
 		m_create_args(nullptr),
 		m_user_loadable(true),
-		m_is_loading(false)
+		m_is_loading(false),
+		m_is_reset_and_loading(false)
 {
 }
 
@@ -1217,7 +1218,10 @@ void device_image_interface::reset_and_load(const std::string &path)
 	device().machine().schedule_hard_reset();
 
 	// and record the new load
-	device().machine().options().image_options()[instance_name()] = path;
+	device().machine().options().image_option(instance_name()).specify(path);
+
+	// record that we're reset and loading
+	m_is_reset_and_loading = true;
 }
 
 
@@ -1283,17 +1287,6 @@ const util::option_guide &device_image_interface::create_option_guide() const
 
 void device_image_interface::update_names()
 {
-	// count instances of the general image type, or device type if custom
-	int count = 0;
-	int index = -1;
-	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
-	{
-		if (this == &image)
-			index = count;
-		if ((image.image_type() == image_type() && custom_instance_name() == nullptr) || (device().type() == image.device().type()))
-			count++;
-	}
-
 	const char *inst_name = custom_instance_name();
 	const char *brief_name = custom_brief_instance_name();
 	if (inst_name == nullptr)
@@ -1301,9 +1294,25 @@ void device_image_interface::update_names()
 	if (brief_name == nullptr)
 		brief_name = device_brieftypename(image_type());
 
+	// count instances of the general image type, or device type if custom
+	int count = 0;
+	int index = -1;
+	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
+	{
+		if (this == &image)
+			index = count;
+		const char *other_name = image.custom_instance_name();
+		if (!other_name)
+			other_name = device_typename(image.image_type());
+
+		if (other_name == inst_name || !strcmp(other_name, inst_name))
+			count++;
+	}
+
+	m_canonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
-		m_instance_name = string_format("%s%d", inst_name, index + 1);
+		m_instance_name = m_canonical_instance_name;
 		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
@@ -1454,11 +1463,11 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 {
 	std::string result;
 
-	auto iter = device().mconfig().options().image_options().find(instance_name());
-	if (iter != device().mconfig().options().image_options().end() && !iter->second.empty())
+	const std::string &image_name(device().mconfig().options().image_option(instance_name()).value());
+	if (!image_name.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(iter->second, true);
+		const software_part *swpart = find_software_item(image_name, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

@@ -140,7 +140,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 void ui_gfx_init(running_machine &machine)
 {
 	ui_gfx_state *state = &ui_gfx;
-	uint8_t rotate = machine.system().flags & ORIENTATION_MASK;
+	uint8_t rotate = machine.system().flags & machine_flags::MASK_ORIENTATION;
 
 	// make sure we clean up after ourselves
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&ui_gfx_exit, &machine));
@@ -205,7 +205,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 					state.gfxdev[state.gfxset.devcount].palette[slot] = state.palette.interface;
 					state.gfxdev[state.gfxset.devcount].color_count[slot] = state.palette.interface->entries() / gfx->granularity();
 					if (!state.gfxdev[state.gfxset.devcount].color_count[slot])
-						state.gfxdev[state.gfxset.devcount].color_count[slot] = 1;						
+						state.gfxdev[state.gfxset.devcount].color_count[slot] = 1;
 				}
 			}
 			if (++state.gfxset.devcount == MAX_GFX_DECODERS)

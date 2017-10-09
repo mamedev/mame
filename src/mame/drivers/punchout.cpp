@@ -119,6 +119,7 @@ DIP locations verified for:
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
@@ -134,29 +135,9 @@ DIP locations verified for:
 
 // Z80 (main)
 
-WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
+WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 {
-	m_vlm->rst( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_speech_st_w)
-{
-	m_vlm->st( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
-{
-	m_vlm->vcu( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE8_MEMBER(punchout_state::nmi_mask_w)
-{
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
 }
 
 static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
@@ -197,18 +178,11 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
-	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP // watchdog reset, seldom used because 08 clears the watchdog as well
-	AM_RANGE(0x0a, 0x0a) AM_WRITENOP // ?
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITENOP // enable NVRAM?
+	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punchout_vlm_map, AS_0, 8, punchout_state )
+static ADDRESS_MAP_START( punchout_vlm_map, 0, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -654,6 +628,16 @@ static MACHINE_CONFIG_START( punchout )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(punchout_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // watchdog reset, seldom used because 08 clears the watchdog as well
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, rst))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, st))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, vcu))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", punchout)
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -682,7 +666,7 @@ static MACHINE_CONFIG_START( punchout )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 

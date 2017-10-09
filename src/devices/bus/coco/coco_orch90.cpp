@@ -10,6 +10,19 @@
     supporting stereo sound.  The left channel was at $FF7A, and the right
     channel was at $FF7B
 
+
+    Hidden Code exists in the ORCH-90 to produce a higher quality output.
+    Once you start the PAK, hit "SHIFT+ENTER" at the title screen.  Once you
+    are at command, type the following (playing the William Tell default):
+    "S" + "ENTER"
+    "P" + "SHIFT+ENTER"
+
+    The output will be cleaner due to code causing a change in CPU speed by
+    addressing CPU registers to run the 6809 at 2x speed.
+
+    "P" + "ENTER" will play at regular CPU speed.  The difference should be
+    very noticable.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -64,7 +77,7 @@ namespace
 			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
 
 			// Orch-90 ties CART to Q
-			set_line_value(cococart_slot_device::line::CART, cococart_slot_device::line_value::Q);
+			set_line_value(line::CART, line_value::Q);
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override
@@ -79,8 +92,8 @@ namespace
 		}
 
 	private:
-		WRITE8_MEMBER(write_left)	{ m_ldac->write(data); }
-		WRITE8_MEMBER(write_right)	{ m_rdac->write(data); }
+		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
+		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }
 
 		// internal state
 		required_device<dac_byte_interface> m_ldac;

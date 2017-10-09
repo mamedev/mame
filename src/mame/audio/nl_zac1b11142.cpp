@@ -35,14 +35,14 @@ NETLIST_START(zac1b11142_schematics)
 	RES(R104, RES_K(120))
 	RES(R105, RES_K(56))
 	RES(R120, RES_K(47))
+	RES(R121, 680) // incorrectly labelled R128 on schematic
 	RES(R122, RES_K(33))
 	RES(R123, RES_K(1))
 	RES(R124, RES_K(39))
 	RES(R125, RES_K(560))
 	RES(R126, RES_K(470))
 	RES(R127, RES_K(100))
-	RES(R128A, RES_K(56)) // schematic has two resistors marked as R128, need PCB photo or parts list to resolve
-	RES(R128B, 680)
+	RES(R128, RES_K(56))
 	RES(R129, RES_K(1))
 	RES(R130, RES_K(33))
 	RES(R131, RES_K(150))
@@ -59,10 +59,10 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R131.2, R130.1, U5C1.MINUS)
 	NET_C(R130.2, R124.1, U5C1.OUT)
 	NET_C(R120.1, U5C1.PLUS)
-	NET_C(U5D.8, R129.1, R128A.1)
-	NET_C(R128A.2, R126.2, R127.1, R125.1, C62.1, U5C2.MINUS)
+	NET_C(U5D.8, R129.1, R128.1)
+	NET_C(R128.2, R126.2, R127.1, R125.1, C62.1, U5C2.MINUS)
 	NET_C(R125.2, C62.2, U5C2.OUT, R123.1)
-	NET_C(R128B.1, U5C2.PLUS)
+	NET_C(R121.1, U5C2.PLUS)
 	NET_C(R123.2, C61.1, C68.1)
 	NET_C(C68.2, R122.1)
 	NET_C(R122.2, R104.1, U5C3.MINUS)
@@ -70,7 +70,7 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R102.1, U5C3.PLUS)
 	NET_C(R103.2, R102.2, R84.1)
 	NET_C(VCC, R126.1, R103.1, U5C1.VP, U5C2.VP, U5C3.VP)
-	NET_C(GND, R133.2, C63.2, R132.2, R120.2, R129.2, R127.2, R128B.2, C61.2, R84.2, U5C1.VM, U5C2.VM, U5C3.VM)
+	NET_C(GND, R133.2, C63.2, R132.2, R120.2, R129.2, R127.2, R121.2, C61.2, R84.2, U5C1.VM, U5C2.VM, U5C3.VM)
 	ALIAS(RULLANTE, R124.2)
 	ALIAS(CASSA, R105.2)
 
@@ -88,7 +88,7 @@ NETLIST_START(zac1b11142_schematics)
 	RES(R85, RES_K(120))
 	RES(R86, RES_K(100))
 	RES(R87, RES_K(33))
-	RES(R88, RES_K(15)) // schematic just says "15" but 15Ω would be way too low
+	RES(R88, RES_K(15)) // schematic says "15" but board has 15kΩ resistor and 15Ω would be way too low
 	RES(R98, RES_K(180))
 	RES(R99, RES_K(47))
 	RES(R100, RES_K(1))
@@ -135,18 +135,19 @@ NETLIST_START(zac1b11142_schematics)
 
 	// ANAL6
 	// schematic shows an open jumper between R80 and the mix, so this channel may have been disconnected in practice
+	// at least one physical board has no connection between the pads
 
 	CAP(C42, CAP_U(0.1))
 	CAP(C43, CAP_U(0.01))
 	RES(R47, RES_K(1))
 	RES(R48, RES_K(10))
-	RES(R80, RES_K(10))
+	//RES(R80, RES_K(10))
 	RES(R81, RES_K(10))
 
 	NET_C(ANAL6, R47.1, R48.1)
 	NET_C(R48.2, C42.1)
 	NET_C(C42.2, R81.1)
-	NET_C(R81.2, C43.1, R80.1)
+	NET_C(R81.2, C43.1/*, R80.1*/)
 	NET_C(GND, R47.2, C43.2)
 
 
@@ -242,11 +243,11 @@ NETLIST_START(zac1b11142_schematics)
 	LM3900(U5B3)
 
 #if 0
-	NET_C(RULLANTE, CASSA, BASSO, R82.2, R80.2, PIANO, C40.1, R77.1)
+	NET_C(RULLANTE, CASSA, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
 #else
 	// cassa swamps the other instruments if it's connected - just ground it for now
 	NET_C(GND, CASSA)
-	NET_C(RULLANTE, BASSO, R82.2, R80.2, PIANO, C40.1, R77.1)
+	NET_C(RULLANTE, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
 #endif
 	NET_C(C40.2, R97.1)
 	NET_C(TROMBA, R97.2, R41.2, R42.2, R43.2, R44.2, R73.2, R74.2, R75.2, R76.2)

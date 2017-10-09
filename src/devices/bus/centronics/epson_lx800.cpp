@@ -58,15 +58,14 @@ static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, epson_lx800_device )
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
 	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("ic3b", e05a03_device, read, write)
 	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( epson_lx800 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( epson_lx800 )
+MACHINE_CONFIG_MEMBER( epson_lx800_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
@@ -96,17 +95,6 @@ static MACHINE_CONFIG_START( epson_lx800 )
 	MCFG_E05A03_PE_CALLBACK(WRITELINE(epson_lx800_device, centronics_pe_w))
 	MCFG_E05A03_DATA_CALLBACK(READ8(epson_lx800_device, centronics_data_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor epson_lx800_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( epson_lx800 );
-}
 
 
 //-------------------------------------------------

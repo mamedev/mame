@@ -32,6 +32,7 @@ Lower board (MGP_01):
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "video/resnet.h"
 #include "screen.h"
 

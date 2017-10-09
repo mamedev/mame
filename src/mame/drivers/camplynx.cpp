@@ -786,8 +786,7 @@ FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( camplynx_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( lynx_common )
@@ -804,9 +803,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lynx_disk )
 	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", camplynx_state::camplynx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "drive1", camplynx_state::camplynx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

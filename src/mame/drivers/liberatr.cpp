@@ -168,15 +168,33 @@ void liberatr_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( liberatr_state::led_w )
+WRITE8_MEMBER(liberatr_state::output_latch_w)
 {
-	output().set_led_value(offset, ~data & 0x10);
+	m_outlatch->write_bit(offset, BIT(data, 4));
 }
 
 
-WRITE8_MEMBER( liberatr_state::coin_counter_w )
+WRITE_LINE_MEMBER(liberatr_state::start_led_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset ^ 0x01, data & 0x10);
+	output().set_led_value(0, !state);
+}
+
+
+WRITE_LINE_MEMBER(liberatr_state::start_led_2_w)
+{
+	output().set_led_value(1, !state);
+}
+
+
+WRITE_LINE_MEMBER(liberatr_state::coin_counter_left_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(liberatr_state::coin_counter_right_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -187,17 +205,17 @@ WRITE8_MEMBER( liberatr_state::coin_counter_w )
  *
  *************************************/
 
-WRITE8_MEMBER( liberatr_state::trackball_reset_w )
+WRITE_LINE_MEMBER(liberatr_state::trackball_reset_w)
 {
 	/* on the rising edge of /ctrld, the /ld signal on the LS191 is released and the value of the switches */
 	/* input becomes the starting point for the trackball counters */
-	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
+	if (!m_ctrld && state)
 	{
 		uint8_t trackball = ioport("FAKE")->read();
 		uint8_t switches = ioport("IN0")->read();
 		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
-	m_ctrld = data & 0x10;
+	m_ctrld = state;
 }
 
 
@@ -279,10 +297,7 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_SHARE("planet_frame")
 	AM_RANGE(0x6a00, 0x6a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(led_w)
-	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(trackball_reset_w)
-	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
-	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_SHARE("planet_select")
+	AM_RANGE(0x6c00, 0x6c07) AM_WRITE(output_latch_w)
 	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
@@ -312,10 +327,7 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_SHARE("planet_frame")
 	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(led_w)
-	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(trackball_reset_w)
-	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
-	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_SHARE("planet_select")
+	AM_RANGE(0x4c00, 0x4c07) AM_WRITE(output_latch_w)
 	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
@@ -423,6 +435,16 @@ static MACHINE_CONFIG_START( liberatr )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(liberatr_state, start_led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(liberatr_state, start_led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // TBSWP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // SPARE
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(liberatr_state, trackball_reset_w)) // CTRLD
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(liberatr_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(liberatr_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(liberatr_state, planet_select_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

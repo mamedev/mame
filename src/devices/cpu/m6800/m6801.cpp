@@ -248,7 +248,7 @@ DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "M6801")
 DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "M6803")
 DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "HD6301")
 DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "HD63701")
-DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6304r", "HD6304R")
+DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "HD6303R")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -294,15 +294,12 @@ hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-const address_space_config *m6801_cpu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m6801_cpu_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_IO:                return &m_io_config;
-	default:                   return m6800_cpu_device::memory_space_config(spacenum);
-	}
+	auto r = m6800_cpu_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_IO, &m_io_config));
+	return r;
 }
-
 
 void m6801_cpu_device::m6800_check_irq2()
 {

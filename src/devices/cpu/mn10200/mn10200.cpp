@@ -58,6 +58,14 @@ mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *
 { }
 
 
+device_memory_interface::space_config_vector mn10200_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+
 // disasm
 void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -200,10 +208,12 @@ void mn10200_device::device_start()
 		m_serial[i].ctrll = 0;
 		m_serial[i].ctrlh = 0;
 		m_serial[i].buf = 0;
+		m_serial[i].recv = 0;
 
 		save_item(NAME(m_serial[i].ctrll), i);
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
+		save_item(NAME(m_serial[i].recv), i);
 	}
 
 	// ports
@@ -2145,13 +2155,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x181: case 0x191:
 			return m_serial[(offset-0x180) >> 4].ctrlh;
 
-		case 0x182:
+		case 0x182: //case 0x192:
 		{
-			static int zz;
-			return zz++;
+			int ser = (offset-0x180) >> 4;
+			return m_serial[ser].recv++;
 		}
 
-		case 0x183:
+		case 0x183: //case 0x193:
 			return 0x10;
 
 		// 8-bit timers

@@ -16,13 +16,6 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( iq151_grafik )
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
-MACHINE_CONFIG_END
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -69,13 +62,15 @@ void iq151_grafik_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor iq151_grafik_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iq151_grafik );
-}
+MACHINE_CONFIG_MEMBER( iq151_grafik_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  I8255 port a

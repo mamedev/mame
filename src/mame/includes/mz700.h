@@ -16,6 +16,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
 

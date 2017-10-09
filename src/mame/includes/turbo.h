@@ -130,7 +130,9 @@ public:
 	DECLARE_READ8_MEMBER(turbo_collision_r);
 	DECLARE_WRITE8_MEMBER(turbo_collision_clear_w);
 	DECLARE_WRITE8_MEMBER(turbo_analog_reset_w);
-	DECLARE_WRITE8_MEMBER(turbo_coin_and_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_meter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_meter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
 	DECLARE_READ8_MEMBER(buckrog_cpu2_command_r);
 	DECLARE_READ8_MEMBER(buckrog_port_2_r);
 	DECLARE_READ8_MEMBER(buckrog_port_3_r);

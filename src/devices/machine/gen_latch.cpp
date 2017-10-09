@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device, "generic_latch_16"
 
 generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_separate_acknowledge(false),
 	m_latch_written(false),
 	m_data_pending_cb(*this)
 {
@@ -41,6 +42,18 @@ void generic_latch_base_device::device_start()
 {
 	m_data_pending_cb.resolve_safe();
 	save_item(NAME(m_latch_written));
+
+	// synchronization is needed since other devices may not be initialized yet
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_base_device::init_callback), this));
+}
+
+//-------------------------------------------------
+//  init_callback - set initial state
+//-------------------------------------------------
+
+void generic_latch_base_device::init_callback(void *ptr, s32 param)
+{
+	m_data_pending_cb(m_latch_written ? 1 : 0);
 }
 
 //-------------------------------------------------
@@ -88,7 +101,8 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	set_latch_written(false);
+	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
+		set_latch_written(false);
 	return m_latched_value;
 }
 
@@ -115,6 +129,18 @@ WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
 WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
 {
 	m_latched_value = 0x00;
+}
+
+READ8_MEMBER( generic_latch_8_device::acknowledge_r )
+{
+	if (!machine().side_effect_disabled())
+		set_latch_written(false);
+	return space.unmap();
+}
+
+WRITE8_MEMBER( generic_latch_8_device::acknowledge_w )
+{
+	set_latch_written(false);
 }
 
 //-------------------------------------------------
@@ -158,7 +184,8 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	set_latch_written(false);
+	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
+		set_latch_written(false);
 	return m_latched_value;
 }
 

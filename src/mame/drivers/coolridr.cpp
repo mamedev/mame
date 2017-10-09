@@ -283,8 +283,9 @@ to the same bank as defined through A20.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/scsp.h"
 #include "rendlay.h"
 #include "screen.h"

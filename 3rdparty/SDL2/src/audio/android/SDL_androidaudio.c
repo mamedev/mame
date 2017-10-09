@@ -31,10 +31,13 @@
 
 #include "../../core/android/SDL_android.h"
 
+#include "opensl_io.h"
+
 #include <android/log.h>
 
 static SDL_AudioDevice* audioDevice = NULL;
 static SDL_AudioDevice* captureDevice = NULL;
+static OPENSL_STREAM *sl = NULL;
 
 static int
 ANDROIDAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
@@ -57,7 +60,8 @@ ANDROIDAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 
     test_format = SDL_FirstAudioFormat(this->spec.format);
     while (test_format != 0) { /* no "UNKNOWN" constant */
-        if ((test_format == AUDIO_U8) || (test_format == AUDIO_S16LSB)) {
+//        if ((test_format == AUDIO_U8) || (test_format == AUDIO_S16LSB)) {
+        if (test_format == AUDIO_S16MSB) {
             this->spec.format = test_format;
             break;
         }
@@ -75,20 +79,32 @@ ANDROIDAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
         this->spec.channels = 1;
     }
 
+	#if 0
     if (this->spec.freq < 8000) {
         this->spec.freq = 8000;
     }
     if (this->spec.freq > 48000) {
         this->spec.freq = 48000;
     }
-
+	#endif
     /* TODO: pass in/return a (Java) device ID */
-    this->spec.samples = Android_JNI_OpenAudioDevice(iscapture, this->spec.freq, this->spec.format == AUDIO_U8 ? 0 : 1, this->spec.channels, this->spec.samples);
-
-    if (this->spec.samples == 0) {
-        /* Init failed? */
-        return SDL_SetError("Java-side initialization failed!");
-    }
+    //this->spec.samples = Android_JNI_OpenAudioDevice(iscapture, this->spec.freq, this->spec.format == AUDIO_U8 ? 0 : 1, this->spec.channels, this->spec.samples);
+	if (!sl & !iscapture)
+	{
+		if (this->spec.size != 0)
+		{
+//			this->spec.samples = this->spec.size / this->spec.channels / 2;
+		} else {
+			this->spec.samples = 400;
+			this->spec.size = this->spec.channels * this->spec.samples;
+		}
+		sl = android_OpenAudioDevice(this->spec.freq, this->spec.channels, this->spec.channels, this->spec.samples);
+		__android_log_print(ANDROID_LOG_INFO, "SDL", "android_OpenAudioDevice: %x, freq=%d, channels=%d, %d samples", (int)sl, this->spec.freq, this->spec.channels, this->spec.samples);
+		if (!sl) {
+			/* Init failed? */
+			return SDL_SetError("Java-side initialization failed!");
+		}
+	}
 
     SDL_CalculateAudioSpec(&this->spec);
 
@@ -98,13 +114,17 @@ ANDROIDAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 static void
 ANDROIDAUDIO_PlayDevice(_THIS)
 {
-    Android_JNI_WriteAudioBuffer();
+    //Android_JNI_WriteAudioBuffer();
+	android_AudioOut2(sl);
 }
 
 static Uint8 *
 ANDROIDAUDIO_GetDeviceBuf(_THIS)
 {
-    return Android_JNI_GetAudioBuffer();
+    //return Android_JNI_GetAudioBuffer();
+	Uint8 *buf = android_GetDeviceBuffer(sl);
+//	__android_log_print(ANDROID_LOG_INFO, "SDL", "GetDeviceBuf: %x", (int) buf);
+	return buf;
 }
 
 static int
@@ -148,9 +168,9 @@ ANDROIDAUDIO_Init(SDL_AudioDriverImpl * impl)
     impl->FlushCapture = ANDROIDAUDIO_FlushCapture;
 
     /* and the capabilities */
-    impl->HasCaptureSupport = SDL_TRUE;
+    impl->HasCaptureSupport = SDL_FALSE;
     impl->OnlyHasDefaultOutputDevice = 1;
-    impl->OnlyHasDefaultCaptureDevice = 1;
+    impl->OnlyHasDefaultCaptureDevice = 0;
 
     return 1;   /* this audio target is available. */
 }

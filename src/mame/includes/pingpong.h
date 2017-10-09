@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+
+#include "machine/timer.h"
+
 class pingpong_state : public driver_device
 {
 public:

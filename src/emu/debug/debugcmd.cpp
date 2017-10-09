@@ -20,6 +20,7 @@
 #include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
+#include <fstream>
 
 
 
@@ -180,8 +181,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("wpd",       CMDFLAG_NONE, AS_DATA, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wpiset",    CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wpi",       CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wposet",    CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpo",       CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wposet",    CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpo",       CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1, _2));
 	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2));
 	m_console.register_command("wpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2));
@@ -204,17 +205,17 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saveo",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 
-	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loado",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_OPCODES, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
@@ -239,8 +240,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("findd",     CMDFLAG_KEEP_QUOTES, AS_DATA, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
 	m_console.register_command("fi",        CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
 	m_console.register_command("findi",     CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, AS_DECRYPTED_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, AS_DECRYPTED_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
+	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
+	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2));
 
@@ -255,7 +256,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("pcatmemp",  CMDFLAG_NONE, AS_PROGRAM, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2));
 	m_console.register_command("pcatmemd",  CMDFLAG_NONE, AS_DATA,    1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2));
 	m_console.register_command("pcatmemi",  CMDFLAG_NONE, AS_IO,      1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2));
-	m_console.register_command("pcatmemo",  CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2));
+	m_console.register_command("pcatmemo",  CMDFLAG_NONE, AS_OPCODES, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2));
 
 	m_console.register_command("snap",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_snap, this, _1, _2));
 
@@ -264,7 +265,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("map",       CMDFLAG_NONE, AS_PROGRAM, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
 	m_console.register_command("mapd",      CMDFLAG_NONE, AS_DATA, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
 	m_console.register_command("mapi",      CMDFLAG_NONE, AS_IO, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
-	m_console.register_command("mapo",      CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
+	m_console.register_command("mapo",      CMDFLAG_NONE, AS_OPCODES, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
 	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_memdump, this, _1, _2));
 
 	m_console.register_command("symlist",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_symlist, this, _1, _2));
@@ -1398,7 +1399,7 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
 			if (device.debug()->watchpoint_first(spacenum) != nullptr)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
@@ -1684,44 +1685,51 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_load(int ref, const std::vector<std::string> &params)
 {
-	u64 offset, endoffset, length;
+	u64 offset, endoffset, length = 0;
 	address_space *space;
-	FILE *f;
 	u64 i;
 
-	/* validate parameters */
+	// validate parameters
 	if (!validate_number_parameter(params[1], offset))
 		return;
-	if (!validate_number_parameter(params[2], length))
+	if (params.size() > 2 && !validate_number_parameter(params[2], length))
 		return;
 	if (!validate_cpu_space_parameter((params.size() > 3) ? params[3].c_str() : nullptr, ref, space))
 		return;
 
-	/* determine the addresses to read */
-	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
-
-	/* open the file */
-	f = fopen(params[0].c_str(), "rb");
-	if (!f)
+	// open the file
+	std::ifstream f;
+	f.open(params[0], std::ifstream::in | std::ifstream::binary);
+	if (f.fail())
 	{
 		m_console.printf("Error opening file '%s'\n", params[0].c_str());
 		return;
 	}
 
-	/* now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1) */
-	u8 byte;
-	for (i = offset; i <= endoffset || endoffset == offset - 1 ; i++)
+	// determine the file size, if not specified
+	if (params.size() <= 2)
 	{
-		fread(&byte, 1, 1, f);
-		/* check if end of file has been reached and stop loading if it has */
-		if (feof(f))
-			break;
-		m_cpu.write_byte(*space, i, byte, true);
+		f.seekg(0, std::ios::end);
+		length = f.tellg();
+		f.seekg(0);
 	}
-	/* close the file */
-	fclose(f);
-	if ( i == offset)
+
+	// determine the addresses to read
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
+
+	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
+	for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+	{
+		char byte;
+		f.read(&byte, 1);
+		if (f)
+			m_cpu.write_byte(*space, i, byte, true);
+	}
+
+	if (!f.good())
+		m_console.printf("I/O error, load failed\n");
+	else if (i == offset)
 		m_console.printf("Length specified too large, load failed\n");
 	else
 		m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
@@ -1771,7 +1779,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	}
 	if (rowsize == 0 || (rowsize % width) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
 		return;
 	}
 
@@ -2206,7 +2214,7 @@ void debugger_commands::execute_cheatlist(int ref, const std::vector<std::string
 		case AS_PROGRAM:    spaceletter = 'p';  break;
 		case AS_DATA:   spaceletter = 'd';  break;
 		case AS_IO:     spaceletter = 'i';  break;
-		case AS_DECRYPTED_OPCODES: spaceletter = 'o'; break;
+		case AS_OPCODES: spaceletter = 'o'; break;
 	}
 
 	switch (m_cheat.width)
@@ -2409,8 +2417,8 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		return;
 	if (!validate_cpu_space_parameter(params.size() > 4 ? params[4].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	if (space->device().memory().has_space(AS_DECRYPTED_OPCODES))
-		decrypted_space = &space->device().memory().space(AS_DECRYPTED_OPCODES);
+	if (space->device().memory().has_space(AS_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_OPCODES);
 	else
 		decrypted_space = space;
 
@@ -2635,8 +2643,8 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 	address_space *space, *decrypted_space;
 	if (!validate_cpu_space_parameter(!params.empty() ? params[0].c_str() : nullptr, AS_PROGRAM, space))
 		return;
-	if (space->device().memory().has_space(AS_DECRYPTED_OPCODES))
-		decrypted_space = &space->device().memory().space(AS_DECRYPTED_OPCODES);
+	if (space->device().memory().has_space(AS_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_OPCODES);
 	else
 		decrypted_space = space;
 
@@ -2786,7 +2794,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
 	const u64 data = m_cpu.read_memory(*space, space->address_to_byte(address), native_data_width, true);
 
 	// Recover the pc & print
-	const address_spacenum space_num = (address_spacenum)ref;
+	const int space_num = (int)ref;
 	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space_num, address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);
@@ -2877,7 +2885,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 		taddress = space->address_to_byte(address) & space->bytemask();
 		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
-			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
+			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],
@@ -2907,7 +2915,9 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	file = fopen(filename, "w");
 	if (file)
 	{
-		m_machine.memory().dump(file);
+		memory_interface_iterator iter(m_machine.root_device());
+		for (device_memory_interface &memory : iter)
+			memory.dump(file);
 		fclose(file);
 	}
 }

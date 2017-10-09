@@ -45,7 +45,7 @@ void vp575_device::update_interrupts()
 //  MACHINE_CONFIG_START( vp575 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vp575 )
+MACHINE_CONFIG_MEMBER( vp575_device::device_add_mconfig )
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp1_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp1_dma_out_w))
@@ -71,17 +71,6 @@ static MACHINE_CONFIG_START( vp575 )
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp5_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp5_dma_in_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vp575_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vp575 );
-}
 
 
 

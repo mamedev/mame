@@ -45,11 +45,12 @@
     Master clock frequency    640kHz           384kHz
     Sampling frequency        4k/8k/16k/32kHz  4k/6k/8kHz
     ADPCM bit length          4-bit            3-bit/4-bit
+    Data capture timing       5µsec            15.6µsec
     DA converter              12-bit           10-bit
     Low-pass filter           -40dB/oct        N/A
     Overflow prevent circuit  Included         N/A
 
-    Data input follows VCK falling edge on MSM5205 (VCK rising edge on MSM6585)
+    Data capture follows VCK falling edge on MSM5205 (VCK rising edge on MSM6585)
 
    TODO:
    - lowpass filter for MSM6585
@@ -71,7 +72,8 @@ msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, 
 		m_s1(false),
 		m_s2(false),
 		m_bitwidth(4),
-		m_vclk_cb(*this)
+		m_vck_cb(*this),
+		m_vck_legacy_cb(*this)
 {
 }
 
@@ -99,18 +101,20 @@ void msm5205_device::set_prescaler_selector(device_t &device, int select)
 
 void msm5205_device::device_start()
 {
-	m_vclk_cb.resolve();
+	m_vck_cb.resolve_safe();
+	m_vck_legacy_cb.resolve();
 
 	/* compute the difference tables */
 	compute_tables();
 
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::vclk_callback), this));
+	m_vck_timer = timer_alloc(TIMER_VCK);
+	m_capture_timer = timer_alloc(TIMER_ADPCM_CAPTURE);
 
 	/* register for save states */
 	save_item(NAME(m_data));
-	save_item(NAME(m_vclk));
+	save_item(NAME(m_vck));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_s1));
 	save_item(NAME(m_s2));
@@ -127,7 +131,7 @@ void msm5205_device::device_reset()
 {
 	/* initialize work */
 	m_data    = 0;
-	m_vclk     = 0;
+	m_vck     = 0;
 	m_reset   = 0;
 	m_signal  = 0;
 	m_step    = 0;
@@ -176,15 +180,38 @@ void msm5205_device::compute_tables()
 	}
 }
 
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void msm5205_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_VCK:
+			m_vck = !m_vck;
+			m_vck_cb(m_vck);
+			if (!m_vck)
+				m_capture_timer->adjust(attotime::from_nsec(15600));
+			break;
+
+		case TIMER_ADPCM_CAPTURE:
+			update_adpcm();
+			break;
+	}
+}
+
 // timer callback at VCK low edge on MSM5205 (at rising edge on MSM6585)
-TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
+void msm5205_device::update_adpcm()
 {
 	int val;
 	int new_signal;
 
 	// callback user handler and latch next data
-	if (!m_vclk_cb.isnull())
-		m_vclk_cb(1);
+	if (!m_vck_legacy_cb.isnull())
+		m_vck_legacy_cb(1);
 
 	// reset check at last hiedge of VCK
 	if (m_reset)
@@ -228,12 +255,9 @@ WRITE_LINE_MEMBER(msm5205_device::vclk_w)
 		logerror("Error: vclk_w() called but VCK selected master mode\n");
 	else
 	{
-		if (m_vclk != state)
-		{
-			m_vclk = state;
-			if (!state)
-				vclk_callback(this, 0);
-		}
+		if (m_vck && !state)
+			m_capture_timer->adjust(attotime::from_nsec(15600));
+		m_vck = state;
 	}
 }
 
@@ -333,11 +357,16 @@ void msm5205_device::device_clock_changed()
 	int prescaler = get_prescaler();
 	if (prescaler != 0)
 	{
-		attotime period = clocks_to_attotime(prescaler);
-		m_timer->adjust(period, 0, period);
+		logerror("/%d prescaler selected\n", prescaler);
+
+		attotime half_period = clocks_to_attotime(prescaler / 2);
+		m_vck_timer->adjust(half_period, 0, half_period);
 	}
 	else
-		m_timer->adjust(attotime::never);
+	{
+		logerror("VCK slave mode selected\n");
+		m_vck_timer->adjust(attotime::never);
+	}
 }
 
 
@@ -361,6 +390,29 @@ void msm5205_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 	else
 		memset(buffer, 0, samples * sizeof(*buffer));
+}
+
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void msm6585_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_VCK:
+			m_vck = !m_vck;
+			m_vck_cb(m_vck);
+			if (m_vck)
+				m_capture_timer->adjust(attotime::from_usec(3));
+			break;
+
+		case TIMER_ADPCM_CAPTURE:
+			update_adpcm();
+			break;
+	}
 }
 
 

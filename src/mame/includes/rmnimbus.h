@@ -80,6 +80,8 @@ public:
 	{
 	}
 
+	static constexpr feature_type imperfect_features() { return feature::MOUSE; }
+
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<scsi_port_device> m_scsibus;

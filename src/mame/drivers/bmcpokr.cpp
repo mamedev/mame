@@ -22,6 +22,7 @@ Other:  BMC B816140 (CPLD)
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -795,7 +796,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcpokr_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcpokr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

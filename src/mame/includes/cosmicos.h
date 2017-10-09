@@ -10,6 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/cdp1864.h"
 #include "sound/spkrdev.h"
 #include "video/dm9368.h"

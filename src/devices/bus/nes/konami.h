@@ -126,12 +126,13 @@ public:
 	// construction/destruction
 	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<vrc6snd_device> m_vrc6snd;
 };
@@ -145,7 +146,6 @@ public:
 	// construction/destruction
 	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
@@ -153,6 +153,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ym2413_device> m_ym2413;

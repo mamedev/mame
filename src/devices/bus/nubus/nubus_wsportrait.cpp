@@ -22,13 +22,6 @@
 
 #define VRAM_SIZE   (0x80000)   // 512k max
 
-MACHINE_CONFIG_START( wsportrait )
-	MCFG_SCREEN_ADD( WSPORTRAIT_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_wsportrait_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,960)
-	MCFG_SCREEN_REFRESH_RATE(75.0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
-MACHINE_CONFIG_END
 
 ROM_START( wsportrait )
 	ROM_REGION(0x1000, WSPORTRAIT_ROM_REGION, 0)
@@ -43,14 +36,16 @@ DEFINE_DEVICE_TYPE(NUBUS_WSPORTRAIT, nubus_wsportrait_device, "nb_wspt", "Macint
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_wsportrait_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wsportrait );
-}
+MACHINE_CONFIG_MEMBER( nubus_wsportrait_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( WSPORTRAIT_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_wsportrait_device, screen_update)
+	MCFG_SCREEN_SIZE(1024,960)
+	MCFG_SCREEN_REFRESH_RATE(75.0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

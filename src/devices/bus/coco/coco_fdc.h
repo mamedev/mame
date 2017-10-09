@@ -47,16 +47,6 @@ protected:
 	virtual void update_lines() = 0;
 	virtual uint8_t* get_cart_base() override;
 
-	// wrapper for setting the cart line
-	void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
-	{
-		owning_slot().set_line_value(which, value);
-	}
-	void cart_set_line(cococart_slot_device::line which, bool value)
-	{
-		cart_set_line(which, value ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
-	}
-
 	// accessors
 	uint8_t dskreg() const { return m_dskreg; }
 	bool intrq() const { return m_intrq; }

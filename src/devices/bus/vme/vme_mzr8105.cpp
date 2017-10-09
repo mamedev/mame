@@ -33,16 +33,16 @@
 DEFINE_DEVICE_TYPE(VME_MZR8105, vme_mzr8105_card_device, "mzr8105", "Mizar 8105 68K CPU board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_EXTERN( mzr8105 );
-
-machine_config_constructor vme_mzr8105_card_device::device_mconfig_additions() const
+MACHINE_CONFIG_MEMBER(vme_mzr8105_card_device::device_add_mconfig)
 {
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( mzr8105 );
+	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_BUS_OWNER_SPACES()
+	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
 }
 
 vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

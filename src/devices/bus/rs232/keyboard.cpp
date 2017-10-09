@@ -47,12 +47,6 @@ WRITE_LINE_MEMBER( serial_keyboard_device::update_serial )
 	reset();
 }
 
-void serial_keyboard_device::device_start()
-{
-	generic_keyboard_device::device_start();
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
-}
-
 void serial_keyboard_device::device_reset()
 {
 	generic_keyboard_device::device_reset();
@@ -77,13 +71,6 @@ void serial_keyboard_device::device_reset()
 	output_cts(0);
 	receive_register_reset();
 	transmit_register_reset();
-}
-
-void serial_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	// give both bases a chance to handle it
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
-	generic_keyboard_device::device_timer(timer, id, param, ptr);
 }
 
 void serial_keyboard_device::tra_callback()

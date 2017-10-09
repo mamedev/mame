@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 
 
 lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
 {
 }
@@ -66,13 +66,11 @@ WRITE32_MEMBER(lpc210x_device::flash_w)
 }
 
 
-const address_space_config *lpc210x_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector lpc210x_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	default:                   return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 

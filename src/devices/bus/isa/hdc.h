@@ -149,14 +149,7 @@ public:
 
 	DECLARE_READ8_MEMBER(pc_hdc_r);
 	DECLARE_WRITE8_MEMBER(pc_hdc_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	required_device<xt_hdc_device> m_hdc;
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -164,6 +157,15 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
+
 public:
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line,uint8_t data) override;
@@ -178,8 +180,9 @@ class isa8_hdc_ec1841_device : public isa8_hdc_device
 public:
 	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<ec1841_device> m_hdc;
 };

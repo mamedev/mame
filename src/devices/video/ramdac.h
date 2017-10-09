@@ -19,7 +19,7 @@
 
 #define MCFG_RAMDAC_ADD(_tag, _map, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
 	ramdac_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define MCFG_RAMDAC_COLOR_BASE(_color_base) \
@@ -50,6 +50,7 @@ public:
 	// I/O operations
 	DECLARE_READ8_MEMBER( index_r );
 	DECLARE_READ8_MEMBER( pal_r );
+	DECLARE_READ8_MEMBER( mask_r );
 	DECLARE_WRITE8_MEMBER( index_w );
 	DECLARE_WRITE8_MEMBER( index_r_w );
 	DECLARE_WRITE8_MEMBER( pal_w );
@@ -59,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdac_rgb666_w );
 	DECLARE_WRITE8_MEMBER( ramdac_rgb888_w );
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides

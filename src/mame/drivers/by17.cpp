@@ -22,6 +22,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"

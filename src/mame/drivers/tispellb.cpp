@@ -84,7 +84,7 @@ public:
 	u16 m_sub_r;
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
-	void power_off();
+	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
@@ -133,11 +133,10 @@ void tispellb_state::machine_start()
 
 void tispellb_state::power_off()
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	hh_tms1k_state::power_off();
+
 	if (m_subcpu)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	m_power_on = false;
 }
 
 void tispellb_state::prepare_display()

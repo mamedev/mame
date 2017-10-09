@@ -26,7 +26,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2015-06-19: Added code for the centronics printer port
 
-2016-01-14: Casstte tape motor fixed for working perperly and ROM file changed for CP/M disk loading
+2016-01-14: Cassette tape motor fixed to work properly and ROM file changed for CP/M disk loading
 
 ****************************************************************************/
 /*

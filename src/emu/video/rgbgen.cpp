@@ -77,26 +77,6 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 }
 
 
-void rgbaint_t::scale_imm_add_and_clamp(s32 scale, const rgbaint_t& other)
-{
-	m_a = (m_a * scale) >> 8;
-	m_r = (m_r * scale) >> 8;
-	m_g = (m_g * scale) >> 8;
-	m_b = (m_b * scale) >> 8;
-	m_a |= (m_a & 0x00800000) ? 0xff000000 : 0;
-	m_r |= (m_r & 0x00800000) ? 0xff000000 : 0;
-	m_g |= (m_g & 0x00800000) ? 0xff000000 : 0;
-	m_b |= (m_b & 0x00800000) ? 0xff000000 : 0;
-	m_a += other.m_a;
-	m_r += other.m_r;
-	m_g += other.m_g;
-	m_b += other.m_b;
-	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
-}
-
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 {
 	m_a = (m_a * scale.m_a) >> 8;

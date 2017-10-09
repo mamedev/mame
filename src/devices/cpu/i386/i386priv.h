@@ -6,6 +6,7 @@
 #define __I386_H__
 
 #include "i386.h"
+#include "i386dasm.h"
 
 //#define DEBUG_MISSING_OPCODE
 
@@ -14,8 +15,6 @@
 #define PENTIUMOP(XX)   pentium_##XX
 #define MMXOP(XX)       mmx_##XX
 #define SSEOP(XX)       sse_##XX
-
-extern int i386_dasm_one(std::ostream &stream, uint32_t pc, const uint8_t *oprom, int mode);
 
 enum SREGS { ES, CS, SS, DS, FS, GS };
 

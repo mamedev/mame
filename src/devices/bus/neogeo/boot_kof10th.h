@@ -17,8 +17,6 @@ public:
 	// construction/destruction
 	neogeo_kof10th_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual uint16_t get_helper() override;
 	virtual uint32_t get_bank_base(uint16_t sel) override;
@@ -34,6 +32,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t* m_fixed;

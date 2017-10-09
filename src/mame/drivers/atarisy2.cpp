@@ -127,6 +127,8 @@
 
 #include "emu.h"
 #include "includes/atarisy2.h"
+
+#include "machine/eeprompar.h"
 #include "speaker.h"
 
 
@@ -341,7 +343,7 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 	if (m_tms5220.found())
 	{
 		data = 12 | ((data >> 5) & 1);
-		m_tms5220->set_frequency(MASTER_CLOCK/4 / (16 - data) / 2);
+		m_tms5220->set_unscaled_clock(MASTER_CLOCK/4 / (16 - data) / 2);
 	}
 }
 

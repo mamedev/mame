@@ -68,7 +68,6 @@ Stephh's additional notes :
 #include "emu.h"
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
-#include "includes/kaneko16.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
@@ -157,7 +156,7 @@ static ADDRESS_MAP_START( galpanica_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galpanic_oki_map, AS_0, 8, galpanic_state )
+static ADDRESS_MAP_START( galpanic_oki_map, 0, 8, galpanic_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -262,7 +261,7 @@ static MACHINE_CONFIG_START( galpanic )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_LOW) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, galpanic_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

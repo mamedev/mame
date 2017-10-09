@@ -142,9 +142,9 @@ WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
+WRITE_LINE_MEMBER(fastfred_state::charbank1_w)
 {
-	uint16_t new_data = (m_charbank & 0x0200) | ((data & 0x01) << 8);
+	uint16_t new_data = (m_charbank & 0x0200) | (state << 8);
 
 	if (new_data != m_charbank)
 	{
@@ -154,9 +154,9 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
 	}
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
+WRITE_LINE_MEMBER(fastfred_state::charbank2_w)
 {
-	uint16_t new_data = (m_charbank & 0x0100) | ((data & 0x01) << 9);
+	uint16_t new_data = (m_charbank & 0x0100) | (state << 9);
 
 	if (new_data != m_charbank)
 	{
@@ -167,9 +167,9 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
+WRITE_LINE_MEMBER(fastfred_state::colorbank1_w)
 {
-	uint8_t new_data = (m_colorbank & 0x10) | ((data & 0x01) << 3);
+	uint8_t new_data = (m_colorbank & 0x10) | (state << 3);
 
 	if (new_data != m_colorbank)
 	{
@@ -179,9 +179,9 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
 	}
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
+WRITE_LINE_MEMBER(fastfred_state::colorbank2_w)
 {
-	uint8_t new_data = (m_colorbank & 0x08) | ((data & 0x01) << 4);
+	uint8_t new_data = (m_colorbank & 0x08) | (state << 4);
 
 	if (new_data != m_colorbank)
 	{
@@ -193,24 +193,18 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
 
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_x_w )
+WRITE_LINE_MEMBER(fastfred_state::flip_screen_x_w)
 {
-	if (flip_screen_x() != (data & 0x01))
-	{
-		flip_screen_x_set(data & 0x01);
+	flip_screen_x_set(state);
 
-		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
-	}
+	m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_y_w )
+WRITE_LINE_MEMBER(fastfred_state::flip_screen_y_w)
 {
-	if (flip_screen_y() != (data & 0x01))
-	{
-		flip_screen_y_set(data & 0x01);
+	flip_screen_y_set(state);
 
-		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
-	}
+	m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -322,11 +316,11 @@ WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_charbank_w )
+WRITE_LINE_MEMBER(fastfred_state::imago_charbank_w)
 {
-	if( m_charbank != data )
+	if (m_charbank != state)
 	{
-		m_charbank = data;
+		m_charbank = state;
 		m_bg_tilemap->mark_all_dirty();
 	}
 }

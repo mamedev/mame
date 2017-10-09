@@ -17,6 +17,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDisassemblyViewer
 
@@ -224,6 +226,23 @@
 - (IBAction)changeSubview:(id)sender {
 	[dasmView selectSubviewAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER);
+	node->set_attribute_int("cpu", [dasmView selectedSubviewIndex]);
+	[dasmView saveConfigurationToNode:node];
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	int const region = node->get_attribute_int("cpu", [dasmView selectedSubviewIndex]);
+	[dasmView selectSubviewAtIndex:region];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];
+	[dasmView restoreConfigurationFromNode:node];
 }
 
 

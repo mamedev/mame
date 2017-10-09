@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#include "includes/kaneko16.h"
+
+#include "machine/timer.h"
+#include "video/kan_pand.h"
 #include "screen.h"
 
 class galpanic_state : public driver_device

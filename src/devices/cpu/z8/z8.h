@@ -12,19 +12,62 @@
 #pragma once
 
 
-enum
-{
-	Z8_PC, Z8_SP, Z8_RP, Z8_T0, Z8_T1,
+#define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 0, DEVCB_##_devcb);
 
-	Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
-};
+#define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
+	devcb = &z8_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+
+
+#define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
+	devcb = &z8_device::set_output_cb(*device, 3, DEVCB_##_devcb);
 
 
 class z8_device : public cpu_device
 {
+public:
+	// static configuration
+	template<class Object>
+	static devcb_base &set_input_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_input_cb[port].set_callback(std::forward<Object>(object));
+	}
+	template<class Object>
+	static devcb_base &set_output_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < 4);
+		return downcast<z8_device &>(device).m_output_cb[port].set_callback(std::forward<Object>(object));
+	}
+
 protected:
+	enum
+	{
+		Z8_PC, Z8_SP, Z8_RP,
+		Z8_IMR, Z8_IRQ, Z8_IPR,
+		Z8_P01M, Z8_P3M, Z8_P2M,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+
+		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
+	};
+
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_delegate map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -32,7 +75,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 6; }
-	virtual uint32_t execute_max_cycles() const override { return 20; }
+	virtual uint32_t execute_max_cycles() const override { return 27; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
@@ -40,17 +83,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
-	{
-		switch ( spacenum )
-		{
-			case AS_PROGRAM:   return &m_program_config;
-			case AS_DATA:      return &m_data_config;
-			case AS_IO:        return &m_io_config;
-			default:           return nullptr;
-		}
-		return nullptr;
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -62,19 +95,26 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
+	DECLARE_ADDRESS_MAP(program_2kb, 8);
+	DECLARE_ADDRESS_MAP(program_4kb, 8);
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
+
+	// callbacks
+	devcb_read8 m_input_cb[4];
+	devcb_write8 m_output_cb[4];
+
+	uint32_t m_rom_size;
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */
+	uint16_t m_ppc;             /* program counter at last opcode fetch */
 	uint8_t m_r[256];           /* register file */
 	uint8_t m_input[4];         /* port input latches */
 	uint8_t m_output[4];        /* port output latches */
@@ -86,7 +126,8 @@ private:
 	uint8_t m_fake_r[16];       /* fake working registers */
 
 	/* interrupts */
-	int m_irq[6];             /* interrupts */
+	int m_irq_line[4];          /* IRQ line state */
+	bool m_irq_taken;
 
 	/* execution logic */
 	int m_icount;             /* instruction counter */
@@ -98,7 +139,13 @@ private:
 	TIMER_CALLBACK_MEMBER( t0_tick );
 	TIMER_CALLBACK_MEMBER( t1_tick );
 
+	void take_interrupt(int irq);
+	void process_interrupts();
+
+	inline uint16_t mask_external_address(uint16_t addr);
 	inline uint8_t fetch();
+	inline uint8_t fetch_opcode();
+	inline uint16_t fetch_word();
 	inline uint8_t register_read(uint8_t offset);
 	inline uint16_t register_pair_read(uint8_t offset);
 	inline void register_write(uint8_t offset, uint8_t data);
@@ -113,10 +160,10 @@ private:
 	inline void set_flag(uint8_t flag, int state);
 	inline void clear(uint8_t dst);
 	inline void load(uint8_t dst, uint8_t src);
-	inline void load_from_memory(address_space *space);
-	inline void load_to_memory(address_space *space);
-	inline void load_from_memory_autoinc(address_space *space);
-	inline void load_to_memory_autoinc(address_space *space);
+	inline void load_from_memory(address_space &space);
+	inline void load_to_memory(address_space &space);
+	inline void load_from_memory_autoinc(address_space &space);
+	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
 	inline void add_carry(uint8_t dst, int8_t src);
@@ -309,6 +356,13 @@ public:
 };
 
 
+class z8681_device : public z8_device
+{
+public:
+	z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // Zilog Z8601
 DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
@@ -317,5 +371,8 @@ DECLARE_DEVICE_TYPE(UB8830D, ub8830d_device)
 
 // Zilog Z8611
 DECLARE_DEVICE_TYPE(Z8611, z8611_device)
+
+// Zilog Z8681 ROMless
+DECLARE_DEVICE_TYPE(Z8681, z8681_device)
 
 #endif // MAME_CPU_Z8_Z8_H

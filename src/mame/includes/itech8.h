@@ -8,11 +8,11 @@
 **************************************************************************/
 
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
 #include "screen.h"
 
-#define YBUFFER_COUNT   15
 
 class itech8_state : public driver_device
 {
@@ -30,6 +30,10 @@ public:
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
+
+	static constexpr uint32_t YBUFFER_COUNT = 15;
+	static constexpr uint32_t VRAM_SIZE = 0x40000;
+	static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
 
 	enum
 	{
@@ -104,9 +108,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
-	DECLARE_WRITE16_MEMBER(grom_bank16_w);
-	DECLARE_WRITE16_MEMBER(display_page16_w);
-	DECLARE_WRITE16_MEMBER(palette16_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(page_w);
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -175,6 +176,13 @@ public:
 							uint16_t *sens0, uint16_t *sens1, uint16_t *sens2, uint16_t *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
+
+	// ninja clowns
+	DECLARE_READ16_MEMBER(rom_constant_r);
+	DECLARE_READ8_MEMBER(ninclown_palette_r);
+	DECLARE_WRITE8_MEMBER(ninclown_palette_w);
+	DECLARE_WRITE16_MEMBER(grom_bank16_w);
+	DECLARE_WRITE16_MEMBER(display_page16_w);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

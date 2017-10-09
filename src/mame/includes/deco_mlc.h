@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
 #include "screen.h"
 

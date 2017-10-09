@@ -2,8 +2,11 @@
 // copyright-holders:Nicola Salmoria
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
+#include "sound/ta7630.h"
+#include "sound/ay8910.h"
 
 class flstory_state : public driver_device
 {
@@ -18,9 +21,13 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ay(*this, "aysnd"),
+		m_ta7630(*this, "ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundnmi(*this, "soundnmi") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -37,11 +44,6 @@ public:
 	uint8_t    m_palette_bank;
 
 	/* sound-related */
-	uint8_t    m_snd_data;
-	uint8_t    m_snd_flag;
-	int      m_sound_nmi_enable;
-	int      m_pending_nmi;
-	int      m_vol_ctrl[16];
 	uint8_t    m_snd_ctrl0;
 	uint8_t    m_snd_ctrl1;
 	uint8_t    m_snd_ctrl2;
@@ -56,32 +58,17 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<input_merger_device> m_soundnmi;
 
-	/* mcu */
-	uint8_t m_mcu_cmd;
-	uint8_t m_mcu_counter;
-	uint8_t m_mcu_b4_cmd;
-	uint8_t m_mcu_param;
-	uint8_t m_mcu_b2_res;
-	uint8_t m_mcu_b1_res;
-	uint8_t m_mcu_bb_res;
-	uint8_t m_mcu_b5_res;
-	uint8_t m_mcu_b6_res;
-	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(snd_reset_w);
 	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_READ8_MEMBER(rumba_mcu_r);
-	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
-	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_r);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
 	DECLARE_READ8_MEMBER(victnine_mcu_r);
 	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
@@ -110,7 +97,6 @@ public:
 	uint32_t screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

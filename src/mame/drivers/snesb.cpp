@@ -13,6 +13,7 @@
     - Ghost Chaser Densei
     - Sonic Blast Man 2
     - Gundam Wing: Endless Duel
+    - Legend
 
     Not dumped:
     - Final Fight 3
@@ -26,6 +27,7 @@ TODO:
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib  :  fix gfx glitches, missing texts
+ - legendsb : dipswitches
 
 ***************************************************************************
 
@@ -181,6 +183,7 @@ public:
 	DECLARE_DRIVER_INIT(ffight2b);
 	DECLARE_DRIVER_INIT(endless);
 	DECLARE_DRIVER_INIT(mk3snes);
+	DECLARE_DRIVER_INIT(legendsb);
 	DECLARE_MACHINE_RESET(ffight2b);
 };
 
@@ -860,6 +863,38 @@ DRIVER_INIT_MEMBER(snesb_state,denseib)
 	DRIVER_INIT_CALL(snes_hirom);
 }
 
+DRIVER_INIT_MEMBER(snesb_state,legendsb)
+{
+	u8 *rom = memregion("user3")->base();
+
+	for(int i = 0; i < 0x100000; i++)
+	{
+		u8 val = rom[i] ^ 0xff;
+
+		if (i < 0x10000)
+			rom[i] = BITSWAP8(val,6,5,4,2,1,0,3,7); // 0x00000 - 0x0ffff
+		else if (i < 0x20000)
+			rom[i] = BITSWAP8(val,6,1,3,5,2,0,7,4); // 0x10000 - 0x1ffff
+		else if (i < 0x30000)
+			rom[i] = BITSWAP8(val,2,6,3,0,4,5,7,1); // 0x20000 - 0x2ffff
+		else if (i < 0x40000)
+			rom[i] = BITSWAP8(val,5,4,2,7,0,3,6,1); // 0x30000 - 0x3ffff
+		else
+			rom[i] = BITSWAP8(val,3,6,0,5,1,4,7,2); // 0x40000 - 0xfffff
+	}
+
+	// boot vector
+	rom[0x7ffc] = 0x19;
+	rom[0x7ffd] = 0x80;
+
+	// extra inputs
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(FUNC(snesb_state::snesb_dsw1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
+
+	DRIVER_INIT_CALL(snes);
+}
+
 static const uint8_t data_substitution0[] = {0x88,0x02,0x2a,0x08,0x28,0xaa,0x8a,0x0a,0xa2,0x00,0x80,0xa0,0x22,0xa8,0x82,0x20,};
 static const uint8_t data_substitution1[] = {0x44,0x01,0x51,0x40,0x50,0x55,0x45,0x41,0x15,0x00,0x04,0x14,0x11,0x54,0x05,0x10,};
 static const uint8_t address_substitution_low[] =
@@ -1119,6 +1154,48 @@ ROM_START( sblast2b )
 
 ROM_END
 
+ROM_START( legendsb )
+	ROM_REGION( 0x100000, "user3", 0 )
+	ROM_LOAD( "u37_0", 0x000000, 0x080000, BAD_DUMP CRC(44101f23) SHA1(7563886598b290faa616397f7e87a56e2f984b79) ) // U37 ROM is bad, was unable to get stable reads
+	ROM_LOAD( "u37_1", 0x000000, 0x080000, BAD_DUMP CRC(d2e835bb) SHA1(0620e099f43cde95d6b4b210eef13abbff5f40e9) )
+	ROM_LOAD( "u37_2", 0x000000, 0x008000, BAD_DUMP CRC(1bc6f429) SHA1(eb4e1a483d2aa545a1ba33243afd9693ee5bebd0) )
+	ROM_CONTINUE(      0x088000, 0x008000 )
+	ROM_CONTINUE(      0x010000, 0x008000 )
+	ROM_CONTINUE(      0x098000, 0x008000 )
+	ROM_CONTINUE(      0x020000, 0x008000 )
+	ROM_CONTINUE(      0x0a8000, 0x008000 )
+	ROM_CONTINUE(      0x030000, 0x008000 )
+	ROM_CONTINUE(      0x0b8000, 0x008000 )
+	ROM_CONTINUE(      0x040000, 0x008000 )
+	ROM_CONTINUE(      0x0c8000, 0x008000 )
+	ROM_CONTINUE(      0x050000, 0x008000 )
+	ROM_CONTINUE(      0x0d8000, 0x008000 )
+	ROM_CONTINUE(      0x060000, 0x008000 )
+	ROM_CONTINUE(      0x0e8000, 0x008000 )
+	ROM_CONTINUE(      0x070000, 0x008000 )
+	ROM_CONTINUE(      0x0f8000, 0x008000 )
+	ROM_LOAD( "u36",   0x080000, 0x008000, CRC(c33a5362) SHA1(537b1b7ef22baa289523fac8f9843db155408c56) )
+	ROM_CONTINUE(      0x008000, 0x008000 )
+	ROM_CONTINUE(      0x090000, 0x008000 )
+	ROM_CONTINUE(      0x018000, 0x008000 )
+	ROM_CONTINUE(      0x0a0000, 0x008000 )
+	ROM_CONTINUE(      0x028000, 0x008000 )
+	ROM_CONTINUE(      0x0b0000, 0x008000 )
+	ROM_CONTINUE(      0x038000, 0x008000 )
+	ROM_CONTINUE(      0x0c0000, 0x008000 )
+	ROM_CONTINUE(      0x048000, 0x008000 )
+	ROM_CONTINUE(      0x0d0000, 0x008000 )
+	ROM_CONTINUE(      0x058000, 0x008000 )
+	ROM_CONTINUE(      0x0e0000, 0x008000 )
+	ROM_CONTINUE(      0x068000, 0x008000 )
+	ROM_CONTINUE(      0x0f0000, 0x008000 )
+	ROM_CONTINUE(      0x078000, 0x008000 )
+
+	ROM_REGION(0x100,           "sound_ipl", 0)
+	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+ROM_END
 
 ROM_START( endless )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
@@ -1144,3 +1221,4 @@ GAME( 1996, iron,         0,     kinstb,         iron,     snesb_state,  iron,  
 GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state,  denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state,  endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,     kinstb,         kinstb,   snesb_state,  legendsb,     ROT0, "bootleg",  "Legend (SNES bootleg)",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

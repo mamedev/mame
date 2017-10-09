@@ -82,7 +82,6 @@ typedef void (*machine_config_constructor)(machine_config &config, device_t *own
 #include "dinvram.h"
 #include "didisasm.h"
 #include "schedule.h"
-#include "timer.h"
 #include "dinetwork.h"
 
 // machine and driver configuration

@@ -40,6 +40,10 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 	}
 }
 
+bgfx_input_pair::~bgfx_input_pair()
+{
+}
+
 void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 {
 	assert(effect->uniform(m_sampler) != nullptr);
@@ -95,26 +99,24 @@ int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t n
 
 void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 {
-	std::string description = "Window " + std::to_string(chains().window_index()) + ", Screen " + std::to_string(screen_index) + " " + m_selection + ":";
-	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(chains().machine(), uint8_t, size));
+	m_slider_state = make_unique_clear<slider_state>();
 
-	state->minval = 0;
-	state->defval = m_current_texture;
-	state->maxval = m_available_textures.size() - 1;
-	state->incval = 1;
+	m_slider_state->minval = 0;
+	m_slider_state->defval = m_current_texture;
+	m_slider_state->maxval = m_available_textures.size() - 1;
+	m_slider_state->incval = 1;
 
 	using namespace std::placeholders;
-	state->update = std::bind(&bgfx_input_pair::slider_changed, this, _1, _2, _3, _4, _5);
-	state->arg = this;
-	state->id = screen_index;
-	strcpy(state->description, description.c_str());
+	m_slider_state->update = std::bind(&bgfx_input_pair::slider_changed, this, _1, _2, _3, _4, _5);
+	m_slider_state->arg = this;
+	m_slider_state->id = screen_index;
+	m_slider_state->description = "Window " + std::to_string(chains().window_index()) + ", Screen " + std::to_string(screen_index) + " " + m_selection + ":";
 
 	ui::menu_item item;
-	item.text = state->description;
+	item.text = m_slider_state->description;
 	item.subtext = "";
 	item.flags = 0;
-	item.ref = state;
+	item.ref = m_slider_state.get();
 	item.type = ui::menu_item_type::SLIDER;
 	m_selection_slider = item;
 }

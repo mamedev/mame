@@ -17,7 +17,7 @@
 #include "video/ramdac.h"
 
 // default address map
-static ADDRESS_MAP_START( ramdac_palram, AS_0, 8, ramdac_device )
+static ADDRESS_MAP_START( ramdac_palram, 0, 8, ramdac_device )
 	AM_RANGE(0x000, 0x0ff) AM_RAM // R bank
 	AM_RANGE(0x100, 0x1ff) AM_RAM // G bank
 	AM_RANGE(0x200, 0x2ff) AM_RAM // B bank
@@ -65,9 +65,11 @@ void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *ramdac_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector ramdac_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //-------------------------------------------------
@@ -167,6 +169,11 @@ WRITE8_MEMBER( ramdac_device::pal_w )
 {
 	writebyte(m_pal_index[0] | (m_int_index[0] << 8),data);
 	reg_increment(0);
+}
+
+READ8_MEMBER( ramdac_device::mask_r )
+{
+	return m_pal_mask;
 }
 
 WRITE8_MEMBER( ramdac_device::mask_w )

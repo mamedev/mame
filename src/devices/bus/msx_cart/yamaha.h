@@ -18,23 +18,22 @@ DECLARE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device)
 class msx_cart_sfg_device : public device_t, public msx_cart_interface
 {
 public:
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
-
 protected:
 	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
+
 	required_memory_region m_region_sfg;
 	required_device<ym2151_device> m_ym2151;
 	required_device<msx_audio_kbdc_port_device> m_kbdc;

@@ -163,6 +163,9 @@ const options_entry sdl_options::s_option_entries[] =
 sdl_options::sdl_options()
 : osd_options()
 {
+#if defined (SDLMAME_ANDROID)
+	chdir (SDL_AndroidGetExternalStoragePath());
+#endif
 	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
@@ -180,15 +183,9 @@ sdl_options::sdl_options()
 extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 #endif
 
-// translated to utf8_main
-#if defined(SDLMAME_WIN32)
-int main(std::vector<std::string> &args)
-{
-#else
 int main(int argc, char** argv)
 {
-	std::vector<std::string> args(argv, argv+argc);
-#endif
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
 	int res = 0;
 
 	// disable I/O buffering
@@ -396,6 +393,16 @@ void sdl_osd_interface::output_oslog(const char *buffer)
 
 
 //============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+}
+
+
+//============================================================
 //  init
 //============================================================
 
@@ -408,14 +415,12 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options().bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.c_str()[0] == 0);
+		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// Some driver options - must be before audio init!

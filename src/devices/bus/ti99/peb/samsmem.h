@@ -18,11 +18,12 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/74259.h"
 #include "machine/ram.h"
 
 namespace bus { namespace ti99 { namespace peb {
 
-class sams_memory_expansion_device : public ti_expansion_card_device
+class sams_memory_expansion_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -32,15 +33,19 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	void device_start() override;
 	void device_reset() override;
 
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(access_mapper_w);
+	DECLARE_WRITE_LINE_MEMBER(map_mode_w);
+
 	// Console RAM
 	required_device<ram_device> m_ram;
+	required_device<ls259_device> m_crulatch;
 	int     m_mapper[16];
 	bool    m_map_mode;
 	bool    m_access_mapper;

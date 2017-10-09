@@ -50,17 +50,6 @@ enum ay31015_output_pin_t
 class ay31015_device : public device_t
 {
 public:
-	enum state_t
-	{
-		IDLE,
-		START_BIT,
-		PROCESSING,
-		PARITY_BIT,
-		FIRST_STOP_BIT,
-		SECOND_STOP_BIT,
-		PREP_TIME
-	};
-
 	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }
@@ -93,6 +82,17 @@ public:
 	void tx_process();
 
 protected:
+	enum state_t : u8
+	{
+		IDLE,
+		START_BIT,
+		PROCESSING,
+		PARITY_BIT,
+		FIRST_STOP_BIT,
+		SECOND_STOP_BIT,
+		PREP_TIME
+	};
+
 	static constexpr device_timer_id TIMER_RX = 0;
 	static constexpr device_timer_id TIMER_TX = 1;
 

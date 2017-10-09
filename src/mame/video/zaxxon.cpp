@@ -175,23 +175,23 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
+WRITE_LINE_MEMBER(zaxxon_state::flipscreen_w)
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	flip_screen_set_no_update(~data & 1);
+	flip_screen_set_no_update(!state);
 	m_fg_tilemap->set_flip(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
+WRITE_LINE_MEMBER(zaxxon_state::fg_color_w)
 {
 	/* low bit selects high color palette index */
-	m_fg_color = (data & 1) * 0x80;
+	m_fg_color = state * 0x80;
 	m_fg_tilemap->set_palette_offset(m_fg_color + (m_congo_color_bank << 8));
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
+WRITE8_MEMBER(zaxxon_state::bg_position_w)
 {
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -201,32 +201,32 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_color_w)
+WRITE_LINE_MEMBER(zaxxon_state::bg_color_w)
 {
 	/* low bit selects high color palette index */
-	m_bg_color = (data & 1) * 0x80;
+	m_bg_color = state * 0x80;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_enable_w)
+WRITE_LINE_MEMBER(zaxxon_state::bg_enable_w)
 {
 	/* low bit enables/disables the background layer */
-	m_bg_enable = data & 1;
+	m_bg_enable = state;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
+WRITE_LINE_MEMBER(zaxxon_state::congo_fg_bank_w)
 {
 	/* low bit controls the topmost character bit */
-	m_congo_fg_bank = data & 1;
+	m_congo_fg_bank = state;
 	m_fg_tilemap->mark_all_dirty();
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
+WRITE_LINE_MEMBER(zaxxon_state::congo_color_bank_w)
 {
 	/* low bit controls the topmost bit into the color PROM */
-	m_congo_color_bank = data & 1;
+	m_congo_color_bank = state;
 	m_fg_tilemap->set_palette_offset(m_fg_color + (m_congo_color_bank << 8));
 }
 

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/74259.h"
 #include "video/atarimo.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
@@ -22,6 +23,7 @@ public:
 			m_ym2151(*this, "ymsnd"),
 			m_pokey(*this, "pokey"),
 			m_tms5220(*this, "tms"),
+			m_soundctl(*this, "soundctl"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_mob(*this, "mob")  { }
@@ -31,6 +33,7 @@ public:
 	required_device<ym2151_device> m_ym2151;
 	required_device<pokey_device> m_pokey;
 	required_device<tms5220_device> m_tms5220;
+	required_device<ls259_device> m_soundctl;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -44,7 +47,9 @@ public:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE8_MEMBER(sound_ctl_w);
+	DECLARE_WRITE_LINE_MEMBER(speech_squeak_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE8_MEMBER(mixer_w);
 	void swap_memory(void *ptr1, void *ptr2, int bytes);
 	void common_init(int vindctr2);

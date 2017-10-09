@@ -29,27 +29,12 @@
 {
 	"name": "xBR-lv2",
 	"author": "Hyllian",
-	"targets": [
-		{
-			"name": "internal",
-			"mode": "guest",
-			"doublebuffer": true
-		}
-	],
 	"passes": [
 		{
 			"effect": "xbr/xbr-lv2",
 			"name": "Main Pass",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }
-			],
-			"output": "internal"
-		},
-		{
-			"effect": "misc/blit",
-			"name": "Upscale",
-			"input": [
-				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "output"
 		}

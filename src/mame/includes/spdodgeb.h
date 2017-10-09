@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "screen.h"
 
@@ -61,7 +62,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
 	DECLARE_READ8_MEMBER(mcu63701_r);
 	DECLARE_WRITE8_MEMBER(mcu63701_w);

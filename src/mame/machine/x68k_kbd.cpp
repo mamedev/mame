@@ -295,12 +295,6 @@ void x68k_keyboard_device::device_reset()
 	output_rxd(1);
 }
 
-void x68k_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	buffered_rs232_device::device_timer(timer, id, param, ptr);
-}
-
 
 DEFINE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device, "x68k_keyboard", "Sharp X68000 Keyboard")
 

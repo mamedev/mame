@@ -60,11 +60,12 @@ void prof80_mmu_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *prof80_mmu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector prof80_mmu_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_space_config)
+	};
 }
-
 
 //-------------------------------------------------
 //  par_w -

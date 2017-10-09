@@ -23,6 +23,7 @@
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	disasmbasewin_info(debugger, true, "Debug", nullptr),
+	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
 	if ((window() == nullptr) || (m_views[0] == nullptr))
@@ -44,6 +45,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
+				if (!img.user_loadable())
+					continue;
 				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
@@ -92,21 +95,26 @@ consolewin_info::~consolewin_info()
 {
 }
 
-
 void consolewin_info::set_cpu(device_t &device)
 {
-	// first set all the views to the new cpu number
-	m_views[0]->set_source_for_device(device);
-	m_views[1]->set_source_for_device(device);
+	// exit if this cpu is already selected
+	if (&device != m_current_cpu)
+	{
+		m_current_cpu = &device;
 
-	// then update the caption
-	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
-	std::string curtitle = win_get_window_text_utf8(window());
-	if (title != curtitle)
-		win_set_window_text_utf8(window(), title.c_str());
+		// first set all the views to the new cpu number
+		m_views[0]->set_source_for_device(device);
+		m_views[1]->set_source_for_device(device);
 
-	// and recompute the children
-	recompute_children();
+		// then update the caption
+		std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
+		std::string curtitle = win_get_window_text_utf8(window());
+		if (title != curtitle)
+			win_set_window_text_utf8(window(), title.c_str());
+
+		// and recompute the children
+		recompute_children();
+	}
 }
 
 
@@ -161,6 +169,9 @@ void consolewin_info::update_menu()
 		uint32_t cnt = 0;
 		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
+			if (!img.user_loadable())
+				continue;
+
 			HMENU const devicesubmenu = CreatePopupMenu();
 
 			UINT_PTR const new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
@@ -173,8 +184,9 @@ void consolewin_info::update_menu()
 			if (img.is_readonly())
 				flags_for_writing |= MF_GRAYED;
 
-			if (get_softlist_info(&img))
-				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
+			// not working properly, removed for now until investigation can be done
+			//if (get_softlist_info(&img))
+			//  AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount File..."));
 
@@ -447,9 +459,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 }
 
 
-void consolewin_info::process_string(char const *string)
+void consolewin_info::process_string(std::string const &string)
 {
-	if (string[0] == 0) // an empty string is a single step
+	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
 		machine().debugger().console().execute_command(string, true);
@@ -541,6 +553,8 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
+					if (!image.user_loadable())
+						continue;
 					if (!has_software && (opt_name == image.instance_name()))
 					{
 						const char *interface = image.image_interface();

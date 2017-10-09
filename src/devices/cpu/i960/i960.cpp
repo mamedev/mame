@@ -25,6 +25,14 @@ i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
+device_memory_interface::space_config_vector i960_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+
 uint32_t i960_cpu_device::i960_read_dword_unaligned(uint32_t address)
 {
 	if (!DWORD_ALIGNED(address))

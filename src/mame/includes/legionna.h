@@ -13,6 +13,10 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
+			m_layer_disable(0),
+			m_back_gfx_bank(0),
+			m_fore_gfx_bank(0),
+			m_mid_gfx_bank(0),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_seibu_sound(*this, "seibu_sound"),
@@ -55,9 +59,7 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
-	DECLARE_READ16_MEMBER(sound_comms_r);
-	DECLARE_READ16_MEMBER(denjinmk_sound_comms_r);
-	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
 	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);

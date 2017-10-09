@@ -26,7 +26,7 @@ devcb_base::devcb_base(device_t &device, u64 defmask)
 		m_target_tag(nullptr),
 		m_target_int(0),
 		m_space_tag(nullptr),
-		m_space_num(AS_0),
+		m_space_num(0),
 		m_space(nullptr),
 		m_rshift(0),
 		m_mask(defmask),
@@ -56,7 +56,7 @@ void devcb_base::reset(callback_type type)
 	m_target_tag = nullptr;
 	m_target_int = 0;
 	m_space_tag = nullptr;
-	m_space_num = AS_0;
+	m_space_num = 0;
 	m_space = nullptr;
 	m_target.ptr = nullptr;
 	m_rshift = 0;
@@ -267,6 +267,7 @@ void devcb_read_base::resolve()
 			case CALLBACK_INPUTLINE:
 			case CALLBACK_ASSERTLINE:
 			case CALLBACK_CLEARLINE:
+			case CALLBACK_HOLDLINE:
 				throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
 		}
 	}
@@ -526,6 +527,11 @@ void devcb_write_base::resolve()
 				resolve_inputline();
 				m_adapter = &devcb_write_base::write_clearline_adapter;
 				break;
+
+			case CALLBACK_HOLDLINE:
+				resolve_inputline();
+				m_adapter = &devcb_write_base::write_holdline_adapter;
+				break;
 		}
 	}
 	catch (binding_type_exception &binderr)
@@ -690,4 +696,15 @@ void devcb_write_base::write_clearline_adapter(address_space &space, offs_t offs
 {
 	if (unshift_mask_xor(data) & 1)
 		m_target.device->execute().set_input_line(m_target_int, CLEAR_LINE);
+}
+
+//-------------------------------------------------
+//  write_clearline_adapter - write to a device's
+//  input line
+//-------------------------------------------------
+
+void devcb_write_base::write_holdline_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
+{
+	if (unshift_mask_xor(data) & 1)
+		m_target.device->execute().set_input_line(m_target_int, HOLD_LINE);
 }

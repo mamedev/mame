@@ -270,6 +270,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/nt7534.h,VIDEOS["NT7534"] = true
+--------------------------------------------------
+
+if (VIDEOS["NT7534"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/nt7534.cpp",
+		MAME_DIR .. "src/devices/video/nt7534.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 
@@ -703,6 +715,17 @@ if (VIDEOS["SCN2674"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/scn2674.cpp",
 		MAME_DIR .. "src/devices/video/scn2674.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sda5708.h,VIDEOS["SDA5708"] = true
+--------------------------------------------------
+if (VIDEOS["SDA5708"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sda5708.cpp",
+		MAME_DIR .. "src/devices/video/sda5708.h",
 	}
 end
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// shared opcode handlers
+// SM510 shared opcode handlers
 
 #include "emu.h"
 #include "sm510.h"
@@ -250,6 +250,7 @@ void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
 	m_r = m_acc;
+	clock_melody();
 }
 
 

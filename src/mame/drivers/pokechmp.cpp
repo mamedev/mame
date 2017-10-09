@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pokechmp_oki_map, AS_0, 8, pokechmp_state )
+static ADDRESS_MAP_START( pokechmp_oki_map, 0, 8, pokechmp_state )
 	AM_RANGE(0x00000, 0x37fff) AM_ROM
 	AM_RANGE(0x38000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( pokechmp )
 	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)

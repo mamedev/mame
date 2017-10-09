@@ -305,6 +305,7 @@ public:
 	uint32_t m_cmos_write_enabled;
 	uint32_t m_output;
 	uint8_t m_output_mode;
+	uint32_t m_gear;
 	DECLARE_READ32_MEMBER(interrupt_state_r);
 	DECLARE_READ32_MEMBER(interrupt_state2_r);
 	DECLARE_READ32_MEMBER(interrupt_config_r);
@@ -332,6 +333,8 @@ public:
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
+	DECLARE_WRITE32_MEMBER(wheel_board_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
@@ -395,6 +398,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_cmos_write_enabled));
 	save_item(NAME(m_output));
 	save_item(NAME(m_output_mode));
+	save_item(NAME(m_gear));
 }
 
 
@@ -404,7 +408,7 @@ void seattle_state::machine_reset()
 	m_vblank_irq_num = 0;
 	m_interrupt_config = 0;
 	m_interrupt_enable = 0;
-
+	m_gear = 1;
 	/* reset either the DCS2 board or the CAGE board */
 	if (machine().device("dcs") != nullptr)
 	{
@@ -603,6 +607,57 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", space.device().safe_pc(), data);
 	m_pending_analog_read = ioport(portnames[data & 7])->read();
+}
+
+/*************************************
+*
+*  Wheelboard output module
+*
+*************************************/
+WRITE32_MEMBER(seattle_state::wheel_board_w)
+{
+	//logerror("wheel_board_w: data = %08x\n", data);
+	/* two writes in pairs. flag off first, on second. arg remains the same. */
+	bool flag = (data & (1 << 11));
+	uint8_t op = (data >> 8) & 0x7;
+	uint8_t arg = data & 0xff;
+
+	if (flag)
+	{
+		switch (op)
+		{
+		case 0x0:
+			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			break;
+
+		case 0x4:
+			for (uint8_t bit = 0; bit < 8; bit++)
+				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
+			break;
+
+		case 0x5:
+			for (uint8_t bit = 0; bit < 8; bit++)
+				machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
+			break;
+		}
+	}
+}
+
+/*************************************
+*
+*  Gearshift (calspeed)
+*
+*************************************/
+DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
+{
+	// Check for gear change and save gear selection
+	uint32_t gear = ioport("GEAR")->read();
+	for (int i = 0; i < 4; i++)
+	{
+		if (gear & (1 << i))
+			m_gear = 1 << i;
+	}
+	return m_gear;
 }
 
 /*************************************
@@ -1262,6 +1317,9 @@ static INPUT_PORTS_START( calspeed )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
+	PORT_DIPNAME( 0x0010, 0x0010, "Obsidian Manufacturing Test" ) // Needs boot rom test on to run.
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1282,10 +1340,13 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* tailgate cam */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)   /* sky cam */
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("2nd Gear") PORT_PLAYER(1) /* 2nd gear */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("3rd Gear") PORT_PLAYER(1) /* 3rd gear */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("4th Gear") PORT_PLAYER(1) /* 4th gear */
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+
+	PORT_START("GEAR")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2nd Gear") PORT_PLAYER(1) /* 2nd gear */
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3rd Gear") PORT_PLAYER(1) /* 3rd gear */
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4th Gear") PORT_PLAYER(1) /* 4th gear */
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1509,6 +1570,9 @@ static INPUT_PORTS_START( blitz99 )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0200, "Graphics Mode" )
+	PORT_DIPSETTING(      0x0200, "512x385 @ 25KHz" )
+	PORT_DIPSETTING(      0x0400, "512x256 @ 15KHz" )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Players ) )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
@@ -1870,6 +1934,7 @@ static MACHINE_CONFIG_DERIVED( sfrush, flagstaff )
 	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
@@ -1882,6 +1947,7 @@ static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
 	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sfrushrkw, sfrushrk )
@@ -1941,7 +2007,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( blitz99, seattle150 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb) -- Not in ram???
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
@@ -1953,7 +2019,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( blitz2k, seattle150 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
@@ -1965,7 +2031,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( carnevil, seattle150 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7) -- Not in ram???
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
@@ -1977,7 +2043,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hyprdriv, seattle200_widget )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7) -- Not in ram???
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)

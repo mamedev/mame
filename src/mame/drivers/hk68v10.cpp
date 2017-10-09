@@ -6,7 +6,7 @@
  *
  *  21/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68010 CPU @ 10MHz and two 2764 EPROMS with HBUG firmware
  * The board is very populated and suitable to run a real server OS supported by
  * FPU,MMU and DMA controller chips. The firmware supports SCSI, Centronics/FPI
@@ -73,7 +73,7 @@
  *---------------------
  * The company was founded 1972 as cellar company. Heurikon was aquired
  * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
- * Electric who consilidated it fully by 2009 and closed the office.
+ * Electric who consolidated it fully by 2009 and closed the office.
  *
  * Misc links about Heurikon and this board:
  * http://www.heurikon.com/
@@ -390,4 +390,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY                  FULLNAME    FLAGS */
-COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW )

@@ -150,7 +150,7 @@ PCB 'Z545-1 A240570-1'
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "screen.h"
@@ -564,4 +564,4 @@ DRIVER_INIT_MEMBER(casloopy_state,casloopy)
 		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
 
-CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_PRINTER )

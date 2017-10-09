@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 #include "screen.h"

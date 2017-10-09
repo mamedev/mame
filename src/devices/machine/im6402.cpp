@@ -152,16 +152,6 @@ void im6402_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-
-//-------------------------------------------------
 //  tra_callback -
 //-------------------------------------------------
 

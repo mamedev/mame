@@ -153,7 +153,7 @@ CPU_DISASSEMBLE(z8)
 			case 0x2f:      illegal;                                                break;
 
 			case 0x30:      mnemonic("JP"); arg_IRR(B0); bytes(2);                  break;
-			case 0x31:      mnemonic("SRP"); arg_IM(*oprom++);                      break;
+			case 0x31:      mnemonic("SRP"); arg_IM(B0); bytes(2);                 break;
 			case 0x32:      mnemonic("SBC"); arg_r(B0H); arg_r(B0L); bytes(2);      break;
 			case 0x33:      mnemonic("SBC"); arg_r(B0H); arg_Ir(B0L); bytes(2);     break;
 			case 0x34:      mnemonic("SBC"); arg_R(B1); arg_R(B0); bytes(3);        break;
@@ -237,7 +237,7 @@ CPU_DISASSEMBLE(z8)
 			case 0x7e:      mnemonic("INC"); arg_r(OPH);                            break;
 			case 0x7f:      illegal; /* mnemonic("HALT"); */                        break;
 
-			case 0x80:      mnemonic("DECW"); arg_RR(*oprom++);                     break;
+			case 0x80:      mnemonic("DECW"); arg_RR(B0); bytes(2);                 break;
 			case 0x81:      mnemonic("DECW"); arg_IR(B0); bytes(2);                 break;
 			case 0x82:      mnemonic("LDE"); arg_r(B0H); arg_Irr(B0L); bytes(2);    break;
 			case 0x83:      mnemonic("LDEI"); arg_Ir(B0H); arg_Irr(B0L); bytes(2);  break;
@@ -256,8 +256,8 @@ CPU_DISASSEMBLE(z8)
 
 			case 0x90:      mnemonic("RL"); arg_R(B0); bytes(2);                    break;
 			case 0x91:      mnemonic("RL"); arg_IR(B0); bytes(2);                   break;
-			case 0x92:      mnemonic("LDE"); arg_r(B0L); arg_Irr(B0H); bytes(2);    break;
-			case 0x93:      mnemonic("LDEI"); arg_Ir(B0L); arg_Irr(B0H); bytes(2);  break;
+			case 0x92:      mnemonic("LDE"); arg_Irr(B0L); arg_r(B0H); bytes(2);    break;
+			case 0x93:      mnemonic("LDEI"); arg_Irr(B0L); arg_Ir(B0H); bytes(2);  break;
 			case 0x94:      illegal;                                                break;
 			case 0x95:      illegal;                                                break;
 			case 0x96:      illegal;                                                break;

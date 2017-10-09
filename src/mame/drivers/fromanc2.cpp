@@ -158,6 +158,12 @@ WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_rombank_w)
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
 }
 
+// custom handler allowing byte-smeared writes
+WRITE16_MEMBER(fromanc2_state::uart_w)
+{
+	m_uart->ins8250_w(space, offset, data & 0xff);
+}
+
 
 /*************************************
  *
@@ -257,8 +263,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
 
-	AM_RANGE(0xe50000, 0xe50009) AM_WRITENOP                        // EXT-COMM PORT ?
-	AM_RANGE(0xe5000c, 0xe5000d) AM_READNOP                         // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) AM_WRITE(uart_w) // EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
@@ -624,17 +629,22 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( fromanc4 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
 	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
@@ -685,6 +695,37 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( fromanc2 )
+	ROM_REGION( 0x0080000, "maincpu", 0 )   // MAIN CPU
+	ROM_LOAD16_WORD_SWAP( "9.ic23", 0x000000, 0x080000, CRC(1b8b2570) SHA1(efcaa9af0737ab280c1e49ad69dcd4e05f6102c8) )
+
+	ROM_REGION( 0x0010000, "audiocpu", 0 )  // SOUND CPU
+	ROM_LOAD( "5-ic85.bin",  0x00000, 0x10000, CRC(d8f19aa3) SHA1(f980c2a021fa1995bc18b6427b361506ca8d9bf2) )
+
+	ROM_REGION( 0x0010000, "sub", 0 )   // SUB CPU
+	ROM_LOAD( "3-ic1.bin",   0x00000, 0x10000, CRC(6d02090e) SHA1(08a538f3a578adbf83718e5e592c457b2ad841a6) )
+
+	ROM_REGION( 0x0480000, "gfx1", 0 )  // LAYER4 DATA
+	ROM_LOAD( "124-121.bin", 0x000000, 0x200000, CRC(0b62c9c5) SHA1(1e82398a34fb69bf2a82ef1af79dcc6a50ee53e9) )
+	ROM_LOAD( "125-122.bin", 0x200000, 0x200000, CRC(1d6dc86e) SHA1(31804465fd9a7c8a20a4bc2217a70bda7963e0ae) )
+	ROM_LOAD( "126-123.bin", 0x400000, 0x080000, CRC(9c0f7abc) SHA1(0b69d72e50e64bf02fed4a11cdf10db547953074) )
+
+	ROM_REGION( 0x0480000, "gfx2", 0 )  // LAYER3 DATA
+	ROM_LOAD( "35-47.bin",   0x000000, 0x200000, CRC(97ff0ad6) SHA1(eefa13ef07d6f665a641464089345f1e0ffa7b56) )
+	ROM_LOAD( "161-164.bin", 0x200000, 0x200000, CRC(eedbc4d1) SHA1(2f882c5a2a0311bc1fca7b8569621ffee8cdbc82) )
+	ROM_LOAD( "162-165.bin", 0x400000, 0x080000, CRC(9b546e59) SHA1(69a2fad9aa87fd07e59fed2fb19c5533a9176bb5) )
+
+	ROM_REGION( 0x0200000, "gfx3", 0 )  // LAYER2 DATA
+	ROM_LOAD( "36-48.bin",   0x000000, 0x200000, CRC(c8ee7f40) SHA1(3f043e4d93dd20f0bfb56b6345d8d60c884547db) )
+
+	ROM_REGION( 0x0100000, "gfx4", 0 )  // LAYER1 DATA
+	ROM_LOAD( "40-52.bin",   0x000000, 0x100000, CRC(dbb5062d) SHA1(d1be4d675b36ea6ebd602d5c990adcf3c029485e) )
+
+	ROM_REGION( 0x0400000, "ymsnd", 0 ) // SOUND DATA
+	ROM_LOAD( "ic96.bin",    0x000000, 0x200000, CRC(2f1b394c) SHA1(d95dd8231d7873328f2253eaa27374c79d87e21b) )
+	ROM_LOAD( "ic97.bin",    0x200000, 0x200000, CRC(1d1377fc) SHA1(0dae5dfcbcf4ed6662522e9404fcac0236dce04d) )
+ROM_END
+
+ROM_START( fromanc2o )
 	ROM_REGION( 0x0080000, "maincpu", 0 )   // MAIN CPU
 	ROM_LOAD16_WORD_SWAP( "4-ic23.bin", 0x000000, 0x080000, CRC(96c90f9e) SHA1(c233e91d6967ef05cf14923273be84b17fce200f) )
 
@@ -810,6 +851,7 @@ DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
  *
  *************************************/
 
-GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2,  0,        fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2o, fromanc2, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromancr,  0,        fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fromanc4,  0,        fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

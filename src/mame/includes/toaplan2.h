@@ -2,7 +2,6 @@
 // copyright-holders:Quench, Yochizo, David Haywood
 
 /**************** Machine stuff ******************/
-//#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 #include "cpu/m68000/m68000.h"
@@ -21,15 +20,9 @@
 class toaplan2_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RAISE_IRQ
-	};
-
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
-		m_shared_ram16(*this, "shared_ram16"),
 		m_paletteram(*this, "palette"),
 		m_tx_videoram(*this, "tx_videoram"),
 		m_tx_lineselect(*this, "tx_lineselect"),
@@ -53,7 +46,6 @@ public:
 		m_hopper(*this, "hopper") { }
 
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<uint16_t> m_shared_ram16;     // Really 8 bit RAM connected to Z180
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_tx_videoram;
 	optional_shared_ptr<uint16_t> m_tx_lineselect;
@@ -73,11 +65,10 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
+	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
 
-	uint16_t m_mcu_data;
 	int8_t m_old_p1_paddle_h; /* For Ghox */
 	int8_t m_old_p2_paddle_h;
 	uint8_t m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
@@ -87,8 +78,6 @@ public:
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
-	emu_timer * m_raise_irq_timer;
-
 	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
 	DECLARE_READ16_MEMBER(video_count_r);
 	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);
@@ -97,21 +86,13 @@ public:
 	DECLARE_WRITE16_MEMBER(shippumd_coin_word_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_hd647180_cpu_w);
 	DECLARE_READ16_MEMBER(ghox_p1_h_analog_r);
 	DECLARE_READ16_MEMBER(ghox_p2_h_analog_r);
-	DECLARE_READ16_MEMBER(ghox_mcu_r);
-	DECLARE_WRITE16_MEMBER(ghox_mcu_w);
-	DECLARE_READ16_MEMBER(ghox_shared_ram_r);
-	DECLARE_WRITE16_MEMBER(ghox_shared_ram_w);
 	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
-	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(bgaregga_soundlatch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
-	DECLARE_WRITE8_MEMBER(bgaregga_E00C_w);
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
@@ -154,10 +135,6 @@ public:
 	DECLARE_VIDEO_START(batrider);
 
 	// Teki Paki sound
-	uint8_t m_cmdavailable;
-
-	DECLARE_WRITE16_MEMBER(tekipaki_mcu_w);
-	DECLARE_READ8_MEMBER(tekipaki_soundlatch_r);
 	DECLARE_READ8_MEMBER(tekipaki_cmdavailable_r);
 
 	uint32_t screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -166,18 +143,14 @@ public:
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
+	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
+	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
-	void toaplan2_vblank_irq(int irq_line);
 
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -60,6 +60,13 @@ t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+device_memory_interface::space_config_vector t11_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 
 /*************************************
  *

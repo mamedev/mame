@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/timer.h"
 
 class snk6502_sound_device;
 

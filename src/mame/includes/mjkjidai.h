@@ -36,7 +36,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_select_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_lo_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_hi_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);

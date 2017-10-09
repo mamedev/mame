@@ -16,8 +16,6 @@ public:
 	// construction/destruction
 	neogeo_sma_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_sma_prot->prot_9a37_r(space, offset, mem_mask); }
 	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_sma_prot->random_r(space, offset, mem_mask); }
@@ -32,6 +30,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<sma_prot_device> m_sma_prot;
 	required_device<cmc_prot_device> m_cmc_prot;

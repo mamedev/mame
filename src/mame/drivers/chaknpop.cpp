@@ -4,8 +4,8 @@
 
 Chack'n Pop driver by BUT
 
-Note: The 68705 MCU isn't dumped, because it's protected, however we simulate
-      it using data extracted with a trojan. See machine/chaknpop.c
+
+Modified by Hau, Chack'n
 
 Chack'n Pop
 Taito 1983
@@ -113,6 +113,7 @@ Notes:
 #include "includes/chaknpop.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -124,14 +125,28 @@ Notes:
 
 ***************************************************************************/
 
+READ8_MEMBER(chaknpop_state::mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+			((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+			((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
 WRITE8_MEMBER(chaknpop_state::unknown_port_1_w)
 {
-	//logerror("%s: write to unknow port 1: 0x%02x\n", machine().describe_context(), data);
+	//logerror("%s: write to unknown port 1: 0x%02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(chaknpop_state::unknown_port_2_w)
 {
-	//logerror("%s: write to unknow port 2: 0x%02x\n", machine().describe_context(), data);
+	//logerror("%s: write to unknown port 2: 0x%02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(chaknpop_state::unknown_port_3_w)
+{
+	//logerror("%s: write to unknown port 3: 0x%02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(chaknpop_state::coinlock_w)
@@ -148,10 +163,10 @@ WRITE8_MEMBER(chaknpop_state::coinlock_w)
 
 static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mcu_ram")
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mcu_port_a_r, mcu_port_a_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(mcu_port_b_r, mcu_port_b_w)
-	AM_RANGE(0x8802, 0x8802) AM_READWRITE(mcu_port_c_r, mcu_port_c_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x8801, 0x8801) AM_READ(mcu_status_r)
+	AM_RANGE(0x8802, 0x8802) AM_WRITE(unknown_port_3_w)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
@@ -159,12 +174,12 @@ static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
 	AM_RANGE(0x880c, 0x880c) AM_READWRITE(gfxmode_r, gfxmode_w)
-	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)                                               // coin lock out
+	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)                              // coin lock out
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(txram_w) AM_SHARE("tx_ram")          // TX tilemap
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(attrram_w) AM_SHARE("attr_ram")      // Color attribute
 	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_SHARE("spr_ram") // sprite
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")                                                        // bitmap plane 1-4
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")                               // bitmap plane 1-4
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -337,10 +352,6 @@ void chaknpop_state::machine_start()
 	save_item(NAME(m_gfxmode));
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
-
-	save_item(NAME(m_mcu_seed));
-	save_item(NAME(m_mcu_result));
-	save_item(NAME(m_mcu_select));
 }
 
 void chaknpop_state::machine_reset()
@@ -348,19 +359,17 @@ void chaknpop_state::machine_reset()
 	m_gfxmode = 0;
 	m_flip_x = 0;
 	m_flip_y = 0;
-
-	m_mcu_seed = MCU_INITIAL_SEED;
-	m_mcu_result = 0;
-	m_mcu_select = 0;
 }
 
 static MACHINE_CONFIG_START( chaknpop )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    /* Verified on PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    // Verified on PCB
 	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_18MHz / 6)    // Verified on PCB
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -378,7 +387,7 @@ static MACHINE_CONFIG_START( chaknpop )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz / 12)  /* Verified on PCB */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz / 12)  // Verified on PCB
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -397,29 +406,29 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( chaknpop )
-	ROM_REGION( 0x18000, "maincpu", 0 )         /* Main CPU */
+	ROM_REGION( 0x18000, "maincpu", 0 ) // Main CPU
 	ROM_LOAD( "ao4_01.ic28", 0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
 	ROM_LOAD( "ao4_02.ic27", 0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
 	ROM_LOAD( "ao4_03.ic26", 0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )
 	ROM_LOAD( "ao4_04.ic25", 0x06000, 0x2000, CRC(5209c7d4) SHA1(dcba785a697df55d84d65735de38365869a1da9d) )
 	ROM_LOAD( "ao4_05.ic3",  0x0a000, 0x2000, CRC(8720e024) SHA1(99e445c117d1501a245f9eb8d014abc4712b4963) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the Motorola MC68705P5 Micro-controller */
-	ROM_LOAD( "ao4_06.ic23", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 ) // 2k for the Motorola MC68705P5 Micro-controller
+	ROM_LOAD( "ao4_06.ic23", 0x0000, 0x0800, CRC(9c78c24c) SHA1(f74c7f3ee106e5c45c907e590ec09614a2bc6751) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 ) /* Sprite */
+	ROM_REGION( 0x4000, "gfx1", 0 )     // Sprite
 	ROM_LOAD( "ao4_08.ic14", 0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
 	ROM_LOAD( "ao4_07.ic15", 0x2000, 0x2000, CRC(ae687c18) SHA1(65b25263da88d30cbc0dad94511869596e5c975a) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 ) /* Text */
+	ROM_REGION( 0x4000, "gfx2", 0 )     // Text
 	ROM_LOAD( "ao4_09.ic98", 0x0000, 0x2000, CRC(757a723a) SHA1(62ab84d2aaa9bc1ea5aa9df8155aa3b5a1e93889) )
 	ROM_LOAD( "ao4_10.ic97", 0x2000, 0x2000, CRC(3e3fd608) SHA1(053a8fbdb35bf1c142349f78a63e8cd1adb41ef6) )
 
-	ROM_REGION( 0x0800, "proms", 0 )            /* Palette */
+	ROM_REGION( 0x0800, "proms", 0 )    // Palette
 	ROM_LOAD( "ao4-11.ic96", 0x0000, 0x0400, CRC(9bf0e85f) SHA1(44f0a4712c99a715dec54060afb0b27dc48998b4) )
 	ROM_LOAD( "ao4-12.ic95", 0x0400, 0x0400, CRC(954ce8fc) SHA1(e187f9e2cb754264d149c2896ca949dea3bcf2eb) )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS ) */
+//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS )
 GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

@@ -78,7 +78,7 @@ private:
 
 	uint16_t  m_palette[512];
 	uint16_t  m_address;
-	uint8_t   m_greyscales;       /* Should the HuC6260 output grey or color graphics */
+	uint16_t  m_greyscales;       /* Should the HuC6260 output grey or color graphics */
 	uint8_t   m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
 	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
 	uint16_t  m_pixel_data;

@@ -68,12 +68,14 @@ public:
 	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( register_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_WRITE8_MEMBER(data_w);
+
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	// device-level overrides
@@ -81,6 +83,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -257,8 +260,10 @@ private:
 	uint8_t                  m_lastreg;
 	devcb_write_line       m_irqhandler;
 	devcb_write8           m_portwritehandler;
+	bool                   m_reset_active;
 
 	void init_tables();
+	void calculate_timers();
 	void envelope_KONKOFF(YM2151Operator * op, int v);
 	void set_connect(YM2151Operator *om1, int cha, int v);
 	void advance();

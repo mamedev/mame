@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( octopus_vram, AS_0, 8, octopus_state )
+static ADDRESS_MAP_START( octopus_vram, 0, 8, octopus_state )
 	AM_RANGE(0x0000,0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -909,8 +909,14 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack7_w))
 
-	MCFG_PIC8259_ADD("pic_master", INPUTLINE("maincpu",0), VCC, READ8(octopus_state,get_slave_ack))
-	MCFG_PIC8259_ADD("pic_slave", DEVWRITELINE("pic_master",pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(octopus_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	// RTC (MC146818 via i8255 PPI)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
@@ -954,7 +960,7 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_Z80SIO2_ADD("serial", XTAL_16MHz / 4, 0, 0, 0, 0) // clock rate not mentioned in tech manual
+	MCFG_DEVICE_ADD("serial", Z80SIO2, XTAL_16MHz / 4) // clock rate not mentioned in tech manual
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
@@ -989,7 +995,8 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, octopus_vram)
+	MCFG_DEVICE_ADDRESS_MAP(0, octopus_vram)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("z80_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)

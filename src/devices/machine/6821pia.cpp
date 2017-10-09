@@ -15,21 +15,13 @@
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
 #define LOG_CA1     0x08
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_SETUP | LOG_GENERAL)
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGCA1(...)   LOGMASK(LOG_CA1,     __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#include "logmacro.h"
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGCA1(...)   LOGMASKED(LOG_CA1,     __VA_ARGS__)
 
 #define PIA_IRQ1                (0x80)
 #define PIA_IRQ2                (0x40)
@@ -239,7 +231,7 @@ uint8_t pia6821_device::get_in_a_value()
 
 			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff))
 			{
-				logerror("PIA #%s: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", tag(), m_ddr_a ^ 0xff);
+				logerror("Warning! No port A read handler. Assuming pins 0x%02X not connected\n", m_ddr_a ^ 0xff);
 				m_logged_port_a_not_connected = true;
 			}
 		}
@@ -288,7 +280,7 @@ uint8_t pia6821_device::get_in_b_value()
 			{
 				if (!m_logged_port_b_not_connected && (m_ddr_b != 0xff))
 				{
-					logerror("PIA #%s: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", tag(), m_ddr_b ^ 0xff);
+					logerror("Error! No port B read handler. Three-state pins 0x%02X are undefined\n", m_ddr_b ^ 0xff);
 					m_logged_port_b_not_connected = true;
 				}
 
@@ -358,7 +350,7 @@ void pia6821_device::set_out_ca2(int data)
 		{
 			if (m_out_ca2_needs_pulled)
 			{
-				logerror("PIA #%s: Warning! No port CA2 write handler. Previous value has been lost!\n", tag());
+				logerror("Warning! No port CA2 write handler. Previous value has been lost!\n");
 			}
 
 			m_out_ca2_needs_pulled = true;
@@ -389,7 +381,7 @@ void pia6821_device::set_out_cb2(int data)
 		{
 			if (m_out_cb2_needs_pulled)
 			{
-				logerror("PIA #%s: Warning! No port CB2 write handler. Previous value has been lost!\n", tag());
+				logerror("Warning! No port CB2 write handler. Previous value has been lost!\n");
 			}
 
 			m_out_cb2_needs_pulled = true;
@@ -424,7 +416,7 @@ uint8_t pia6821_device::port_a_r()
 		}
 	}
 
-	LOG("PIA #%s: port A read = %02X\n", tag(), ret);
+	LOG("PIA port A read = %02X\n", ret);
 
 	return ret;
 }
@@ -438,7 +430,7 @@ uint8_t pia6821_device::ddr_a_r()
 {
 	uint8_t ret = m_ddr_a;
 
-	LOG("PIA #%s: DDR A read = %02X\n", tag(), ret);
+	LOG("PIA DDR A read = %02X\n", ret);
 
 	return ret;
 }
@@ -466,7 +458,7 @@ uint8_t pia6821_device::port_b_r()
 	m_irq_b2 = false;
 	update_interrupts();
 
-	LOG("PIA #%s: port B read = %02X\n", tag(), ret);
+	LOG("PIA port B read = %02X\n", ret);
 
 	return ret;
 }
@@ -480,7 +472,7 @@ uint8_t pia6821_device::ddr_b_r()
 {
 	uint8_t ret = m_ddr_b;
 
-	LOG("PIA #%s: DDR B read = %02X\n", tag(), ret);
+	LOG("PIA DDR B read = %02X\n", ret);
 
 	return ret;
 }
@@ -501,7 +493,7 @@ uint8_t pia6821_device::control_a_r()
 	}
 	else if(!m_logged_ca1_not_connected && (!m_in_ca1_pushed))
 	{
-		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", tag());
+		logerror("Warning! No CA1 read handler. Assuming pin not connected\n");
 		m_logged_ca1_not_connected = true;
 	}
 
@@ -511,7 +503,7 @@ uint8_t pia6821_device::control_a_r()
 	}
 	else if ( !m_logged_ca2_not_connected && c2_input(m_ctl_a) && !m_in_ca2_pushed)
 	{
-		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", tag());
+		logerror("Warning! No CA2 read handler. Assuming pin not connected\n");
 		m_logged_ca2_not_connected = true;
 	}
 
@@ -529,7 +521,7 @@ uint8_t pia6821_device::control_a_r()
 		ret |= PIA_IRQ2;
 	}
 
-	LOG("PIA #%s: control A read = %02X\n", tag(), ret);
+	LOG("PIA control A read = %02X\n", ret);
 
 	return ret;
 }
@@ -550,13 +542,13 @@ uint8_t pia6821_device::control_b_r()
 	}
 	else if(!m_logged_cb1_not_connected && !m_in_cb1_pushed)
 	{
-		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", tag());
+		logerror("Error! no CB1 read handler. Three-state pin is undefined\n");
 		m_logged_cb1_not_connected = true;
 	}
 
 	if(!m_logged_cb2_not_connected && c2_input(m_ctl_b) && !m_in_cb2_pushed)
 	{
-		logerror("PIA #%s: Error! Three-state pin is undefined\n", tag());
+		logerror("Error! Three-state pin is undefined\n");
 		m_logged_cb2_not_connected = true;
 	}
 
@@ -574,7 +566,7 @@ uint8_t pia6821_device::control_b_r()
 		ret |= PIA_IRQ2;
 	}
 
-	LOG("PIA #%s: control B read = %02X\n", tag(), ret);
+	LOG("PIA control B read = %02X\n", ret);
 
 	return ret;
 }
@@ -636,7 +628,7 @@ void pia6821_device::send_to_out_a_func(const char* message)
 	// input pins are pulled high
 	uint8_t data = get_out_a_value();
 
-	LOG("PIA #%s: %s = %02X\n", tag(), message, data);
+	LOG("PIA %s = %02X\n", message, data);
 
 	if(!m_out_a_handler.isnull())
 	{
@@ -646,7 +638,7 @@ void pia6821_device::send_to_out_a_func(const char* message)
 	{
 		if(m_out_a_needs_pulled)
 		{
-			logerror("PIA #%s: Warning! No port A write handler. Previous value has been lost!\n", tag());
+			logerror("Warning! No port A write handler. Previous value has been lost!\n");
 		}
 
 		m_out_a_needs_pulled = true;
@@ -663,7 +655,7 @@ void pia6821_device::send_to_out_b_func(const char* message)
 	// input pins are high-impedance - we just send them as zeros for backwards compatibility
 	uint8_t data = get_out_b_value();
 
-	LOG("PIA #%s: %s = %02X\n", tag(), message, data);
+	LOG("PIA %s = %02X\n", message, data);
 
 	if(!m_out_b_handler.isnull())
 	{
@@ -673,7 +665,7 @@ void pia6821_device::send_to_out_b_func(const char* message)
 	{
 		if(m_out_b_needs_pulled)
 		{
-			logerror("PIA #%s: Warning! No port B write handler. Previous value has been lost!\n", tag());
+			logerror("Warning! No port B write handler. Previous value has been lost!\n");
 		}
 
 		m_out_b_needs_pulled = true;
@@ -702,15 +694,15 @@ void pia6821_device::ddr_a_w(uint8_t data)
 {
 	if(data == 0x00)
 	{
-		LOG("PIA #%s: DDR A write = %02X (input mode)\n", tag(), data);
+		LOGSETUP("PIA DDR A write = %02X (input mode)\n", data);
 	}
 	else if(data == 0xff)
 	{
-		LOG("PIA #%s: DDR A write = %02X (output mode)\n", tag(), data);
+		LOGSETUP("PIA DDR A write = %02X (output mode)\n", data);
 	}
 	else
 	{
-		LOG("PIA #%s: DDR A write = %02X (mixed mode)\n", tag(), data);
+		LOGSETUP("PIA DDR A write = %02X (mixed mode)\n", data);
 	}
 
 	if(m_ddr_a != data)
@@ -757,15 +749,15 @@ void pia6821_device::ddr_b_w(uint8_t data)
 {
 	if (data == 0x00)
 	{
-		LOG("PIA #%s: DDR B write = %02X (input mode)\n", tag(), data);
+		LOGSETUP("PIA DDR B write = %02X (input mode)\n", data);
 	}
 	else if (data == 0xff)
 	{
-		LOG("PIA #%s: DDR B write = %02X (output mode)\n", tag(), data);
+		LOGSETUP("PIA DDR B write = %02X (output mode)\n", data);
 	}
 	else
 	{
-		LOG("PIA #%s: DDR B write = %02X (mixed mode)\n", tag(), data);
+		LOGSETUP("PIA DDR B write = %02X (mixed mode)\n", data);
 	}
 
 	if(m_ddr_b != data)
@@ -787,7 +779,7 @@ void pia6821_device::control_a_w(uint8_t data)
 	// bit 7 and 6 are read only
 	data &= 0x3f;
 
-	LOG("PIA #%s: control A write = %02X\n", tag(), data);
+	LOGSETUP("PIA control A write = %02X\n", data);
 
 	// update the control register
 	m_ctl_a = data;
@@ -827,7 +819,7 @@ void pia6821_device::control_b_w(uint8_t data)
 	// bit 7 and 6 are read only
 	data &= 0x3f;
 
-	LOG("PIA #%s: control B write = %02X\n", tag(), data);
+	LOGSETUP("PIA control B write = %02X\n", data);
 
 	// update the control register
 	m_ctl_b = data;
@@ -900,7 +892,7 @@ void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
 {
 	assert_always(m_in_a_handler.isnull(), "pia6821_porta_w() called when in_a_func implemented");
 
-	LOG("PIA #%s: set input port A = %02X\n", tag(), data);
+	LOG("Set PIA input port A = %02X\n", data);
 
 	m_in_a = data;
 	m_port_a_z_mask = z_mask;
@@ -936,12 +928,12 @@ uint8_t pia6821_device::a_output()
 
 WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 {
-	LOGCA1("PIA #%s: set input CA1 = %d\n", tag(), state);
+	LOGCA1("Set PIA input CA1 = %d\n", state);
 
 	// the new state has caused a transition
 	if((m_in_ca1 != state) && ((state && c1_low_to_high(m_ctl_a)) || (!state && c1_high_to_low(m_ctl_a))))
 	{
-		LOGCA1("PIA #%s: CA1 triggering\n", tag());
+		LOGCA1("CA1 triggering\n");
 
 		// mark the IRQ
 		m_irq_a1 = true;
@@ -968,12 +960,12 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 
 WRITE_LINE_MEMBER( pia6821_device::ca2_w )
 {
-	LOG("PIA #%s: set input CA2 = %d\n", tag(), state);
+	LOG("Set PIA input CA2 = %d\n", state);
 
 	// if input mode and the new state has caused a transition
 	if(c2_input(m_ctl_a) && (m_in_ca2 != state) && ((state && c2_low_to_high(m_ctl_a)) || (!state && c2_high_to_low(m_ctl_a))))
 	{
-		LOG("PIA #%s: CA2 triggering\n", tag());
+		LOG("CA2 triggering\n");
 
 		// mark the IRQ
 		m_irq_a2 = true;
@@ -1023,7 +1015,7 @@ void pia6821_device::portb_w(uint8_t data)
 {
 	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 
-	LOG("PIA #%s: set input port B = %02X\n", tag(), data);
+	LOG("Set PIA input port B = %02X\n", data);
 
 	m_in_b = data;
 	m_in_b_pushed = true;
@@ -1048,12 +1040,12 @@ uint8_t pia6821_device::b_output()
 
 WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 {
-	LOG("PIA #%s: set input CB1 = %d\n", tag(), state);
+	LOG("Set PIA input CB1 = %d\n", state);
 
 	// the new state has caused a transition
 	if((m_in_cb1 != state) && ((state && c1_low_to_high(m_ctl_b)) || (!state && c1_high_to_low(m_ctl_b))))
 	{
-		LOG("PIA #%s: CB1 triggering\n", tag());
+		LOG("CB1 triggering\n");
 
 		// mark the IRQ
 		m_irq_b1 = 1;
@@ -1079,14 +1071,14 @@ WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 
 WRITE_LINE_MEMBER( pia6821_device::cb2_w )
 {
-	LOG("PIA #%s: set input CB2 = %d\n", tag(), state);
+	LOG("Set PIA input CB2 = %d\n", state);
 
 	// if input mode and the new state has caused a transition
 	if (c2_input(m_ctl_b) &&
 		(m_in_cb2 != state) &&
 		((state && c2_low_to_high(m_ctl_b)) || (!state && c2_high_to_low(m_ctl_b))))
 	{
-		LOG("PIA #%s: CB2 triggering\n", tag());
+		LOG("CB2 triggering\n");
 
 		// mark the IRQ
 		m_irq_b2 = 1;

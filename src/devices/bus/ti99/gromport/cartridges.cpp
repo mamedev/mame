@@ -49,7 +49,8 @@ enum
 	PCB_PAGED378,
 	PCB_PAGED377,
 	PCB_PAGEDCRU,
-	PCB_GROMEMU
+	PCB_GROMEMU,
+	PCB_PAGED7
 };
 
 static const pcb_type pcbdefs[] =
@@ -65,6 +66,7 @@ static const pcb_type pcbdefs[] =
 	{ PCB_PAGED377, "paged377" },
 	{ PCB_PAGEDCRU, "pagedcru" },
 	{ PCB_GROMEMU, "gromemu" },
+	{ PCB_PAGED7, "paged7" },
 	{ 0, nullptr}
 };
 
@@ -77,11 +79,12 @@ static const pcb_type sw_pcbdefs[] =
 	{ PCB_SUPER, "super" },
 	{ PCB_MBX, "mbx" },
 	{ PCB_GROMEMU, "gromemu" },
+	{ PCB_PAGED7, "paged7" },
 	{ 0, nullptr}
 };
 
 ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-:   bus8z_device(mconfig, TI99_CART, tag, owner, clock),
+:   device_t(mconfig, TI99_CART, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_pcbtype(0),
 	m_slot(0),
@@ -257,6 +260,10 @@ image_init_result ti99_cartridge_device::call_load()
 		if (TRACE_CONFIG) logerror("Paged PCB 16K\n");
 		m_pcb = std::make_unique<ti99_paged16k_cartridge>();
 		break;
+	case PCB_PAGED7:
+		if (TRACE_CONFIG) logerror("Paged PCB 7000\n");
+		m_pcb = std::make_unique<ti99_paged7_cartridge>();
+		break;
 	case PCB_MINIMEM:
 		if (TRACE_CONFIG) logerror("Minimem PCB\n");
 		m_pcb = std::make_unique<ti99_minimem_cartridge>();
@@ -389,7 +396,7 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-static MACHINE_CONFIG_START( ti99_cartridge )
+MACHINE_CONFIG_MEMBER( ti99_cartridge_device::device_add_mconfig )
 	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(ti99_cartridge_device, ready_line))
@@ -397,10 +404,6 @@ static MACHINE_CONFIG_START( ti99_cartridge )
 	MCFG_GROM_ADD( GROM7_TAG, 7, CARTGROM_TAG, 0x8000, WRITELINE(ti99_cartridge_device, ready_line))
 MACHINE_CONFIG_END
 
-machine_config_constructor ti99_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_cartridge );
-}
 
 /*
     Memory area for one cartridge. For most cartridges we only need 8 KiB for
@@ -864,7 +867,7 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
     |                 |= RAM =|                     |
     |=== ROM bank 0 ==|       |===== ROM bank 1 ====|       6ffe = 01
                               |                     |
-                              |===== ROM bank 3 ====|       6ffe = 02
+                              |===== ROM bank 2 ====|       6ffe = 02
                               |                     |
                               |===== ROM bank 3 ====|       6ffe = 03
 
@@ -930,6 +933,74 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
 				m_ram_ptr[offset & 0x03ff] = data;
 			else
 				if (TRACE_ILLWRITE) m_cart->logerror("Write access to %04x but no RAM present\n", offset+0x6000);
+		}
+	}
+	else
+	{
+		gromwrite(space, offset, data, mem_mask);
+	}
+}
+
+
+/*****************************************************************************
+  Cartridge type: paged7
+    GROM: up to 5 GROMs (sockets for a maximum of 3 GROMs, but may be stacked)
+    ROM: up to 16 KiB (in up to 2 banks of 8KiB each)
+    ROM mapper: 7000, 7002, 7004, 7006
+
+    GROM space
+    6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000     f7ff
+    |== GROM3 ==|...|== GROM4 ==|...|== GROM5 ==|...|== GROM6 ==|...|== GROM7 ==|
+
+    ROM space
+    6000                    7000                 7fff
+    |                        |                     |
+    |                        |===== ROM bank 0 ====|       write to 7000
+    |                        |                     |
+    |=== ROM bank 0 =========|===== ROM bank 1 ====|       write to 7002
+                             |                     |
+                             |===== ROM bank 2 ====|       write to 7004
+                             |                     |
+                             |===== ROM bank 3 ====|       write to 7006
+
+    This is very similar to the MBX scheme, only that the bank switch is
+    done by writing to the first words of the 7000 space. Also, there is no
+    additional RAM.
+
+******************************************************************************/
+
+/* Read function for the paged7 cartridge. */
+READ8Z_MEMBER(ti99_paged7_cartridge::readz)
+{
+	if (m_romspace_selected)
+	{
+		if (m_rom_ptr!=nullptr)
+		{
+			if ((offset & 0x1000)==0x0000)  // 6000 area
+				*value = m_rom_ptr[offset];
+			else  // 7000 area
+				*value = m_rom_ptr[(offset & 0x0fff) | (m_rom_page << 12)];
+
+			if (TRACE_READ) m_cart->logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
+		}
+	}
+	else
+	{
+		gromreadz(space, offset, value, mem_mask);
+	}
+}
+
+/* Write function for the paged7 cartridge. */
+WRITE8_MEMBER(ti99_paged7_cartridge::write)
+{
+	if (m_romspace_selected)
+	{
+		// 0111 0000 0000 0110
+		if ((offset & 0x1ff9) == 0x1000)   // Mapper
+		{
+			// Valid values are 0, 1, 2, 3
+			m_rom_page = (offset>>1) & 3;
+			if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 		}
 	}
 	else
@@ -1636,7 +1707,6 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
-	util::xml::data_node *layout_xml = nullptr;
 
 	int i;
 
@@ -1665,7 +1735,7 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = util::xml::data_node::string_read(&layout_text[0], nullptr);
+		util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_text[0], nullptr);
 		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree
@@ -1744,13 +1814,10 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	catch (rpk_exception &)
 	{
 		newrpk->close();
-		if (layout_xml) layout_xml->file_free();
 
 		// rethrow the exception
 		throw;
 	}
-
-	if (layout_xml) layout_xml->file_free();
 
 	return newrpk;
 }

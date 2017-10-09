@@ -44,6 +44,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "speaker.h"
 

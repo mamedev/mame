@@ -14,6 +14,7 @@
 
 // use SSE on 64-bit implementations, where it can be assumed
 #if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
+
 #include "rgbsse.h"
 #elif defined(__ALTIVEC__)
 #include "rgbvmx.h"

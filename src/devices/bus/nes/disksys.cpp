@@ -47,20 +47,14 @@ static const floppy_interface nes_floppy_interface =
 	"floppy_5_25"
 };
 
-static MACHINE_CONFIG_START( nes_disksys )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_disksys_device::device_add_mconfig )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_disksys_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nes_disksys );
-}
-
 
 
 ROM_START( disksys )

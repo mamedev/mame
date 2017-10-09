@@ -34,11 +34,10 @@ static SLOT_INTERFACE_START( nascom_floppies )
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( nascom_fdc )
+MACHINE_CONFIG_MEMBER( nascom_fdc_device::device_add_mconfig )
 	MCFG_FD1793_ADD("fd1793", XTAL_16MHz / 4 / 4)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
@@ -46,11 +45,6 @@ static MACHINE_CONFIG_START( nascom_fdc )
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nascom_fdc );
-}
 
 
 //**************************************************************************

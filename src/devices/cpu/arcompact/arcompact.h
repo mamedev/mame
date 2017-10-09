@@ -95,7 +95,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -840,8 +840,8 @@ private:
 	inline uint8_t READ8(uint32_t address) { return m_program->read_byte(address << 0); }
 	inline void WRITE8(uint32_t address, uint8_t data){     m_program->write_byte(address << 0, data); }
 
-	inline  uint64_t READAUX(uint64_t address) { return m_io->read_dword(address *4); }
-	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address *4, data); }
+	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
+	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
 
 
 	int check_condition(uint8_t condition);

@@ -62,6 +62,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
 
 protected:
+	// construction/destruction
+	rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -103,8 +106,18 @@ private:
 	emu_timer *m_16hz_timer;
 };
 
+// ======================> tc8521_device
+
+class tc8521_device : public rp5c01_device
+{
+public:
+	// construction/destruction
+	tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(RP5C01, rp5c01_device)
+DECLARE_DEVICE_TYPE(TC8521, tc8521_device)
 
 #endif // MAME_MACHINE_RP5C01_H

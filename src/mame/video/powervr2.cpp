@@ -8,7 +8,7 @@
 #include "powervr2.h"
 #include "includes/dc.h"
 
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "video/rgbutil.h"
 #include "rendutil.h"
 
@@ -940,9 +940,10 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 		logerror("%s: Core Pipeline soft reset\n", tag());
 #endif
 		if (start_render_received == 1) {
-			for (auto & elem : grab)
-				if (elem.busy == 1)
-					elem.busy = 0;
+			for (int a=0;a < NUM_BUFFERS;a++)
+				if (grab[a].busy == 1)
+					grab[a].busy = 0;
+
 			start_render_received = 0;
 		}
 	}
@@ -2029,13 +2030,13 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 		tafifo_buff[tafifo_pos]=(uint32_t)data;
 		tafifo_buff[tafifo_pos+1]=(uint32_t)(data >> 32);
 		#if DEBUG_FIFO_POLY
-		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %I64x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]).c_str());
+		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]).c_str());
 		#endif
 		tafifo_pos += 2;
 	}
 	else
 	{
-		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %I64x mask %I64x\n", 0x10000000+offset*8, data, mem_mask).c_str());
+		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %x mask %x\n", 0x10000000+offset*8, data, mem_mask).c_str());
 	}
 
 	tafifo_pos &= tafifo_mask;
@@ -3620,7 +3621,8 @@ void powervr2_device::device_start()
 {
 	irq_cb.resolve_safe();
 
-	memset(grab, 0, sizeof(grab));
+	grab = make_unique_clear<receiveddata[]>(NUM_BUFFERS);
+
 	pvr_build_parameterconfig();
 
 	computedilated();

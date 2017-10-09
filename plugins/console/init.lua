@@ -16,6 +16,8 @@ function console.startplugin()
 	local ln = require("linenoise")
 	local preload = false
 	local matches = {}
+	local lastindex = 0
+	local consolebuf
 	print("    _/      _/    _/_/    _/      _/  _/_/_/_/");
 	print("   _/_/  _/_/  _/    _/  _/_/  _/_/  _/       ");
 	print("  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/    ");
@@ -197,7 +199,25 @@ return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
 		return "\x01" .. "-1"
 	end
 
+	emu.register_start(function()
+		if not consolebuf and manager:machine():debugger() then
+			consolebuf = manager:machine():debugger().consolelog
+			lastindex = 0
+		end
+	end)
+
+	emu.register_stop(function() consolebuf = nil end)
+
 	emu.register_periodic(function()
+		if consolebuf and (#consolebuf > lastindex) then
+			local last = #consolebuf
+			print("\n")
+			while lastindex < last do
+				lastindex = lastindex + 1
+				print(consolebuf[lastindex])
+			end
+			ln.refresh()
+		end
 		if conth.yield then
 			conth:continue(get_completions(conth.result:match("([^\x01]*)\x01(.*)")))
 			return

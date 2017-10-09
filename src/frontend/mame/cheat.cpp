@@ -1403,10 +1403,10 @@ void cheat_manager::load_cheats(const char *filename)
 			util::xml::parse_options options = { nullptr };
 			util::xml::parse_error error;
 			options.error = &error;
-			std::unique_ptr<util::xml::data_node, void (*)(util::xml::data_node *)> rootnode(util::xml::data_node::file_read(cheatfile, &options), [] (util::xml::data_node *node) { node->file_free(); });
+			util::xml::file::ptr const rootnode(util::xml::file::read(cheatfile, &options));
 
 			// if unable to parse the file, just bail
-			if (rootnode == nullptr)
+			if (!rootnode)
 				throw emu_fatalerror("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
 
 			// find the layout node

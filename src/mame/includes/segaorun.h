@@ -12,6 +12,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"

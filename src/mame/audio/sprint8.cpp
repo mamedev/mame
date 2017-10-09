@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "includes/sprint8.h"
 
+#include "speaker.h"
+
 
 /* Discrete Sound Input Nodes */
 #define SPRINT8_CRASH_EN            NODE_01
@@ -294,23 +296,39 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_TASK_END()
 DISCRETE_SOUND_END
 
+MACHINE_CONFIG_START( sprint8_audio )
+	/* sound hardware */
+	/* the proper way is to hook up 4 speakers, but they are not really
+	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
+	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)      /* front */
+	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)     /* left */
+	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)    /* back */
+	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
 
-WRITE8_MEMBER(sprint8_state::crash_w)
-{
-	m_discrete->write(space, SPRINT8_CRASH_EN, data & 0x01);
-}
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(sprint8)
+	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
+	/* volumes on other channels defaulted to off, */
+	/* user can turn them up if needed. */
+	/* The game does not sound good with all channels mixed to stereo. */
+	MCFG_SOUND_ROUTE(1, "speaker_3_7", 0.0)
+	MCFG_SOUND_ROUTE(2, "speaker_5_6", 0.0)
+	MCFG_SOUND_ROUTE(3, "speaker_4_8", 0.0)
 
-WRITE8_MEMBER(sprint8_state::screech_w)
-{
-	m_discrete->write(space, SPRINT8_SCREECH_EN, data & 0x01);
-}
+	MCFG_DEVICE_ADD("latch", F9334, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sprint8_state, int_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_CRASH_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_SCREECH_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint8_state, team_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_ATTRACT_EN>))
 
-WRITE8_MEMBER(sprint8_state::attract_w)
-{
-	m_discrete->write(space, SPRINT8_ATTRACT_EN, data & 0x01);
-}
-
-WRITE8_MEMBER(sprint8_state::motor_w)
-{
-	m_discrete->write(space, NODE_RELATIVE(SPRINT8_MOTOR1_EN, offset & 0x07), data & 0x01);
-}
+	MCFG_DEVICE_ADD("motor", F9334, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR3_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR4_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR5_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR6_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR7_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR8_EN>))
+MACHINE_CONFIG_END

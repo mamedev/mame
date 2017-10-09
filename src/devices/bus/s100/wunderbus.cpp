@@ -83,21 +83,27 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( s100_wunderbus )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( s100_wunderbus )
-	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NOOP)
+
+MACHINE_CONFIG_MEMBER( s100_wunderbus_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(s100_wunderbus_device, pic_int_w))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+
 	MCFG_DEVICE_ADD(INS8250_1_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir3_w))
+
 	MCFG_DEVICE_ADD(INS8250_2_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+
 	MCFG_DEVICE_ADD(INS8250_3_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
@@ -128,17 +134,6 @@ static MACHINE_CONFIG_START( s100_wunderbus )
 
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, NOOP, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_wunderbus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s100_wunderbus );
-}
 
 
 //-------------------------------------------------

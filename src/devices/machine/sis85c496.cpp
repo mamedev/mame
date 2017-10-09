@@ -2,14 +2,14 @@
 // copyright-holders:R. Belmont, O. Galibert
 /***************************************************************************
 
-	sis85c496.cpp - SiS 85C496/497 PCI chipset
-	by R. Belmont (based on i82439hx.cpp/i82439tx.cpp by O. Galibert)
-	
-	Unlike Intel chipsets, the southbridge is not a PCI device;
-	it connects via a proprietary bus to the northbridge, and the two
-	chips appear to software/the BIOS as a single chip.  Thus we emulate 
-	them in a single file.
-	
+    sis85c496.cpp - SiS 85C496/497 PCI chipset
+    by R. Belmont (based on i82439hx.cpp/i82439tx.cpp by O. Galibert)
+
+    Unlike Intel chipsets, the southbridge is not a PCI device;
+    it connects via a proprietary bus to the northbridge, and the two
+    chips appear to software/the BIOS as a single chip.  Thus we emulate
+    them in a single file.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -19,9 +19,10 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)	
+DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(dram_config_r, dram_config_w, 0x000000ff)
 	AM_RANGE(0x44, 0x47) AM_READWRITE16(shadow_config_r, shadow_config_w, 0x0000ffff)
+	AM_RANGE(0x58, 0x5b) AM_READWRITE8(smram_ctrl_r, smram_ctrl_w, 0x00ff0000)
 	AM_RANGE(0xc8, 0xcb) AM_READWRITE(mailbox_r, mailbox_w)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(bios_config_r, bios_config_w, 0x000000ff)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(isa_decoder_r, isa_decoder_w, 0x0000ff00)
@@ -40,7 +41,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP
-	
+
 	AM_INHERIT_FROM(pci_host_device::io_configuration_access_map)
 ADDRESS_MAP_END
 
@@ -86,8 +87,14 @@ MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(sis85c496_host_device, pc_dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(sis85c496_host_device, pc_dack7_w))
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(":maincpu", 0), VCC, READ8(sis85c496_host_device, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(sis85c496_host_device, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
@@ -123,7 +130,7 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_speaker(*this, "speaker"),
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc"),
-    m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
 
@@ -140,7 +147,7 @@ void sis85c496_host_device::set_ram_size(int _ram_size)
 void sis85c496_host_device::device_start()
 {
 	pci_host_device::device_start();
-		
+
 	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
@@ -157,6 +164,7 @@ void sis85c496_host_device::device_start()
 	m_dram_config = 0;
 	m_isa_decoder = 0xff;
 	m_shadctrl = 0;
+	m_smramctrl = 0;
 
 	ram.resize(ram_size/4);
 }
@@ -169,13 +177,19 @@ void sis85c496_host_device::reset_all_mappings()
 void sis85c496_host_device::device_reset()
 {
 	pci_host_device::device_reset();
-	
+
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_nmi_enabled = 0;
 	m_refresh = false;
+
+	m_bios_config = 0x78;
+	m_dram_config = 0;
+	m_isa_decoder = 0xff;
+	m_shadctrl = 0;
+	m_smramctrl = 0;
 }
 
 void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
@@ -184,84 +198,130 @@ void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start
 	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
+void sis85c496_host_device::map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr)
+{
+	if (m_shadctrl & 0x100) // write protected?
+	{
+		memory_space->install_rom(addrstart, addrend, baseptr);
+	}
+	else
+	{
+		memory_space->install_ram(addrstart, addrend, baseptr);
+	}
+}
+
 void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	logerror("SiS496: mapping!\n");
 	io_space->install_device(0, 0xffff, *this, &sis85c496_host_device::internal_io_map);
 
-	if (m_bios_config & 0x40)
+	// is SMRAM at e0000?  overrides shadow if so
+	if ((m_smramctrl & 0x16) == 0x16)
 	{
-		logerror("SiS496: BIOS at Exxxx\n");
-		map_bios(memory_space, 0xfffe0000, 0xfffeffff);
-		
-		if ((m_shadctrl & 0x30) == 0)
+		if (m_smramctrl & 0x08)
 		{
-			map_bios(memory_space, 0x000e0000, 0x000effff);
+			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000b0000/4]);
+			logerror("Sis496: SMRAM at Exxxx, phys Bxxxx\n");
 		}
-		else	// at least one 32K block has shadow memory
+		else
 		{
-			if (m_shadctrl & 0x20)
+			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000a0000/4]);
+			logerror("Sis496: SMRAM at Exxxx, phys Axxxx\n");
+		}
+
+		// map the high BIOS at FFFExxxx if enabled
+		if (m_bios_config & 0x40)
+		{
+			map_bios(memory_space, 0xfffe0000, 0xfffeffff);
+		}
+	}
+	else
+	{
+		// does shadow RAM actually require this to be set?  can't tell w/Megatouch BIOS.
+		if (m_bios_config & 0x40)
+		{
+			logerror("SiS496: BIOS at Exxxx\n");
+			map_bios(memory_space, 0xfffe0000, 0xfffeffff);
+
+			if ((m_shadctrl & 0x30) == 0)
 			{
-				logerror("Sis496: shadow RAM at e8000\n");
-				memory_space->install_ram(0x000e8000, 0x000effff, &ram[0x000e8000/4]);
+				map_bios(memory_space, 0x000e0000, 0x000effff);
 			}
-			
-			if (m_shadctrl & 0x10)
-			{				
-				logerror("Sis496: shadow RAM at e0000\n");
-				memory_space->install_ram(0x000e0000, 0x000e7fff, &ram[0x000e0000/4]);
+			else    // at least one 32K block has shadow memory
+			{
+				if (m_shadctrl & 0x20)
+				{
+					logerror("SiS496: shadow RAM at e8000\n");
+					map_shadowram(memory_space, 0x000e8000, 0x000effff, &ram[0x000e8000/4]);
+				}
+
+				if (m_shadctrl & 0x10)
+				{
+					logerror("SiS496: shadow RAM at e0000\n");
+					map_shadowram(memory_space, 0x000e0000, 0x000e7fff, &ram[0x000e0000/4]);
+				}
 			}
 		}
 	}
 	if (m_bios_config & 0x20)
 	{
-		logerror("SiS496: BIOS at Fxxxx\n");
 		map_bios(memory_space, 0xffff0000, 0xffffffff);
-		
+
 		if ((m_shadctrl & 0xc0) == 0)
 		{
 			map_bios(memory_space, 0x000f0000, 0x000fffff);
+			logerror("SiS496: BIOS at Fxxxx\n");
 		}
-		else	// at least one 32K block has shadow memory
+		else    // at least one 32K block has shadow memory
 		{
 			if (m_shadctrl & 0x80)
 			{
-				logerror("Sis496: shadow RAM at f8000\n");
-				memory_space->install_ram(0x000f8000, 0x000fffff, &ram[0x000f8000/4]);
+				logerror("SiS496: shadow RAM at f8000\n");
+				map_shadowram(memory_space, 0x000f8000, 0x000fffff, &ram[0x000f8000/4]);
 			}
-			
+
 			if (m_shadctrl & 0x40)
 			{
-				logerror("Sis496: shadow RAM at f0000\n");
-				memory_space->install_ram(0x000f0000, 0x000f7fff, &ram[0x000f0000/4]);
+				logerror("SiS496: shadow RAM at f0000\n");
+				map_shadowram(memory_space, 0x000f0000, 0x000f7fff, &ram[0x000f0000/4]);
 			}
 		}
 	}
-	
+
 	if (m_shadctrl & 0x08)
 	{
+		logerror("SiS496: shadow RAM at d8000\n");
 		memory_space->install_ram(0x000d8000, 0x000dffff, &ram[0x000d8000/4]);
-	}		
+	}
 	if (m_shadctrl & 0x04)
 	{
+		logerror("SiS496: shadow RAM at d0000\n");
 		memory_space->install_ram(0x000d0000, 0x000d7fff, &ram[0x000d0000/4]);
 	}
 	if (m_shadctrl & 0x02)
 	{
+		logerror("SiS496: shadow RAM at c8000\n");
 		memory_space->install_ram(0x000c8000, 0x000cffff, &ram[0x000c8000/4]);
-	}		
+	}
 	if (m_shadctrl & 0x01)
 	{
+		logerror("SiS496: shadow RAM at d8000\n");
 		memory_space->install_ram(0x000c0000, 0x000c7fff, &ram[0x000c0000/4]);
 	}
-				
+
+	// is SMRAM enabled at 6xxxx?
+	if ((m_smramctrl & 0x12) == 0x02)
+	{
+		fatalerror("Sis486: SMRAM enabled at 6xxxx, not yet supported!\n");
+	}
+
 	if (m_isa_decoder & 0x01)
 	{
 		logerror("SiS496: ISA base 640K enabled\n");
 		memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000/4]);
 	}
-	
+
 	// 32 megs of RAM (todo: don't hardcode)
 	memory_space->install_ram(0x00100000, 0x01ffffff, &ram[0x00100000/4]);
 }
@@ -525,53 +585,35 @@ WRITE8_MEMBER( sis85c496_host_device::write_rtc )
 
 /*
 
-init sequence:
+after decompress to shadow RAM:
 
-config_write 00:05.0:64 00000000 @ 00ff0000  (00 to 66: select all FPM DRAMs)
-00 to DRAM config
-config_write 00:05.0:40 00000000 @ 000000ff  (CPU config: slowest DRAM, no cache, type = 486DX2)
-config_write 00:05.0:44 00000000 @ 000000ff  (disable all shadow RAM)
-config_write 00:05.0:80 00000000 @ 000000ff  (disable all power management)
-config_write 00:05.0:88 00000000 @ 000000ff  (disable all chipset timers)
-config_write 00:05.0:a0 00000000 @ 00ff0000  (disable all SMI)
-config_write 00:05.0:a0 00000000 @ ff000000  ( "       "   " )
-config_write 00:05.0:40 00000000 @ 00ff0000  (cache configure)
-config_write 00:05.0:44 00000000 @ 00ff0000  (disable caching all C0000-FFFFF)
-config_write 00:05.0:58 00000000 @ 00ff0000  (disable SMRAM)
-70 to BIOS config
-config_write 00:05.0:d0 00000070 @ 000000ff  (enable BIOS ROM from E0000-FFFFF)
-config_write 00:05.0:54 7a000000 @ ff000000  (chipset pin configurations)
-00 to DRAM config
-config_write 00:05.0:40 00000000 @ 000000ff  (still 486DX2, slowest DRAM, no cache)
-config_write 00:05.0:40 00000000 @ 0000ff00  (256/512K type)
-config_write 00:05.0:48 000000ff @ 000000ff  (set all DRAM bank boundries to 256MB)
-config_write 00:05.0:48 0000ff00 @ 0000ff00
-config_write 00:05.0:48 00ff0000 @ 00ff0000
-config_write 00:05.0:48 ff000000 @ ff000000
-config_write 00:05.0:4c 000000ff @ 000000ff
-config_write 00:05.0:4c 0000ff00 @ 0000ff00
-config_write 00:05.0:4c 00ff0000 @ 00ff0000
-config_write 00:05.0:4c ff000000 @ ff000000
-config_write 00:05.0:48 00000000 @ 000000ff  (now set all boundries to 0MB)
-config_write 00:05.0:48 00000000 @ 0000ff00
-config_write 00:05.0:48 00000000 @ 00ff0000
-config_write 00:05.0:48 00000000 @ ff000000
-config_write 00:05.0:4c 00000000 @ 000000ff
-config_write 00:05.0:4c 00000000 @ 0000ff00
-config_write 00:05.0:4c 00000000 @ 00ff0000
-config_write 00:05.0:4c 00000000 @ ff000000
-config_write 00:05.0:48 00000000 @ 000000ff
-config_write 00:05.0:48 00000000 @ 0000ff00
-config_write 00:05.0:48 00000000 @ 00ff0000
-config_write 00:05.0:48 00000000 @ ff000000
-config_write 00:05.0:4c 00000000 @ 000000ff
-config_write 00:05.0:4c 00000000 @ 0000ff00
-config_write 00:05.0:4c 00000000 @ 00ff0000
-config_write 00:05.0:4c 00000000 @ ff000000
-config_write 00:05.0:40 00004000 @ 0000ff00 (4/8/16/32M type)
-config_write 00:05.0:40 00000000 @ ff000000 
-config_write 00:05.0:40 00b30000 @ 00ff0000
-config_write 00:05.0:40 00000000 @ 00ff0000
+config_write 00:05.0:40 00000004 @ 000000ff
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00120000 & 00FF0000 SMRAM: e0000 to SMRAM, enable
+config_write 00:05.0:58 00120000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00040000 & 00FF0000 SMRAM: always enable
+config_write 00:05.0:58 00040000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00000000 & 00FF0000 SMRAM: disable
+config_write 00:05.0:58 00000000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 0000FF00 & 0000FF00 SMI: clear all requests
+config_write 00:05.0:a0 0000ff00 @ 0000ff00
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 000000FF & 000000FF SMI: clear all requests
+config_write 00:05.0:a0 000000ff @ 000000ff
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2808C = 00000500 & 0000FF00 SMI: timer count
+config_write 00:05.0:8c 00000500 @ 0000ff00
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2809C = 00020000 & 00FF0000 SMI: start countdown timer
+config_write 00:05.0:9c 00020000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28084 = 00000006 & 000000FF clear deturbo and break switch blocks
+config_write 00:05.0:84 00000006 @ 000000ff
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28080 = 00000004 & 000000FF enable soft-SMI
+config_write 00:05.0:80 00000004 @ 000000ff
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 00100000 & 00FF0000 select software SMI request
+config_write 00:05.0:a0 00100000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2809C = 00010000 & 00FF0000 assert SMI
+config_write 00:05.0:9c 00010000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280C4 = 00080000 & 00FF0000 IRQ routing: undocumented value
+config_write 00:05.0:c4 00080000 @ 00ff0000
+[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28080 = 00000000 & 000000FF clear all SMI
+config_write 00:05.0:80 00000000 @ 000000ff
 
 
 

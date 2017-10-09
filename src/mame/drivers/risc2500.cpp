@@ -45,6 +45,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 	void install_boot_rom();
+	void remove_boot_rom();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -62,6 +63,11 @@ private:
 void risc2500_state::install_boot_rom()
 {
 	m_maincpu->space(AS_PROGRAM).install_rom(0x00000000, 0x001ffff, memregion("maincpu")->base());
+}
+
+void risc2500_state::remove_boot_rom()
+{
+	m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
 }
 
 uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -258,7 +264,7 @@ READ32_MEMBER(risc2500_state::disable_boot_rom)
 
 TIMER_CALLBACK_MEMBER(risc2500_state::disable_boot_rom)
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
+	remove_boot_rom();
 }
 
 void risc2500_state::machine_start()
@@ -268,6 +274,8 @@ void risc2500_state::machine_start()
 	save_item(NAME(m_p1000));
 	save_item(NAME(m_vram_addr));
 	save_item(NAME(m_vram));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(risc2500_state::remove_boot_rom), this));
 }
 
 void risc2500_state::machine_reset()
@@ -336,5 +344,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE            INIT  COMPANY                      FULLNAME             FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek",                    "RISC 2500",         MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek",                    "RISC 2500",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

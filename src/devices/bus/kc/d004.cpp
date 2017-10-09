@@ -63,36 +63,6 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START(kc_d004)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
-	MCFG_CPU_IO_MAP(kc_d004_io)
-	MCFG_Z80_DAISY_CHAIN(kc_d004_daisy_chain)
-
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
-
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START(kc_d004_gide)
-	MCFG_FRAGMENT_ADD(kc_d004)
-
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_IO_MAP(kc_d004_gide_io)
-
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
-
-
 ROM_START( kc_d004 )
 	ROM_REGION(0x2000, Z80_TAG, 0)
 	ROM_LOAD_OPTIONAL("d004v20.bin",    0x0000, 0x2000, CRC(4f3494f1) SHA1(66f476de78fb474d9ac61c6eaffce3354fd66776))
@@ -173,13 +143,28 @@ void kc_d004_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor kc_d004_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kc_d004 );
-}
+MACHINE_CONFIG_MEMBER(kc_d004_device::device_add_mconfig)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
+	MCFG_CPU_IO_MAP(kc_d004_io)
+	MCFG_Z80_DAISY_CHAIN(kc_d004_daisy_chain)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+
+	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region
@@ -382,13 +367,17 @@ kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor kc_d004_gide_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kc_d004_gide );
-}
+MACHINE_CONFIG_MEMBER(kc_d004_gide_device::device_add_mconfig)
+	kc_d004_device::device_add_mconfig(config);
+
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_IO_MAP(kc_d004_gide_io)
+
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

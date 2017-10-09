@@ -98,7 +98,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, AS_0, 8, i8155_device )
+static ADDRESS_MAP_START( i8155, 0, 8, i8155_device )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -344,9 +344,11 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *i8155_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector i8155_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -458,7 +460,8 @@ void i8155_device::register_w(int offset, uint8_t data)
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length & 0x3fff;
-				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
+				if (clock() > 0)   // a clock of 0 causes MAME to freeze.
+					m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 				// clear timer command so this won't execute twice
 				m_command &= ~COMMAND_TM_MASK;

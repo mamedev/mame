@@ -212,18 +212,6 @@ static SLOT_INTERFACE_START( pc_hd_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( omti_disk )
-	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
-	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
-
-	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
-// Apollo workstations never have more then 1 floppy drive
-//  MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
-MACHINE_CONFIG_END
-
 FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
 	FLOPPY_APOLLO_FORMAT,
 	FLOPPY_PC_FORMAT,
@@ -264,10 +252,17 @@ static INPUT_PORTS_START( omti_port )
 	PORT_DIPSETTING(    0x01, "CA000h" )
 INPUT_PORTS_END
 
-machine_config_constructor omti8621_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( omti_disk );
-}
+MACHINE_CONFIG_MEMBER( omti8621_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
+	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
+
+	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+// Apollo workstations never have more then 1 floppy drive
+//  MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *omti8621_device::device_rom_region() const
 {

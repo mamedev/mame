@@ -62,6 +62,19 @@ Options: 8087 FPU
 Expansion: Expansion box: 2x ISA
 
 
+Commodore PC10 / PC20 / PC30
+Links: http://www.zimmers.net/cbmpics/cpcs.html , https://de.wikipedia.org/wiki/Commodore_PC-10_bis_PC-60 , http://mingos-commodorepage.tumblr.com/post/123656301482/commodore-pc-20-beim-pc-20-handelt-es-sich-um
+http://www.richardlagendijk.nl/cip/computer/item/pc20ii/de
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K / 512K / 640K
+BUS: 5x ISA
+Video: MDA
+Mass storage: PC10: 1 or 2x 5.25" 360K , PC20: 1x 360K + 10MB HD, PC30: 1x 360K + 20MB HD
+On board ports: Floppy, serial, parallel, speaker
+Options: 8087 FPU
+
+
 Commodore PC-10 III
 =============
 Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf ; ftp://ftp.zimmers.net/pub/cbm-pc/documents/PC-8088-Information.txt
@@ -267,12 +280,59 @@ Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddi
 On board ports: speaker
 Options: 8087 FPU
 
+Ericsson PC
+===========
+Links: https://youtu.be/6uilOdMJc24
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: 6x ISA
+Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
+On board ports: Beeper,
+Ports: serial, parallel
+Internal Options: Up to 640K RAM through add-on RAM card
+Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+
+Ericsson Portable PC - EPPC
+===========================
+Links: https://youtu.be/Qmke4L4Jls8 , https://youtu.be/yXK01gBQE6Q
+Form Factor: Laptop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: No internal slots
+Video: Monochrome 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: half height 5.25" 360K
+On board ports: Beeper,
+Ports: serial, parallel, ext. floppy
+Internal Options: 256K RAM, thermal printer
+External Options: A disk cabinet with networking, 1200/300 accoustic modem, 256K Ergo disk electronic disk drive
+Misc: No battery due to the power hungry GP display. 10-15.000 units sold
+
+AEG Olympia Olytext 30
+=======================
+Form Factor: Desktop
+CPU: NEC V20 @ 4.77MHz
+RAM: 768K, not sure how to address the area above 640K
+Bus: 8x ISA:    1) NEC V20 Slot CPU with 786K RAM, TI TACT80181FT chip
+                2) Z180 CP/M emulation card, needed to run the proprietary Olytext 30 word processor)
+                3) Monochrome graphics/color graphics card (possibly EGA capable) ICs: Chips P82C441 and P82A442A
+                4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223,
+                5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
+Video: MDA/Hercules/CGA, possibly EGA
+Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
+On board ports: speaker
+Options: 8087 FPU
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "machine/genpc.h"
 #include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -435,6 +495,12 @@ static MACHINE_CONFIG_START( cfg_single_360K )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( cfg_single_720K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("35dd")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_REMOVE("fdc:1")
+MACHINE_CONFIG_END
 
 //Data General One
 static MACHINE_CONFIG_DERIVED( dgone, pccga )
@@ -442,6 +508,12 @@ static MACHINE_CONFIG_DERIVED( dgone, pccga )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
+// Ericsson Information System
+static MACHINE_CONFIG_DERIVED( epc, pccga )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( eppc, pccga )
+MACHINE_CONFIG_END
 
 // Bondwell BW230
 static INPUT_PORTS_START( bondwell )
@@ -695,6 +767,20 @@ static MACHINE_CONFIG_START( laser_turbo_xt )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+//Olytext 30
+static MACHINE_CONFIG_DERIVED(olytext30, pccga)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_DEFAULT_OPTION("")
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -702,6 +788,18 @@ MACHINE_CONFIG_END
 ROM_START( dgone )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_LOAD( "dgone.bin",  0x8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
+ROM_END
+
+ROM_START( epc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55))
+	ROM_LOAD( "epcbios2.bin",  0xc000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e))
+	ROM_LOAD( "epcbios3.bin",  0xa000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f))
+ROM_END
+
+ROM_START( eppc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
 ROM_END
 
 ROM_START( bw230 )
@@ -714,29 +812,6 @@ ROM_START( compc1 )
 	ROM_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03))
 	ROM_REGION(0x8000, "gfx1", 0)
 	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
-ROM_END
-
-// Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
-ROM_START( pc10iii )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_DEFAULT_BIOS("v441")
-	ROM_SYSTEM_BIOS(0, "v435", "v4.35")
-	ROMX_LOAD("318085-01.u201", 0x8000, 0x8000, CRC(be752d1e) SHA1(5e5e63cd6d6269816cd691602e4c4d209fe3df67), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v436", "v4.36")
-	ROMX_LOAD("318085-02.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "v436c", "v4.36c")
-	ROMX_LOAD("318085-04.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "v438", "v4.38")
-	ROMX_LOAD("318085-05.u201", 0x8000, 0x8000, CRC(ae9e6a31) SHA1(853ee251cf230818c407a8d13ef060a21c90a8c1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "v439", "v4.39")
-	ROMX_LOAD("318085-06.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(5, "v440", "v4.40")
-	ROMX_LOAD("318085-07.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(6, "v441", "v4.41")
-	ROMX_LOAD("318085-08.u201", 0x8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(7))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
-	//ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* temp so you can read the text */
 ROM_END
 
 ROM_START( iskr3104 )
@@ -881,6 +956,10 @@ ROM_START( laser_xt3 )
 	ROM_LOAD("laser_xt3.bin", 0x0e000, 0x02000, CRC(b45a7dd3) SHA1(62f17c408be0036d00a182e94c5c88b83d46b625)) // version 1.26 - 27c64
 ROM_END
 
+ROM_START( olytext30 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("o45995.bin", 0xe000, 0x2000, CRC(fdc05b4f) SHA1(abb94e75e7394be1e85ff706d4d8f3b9cdfea09f))
+ROM_END
 
 /***************************************************************************
 
@@ -890,9 +969,10 @@ ROM_END
 
 //    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
-COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-10 III",  MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
 COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
 COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
@@ -911,3 +991,4 @@ COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,  
 COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
 COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
 COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
+COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )

@@ -288,7 +288,7 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
+static ADDRESS_MAP_START(bios_bank, 0, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
 
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
 	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_fetch_map, AS_DECRYPTED_OPCODES, 16, pwrview_state)
+static ADDRESS_MAP_START(pwrview_fetch_map, AS_OPCODES, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
@@ -370,7 +370,9 @@ static MACHINE_CONFIG_START( pwrview )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_Z80SIO2_ADD("sio", 4000000, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
+
 	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)

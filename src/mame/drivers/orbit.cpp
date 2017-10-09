@@ -39,7 +39,7 @@ Atari Orbit Driver
 TIMER_DEVICE_CALLBACK_MEMBER(orbit_state::nmi_32v)
 {
 	int scanline = param;
-	int nmistate = (scanline & 32) && (m_misc_flags & 4);
+	int nmistate = (scanline & 32) && m_latch->q2_r();
 	m_maincpu->set_input_line(INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -64,37 +64,23 @@ INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
  *
  *************************************/
 
-void orbit_state::update_misc_flags(address_space &space, uint8_t val)
+
+WRITE_LINE_MEMBER(orbit_state::coin_lockout_w)
 {
-	m_misc_flags = val;
-
-	/* BIT0 => UNUSED       */
-	/* BIT1 => LOCKOUT      */
-	/* BIT2 => NMI ENABLE   */
-	/* BIT3 => HEAT RST LED */
-	/* BIT4 => PANEL BUS OC */
-	/* BIT5 => PANEL STROBE */
-	/* BIT6 => HYPER LED    */
-	/* BIT7 => WARNING SND  */
-
-	m_discrete->write(space, ORBIT_WARNING_EN, BIT(m_misc_flags, 7));
-
-	output().set_led_value(0, BIT(m_misc_flags, 3));
-	output().set_led_value(1, BIT(m_misc_flags, 6));
-
-	machine().bookkeeping().coin_lockout_w(0, !BIT(m_misc_flags, 1));
-	machine().bookkeeping().coin_lockout_w(1, !BIT(m_misc_flags, 1));
+	machine().bookkeeping().coin_lockout_w(0, !state);
+	machine().bookkeeping().coin_lockout_w(1, !state);
 }
 
 
-WRITE8_MEMBER(orbit_state::orbit_misc_w)
+WRITE_LINE_MEMBER(orbit_state::heat_rst_led_w)
 {
-	uint8_t bit = offset >> 1;
+	output().set_led_value(0, state);
+}
 
-	if (offset & 1)
-		update_misc_flags(space, m_misc_flags | (1 << bit));
-	else
-		update_misc_flags(space, m_misc_flags & ~(1 << bit));
+
+WRITE_LINE_MEMBER(orbit_state::hyper_led_w)
+{
+	output().set_led_value(1, state);
 }
 
 
@@ -118,7 +104,7 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_w)
 	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_amp_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_amp_w)
-	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
+	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_DEVWRITE("latch", f9334_device, write_a0)
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_rst_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -274,13 +260,11 @@ GFXDECODE_END
 
 void orbit_state::machine_start()
 {
-	save_item(NAME(m_misc_flags));
 	save_item(NAME(m_flip_screen));
 }
 
 void orbit_state::machine_reset()
 {
-	update_misc_flags(generic_space(), 0);
 	m_flip_screen = 0;
 }
 
@@ -299,6 +283,20 @@ static MACHINE_CONFIG_START( orbit )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
+
+	MCFG_DEVICE_ADD("latch", F9334, 0) // M6
+	/* BIT0 => UNUSED       */
+	/* BIT1 => LOCKOUT      */
+	/* BIT2 => NMI ENABLE   */
+	/* BIT3 => HEAT RST LED */
+	/* BIT4 => PANEL BUS OC */
+	/* BIT5 => PANEL STROBE */
+	/* BIT6 => HYPER LED    */
+	/* BIT7 => WARNING SND  */
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(orbit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(orbit_state, heat_rst_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(orbit_state, hyper_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

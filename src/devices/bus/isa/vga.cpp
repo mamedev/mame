@@ -23,14 +23,12 @@ DEFINE_DEVICE_TYPE(ISA8_VGA, isa8_vga_device, "ibm_vga", "IBM VGA Graphics Card"
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_vga );
-}
+MACHINE_CONFIG_MEMBER( isa8_vga_device::device_add_mconfig)
+	MCFG_FRAGMENT_ADD( pcvideo_vga );
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

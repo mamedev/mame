@@ -179,11 +179,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 5) 'kageki' and clones
 
-5a) 'kageki'
+5a) 'kagekiu'
 
   - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
   - Sets :
-      * 'kageki'   : region = 0x02
+      * 'kagekiu'   : region = 0x02
   - Coinage relies on region (code at 0x0099 in CPU1) :
       * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
       * 0x03 and 0x04 : TAITO_COINAGE_WORLD
@@ -225,7 +225,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * 'kagekij'  : region = 0x01
   - This set really looks like a hack :
       * year has been changed from 1988 to 1992
-      * the game uses Japanese ROMS, but CPU0 ROM displays Engish text
+      * the game uses Japanese ROMS, but CPU0 ROM displays English text
         on bad guys screens when game starts
   - Coinage relies on region (code at 0x0099 in CPU1) :
       * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, jpopnics_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r)
+	AM_RANGE(0xf000, 0xf003) AM_DEVREAD("upd4701", upd4701_device, read_xy)
 ADDRESS_MAP_END
 
 /* RAM/ROM bank that maps at 0x8000-0xbfff on maincpu */
@@ -890,17 +890,6 @@ MACHINE_CONFIG_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define COMMON_COIN1(coinstate)\
-	PORT_START("COIN1")\
-	PORT_BIT( 0x01, coinstate, IPT_COIN1 )\
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-#define COMMON_COIN2(coinstate)\
-	PORT_START("COIN2")\
-	PORT_BIT( 0x01, coinstate, IPT_COIN2 )\
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 
 static INPUT_PORTS_START( plumppop )
 	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
@@ -961,14 +950,17 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1003,8 +995,12 @@ static INPUT_PORTS_START( extrmatn )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 
@@ -1045,20 +1041,22 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
-	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW,  IPT_COIN2 )    /* Mirrored for service mode */
-	PORT_BIT   ( 0x2000, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* Mirrored for service mode */
-	PORT_BIT   ( 0x4000, IP_ACTIVE_LOW,  IPT_COIN1 )    /* Mirrored for service mode */
-	PORT_BIT   ( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
-	PORT_BIT   ( 0xf000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arknid2u )
@@ -1098,8 +1096,12 @@ static INPUT_PORTS_START( drtoppel )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drtopplu )
@@ -1114,7 +1116,7 @@ static INPUT_PORTS_START( kageki )
 	/* special (see kageki_csport_* handlers) -> 0xe03b (shared RAM) */
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SWA)                           /* see notes */
-	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* special (see kageki_csport_* handlers) -> 0xe03c (shared RAM) */
 	PORT_START("DSWB")
@@ -1145,8 +1147,15 @@ static INPUT_PORTS_START( kageki )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kagekij )
+static INPUT_PORTS_START( kagekiu )
 	PORT_INCLUDE( kageki )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kagekij )
+	PORT_INCLUDE( kagekiu )
 
 	PORT_MODIFY("DSWA")
 	TAITO_MACHINE_COCKTAIL_LOC(SWA)                              /* see notes */
@@ -1182,8 +1191,12 @@ static INPUT_PORTS_START( chukatai )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chukatau )
@@ -1291,8 +1304,12 @@ static INPUT_PORTS_START( tnzsjo )
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
-	COMMON_COIN1(IP_ACTIVE_LOW)
-	COMMON_COIN2(IP_ACTIVE_LOW)
+
+	PORT_START("COIN1")
+	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("COIN2")
+	PORT_BIT( 1, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tnzsop )
@@ -1458,17 +1475,11 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("COIN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("COIN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1578,7 +1589,13 @@ static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arknoid2, extrmatn )
+static MACHINE_CONFIG_DERIVED( plumppop, extrmatn )
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN1")
+	MCFG_UPD4701_PORTY("AN2")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
@@ -1682,6 +1699,10 @@ static MACHINE_CONFIG_DERIVED( jpopnics, tnzs_base )
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(jpopnics_sub_map)
 
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN1")
+	MCFG_UPD4701_PORTY("AN2")
+
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(1024)
@@ -1712,7 +1733,7 @@ P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No  
 P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
 P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
 P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000*   N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
-P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    U43???      5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    N/A         5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
 
 (A) GFX rom mapping is slightly different to P0-022-A pcb, possibly configured
     by a jumper.
@@ -1865,11 +1886,11 @@ ROM_END
 
 ROM_START( extrmatnur )
 	ROM_REGION( 0x20000, "maincpu", 0 )             /* Region 0 - main cpu */
-	ROM_LOAD( "b06_15",  0x00000, 0x10000, CRC(4b3ee597) SHA1(024964faebd0fa894ab4868a8e009267e828cbfb) )
-	ROM_LOAD( "b06_16",  0x10000, 0x10000, CRC(86175ea4) SHA1(0f30cbb1a6a32355528543707799f752a1b9b75e) )
+	ROM_LOAD( "b06-15.11c",  0x00000, 0x10000, CRC(4b3ee597) SHA1(024964faebd0fa894ab4868a8e009267e828cbfb) )
+	ROM_LOAD( "b06-16.9c",   0x10000, 0x10000, CRC(86175ea4) SHA1(0f30cbb1a6a32355528543707799f752a1b9b75e) )
 
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
-	ROM_LOAD( "b06_17", 0x00000, 0x10000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) )
+	ROM_LOAD( "b06-17.4e", 0x00000, 0x10000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
@@ -2142,9 +2163,37 @@ ROM_START( drtoppelj )
 	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
+ROM_START( kageki )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b35-13.bin", 0x00000, 0x10000, CRC(dc4b025f) SHA1(ed7e0d846693abe0a0ac198e23b272f84b30af46) )    /* World ver */
+	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "b35-14.bin", 0x00000, 0x10000, CRC(8adef2d0) SHA1(0dc8206b35e898b8fed5cdccbdcc5ff1bad68da4) )    /* World ver */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "b35__01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
+	ROM_LOAD( "b35__02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
+	ROM_LOAD( "b35__03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
+	ROM_LOAD( "b35__04.8a",   0x60000, 0x20000, CRC(71c03f91) SHA1(edce6e5a52b0c83c1c3c6bf9bc6b7957f7941521) )
+	ROM_LOAD( "b35__05.7a",   0x80000, 0x20000, CRC(a4e20c08) SHA1(5d1d23d1410fea8650b18c595b0170a17e5d89a6) )
+	ROM_LOAD( "b35__06.5a",   0xa0000, 0x20000, CRC(3f8ab658) SHA1(44de7ee2bdb89bc520ed9bc812c26789c3f31411) )
+	ROM_LOAD( "b35__07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
+	ROM_LOAD( "b35__08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
+ROM_END
+
 /* M6100309A PCB
    P0-038A */
-ROM_START( kageki )
+ROM_START( kagekiu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x10000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )    /* US ver */
 	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
@@ -2163,7 +2212,7 @@ ROM_START( kageki )
 	ROM_LOAD( "b35__08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )   /* US ver */
+	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )   /* matches World ver */
 
 	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
 	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
@@ -2206,7 +2255,7 @@ ROM_END
 
 ROM_START( kagekih )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b35_16.11c", 0x00000, 0x10000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )    /* hacked ver */
+	ROM_LOAD( "b35_16.11c", 0x00000, 0x10000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )    /* hacked ver of the World set */
 	ROM_LOAD( "b35-10.9c",  0x10000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -2237,23 +2286,8 @@ ROM_END
 Chuka Taisen
 Taito, 1988
 
-This PCB comes in two variations: one which is on the older, color prom based P0-025-A PCB as used on extrmatn, drtoppel
-and one which is a unique PCB sort of an 'older version of p0-051-a' which uses color ram like tnzs.
-The color prom version is not dumped yet.
-
-The chukatai (p0-025-a) PCB has a sticker label which says "????????? // CHUKATAISEN"
-The chukatai (p0-028-a) PCB has a sticker label which says "K1100??2A // CHUKATAISEN"
-
-PCB:
-Older(technically 'newer rom ids but used to get rid of old pcb stock') set is:
-Seta: P0-025-A
-Taito: K1100241A J1100107A
-
-The two newer sets are:
-Seta: P0-028-A
+ Seta: P0-028-A
 Taito: K1100416A J1100332A
-which is described in the diagram below.
-
 |--------------------------------------------------|
 |    SETA                     SETA         12MHz   |
 |    X1-003     6116          X1-001               |
@@ -2285,18 +2319,52 @@ which is described in the diagram below.
 Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
+      Graphics ROMs are 23C1000/TC531000 MASK ROMs
 
-The undumped Chuka Taisen set has a daughterboard which plugs into the
-GFX ROM sockets and allows use of 27c1000d eproms instead of 23c1000 mask roms.
-The undumped set, unlike the two here, runs on an older drtoppel/extrmatn pcb
-and uses color proms!
 
+Chuka Taisen 'later' version:
+   Seta: PO-025-A
+  Taito: K1100241A J1100107A
+Sticker: K1100364A CHUKA TAISEN
+
+Technically newer ROM ID#s but was used to get rid of old pcb stock.
+This set, unlike the PO-028-A PCB versions, uses two color proms.
+
+
+************************************************
+Guru-Readme for EPROM version of Chuuka Taisen
+------------------------------------------------
+
+Main Board (same as Extermination/Dr Toppel etc)
+----------
+PO-025-A
+J1100107A K1100241A
+Sticker: K1100364A CHUUKA TAISEN
+Sticker: M4300092A CHUUKA TAISEN
+
+All EPROMs are NEC D27C512D-15
+M-Chip labelled "B06 14" at location 3G
+
+PALs (all MMI PAL16L8A-2CN): B06-13.2C, B06-12.3C, B06-11.6D, B06-10.8D
+PALs are protected
+
+PROMs are AM27S29
+
+
+ROM Board
+---------
+K9100189A J9100141A ROM7PCB
+Sticker: K9100189A CHUUKA TAISEN
+
+All EPROMs are Toshiba TC571000D-20
+
+************************************************
 
 */
 
 ROM_START( chukatai )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
+	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) ) /* P0-028-A PCB set */
 	ROM_LOAD( "b44-11", 0x10000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
@@ -2324,7 +2392,7 @@ ROM_END
 
 ROM_START( chukataiu )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
+	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) ) /* P0-028-A PCB set */
 	ROM_LOAD( "b44-11", 0x10000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
@@ -2352,7 +2420,7 @@ ROM_END
 
 ROM_START( chukataij )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
+	ROM_LOAD( "b44-10", 0x00000, 0x10000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) ) /* P0-028-A PCB set */
 	ROM_LOAD( "b44-11", 0x10000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
@@ -2378,10 +2446,37 @@ ROM_START( chukataij )
 	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
-/*An undumped set of chuka taisen exists with all roms in the b44-14
-thru b44-25 number range and 27c1000d gfx roms, AND COLOR PROMS, using the older p0-025-a pcb
-This set, unlike the others, does use the b06-10.pal16l8a.d9.jed "older" pal rather than the 'newer' b06-101.pal16l8a.d9.jed pal.
-*/
+ROM_START( chukataija )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
+	ROM_LOAD( "b44-31.11c", 0x00000, 0x10000, CRC(134d3c9e) SHA1(e686a75b9c267db9e8dad7f162c93f1992e395ec) ) /* P0-025-A PCB set */
+	ROM_LOAD( "b44-11.9c",  0x10000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_LOAD( "b44-32.4e", 0x00000, 0x10000, CRC(f52d2f90) SHA1(f040b16e29553ae510e50e1ed55344a36fdcc56d) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* located on the K9100189A J9100141A ROM7PCB daughterboard */
+	ROM_LOAD( "b44-21.rom4l", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) ) /* same data as B44-01 through B44-08 */
+	ROM_LOAD( "b44-22.rom4h", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
+	ROM_LOAD( "b44-23.rom3l", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
+	ROM_LOAD( "b44-24.rom3h", 0x60000, 0x20000, CRC(3c5f544b) SHA1(d3b0ee18f1027483a36ef02757b62f42a086a8e2) )
+	ROM_LOAD( "b44-25.rom2l", 0x80000, 0x20000, CRC(d1b7e314) SHA1(8b4181caa32955b4274614a4238bb24d67ecb729) )
+	ROM_LOAD( "b44-26.rom2h", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
+	ROM_LOAD( "b44-27.rom1l", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
+	ROM_LOAD( "b44-28.rom1h", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "b44-30.15f", 0x00000, 0x200, CRC(b3de8312) SHA1(dac0d9bfb593d691fd7030e2b1b13be1218929a4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b44-29.17f", 0x00200, 0x200, CRC(ae44b8fb) SHA1(2bf5aca32bb301c0187deb05a3f4a482ac97f0ef) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
+ROM_END
 
 
 /*
@@ -2774,7 +2869,7 @@ ROM_END
 
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, plumppop,  0,        extrmatn, plumppop, extrmatn_state, 0, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, 0, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, 0, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
@@ -2783,29 +2878,31 @@ GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, extrmatn_state, 0, ROT270, 
 GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, 0, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, extrmatn_state, 0, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   0, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   0, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   0, ROT90,  "hack",                                                 "Kageki (hack)", MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
+GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   0, ROT90,  "hack",                                                 "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
 
-GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher rom ID# but older PCB stock */
 
-GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (older PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (older PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  0, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  0, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )

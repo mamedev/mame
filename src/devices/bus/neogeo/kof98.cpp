@@ -43,14 +43,9 @@ void neogeo_kof98_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( kof98_cart )
+MACHINE_CONFIG_MEMBER( neogeo_kof98_cart_device::device_add_mconfig )
 	MCFG_KOF98_PROT_ADD("kof98_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_kof98_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kof98_cart );
-}
 
 void neogeo_kof98_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {

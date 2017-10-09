@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER( background_color_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
+	DECLARE_WRITE8_MEMBER( vbank_clear_w );
 	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
 	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
@@ -45,7 +46,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	inline uint8_t read_byte(offs_t address);

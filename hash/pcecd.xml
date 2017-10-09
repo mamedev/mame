@@ -2184,7 +2184,7 @@
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="TICD-3001"/>
 		<info name="release" value="19931210"/>
-		<info name="alt_title" value="秘密の花園 "/>
+		<info name="alt_title" value="秘密の花園"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2200,7 +2200,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1027"/>
 		<info name="release" value="19930226"/>
-		<info name="alt_title" value="ホラーストーリー "/>
+		<info name="alt_title" value="ホラーストーリー"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2291,7 +2291,7 @@
 	</software>
 
 	<software name="iganin">
-		<description>Iga Ninden Gaiou (SCD)(Jpn)</description>
+		<description>Iga Ninden Gaou (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="NBCD3003"/>
@@ -2301,7 +2301,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="iga ninden gaiou (scd)(jpn)" sha1="b2a975b5d609009bec8a89c5c91e42e2049c982f"/>
+				<disk name="iga ninden gaou (scd)(jpn)" sha1="b2a975b5d609009bec8a89c5c91e42e2049c982f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2390,7 +2390,7 @@
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HECD4017"/>
 		<info name="release" value="19941223"/>
-		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94 "/>
+		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2566,7 +2566,7 @@
 		<publisher>Intec</publisher>
 		<info name="serial" value="IGCD3007"/>
 		<info name="release" value="19940128"/>
-		<info name="alt_title" value="格闘覇王伝説アルガノス "/>
+		<info name="alt_title" value="格闘覇王伝説アルガノス"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2598,7 +2598,7 @@
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD3025"/>
 		<info name="release" value="19940428"/>
-		<info name="alt_title" value="風霧 "/>
+		<info name="alt_title" value="風霧"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2711,7 +2711,7 @@
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HECD5021"/>
 		<info name="release" value="19950526"/>
-		<info name="alt_title" value="機装ルーガII "/>
+		<info name="alt_title" value="機装ルーガII"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3266,7 +3266,7 @@
 		<publisher>NCS</publisher>
 		<info name="serial" value="NSCD2011"/>
 		<info name="release" value="19920313"/>
-		<info name="alt_title" value="魔物ハンター妖子 ~魔界からの転校生~ "/>
+		<info name="alt_title" value="魔物ハンター妖子 ~魔界からの転校生~"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3314,7 +3314,7 @@
 		<publisher>Kogado Studio</publisher>
 		<info name="serial" value="KSCD1001"/>
 		<info name="release" value="19910322"/>
-		<info name="alt_title" value="魔晶伝記 ラ・ヴァルー "/>
+		<info name="alt_title" value="魔晶伝記 ラ・ヴァルー"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4079,7 +4079,7 @@
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="RHCD1002"/>
 		<info name="release" value="19911108"/>
-		<info name="alt_title" value="プリンスオブペルシャ "/>
+		<info name="alt_title" value="プリンスオブペルシャ"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4151,7 +4151,7 @@
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HECD5019"/>
 		<info name="release" value="19950811"/>
-		<info name="alt_title" value="プライベート アイドル "/>
+		<info name="alt_title" value="プライベート アイドル"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6177,7 +6177,6 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSCD0001"/>
 		<info name="release" value="19910322"/>
-		<info name="alt_title" value="ザ･キックボクシング"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6877,7 +6876,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD0015"/>
 		<info name="release" value="19910322"/>
-		<info name="alt_title" value="イースIII "/>
+		<info name="alt_title" value="イースIII"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">

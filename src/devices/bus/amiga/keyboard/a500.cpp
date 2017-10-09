@@ -36,11 +36,6 @@ namespace bus { namespace amiga { namespace keyboard {
 
 namespace {
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
 ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x000, 0x03f) AM_RAM
@@ -134,6 +129,11 @@ INPUT_PORTS_START( a500_gb_keyboard )
 INPUT_PORTS_END
 
 } // anonymous namespace
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
 
 MACHINE_CONFIG_MEMBER(a500_kbd_device::device_add_mconfig)

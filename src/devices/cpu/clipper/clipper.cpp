@@ -21,16 +21,16 @@
 #include "debugger.h"
 #include "clipper.h"
 
-#define VERBOSE 0
-#define LOG_INTERRUPT(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (false)
+#define LOG_GENERAL   (1U << 0)
+#define LOG_INTERRUPT (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_INTERRUPT)
+
+#include "logmacro.h"
 
 // convenience macros for frequently used instruction fields
 #define R1 (m_info.r1)
 #define R2 (m_info.r2)
-
-// convenience macros for dealing with the psw
-#define PSW(mask) (m_psw & PSW_##mask)
-#define SSW(mask) (m_ssw & SSW_##mask)
 
 // macros for setting psw condition codes
 #define FLAGS(C,V,Z,N) \
@@ -57,17 +57,19 @@ DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIP
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, 0) { }
 
 clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, 0) { }
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, SSW_ID_C400R4) { }
 
-clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u32 cpuid)
 	: cpu_device(mconfig, type, tag, owner, clock),
 	m_pc(0),
+	m_psw(0),
+	m_ssw(cpuid),
 	m_r(m_rs),
 	m_insn_config("insn", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0),
@@ -111,7 +113,16 @@ void clipper_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
-	//save_item(NAME(m_pc));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_psw));
+	save_item(NAME(m_ssw));
+	save_item(NAME(m_ru));
+	save_item(NAME(m_rs));
+	save_item(NAME(m_f));
+
+	save_item(NAME(m_nmi));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_ivec));
 
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
@@ -170,7 +181,7 @@ void clipper_device::device_reset()
 	 *   ssw: EI, TP, M, U, K, KU, UU, P cleared, ID set from hardware, others undefined
 	 */
 	m_psw = 0;
-	m_ssw = 0;
+	set_ssw(0);
 
 	m_r = SSW(U) ? m_ru : m_rs;
 
@@ -180,8 +191,9 @@ void clipper_device::device_reset()
 
 	// FIXME: figure out how to branch to the boot code properly
 	m_pc = 0x7f100000;
-	m_irq = 0;
-	m_nmi = 0;
+	m_irq = CLEAR_LINE;
+	m_nmi = CLEAR_LINE;
+	m_ivec = 0;
 }
 
 void clipper_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -208,23 +220,21 @@ void clipper_device::execute_run()
 		// acknowledge non-maskable interrupt
 		standard_irq_callback(INPUT_LINE_NMI);
 
-		LOG_INTERRUPT("non-maskable interrupt - current pc = 0x%08x\n", m_pc);
+		LOGMASKED(LOG_INTERRUPT, "non-maskable interrupt\n");
 		m_pc = intrap(EXCEPTION_INTERRUPT_BASE, m_pc);
 	}
 	else if (SSW(EI) && m_irq)
 	{
-		// FIXME: sample interrupt vector from the bus without acknowledging the interrupt
-		u8 ivec = standard_irq_callback(-1);
-		LOG_INTERRUPT("received prioritised interrupt with vector 0x%04x\n", ivec);
+		LOGMASKED(LOG_INTERRUPT, "received prioritised interrupt ivec 0x%02x\n", m_ivec);
 
 		// allow equal/higher priority interrupts
-		if ((ivec >> 4) <= SSW(IL))
+		if ((m_ivec & IVEC_LEVEL) <= SSW(IL))
 		{
 			// acknowledge interrupt
 			standard_irq_callback(INPUT_LINE_IRQ0);
 
-			LOG_INTERRUPT("accepting interrupt vector 0x%04x - current pc = %08x\n", ivec, m_pc);
-			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + ivec * 8, m_pc);
+			LOGMASKED(LOG_INTERRUPT, "transferring control to ivec 0x%02x\n", m_ivec);
+			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_ivec * 8, m_pc);
 		}
 	}
 
@@ -235,9 +245,10 @@ void clipper_device::execute_run()
 		// fetch instruction word
 		insn = m_insn->read_word(m_pc + 0);
 
+		// decode instruction
 		decode_instruction(insn);
 
-		// decode and execute instruction, return next pc
+		// execute instruction, return next pc
 		m_pc = execute_instruction();
 
 		// FIXME: some instructions take longer (significantly) than one cycle
@@ -264,16 +275,12 @@ void clipper_device::execute_set_input(int inputnum, int state)
  * The CLIPPER has a true Harvard architecture. In the InterPro, these are tied back together
  * again by the MMU, which then directs the access to one of 3 address spaces: main, i/o or boot.
  */
-const address_space_config *clipper_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector clipper_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM: return &m_insn_config;
-	case AS_DATA: return &m_data_config;
-	default: break;
-	}
-
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_insn_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 /*
@@ -380,7 +387,7 @@ void clipper_device::decode_instruction (u16 insn)
 				break;
 
 			default:
-				logerror("illegal addressing mode pc = 0x%08x\n", m_pc);
+				LOG("illegal addressing mode pc 0x%08x\n", m_pc);
 				machine().debug_break();
 				break;
 			}
@@ -425,7 +432,7 @@ int clipper_device::execute_instruction ()
 			m_psw = m_r[R2];
 		else if (!SSW(U) && (R1 == 1 || R1 == 3))
 		{
-			m_ssw = m_r[R2];
+			set_ssw(m_r[R2]);
 			m_r = SSW(U) ? m_ru : m_rs;
 		}
 		// FLAGS: CVZN
@@ -450,15 +457,15 @@ int clipper_device::execute_instruction ()
 		break;
 	case 0x14:
 		// pushw: push word
+		m_data->write_dword(m_r[R1] - 4, m_r[R2]);
 		m_r[R1] -= 4;
-		m_data->write_dword(m_r[R1], m_r[R2]);
 		// TRAPS: A,P,W
 		break;
 
 	case 0x16:
 		// popw: pop word
-		m_r[R2] = m_data->read_dword(m_r[R1]);
 		m_r[R1] += 4;
+		m_r[R2] = m_data->read_dword(m_r[R1] - 4);
 		// TRAPS: C,U,A,P,R
 		break;
 
@@ -1222,7 +1229,7 @@ int clipper_device::execute_instruction ()
 			break;
 #endif
 		default:
-			logerror("illegal unprivileged macro opcode at 0x%08x\n", m_pc);
+			LOG("illegal unprivileged macro opcode at 0x%08x\n", m_pc);
 			next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 			machine().debug_break();
 			break;
@@ -1268,11 +1275,11 @@ int clipper_device::execute_instruction ()
 				break;
 			case 0x04:
 				// reti: restore psw, ssw and pc from supervisor stack
-				LOG_INTERRUPT("reti r%d, ssp = %08x, pc = %08x, next_pc = %08x\n",
+				LOGMASKED(LOG_INTERRUPT, "reti r%d ssp 0x%08x pc 0x%08x next_pc 0x%08x\n",
 					(m_info.macro >> 4) & 0xf, m_rs[(m_info.macro >> 4) & 0xf], m_pc, m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8));
 
 				m_psw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 0);
-				m_ssw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4);
+				set_ssw(m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4));
 				next_pc = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8);
 
 				m_rs[(m_info.macro >> 4) & 0xf] += 12;
@@ -1293,7 +1300,7 @@ int clipper_device::execute_instruction ()
 
 			default:
 				// illegal operation
-				logerror("illegal privileged macro opcode at 0x%08x\n", m_pc);
+				LOG("illegal privileged macro opcode at 0x%08x\n", m_pc);
 				next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 				machine().debug_break();
 				break;
@@ -1314,7 +1321,7 @@ int clipper_device::execute_instruction ()
 #endif
 
 	default:
-		logerror("illegal opcode at 0x%08x\n", m_pc);
+		LOG("illegal opcode at 0x%08x\n", m_pc);
 		next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 		break;
 	}
@@ -1327,28 +1334,25 @@ int clipper_device::execute_instruction ()
 */
 u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 {
-	LOG_INTERRUPT("intrap - vector %x, pc = 0x%08x, next_pc = 0x%08x, ssp = 0x%08x\n", vector, pc, m_data->read_dword(vector + 4), m_rs[15]);
+	// fetch pc and ssw from interrupt vector
+	u32 next_pc = m_data->read_dword(vector + 0);
+	u32 next_ssw = m_data->read_dword(vector + 4);
+
+	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%08x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
 
 	// set cts and mts to indicate source of exception
 	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;
 
-	// push pc, psw and ssw onto supervisor stack
-	m_data->write_dword(m_rs[15] - 4, pc);
-	m_data->write_dword(m_rs[15] - 12, m_psw);
-	m_data->write_dword(m_rs[15] - 8, m_ssw);
+	// push pc, ssw and psw onto supervisor stack
+	m_data->write_dword(m_rs[15] - 0x4, pc);
+	m_data->write_dword(m_rs[15] - 0x8, m_ssw);
+	m_data->write_dword(m_rs[15] - 0xc, m_psw);
 
 	// decrement supervisor stack pointer
-
-	// NOTE: while not explicitly stated anywhere, it seems the InterPro boot code has been
-	// developed with the assumption that the SSP is decremented by 24 bytes during an exception,
-	// rather than the 12 bytes that might otherwise be expected. This means the exception handler
-	// code must explicitly increment the SSP by 12 prior to executing the RETI instruction,
-	// as otherwise the SSP will not be pointing at a valid return frame. It's possible this
-	// behaviour might vary with some other version of the CPU, but this is all we know for now.
-	m_rs[15] -= 24;
+	m_rs[15] -= 12;
 
 	// load ssw from trap vector and set previous mode
-	m_ssw = (m_data->read_dword(vector + 0) & ~SSW_P) | (SSW(U) << 1);
+	set_ssw((next_ssw & ~(SSW(P))) | (SSW(U) << 1));
 
 	// clear psw
 	m_psw = 0;
@@ -1356,10 +1360,47 @@ u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 	m_r = SSW(U) ? m_ru : m_rs;
 
 	// return new pc from trap vector
-	return m_data->read_dword(vector + 4);
+	return next_pc;
 }
 
-bool clipper_device::evaluate_branch ()
+u32 clipper_c400_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
+{
+	// C400 reverses order of pc and ssw in interrupt vector
+	u32 next_pc = m_data->read_dword(vector + 4);
+	u32 next_ssw = m_data->read_dword(vector + 0);
+
+	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%08x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
+
+	// set cts and mts to indicate source of exception
+	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;
+
+	// push pc, ssw and psw onto supervisor stack
+	m_data->write_dword(m_rs[15] - 0x4, pc);
+	m_data->write_dword(m_rs[15] - 0x8, m_ssw);
+	m_data->write_dword(m_rs[15] - 0xc, m_psw);
+
+	// decrement supervisor stack pointer
+
+	// NOTE: while not explicitly stated anywhere, it seems the InterPro C400 boot code has been
+	// developed with the assumption that the SSP is decremented by 24 bytes during an exception,
+	// rather than the 12 bytes for the InterPro C300 version. This means the exception handler
+	// code must explicitly increment the SSP by 12 prior to executing the RETI instruction,
+	// as otherwise the SSP will not be pointing at a valid return frame.
+	m_rs[15] -= 24;
+
+	// load ssw from trap vector and set previous mode
+	set_ssw((next_ssw & ~(SSW(P))) | (SSW(U) << 1));
+
+	// clear psw
+	m_psw = 0;
+
+	m_r = SSW(U) ? m_ru : m_rs;
+
+	// return new pc from trap vector
+	return next_pc;
+}
+
+bool clipper_device::evaluate_branch() const
 {
 	switch (m_info.r2)
 	{

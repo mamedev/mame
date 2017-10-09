@@ -273,11 +273,13 @@ const options_entry windows_options::s_option_entries[] =
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
-//  utf8_main
+//  main
 //============================================================
 
-int main(std::vector<std::string> &args)
+int main(int argc, char *argv[])
 {
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
+
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
 		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
@@ -515,23 +517,20 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
 	int profile = options.profile();
 	if (profile > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority
@@ -617,6 +616,17 @@ void windows_osd_interface::osd_exit()
 
 	// one last pass at events
 	winwindow_process_events(machine(), false, false);
+}
+
+
+//============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+	opts.add_entries(windows_options::s_option_entries);
 }
 
 

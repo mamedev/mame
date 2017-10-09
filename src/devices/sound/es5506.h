@@ -143,8 +143,6 @@ protected:
 	void *      m_wavraw;                 /* raw waveform */
 #endif
 
-	FILE *m_eslog;
-
 	const char * m_region0;                       /* memory region where the sample ROM lives */
 	const char * m_region1;                       /* memory region where the sample ROM lives */
 	const char * m_region2;                       /* memory region where the sample ROM lives */

@@ -394,12 +394,12 @@
 		<bezel element="text_r92"><bounds x="96.8" y="49.5" width="10" height="1.5" /></bezel>
 		<bezel element="text_r93"><bounds x="96.8" y="51" width="10" height="1.5" /></bezel>
 
-		<bezel name="8.8" element="led2"><bounds x="90" y="29.75" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.9" element="led2"><bounds x="90" y="32.25" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.10" element="led2"><bounds x="90" y="34.75" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.11" element="led2"><bounds x="90" y="37.25" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.12" element="led2"><bounds x="90" y="39.75" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.13" element="led2"><bounds x="90" y="42.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.13" element="led2"><bounds x="90" y="29.75" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.12" element="led2"><bounds x="90" y="32.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.11" element="led2"><bounds x="90" y="34.75" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.10" element="led2"><bounds x="90" y="37.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.9" element="led2"><bounds x="90" y="39.75" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.8" element="led2"><bounds x="90" y="42.25" width="1.5" height="1.5" /></bezel>
 
 		<bezel element="bt" inputtag="IN.8" inputmask="0x80"><bounds x="94" y="29.5" width="2" height="2" /></bezel>
 		<bezel element="bt" inputtag="IN.8" inputmask="0x40"><bounds x="94" y="32" width="2" height="2" /></bezel>

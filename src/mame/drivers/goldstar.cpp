@@ -479,7 +479,7 @@ ADDRESS_MAP_END
   E1:  W    Reels enable/disable register
  */
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, goldstar_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, goldstar_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -8540,7 +8540,7 @@ static MACHINE_CONFIG_START( lucky8 )
 	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_ADD("aysnd", YM2149, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))

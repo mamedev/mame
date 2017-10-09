@@ -31,6 +31,7 @@
 #include "speaker.h"
 #include "video/k053250_ps.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/k054539.h"
 #include "includes/konamigx.h" // TODO: WHY?

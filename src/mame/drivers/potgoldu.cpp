@@ -119,5 +119,5 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 	ROM_LOAD( "mc68h705",     0x0000, 0x2000, NO_DUMP ) // not sure which type of mcu this is, size is a guess
 ROM_END
 
-GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON | MACHINE_NO_SOUND )
-GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON | MACHINE_NO_SOUND )
+GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

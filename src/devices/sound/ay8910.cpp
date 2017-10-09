@@ -346,7 +346,41 @@ ANALOG CHANNEL A <-  |_|5   \-/ |   A   24|_|  <> DA4
                        |__________________|
 
 
-AY-3-8910/A: 2 I/O ports
+AY-3-8913:
+                        _______    _______
+                      _|       \__/       |_
+   [1] VSS (GND) --  |_|1  *            24|_|  <- /CHIP SELECT [2]
+                      _|                  |_
+            BDIR ->  |_|2               23|_|  <- A8
+                      _|                  |_
+             BC1 ->  |_|3               22|_|  <- /A9
+                      _|    /---\         |_
+             DA7 <>  |_|4   \-/ |   A   21|_|  <- /RESET
+                      _|    .   .   Y     |_
+             DA6 <>  |_|5   |---|   -   20|_|  == CLOCK
+                      _|    '   '   3     |_
+             DA5 <>  |_|6    T 8    -   19|_|  -- VSS (GND) [1]
+                      _|     A 3    8     |_
+             DA4 <>  |_|7    I 3    9   18|_|  -> ANALOG CHANNEL C
+                      _|     W 2    1     |_
+             DA3 <>  |_|8    A      3   17|_|  -> ANALOG CHANNEL A
+                      _|     N C          |_
+             DA2 <>  |_|9      -        16|_|  NC(?)
+                      _|       A          |_
+             DA1 <>  |_|10              15|_|  -> ANALOG CHANNEL B
+                      _|                  |_
+             DA0 <>  |_|11              14|_|  ?? TEST IN [3]
+                      _|                  |_
+    [4] TEST OUT ??  |_|12              13|_|  -- VCC (+5V)
+                       |__________________|
+
+[1] Both of these are ground, they are probably connected together internally. Grounding either one should work.
+[2] This is effectively another enable, much like TEST 2 is on the AY-3-8910 and 8914, but active low
+[3] This is claimed to be equivalent to TEST 1 on the datasheet
+[4] This is claimed to be equivalent to TEST 2 on the datasheet
+
+
+GI AY-3-8910/A Programmable Sound Generator (PSG): 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
     factory mask adjustment but default was 0000 for the "common" part shipped
     (probably die "-100").
@@ -358,7 +392,7 @@ AY-3-8910/A: 2 I/O ports
   AY-3-8910 die is labeled "90-32033" with a 1979 copyright and a "-100" die
     code.
   AY-3-8910A die is labeled "90-32128" with a 1983 copyright.
-AY-3-8912/A: 1 I/O port
+GI AY-3-8912/A: 1 I/O port
   /A9 pin doesn't exist and is considered pulled low.
   TEST2 pin doesn't exist and is considered pulled high.
   IOB pins do not exist and have unknown behavior if driven high/low and read
@@ -377,7 +411,7 @@ AY-3-8913: 0 I/O ports
     factory mask adjustment but default was 0000 for the "common" part shipped
   AY-3-8913:  Unused bits in registers have unknown behavior.
   AY-3-8913 die is unknown.
-AY-3-8914/A: 2 I/O ports
+GI AY-3-8914/A: 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
     factory mask adjustment but was 0000 for the part shipped with the
     Intellivision.
@@ -396,7 +430,7 @@ AY-3-8914/A: 2 I/O ports
   I/O current source/sink behavior is unknown.
   AY-3-8914 die is labeled "90-32022" with a 1978 copyright.
   AY-3-8914A die is unknown.
-AY-3-8916: 2 I/O ports
+GI AY-3-8916: 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
     factory mask adjustment; its mask is unknown. This chip was shipped
     with certain later Intellivision II systems.
@@ -406,7 +440,7 @@ AY-3-8916: 2 I/O ports
   AY-3-8916: Unused bits in registers have unknown behavior.
   I/O current source/sink behavior is unknown.
   AY-3-8916 die is unknown.
-AY-3-8917: 2 I/O ports
+GI AY-3-8917: 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
     factory mask adjustment but was 1111 for the part shipped with the
     Intellivision ECS module.
@@ -416,7 +450,7 @@ AY-3-8917: 2 I/O ports
   AY-3-8917: Unused bits in registers have unknown behavior.
   I/O current source/sink behavior is unknown.
   AY-3-8917 die is unknown.
-AY8930: 2 I/O ports
+Microchip AY8930 Enhanced Programmable Sound Generator (EPSG): 2 I/O ports
   BC2 pin exists but is always considered pulled high. The pin might have no
     bond wire at all.
   Pins 2 and 5 might be additional test pins rather than being NC.
@@ -437,7 +471,7 @@ AY8930: 2 I/O ports
     explicitly states that unused bits always read as 0.
   I/O current source/sink behavior is unknown.
   AY8930 die is unknown.
-YM2149: 2 I/O ports
+Yamaha YM2149 Software-Controlled Sound Generator (SSG): 2 I/O ports
   A7 thru A4 enable state for selecting a register are 0000 for all? parts
     shipped.
   Pins 24 and 25 are /A9, A8 which are an active low and high chip enable.
@@ -449,7 +483,7 @@ YM2149: 2 I/O ports
   I/O current source/sink behavior is unknown.
   YM2149 die is unknown; only one die revision, 'G', has been observed
     from Yamaha chip/datecode silkscreen surface markings.
-YM2203: 2 I/O ports
+Yamaha YM2203: 2 I/O ports
   The pinout of this chip is completely different from the AY-3-8910.
   The entire way this chip is accessed is completely different from the usual
     AY-3-8910 selection of chips, so there is a /CS and a /RD and a /WR and
@@ -460,17 +494,19 @@ YM2203: 2 I/O ports
   The first 16 registers are the same(?) as the YM2149.
   YM2203: Unused bits in registers have unknown behavior.
   I/O current source/sink behavior is unknown.
-  YM2203 die is unknown; two die revisions, 'F' and 'H', have been observed
-    from Yamaha chip/datecode silkscreen surface markings. It is unknown
-    what behavioral differences exist between these two revisions.
-    The 'F' revision only appears during the first year of production.
-YM3439: limited info: CMOS version of YM2149?
-YMZ284: limited info: 0 I/O port, different clock divider
+  YM2203 die is unknown; three die revisions, 'D', 'F' and 'H', have been
+    observed from Yamaha chip/datecode silkscreen surface markings. It is
+    unknown what behavioral differences exist between these revisions.
+    The 'D' revision only appears during the first year of production, 1984, on chips marked 'YM2203B'
+    The 'F' revision exists from 1984?-1991, chips are marked 'YM2203C'
+    The 'H' revision exists from 1991 onward, chips are marked 'YM2203C'
+Yamaha YM3439: limited info: CMOS version of YM2149?
+Yamaha YMZ284: limited info: 0 I/O port, different clock divider
   The chip selection logic is again simplified here: pin 1 is /WR, pin 2 is
     /CS and pin 3 is A0.
   D0-D7 are conveniently all on one side of the 16-pin package.
   Pin 8 is /IC (initial clear), with an internal pullup.
-YMZ294: limited info: 0 I/O port
+Yamaha YMZ294: limited info: 0 I/O port
   Pinout is identical to YMZ284 except for two additions: pin 8 selects
     between 4MHz (H) and 6MHz (L), while pin 10 is /TEST.
 OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
@@ -1113,7 +1149,7 @@ void ay8910_device::build_mixer_table()
 	 */
 	else
 	{
-		build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
+		build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table.get());
 	}
 }
 
@@ -1166,11 +1202,7 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
-	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
-	{
-		master_clock /= 2;
-	}
+	m_vol3d_table = make_unique_clear<int32_t[]>(8*32*32*32);
 
 	build_mixer_table();
 
@@ -1233,6 +1265,11 @@ void ay8910_device::set_volume(int channel,int volume)
 
 void ay8910_device::ay_set_clock(int clock)
 {
+	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
+	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
+	{
+		clock /= 2;
+	}
 	m_channel->set_sample_rate( clock / 8 );
 }
 
@@ -1433,7 +1470,7 @@ WRITE8_MEMBER( ay8914_device::write )
 
 
 
-DEFINE_DEVICE_TYPE(AY8910, ay8910_device, "ay8910", "AY-3-8910A")
+DEFINE_DEVICE_TYPE(AY8910, ay8910_device, "ay8910", "AY-3-8910A PSG")
 
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8910, tag, owner, clock, PSG_TYPE_AY, 3, 2)
@@ -1479,7 +1516,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	memset(&m_vol_enabled,0,sizeof(m_vol_enabled));
 	memset(&m_vol_table,0,sizeof(m_vol_table));
 	memset(&m_env_table,0,sizeof(m_env_table));
-	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 
 	set_type(psg_type);
@@ -1506,7 +1542,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 	}
 }
 
-DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A")
+DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")
 
 ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8912, tag, owner, clock, PSG_TYPE_AY, 3, 1)
@@ -1514,7 +1550,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(AY8913, ay8913_device, "ay8913", "AY-3-8913A")
+DEFINE_DEVICE_TYPE(AY8913, ay8913_device, "ay8913", "AY-3-8913 PSG")
 
 ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8913, tag, owner, clock, PSG_TYPE_AY, 3, 0)
@@ -1522,7 +1558,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(AY8914, ay8914_device, "ay8914", "AY-3-8914A")
+DEFINE_DEVICE_TYPE(AY8914, ay8914_device, "ay8914", "AY-3-8914A PSG")
 
 ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8914, tag, owner, clock, PSG_TYPE_AY, 3, 2)
@@ -1530,7 +1566,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(AY8930, ay8930_device, "ay8930", "AY-3-8930A")
+DEFINE_DEVICE_TYPE(AY8930, ay8930_device, "ay8930", "AY8930 EPSG")
 
 ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8930, tag, owner, clock, PSG_TYPE_AY, 3, 2)
@@ -1538,7 +1574,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(YM2149, ym2149_device, "ym2149", "YM2149")
+DEFINE_DEVICE_TYPE(YM2149, ym2149_device, "ym2149", "YM2149 SSG")
 
 ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2149, tag, owner, clock, PSG_TYPE_YM, 3, 2)
@@ -1546,7 +1582,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(YM3439, ym3439_device, "ym3439", "YM3439")
+DEFINE_DEVICE_TYPE(YM3439, ym3439_device, "ym3439", "YM3439 SSGC")
 
 ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM3439, tag, owner, clock, PSG_TYPE_YM, 3, 2)
@@ -1554,7 +1590,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(YMZ284, ymz284_device, "ymz284", "YMZ284")
+DEFINE_DEVICE_TYPE(YMZ284, ymz284_device, "ymz284", "YMZ284 SSGL")
 
 ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ284, tag, owner, clock, PSG_TYPE_YM, 1, 0)
@@ -1562,7 +1598,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294")
+DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294 SSGLP")
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ294, tag, owner, clock, PSG_TYPE_YM, 1, 0)

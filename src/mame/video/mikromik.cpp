@@ -59,7 +59,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 //  ADDRESS_MAP( mm1_upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 16, mm1_state )
+static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16, mm1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -148,7 +148,7 @@ MACHINE_CONFIG_START( mm1m6_video )
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL_18_720MHz/8)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mm1_upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mm1_upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mm1_state, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

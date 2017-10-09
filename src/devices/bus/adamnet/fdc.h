@@ -31,11 +31,6 @@ public:
 	// construction/destruction
 	adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_READ8_MEMBER( p1_r );
@@ -43,21 +38,27 @@ public:
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_adamnet_card_interface overrides
 	virtual void adamnet_reset_w(int state) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
-	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_connector> m_connector;
 	floppy_image_device *m_floppy;
 	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_sw3;
+
+private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

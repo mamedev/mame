@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( ninjakid_nopcm_sound_cpu, AS_PROGRAM, 8, ninjakd2_stat
 	AM_RANGE(0xf000, 0xf000) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ninjakd2_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("soundcpu", 0x8000)
 ADDRESS_MAP_END
@@ -979,6 +979,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 

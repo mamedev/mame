@@ -59,8 +59,10 @@ OP_HANDLER( nop )
 OP_HANDLER( lsrd )
 {
 	uint16_t t;
-	CLR_NZC; t = D; CC|=(t&0x0001);
-	t>>=1; SET_Z16(t); D=t;
+	CLR_NZVC; t = D; CC|=(t&0x0001);
+	t>>=1; SET_Z16(t);
+	if (NXORC) SEV;
+	D=t;
 }
 
 /* $05 ASLD inherent ?**** */
@@ -497,8 +499,9 @@ OP_HANDLER( coma )
 /* $44 LSRA inherent -0*-* */
 OP_HANDLER( lsra )
 {
-	CLR_NZC; CC|=(A&0x01);
+	CLR_NZVC; CC|=(A&0x01);
 	A>>=1; SET_Z8(A);
+	if (NXORC) SEV;
 }
 
 /* $45 ILLEGAL */
@@ -508,17 +511,19 @@ OP_HANDLER( rora )
 {
 	uint8_t r;
 	r=(CC&0x01)<<7;
-	CLR_NZC; CC|=(A&0x01);
+	CLR_NZVC; CC|=(A&0x01);
 	r |= A>>1; SET_NZ8(r);
+	if (NXORC) SEV;
 	A=r;
 }
 
 /* $47 ASRA inherent ?**-* */
 OP_HANDLER( asra )
 {
-	CLR_NZC; CC|=(A&0x01);
+	CLR_NZVC; CC|=(A&0x01);
 	A>>=1; A|=((A&0x40)<<1);
 	SET_NZ8(A);
+	if (NXORC) SEV;
 }
 
 /* $48 ASLA inherent ?**** */
@@ -593,8 +598,9 @@ OP_HANDLER( comb )
 /* $54 LSRB inherent -0*-* */
 OP_HANDLER( lsrb )
 {
-	CLR_NZC; CC|=(B&0x01);
+	CLR_NZVC; CC|=(B&0x01);
 	B>>=1; SET_Z8(B);
+	if (NXORC) SEV;
 }
 
 /* $55 ILLEGAL */
@@ -604,17 +610,19 @@ OP_HANDLER( rorb )
 {
 	uint8_t r;
 	r=(CC&0x01)<<7;
-	CLR_NZC; CC|=(B&0x01);
+	CLR_NZVC; CC|=(B&0x01);
 	r |= B>>1; SET_NZ8(r);
+	if (NXORC) SEV;
 	B=r;
 }
 
 /* $57 ASRB inherent ?**-* */
 OP_HANDLER( asrb )
 {
-	CLR_NZC; CC|=(B&0x01);
+	CLR_NZVC; CC|=(B&0x01);
 	B>>=1; B|=((B&0x40)<<1);
 	SET_NZ8(B);
+	if (NXORC) SEV;
 }
 
 /* $58 ASLB inherent ?**** */
@@ -710,8 +718,9 @@ OP_HANDLER( com_ix )
 OP_HANDLER( lsr_ix )
 {
 	uint8_t t;
-	IDXBYTE(t); CLR_NZC; CC|=(t&0x01);
+	IDXBYTE(t); CLR_NZVC; CC|=(t&0x01);
 	t>>=1; SET_Z8(t);
+	if (NXORC) SEV;
 	WM(EAD,t);
 }
 
@@ -731,8 +740,9 @@ OP_HANDLER( ror_ix )
 {
 	uint8_t t,r;
 	IDXBYTE(t); r=(CC&0x01)<<7;
-	CLR_NZC; CC|=(t&0x01);
+	CLR_NZVC; CC|=(t&0x01);
 	r |= t>>1; SET_NZ8(r);
+	if (NXORC) SEV;
 	WM(EAD,r);
 }
 
@@ -740,9 +750,10 @@ OP_HANDLER( ror_ix )
 OP_HANDLER( asr_ix )
 {
 	uint8_t t;
-	IDXBYTE(t); CLR_NZC; CC|=(t&0x01);
+	IDXBYTE(t); CLR_NZVC; CC|=(t&0x01);
 	t>>=1; t|=((t&0x40)<<1);
 	SET_NZ8(t);
+	if (NXORC) SEV;
 	WM(EAD,t);
 }
 
@@ -857,10 +868,11 @@ OP_HANDLER( lsr_ex )
 {
 	uint8_t t;
 	EXTBYTE(t);
-	CLR_NZC;
+	CLR_NZVC;
 	CC|=(t&0x01);
 	t>>=1;
 	SET_Z8(t);
+	if (NXORC) SEV;
 	WM(EAD,t);
 }
 
@@ -880,8 +892,9 @@ OP_HANDLER( ror_ex )
 {
 	uint8_t t,r;
 	EXTBYTE(t); r=(CC&0x01)<<7;
-	CLR_NZC; CC|=(t&0x01);
+	CLR_NZVC; CC|=(t&0x01);
 	r |= t>>1; SET_NZ8(r);
+	if (NXORC) SEV;
 	WM(EAD,r);
 }
 
@@ -889,9 +902,10 @@ OP_HANDLER( ror_ex )
 OP_HANDLER( asr_ex )
 {
 	uint8_t t;
-	EXTBYTE(t); CLR_NZC; CC|=(t&0x01);
+	EXTBYTE(t); CLR_NZVC; CC|=(t&0x01);
 	t>>=1; t|=((t&0x40)<<1);
 	SET_NZ8(t);
+	if (NXORC) SEV;
 	WM(EAD,t);
 }
 
@@ -1071,11 +1085,12 @@ OP_HANDLER( cmpx_im )
 	PAIR r,d,b;
 	IMMWORD(b);
 	d.d = X;
-	r.d = d.d - b.d;
+	r.w.l = d.b.h - b.b.h;
 	CLR_NZV;
+	SET_N8(r.b.l);
+	SET_V8(d.b.h, b.b.h, r.w.l);
+	r.d = d.d - b.d;
 	SET_Z16(r.d);
-	SET_N8(r.b.h);
-	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $8c CPX immediate -**** (6803) */
@@ -1238,11 +1253,12 @@ OP_HANDLER( cmpx_di )
 	PAIR r,d,b;
 	DIRWORD(b);
 	d.d = X;
-	r.d = d.d - b.d;
+	r.w.l = d.b.h - b.b.h;
 	CLR_NZV;
+	SET_N8(r.b.l);
+	SET_V8(d.b.h, b.b.h, r.w.l);
+	r.d = d.d - b.d;
 	SET_Z16(r.d);
-	SET_N8(r.b.h);
-	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $9c CPX direct -**** (6803) */
@@ -1412,11 +1428,12 @@ OP_HANDLER( cmpx_ix )
 	PAIR r,d,b;
 	IDXWORD(b);
 	d.d = X;
-	r.d = d.d - b.d;
+	r.w.l = d.b.h - b.b.h;
 	CLR_NZV;
+	SET_N8(r.b.l);
+	SET_V8(d.b.h, b.b.h, r.w.l);
+	r.d = d.d - b.d;
 	SET_Z16(r.d);
-	SET_N8(r.b.h);
-	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $ac CPX indexed -**** (6803)*/
@@ -1588,11 +1605,12 @@ OP_HANDLER( cmpx_ex )
 	PAIR r,d,b;
 	EXTWORD(b);
 	d.d = X;
-	r.d = d.d - b.d;
+	r.w.l = d.b.h - b.b.h;
 	CLR_NZV;
+	SET_N8(r.b.l);
+	SET_V8(d.b.h, b.b.h, r.w.l);
+	r.d = d.d - b.d;
 	SET_Z16(r.d);
-	SET_N8(r.b.h);
-	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $bc CPX extended -**** (6803) */

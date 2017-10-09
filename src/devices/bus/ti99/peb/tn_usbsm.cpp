@@ -59,22 +59,23 @@ enum
 	FEEPROM_WRITE_ENABLE = 0x10
 };
 
-nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_USBSM, tag, owner, clock),
-	  m_feeprom_page(0),
-	  m_sram_page(0),
-	  m_cru_register(0),
-	  m_tms9995_mode(false),
-	  m_enable_io(false),
-	  m_enable_int(false),
-	  m_enable_sm(false),
-	  m_write_flash(false),
-	  m_input_latch(0),
-	  m_output_latch(0),
-	  m_ram_lb(*this, RAM1_TAG),
-	  m_ram_hb(*this, RAM2_TAG),
-	  m_smartmedia(*this, "smartmedia"),
-	  m_flash(*this, STRATA_TAG)
+nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_USBSM, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
+	m_feeprom_page(0),
+	m_sram_page(0),
+	m_cru_register(0),
+	m_tms9995_mode(false),
+	m_enable_io(false),
+	m_enable_int(false),
+	m_enable_sm(false),
+	m_write_flash(false),
+	m_input_latch(0),
+	m_output_latch(0),
+	m_ram_lb(*this, RAM1_TAG),
+	m_ram_hb(*this, RAM2_TAG),
+	m_smartmedia(*this, "smartmedia"),
+	m_flash(*this, STRATA_TAG)
 {
 }
 
@@ -359,7 +360,7 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( tn_usbsm )
+MACHINE_CONFIG_MEMBER( nouspikel_usb_smartmedia_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 	MCFG_RAM_ADD(RAM1_TAG)
@@ -369,11 +370,6 @@ MACHINE_CONFIG_START( tn_usbsm )
 	MCFG_RAM_DEFAULT_SIZE("512k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor nouspikel_usb_smartmedia_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tn_usbsm );
-}
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {

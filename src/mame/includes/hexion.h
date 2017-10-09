@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 #include "machine/k053252.h"
+#include "machine/timer.h"
 
 class hexion_state : public driver_device
 {
@@ -22,6 +24,8 @@ public:
 	int m_rambank;
 	int m_pmcbank;
 	int m_gfxrom_select;
+	int m_ccu_int_time;
+	int m_ccu_int_time_count;
 	tilemap_t *m_bg_tilemap[2];
 
 	DECLARE_WRITE8_MEMBER(coincntr_w);
@@ -32,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gfxrom_select_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

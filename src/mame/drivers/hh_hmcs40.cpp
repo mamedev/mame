@@ -66,7 +66,7 @@
 
  *89      HD44801C  1985, CXG Advanced Portachess
 
-  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
+  (* means undumped unless noted, @ denotes it's in this driver)
 
 
   TODO:
@@ -85,6 +85,7 @@
     On MAME they will show with full brightness, see eg. building explosions.
     Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
+  - improve SVGs of bzaxxon, bpengo, bbtime
 
 ***************************************************************************/
 
@@ -92,6 +93,7 @@
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "rendlay.h"
 #include "screen.h"
@@ -114,6 +116,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_out_a(*this, "%u.a", 0U),
+		m_out_digit(*this, "digit%u", 0U),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -126,6 +131,9 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_ioport_array<7> m_inp_matrix; // max 7
+	output_finder<0x20, 0x40> m_out_x;
+	output_finder<0x20> m_out_a;
+	output_finder<0x20> m_out_digit;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -140,7 +148,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 	// display common
-	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
 	int m_display_maxy;             // display matrix number of rows
 	int m_display_maxx;             // display matrix number of columns (max 47 for now)
 
@@ -149,7 +157,6 @@ public:
 
 	u64 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u64 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x40]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
@@ -168,9 +175,13 @@ protected:
 
 void hh_hmcs40_state::machine_start()
 {
+	// resolve handlers
+	m_out_x.resolve();
+	m_out_a.resolve();
+	m_out_digit.resolve();
+
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
@@ -187,7 +198,6 @@ void hh_hmcs40_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
@@ -217,11 +227,9 @@ void hh_hmcs40_state::machine_reset()
 
 void hh_hmcs40_state::display_update()
 {
-	u64 active_state[0x20];
-
 	for (int y = 0; y < m_display_maxy; y++)
 	{
-		active_state[y] = 0;
+		u64 active_state = 0;
 
 		for (int x = 0; x <= m_display_maxx; x++)
 		{
@@ -231,41 +239,19 @@ void hh_hmcs40_state::display_update()
 
 			// determine active state
 			u64 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state[y] |= (ds << x);
+			active_state |= (ds << x);
+
+			// output to y.x, or y.a when always-on
+			if (x != m_display_maxx)
+				m_out_x[y][x] = ds;
+			else
+				m_out_a[y] = ds;
 		}
+
+		// output to digity
+		if (m_display_segmask[y] != 0)
+			m_out_digit[y] = active_state & m_display_segmask[y];
 	}
-
-	// on difference, send to output
-	for (int y = 0; y < m_display_maxy; y++)
-		if (m_display_cache[y] != active_state[y])
-		{
-			if (m_display_segmask[y] != 0)
-				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
-
-			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x <= m_display_maxx; x++)
-			{
-				int state = active_state[y] >> x & 1;
-				char buf1[0x10]; // lampyx
-				char buf2[0x10]; // y.x
-
-				if (x == m_display_maxx)
-				{
-					// always-on if selected
-					sprintf(buf1, "lamp%da", y);
-					sprintf(buf2, "%d.a", y);
-				}
-				else
-				{
-					sprintf(buf1, "lamp%d", y * mul + x);
-					sprintf(buf2, "%d.%d", y, x);
-				}
-				output().set_value(buf1, state);
-				output().set_value(buf2, state);
-			}
-		}
-
-	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
@@ -364,7 +350,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   Bambino Dribble Away Basketball (manufactured in Japan)
   * PCB label Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
-  * green VFD display Emix-106, with bezel overlay
+  * cyan VFD display Emix-106, with bezel overlay
 
 ***************************************************************************/
 
@@ -4110,8 +4096,8 @@ ROM_START( bambball )
 	ROM_LOAD( "hd38750a08", 0x0000, 0x0800, CRC(907fef18) SHA1(73fe7ca7c6332268a3a9abc5ac88ada2991012fb) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
-	ROM_REGION( 280708, "svg", 0)
-	ROM_LOAD( "bambball.svg", 0, 280708, CRC(cf096b37) SHA1(8a2ea1762612c3a3edb68596ff2a9f91eedf0e68) ) // by kevtris, ver. 25 apr 2016
+	ROM_REGION( 281988, "svg", 0)
+	ROM_LOAD( "bambball.svg", 0, 281988, CRC(63019194) SHA1(cbfb5b051d8f57f6b4d698796030850b3631ed56) )
 ROM_END
 
 
@@ -4121,7 +4107,7 @@ ROM_START( bmboxing )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
 	ROM_REGION( 257144, "svg", 0)
-	ROM_LOAD( "bmboxing.svg", 0, 257144, CRC(dab81477) SHA1(28b0c844a311e2023ffa71d754e799059b7d050f) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "bmboxing.svg", 0, 257144, CRC(dab81477) SHA1(28b0c844a311e2023ffa71d754e799059b7d050f) )
 ROM_END
 
 
@@ -4131,7 +4117,7 @@ ROM_START( bfriskyt )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 413577, "svg", 0)
-	ROM_LOAD( "bfriskyt.svg", 0, 413577, CRC(17090264) SHA1(4512a8a91a459f2ddc258641c6d38c2f48f4160f) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "bfriskyt.svg", 0, 413577, CRC(17090264) SHA1(4512a8a91a459f2ddc258641c6d38c2f48f4160f) )
 ROM_END
 
 
@@ -4141,7 +4127,7 @@ ROM_START( packmon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 246356, "svg", 0)
-	ROM_LOAD( "packmon.svg", 0, 246356, CRC(991eea96) SHA1(bf42765aea838e9c26453642b01a962399b3e74c) ) // by Rik/kevtris, ver. 27 apr 2016
+	ROM_LOAD( "packmon.svg", 0, 246356, CRC(991eea96) SHA1(bf42765aea838e9c26453642b01a962399b3e74c) )
 ROM_END
 
 
@@ -4151,7 +4137,7 @@ ROM_START( msthawk )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 197907, "svg", 0)
-	ROM_LOAD( "msthawk.svg", 0, 197907, CRC(b54efcb9) SHA1(76db2ca156d556bf578995196eca1170b39988bb) ) // by kevtris/hap, ver. 25 apr 2016
+	ROM_LOAD( "msthawk.svg", 0, 197907, CRC(b54efcb9) SHA1(76db2ca156d556bf578995196eca1170b39988bb) )
 ROM_END
 
 
@@ -4161,7 +4147,7 @@ ROM_START( bzaxxon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 521080, "svg", 0)
-	ROM_LOAD( "bzaxxon.svg", 0, 521080, BAD_DUMP CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) ) // by kevtris/hap, ver. 28 apr 2016 - BAD_DUMP: needs cleanup/redo
+	ROM_LOAD( "bzaxxon.svg", 0, 521080, CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
 ROM_END
 
 
@@ -4171,7 +4157,7 @@ ROM_START( zackman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 910689, "svg", 0)
-	ROM_LOAD( "zackman.svg", 0, 910689, CRC(5f322820) SHA1(4210aff160e5de9a409aba8b915aaebff2a92647) ) // by kevtris, ver. 29 mar 2015
+	ROM_LOAD( "zackman.svg", 0, 910689, CRC(5f322820) SHA1(4210aff160e5de9a409aba8b915aaebff2a92647) )
 ROM_END
 
 
@@ -4181,7 +4167,7 @@ ROM_START( bpengo )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 744461, "svg", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) ) // by hap/kevtris, ver. 25 apr 2016 - BAD_DUMP: needs cleanup/redo
+	ROM_LOAD( "bpengo.svg", 0, 744461, CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
 ROM_END
 
 
@@ -4191,7 +4177,7 @@ ROM_START( bbtime )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 461605, "svg", 0)
-	ROM_LOAD( "bbtime.svg", 0, 461605, BAD_DUMP CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) ) // by hap/kevtris, ver. 25 apr 2016 - BAD_DUMP: needs cleanup/redo
+	ROM_LOAD( "bbtime.svg", 0, 461605, CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
 ROM_END
 
 
@@ -4201,7 +4187,7 @@ ROM_START( bdoramon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 624751, "svg", 0)
-	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(5dc4017c) SHA1(2091765de401969651b8eb22067572be72d12398) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(5dc4017c) SHA1(2091765de401969651b8eb22067572be72d12398) )
 ROM_END
 
 
@@ -4211,7 +4197,7 @@ ROM_START( bultrman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 405717, "svg", 0)
-	ROM_LOAD( "bultrman.svg", 0, 405717, CRC(13367971) SHA1(f294898712d1e146ff267bb1e3cfd059f972b248) ) // by Rik/kevtris, ver. 7 apr 2016
+	ROM_LOAD( "bultrman.svg", 0, 405717, CRC(13367971) SHA1(f294898712d1e146ff267bb1e3cfd059f972b248) )
 ROM_END
 
 
@@ -4221,7 +4207,7 @@ ROM_START( machiman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 374097, "svg", 0)
-	ROM_LOAD( "machiman.svg", 0, 374097, CRC(78af02ac) SHA1(1b4bbea3e46e1bf33149727d9725bc9b18652b9c) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "machiman.svg", 0, 374097, CRC(78af02ac) SHA1(1b4bbea3e46e1bf33149727d9725bc9b18652b9c) )
 ROM_END
 
 
@@ -4242,7 +4228,7 @@ ROM_START( alnattck )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 564271, "svg", 0)
-	ROM_LOAD( "alnattck.svg", 0, 564271, CRC(5466d1d4) SHA1(3295272015969e58fddc53272769e1fc1bd4b355) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "alnattck.svg", 0, 564271, CRC(5466d1d4) SHA1(3295272015969e58fddc53272769e1fc1bd4b355) )
 ROM_END
 
 
@@ -4252,7 +4238,7 @@ ROM_START( cdkong )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 359199, "svg", 0)
-	ROM_LOAD( "cdkong.svg", 0, 359199, CRC(ba159fd5) SHA1(3188e2ed3234f39ac9ee93a485a7e73314bc3457) ) // by Rik/kevtris, ver. 8 apr 2016
+	ROM_LOAD( "cdkong.svg", 0, 359199, CRC(ba159fd5) SHA1(3188e2ed3234f39ac9ee93a485a7e73314bc3457) )
 ROM_END
 
 
@@ -4262,7 +4248,7 @@ ROM_START( cgalaxn )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 712204, "svg", 0)
-	ROM_LOAD( "cgalaxn.svg", 0, 712204, CRC(67ec57bf) SHA1(195c9867b321da9768ce287d1060ceae50345dd4) ) // by kevtris, ver. 30 mar 2015
+	ROM_LOAD( "cgalaxn.svg", 0, 712204, CRC(67ec57bf) SHA1(195c9867b321da9768ce287d1060ceae50345dd4) )
 ROM_END
 
 
@@ -4272,7 +4258,7 @@ ROM_START( cpacman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 359765, "svg", 0)
-	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) ) // by Rik/kevtris, ver. 26 apr 2016
+	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) )
 ROM_END
 
 ROM_START( cpacmanr1 )
@@ -4281,7 +4267,7 @@ ROM_START( cpacmanr1 )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 359765, "svg", 0)
-	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) ) // by Rik/kevtris, ver. 26 apr 2016
+	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) )
 ROM_END
 
 
@@ -4291,7 +4277,7 @@ ROM_START( cmspacmn )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 849327, "svg", 0)
-	ROM_LOAD( "cmspacmn.svg", 0, 849327, CRC(4110ad07) SHA1(76113a2ce0fb1c6dab4e26fd59a13dc89d950d75) ) // by kevtris, ver. 1 apr 2015
+	ROM_LOAD( "cmspacmn.svg", 0, 849327, CRC(4110ad07) SHA1(76113a2ce0fb1c6dab4e26fd59a13dc89d950d75) )
 ROM_END
 
 
@@ -4322,7 +4308,7 @@ ROM_START( egalaxn2 )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 507945, "svg", 0)
-	ROM_LOAD( "egalaxn2.svg", 0, 507945, CRC(b72a8721) SHA1(2d90fca6ce962710525b631e5bc8f75d79332b9d) ) // by kevtris, ver. 25 mar 2015
+	ROM_LOAD( "egalaxn2.svg", 0, 507945, CRC(b72a8721) SHA1(2d90fca6ce962710525b631e5bc8f75d79332b9d) )
 ROM_END
 
 
@@ -4332,7 +4318,7 @@ ROM_START( epacman2 )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 262480, "svg", 0)
-	ROM_LOAD( "epacman2.svg", 0, 262480, CRC(73bd9671) SHA1(a3ac754c0e060da50b65f3d0f9630d9c3d871650) ) // by Rik/kevtris, ver. 9 apr 2016
+	ROM_LOAD( "epacman2.svg", 0, 262480, CRC(73bd9671) SHA1(a3ac754c0e060da50b65f3d0f9630d9c3d871650) )
 ROM_END
 
 ROM_START( epacman2r )
@@ -4341,7 +4327,7 @@ ROM_START( epacman2r )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 262483, "svg", 0)
-	ROM_LOAD( "epacman2r.svg", 0, 262483, CRC(279b629a) SHA1(4c499fb143aadf4f6722b994a22a0d0d3c5150b6) ) // by Rik/kevtris, ver. 9 apr 2016
+	ROM_LOAD( "epacman2r.svg", 0, 262483, CRC(279b629a) SHA1(4c499fb143aadf4f6722b994a22a0d0d3c5150b6) )
 ROM_END
 
 
@@ -4354,7 +4340,7 @@ ROM_START( estargte )
 	ROM_LOAD( "cop411l-kec_n", 0x0000, 0x0200, CRC(fbd3c2d3) SHA1(65b8b24d38678c3fa970bfd639e9449a75a28927) )
 
 	ROM_REGION( 462214, "svg", 0)
-	ROM_LOAD( "estargte.svg", 0, 462214, CRC(282cc090) SHA1(b0f3c21e9a529e5f1e33b90ca25ce3a097fb75a0) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "estargte.svg", 0, 462214, CRC(282cc090) SHA1(b0f3c21e9a529e5f1e33b90ca25ce3a097fb75a0) )
 ROM_END
 
 
@@ -4367,7 +4353,7 @@ ROM_START( eturtles )
 	ROM_LOAD( "cop411l-ked_n", 0x0000, 0x0200, CRC(503d26e9) SHA1(a53d24d62195bfbceff2e4a43199846e0950aef6) )
 
 	ROM_REGION( 1027626, "svg", 0)
-	ROM_LOAD( "eturtles.svg", 0, 1027626, CRC(b4f7abff) SHA1(e9b065a3a3fef3c71495002945724a86c2a68eb4) ) // by kevtris, ver. 30 mar 2015
+	ROM_LOAD( "eturtles.svg", 0, 1027626, CRC(b4f7abff) SHA1(e9b065a3a3fef3c71495002945724a86c2a68eb4) )
 ROM_END
 
 
@@ -4377,7 +4363,7 @@ ROM_START( ghalien )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 462749, "svg", 0)
-	ROM_LOAD( "ghalien.svg", 0, 462749, CRC(1acbb1e8) SHA1(7bdeb840bc9080792e24812eba923bf84f7865a6) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "ghalien.svg", 0, 462749, CRC(1acbb1e8) SHA1(7bdeb840bc9080792e24812eba923bf84f7865a6) )
 ROM_END
 
 
@@ -4387,7 +4373,7 @@ ROM_START( gckong )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 356769, "svg", 0)
-	ROM_LOAD( "gckong.svg", 0, 356769, CRC(e2559b53) SHA1(519309c3a88b5d7f4c0ac5ae05dcdc1153377765) ) // by kevtris/hap, ver. 12 may 2017
+	ROM_LOAD( "gckong.svg", 0, 356769, CRC(e2559b53) SHA1(519309c3a88b5d7f4c0ac5ae05dcdc1153377765) )
 ROM_END
 
 
@@ -4397,7 +4383,7 @@ ROM_START( gdigdug )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 807990, "svg", 0)
-	ROM_LOAD( "gdigdug.svg", 0, 807990, CRC(a5b8392d) SHA1(3503829bb1a626a9e70115fb60b656dff8908144) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "gdigdug.svg", 0, 807990, CRC(a5b8392d) SHA1(3503829bb1a626a9e70115fb60b656dff8908144) )
 ROM_END
 
 
@@ -4407,7 +4393,7 @@ ROM_START( mwcbaseb )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 178441, "svg", 0)
-	ROM_LOAD( "mwcbaseb.svg", 0, 178441, CRC(0f631190) SHA1(74a10ad0630af5516f76d5bf5628483d21f6b7be) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "mwcbaseb.svg", 0, 178441, CRC(0f631190) SHA1(74a10ad0630af5516f76d5bf5628483d21f6b7be) )
 ROM_END
 
 
@@ -4417,7 +4403,7 @@ ROM_START( pbqbert )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 456567, "svg", 0)
-	ROM_LOAD( "pbqbert.svg", 0, 456567, CRC(49853a62) SHA1(869377109fb7163e5ef5efadb26ce3955231f6ca) ) // by kevtris, ver. 30 mar 2015
+	ROM_LOAD( "pbqbert.svg", 0, 456567, CRC(49853a62) SHA1(869377109fb7163e5ef5efadb26ce3955231f6ca) )
 ROM_END
 
 
@@ -4427,7 +4413,7 @@ ROM_START( kingman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 396320, "svg", 0)
-	ROM_LOAD( "kingman.svg", 0, 396320, CRC(3f52d2a9) SHA1(9291f1a1da3d19c3d6dedb995de0a5feba75b442) ) // by kevtris, ver. 29 mar 2015
+	ROM_LOAD( "kingman.svg", 0, 396320, CRC(3f52d2a9) SHA1(9291f1a1da3d19c3d6dedb995de0a5feba75b442) )
 ROM_END
 
 
@@ -4437,7 +4423,7 @@ ROM_START( tmtron )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 384174, "svg", 0)
-	ROM_LOAD( "tmtron.svg", 0, 384174, CRC(06bd9e63) SHA1(fb93013ec42dc05f7029ef3c3073c84867f0d077) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "tmtron.svg", 0, 384174, CRC(06bd9e63) SHA1(fb93013ec42dc05f7029ef3c3073c84867f0d077) )
 ROM_END
 
 
@@ -4447,7 +4433,7 @@ ROM_START( vinvader )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
 	ROM_REGION( 166379, "svg", 0)
-	ROM_LOAD( "vinvader.svg", 0, 166379, CRC(b75c448e) SHA1(40d546f9fbdb446883e3ab0e3f678f1be8105159) ) // by kevtris, ver. 25 apr 2016
+	ROM_LOAD( "vinvader.svg", 0, 166379, CRC(b75c448e) SHA1(40d546f9fbdb446883e3ab0e3f678f1be8105159) )
 ROM_END
 
 

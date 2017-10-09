@@ -43,11 +43,6 @@ void neogeo_fatfury2_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( fatfury2_cart )
+MACHINE_CONFIG_MEMBER( neogeo_fatfury2_cart_device::device_add_mconfig )
 	MCFG_FATFURY2_PROT_ADD("fatfury2_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_fatfury2_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fatfury2_cart );
-}

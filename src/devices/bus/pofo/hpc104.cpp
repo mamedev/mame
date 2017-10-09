@@ -28,10 +28,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC104_2, pofo_hpc104_2_device, "pofo_hpc104_2", "Atari 
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( hpc104 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hpc104 )
+MACHINE_CONFIG_MEMBER( pofo_hpc104_device::device_add_mconfig )
 	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_B_TAG, portfolio_memory_cards, nullptr)
 
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
@@ -39,17 +39,6 @@ static MACHINE_CONFIG_START( hpc104 )
 	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, nmio_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, wake_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pofo_hpc104_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hpc104 );
-}
 
 
 //-------------------------------------------------

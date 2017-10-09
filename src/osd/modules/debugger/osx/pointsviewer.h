@@ -18,11 +18,15 @@
 
 @interface MAMEPointsViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	NSTabView   *tabs;
+	NSTabView       *tabs;
+	NSPopUpButton   *subviewButton;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 - (IBAction)changeSubview:(id)sender;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 @end

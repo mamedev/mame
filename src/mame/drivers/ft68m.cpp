@@ -15,9 +15,9 @@ Interrupts: INT6 is output of Timer 2, INT7 is output of Timer 3 (refresh),
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
+#include "bus/rs232/rs232.h"
+#include "machine/am9513.h"
+#include "machine/z80sio.h"
 
 class ft68m_state : public driver_device
 {
@@ -25,37 +25,19 @@ public:
 	ft68m_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_base(*this, "rambase"),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		m_maincpu(*this, "maincpu")
 	{
 	}
 
-	void kbd_put(u8 data);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
 	DECLARE_READ16_MEMBER(switches_r);
 
 private:
-	uint8_t m_term_data;
 	virtual void machine_reset() override;
 
 	required_shared_ptr<uint16_t> m_p_base;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 };
-
-READ16_MEMBER( ft68m_state::keyin_r )
-{
-	uint16_t ret = m_term_data;
-	m_term_data = 0;
-	return ret << 8;
-}
-
-READ16_MEMBER( ft68m_state::status_r )
-{
-	return (m_term_data) ? 0x500 : 0x400;
-}
 
 READ16_MEMBER( ft68m_state::switches_r )
 {
@@ -69,10 +51,8 @@ static ADDRESS_MAP_START(ft68m_mem, AS_PROGRAM, 16, ft68m_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x201fff) AM_ROM AM_REGION("roms", 0x0000)
 	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("roms", 0x2000)
-	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_READ(status_r)
-	//AM_RANGE(0x600000, 0x600003) AM_MIRROR(0x1ffffc) uPD7201 SIO
-	//AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM9513 Timer
+	AM_RANGE(0x600000, 0x600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("mpsc", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
+	AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("stc", am9513_device, read16, write16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_RAM //Page Map
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM //Segment Map
 	AM_RANGE(0xe00000, 0xffffff) AM_READ(switches_r) //Context Register
@@ -91,20 +71,34 @@ void ft68m_state::machine_reset()
 	m_maincpu->reset();
 }
 
-void ft68m_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
 static MACHINE_CONFIG_START( ft68m )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ft68m_mem)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ft68m_state, kbd_put))
+	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 0)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+
+	MCFG_DEVICE_ADD("stc", AM9513A, XTAL_19_6608MHz / 8)
+	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6))
+	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mpsc", upd7201_new_device, txcb_w))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

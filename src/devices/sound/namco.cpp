@@ -88,33 +88,20 @@ namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char
 void namco_audio_device::device_start()
 {
 	sound_channel *voice;
-	int clock_multiple;
 
 	/* extract globals from the interface */
 	m_last_channel = m_channel_list + m_voices;
 
 	m_soundregs = auto_alloc_array_clear(machine(), uint8_t, 0x400);
 
-	/* adjust internal clock */
-	m_namco_clock = clock();
-	for (clock_multiple = 0; m_namco_clock < INTERNAL_RATE; clock_multiple++)
-		m_namco_clock *= 2;
-
-	m_f_fracbits = clock_multiple + 15;
-
-	/* adjust output clock */
-	m_sample_rate = m_namco_clock;
-
-	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", m_f_fracbits, m_namco_clock, m_sample_rate);
-
 	/* build the waveform table */
 	build_decoded_waveform(m_wave_ptr);
 
 	/* get stream channels */
 	if (m_stereo)
-		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate);
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, 192000);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, m_sample_rate);
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, 192000);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = 1;
@@ -157,6 +144,25 @@ void namco_audio_device::device_start()
 	}
 }
 
+
+void namco_audio_device::device_clock_changed()
+{
+	int clock_multiple;
+
+	/* adjust internal clock */
+	m_namco_clock = clock();
+	for (clock_multiple = 0; m_namco_clock < INTERNAL_RATE; clock_multiple++)
+		m_namco_clock *= 2;
+
+	m_f_fracbits = clock_multiple + 15;
+
+	/* adjust output clock */
+	m_sample_rate = m_namco_clock;
+
+	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", m_f_fracbits, m_namco_clock, m_sample_rate);
+
+	m_stream->set_sample_rate(m_sample_rate);
+}
 
 
 /* update the decoded waveform data */
@@ -257,9 +263,9 @@ uint32_t namco_audio_device::namco_update_one(stream_sample_t *buffer, int lengt
     0x1f:       ch 2    volume
 */
 
-WRITE8_MEMBER( namco_device::pacman_sound_enable_w )
+WRITE_LINE_MEMBER(namco_device::pacman_sound_enable_w)
 {
-	m_sound_enable = data;
+	m_sound_enable = state;
 }
 
 WRITE8_MEMBER( namco_device::pacman_sound_w )
@@ -485,9 +491,9 @@ WRITE8_MEMBER( namco_device::polepos_sound_w )
     0x3e        ch 7    waveform select & frequency
 */
 
-void namco_15xx_device::mappy_sound_enable(int enable)
+WRITE_LINE_MEMBER(namco_15xx_device::mappy_sound_enable)
 {
-	m_sound_enable = enable;
+	m_sound_enable = state;
 }
 
 WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)

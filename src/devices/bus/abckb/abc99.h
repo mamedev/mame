@@ -31,21 +31,12 @@ public:
 	// construction/destruction
 	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
 	DECLARE_WRITE8_MEMBER( z2_led_w );
-	DECLARE_WRITE8_MEMBER( z2_p1_w );
-	DECLARE_READ8_MEMBER( z2_p2_r );
-	DECLARE_READ_LINE_MEMBER( z2_t0_r );
-	DECLARE_READ_LINE_MEMBER( z2_t1_r );
 	DECLARE_READ8_MEMBER( z5_p1_r );
 	DECLARE_WRITE8_MEMBER( z5_p2_w );
 	DECLARE_READ8_MEMBER( z5_t1_r );
@@ -55,6 +46,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	enum
@@ -83,6 +79,11 @@ private:
 	inline void serial_clock();
 	inline void key_down(int state);
 	inline void scan_mouse();
+
+	DECLARE_WRITE8_MEMBER( z2_p1_w );
+	DECLARE_READ8_MEMBER( z2_p2_r );
+	DECLARE_READ_LINE_MEMBER( z2_t0_r );
+	DECLARE_READ_LINE_MEMBER( z2_t1_r );
 
 	emu_timer *m_serial_timer;
 	emu_timer *m_mouse_timer;

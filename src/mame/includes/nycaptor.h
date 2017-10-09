@@ -2,6 +2,7 @@
 // copyright-holders:Tomasz Slanina
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
 
@@ -21,7 +22,9 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundnmi(*this, "soundnmi") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -39,11 +42,7 @@ public:
 
 	/* misc */
 	int m_generic_control_reg;
-	int m_sound_nmi_enable;
-	int m_pending_nmi;
-	uint8_t m_snd_data;
-	int m_vol_ctrl[16];
-	int  m_gametype;
+	int m_gametype;
 	int m_mask;
 
 	/* devices */
@@ -54,16 +53,15 @@ public:
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<input_merger_device> m_soundnmi;
 
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
-	DECLARE_READ8_MEMBER(from_snd_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_READ8_MEMBER(nycaptor_b_r);
 	DECLARE_READ8_MEMBER(nycaptor_by_r);
 	DECLARE_READ8_MEMBER(nycaptor_bx_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(nycaptor_generic_control_r);
@@ -77,6 +75,7 @@ public:
 
 	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r1);
 	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r2);
+	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_videoram_w);
 	DECLARE_WRITE8_MEMBER(nycaptor_palette_w);
 	DECLARE_READ8_MEMBER(nycaptor_palette_r);
@@ -92,9 +91,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 };

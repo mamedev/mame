@@ -199,6 +199,7 @@ GFX check (these don't explicitly fails):
 */
 #include "emu.h"
 #include "machine/mega32x.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 
 

@@ -136,11 +136,12 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 	m_roml_sel = BIT(data, 4);
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_ieee488 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_ieee488 )
+MACHINE_CONFIG_MEMBER( c64_ieee488_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_ieee488_device, tpi_pa_r))
 	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_ieee488_device, tpi_pa_w))
@@ -152,17 +153,6 @@ static MACHINE_CONFIG_START( c64_ieee488 )
 	MCFG_CBM_IEEE488_ADD(nullptr)
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_ieee488 );
-}
 
 
 

@@ -78,15 +78,9 @@ public:
 	uint32_t aerofgt_old_tile_callback( uint32_t code );
 	uint32_t aerofgt_ol2_tile_callback( uint32_t code );
 
-	/* misc */
-	int       m_pending_command;
-
 	/* handlers */
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE8_MEMBER(aerofgt_unknown_output_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
@@ -97,6 +91,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spikes91_lookup_w);
 	DECLARE_WRITE8_MEMBER(karatblz_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(kickball_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrollx_w);
@@ -128,6 +123,7 @@ public:
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
 	DECLARE_DRIVER_INIT(banked_oki);
+	DECLARE_DRIVER_INIT(kickball);
 	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -14,6 +14,7 @@
 #include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/trs80m2kb.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -59,6 +60,8 @@ public:
 		m_video_ram(*this, "video_ram")
 	{
 	}
+
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

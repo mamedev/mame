@@ -69,10 +69,10 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( luxor_4105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( luxor_4105 )
+MACHINE_CONFIG_MEMBER( luxor_4105_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
 	MCFG_SCSI_BSY_HANDLER(WRITELINE(luxor_4105_device, write_sasi_bsy))
@@ -84,17 +84,6 @@ static MACHINE_CONFIG_START( luxor_4105 )
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_4105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_4105 );
-}
 
 
 //-------------------------------------------------

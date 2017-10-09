@@ -363,13 +363,13 @@ static ADDRESS_MAP_START( systeme_map, AS_PROGRAM, 8, systeme_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, systeme_state )
+static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, systeme_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
@@ -396,12 +396,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp1_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp1_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp1_bank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vdp2_map, AS_0, 8, systeme_state )
+static ADDRESS_MAP_START( vdp2_map, 0, 8, systeme_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp2_bank")
 ADDRESS_MAP_END
 
@@ -418,9 +418,6 @@ WRITE8_MEMBER(systeme_state::bank_write)
 
 WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
-	if (data == 0xff)
-		return;
-
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
 	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
@@ -685,7 +682,6 @@ static INPUT_PORTS_START( segae_ridleofp_generic )
 	PORT_BIT( 0x4, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( transfrm ) /* Used By Transformer */
 	PORT_INCLUDE( segae_joy1_generic )
 
@@ -763,9 +759,8 @@ static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
-	PORT_INCLUDE( segae_joy1_generic )
+	PORT_INCLUDE( segae_joy2_generic )
 
 	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
 	//"SW2:1" unused
@@ -783,14 +778,12 @@ static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
 	//"SW2:8" unused
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( slapshtr )
 	PORT_INCLUDE( segae_joy1_generic )
 
 	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
 	// todo
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_INCLUDE( segae_hangonjr_generic )
@@ -835,7 +828,9 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 INPUT_PORTS_END
 
 
-
+//*************************************************************************************************************************
+//  Hang-On Jr., Sega System E
+//
 ROM_START( hangonjr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "rom5.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
@@ -847,6 +842,9 @@ ROM_START( hangonjr )
 	ROM_LOAD( "rom1.ic2",   0x28000, 0x08000, CRC(3810cbf5) SHA1(c8d5032522c0c903ab3d138f62406a66e14a5c69) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Riddle of Pythagoras (Japan), Sega System E
+//
 ROM_START( ridleofp )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "epr10426.bin",   0x00000, 0x08000, CRC(4404c7e7) SHA1(555f44786976a009d96a6395c9173929ad6138a7) ) /* Fixed Code */
@@ -858,17 +856,25 @@ ROM_START( ridleofp )
 	ROM_LOAD( "epr10422.bin",   0x28000, 0x08000, CRC(14781e56) SHA1(f15d9d89e1ebff36c3867cfc8f0bdf7f6b3c96bc) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Transformers, Sega System E
+//   Game ID# 833-5927-01
+//   ROM BD # 834-5929-01
+//
 ROM_START( transfrm )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "ic7.top",    0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
+	ROM_LOAD( "epr-7605.ic7",   0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
 	ROM_LOAD( "epr-7347.ic5",   0x10000, 0x08000, CRC(df0f639f) SHA1(a09a9841b66de246a585be63d911b9a42a323503) )
 	ROM_LOAD( "epr-7348.ic4",   0x18000, 0x08000, CRC(0f38ea96) SHA1(d4d421c5d93832e2bc1f22f39dffb6b80f2750bd) )
-	ROM_LOAD( "ic3.top",        0x20000, 0x08000, CRC(9d485df6) SHA1(b25f04803c8f7188021f3039aa13aac80d480823) )
+	ROM_LOAD( "epr-7606.ic3",   0x20000, 0x08000, CRC(9d485df6) SHA1(b25f04803c8f7188021f3039aa13aac80d480823) )
 	ROM_LOAD( "epr-7350.ic2",   0x28000, 0x08000, CRC(0052165d) SHA1(cf4b5dffa54238e513515b3fc90faa7ce0b65d34) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Astro Flash (Japan), Sega System E
+//
 ROM_START( astrofl )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-7723.ic7",   0x00000, 0x08000, CRC(66061137) SHA1(cb6a2c7864f9f87bbedfd4b1448ad6c2de65d6ca) ) /* encrypted */
@@ -880,19 +886,24 @@ ROM_START( astrofl )
 	ROM_LOAD( "epr-7350.ic2",   0x28000, 0x08000, CRC(0052165d) SHA1(cf4b5dffa54238e513515b3fc90faa7ce0b65d34) )
 ROM_END
 
-
+//*************************************************************************************************************************
+//  Tetris (Japan), Sega System E
+//
 ROM_START( tetrisse )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr12213.7", 0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) /* Fixed Code */
+	ROM_LOAD( "epr-12213.7", 0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
-	ROM_LOAD( "epr12212.5", 0x10000, 0x08000, CRC(28b550bf) SHA1(445922a62e8a7360335c754ad70dabbe0208207b) )
-	ROM_LOAD( "epr12211.4", 0x18000, 0x08000, CRC(5aa114e9) SHA1(f9fc7fe4d0444a264185e74d2abc8475f0976534) )
+	ROM_LOAD( "epr-12212.5", 0x10000, 0x08000, CRC(28b550bf) SHA1(445922a62e8a7360335c754ad70dabbe0208207b) )
+	ROM_LOAD( "epr-12211.4", 0x18000, 0x08000, CRC(5aa114e9) SHA1(f9fc7fe4d0444a264185e74d2abc8475f0976534) )
 	/* ic3 unpopulated */
 	/* ic2 unpopulated */
 ROM_END
 
-// ROM BD # 834-5930
+//*************************************************************************************************************************
+//  Slap Shooter, Sega System E
+//   ROM BD # 834-5930
+//
 ROM_START( slapshtr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "epr-7351.ic7",   0x00000, 0x08000, CRC(894adb04) SHA1(e38d296aa56c531985cde75423ae03f0d9cc8f5d) ) /* Fixed Code */
@@ -903,7 +914,9 @@ ROM_START( slapshtr )
 	ROM_LOAD( "epr-7355.ic2",   0x28000, 0x08000, CRC(c67e1aef) SHA1(121bc40d652449c7b1b5f66a837baeaffb7af0b9) )
 ROM_END
 
-
+//*************************************************************************************************************************
+//  Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057), Sega System E
+//
 ROM_START( fantzn2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-11416.ic7",  0x00000, 0x08000, CRC(76db7b7b) SHA1(d60e2961fc893dcb4445aed5f67515cbd25b610f) )    /* encrypted */
@@ -917,7 +930,10 @@ ROM_START( fantzn2 )
 	ROM_LOAD( "317-0057.key",  0x0000, 0x2000, CRC(ee43d0f0) SHA1(72cb75a4d8352fe372db12046a59ea044360d5c3) )
 ROM_END
 
-// Game ID# 833-6407-01 OPA OPA
+//*************************************************************************************************************************
+//  Opa Opa (MC-8123, 317-0042), Sega System E
+//   Game ID# 833-6407-01 OPA OPA
+//
 ROM_START( opaopa )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-11054.ic7",  0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) /* encrypted */
@@ -963,6 +979,7 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(systeme_state, coin_counters_write))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
@@ -972,12 +989,12 @@ static MACHINE_CONFIG_START( systeme )
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp1_map)
 
 	MCFG_DEVICE_ADD("vdp2", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
 	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vdp2_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -997,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // on 834-6193 I/O sub board
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
 
@@ -1009,8 +1026,6 @@ static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resetx_w)) MCFG_DEVCB_BIT(1) // or possibly bit 0
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
 MACHINE_CONFIG_END
-
-
 
 static MACHINE_CONFIG_DERIVED( systemex, systeme )
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */

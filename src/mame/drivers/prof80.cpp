@@ -47,119 +47,80 @@ void prof80_state::motor(int mon)
 }
 
 
-//-------------------------------------------------
-//  ls259_w -
-//-------------------------------------------------
-
-void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
+WRITE_LINE_MEMBER(prof80_state::ready_w)
 {
-	switch (sa)
+	if (m_ready != state)
 	{
-	case 0: // C0/TDI
-		m_rtc->data_in_w(fa);
-		m_rtc->c0_w(fa);
-		m_c0 = fa;
-		break;
-
-	case 1: // C1
-		m_rtc->c1_w(fa);
-		m_c1 = fa;
-		break;
-
-	case 2: // C2
-		m_rtc->c2_w(fa);
-		m_c2 = fa;
-		break;
-
-	case 3: // READY
-		if (m_ready != fa)
-		{
-			m_fdc->set_ready_line_connected(!fa);
-			m_fdc->ready_w(!fa);
-			m_ready = fa;
-		}
-		break;
-
-	case 4: // TCK
-		m_rtc->clk_w(fa);
-		break;
-
-	case 5: // IN USE
-		//m_floppy->inuse_w(fa);
-		break;
-
-	case 6: // _MOTOR
-		if (fa)
-		{
-			// trigger floppy motor off NE555 timer
-			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
-
-			timer_set(attotime::from_msec(t), TIMER_ID_MOTOR);
-		}
-		else
-		{
-			// turn on floppy motor
-			motor(0);
-
-			// reset floppy motor off NE555 timer
-			timer_set(attotime::never, TIMER_ID_MOTOR);
-		}
-		break;
-
-	case 7: // SELECT
-		if (m_select != fa)
-		{
-			//m_fdc->set_select_lines_connected(fa);
-			m_select = fa;
-		}
-		break;
+		m_fdc->set_ready_line_connected(!state);
+		m_fdc->ready_w(!state);
+		m_ready = state;
 	}
+}
 
-	switch (sb)
+
+WRITE_LINE_MEMBER(prof80_state::inuse_w)
+{
+	//m_floppy->inuse_w(state);
+}
+
+
+WRITE_LINE_MEMBER(prof80_state::motor_w)
+{
+	if (state)
 	{
-	case 0: // RESF
-		if (fb) m_fdc->soft_reset();
-		break;
+		// trigger floppy motor off NE555 timer
+		int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-	case 1: // MINI
-		break;
+		timer_set(attotime::from_msec(t), TIMER_ID_MOTOR);
+	}
+	else
+	{
+		// turn on floppy motor
+		motor(0);
 
-	case 2: // _RTS
-		m_rs232a->write_rts(fb);
-		break;
+		// reset floppy motor off NE555 timer
+		timer_set(attotime::never, TIMER_ID_MOTOR);
+	}
+}
 
-	case 3: // TX
-		m_rs232a->write_txd(fb);
-		break;
 
-	case 4: // _MSTOP
-		if (!fb)
-		{
-			// turn off floppy motor
-			motor(1);
+WRITE_LINE_MEMBER(prof80_state::select_w)
+{
+	if (m_select != state)
+	{
+		//m_fdc->set_select_lines_connected(state);
+		m_select = state;
+	}
+}
 
-			// reset floppy motor off NE555 timer
-			timer_set(attotime::never, TIMER_ID_MOTOR);
-		}
-		break;
 
-	case 5: // TXP
-		m_rs232b->write_txd(fb);
-		break;
+WRITE_LINE_MEMBER(prof80_state::resf_w)
+{
+	if (state)
+		m_fdc->soft_reset();
+}
 
-	case 6: // TSTB
-		m_rtc->stb_w(fb);
-		break;
 
-	case 7: // MME
-		m_mmu->mme_w(fb);
-		break;
+WRITE_LINE_MEMBER(prof80_state::mini_w)
+{
+}
+
+
+WRITE_LINE_MEMBER(prof80_state::mstop_w)
+{
+	if (!state)
+	{
+		// turn off floppy motor
+		motor(1);
+
+		// reset floppy motor off NE555 timer
+		timer_set(attotime::never, TIMER_ID_MOTOR);
 	}
 }
 
 
 //-------------------------------------------------
-//  flr_w -
+//  flr_w - flag register
 //-------------------------------------------------
 
 WRITE8_MEMBER( prof80_state::flr_w )
@@ -179,13 +140,8 @@ WRITE8_MEMBER( prof80_state::flr_w )
 
 	*/
 
-	int fa = BIT(data, 7);
-	int sa = (data >> 4) & 0x07;
-
-	int fb = BIT(data, 0);
-	int sb = (data >> 1) & 0x07;
-
-	ls259_w(fa, sa, fb, sb);
+	m_flra->write_bit((data >> 4) & 0x07, BIT(data, 7));
+	m_flrb->write_bit((data >> 1) & 0x07, BIT(data, 0));
 }
 
 
@@ -258,9 +214,9 @@ READ8_MEMBER( prof80_state::status2_r )
 	{
 	case 0: js4 = 0; break;
 	case 1: js4 = 1; break;
-	case 2: js4 = !m_c0; break;
-	case 3: js4 = !m_c1; break;
-	case 4: js4 = !m_c2; break;
+	case 2: js4 = !m_flra->q0_r(); break;
+	case 3: js4 = !m_flra->q1_r(); break;
+	case 4: js4 = !m_flra->q2_r(); break;
 	}
 
 	data |= js4 << 4;
@@ -270,9 +226,9 @@ READ8_MEMBER( prof80_state::status2_r )
 	{
 	case 0: js5 = 0; break;
 	case 1: js5 = 1; break;
-	case 2: js5 = !m_c0; break;
-	case 3: js5 = !m_c1; break;
-	case 4: js5 = !m_c2; break;
+	case 2: js5 = !m_flra->q0_r(); break;
+	case 3: js5 = !m_flra->q1_r(); break;
+	case 4: js5 = !m_flra->q2_r(); break;
 	}
 
 	data |= js5 << 4;
@@ -472,23 +428,9 @@ void prof80_state::machine_start()
 	m_rtc->oe_w(1);
 
 	// register for state saving
-	save_item(NAME(m_c0));
-	save_item(NAME(m_c1));
-	save_item(NAME(m_c2));
 	save_item(NAME(m_motor));
 	save_item(NAME(m_ready));
 	save_item(NAME(m_select));
-}
-
-
-void prof80_state::machine_reset()
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-	{
-		ls259_w(0, i, 0, i);
-	}
 }
 
 
@@ -507,14 +449,39 @@ static MACHINE_CONFIG_START( prof80 )
 	MCFG_CPU_PROGRAM_MAP(prof80_mem)
 	MCFG_CPU_IO_MAP(prof80_io)
 
-	// devices
+	// MMU
 	MCFG_PROF80_MMU_ADD(MMU_TAG, prof80_mmu)
+
+	// RTC
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+
+	// FDC
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+
+	// DEMUX latches
+	MCFG_DEVICE_ADD(FLR_A_TAG, LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, data_in_w)) // TDI
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c0_w)) // C0
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c1_w)) // C1
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, c2_w)) // C2
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(prof80_state, ready_w)) // READY
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, clk_w)) // TCK
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(prof80_state, inuse_w)) // IN USE
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(prof80_state, motor_w)) // _MOTOR
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(prof80_state, select_w)) // SELECT
+	MCFG_DEVICE_ADD(FLR_B_TAG, LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(prof80_state, resf_w)) // RESF
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(prof80_state, mini_w)) // MINI
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts)) // _RTS
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd)) // TX
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(prof80_state, mstop_w)) // _MSTOP
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd)) // TXP
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE(UPD1990A_TAG, upd1990a_device, stb_w)) // TSTB
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE(MMU_TAG, prof80_mmu_device, mme_w)) // MME
 
 	// ECB bus
 	MCFG_ECBBUS_ADD()

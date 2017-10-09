@@ -99,9 +99,11 @@ namespace bus { namespace ti99 { namespace peb {
 #define TRACE_CRU 0
 #define TRACE_SWITCH 0
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_P_CODE, tag, owner, clock),
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_rom(nullptr),
+	m_crulatch(*this, "crulatch"),
 	m_bank_select(0),
 	m_active(false),
 	m_clock_count(0),
@@ -253,18 +255,18 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
 WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 {
 	if ((offset & 0xff00)==CRU_BASE)
-	{
-		int addr = offset & 0x00ff;
+		m_crulatch->write_bit((offset & 0x80) >> 5 | (offset & 0x06) >> 1, data);
+}
 
-		if (addr==0)
-			m_selected = (data != 0);
+WRITE_LINE_MEMBER(ti_pcode_card_device::pcpage_w)
+{
+	m_selected = state;
+}
 
-		if (addr==0x80) // Bit 4 is on address line 8
-		{
-			m_bank_select = (data+1);   // we're calling this bank 1 and bank 2
-			if (TRACE_CRU) logerror("Select rom bank %d\n", m_bank_select);
-		}
-	}
+WRITE_LINE_MEMBER(ti_pcode_card_device::ekrpg_w)
+{
+	m_bank_select = state ? 2 : 1;   // we're calling this bank 1 and bank 2
+	if (TRACE_CRU) logerror("Select rom bank %d\n", m_bank_select);
 }
 
 void ti_pcode_card_device::device_start()
@@ -326,17 +328,6 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 }
 
 
-MACHINE_CONFIG_START( ti99_pcode )
-	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM3_TAG, 3, PCODE_GROM_TAG, 0x6000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM4_TAG, 4, PCODE_GROM_TAG, 0x8000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM5_TAG, 5, PCODE_GROM_TAG, 0xa000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM6_TAG, 6, PCODE_GROM_TAG, 0xc000, WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM7_TAG, 7, PCODE_GROM_TAG, 0xe000, WRITELINE(ti_pcode_card_device, ready_line))
-MACHINE_CONFIG_END
-
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
 	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
@@ -362,10 +353,20 @@ ROM_START( ti99_pcode )
 	ROM_LOAD("pcode_rom1.u18", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
 ROM_END
 
-machine_config_constructor ti_pcode_card_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_pcode );
-}
+MACHINE_CONFIG_MEMBER( ti_pcode_card_device::device_add_mconfig )
+	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM3_TAG, 3, PCODE_GROM_TAG, 0x6000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM4_TAG, 4, PCODE_GROM_TAG, 0x8000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM5_TAG, 5, PCODE_GROM_TAG, 0xa000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM6_TAG, 6, PCODE_GROM_TAG, 0xc000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM7_TAG, 7, PCODE_GROM_TAG, 0xe000, WRITELINE(ti_pcode_card_device, ready_line))
+
+	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ti_pcode_card_device, pcpage_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ti_pcode_card_device, ekrpg_w))
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const
 {

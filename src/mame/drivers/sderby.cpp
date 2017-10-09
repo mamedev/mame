@@ -950,6 +950,9 @@ ROM_START( croupier )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(e7941975) SHA1(ea32cd51b8d87205a1d6c6a83ebf8b50e03c55fc))
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(29d06a38) SHA1(c6fdca1a31fad9abf854e521e593f3ec8018ae6d))
 
+	ROM_REGION( 0x4008, "pic16c74", 0 )
+	ROM_LOAD( "pic16c74.u39", 0x00000, 0x4008, CRC(9cb88e5b) SHA1(3c6b371efeda757f2bcab6c860e7585b628c210a))
+
 	ROM_REGION( 0x080000, "oki", 0 ) /* samples are ok */
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
 
@@ -965,6 +968,9 @@ ROM_START( croupiera )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5)) // sldh
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07)) // sldh
+
+	ROM_REGION( 0x4008, "pic16c74", 0 )
+	ROM_LOAD( "pic16c74.u39", 0x00000, 0x4008, CRC(9cb88e5b) SHA1(3c6b371efeda757f2bcab6c860e7585b628c210a))
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* samples are ok */
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))

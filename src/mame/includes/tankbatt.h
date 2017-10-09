@@ -25,18 +25,19 @@ public:
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE_LINE_MEMBER(led0_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
 	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(interrupt_enable_w);
-	DECLARE_WRITE8_MEMBER(demo_interrupt_enable_w);
-	DECLARE_WRITE8_MEMBER(sh_expl_w);
-	DECLARE_WRITE8_MEMBER(sh_engine_w);
-	DECLARE_WRITE8_MEMBER(sh_fire_w);
+	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(demo_interrupt_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sh_expl_w);
+	DECLARE_WRITE_LINE_MEMBER(sh_engine_w);
+	DECLARE_WRITE_LINE_MEMBER(sh_fire_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coincounter_w);
+	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
 

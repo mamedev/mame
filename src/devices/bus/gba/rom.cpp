@@ -406,14 +406,9 @@ void gba_rom_wariotws_device::gpio_dev_write(uint16_t data, int gpio_dirs)
  Carts with Flash RAM
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( panasonic_flash )
+MACHINE_CONFIG_MEMBER( gba_rom_flash_device::device_add_mconfig )
 	MCFG_PANASONIC_MN63F805MNP_ADD("flash")
 MACHINE_CONFIG_END
-
-machine_config_constructor gba_rom_flash_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( panasonic_flash );
-}
 
 
 READ32_MEMBER(gba_rom_flash_device::read_ram)
@@ -457,14 +452,9 @@ WRITE32_MEMBER(gba_rom_flash_device::write_ram)
 	}
 }
 
-static MACHINE_CONFIG_START( sanyo_flash )
+MACHINE_CONFIG_MEMBER( gba_rom_flash1m_device::device_add_mconfig )
 	MCFG_SANYO_LE26FV10N1TS_ADD("flash")
 MACHINE_CONFIG_END
-
-machine_config_constructor gba_rom_flash1m_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sanyo_flash );
-}
 
 
 READ32_MEMBER(gba_rom_flash1m_device::read_ram)

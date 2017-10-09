@@ -19,11 +19,6 @@ public:
 	// construction/destruction
 	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
@@ -54,6 +49,11 @@ protected:
 	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
 
 	required_device<device_t> m_svp;
 	required_ioport m_test_ipt;

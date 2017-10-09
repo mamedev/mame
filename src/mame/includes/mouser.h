@@ -36,12 +36,12 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	DECLARE_WRITE8_MEMBER(mouser_nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
 	DECLARE_READ8_MEMBER(mouser_sound_byte_r);
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
-	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_DRIVER_INIT(mouser);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

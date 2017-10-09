@@ -86,6 +86,7 @@ Blitter source graphics
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
@@ -123,9 +124,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
@@ -276,25 +274,6 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::flip_screen_w)
-{
-	tutankhm_flip_screen_x_w(space, 0, data);
-	tutankhm_flip_screen_y_w(space, 0, data);
-}
-
-
-WRITE8_MEMBER(junofrst_state::coincounter_w)
-{
-	machine().bookkeeping().coin_counter_w(offset, data);
-}
-
-WRITE8_MEMBER(junofrst_state::irq_enable_w)
-{
-	m_irq_enable = data & 1;
-	if (!m_irq_enable)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -304,10 +283,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x8031, 0x8032) AM_WRITE(coincounter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_SHARE("scroll")  /* not used in Juno */
-	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x8030, 0x8037) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
@@ -394,8 +370,6 @@ MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 {
 	m_i8039_status = 0;
 	m_last_irq = 0;
-	m_flip_x = 0;
-	m_flip_y = 0;
 	m_blitterdata[0] = 0;
 	m_blitterdata[1] = 0;
 	m_blitterdata[2] = 0;
@@ -425,6 +399,14 @@ static MACHINE_CONFIG_START( junofrst )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(junofrst_state, i8039_irqen_and_status_w))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(junofrst_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(junofrst_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(junofrst_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(junofrst_state, flip_screen_x_w)) // HFF
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(junofrst_state, flip_screen_y_w)) // VFLIP
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

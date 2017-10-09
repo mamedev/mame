@@ -22,13 +22,6 @@ public:
 	// construction/destruction
 	cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
-
 	DECLARE_READ8_MEMBER(dart_r);
 	DECLARE_WRITE8_MEMBER(dart_w);
 	DECLARE_READ8_MEMBER(pit_r);
@@ -42,11 +35,18 @@ protected:
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	required_device<pit8253_device> m_pit;
 	required_device<z80dart_device> m_dart;
 	required_device<rs232_port_device> m_rs232;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
+	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
+	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
+
 	cpc_expansion_slot_device *m_slot;
 };
 

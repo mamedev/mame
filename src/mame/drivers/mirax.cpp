@@ -102,6 +102,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -115,6 +116,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ay(*this, "ay%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -124,6 +126,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device_array<ay8912_device, 2> m_ay;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -138,11 +141,12 @@ public:
 	uint8_t m_flipscreen_y;
 
 	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(coin_counter0_w);
-	DECLARE_WRITE8_MEMBER(coin_counter1_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter0_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter1_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
@@ -266,23 +270,21 @@ WRITE8_MEMBER(mirax_state::audio_w)
 
 WRITE8_MEMBER(mirax_state::ay1_sel)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
-	ay8910->address_w(space,0,m_nAyCtrl);
-	ay8910->data_w(space,0,data);
+	m_ay[0]->address_w(space,0,m_nAyCtrl);
+	m_ay[0]->data_w(space,0,data);
 }
 
 WRITE8_MEMBER(mirax_state::ay2_sel)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
-	ay8910->address_w(space,0,m_nAyCtrl);
-	ay8910->data_w(space,0,data);
+	m_ay[1]->address_w(space,0,m_nAyCtrl);
+	m_ay[1]->data_w(space,0,data);
 }
 
-WRITE8_MEMBER(mirax_state::nmi_mask_w)
+WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 {
-	m_nmi_mask = data & 1;
-	if(data & 0xfe)
-		printf("Warning: %02x written at $f501\n",data);
+	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
@@ -292,24 +294,24 @@ WRITE8_MEMBER(mirax_state::sound_cmd_w)
 }
 
 
-WRITE8_MEMBER(mirax_state::coin_counter0_w)
+WRITE_LINE_MEMBER(mirax_state::coin_counter0_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(mirax_state::coin_counter1_w)
+WRITE_LINE_MEMBER(mirax_state::coin_counter1_w)
 {
-	machine().bookkeeping().coin_counter_w(1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-/* One address flips X, the other flips Y, but I can't tell which is which - Since the value is the same for the 2 addresses, it doesn't really matter */
-WRITE8_MEMBER(mirax_state::flip_screen_w)
+WRITE_LINE_MEMBER(mirax_state::flip_screen_x_w)
 {
-	if (offset == 0)
-		m_flipscreen_x = data & 0x01;
+	m_flipscreen_x = state;
+}
 
-	if (offset == 1)
-		m_flipscreen_y = data & 0x01;
+WRITE_LINE_MEMBER(mirax_state::flip_screen_y_w)
+{
+	m_flipscreen_y = state;
 }
 
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
@@ -323,10 +325,7 @@ static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf300, 0xf300) AM_READNOP //watchdog? value is always read then discarded
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(coin_counter0_w)
-	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf502, 0xf502) AM_WRITE(coin_counter1_w) // only used in 'miraxa' - see notes
-	AM_RANGE(0xf506, 0xf507) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xf500, 0xf507) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_cmd_w)
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
@@ -470,8 +469,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( mirax )
@@ -482,6 +481,15 @@ static MACHINE_CONFIG_START( mirax )
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mirax_state, coin_counter0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mirax_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
+	// One address flips X, the other flips Y, but I can't tell which is which
+	// Since the value is the same for the 2 addresses, it doesn't really matter
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mirax_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mirax_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -500,10 +508,10 @@ static MACHINE_CONFIG_START( mirax )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)
+	MCFG_SOUND_ADD("ay1", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/4)
+	MCFG_SOUND_ADD("ay2", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -582,10 +590,6 @@ DRIVER_INIT_MEMBER(mirax_state,mirax)
 
 	for(i=0x8000;i<0xc000;i++)
 		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
-
-	/* These values need to be initialised only once, not on every soft reset */
-	m_flipscreen_x = 0;
-	m_flipscreen_y = 0;
 }
 
 GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )

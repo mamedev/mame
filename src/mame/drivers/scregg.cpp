@@ -55,6 +55,7 @@ it as ASCII text.
 #include "includes/btime.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 

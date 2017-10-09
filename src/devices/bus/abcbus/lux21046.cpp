@@ -284,10 +284,10 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( luxor_55_21046 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( luxor_55_21046 )
+MACHINE_CONFIG_MEMBER( luxor_55_21046_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21046_mem)
@@ -306,81 +306,35 @@ static MACHINE_CONFIG_START( luxor_55_21046 )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( abc830 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( abc830, luxor_55_21046 )
+MACHINE_CONFIG_MEMBER( abc830_device::device_add_mconfig )
+	luxor_55_21046_device::device_add_mconfig(config);
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( abc832 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( abc832, luxor_55_21046 )
+MACHINE_CONFIG_MEMBER( abc832_device::device_add_mconfig )
+	luxor_55_21046_device::device_add_mconfig(config);
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_MEMBER( abc834_device::device_add_mconfig )
+	luxor_55_21046_device::device_add_mconfig(config);
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
+MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( abc838 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( abc838, luxor_55_21046 )
+MACHINE_CONFIG_MEMBER( abc838_device::device_add_mconfig )
+	luxor_55_21046_device::device_add_mconfig(config);
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( abc850 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( abc850, luxor_55_21046 )
+MACHINE_CONFIG_MEMBER( abc850_floppy_device::device_add_mconfig )
+	luxor_55_21046_device::device_add_mconfig(config);
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, nullptr, luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_55_21046_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_55_21046 );
-}
-
-machine_config_constructor abc830_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc830 );
-}
-
-machine_config_constructor abc832_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc832 );
-}
-
-machine_config_constructor abc834_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc832 );
-}
-
-machine_config_constructor abc838_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc838 );
-}
-
-machine_config_constructor abc850_floppy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc850 );
-}
 
 
 //-------------------------------------------------

@@ -145,23 +145,6 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 	m_z80bank->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(crshrace_state::sound_command_w)
-{
-	m_pending_command = 1;
-	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
-{
-	return m_pending_command;
-}
-
-WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
-
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -178,7 +161,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE8(sound_command_w, 0x00ff)
+	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
@@ -194,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, crshrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -343,7 +326,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crshrace_state,country_sndpending_r, nullptr)  /* pending sound command */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* pending sound command */
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */
@@ -407,7 +390,6 @@ void crshrace_state::machine_start()
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_pending_command));
 }
 
 void crshrace_state::machine_reset()
@@ -415,7 +397,6 @@ void crshrace_state::machine_reset()
 	m_roz_bank = 0;
 	m_gfxctrl = 0;
 	m_flipscreen = 0;
-	m_pending_command = 0;
 }
 
 static MACHINE_CONFIG_START( crshrace )
@@ -460,6 +441,8 @@ static MACHINE_CONFIG_START( crshrace )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

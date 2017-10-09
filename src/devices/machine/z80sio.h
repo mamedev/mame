@@ -66,18 +66,6 @@
 #define SIO_CHANA_TAG   "cha"
 #define SIO_CHANB_TAG   "chb"
 
-#define MCFG_Z80SIO_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO, _clock) \
-	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, UPD7201_NEW, _clock) \
-	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, I8274_NEW, _clock) \
-	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
-
 /* Generic macros */
 #define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
@@ -152,7 +140,6 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;

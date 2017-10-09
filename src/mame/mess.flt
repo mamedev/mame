@@ -16,6 +16,7 @@ ac1.cpp
 accomm.cpp
 aceex.cpp
 acrnsys1.cpp
+acvirus.cpp
 adam.cpp
 advision.cpp
 agat.cpp
@@ -25,11 +26,13 @@ akaiax80.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
+alphatpx.cpp
 alphatro.cpp
 altair.cpp
 alto2.cpp
 altos5.cpp
 altos486.cpp
+altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampro.cpp
@@ -63,6 +66,7 @@ atarist.cpp
 atm.cpp
 atom.cpp
 atpci.cpp
+att4425.cpp
 attache.cpp
 aussiebyte.cpp
 avigo.cpp
@@ -123,11 +127,13 @@ coco12.cpp
 coco3.cpp
 codata.cpp
 coleco.cpp
+compc.cpp
 compis.cpp
 compucolor.cpp
 comquest.cpp
 comx35.cpp
 concept.cpp
+controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
@@ -144,6 +150,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -171,6 +178,7 @@ ec65.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
+elektronmono.cpp
 elf.cpp
 elwro800.cpp
 enmirage.cpp
@@ -202,6 +210,7 @@ fidelz80.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp
+fontwriter.cpp
 force68k.cpp
 fp1100.cpp
 fp200.cpp
@@ -211,6 +220,7 @@ galaxy.cpp
 galeb.cpp
 gamate.cpp
 gamecom.cpp
+gamecube.cpp
 gameking.cpp
 gamepock.cpp
 gb.cpp
@@ -226,6 +236,7 @@ goupil.cpp
 gp2x.cpp
 gp32.cpp
 grfd2301.cpp
+gridcomp.cpp
 h19.cpp
 h8.cpp
 h89.cpp
@@ -237,7 +248,6 @@ hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
-hh_sm500.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -255,6 +265,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
+hp80.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp
@@ -275,6 +286,7 @@ indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
 instruct.cpp
+intellec4.cpp
 interact.cpp
 interpro.cpp
 intv.cpp
@@ -302,16 +314,19 @@ k28.cpp
 k8915.cpp
 kaypro.cpp
 kc.cpp
+kdt6.cpp
 kim1.cpp
 konin.cpp
 kramermc.cpp
 kron.cpp
+krz2000.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
 lc80.cpp
 lcmate2.cpp
 leapster.cpp
+learnwin.cpp
 lft.cpp
 lg-dvd.cpp
 lisa.cpp
@@ -342,7 +357,9 @@ mccpm.cpp
 megadriv.cpp
 mekd2.cpp
 mephisto.cpp
+mephisto_montec.cpp
 mes.cpp
+mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -357,6 +374,7 @@ mikrosha.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
+miniframe.cpp
 minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
@@ -375,6 +393,7 @@ mpf1.cpp
 mps1230.cpp
 mpz80.cpp
 ms0515.cpp
+ms6102.cpp
 ms9540.cpp
 msbc1.cpp
 mstation.cpp
@@ -400,6 +419,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
@@ -485,6 +505,7 @@ pockstat.cpp
 pofo.cpp
 poisk1.cpp
 pokemini.cpp
+polgar.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp
@@ -534,6 +555,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rzone.cpp
 sacstate.cpp
 sage2.cpp
 samcoupe.cpp
@@ -599,6 +621,7 @@ swyft.cpp
 sym1.cpp
 symbolics.cpp
 sys2900.cpp
+sys9002.cpp
 systec.cpp
 tamag1.cpp
 tandy1t.cpp
@@ -615,6 +638,7 @@ tekxp33x.cpp
 terak.cpp
 test_t400.cpp
 testconsole.cpp
+tg100.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

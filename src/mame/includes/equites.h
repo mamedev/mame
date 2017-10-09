@@ -8,6 +8,7 @@
 
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
@@ -89,18 +90,18 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
+	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
 	DECLARE_WRITE8_MEMBER(mcu_ram_w);
-	DECLARE_WRITE16_MEMBER(mcu_start_w);
-	DECLARE_WRITE16_MEMBER(mcu_switch_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
 	DECLARE_READ8_MEMBER(equites_fg_videoram_r);
 	DECLARE_WRITE8_MEMBER(equites_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(equites_bgcolor_w);
 	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_selchar_w);
-	DECLARE_WRITE16_MEMBER(equites_flipw_w);
-	DECLARE_WRITE8_MEMBER(equites_flipb_w);
+	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);

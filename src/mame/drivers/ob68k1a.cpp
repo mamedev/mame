@@ -148,29 +148,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_0_w )
-{
-	m_acia0->write_txc(state);
-	m_acia0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_1_w )
-{
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
-}
-
-
-
-//**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
@@ -247,8 +224,10 @@ static MACHINE_CONFIG_START( ob68k1a )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(ob68k1a_state, rx_tx_0_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(ob68k1a_state, rx_tx_1_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

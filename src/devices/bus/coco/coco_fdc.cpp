@@ -228,10 +228,10 @@ void coco_fdc_device_base::update_lines()
 		set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
 	// set the NMI line
-	cart_set_line(cococart_slot_device::line::NMI, intrq() && (dskreg() & 0x20));
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
 	// set the HALT line
-	cart_set_line(cococart_slot_device::line::HALT, !drq() && (dskreg() & 0x80));
+	set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
 }
 
 
@@ -273,11 +273,12 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	else if (data & 0x40)
 		drive = 3;
 
+	// the motor is always turned on or off for all drives
 	for (int i = 0; i < 4; i++)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w(((i == drive) && (data & 0x08)) ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(BIT(data, 3) ? 0 : 1);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;

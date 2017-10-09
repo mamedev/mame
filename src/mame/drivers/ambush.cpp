@@ -45,6 +45,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -61,6 +62,7 @@ public:
 	ambush_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_outlatch(*this, "outlatch%u", 1),
 		m_video_ram(*this, "video_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_attribute_ram(*this, "attribute_ram"),
@@ -80,21 +82,24 @@ public:
 	TILE_GET_INFO_MEMBER(mariobl_char_tile_info);
 	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(scroll_ram_w);
-	DECLARE_WRITE8_MEMBER(color_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
+	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
 
 	DECLARE_MACHINE_START(ambush);
 	DECLARE_MACHINE_START(mariobl);
 	DECLARE_MACHINE_START(dkong3abl);
 
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE8_MEMBER(output_latches_w);
 
 private:
 	void register_save_states();
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device_array<ls259_device, 2> m_outlatch;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_attribute_ram;
@@ -120,10 +125,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0xc200, 0xc3ff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("sw1")
-	AM_RANGE(0xcc00, 0xcc03) AM_WRITE(unk_w)
-	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITE(color_bank_w)
-	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(coin_counter_w)
+	AM_RANGE(0xcc00, 0xcc07) AM_WRITE(output_latches_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
@@ -145,8 +147,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("sw1")
-	AM_RANGE(0xa204, 0xa204) AM_WRITE(coin_counter_w)
-	AM_RANGE(0xa206, 0xa206) AM_WRITE(color_bank_w)
+	AM_RANGE(0xa200, 0xa207) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -508,9 +509,9 @@ uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-WRITE8_MEMBER( ambush_state::flip_screen_w )
+WRITE_LINE_MEMBER(ambush_state::flip_screen_w)
 {
-	flip_screen_set(data);
+	flip_screen_set(state);
 }
 
 WRITE8_MEMBER( ambush_state::scroll_ram_w )
@@ -519,9 +520,14 @@ WRITE8_MEMBER( ambush_state::scroll_ram_w )
 	m_char_tilemap->set_scrolly(offset, data + 1);
 }
 
-WRITE8_MEMBER( ambush_state::color_bank_w )
+WRITE_LINE_MEMBER(ambush_state::color_bank_1_w)
 {
-	m_color_bank = data & 0x03;
+	m_color_bank = (m_color_bank & 0x02) | (state ? 0x01 : 0x00);
+}
+
+WRITE_LINE_MEMBER(ambush_state::color_bank_2_w)
+{
+	m_color_bank = (m_color_bank & 0x01) | (state ? 0x02 : 0x00);
 }
 
 
@@ -651,15 +657,20 @@ MACHINE_START_MEMBER( ambush_state, dkong3abl )
 	m_char_tilemap->set_transparent_pen(0);
 }
 
-WRITE8_MEMBER( ambush_state::coin_counter_w )
+WRITE_LINE_MEMBER(ambush_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER( ambush_state::unk_w )
+WRITE_LINE_MEMBER(ambush_state::coin_counter_2_w)
 {
-	logerror("unk_w: %02x = %02x\n", offset, data);
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE8_MEMBER(ambush_state::output_latches_w)
+{
+	m_outlatch[0]->write_bit(offset, BIT(data, 0));
+	m_outlatch[1]->write_bit(offset, BIT(data, 1));
 }
 
 
@@ -672,6 +683,15 @@ static MACHINE_CONFIG_START( ambush )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
+
+	// addressable latches at 8B and 8C
+	MCFG_DEVICE_ADD("outlatch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ambush_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ambush_state, color_bank_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ambush_state, coin_counter_1_w))
+	MCFG_DEVICE_ADD("outlatch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ambush_state, color_bank_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ambush_state, coin_counter_2_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -702,6 +722,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mariobl, ambush )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+
+	// To be verified: do these bootlegs only have one LS259?
+	MCFG_DEVICE_REMOVE("outlatch1")
+	MCFG_DEVICE_REMOVE("outlatch2")
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ambush_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ambush_state, color_bank_1_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 

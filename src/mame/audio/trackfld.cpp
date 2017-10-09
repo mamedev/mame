@@ -121,15 +121,15 @@ WRITE8_MEMBER( trackfld_audio_device::hyperspt_sound_w )
 
 
 
-WRITE8_MEMBER( trackfld_audio_device::konami_sh_irqtrigger_w )
+WRITE_LINE_MEMBER(trackfld_audio_device::sh_irqtrigger_w)
 {
-	if (m_last_irq == 0 && data)
+	if (m_last_irq == 0 && state)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
-	m_last_irq = data;
+	m_last_irq = state;
 }
 
 //-------------------------------------------------

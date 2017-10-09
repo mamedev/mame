@@ -112,6 +112,12 @@ void m3745x_device::device_start()
 	m_last_all_ints = 0;
 }
 
+device_memory_interface::space_config_vector m3745x_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

@@ -760,8 +760,13 @@ static MACHINE_CONFIG_START(imds2)
 		MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic" , pic8259_device , inta_cb)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC, NOOP)
-		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC, NOOP)
+		MCFG_DEVICE_ADD("ipcsyspic", PIC8259, 0)
+		MCFG_PIC8259_OUT_INT_CB(WRITELINE(imds2_state, imds2_ipc_intr))
+		MCFG_PIC8259_IN_SP_CB(VCC)
+
+		MCFG_DEVICE_ADD("ipclocpic", PIC8259, 0)
+		MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("ipcsyspic", pic8259_device, ir7_w))
+		MCFG_PIC8259_IN_SP_CB(VCC) // ???
 
 		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
 		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)
@@ -903,7 +908,7 @@ ROM_START(imds2)
 		// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
 		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
-		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))
+		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
 
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)

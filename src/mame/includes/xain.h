@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class xain_state : public driver_device
@@ -31,7 +32,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(main_irq_w);
 	DECLARE_WRITE8_MEMBER(irqA_assert_w);
 	DECLARE_WRITE8_MEMBER(irqB_clear_w);

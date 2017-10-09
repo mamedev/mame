@@ -2,6 +2,7 @@
 // copyright-holders:Tomasz Slanina
 
 #include "machine/st0016.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class st0016_state : public driver_device

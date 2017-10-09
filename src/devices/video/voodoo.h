@@ -1019,15 +1019,39 @@ static const uint8_t dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
+//static const uint8_t dither_matrix_2x2[16] =
+//{
+//      2, 10,  2, 10,
+//  14,  6, 14,  6,
+//      2, 10,  2, 10,
+//  14,  6, 14,  6
+//};
+// Using this matrix allows iteagle video memory tests to pass
 static const uint8_t dither_matrix_2x2[16] =
 {
-		2, 10,  2, 10,
-	14,  6, 14,  6,
-		2, 10,  2, 10,
-	14,  6, 14,  6
+	8, 10, 8, 10,
+	11, 9, 11, 9,
+	8, 10, 8, 10,
+	11, 9, 11, 9
 };
 
+// Dither 4x4 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_4x4[16] =
+{
+	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
+	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
+	(15 - 3) >> 1, (15 - 11) >> 1,  (15 - 1) >> 1,  (15 - 9) >> 1,
+	(15 - 15) >> 1,  (15 - 7) >> 1, (15 - 13) >> 1,  (15 - 5) >> 1
+};
 
+// Dither 2x2 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_2x2[16] =
+{
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1
+};
 
 /*************************************
  *
@@ -1428,6 +1452,8 @@ enum
 #define MCFG_VOODOO_STALL_CB(_devcb) \
 	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_VOODOO_PCIINT_CB(_devcb) \
+	devcb = &voodoo_device::static_set_pciint_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -1446,6 +1472,7 @@ public:
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
 	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &static_set_stall_callback(device_t &device, Object &&cb)  { return downcast<voodoo_device &>(device).m_stall.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_pciint_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_pciint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
@@ -1457,6 +1484,8 @@ public:
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
+	// This is for internally generated PCI interrupts in Voodoo3
+	devcb_write_line   m_pciint;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
@@ -1632,7 +1661,7 @@ protected:
 		rgb_t               int8[256];              /* intensity 8-bit lookup table */
 		rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
 
-		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
+		rgb_t*              rgb565;                 /* RGB 5-6-5 lookup table */
 		rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
 		rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
 	};
@@ -1711,6 +1740,7 @@ protected:
 		rgb_t               pen[65536];             /* mapping from pixels to pens */
 		rgb_t               clut[512];              /* clut gamma data */
 		uint8_t               clut_dirty;             /* do we need to recompute? */
+		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
 	};
 
 
@@ -1778,7 +1808,6 @@ protected:
 
 
 	static const raster_info predef_raster_table[];
-
 
 	// not all of these need to be static, review.
 

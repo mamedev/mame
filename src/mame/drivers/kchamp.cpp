@@ -68,7 +68,7 @@ IO ports and memory map changes. Dip switches differ too.
 #include "includes/kchamp.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "machine/74259.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
@@ -78,17 +78,22 @@ IO ports and memory map changes. Dip switches differ too.
 * VS Version        *
 ********************/
 
-WRITE8_MEMBER(kchamp_state::control_w)
+WRITE_LINE_MEMBER(kchamp_state::nmi_enable_w)
 {
-	m_nmi_enable = data & 1;
+	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(kchamp_state::sound_reset_w)
+WRITE_LINE_MEMBER(kchamp_state::sound_reset_w)
 {
-	if (!(data & 1))
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	if (!state)
+	{
+		m_ay[0]->reset();
+		m_ay[1]->reset();
+		sound_control_w(machine().dummy_space(), 0, 0);
+	}
 }
 
 WRITE8_MEMBER(kchamp_state::sound_control_w)
@@ -109,15 +114,14 @@ static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, kchamp_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
@@ -170,8 +174,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE(kchamp_flipscreen_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW")
+	AM_RANGE(0x80, 0x87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
@@ -404,6 +408,11 @@ static MACHINE_CONFIG_START( kchampvs )
 	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8C
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(kchamp_state, sound_reset_w))
+
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
 	/* video hardware */
@@ -436,7 +445,7 @@ static MACHINE_CONFIG_START( kchampvs )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kchamp_state, msmint))         /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(kchamp_state, msmint))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -459,6 +468,10 @@ static MACHINE_CONFIG_START( kchamp )
 	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC71
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
@@ -488,7 +501,7 @@ static MACHINE_CONFIG_START( kchamp )
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

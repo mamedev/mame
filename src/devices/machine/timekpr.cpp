@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
 
 #define FLAGS_BL ( 0x10 ) /* MK48T08/M48T37: not emulated */
 #define FLAGS_AF ( 0x40 ) /* M48T37: not emulated */
-#define FLAGS_WDF ( 0x80 ) /* M48T37: not emulated */
+#define FLAGS_WDF ( 0x80 ) /* M48T37 */
 
 
 /***************************************************************************
@@ -91,6 +91,8 @@ static int counter_from_ram( uint8_t *data, int offset )
 timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, m_reset_cb(*this)
+	, m_irq_cb(*this)
 	, m_default_data(*this, DEVICE_SELF, size)
 	, m_size(size)
 {
@@ -99,6 +101,7 @@ timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type 
 m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, M48T02, tag, owner, clock, 0x800)
 {
+	m_offset_watchdog = -1;
 	m_offset_control = 0x7f8;
 	m_offset_seconds = 0x7f9;
 	m_offset_minutes = 0x7fa;
@@ -114,6 +117,7 @@ m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, dev
 m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, M48T35, tag, owner, clock, 0x8000)
 {
+	m_offset_watchdog = -1;
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
 	m_offset_minutes = 0x7ffa;
@@ -129,6 +133,7 @@ m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, dev
 m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, M48T37, tag, owner, clock, 0x8000)
 {
+	m_offset_watchdog = 0x7ff7;
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
 	m_offset_minutes = 0x7ffa;
@@ -144,6 +149,7 @@ m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, dev
 m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, M48T58, tag, owner, clock, 0x2000)
 {
+	m_offset_watchdog = -1;
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
 	m_offset_minutes = 0x1ffa;
@@ -159,6 +165,7 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, MK48T08, tag, owner, clock, 0x2000)
 {
+	m_offset_watchdog = -1;
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
 	m_offset_minutes = 0x1ffa;
@@ -174,6 +181,7 @@ mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, d
 mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, MK48T12, tag, owner, clock, 0x2000)
 {
+	m_offset_watchdog = -1;
 	m_offset_control = 0x7f8;
 	m_offset_seconds = 0x7f9;
 	m_offset_minutes = 0x7fa;
@@ -220,9 +228,16 @@ void timekeeper_device::device_start()
 	save_item( NAME(m_year) );
 	save_item( NAME(m_century) );
 	save_item( NAME(m_data) );
+	save_item( NAME(m_watchdog_delay));
 
 	emu_timer *timer = timer_alloc();
 	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+
+	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timekeeper_device::watchdog_callback), this));
+	m_watchdog_timer->adjust(attotime::never);
+	m_reset_cb.resolve_safe();
+	m_irq_cb.resolve_safe();
+
 }
 
 //-------------------------------------------------
@@ -328,6 +343,29 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
+TIMER_CALLBACK_MEMBER(timekeeper_device::watchdog_callback)
+{
+	// Set Flag
+	m_data[m_offset_flags] |= FLAGS_WDF;
+	// WDS (bit 7) selects callback
+	if (m_data[m_offset_watchdog] & 0x80) {
+		// Clear watchdog register
+		m_data[m_offset_watchdog] = 0;
+		m_reset_cb(ASSERT_LINE);
+	}
+	else {
+		m_irq_cb(ASSERT_LINE);
+	}
+	//printf("watchdog_callback: WD Control: %02x WD Flags: %02x\n", m_data[m_offset_watchdog], m_data[m_offset_flags]);
+}
+
+WRITE8_MEMBER(timekeeper_device::watchdog_write)
+{
+	if ((m_data[m_offset_watchdog] & 0x7f) != 0) {
+		m_watchdog_timer->adjust(m_watchdog_delay);
+	}
+}
+
 WRITE8_MEMBER( timekeeper_device::write )
 {
 	if( offset == m_offset_control )
@@ -347,6 +385,21 @@ WRITE8_MEMBER( timekeeper_device::write )
 			m_day = ( m_day & ~DAY_CEB ) | ( data & DAY_CEB );
 		}
 	}
+	else if (offset == m_offset_watchdog && type() == M48T37)
+	{
+		if ((data & 0x7f) == 0) {
+			m_watchdog_timer->adjust(attotime::never);
+		}
+		else {
+			// Calculate the time unit
+			m_watchdog_delay = attotime::from_usec(62500);
+			m_watchdog_delay *= 4 << (data & 0x3);
+			// Adjust by multiplier
+			m_watchdog_delay *= (data >> 2) & 0x1f;
+			m_watchdog_timer->adjust(m_watchdog_delay);
+			//printf("write: setting watchdog to %s WatchdogReg = 0x%02x\n", m_watchdog_delay.as_string(), data);
+		}
+	}
 
 	m_data[ offset ] = data;
 }
@@ -358,9 +411,13 @@ READ8_MEMBER( timekeeper_device::read )
 	{
 		result &= ~DATE_BL;
 	}
-	else if( offset == m_offset_flags && (type() == MK48T08 || type() == M48T37) )
+	else if( offset == m_offset_flags && type() == M48T37 )
 	{
-		result = 0;
+		// Clear the watchdog flag
+		m_data[m_offset_flags] &= ~FLAGS_WDF;
+		// Clear callbacks
+		m_reset_cb(CLEAR_LINE);
+		m_irq_cb(CLEAR_LINE);
 	}
 	return result;
 }

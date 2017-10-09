@@ -20,8 +20,6 @@ public:
 	// construction/destruction
 	neogeo_cthd2k3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_prot->get_bank_base(sel); }
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
@@ -33,6 +31,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cthd_prot_device> m_prot;
 };
@@ -83,7 +83,8 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 2; }
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;

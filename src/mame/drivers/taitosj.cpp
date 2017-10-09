@@ -175,21 +175,13 @@ TODO:
 
 WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 {
-	m_sndnmi_disable = (data & 1);
-	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	/* B0 is the sound nmi enable, active low */
+	m_soundnmi->in_w<0>((~data)&1);
 }
 
-WRITE8_MEMBER(taitosj_state::sound_command_w)
+WRITE8_MEMBER(taitosj_state::soundlatch_w)
 {
-	m_sound_cmd_written = true;
-	m_soundlatch->write(space,0,data);
-	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_w_cb), this), data);
 }
 
 
@@ -199,13 +191,9 @@ WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
 }
 
 // EPORT2
-WRITE8_MEMBER(taitosj_state::sound_semaphore_w)
+WRITE8_MEMBER(taitosj_state::sound_semaphore2_w)
 {
-	m_sound_semaphore = (data & 1);
-	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_w_cb), this), data);
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -243,8 +231,8 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_MIRROR(0x00f0) AM_WRITE(sound_semaphore2_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -256,8 +244,7 @@ ADDRESS_MAP_END
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
 static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
-	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_mcu_status_r)
+	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( taitosj_main_nomcu_map )
 ADDRESS_MAP_END
 
@@ -289,8 +276,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
-	AM_RANGE(0x8801, 0x8801) AM_READ(taitosj_mcu_status_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 	AM_RANGE(0x8802, 0x8802) AM_NOP
 	AM_RANGE(0x8a00, 0x8a5f) AM_WRITEONLY AM_SHARE("colscrolly")
 	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_SHARE("characterram")
@@ -315,8 +301,8 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_device, data_r) /* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
-	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xd50c, 0xd50c) AM_WRITE(sound_semaphore2_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_SHARE("video_mode")
@@ -324,47 +310,75 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
-// RD5000
-READ8_MEMBER(taitosj_state::sound_command_r)
+TIMER_CALLBACK_MEMBER(taitosj_state::soundlatch_w_cb)
 {
-	m_sound_cmd_written = false;
-	return m_soundlatch->read(space,0);
+	if (m_soundlatch_flag && (m_soundlatch_data != param))
+		logerror("Warning: soundlatch written before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, param);
+	m_soundlatch_data = param;
+	m_soundlatch_flag = true;
+	m_soundnmi->in_w<1>(1);
+}
+
+TIMER_CALLBACK_MEMBER(taitosj_state::soundlatch_clear7_w_cb)
+{
+	if (m_soundlatch_flag)
+		logerror("Warning: soundlatch bit 7 cleared before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, m_soundlatch_data&0x7f);
+	m_soundlatch_data &= 0x7F;
+}
+
+TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_w_cb)
+{
+	m_sound_semaphore2 = (param&1);
+	m_soundnmi2->in_w<1>((param&1));
+}
+
+TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_clear_w_cb)
+{
+	m_sound_semaphore2 = false;
+	m_soundnmi2->in_w<1>(0);
+}
+
+// RD5000
+READ8_MEMBER(taitosj_state::soundlatch_r)
+{
+	if (!machine().side_effect_disabled())
+	{
+		m_soundlatch_flag = false;
+		m_soundnmi->in_w<1>(0);
+	}
+	return m_soundlatch_data;
 }
 
 // RD5001
-READ8_MEMBER(taitosj_state::sound_status_r)
+READ8_MEMBER(taitosj_state::soundlatch_flags_r)
 {
-	return (m_sound_cmd_written == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
+	return (m_soundlatch_flag?8:0) | (m_sound_semaphore2?4:0) | 3;
 }
 
 // WR5000
-WRITE8_MEMBER(taitosj_state::sound_command_ack_w)
+WRITE8_MEMBER(taitosj_state::soundlatch_clear7_w)
 {
-	m_soundlatch->write(space,0, m_soundlatch->read(space,0) & 0x7f);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_clear7_w_cb), this), data);
 }
 
 // WR5001
-WRITE8_MEMBER(taitosj_state::sound_semaphore_clear_w)
+WRITE8_MEMBER(taitosj_state::sound_semaphore2_clear_w)
 {
-	m_sound_semaphore = false;
-	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_clear_w_cb), this), data);
 }
 
 
 static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x4801, 0x4801) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READWRITE(sound_command_r, sound_command_ack_w)
-	AM_RANGE(0x5001, 0x5001) AM_READWRITE(sound_status_r,  sound_semaphore_clear_w)
+	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x4802, 0x4803) AM_MIRROR(0x07f8) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
+	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD("ay4", ay8910_device, data_r)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x07fc) AM_READWRITE(soundlatch_r, soundlatch_clear7_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0x07fc) AM_READWRITE(soundlatch_flags_r, sound_semaphore2_clear_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
@@ -1770,7 +1784,11 @@ static MACHINE_CONFIG_START( nomcu )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("soundnmi2", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
@@ -1815,10 +1833,12 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_M68705_PORTA_W_CB(WRITE8(taitosj_state, taitosj_68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taitosj_state, taitosj_68705_portB_w))
-	MCFG_M68705_PORTC_R_CB(READ8(taitosj_state, taitosj_68705_portC_r))
+	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
+	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
+	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))
+	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(taitosj_state, mcu_intrq_w))
+	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(taitosj_state, mcu_busrq_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
@@ -2274,7 +2294,7 @@ ROM_START( frontlin )
 	ROM_LOAD( "fl70.u70",     0x0000, 0x1000, CRC(15f4ed8c) SHA1(ec096234e4e594100180eb99c8c57eb97b9f57e2) )
 	ROM_LOAD( "fl71.u71",     0x1000, 0x1000, CRC(c3eb38e7) SHA1(427e5deb6a6e22d8c34923209a818f79d50e59d4) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "aa1.13",       0x0000, 0x0800, CRC(7e78bdd3) SHA1(9eeb0e969fd013b9db074a15b0463216453e9364) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2441,7 +2461,7 @@ ROM_START( elevator ) // 5 board set, using 2732s on both mainboard and square r
 	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
 	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "ba3__11.mc68705p3.ic4",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC4 on the older Z80+security daughterboard; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on Square ROM board */
@@ -2529,7 +2549,7 @@ ROM_START( elevator4 ) // later 4 board set, with rom data on 2764s, split betwe
 	ROM_REGION( 0x0800, "pal", 0 ) // on GAME BOARD
 	ROM_LOAD( "ww15.pal16l8.ic24.jed.bin",  0x0000, 0x0117, CRC(c3ec20d6) SHA1(4bcdd92ca6b75ba825a7f90b1f35d8dcaeaf8a96) ) // what format is this? jed2bin?
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "ba3__11.mc68705p3.ic24",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC24 on the later CPU BOARD; The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime, on L-shaped rom board */
@@ -2559,7 +2579,7 @@ ROM_START( tinstar )
 	ROM_LOAD( "ts.71",        0x1000, 0x1000, CRC(03c91332) SHA1(3903e876ae02e9aea7ee6854bb4c6407dd7108d6) )
 	ROM_LOAD( "ts.72",        0x2000, 0x1000, CRC(beeed8f3) SHA1(2a18edecabbfd10b3238338cb5554edc8c18d93c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a10-12",       0x0000, 0x0800, CRC(889eefc9) SHA1(1a31aa21c02215410eea27ed52fad67f007ee810) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2603,7 +2623,7 @@ ROM_START( tinstar2 )
 	ROM_LOAD( "a10-29.bin",        0x0000, 0x2000, CRC(771f1a6a) SHA1(c5d1841840ff35e2c20a285b1b7f35150356f50f) )
 	ROM_LOAD( "a10-10.bin",        0x2000, 0x1000, CRC(beeed8f3) SHA1(2a18edecabbfd10b3238338cb5554edc8c18d93c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a10-12",       0x0000, 0x0800, CRC(889eefc9) SHA1(1a31aa21c02215410eea27ed52fad67f007ee810) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2684,7 +2704,7 @@ ROM_START( sfposeid )
 	ROM_LOAD( "a14-10.70",    0x0000, 0x1000, CRC(f1365f35) SHA1(34b3ea03eb9fbf5454858fa6e07ec49a7b3be8b4) )
 	ROM_LOAD( "a14-11.71",    0x1000, 0x1000, CRC(74a12fe2) SHA1(8678ea68bd283b7a63915717cdbbedef0b699198) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a14-12",       0x0000, 0x0800, CRC(091beed8) SHA1(263806aef01bbc258f5cfa92de8a9e355491fb3a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2740,7 +2760,7 @@ ROM_START( kikstart )
 	ROM_LOAD( "a20-11",       0x1000, 0x1000, CRC(8db12dd9) SHA1(3b291d478b3f3f1bf93d95a78506d99a71f36d05) )
 	ROM_LOAD( "a20-12",       0x2000, 0x1000, CRC(e7eeb933) SHA1(26f3904f6d4dc814318221f1c9cd5dcc671fe05a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
 	ROM_LOAD( "a20-13.ic91",  0x0000, 0x0800, CRC(3fb6c4fb) SHA1(04b9458f21a793444cd587055e2e3ccfa3f835a2) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
@@ -2758,8 +2778,13 @@ ROM_END
 
 void taitosj_state::reset_common()
 {
-	m_sndnmi_disable = false; // ay-3-8910 resets all registers to 0 on reset
-	m_sound_semaphore = false;
+	m_sound_semaphore2 = false;
+	m_soundnmi2->in_w<1>(0);
+	m_soundlatch_data = 0xff;
+	m_soundlatch_flag = false;
+	m_soundnmi->in_w<1>(0);
+	m_soundnmi->in_w<0>(0);
+	m_sound_semaphore2 = false;
 	m_ay1->set_output_gain(0, 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
 	m_ay1->set_output_gain(1, 0.0);
 	m_ay1->set_output_gain(2, 0.0);
@@ -2775,9 +2800,9 @@ void taitosj_state::reset_common()
 
 void taitosj_state::init_common()
 {
-	save_item(NAME(m_sndnmi_disable));
-	save_item(NAME(m_sound_cmd_written));
-	save_item(NAME(m_sound_semaphore));
+	save_item(NAME(m_soundlatch_data));
+	save_item(NAME(m_soundlatch_flag));
+	save_item(NAME(m_sound_semaphore2));
 	save_item(NAME(m_input_port_4_f0));
 	save_item(NAME(m_kikstart_gears));
 

@@ -472,8 +472,6 @@ void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	if(id >= TIMER_A && id <= TIMER_D)
 		timer_count(id);
-	else
-		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 
@@ -791,7 +789,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_TCDCR:
-		m_tcdcr = data & 0x6f;
+		m_tcdcr = data & 0x77;
 
 		switch (m_tcdcr & 0x07)
 		{

@@ -394,9 +394,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
-	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, uint8_t, size));
+	std::unique_ptr<slider_state> state = make_unique_clear<slider_state>();
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];
@@ -407,15 +405,16 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
 	state->arg = this;
 	state->id = screen_index;
-	strcpy(state->description, description.c_str());
+	state->description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 
 	ui::menu_item item;
 	item.text = state->description;
 	item.subtext = "";
 	item.flags = 0;
-	item.ref = state;
+	item.ref = state.get();
 	item.type = ui::menu_item_type::SLIDER;
 	m_selection_sliders.push_back(item);
+	m_core_sliders.push_back(std::move(state));
 }
 
 uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window)

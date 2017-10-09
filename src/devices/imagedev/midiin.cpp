@@ -64,27 +64,24 @@ void midiin_device::device_reset()
 
 void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id) {
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
-	}
+	if (!id) {
+		uint8_t buf[8192*4];
+		int bytesRead;
 
-	uint8_t buf[8192*4];
-	int bytesRead;
+		if (m_midi == nullptr) {
+			return;
+		}
 
-	if (m_midi == nullptr) {
-		return;
-	}
-
-	while (m_midi->poll())
-	{
-		bytesRead = m_midi->read(buf);
-
-		if (bytesRead > 0)
+		while (m_midi->poll())
 		{
-			for (int i = 0; i < bytesRead; i++)
+			bytesRead = m_midi->read(buf);
+
+			if (bytesRead > 0)
 			{
-				xmit_char(buf[i]);
+				for (int i = 0; i < bytesRead; i++)
+				{
+					xmit_char(buf[i]);
+				}
 			}
 		}
 	}

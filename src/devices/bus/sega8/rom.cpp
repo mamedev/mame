@@ -250,6 +250,7 @@ void sega8_4pak_device::device_start()
 void sega8_4pak_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_rom_bank_base, 0, sizeof(m_rom_bank_base));
 }
 
 
@@ -713,14 +714,9 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 	}
 }
 
-MACHINE_CONFIG_START( gg_eeprom )
+MACHINE_CONFIG_MEMBER( sega8_eeprom_device::device_add_mconfig )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
-
-machine_config_constructor sega8_eeprom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( gg_eeprom );
-}
 
 
 /*-------------------------------------------------
