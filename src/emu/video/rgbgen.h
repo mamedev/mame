@@ -64,6 +64,12 @@ public:
 	s32 get_g32() const { return m_g; }
 	s32 get_b32() const { return m_b; }
 
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
+	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
+	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
+	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
+
 	inline void add(const rgbaint_t& color)
 	{
 		add_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
@@ -304,7 +310,6 @@ public:
 	void scale_imm_and_clamp(const s32 scale);
 	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other);
 
 	void cmpeq(const rgbaint_t& value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
 	void cmpgt(const rgbaint_t& value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }

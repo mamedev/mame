@@ -1361,6 +1361,7 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fb
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
+				// Need to check this, manual states 9 bits
 				fogColorLocal.sub(color);
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
@@ -1423,9 +1424,11 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fb
 			//fg = (fg * fogblend) >> 8;
 			//fb = (fb * fogblend) >> 8;
 			/* if fog_mult is 0, we add this to the original color */
+			fogColorLocal.scale_imm_and_clamp((int16_t)fogblend);
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				fogColorLocal.scale_imm_add_and_clamp(fogblend, color);
+				fogColorLocal.add(color);
+				fogColorLocal.clamp_to_uint8();
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -1435,7 +1438,6 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fb
 			/* otherwise this just becomes the new color */
 			else
 			{
-				fogColorLocal.scale_imm_and_clamp(fogblend);
 				//color = fog;
 				//(RR) = fr;
 				//(GG) = fg;
