@@ -38,7 +38,6 @@ z8002_device::z8002_device(const machine_config &mconfig, const char *tag, devic
 
 z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_BIG, iobits, 16, 0)
 	, m_mo_out(*this)
