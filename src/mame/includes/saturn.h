@@ -60,26 +60,7 @@ public:
 	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	uint8_t     m_en_68k;
-
-	#if 0
-	struct {
-		uint32_t    src[3];       /* Source DMA lv n address*/
-		uint32_t    dst[3];       /* Destination DMA lv n address*/
-		uint32_t    src_add[3];   /* Source Addition for DMA lv n*/
-		uint32_t    dst_add[3];   /* Destination Addition for DMA lv n*/
-		uint32_t    size[3];      /* Transfer DMA size lv n*/
-		uint32_t    index[3];
-		int       start_factor[3];
-		uint8_t     enable_mask[3];
-		uint32_t    illegal_factor[3];
-		uint32_t    ist;
-		uint32_t    ism;
-		uint32_t    status;
-	}m_scu;
-	#endif
-	
-//	void scu_reset(void);
+	uint8_t     m_en_68k;	
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
@@ -142,17 +123,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
 
-//	void scu_do_transfer(uint8_t event);
-//	void scu_test_pending_irq();
-//	DECLARE_READ32_MEMBER(saturn_scu_r);
-//	DECLARE_WRITE32_MEMBER(saturn_scu_w);
-//	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
-//	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
-//	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
+
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-//	void scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift);
-//	void scu_dma_direct(address_space &space, uint8_t dma_ch);
-//	void scu_dma_indirect(address_space &space,uint8_t dma_ch);
 	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
 	DECLARE_READ16_MEMBER(saturn_soundram_r);
 	DECLARE_WRITE32_MEMBER(minit_w);
