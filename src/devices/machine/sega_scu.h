@@ -1,8 +1,8 @@
-// license:BSD-3-Clause
-// copyright-holders:<author_name>
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for squeleton device
+	Sega System Control Unit (c) 1995 Sega
 
 ***************************************************************************/
 
