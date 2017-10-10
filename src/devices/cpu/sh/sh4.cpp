@@ -3814,7 +3814,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block *block, c
 	return true;
 }
 
-void sh34_base_device::func_FABS() { FNEG(m_sh2_state->arg0); }
+void sh34_base_device::func_FABS() { FABS(m_sh2_state->arg0); }
 static void cfunc_FABS(void *param) { ((sh34_base_device *)param)->func_FABS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
