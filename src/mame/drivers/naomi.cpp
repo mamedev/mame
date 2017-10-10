@@ -1956,10 +1956,10 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram")
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram")// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram")// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram")// mirror
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram") AM_MIRROR(0xa0000000)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram") AM_MIRROR(0xa0000000) // extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram") AM_MIRROR(0xa0000000) // mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram") AM_MIRROR(0xa0000000) // mirror
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
 	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
