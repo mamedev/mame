@@ -231,7 +231,7 @@ void smpc_hle_device::static_set_region_code(device_t &device, uint8_t rgn)
 {
 	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
 	dev.m_region_code = rgn;
-}	
+}
 
 void smpc_hle_device::static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2)
 {

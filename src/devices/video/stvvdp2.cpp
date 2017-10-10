@@ -4769,6 +4769,12 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
+				if ( stv2_current_tilemap.roz_mode3 == true )
+				{
+					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
+						continue;
+				}
+				
 				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
 				switch( stv2_current_tilemap.transparency )
 				{
@@ -4921,6 +4927,46 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 		}
 	}
 }
+
+bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
+{
+	int s_x=0,e_x=0,s_y=0,e_y=0;
+	int w0_pix, w1_pix;
+	uint8_t logic = STV_VDP2_RPLOG;
+	uint8_t w0_enable = STV_VDP2_RPW0E;
+	uint8_t w1_enable = STV_VDP2_RPW1E;
+	uint8_t w0_area = STV_VDP2_RPW0A;
+	uint8_t w1_area = STV_VDP2_RPW1A;
+
+	if (w0_enable == 0 &&
+		w1_enable == 0)
+		return rot_parameter ^ 1;
+
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w0_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w1_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+
+	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
+}
+
+int saturn_state::get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
+{
+	int res;
+
+	res = 1;
+	if(winenable)
+	{
+		if(winarea)
+			res = (y >= s_y && y <= e_y && x >= s_x && x <= e_x);
+		else
+			res = (y >= s_y && y <= e_y && x >= s_x && x <= e_x) ^ 1;
+	}
+
+	return res;
+}
+
 
 void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -5594,17 +5640,22 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	switch(STV_VDP2_RPMD)
 	{
 		case 0://Rotation Parameter A
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
 		case 1://Rotation Parameter B
 		//case 2:
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			break;
 		case 2://Rotation Parameter A & B CKTE
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
-		case 3://Rotation Parameter A & B Window (wrong)
+		case 3://Rotation Parameter A & B Window
+			stv2_current_tilemap.roz_mode3 = true;
+			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
 	}
@@ -6015,7 +6066,7 @@ uint8_t saturn_state::get_odd_bit( void )
 int saturn_state::get_vblank_start_position( void )
 {
 	/* TODO: test says that second setting happens at 241, might need further investigation ... */
-	const int d_vres[4] = { 224, 240, 256, 256 };
+	const int d_vres[4] = { 240, 240, 256, 256 };
 	int vres_mask;
 	int vblank_line;
 

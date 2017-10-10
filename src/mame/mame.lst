@@ -13782,6 +13782,9 @@ goindolk                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
+@source:gokidetor.cpp
+gokidetor                       // (c) 1992 Taito
+
 @source:goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
@@ -14656,6 +14659,7 @@ tgaunt                          // Tiger
 tjdredd                         // Tiger
 tsjam                           // Tiger
 tsonic                          // Tiger
+tswampt                         // Tiger
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
@@ -33714,7 +33718,8 @@ gforce2j                        // 1988.07 Galaxy Force II (Japan)
 gforce2ja                       // 1988.07 Galaxy Force II (Japan)
 gforce2sd                       // 1988.?? Galaxy Force II (World, Super Deluxe unit)
 gloc                            // 1990.?? G-LOC Air Battle (World)
-glocr360                        // 1990.?? G-LOC (R360, World?)
+glocr360                        // 1990.?? G-LOC (R360, World)
+glocr360j                       // 1990.?? G-LOC (R360, Japan)
 glocu                           // 1990.04 G-LOC Air Battle (US)
 pdrift                          // 1988.?? Power Drift (World)
 pdrifta                         // 1988.?? Power Drift (World)

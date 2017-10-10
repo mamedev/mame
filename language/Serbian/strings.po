@@ -48,11 +48,11 @@ msgstr "Odaberi mod pristupa"
 
 #: src/frontend/mame/ui/filesel.cpp:526
 msgid "Read-only"
-msgstr "Samo čitanje"
+msgstr "Samo čitaǌe"
 
 #: src/frontend/mame/ui/filesel.cpp:528
 msgid "Read-write"
-msgstr "Čitanje-pisanje"
+msgstr "Čitaǌe-pisaǌe"
 
 #: src/frontend/mame/ui/filesel.cpp:529
 msgid "Read this image, write to another image"
@@ -138,7 +138,7 @@ msgstr ""
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Jedan ili više ROM/CHD fajlova za ovu mašinu nisu ispravno napravljeni.\n"
+"Jedan ili više ROM/CHD fajlova za ovu mašinu nisu ispravno napravǉeni.\n"
 
 #: src/frontend/mame/ui/info.cpp:200
 msgid "Completely unemulated features: "
@@ -161,19 +161,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:231
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "Obrtanje ekrana u \"koktel\" modu nije podržano.\n"
+msgstr "Obrtaǌe ekrana u \"koktel\" modu nije podržano.\n"
 
 #: src/frontend/mame/ui/info.cpp:233
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Mašina zahteva dodatne ilustracione fajlove.\n"
 
 #: src/frontend/mame/ui/info.cpp:235
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Mašsina nije nikad završena. Može se javiti čudno ponašanje ili nedostatak "
-"elemenata sto ne predstavlja problem s emulacijom.\n"
+"Mašsina nije nikad završena. Može se javiti čudno ponašaǌe ili nedostatak "
+"elemenata sto ne predstavǉa problem s emulacijom.\n"
 
 #: src/frontend/mame/ui/info.cpp:237
 msgid ""
@@ -181,7 +181,7 @@ msgid ""
 "expected behaviour.\n"
 msgstr ""
 "Mašina ne poseduje uređaj za zvuk, MAME neće puštati zvuk, ovo je očekivano "
-"ponašanje.\n"
+"ponašaǌe.\n"
 
 #: src/frontend/mame/ui/info.cpp:241
 msgid ""
@@ -306,16 +306,16 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Komentar za varanje:\n"
+"Komentar za varaǌe:\n"
 "%s"
 
 #: src/frontend/mame/ui/cheatopt.cpp:105
 msgid "All cheats reloaded"
-msgstr "Sva varanja ponovo učitana"
+msgstr "Sva varaǌa ponovo učitana"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136
 msgid "Autofire Settings"
-msgstr "Podešavanja automatskog pucanja"
+msgstr "Podešavaǌa automatskog pucaǌa"
 
 #: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:529
 msgid "Reset All"
@@ -327,7 +327,7 @@ msgstr "Ponovo učitaj sve"
 
 #: src/frontend/mame/ui/cheatopt.cpp:273
 msgid "Autofire Status"
-msgstr "Stanje automatskog pucanja"
+msgstr "Staǌe automatskog pucaǌa"
 
 #: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/videoopt.cpp:208
 #: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:216
@@ -348,7 +348,7 @@ msgstr "Omogućeno"
 #: src/frontend/mame/ui/sndmenu.cpp:135 src/frontend/mame/ui/sndmenu.cpp:137
 #: plugins/cheat/init.lua:499 plugins/cheatfind/init.lua:589
 msgid "On"
-msgstr "Uključeno"
+msgstr "Ukǉučeno"
 
 #: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
 #: src/frontend/mame/ui/menu.cpp:739 src/frontend/mame/ui/miscmenu.cpp:894
@@ -356,7 +356,7 @@ msgstr "Uključeno"
 #: plugins/cheat/init.lua:502 plugins/cheat/init.lua:511
 #: plugins/cheatfind/init.lua:586
 msgid "Off"
-msgstr "Isključeno"
+msgstr "Iskǉučeno"
 
 #: src/frontend/mame/ui/cheatopt.cpp:316
 msgid "No buttons found on this machine!"
@@ -364,7 +364,7 @@ msgstr "Nema tastera na ovoj mašini!"
 
 #: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
 msgid "Autofire Delay"
-msgstr "Zadrška automatskog pucanja"
+msgstr "Zadrška automatskog pucaǌa"
 
 #: src/frontend/mame/ui/custui.cpp:31
 msgid "Show All"
@@ -400,7 +400,7 @@ msgstr "Prikaži bočne panele"
 
 #: src/frontend/mame/ui/custui.cpp:173
 msgid "Custom UI Settings"
-msgstr "Podešavanja korisničkog interfejsa"
+msgstr "Podešavaǌa korisničkog interfejsa"
 
 #: src/frontend/mame/ui/custui.cpp:223
 msgid "default"
@@ -412,7 +412,7 @@ msgstr "Font korisničkog interfejsa"
 
 #: src/frontend/mame/ui/custui.cpp:336
 msgid "Bold"
-msgstr "Podebljano"
+msgstr "Podebǉano"
 
 #: src/frontend/mame/ui/custui.cpp:337
 msgid "Italic"
@@ -428,7 +428,7 @@ msgstr "Visina teksta za informacije"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
-msgstr "Podešavanje fontova za korisnički interfejs"
+msgstr "Podešavaǌe fontova za korisnički interfejs"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -505,7 +505,7 @@ msgstr "Vrati originalne boje"
 
 #: src/frontend/mame/ui/custui.cpp:481
 msgid "UI Colors Settings"
-msgstr "Podešavanje boja korisničkog interfejsa"
+msgstr "Podešavaǌe boja korisničkog interfejsa"
 
 #: src/frontend/mame/ui/custui.cpp:490
 #, c-format
@@ -534,7 +534,7 @@ msgstr "Prelay mišem"
 
 #: src/frontend/mame/ui/custui.cpp:740
 msgid "ARGB Settings"
-msgstr "ARGB podešavanja"
+msgstr "ARGB podešavaǌa"
 
 #: src/frontend/mame/ui/custui.cpp:745 src/frontend/mame/ui/custui.cpp:748
 msgid "Alpha"
@@ -581,7 +581,7 @@ msgstr "Crna"
 
 #: src/frontend/mame/ui/custui.cpp:899
 msgid "Orange"
-msgstr "Narandžasta"
+msgstr "Naranǆasta"
 
 #: src/frontend/mame/ui/custui.cpp:900
 msgid "Yellow"
@@ -589,7 +589,7 @@ msgstr "Žuta"
 
 #: src/frontend/mame/ui/custui.cpp:903
 msgid "Violet"
-msgstr "Ljubičasta"
+msgstr "ǈubičasta"
 
 #: src/frontend/mame/ui/state.cpp:388
 msgid "Load State"
@@ -621,11 +621,11 @@ msgstr "(reprodukcija)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "recording"
-msgstr "snimanje"
+msgstr "snimaǌe"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(recording)"
-msgstr "(snimanje)"
+msgstr "(snimaǌe)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:95
 msgid "Pause/Stop"
@@ -681,7 +681,7 @@ msgstr "Kategorija"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr "Lista omiljenih"
+msgstr "Lista omiǉenih"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:759
 msgid "BIOS"
@@ -769,7 +769,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
-msgstr "Izbor proizvoljnih filtera"
+msgstr "Izbor proizvoǉnih filtera"
 
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
@@ -778,7 +778,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
-msgstr "Ukloni poslednji filter"
+msgstr "Ukloni posledǌi filter"
 
 #: src/frontend/mame/ui/utils.cpp:520
 msgid "Add filter"
@@ -840,11 +840,11 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Nisu proanađene mašine. Molimo Vas, proverite putanju do ROM fajlova "
+"Nisu proanađene mašine. Molimo Vas, proverite putaǌu do ROM fajlova "
 "definisanu u %1$s.ini fajlu\n"
 "\n"
 "Ako je ovo Vaš prvi put da koristite %2$s, molimo Vas pogledajte config.txt "
-"fajl u docs direktorijumu za informacije o podešavanju %2$s."
+"fajl u docs direktorijumu za informacije o podešavaǌu %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:271
 #: src/frontend/mame/ui/selgame.cpp:440
@@ -937,7 +937,7 @@ msgstr "Ostale kontrole"
 
 #: src/frontend/mame/ui/menu.cpp:294
 msgid "Return to Machine"
-msgstr "Podešavanje kontrola (ova mašina)"
+msgstr "Podešavaǌe kontrola (ova mašina)"
 
 #: src/frontend/mame/ui/menu.cpp:299 src/frontend/mame/ui/menu.cpp:301
 msgid "Exit"
@@ -953,16 +953,16 @@ msgstr "Automatski"
 
 #: src/frontend/mame/ui/swlist.cpp:88
 msgid "[file manager]"
-msgstr "[upravljanje fajlovima]"
+msgstr "[upravǉaǌe fajlovima]"
 
 #: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
-msgstr "Promeni sortiranje"
+msgstr "Promeni sortiraǌe"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr "Promenjen redosled: sada je sortirano po %s"
+msgstr "Promeǌen redosled: sada je sortirano po %s"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "shortname"
@@ -1061,7 +1061,7 @@ msgstr "Izborna lista - pretraga:"
 #: src/frontend/mame/ui/selector.cpp:124
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr "Dupli klik ili pritisnite %1$s za selektovanje"
+msgstr "Dupli klik ili pritisnite %1$s za selektovaǌe"
 
 #: src/frontend/mame/ui/selgame.cpp:313 src/frontend/mame/ui/selsoft.cpp:211
 #, c-format
@@ -1070,7 +1070,7 @@ msgid ""
 " added to favorites list."
 msgstr ""
 "%s\n"
-" dodato u listu omiljenih"
+" dodato u listu omiǉenih"
 
 #: src/frontend/mame/ui/selgame.cpp:318 src/frontend/mame/ui/selgame.cpp:324
 #: src/frontend/mame/ui/selsoft.cpp:216
@@ -1080,7 +1080,7 @@ msgid ""
 " removed from favorites list."
 msgstr ""
 "%s\n"
-" izbrisano iz liste omiljenih."
+" izbrisano iz liste omiǉenih."
 
 #: src/frontend/mame/ui/selgame.cpp:441
 msgid "Configure Machine"
@@ -1413,7 +1413,7 @@ msgstr "Ikone"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
 msgid "Cheats"
-msgstr "Varanja"
+msgstr "Varaǌa"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
 msgid "Snapshots"
@@ -1441,7 +1441,7 @@ msgstr "PCB (štampane pločice)"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
-msgstr "Upravljački paneli"
+msgstr "Upravǉački paneli"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
@@ -1457,7 +1457,7 @@ msgstr "Finalni protivnici"
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgid "Artworks Preview"
-msgstr "Umanjeni prikaz ilustracija"
+msgstr "Umaǌeni prikaz ilustracija"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:63
 msgid "Select"
@@ -1477,7 +1477,7 @@ msgstr "Logoi"
 
 #: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:62
 msgid "Scores"
-msgstr "Najbolji rezultata"
+msgstr "Najboǉi rezultata"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
 msgid "Versus"
@@ -1489,7 +1489,7 @@ msgstr "Maske"
 
 #: src/frontend/mame/ui/dirmenu.cpp:116
 msgid "Folders Setup"
-msgstr "Podešavanje direktorijuma"
+msgstr "Podešavaǌe direktorijuma"
 
 #: src/frontend/mame/ui/dirmenu.cpp:167
 #, c-format
@@ -1577,11 +1577,11 @@ msgstr "Žeton %1$c: %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
-msgstr " (zaključano)"
+msgstr " (zakǉučano)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:503
 msgid "Visible Delay"
-msgstr "Vidljivo kašnjenje"
+msgstr "Vidǉivo kašǌeǌe"
 
 #: src/frontend/mame/ui/miscmenu.cpp:601
 #, c-format
@@ -1629,11 +1629,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:775 src/frontend/mame/ui/mainmenu.cpp:145
 msgid "Add To Favorites"
-msgstr "Dodaj u listu omiljenih"
+msgstr "Dodaj u listu omiǉenih"
 
 #: src/frontend/mame/ui/miscmenu.cpp:777 src/frontend/mame/ui/mainmenu.cpp:147
 msgid "Remove From Favorites"
-msgstr "Izbriši iz liste omiljenih"
+msgstr "Izbriši iz liste omiǉenih"
 
 #: src/frontend/mame/ui/miscmenu.cpp:780
 msgid "Save machine configuration"
@@ -1669,11 +1669,11 @@ msgstr "[neuspešno]"
 
 #: src/frontend/mame/ui/mainmenu.cpp:60
 msgid "Input (general)"
-msgstr "Podešavanje kontrola (globalno)"
+msgstr "Podešavaǌe kontrola (globalno)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:62
 msgid "Input (this Machine)"
-msgstr "Podešavanje kontrola (ova mašina)"
+msgstr "Podešavaǌe kontrola (ova mašina)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:66
 msgid "Analog Controls"
@@ -1701,7 +1701,7 @@ msgstr "Informacije o programu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:88
 msgid "File Manager"
-msgstr "Upravljanje fajlovima"
+msgstr "Upravǉaǌe fajlovima"
 
 #: src/frontend/mame/ui/mainmenu.cpp:96
 msgid "Tape Control"
@@ -1741,7 +1741,7 @@ msgstr "Opcije nišana"
 
 #: src/frontend/mame/ui/mainmenu.cpp:132 plugins/cheat/init.lua:683
 msgid "Cheat"
-msgstr "Varanje"
+msgstr "Varaǌe"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Plugin Options"
@@ -1749,7 +1749,7 @@ msgstr "Opcije dodataka"
 
 #: src/frontend/mame/ui/mainmenu.cpp:139
 msgid "External DAT View"
-msgstr "Prikaz spoljašnjeg DAT"
+msgstr "Prikaz spoǉašǌeg DAT"
 
 #: src/frontend/mame/ui/mainmenu.cpp:154
 msgid "Select New Machine"
@@ -1761,7 +1761,7 @@ msgstr "Zvuk"
 
 #: src/frontend/mame/ui/sndmenu.cpp:136
 msgid "Sample Rate"
-msgstr "Učestalost uzorkovanja"
+msgstr "Učestalost uzorkovaǌa"
 
 #: src/frontend/mame/ui/sndmenu.cpp:137
 msgid "Use External Samples"
@@ -1827,7 +1827,7 @@ msgstr "Završni ekran igre"
 
 #: src/frontend/mame/ui/selmenu.cpp:69
 msgid "Add or remove favorites"
-msgstr "Dodavanje ili uklanjanje omiljenih"
+msgstr "Dodavaǌe ili uklaǌaǌe omiǉenih"
 
 #: src/frontend/mame/ui/selmenu.cpp:70
 msgid "Export displayed list to file"
@@ -2223,7 +2223,7 @@ msgstr "Za ovaj drajver je neophodno da slike budu učitane u sledeće uređaje:
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
-msgstr "Stanje emulacije tastature"
+msgstr "Staǌe emulacije tastature"
 
 #: src/frontend/mame/ui/ui.cpp:1086
 msgid "Mode: PARTIAL Emulation"
@@ -2235,7 +2235,7 @@ msgstr "Korisnički interfejs: omogućen"
 
 #: src/frontend/mame/ui/ui.cpp:1089 src/frontend/mame/ui/ui.cpp:1099
 msgid "**Use ScrLock to toggle**"
-msgstr "**Koristite ScrLock da promenite radno stanje**"
+msgstr "**Koristite ScrLock da promenite radno staǌe**"
 
 #: src/frontend/mame/ui/ui.cpp:1096
 msgid "Mode: FULL Emulation"
@@ -2243,11 +2243,11 @@ msgstr "Mod: POTPUNA emulacija"
 
 #: src/frontend/mame/ui/ui.cpp:1097
 msgid "UI:   Disabled"
-msgstr "Korisnički interfejs: onesposobljen"
+msgstr "Korisnički interfejs: onesposobǉen"
 
 #: src/frontend/mame/ui/ui.cpp:1240
 msgid "Autofire can't be enabled"
-msgstr "Automatsko pucanje ne može da se omogući"
+msgstr "Automatsko pucaǌe ne može da se omogući"
 
 #: src/frontend/mame/ui/ui.cpp:1293
 #, c-format
@@ -2259,7 +2259,7 @@ msgid ""
 msgstr ""
 "Da li ste sigurni da želite da napustite program?\n"
 "\n"
-"Pritisnite ''%s'' za napuštanje programa,\n"
+"Pritisnite ''%s'' za napuštaǌe programa,\n"
 "Pritisnite ''%s'' za nastavak emulacije."
 
 #: src/frontend/mame/ui/ui.cpp:1365
@@ -2274,7 +2274,7 @@ msgstr "%1$s jačina zvuka"
 #: src/frontend/mame/ui/ui.cpp:1398
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr "Ubrzanje osnovnog takta CPU %1$s"
+msgstr "Ubrzaǌe osnovnog takta CPU %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1407
 #, c-format
@@ -2284,12 +2284,12 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:1428
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr "%1$s frekvencija osvežavanja"
+msgstr "%1$s frekvencija osvežavaǌa"
 
 #: src/frontend/mame/ui/ui.cpp:1433
 #, c-format
 msgid "%1$s Brightness"
-msgstr "%1$s osvetljenost"
+msgstr "%1$s osvetǉenost"
 
 #: src/frontend/mame/ui/ui.cpp:1435
 #, c-format
@@ -2304,7 +2304,7 @@ msgstr "%1$s gama"
 #: src/frontend/mame/ui/ui.cpp:1441
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr "%1$s rastezanje po horizontali"
+msgstr "%1$s rastezaǌe po horizontali"
 
 #: src/frontend/mame/ui/ui.cpp:1443
 #, c-format
@@ -2314,7 +2314,7 @@ msgstr "%1$s horizontalna pozicija"
 #: src/frontend/mame/ui/ui.cpp:1445
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr "%1$s rastezanje po vertikali"
+msgstr "%1$s rastezaǌe po vertikali"
 
 #: src/frontend/mame/ui/ui.cpp:1447
 #, c-format
@@ -2324,7 +2324,7 @@ msgstr "%1$s vertikalna pozicija"
 #: src/frontend/mame/ui/ui.cpp:1466
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Laserdisc '%1$s' rastezanje po horizontali"
+msgstr "Laserdisc '%1$s' rastezaǌe po horizontali"
 
 #: src/frontend/mame/ui/ui.cpp:1468
 #, c-format
@@ -2334,7 +2334,7 @@ msgstr "Laserdisc '%1$s' horizontalna pozicija"
 #: src/frontend/mame/ui/ui.cpp:1470
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Laserdisc '%1$s' rastezanje po vertikali"
+msgstr "Laserdisc '%1$s' rastezaǌe po vertikali"
 
 #: src/frontend/mame/ui/ui.cpp:1472
 #, c-format
@@ -2343,7 +2343,7 @@ msgstr "Laserdisc '%1$s' vertikalna pozicija"
 
 #: src/frontend/mame/ui/ui.cpp:1484
 msgid "Vector Flicker"
-msgstr "Treperenje vektora"
+msgstr "Trepereǌe vektora"
 
 #: src/frontend/mame/ui/ui.cpp:1485
 msgid "Beam Width Minimum"
@@ -2433,12 +2433,12 @@ msgstr "Pomeraj nišana Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2157
 msgid "**Error saving ui.ini**"
-msgstr "**Greška prilikom snimanja ui.ini**"
+msgstr "**Greška prilikom snimaǌa ui.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2213
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr "**Greška prlikom zapisivanja %s.ini**"
+msgstr "**Greška prlikom zapisivaǌa %s.ini**"
 
 #: src/frontend/mame/ui/optsmenu.cpp:193
 msgid "Filter"
@@ -2462,7 +2462,7 @@ msgstr "Sačuvaj konfiguraciju"
 
 #: src/frontend/mame/ui/optsmenu.cpp:228
 msgid "Settings"
-msgstr "Podešavanja"
+msgstr "Podešavaǌa"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
@@ -2790,7 +2790,7 @@ msgstr ""
 #~ msgstr "Drajver je BIOS\t%1$s\n"
 
 #~ msgid "Support Save\t%1$s\n"
-#~ msgstr "Podržava snimanje stanja igre\t%1$s\n"
+#~ msgstr "Podržava snimaǌe staǌa igre\t%1$s\n"
 
 #~ msgid "Requires CHD\t%1$s\n"
 #~ msgstr "Zahteva CHD\t%1$s\n"
@@ -2862,10 +2862,10 @@ msgstr ""
 #~ msgstr "Informacije nisu dostupne"
 
 #~ msgid "Save cancelled"
-#~ msgstr "Čuvanje stanja igre otkazano"
+#~ msgstr "Čuvaǌe staǌa igre otkazano"
 
 #~ msgid "Load cancelled"
-#~ msgstr "Učitavanje stanja igre otkazano"
+#~ msgstr "Učitavaǌe staǌa igre otkazano"
 
 #~ msgid "Save to position %s"
 #~ msgstr "Sačuvaj na poziciju %s"

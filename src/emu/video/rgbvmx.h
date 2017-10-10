@@ -205,6 +205,12 @@ public:
 		return result;
 	}
 
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
+	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
+	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
+	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
+
 	inline void add(const rgbaint_t& color2)
 	{
 		m_value = vec_add(m_value, color2.m_value);
@@ -459,14 +465,6 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const s32 scale);
-
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
-	{
-		mul_imm(scale);
-		sra_imm(8);
-		add(other);
-		clamp_to_uint8();
-	}
 
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{

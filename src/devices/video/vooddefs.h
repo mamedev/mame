@@ -346,12 +346,12 @@ do                                                                              
 	{                                                                           \
 		if (FBZMODE_DITHER_TYPE(FBZMODE) == 0)                                  \
 		{                                                                       \
-			dither = dither4;                                                   \
+			dither = &dither_subtract_4x4[((YY) & 3) * 4];                      \
 			dither_lookup = &dither4_lookup[(YY & 3) << 11];                    \
 		}                                                                       \
 		else                                                                    \
 		{                                                                       \
-			dither = &dither_matrix_2x2[((YY) & 3) * 4];                        \
+			dither = &dither_subtract_2x2[((YY) & 3) * 4];                      \
 			dither_lookup = &dither2_lookup[(YY & 3) << 11];                    \
 		}                                                                       \
 	}                                                                           \
@@ -461,7 +461,7 @@ static inline rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, u
 	//rgbaint_t colorint((int32_t) (itera>>12), (int32_t) (iterr>>12), (int32_t) (iterg>>12), (int32_t) (iterb>>12));
 	result.shr_imm(12);
 
-	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)
+	if (!FBZCP_RGBZW_CLAMP(FBZCP))
 	{
 		//r &= 0xfff;
 		result.and_imm(0xfff);
@@ -471,18 +471,18 @@ static inline rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, u
 		//  result.rgb.r = 0;
 		result.andnot_reg(temp);
 		//else if (r == 0x100)
+		//  result.rgb.r = 0xff;
 		temp.set(result);
 		temp.cmpeq_imm(0x100);
-		// Shift by 1 so that int32_t result is not negative
-		temp.shr_imm(1);
-		//  result.rgb.r = 0xff;
 		result.or_reg(temp);
+		// else wrap
+		result.and_imm(0xff);
 	}
 	else
 	{
 		//return colorint.to_rgba_clamp();
+		result.clamp_to_uint8();
 	}
-	result.clamp_to_uint8();
 	return result;
 }
 
@@ -604,7 +604,6 @@ while (0)
 
 inline bool ATTR_FORCE_INLINE voodoo_device::chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgbaIntColor)
 {
-	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
 		rgb_union color;
 		color.u = rgbaIntColor.to_rgba();
@@ -693,7 +692,6 @@ while (0)
 
 inline bool voodoo_device::alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha)
 {
-	if (FBZMODE_ENABLE_ALPHA_MASK(fbzModeReg))
 	{
 		if ((alpha & 1) == 0)
 		{
@@ -779,7 +777,6 @@ while (0)
 
 inline bool ATTR_FORCE_INLINE voodoo_device::alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha)
 {
-	if (ALPHAMODE_ALPHATEST(alphaModeReg))
 	{
 		uint8_t alpharef = vd->reg[alphaMode].rgb.a;
 		switch (ALPHAMODE_ALPHAFUNCTION(alphaModeReg))
@@ -1008,7 +1005,6 @@ while (0)
 
 static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHAMODE, int32_t x, const uint8_t *dither, int dpix, uint16_t *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
 {
-	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))
 	{
 		//int dpix = dest[XX];
 		int dr, dg, db;
@@ -1029,19 +1025,20 @@ static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHA
 		if (FBZMODE_ALPHA_DITHER_SUBTRACT(FBZMODE))
 		{
 			/* look up the dither value from the appropriate matrix */
-			//int dith = DITHER[(XX) & 3];
+			int dith = dither[x & 3];
 
 			/* subtract the dither value */
-			dr += (15 - dither[x&3]) >> 1;
-			dg += (15 - dither[x&3]) >> 2;
-			db += (15 - dither[x&3]) >> 1;
+			dr += dith;
+			db += dith;
+			dg += dith >> 1;
 		}
 
 		/* blend the source alpha */
-		srcAlphaScale = 0;
 		if (ALPHAMODE_SRCALPHABLEND(ALPHAMODE) == 4)
 			srcAlphaScale = 256;
 			//(AA) = sa;
+		else
+			srcAlphaScale = 0;
 
 		/* compute source portion */
 		switch (ALPHAMODE_SRCRGBBLEND(ALPHAMODE))
@@ -1053,8 +1050,8 @@ static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHA
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				srcScale.set(srcAlphaScale-1, sa, sa, sa);
-				srcScale.add_imm(1);
+				ta = sa + 1;
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (sa + 1)) >> 8;
 				//(GG) = (sg * (sa + 1)) >> 8;
 				//(BB) = (sb * (sa + 1)) >> 8;
@@ -1114,10 +1111,11 @@ static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHA
 		}
 
 		/* blend the dest alpha */
-		destAlphaScale = 0;
 		if (ALPHAMODE_DSTALPHABLEND(ALPHAMODE) == 4)
 			destAlphaScale = 256;
 			//(AA) += da;
+		else
+			destAlphaScale = 0;
 
 		/* add in dest portion */
 		switch (ALPHAMODE_DSTRGBBLEND(ALPHAMODE))
@@ -1128,8 +1126,8 @@ static inline void ATTR_FORCE_INLINE alphaBlend(uint32_t FBZMODE, uint32_t ALPHA
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				destScale.set(destAlphaScale-1, sa, sa, sa);
-				destScale.add_imm(1);
+				ta = sa + 1;
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (sa + 1)) >> 8;
 				//(GG) += (dg * (sa + 1)) >> 8;
 				//(BB) += (db * (sa + 1)) >> 8;
@@ -1326,13 +1324,10 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fogModeReg, uint32_t fbzCpReg,  int32_t x, const uint8_t *dither4, int32_t fogDepth,
-	rgbaint_t &color, int32_t iterz, int64_t iterw, uint8_t itera)
+static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fbzModeReg, uint32_t fogModeReg, uint32_t fbzCpReg,  int32_t x, const uint8_t *dither4, int32_t wFloat,
+	rgbaint_t &color, int32_t iterz, int64_t iterw, const rgbaint_t &iterargb)
 {
-	if (FOGMODE_ENABLE_FOG(fogModeReg))
 	{
-		uint32_t color_alpha = color.get_a();
-
 		/* constant fog bypasses everything else */
 		rgbaint_t fogColorLocal(vd->reg[fogColor].u);
 
@@ -1366,6 +1361,7 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
+				// Need to check this, manual states 9 bits
 				fogColorLocal.sub(color);
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
@@ -1378,6 +1374,13 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			{
 				case 0:     /* fog table */
 				{
+					int32_t fogDepth = wFloat;
+					/* add the bias for fog selection*/
+					if (FBZMODE_ENABLE_DEPTH_BIAS(fbzModeReg))
+					{
+						fogDepth += (int16_t)vd->reg[zaColor].u;
+						CLAMP(fogDepth, 0, 0xffff);
+					}
 					int32_t delta = vd->fbi.fogdelta[fogDepth >> 10];
 					int32_t deltaval;
 
@@ -1401,7 +1404,7 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 				}
 
 				case 1:     /* iterated A */
-					fogblend = itera;
+					fogblend = iterargb.get_a();
 					break;
 
 				case 2:     /* iterated Z */
@@ -1421,9 +1424,11 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			//fg = (fg * fogblend) >> 8;
 			//fb = (fb * fogblend) >> 8;
 			/* if fog_mult is 0, we add this to the original color */
+			fogColorLocal.scale_imm_and_clamp((int16_t)fogblend);
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				fogColorLocal.scale_imm_add_and_clamp(fogblend, color);
+				fogColorLocal.add(color);
+				fogColorLocal.clamp_to_uint8();
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -1433,7 +1438,6 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 			/* otherwise this just becomes the new color */
 			else
 			{
-				fogColorLocal.scale_imm_and_clamp(fogblend);
 				//color = fog;
 				//(RR) = fr;
 				//(GG) = fg;
@@ -1446,7 +1450,7 @@ static inline void ATTR_FORCE_INLINE applyFogging(voodoo_device *vd, uint32_t fo
 		//CLAMP((RR), 0x00, 0xff);
 		//CLAMP((GG), 0x00, 0xff);
 		//CLAMP((BB), 0x00, 0xff);
-		fogColorLocal.set_a(color_alpha);
+		fogColorLocal.merge_alpha(color);
 		color.set(fogColorLocal);
 	}
 }
@@ -1804,8 +1808,8 @@ while (0)
 #define PIXEL_PIPELINE_BEGIN(vd, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)    \
 do                                                                              \
 {                                                                               \
-	int32_t depthval, wfloat, fogdepth, biasdepth;                                  \
-	int32_t r, g, b, a;                                                           \
+	int32_t depthval, wfloat, biasdepth;                                  \
+	int32_t r, g, b;                                                           \
 																				\
 	(STATS)->pixels_in++;                                                       \
 																				\
@@ -1852,36 +1856,32 @@ do                                                                              
 			wfloat = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;       \
 		}                                                                       \
 	}                                                                           \
-	fogdepth = wfloat;                                                          \
-	/* add the bias for fog selection*/                                         \
-	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
-	{                                                                           \
-		fogdepth += (int16_t)vd->reg[zaColor].u;                                \
-		CLAMP(fogdepth, 0, 0xffff);                                             \
-	}                                                                           \
 																				\
 	/* compute depth value (W or Z) for this pixel */                           \
-	if (FBZMODE_WBUFFER_SELECT(FBZMODE) == 0)                                   \
+	if (FBZMODE_WBUFFER_SELECT(FBZMODE))                                   \
 	{                                                                           \
-		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
+		if (!FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE))                          \
+			depthval = wfloat;                                                      \
+		else                                                                        \
+		{                                                                           \
+			if ((ITERZ) & 0xf0000000)                                               \
+				depthval = 0x0000;                                                  \
+			else                                                                    \
+			{                                                                       \
+				uint32_t temp = (ITERZ << 4);                                       \
+				if (!(temp & 0xffff0000))                                           \
+					depthval = 0xffff;                                              \
+				else                                                                \
+				{                                                                   \
+					int exp = count_leading_zeros(temp);                            \
+					depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
+				}                                                                   \
+			}                                                                       \
+		}                                                                           \
 	}                                                                           \
-	else if (FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE) == 0)                          \
-		depthval = wfloat;                                                      \
 	else                                                                        \
 	{                                                                           \
-		if ((ITERZ) & 0xf0000000)                                               \
-			depthval = 0x0000;                                                  \
-		else                                                                    \
-		{                                                                       \
-			uint32_t temp = (ITERZ << 4);                                       \
-			if (!(temp & 0xffff0000))                                           \
-				depthval = 0xffff;                                              \
-			else                                                                \
-			{                                                                   \
-				int exp = count_leading_zeros(temp);                            \
-				depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
-			}                                                                   \
-		}                                                                       \
+		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
 	}                                                                           \
 	/* add the bias */                                                          \
 	biasdepth = depthval;                                                     \
@@ -1972,7 +1972,6 @@ while (0)
 inline bool ATTR_FORCE_INLINE voodoo_device::depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth)
 {
 	/* handle depth buffer testing */
-	if (FBZMODE_ENABLE_DEPTHBUF(fbzModeReg))
 	{
 		int32_t depthsource;
 
@@ -2045,14 +2044,16 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depthTest(uint16_t zaColorReg, stat
 	return true;
 }
 
-#define PIXEL_PIPELINE_END(vd, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
+#define PIXEL_PIPELINE_END(vd, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX, wfloat) \
 																				\
 	/* perform fogging */                                                       \
 	preFog.set(color); \
-	applyFogging(vd, FOGMODE, FBZCOLORPATH, XX, DITHER4, fogdepth, color, ITERZ, ITERW, ITERAXXX.get_a()); \
+	if (FOGMODE_ENABLE_FOG(FOGMODE))                                                                        \
+		applyFogging(vd, FBZMODE, FOGMODE, FBZCOLORPATH, XX, DITHER4, wfloat, color, ITERZ, ITERW, ITERAXXX); \
 	/* perform alpha blending */                                                \
-	alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color, vd->fbi.rgb565); \
-	a = color.get_a(); r = color.get_r(); g = color.get_g(); b = color.get_b();                     \
+	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                                            \
+		alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color, vd->fbi.rgb565); \
+	r = color.get_r(); g = color.get_g(); b = color.get_b();                     \
 	/* modify the pixel for debugging purposes */                               \
 	MODIFY_PIXEL(VV);                                                           \
 																				\
@@ -2065,12 +2066,13 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depthTest(uint16_t zaColorReg, stat
 	}                                                                           \
 																				\
 	/* write to aux buffer */                                                   \
-	if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))                              \
+	/*if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))*/                              \
+	if (FBZMODE_AUX_BUFFER_MASK(FBZMODE))                              \
 	{                                                                           \
 		if (FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) == 0)                          \
 			depth[XX] = biasdepth;                                               \
 		else                                                                    \
-			depth[XX] = a;                                                      \
+			depth[XX] = color.get_a();                                          \
 	}                                                                           \
 																				\
 	/* track pixel writes to the frame buffer regardless of mask */             \
@@ -2407,8 +2409,9 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 	}
 
 	/* handle chroma key */
-	if (!chromaKeyTest(vd, STATS, FBZMODE, c_other))
-		return false;
+	if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE))
+		if (!chromaKeyTest(vd, STATS, FBZMODE, c_other))
+			return false;
 	//APPLY_CHROMAKEY(vd->m_vds, STATS, FBZMODE, c_other);
 
 	/* compute a_other */
@@ -2432,8 +2435,9 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 	}
 
 	/* handle alpha mask */
-	if (!alphaMaskTest(STATS, FBZMODE, c_other.get_a()))
-		return false;
+	if (FBZMODE_ENABLE_ALPHA_MASK(FBZMODE))
+		if (!alphaMaskTest(STATS, FBZMODE, c_other.get_a()))
+			return false;
 	//APPLY_ALPHAMASK(vd->m_vds, STATS, FBZMODE, c_other.rgb.a);
 
 
@@ -2535,6 +2539,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 			break;
 
 		case 5:     /* texture RGB (Voodoo 2 only) */
+			// Warning wipes out c_local alpha
 			c_local.set(TEXELARGB);
 			break;
 	}
@@ -2614,8 +2619,9 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 
 
 	/* handle alpha test */
-	if (!alphaTest(vd, STATS, ALPHAMODE, srcColor.get_a()))
-		return false;
+	if (ALPHAMODE_ALPHATEST(ALPHAMODE))
+		if (!alphaTest(vd, STATS, ALPHAMODE, srcColor.get_a()))
+			return false;
 	//APPLY_ALPHATEST(vd->m_vds, STATS, ALPHAMODE, color.rgb.a);
 
 	return true;
@@ -2726,8 +2732,9 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		/* pixel pipeline part 1 handles depth setup and stippling */         \
 		PIXEL_PIPELINE_BEGIN(vd, stats, x, y, FBZCOLORPATH, FBZMODE, iterz, iterw); \
 		/* depth testing */         \
-		if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], FBZMODE, biasdepth)) \
-			goto skipdrawdepth; \
+		if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                                  \
+			if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], FBZMODE, biasdepth)) \
+				goto skipdrawdepth; \
 																				\
 		/* run the texture pipeline on TMU1 to produce a value in texel */      \
 		/* note that they set LOD min to 8 to "disable" a TMU */                \
@@ -2765,7 +2772,7 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		/* pixel pipeline part 2 handles fog, alpha, and final output */        \
 		PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth, \
 							FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE,          \
-							iterz, iterw, iterargb);                            \
+							iterz, iterw, iterargb, wfloat);                            \
 																				\
 		/* update the iterated parameters */                                    \
 		iterargb += iterargbDelta;                                              \
@@ -2791,19 +2798,24 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 // Computes a log2 of a 16.32 value to 2 fractional bits of precision.
 // The return value is coded as a 24.8 value.
 // The maximum error using a 4 bit lookup from the mantissa is 0.0875, which is less than 1/2 lsb (0.125) for 2 bits of fraction.
+// An offset of  +(56 << 8) is added for alignment in multi_reciplog
 // ******************************************************************************************************************************
 static inline int32_t ATTR_FORCE_INLINE new_log2(double &value)
 {
-	static const int32_t new_log2_table[16] = {0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244};
+	static const int32_t new_log2_table[16] = {0 + (56 << 8), 22 + (56 << 8), 44 + (56 << 8), 63 + (56 << 8), 82 + (56 << 8),
+		100 + (56 << 8), 118 + (56 << 8), 134 + (56 << 8), 150 + (56 << 8), 165 + (56 << 8), 179 + (56 << 8), 193 + (56 << 8),
+		207 + (56 << 8), 220 + (56 << 8), 232 + (56 << 8), 244 + (56 << 8)};
 	uint64_t ival = *((uint64_t *)&value);
+	// Return 0 if negative
+	if (ival & ((uint64_t)1 << 63))
+		return 0;
 	// We zero the result if negative so don't worry about the sign bit
 	int32_t exp = (ival>>52);
 	exp -= 1023+32;
 	exp <<= 8;
 	uint32_t addr = (uint64_t)(ival>>48) & 0xf;
 	exp += new_log2_table[addr];
-	// Return 0 if negative
-	return (ival & ((uint64_t)1<<63)) ? 0 : exp;
+	return exp;
 }
 
 // Computes A/C and B/C and returns log2 of 1/C
@@ -2814,7 +2826,6 @@ static inline void ATTR_FORCE_INLINE multi_reciplog(int64_t valueA, int64_t valu
 	double resAD = valueA * recip;
 	double resBD = valueB * recip;
 	log = new_log2(recip);
-	log += 56<<8;
 	resA = resAD;
 	resB = resBD;
 }
@@ -2855,10 +2866,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 	lod += lodbias;
 	if (TEXMODE_ENABLE_LOD_DITHER(TEXMODE))
 		lod += dither4[x&3] << 4;
-	if (lod < lodmin)
-		lod = lodmin;
-	else if (lod > lodmax)
-		lod = lodmax;
+	CLAMP(lod, lodmin, lodmax);
 
 	/* now the LOD is in range; if we don't own this LOD, take the next one */
 	ilod = lod >> 8;

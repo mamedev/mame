@@ -894,7 +894,10 @@ public:
 	ioport_condition(condition_t condition, const char *tag, ioport_value mask, ioport_value value) { set(condition, tag, mask, value); }
 
 	// getters
+	condition_t condition() const { return m_condition; }
 	const char *tag() const { return m_tag; }
+	ioport_value mask() const { return m_mask; }
+	ioport_value value() const { return m_value; }
 
 	// operators
 	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
@@ -942,6 +945,7 @@ public:
 	running_machine &machine() const;
 	ioport_value value() const { return m_value; }
 	ioport_condition &condition() { return m_condition; }
+	ioport_condition const &condition() const { return m_condition; }
 	const char *name() const { return m_name; }
 
 	// helpers
@@ -1021,6 +1025,7 @@ public:
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
 	ioport_condition &condition() { return m_condition; }
+	ioport_condition const &condition() const { return m_condition; }
 	ioport_type type() const { return m_type; }
 	u8 player() const { return m_player; }
 	bool digital_value() const { return m_digital_value; }

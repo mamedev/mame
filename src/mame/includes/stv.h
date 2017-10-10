@@ -143,8 +143,8 @@ public:
 };
 
 
-#define MASTER_CLOCK_352 57272720
-#define MASTER_CLOCK_320 53693174
+//#define MASTER_CLOCK_352 57272720
+//#define MASTER_CLOCK_320 53693174
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
@@ -152,21 +152,5 @@ public:
 #define STV_VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
-
-#define IRQ_VBLANK_IN  1 << 0
-#define IRQ_VBLANK_OUT 1 << 1
-#define IRQ_HBLANK_IN  1 << 2
-#define IRQ_TIMER_0    1 << 3
-#define IRQ_TIMER_1    1 << 4
-#define IRQ_DSP_END    1 << 5
-#define IRQ_SOUND_REQ  1 << 6
-#define IRQ_SMPC       1 << 7
-#define IRQ_PAD        1 << 8
-#define IRQ_DMALV2     1 << 9
-#define IRQ_DMALV1     1 << 10
-#define IRQ_DMALV0     1 << 11
-#define IRQ_DMAILL     1 << 12
-#define IRQ_VDP1_END   1 << 13
-#define IRQ_ABUS       1 << 15
 
 GFXDECODE_EXTERN( stv );
