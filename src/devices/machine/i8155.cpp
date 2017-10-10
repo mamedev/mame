@@ -4,6 +4,13 @@
 
     Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
 
+    The only difference between 8155 and 8156 is that pin 8 (CE) is
+    active low on the former device and active high on the latter.
+
+    National's NSC810 RAM-I/O-Timer is pin-compatible with the Intel
+    8156, but has different I/O registers (including a second timer)
+    with incompatible mapping.
+
 **********************************************************************/
 
 /*
