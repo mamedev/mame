@@ -525,24 +525,15 @@ inline void sh34_base_device::RTE()
 	if ((m_ssr & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_ssr & sRB ? 1 : 0);
 
-
 	m_sh2_state->sr = m_ssr;
 	m_sh2_state->icount--;
 	sh4_exception_recompute();
-
-	//printf("exiting RTE with %08x in m_delay, %08x in m_pc, %08x in m_ssr\n", m_sh2_state->m_delay, m_sh2_state->pc, m_ssr);
-
 }
 
 /*  TRAPA   #imm */
 inline void sh34_base_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
-
-	//printf("trapa imm = %04x\n", imm);
-	//printf("m_sh2_state->sr IN = %08x\n", m_sh2_state->sr);
-	//printf("m_sh2_state->pc IN = %08x\n", m_sh2_state->pc);
-
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
@@ -552,7 +543,6 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 	{
 		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
 	}
-
 
 	m_ssr = m_sh2_state->sr;
 	m_spc = m_sh2_state->pc;
@@ -578,9 +568,6 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 	}
 
 	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
-
-	//printf("m_sh2_state->sr OUT = %08x\n", m_sh2_state->sr);
-	//printf("m_sh2_state->pc OUT = %08x\n", m_sh2_state->pc);
 
 	m_sh2_state->icount -= 7;
 }
@@ -795,8 +782,6 @@ inline void sh34_base_device::STCDBR(const uint16_t opcode)
 /*  SHAD    Rm,Rn */
 inline void sh34_base_device::SHAD(const uint16_t opcode)
 {
-	//printf("SHAD %08x\n", m_sh2_state->pc);
-
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	if ((m_sh2_state->r[m] & 0x80000000) == 0)
@@ -814,8 +799,6 @@ inline void sh34_base_device::SHAD(const uint16_t opcode)
 /*  SHLD    Rm,Rn */
 inline void sh34_base_device::SHLD(const uint16_t opcode)
 {
-	//printf("SHLD %08x\n", m_sh2_state->pc);
-
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	if ((m_sh2_state->r[m] & 0x80000000) == 0)
