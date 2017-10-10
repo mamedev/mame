@@ -1694,7 +1694,7 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
 
 static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
@@ -1754,7 +1754,7 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 
 static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
