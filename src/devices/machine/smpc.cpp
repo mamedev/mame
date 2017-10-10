@@ -315,9 +315,12 @@ void smpc_hle_device::device_start()
 	m_rtc_data[4] = DectoBCD(systime.local_time.hour);
 	m_rtc_data[5] = DectoBCD(systime.local_time.minute);
 	m_rtc_data[6] = DectoBCD(systime.local_time.second);
-	
-	m_ctrl1 = downcast<saturn_control_port_device *>(machine().device(m_ctrl1_tag));
-	m_ctrl2 = downcast<saturn_control_port_device *>(machine().device(m_ctrl2_tag));
+
+	if (m_has_ctrl_ports)
+	{
+		m_ctrl1 = downcast<saturn_control_port_device *>(machine().device(m_ctrl1_tag));
+		m_ctrl2 = downcast<saturn_control_port_device *>(machine().device(m_ctrl2_tag));
+	}
 //	m_has_ctrl_ports = (m_ctrl1 != nullptr && m_ctrl2 != nullptr);
 }
 
