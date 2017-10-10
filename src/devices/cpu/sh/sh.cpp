@@ -3038,9 +3038,15 @@ bool sh_common_execution::generate_opcode(drcuml_block *block, compiler_state *c
 			return true;
 
 		case 15:
-			return false;
+			return generate_group_15(block, compiler, desc, opcode, in_delay_slot, ovrpc);
 	}
 
+	return false;
+}
+
+bool sh_common_execution::generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	// no ops here on sh1/2
 	return false;
 }
 

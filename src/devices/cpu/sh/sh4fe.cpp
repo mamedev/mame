@@ -215,13 +215,83 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xf2:  return true; // STCMDBR(opcode); break; // sh4 only
 	case 0xf6:  return true; // LDCMDBR(opcode); break; // sh4 only
 	case 0xfa:  return true; // LDCDBR(opcode); break; // sh4 only
-
 	}
 
 	return false;
 }
 
+// SH4 only (FPU ops)
 bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	return true;
+	switch (opcode & 0x0f)
+	{
+	case 0x00:  return true; // FADD(opcode); break;
+	case 0x01:  return true; // FSUB(opcode); break;
+	case 0x02:  return true; // FMUL(opcode); break;
+	case 0x03:  return true; // FDIV(opcode); break;
+	case 0x04:  return true; // FCMP_EQ(opcode); break;
+	case 0x05:  return true; // FCMP_GT(opcode); break;
+	case 0x06:  return true; // FMOVS0FR(opcode); break;
+	case 0x07:  return true; // FMOVFRS0(opcode); break;
+	case 0x08:  return true; // FMOVMRFR(opcode); break;
+	case 0x09:  return true; // FMOVMRIFR(opcode); break;
+	case 0x0a:  return true; // FMOVFRMR(opcode); break;
+	case 0x0b:  return true; // FMOVFRMDR(opcode); break;
+	case 0x0c:  return true; // FMOVFR(opcode); break;
+	case 0x0d:  return describe_op1111_0x13(desc, prev, opcode); // break;
+	case 0x0e:  return true; // FMAC(opcode); break;
+	case 0x0f:  return false; // dbreak(opcode); break;
+	}
+	return false;
+}
+
+bool sh4_frontend::describe_op1111_0x13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+{
+	switch ((opcode >> 4) & 0x0f)
+	{
+	case 0x00:  return true; // FSTS(opcode); break;
+	case 0x01:  return true; // FLDS(opcode); break;
+	case 0x02:  return true; // FLOAT(opcode); break;
+	case 0x03:  return true; // FTRC(opcode); break;
+	case 0x04:  return true; // FNEG(opcode); break;
+	case 0x05:  return true; // FABS(opcode); break;
+	case 0x06:  return true; // FSQRT(opcode); break;
+	case 0x07:  return true; // FSRRA(opcode); break;
+	case 0x08:  return true; // FLDI0(opcode); break;
+	case 0x09:  return true; // FLDI1(opcode); break;
+	case 0x0a:  return true; // FCNVSD(opcode); break;
+	case 0x0b:  return true; // FCNVDS(opcode); break;
+	case 0x0c:  return false; // dbreak(opcode); break;
+	case 0x0d:  return false; // dbreak(opcode); break;
+	case 0x0e:  return true; // FIPR(opcode); break;
+	case 0x0f:  return describe_op1111_0xf13(desc, prev, opcode); // break;
+	}
+	return false;
+}
+
+bool sh4_frontend::describe_op1111_0xf13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+{
+	if (opcode & 0x100) {
+		if (opcode & 0x200) {
+			switch (opcode & 0xC00)
+			{
+			case 0x000:
+				return true; //FSCHG();
+				break;
+			case 0x800:
+				return true; //FRCHG();
+				break;
+			default:
+				return false; //machine().debug_break();
+				break;
+			}
+		}
+		else {
+			return true; // FTRV(opcode);
+		}
+	}
+	else {
+		return true; // FSSCA(opcode);
+	}
+	return false;
 }

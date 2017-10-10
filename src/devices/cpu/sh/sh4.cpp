@@ -2801,8 +2801,6 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 	block->end();
 }
 
-
-
 bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0xff)
@@ -2955,138 +2953,8 @@ bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_sta
 	return true;
 }
 
-
-#if 0
-/*  TRAPA   #imm */
-inline void sh34_base_device::TRAPA(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-
-	if (m_cpu_type == CPU_TYPE_SH4)
-	{
-		m_m[TRA] = imm << 2;
-	}
-	else /* SH3 */
-	{
-		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
-	}
-
-
-	m_ssr = m_sh2_state->sr;
-	m_spc = m_sh2_state->pc;
-	m_sgr = m_sh2_state->r[15];
-
-	m_sh2_state->sr |= MD;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
-	if (!(m_sh2_state->sr & sRB))
-		sh4_change_register_bank(1);
-	m_sh2_state->sr |= sRB;
-	m_sh2_state->sr |= BL;
-	sh4_exception_recompute();
-
-	if (m_cpu_type == CPU_TYPE_SH4)
-	{
-		m_m[EXPEVT] = 0x00000160;
-	}
-	else /* SH3 */
-	{
-		m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
-	}
-
-	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
-
-	m_sh2_state->icount -= 7;
-}
-
-/*  TRAPA   #imm */
-inline void sh2_device::TRAPA(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-
-	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
-
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc );
-
-	m_sh2_state->pc = RL( m_sh2_state->ea );
-
-	m_sh2_state->icount -= 7;
-}
-
-#endif
-
-#if 0
-void sh34_base_device::generate_sh4_change_register_bank(int to)
-{
-	// copy current register set from register bank 'to' (load in new registers)
-	for (regnum = 0; regnum <16; regnum++)
-	{
-		UML_MOV(block, R32(Rm), mem(m_rbnk[to][regnum]) );
-	}
-
-
-	/*
-	int s;
-
-	if (to) // 0 -> 1
-	{
-		for (s = 0;s < 8;s++)
-		{
-			m_rbnk[0][s] = m_sh2_state->r[s];
-			m_sh2_state->r[s] = m_rbnk[1][s];
-		}
-	}
-	else // 1 -> 0
-	{
-		for (s = 0;s < 8;s++)
-		{
-			m_rbnk[1][s] = m_sh2_state->r[s];
-			m_sh2_state->r[s] = m_rbnk[0][s];
-		}
-	}
-	*/
-}
-
-void sh34_base_device::generate_sh4_syncronize_register_bank(int to)
-{
-	// copy current register set to register bank 'to' (syncronize the copy of the register bank)
-	for (regnum = 0; regnum <16; regnum++)
-	{
-		UML_MOV(block, mem(m_rbnk[to][regnum]), R32(Rm) );
-	}
-
-}
-#endif
-
-
-
-
-
-
-
-
-void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
-void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
-
-void sh34_base_device::func_LDCSR() { LDCSR(m_sh2_state->arg0); }
-void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
-
-void sh34_base_device::func_LDCMSR() { LDCMSR(m_sh2_state->arg0); }
-void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
-
 void sh34_base_device::func_RTE() { RTE(); }
 void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
-
-void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
-void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
-
-void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
-void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
-
-
 
 bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3104,6 +2972,9 @@ bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state 
 	return true;
 }
 
+void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
+void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
+
 bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	//printf("generate_group_12_TRAPA\n");
@@ -3120,6 +2991,9 @@ bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_sta
 	return true;
 }
 
+void sh34_base_device::func_LDCSR() { LDCSR(m_sh2_state->arg0); }
+void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
+
 bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	//printf("generate_group_4_LDCSR\n");
@@ -3131,6 +3005,9 @@ bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_stat
 
 	return true;
 }
+
+void sh34_base_device::func_LDCMSR() { LDCMSR(m_sh2_state->arg0); }
+void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
 
 bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3144,6 +3021,8 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_sta
 	return true;
 }
 
+void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
+void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
 
 bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3156,6 +3035,9 @@ bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state
 
 	return true;
 }
+
+void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
+void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
 
 bool sh34_base_device::generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3470,6 +3352,268 @@ bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_st
 bool sh34_base_device::generate_group_4_LDCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	printf("generate_group_4_LDCDBR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch (opcode & 0x0f)
+	{
+	case 0x00:  generate_group_15_FADD(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FADD(opcode); break;
+	case 0x01:  generate_group_15_FSUB(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSUB(opcode); break;
+	case 0x02:  generate_group_15_FMUL(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMUL(opcode); break;
+	case 0x03:  generate_group_15_FDIV(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FDIV(opcode); break;
+	case 0x04:  generate_group_15_FCMP_EQ(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCMP_EQ(opcode); break;
+	case 0x05:  generate_group_15_FCMP_GT(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCMP_GT(opcode); break;
+	case 0x06:  generate_group_15_FMOVS0FR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVS0FR(opcode); break;
+	case 0x07:  generate_group_15_FMOVFRS0(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVFRS0(opcode); break;
+	case 0x08:  generate_group_15_FMOVMRFR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVMRFR(opcode); break;
+	case 0x09:  generate_group_15_FMOVMRIFR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVMRIFR(opcode); break;
+	case 0x0a:  generate_group_15_FMOVFRMR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVFRMR(opcode); break;
+	case 0x0b:  generate_group_15_FMOVFRMDR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVFRMDR(opcode); break;
+	case 0x0c:  generate_group_15_FMOVFR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMOVFR(opcode); break;
+	case 0x0d:  generate_group_15_op1111_0x13(block, compiler, desc, opcode, in_delay_slot, ovrpc); // op1111_0x13(opcode); break;
+	case 0x0e:  generate_group_15_FMAC(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FMAC(opcode); break;
+	case 0x0f:  return false; // dbreak(opcode); break;
+	}
+
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FADD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FADD\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FSUB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FSUB\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMUL\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FDIV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FDIV\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FCMP_EQ\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FCMP_GT\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVS0FR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVS0FR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVFRS0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVFRS0\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVMRFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVMRFR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVMRIFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVMRIFR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVFRMR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVFRMR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVFRMDR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMOVFR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_FMAC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_FMAC\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch ((opcode >> 4) & 0x0f)
+	{
+	case 0x00:  return generate_group_15_op1111_0x13_FSTS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSTS(opcode); break;
+	case 0x01:  return generate_group_15_op1111_0x13_FLDS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDS(opcode); break;
+	case 0x02:  return generate_group_15_op1111_0x13_FLOAT(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLOAT(opcode); break;
+	case 0x03:  return generate_group_15_op1111_0x13_FTRC(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FTRC(opcode); break;
+	case 0x04:  return generate_group_15_op1111_0x13_FNEG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FNEG(opcode); break;
+	case 0x05:  return generate_group_15_op1111_0x13_FABS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FABS(opcode); break;
+	case 0x06:  return generate_group_15_op1111_0x13_FSQRT(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSQRT(opcode); break;
+	case 0x07:  return generate_group_15_op1111_0x13_FSRRA(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSRRA(opcode); break;
+	case 0x08:  return generate_group_15_op1111_0x13_FLDI0(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDI0(opcode); break;
+	case 0x09:  return generate_group_15_op1111_0x13_FLDI1(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDI1(opcode); break;
+	case 0x0a:  return generate_group_15_op1111_0x13_FCNVSD(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCNVSD(opcode); break;
+	case 0x0b:  return generate_group_15_op1111_0x13_FCNVDS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCNVDS(opcode); break;
+	case 0x0c:  return false; // dbreak(opcode); break;
+	case 0x0d:  return false; //dbreak(opcode); break;
+	case 0x0e:  return generate_group_15_op1111_0x13_FIPR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FIPR(opcode); break;
+	case 0x0f:  return generate_group_15_op1111_0x13_op1111_0xf13(block, compiler, desc, opcode, in_delay_slot, ovrpc); // op1111_0xf13(opcode); break;
+	}
+	return false;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FSTS\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FLDS\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FLOAT\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FTRC\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FNEG\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FABS\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FSQRT\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FSRRA\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDI0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FLDI0\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FLDI1\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FCNVSD\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FCNVDS\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_FIPR\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	if (opcode & 0x100) {
+		if (opcode & 0x200) {
+			switch (opcode & 0xC00)
+			{
+			case 0x000:
+				return generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSCHG();
+				break;
+			case 0x800:
+				return generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FRCHG();
+				break;
+			default:
+				return false; //machine().debug_break();
+				break;
+			}
+		}
+		else {
+			return generate_group_15_op1111_0x13_op1111_0xf13_FTRV(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FTRV(opcode);
+		}
+	}
+	else {
+		return generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSSCA(opcode);
+	}
+	return false;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_op1111_0xf13_FSCHG\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_op1111_0xf13_FRCHG\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_op1111_0xf13_FTRV\n");
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	printf("generate_group_15_op1111_0x13_op1111_0xf13_FSSCA\n");
 	return true;
 }
 
