@@ -2629,6 +2629,7 @@ void sh3_device::init_drc_frontend()
 -------------------------------------------------*/
 void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
+	/* TODO: this likely needs adding for interrupts to work in all cases? */
 #if 0
 	/* check full interrupts if pending */
 	if (compiler->checkints)

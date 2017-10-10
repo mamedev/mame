@@ -516,7 +516,6 @@ void sh2_device::device_start()
 	m_wtcsr = 0;
 
 	drc_start();
-	m_drcfe->set_xor(0);
 }
 
 
