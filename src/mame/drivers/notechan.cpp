@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-/***************************************************************************
+/***************************************************************************************
 
   NOTE CHANCE
   Banpresto, 1995
@@ -14,7 +14,7 @@
 
   Reference video: https://www.youtube.com/watch?v=TSIWO75udL8
 
-****************************************************************************
+****************************************************************************************
 
   Hardware Notes...
 
@@ -60,8 +60,8 @@
   09- DC 12V
   10- GND
 
-  
-****************************************************************************
+
+****************************************************************************************
 
   Specs...
 
@@ -71,7 +71,7 @@
   Power:    30 W.
 
   
-****************************************************************************
+****************************************************************************************
 
   Samples:
 
@@ -149,13 +149,66 @@
   $030EDF-$0333F8:    Sample #2-32    voice: unknown.
 
  
-****************************************************************************
+****************************************************************************************
 
-  About lamps...
+  Technical info:
 
-  (nothing yet)
 
-***************************************************************************/
+  Error codes:
+
+  E0 - PCB error, check ROM/RAM.
+  E1 - Home position sensor error.
+  E2 - Output sensor error.
+  C0 - Freebie / Giveaway (??). 
+
+
+  DIP Switches:
+
+  +-----------------------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | DIP SWITCHES BANK                 |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | COINAGE      | 1 CREDIT / 1 COIN  | OFF | OFF |     |     |     |     |     |     |
+  |              | 1 CREDIT / 2 COINS | ON  | OFF |     |     |     |     |     |     |
+  |              | 1 CREDIT / 3 COINS | OFF | ON  |     |     |     |     |     |     |
+  |              | 1 CREDIT / 4 COINS | ON  | ON  |     |     |     |     |     |     |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | PAYOUT RATE  | 40%                |     |     | OFF | OFF |     |     |     |     |
+  |              | 50%                |     |     | ON  | OFF |     |     |     |     |
+  |              | 60%                |     |     | OFF | ON  |     |     |     |     |
+  |              | 70%                |     |     | ON  | ON  |     |     |     |     |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | PLAYS PER    | 1 CREDIT / 3 PLAYS |     |     |     |     | OFF |     |     |     |
+  | CREDIT       | 1 CREDIT / 2 PLAYS |     |     |     |     | ON  |     |     |     |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | ????         | ???                |     |     |     |     |     | OFF |     |     |
+  |              | ???                |     |     |     |     |     | ON  |     |     |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | ATTRACT      | ???                |     |     |     |     |     |     | OFF |     |
+  | SOUND        | ???                |     |     |     |     |     |     | ON  |     |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | UNUSED       | LEAVE IT OFF       |     |     |     |     |     |     |     | OFF |
+  +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+  Known Inputs:
+
+  1x Coin-In (100Y)
+  1x Start/Stop button.
+  1x (comm with prize dispenser)
+
+
+  Known Outputs:
+
+  2x 7-seg LEDs for credits counter and error codes.
+  2x Red panels (2 lamps each).
+  2x Blue panels (2 lamps each).
+  2x Yellow panels (2 lamps each).
+  1x Empty prize stock LED.
+  1x Arrow lamp pointing to the prize (blinks when wins).
+  1x Prize dispenser.
+
+
+***************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -320,10 +373,10 @@ static INPUT_PORTS_START( notechan )
 
   (2) Pulsing and keep pressed under reset, triggers the sample #01 (cling) and starts
       a sequence of 4-lines output through port FFh D3-D2-D1-D0 (lamps 27-26-25-24)
-	  that seems a 4-bits countdown (maybe related to the 7segment LED that counts the
-	  credits). Then triggers sample #04 (voice or effect depending of the OKI bank).
-	  After a little while also triggers sample #05 (voice).
-	  Maybe it's some kind of hardware testing mode...
+	  that seems a 4-bits countdown (from 8 to 0) maybe related to the 7segment LEDs
+	  credits counter). Then triggers sample #04 (voice or effect depending of the OKI
+	  bank). After a little while also triggers sample #05 (voice).
+	  Maybe it's some kind of hardware testing mode or boot sequence...
 
   (3) Pulsing this input activates port FAh-D1 (lamp 17) and triggers sample #01 (cling).
       Maybe it's the 'coin-in' button. 
