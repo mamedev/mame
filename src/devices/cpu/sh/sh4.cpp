@@ -114,7 +114,7 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 {
 	m_cpu_type = CPU_TYPE_SH4;
 	m_am = SH34_AM;
-	m_isdrc = allow_drc();
+	m_isdrc = 0;//allow_drc();
 }
 
 
@@ -465,23 +465,22 @@ inline void sh34_base_device::SETS(const uint16_t opcode)
 /*  LDC     Rm,SR */
 inline void sh34_base_device::LDCSR(const uint16_t opcode)
 {
-	uint32_t reg;
-
-	reg = m_sh2_state->r[Rn];
+	// copy current registers to banked version of current register set
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+
+	// if the register bank in the new differs from the one already in SR
 	if ((m_sh2_state->r[Rn] & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->r[Rn] & sRB ? 1 : 0);
-	m_sh2_state->sr = reg & FLAGS;
+	
+	m_sh2_state->sr = m_sh2_state->r[Rn] & FLAGS;
 	sh4_exception_recompute();
 }
 
 /* for reference
 inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
-	uint32_t x = Rn;
-
-	m_sh2_state->sr = m_sh2_state->r[x] & FLAGS;
+	m_sh2_state->sr = m_sh2_state->r[Rn] & FLAGS;
 	m_test_irq = 1;
 }
 */
@@ -520,13 +519,19 @@ inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 inline void sh34_base_device::RTE()
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_spc;
+
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if ((m_ssr & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_ssr & sRB ? 1 : 0);
+
+
 	m_sh2_state->sr = m_ssr;
 	m_sh2_state->icount--;
 	sh4_exception_recompute();
+
+	//printf("exiting RTE with %08x in m_delay, %08x in m_pc, %08x in m_ssr\n", m_sh2_state->m_delay, m_sh2_state->pc, m_ssr);
+
 }
 
 /*  TRAPA   #imm */
@@ -534,10 +539,9 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
 
-	printf("trapa imm = %04x\n", imm);
-
-	printf("m_sh2_state->sr IN = %08x\n", m_sh2_state->sr);
-	printf("m_sh2_state->pc IN = %08x\n", m_sh2_state->pc);
+	//printf("trapa imm = %04x\n", imm);
+	//printf("m_sh2_state->sr IN = %08x\n", m_sh2_state->sr);
+	//printf("m_sh2_state->pc IN = %08x\n", m_sh2_state->pc);
 
 
 	if (m_cpu_type == CPU_TYPE_SH4)
@@ -552,6 +556,7 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 
 	m_ssr = m_sh2_state->sr;
 	m_spc = m_sh2_state->pc;
+
 	m_sgr = m_sh2_state->r[15];
 
 	m_sh2_state->sr |= MD;
@@ -574,9 +579,8 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 
 	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
 
-	printf("m_sh2_state->sr OUT = %08x\n", m_sh2_state->sr);
-	printf("m_sh2_state->pc OUT = %08x\n", m_sh2_state->pc);
-
+	//printf("m_sh2_state->sr OUT = %08x\n", m_sh2_state->sr);
+	//printf("m_sh2_state->pc OUT = %08x\n", m_sh2_state->pc);
 
 	m_sh2_state->icount -= 7;
 }
@@ -2677,11 +2681,15 @@ void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_stat
     static entry point
 -------------------------------------------------*/
 
+void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
+void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
+
+
 void sh34_base_device::static_generate_entry_point()
 {
 
 	drcuml_state *drcuml = m_drcuml.get();
-	code_label skip = 1;
+	//code_label skip = 1;
 	drcuml_block *block;
 
 	/* begin generating */
@@ -2695,59 +2703,11 @@ void sh34_base_device::static_generate_entry_point()
 
 	/* load fast integer registers */
 	load_fast_iregs(block);
-#if 0
-	/* check for interrupts */
-	UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
-	UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
-	UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
 
-	UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
-	UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
-
-	UML_LABEL(block, skip+2);                   // skip+2:
-	UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
-	UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
-	UML_AND(block, I1,  I0, 0xffff);                // and r1, 0xffff
-
-	UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, r1
-	UML_CMP(block, I1, 32);             // cmp r1, #32
-	UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
-
-	UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
-
-	UML_LABEL(block, skip+4);                   // skip+4:
-	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
-	UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
-	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
-	UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
-
-	UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
-
-	UML_LABEL(block, skip+3);                   // skip+3:
-	UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
-	UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
-	UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq (calls sh2_exception)
-
-	UML_LABEL(block, skip+1);                   // skip+1:
-
-	UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
-	UML_JMPc(block, COND_Z, skip);                  // jz skip
-
-	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-	UML_MOV(block, I0, R32(15));                // mov r0, R15
-	UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
-	UML_CALLH(block, *m_write32);                    // call write32
-
-	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-	UML_MOV(block, I0, R32(15));                // mov r0, R15
-	UML_MOV(block, I1, mem(&m_sh2_state->pc));              // mov r1, pc
-	UML_CALLH(block, *m_write32);                    // call write32
-
-	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->evec));             // mov pc, evec
-#endif
-
-	UML_LABEL(block, skip);                         // skip:
-
+	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	UML_CALLC(block, cfunc_CHECKIRQ, this);
+	load_fast_iregs(block);
+	
 	/* generate a hash jump via the current mode and PC */
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
@@ -2794,16 +2754,8 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 	}
 #endif
 
-//	UML_TEST(block, I0, 0x80000000);        // test r0, #0x80000000
-//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
-//	UML_TEST(block, I0, 0x40000000);        // test r0, #0x80000000
-//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
-//	UML_TEST(block, I0, 0x20000000);        // test r0, #0x80000000
-//	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
-
 	UML_CMP(block, I0, 0xe0000000);
 	UML_JMPc(block, COND_AE, label); 
-
 
 	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0x1fffffff)
 
@@ -2920,6 +2872,21 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 	}
 
 	return false;
+}
+
+void sh34_base_device::func_STCRBANK() { STCRBANK(m_sh2_state->arg0); }
+void cfunc_STCRBANK(void *param) { ((sh34_base_device *)param)->func_STCRBANK(); };
+
+bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+//	printf("generate_group_0_STCRBANK\n");
+
+	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCRBANK, this);
+	load_fast_iregs(block);
+
+	return true;
 }
 
 bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
@@ -3051,6 +3018,55 @@ inline void sh2_device::TRAPA(uint32_t i)
 
 #endif
 
+#if 0
+void sh34_base_device::generate_sh4_change_register_bank(int to)
+{
+	// copy current register set from register bank 'to' (load in new registers)
+	for (regnum = 0; regnum <16; regnum++)
+	{
+		UML_MOV(block, R32(Rm), mem(m_rbnk[to][regnum]) );
+	}
+
+
+	/*
+	int s;
+
+	if (to) // 0 -> 1
+	{
+		for (s = 0;s < 8;s++)
+		{
+			m_rbnk[0][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_rbnk[1][s];
+		}
+	}
+	else // 1 -> 0
+	{
+		for (s = 0;s < 8;s++)
+		{
+			m_rbnk[1][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_rbnk[0][s];
+		}
+	}
+	*/
+}
+
+void sh34_base_device::generate_sh4_syncronize_register_bank(int to)
+{
+	// copy current register set to register bank 'to' (syncronize the copy of the register bank)
+	for (regnum = 0; regnum <16; regnum++)
+	{
+		UML_MOV(block, mem(m_rbnk[to][regnum]), R32(Rm) );
+	}
+
+}
+#endif
+
+
+
+
+
+
+
 
 void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
 void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
@@ -3064,45 +3080,39 @@ void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
 void sh34_base_device::func_RTE() { RTE(); }
 void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
 
+void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
+void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
 
-bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
-{
-	printf("generate_group_0_STCRBANK\n");
-	return true;
-}
+void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
+void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
+
 
 
 bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_RTE\n");
-	
 	generate_delay_slot(block, compiler, desc, 0xffffffff);
 
-	UML_MOV(block, I0, R32(15));            // mov r0, R15
-	UML_CALLH(block, *m_read32);             // call read32
-	UML_MOV(block, mem(&m_sh2_state->pc), I0);          // mov pc, r0
-	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
+	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	UML_CALLC(block, cfunc_RTE, this);
+	load_fast_iregs(block);
 
-	UML_MOV(block, I0, R32(15));            // mov r0, R15
-	UML_CALLH(block, *m_read32);             // call read32
-	UML_MOV(block, mem(&m_sh2_state->sr), I0);          // mov sr, r0
-	UML_ADD(block, R32(15), R32(15), 4);        // add R15, R15, #4
-
-	compiler->checkints = true;
-	UML_MOV(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->pc));       // mov ea, pc
+	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->m_delay));       // mov ea, pc
 	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
+
 	
 	return true;
 }
 
 bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_12_TRAPA\n");
+	//printf("generate_group_12_TRAPA\n");
 
-	save_fast_iregs(block);
+	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_MOV(block, mem(&m_sh2_state->pc), desc->pc + 2); // copy the PC because we need to use it
 	UML_CALLC(block, cfunc_TRAPA, this);
+		
 	load_fast_iregs(block);
 	
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); 
@@ -3130,35 +3140,24 @@ bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_sta
 
 bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCSR\n");
+	//printf("generate_group_4_LDCSR\n");
 
-	/*
-	// needs to be different on SH2 / 4
-	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
-	UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
-	UML_MOV(block, mem(&m_sh2_state->sr), I0);
-
-	compiler->checkints = true;
-	*/
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCSR, this);
+	load_fast_iregs(block);
 
 	return true;
 }
 
 bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCMSR\n");
+//	printf("generate_group_4_LDCMSR\n");
 
-	/*
-	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
-	SETEA(0);
-	UML_CALLH(block, *m_read32);         // call read32
-	UML_ADD(block, R32(Rn), R32(Rn), 4);    // add Rn, #4
-	UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov sr, r0
-
-	compiler->checkints = true;
-	if (!in_delay_slot)
-		generate_update_cycles(block, compiler, desc->pc + 2, true);
-	*/
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSR, this);
+	load_fast_iregs(block);
 
 	return true;
 }
@@ -3166,13 +3165,25 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_sta
 
 bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_SHAD\n");
+//	printf("generate_group_4_SHAD\n");
+
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SHAD, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
 bool sh34_base_device::generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_SHLD\n");
+//	printf("generate_group_4_SHLD\n");
+
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SHLD, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
@@ -3302,9 +3313,20 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	return false;
 }
 
+
+void sh34_base_device::func_LDCRBANK() { LDCRBANK(m_sh2_state->arg0); }
+void cfunc_LDCRBANK(void *param) { ((sh34_base_device *)param)->func_LDCRBANK(); };
+
 bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCRBANK\n");
+	//printf("generate_group_4_LDCRBANK\n");
+
+	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCRBANK, this);
+	load_fast_iregs(block);
+
+
 	return true;
 }
 

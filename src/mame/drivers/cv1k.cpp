@@ -835,7 +835,10 @@ ROM_END
 
 READ64_MEMBER( cv1k_state::speedup_r )
 {
-	if (m_maincpu->pc()== m_idlepc ) m_maincpu->spin_until_time( attotime::from_usec(10));
+	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+
+	if (pc== m_idlepc || pc == m_idlepc+2 ) m_maincpu->spin_until_time( attotime::from_usec(10));
+	
 	return m_ram[m_idleramoffs/8];
 }
 
@@ -843,6 +846,12 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 {
 	m_idleramoffs = idleramoff;
 	m_idlepc = idlepc;
+
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	
+	//m_maincpu->sh2drc_add_pcflush(idlepc);
+	m_maincpu->sh2drc_add_pcflush(idlepc+2);
+	//m_maincpu->sh2drc_add_pcflush(idlepc-2);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
 

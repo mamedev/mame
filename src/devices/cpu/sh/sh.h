@@ -152,6 +152,7 @@ public:
 		int     icount;
 		uint8_t   sleep_mode;
 		uint32_t  arg0;              /* print_debug argument 1 */
+		uint32_t  arg1;
 		uint32_t  gbr;
 		uint32_t  vbr;
 

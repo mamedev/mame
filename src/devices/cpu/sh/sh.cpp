@@ -105,7 +105,6 @@ void sh_common_execution::drc_start()
 	memset(m_pcflushes, 0, sizeof(m_pcflushes));
 
 	//m_numcycles = 0;
-	//m_arg1 = 0;
 	//m_irq = 0;
 	m_fastram_select = 0;
 	memset(m_fastram, 0, sizeof(m_fastram));
@@ -4417,16 +4416,3 @@ void sh_common_execution::sh2drc_add_pcflush(offs_t address)
 	if (m_pcfsel < ARRAY_LENGTH(m_pcflushes))
 		m_pcflushes[m_pcfsel++] = address;
 }
-
-
-
-
-#undef Rn
-#undef Rm
-
-#undef T
-#undef S
-#undef I
-#undef Q
-#undef M
-

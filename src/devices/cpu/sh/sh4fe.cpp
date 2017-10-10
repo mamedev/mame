@@ -177,7 +177,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xde:
 	case 0xee:
 	case 0xfe:
-		return false; // LDCRBANK(opcode); break; // sh3/4 only
+		return true; // LDCRBANK(opcode); break; // sh3/4 only
 
 	case 0x83:
 	case 0x93:

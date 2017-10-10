@@ -410,6 +410,7 @@ protected:
 	void sh4_exception_request(int exception);
 	void sh4_exception_unrequest(int exception);
 	void sh4_exception_checkunrequest(int exception);
+	void sh4_exception_process(int exception, uint32_t vector);
 	void sh4_exception(const char *message, int exception);
 	uint32_t compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor);
 	void sh4_refresh_timer_recompute();
@@ -642,6 +643,17 @@ public:
 	void func_LDCSR();
 	void func_LDCMSR();
 	void func_RTE();
+
+	void func_SHAD();
+	void func_SHLD();
+
+	void func_CHECKIRQ();
+	
+	void func_STCRBANK();
+	void func_LDCRBANK();
+	
+	
+
 
 };
 
