@@ -624,7 +624,7 @@ protected:
 	bool generate_group_15_FMOVFRS0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_15_FMOVMRFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_15_FMOVMRIFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_15_FMOVFRMR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
+	bool generate_group_15_FMOVFRMR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_s_0xf13_FTRVlot, uint32_t ovrpc);
 	bool generate_group_15_FMOVFRMDR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_15_FMOVFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_15_op1111_0x13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
@@ -708,7 +708,24 @@ public:
 	void func_LDCSSR();
 	void func_STSFPSCR();
 	void func_FLDI0();
+	void func_FLDI1();
 	void func_FMOVFR();
+	void func_FMOVFRS0();
+	void func_FTRC();
+	void func_FMOVMRFR();
+	void func_FMOVS0FR();
+	void func_STSFPUL();
+	void func_FMOVFRMR();
+	void func_LDSFPUL();
+	void func_FLOAT();
+	void func_STSMFPSCR();
+	void func_STSMFPUL();
+	void func_FNEG();
+	void func_FMAC();
+	void func_FABS();
+	void func_FLDS();
+	void func_FTRV();
+	void func_FSTS();
 };
 
 

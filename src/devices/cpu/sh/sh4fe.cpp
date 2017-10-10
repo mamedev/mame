@@ -40,12 +40,12 @@ bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xe8:
 	case 0x4a:
 	case 0xca:
-		return false; // ILLEGAL(); break; // illegal on sh4
+		return true; // ILLEGAL(); break; // illegal on sh4
 
 	case 0x93:
 	case 0xa3:
 	case 0xb3:
-		return false; // TODO(opcode); break;
+		return true; // TODO(opcode); break;
 
 	case 0x82:
 	case 0x92:
@@ -131,7 +131,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	case 0xe2:
 	case 0xe6:
 	case 0xea:
-		return false; // ILLEGAL(); break; // defined as illegal on SH4
+		return true; // ILLEGAL(); break; // defined as illegal on SH4
 
 	case 0x0c:
 	case 0x1c:
