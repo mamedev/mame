@@ -833,13 +833,13 @@ ROM_START( dfkbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
 ROM_END
 
-READ64_MEMBER( cv1k_state::speedup_r )
+READ64_MEMBER(cv1k_state::speedup_r)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 
-	if (pc== m_idlepc || pc == m_idlepc+2 ) m_maincpu->spin_until_time( attotime::from_usec(10));
-	
-	return m_ram[m_idleramoffs/8];
+	if (pc == m_idlepc || pc == m_idlepc + 2) m_maincpu->spin_until_time(attotime::from_usec(10));
+
+	return m_ram[m_idleramoffs / 8];
 }
 
 void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed)
@@ -849,16 +849,14 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	
-	//m_maincpu->sh2drc_add_pcflush(idlepc);
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
-	//m_maincpu->sh2drc_add_pcflush(idlepc-2);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
 
-//	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 
-//	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
-//	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
+	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
 }
 
 

@@ -740,6 +740,9 @@ public:
 	void func_MOVCAL();
 	void func_STCSSR();
 	void func_STCSPC();
+
+private:
+	bool            m_bigendian;
 };
 
 
