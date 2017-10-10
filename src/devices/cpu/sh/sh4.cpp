@@ -472,14 +472,14 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	if ((m_sh2_state->r[Rn] & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->r[Rn] & sRB ? 1 : 0);
 	
-	m_sh2_state->sr = m_sh2_state->r[Rn] & FLAGS;
+	m_sh2_state->sr = m_sh2_state->r[Rn] & SH34_FLAGS;
 	sh4_exception_recompute();
 }
 
 /* for reference
 inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
-	m_sh2_state->sr = m_sh2_state->r[Rn] & FLAGS;
+	m_sh2_state->sr = m_sh2_state->r[Rn] & SH34_FLAGS;
 	m_test_irq = 1;
 }
 */
@@ -491,7 +491,7 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 
 	old = m_sh2_state->sr;
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_sh2_state->sr = RL(m_sh2_state->ea) & FLAGS;
+	m_sh2_state->sr = RL(m_sh2_state->ea) & SH34_FLAGS;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((old & sRB) >> 29);
 	if ((old & sRB) != (m_sh2_state->sr & sRB))
@@ -507,7 +507,7 @@ inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 	uint32_t x = Rn;
 
 	m_sh2_state->ea = m_sh2_state->r[x];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH34_FLAGS;
 	m_sh2_state->r[x] += 4;
 	m_sh2_state->icount -= 2;
 	m_test_irq = 1;

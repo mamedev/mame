@@ -36,7 +36,6 @@
 #define FP_XFS2(r) *( (float  *)(m_xf+((r) ^ m_fpu_pr)) )
 #endif
 
-
 enum
 {
 	ICF  = 0x00800000,
@@ -44,8 +43,6 @@ enum
 	OCFB = 0x00040000,
 	OVF  = 0x00020000
 };
-
-
 
 #define FD  0x00008000
 #define BL  0x10000000
@@ -55,7 +52,7 @@ enum
 /* 29 bits */
 #define SH34_AM  0x1fffffff
 
-#define FLAGS   (MD|sRB|BL|FD|SH_M|SH_Q|SH_I|SH_S|SH_T)
+#define SH34_FLAGS   (MD|sRB|BL|FD|SH_M|SH_Q|SH_I|SH_S|SH_T)
 
 /* Bits in FPSCR */
 #define RM  0x00000003
@@ -64,26 +61,14 @@ enum
 #define SZ  0x00100000
 #define FR  0x00200000
 
-#define Rn  ((opcode>>8)&15)
-#define Rm  ((opcode>>4)&15)
-
 #define REGFLAG_R(n)                    (1 << (n))
-#define REGFLAG_FR(n)                   (1 << (n))
-#define REGFLAG_XR(n)                   (1 << (n))
 
-/* register flags 1 */
-#define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                    (1 << 1)
-#define REGFLAG_MACH                    (1 << 2)
-#define REGFLAG_GBR                     (1 << 3)
-#define REGFLAG_VBR                     (1 << 4)
-#define REGFLAG_SR                      (1 << 5)
+/* additional register flags 1 */
 #define REGFLAG_SGR                     (1 << 6)
 #define REGFLAG_FPUL                    (1 << 7)
 #define REGFLAG_FPSCR                   (1 << 8)
 #define REGFLAG_DBR                     (1 << 9)
 #define REGFLAG_SSR                     (1 << 10)
 #define REGFLAG_SPC                     (1 << 11)
-
 
 #endif /* __SH4COMN_H__ */

@@ -21,14 +21,7 @@ enum
 	OVF  = 0x00020000
 };
 
-
 #define SH12_AM  0xc7ffffff
-
-#define FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
-
-#define Rn  ((opcode>>8)&15)
-#define Rm  ((opcode>>4)&15)
-
 
 #define CHECK_PENDING_IRQ(message)              \
 do {                                            \

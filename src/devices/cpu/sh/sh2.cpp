@@ -274,7 +274,7 @@ inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 	uint32_t x = Rn;
 
 	m_sh2_state->ea = m_sh2_state->r[x];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
 	m_sh2_state->r[x] += 4;
 	m_sh2_state->icount -= 2;
 	m_test_irq = 1;
@@ -285,7 +285,7 @@ inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
 	uint32_t x = Rn;
 
-	m_sh2_state->sr = m_sh2_state->r[x] & FLAGS;
+	m_sh2_state->sr = m_sh2_state->r[x] & SH_FLAGS;
 	m_test_irq = 1;
 }
 
@@ -296,7 +296,7 @@ inline void sh2_device::RTE()
 	m_sh2_state->m_delay = RL( m_sh2_state->ea );
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->icount -= 3;
 	m_test_irq = 1;
