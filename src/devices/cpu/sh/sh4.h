@@ -695,8 +695,20 @@ public:
 	void func_FCMP_EQ();
 	void func_FCMP_GT();
 
+	void func_LDSFPSCR();
+	void func_LDCDBR();
 	
+	void func_FMOVMRIFR();
+	void func_FRCHG();
+	void func_FSCHG();
 
+	void func_LDSMFPUL();
+	void func_LDSMFPSCR();
+	void func_FMOVFRMDR();
+	void func_LDCSSR();
+	void func_STSFPSCR();
+	void func_FLDI0();
+	void func_FMOVFR();
 };
 
 
