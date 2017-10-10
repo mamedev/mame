@@ -652,6 +652,8 @@ public:
 	void func_LDCMSPC();
 	void func_STCMSSR();
 	void func_LDCMSSR();
+	void func_STCMRBANK();
+	void func_LDCMRBANK();
 };
 
 

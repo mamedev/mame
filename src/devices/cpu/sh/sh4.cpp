@@ -1826,7 +1826,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0xdc:
 	case 0xec:
 	case 0xfc:
-		SHAD(opcode); break; // sh4 only
+		SHAD(opcode); break; // sh3/4 only
 
 	case 0x0d:
 	case 0x1d:
@@ -1844,7 +1844,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0xdd:
 	case 0xed:
 	case 0xfd:
-		SHLD(opcode); break; // sh4 only
+		SHLD(opcode); break; // sh3/4 only
 
 	case 0x8e:
 	case 0x9e:
@@ -1854,7 +1854,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0xde:
 	case 0xee:
 	case 0xfe:
-		LDCRBANK(opcode); break; // sh4 only
+		LDCRBANK(opcode); break; // sh3/4 only
 
 	case 0x83:
 	case 0x93:
@@ -1864,7 +1864,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0xd3:
 	case 0xe3:
 	case 0xf3:
-		STCMRBANK(opcode); break; // sh4 only
+		STCMRBANK(opcode); break; // sh3/4 only
 
 	case 0x87:
 	case 0x97:
@@ -1874,7 +1874,7 @@ inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 	case 0xd7:
 	case 0xe7:
 	case 0xf7:
-		LDCMRBANK(opcode); break; // sh4 only
+		LDCMRBANK(opcode); break; // sh3/4 only
 
 	case 0x32:  STCMSGR(opcode); break; // sh4 only
 	case 0x33:  STCMSSR(opcode); break; // sh4 only
@@ -3251,7 +3251,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xde:
 	case 0xee:
 	case 0xfe:
-		return generate_group_4_LDCRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+		return generate_group_4_LDCRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh3/4 only
 
 	case 0x83:
 	case 0x93:
@@ -3261,7 +3261,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 	case 0xd3:
 	case 0xe3:
 	case 0xf3:
-		return generate_group_4_STCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+		return generate_group_4_STCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh3/4 only
 
 	case 0x87:
 	case 0x97:
@@ -3308,19 +3308,36 @@ bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_s
 	UML_CALLC(block, cfunc_LDCRBANK, this);
 	load_fast_iregs(block);
 
-
 	return true;
 }
+
+void sh34_base_device::func_STCMRBANK() { STCMRBANK(m_sh2_state->arg0); }
+void cfunc_STCMRBANK(void *param) { ((sh34_base_device *)param)->func_STCMRBANK(); };
 
 bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_STCMRBANK\n");
+//	printf("generate_group_4_STCMRBANK\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMRBANK, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
+void sh34_base_device::func_LDCMRBANK() { LDCMRBANK(m_sh2_state->arg0); }
+void cfunc_LDCMRBANK(void *param) { ((sh34_base_device *)param)->func_LDCMRBANK(); };
+
 bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCMRBANK\n");
+//	printf("generate_group_4_LDCMRBANK\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMRBANK, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
