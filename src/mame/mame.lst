@@ -13782,6 +13782,9 @@ goindolk                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
+@source:gokidetor.cpp
+gokidetor                       // (c) 1992 Taito
+
 @source:goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
