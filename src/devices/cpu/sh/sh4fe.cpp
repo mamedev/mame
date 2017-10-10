@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, David Haywood
 /***************************************************************************
 
     sh4fe.c
 
-    Front end for SH-2 recompiler
+    Front end for SH-4 recompiler
 
 ***************************************************************************/
 

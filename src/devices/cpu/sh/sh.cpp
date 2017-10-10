@@ -1,22 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "sh.h"
-
-#define Rn  ((opcode>>8)&15)
-#define Rm  ((opcode>>4)&15)
-
-/* Bits in SR */
-#define T   0x00000001
-#define S   0x00000002
-#define I   0x000000f0
-#define Q   0x00000100
-#define M   0x00000200
-
-#define FLAGS   (M|Q|I|S|T)
-
-
-#define BUSY_LOOP_HACKS 0 
-
-
 
 void sh_common_execution::device_start()
 {
@@ -100,12 +85,9 @@ void sh_common_execution::device_start()
 
 void sh_common_execution::drc_start()
 {
-	//memset(m_irq_queue, 0, sizeof(m_irq_queue));
-	//m_maxpcfsel = 0;
+	/* DRC helpers */
 	memset(m_pcflushes, 0, sizeof(m_pcflushes));
 
-	//m_numcycles = 0;
-	//m_irq = 0;
 	m_fastram_select = 0;
 	memset(m_fastram, 0, sizeof(m_fastram));
 
@@ -164,7 +146,6 @@ void sh_common_execution::drc_start()
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = true;
 
-
 	save_item(NAME(m_pcfsel));
 	//save_item(NAME(m_maxpcfsel));
 	save_item(NAME(m_pcflushes));
@@ -198,13 +179,13 @@ void sh_common_execution::ADDC(uint32_t m, uint32_t n)
 
 	tmp1 = m_sh2_state->r[n] + m_sh2_state->r[m];
 	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 + (m_sh2_state->sr & T);
+	m_sh2_state->r[n] = tmp1 + (m_sh2_state->sr & SH_T);
 	if (tmp0 > tmp1)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	if (tmp1 > m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -233,12 +214,12 @@ void sh_common_execution::ADDV(uint32_t m, uint32_t n)
 	if (src == 0 || src == 2)
 	{
 		if (ans == 1)
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -279,7 +260,7 @@ void sh_common_execution::ANDM(uint32_t i)
  */
 void sh_common_execution::BF(uint32_t d)
 {
-	if ((m_sh2_state->sr & T) == 0)
+	if ((m_sh2_state->sr & SH_T) == 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
 		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -293,7 +274,7 @@ void sh_common_execution::BF(uint32_t d)
  */
 void sh_common_execution::BFS(uint32_t d)
 {
-	if ((m_sh2_state->sr & T) == 0)
+	if ((m_sh2_state->sr & SH_T) == 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
 		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -364,7 +345,7 @@ void sh_common_execution::BSRF(uint32_t m)
  */
 void sh_common_execution::BT(uint32_t d)
 {
-	if ((m_sh2_state->sr & T) != 0)
+	if ((m_sh2_state->sr & SH_T) != 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
 		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -378,7 +359,7 @@ void sh_common_execution::BT(uint32_t d)
  */
 void sh_common_execution::BTS(uint32_t d)
 {
-	if ((m_sh2_state->sr & T) != 0)
+	if ((m_sh2_state->sr & SH_T) != 0)
 	{
 		int32_t disp = ((int32_t)d << 24) >> 24;
 		m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
@@ -402,7 +383,7 @@ void sh_common_execution::CLRMAC()
  */
 void sh_common_execution::CLRT()
 {
-	m_sh2_state->sr &= ~T;
+	m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -412,9 +393,9 @@ void sh_common_execution::CLRT()
 void sh_common_execution::CMPEQ(uint32_t m, uint32_t n)
 {
 	if (m_sh2_state->r[n] == m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -424,9 +405,9 @@ void sh_common_execution::CMPEQ(uint32_t m, uint32_t n)
 void sh_common_execution::CMPGE(uint32_t m, uint32_t n)
 {
 	if ((int32_t) m_sh2_state->r[n] >= (int32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -436,9 +417,9 @@ void sh_common_execution::CMPGE(uint32_t m, uint32_t n)
 void sh_common_execution::CMPGT(uint32_t m, uint32_t n)
 {
 	if ((int32_t) m_sh2_state->r[n] > (int32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -448,9 +429,9 @@ void sh_common_execution::CMPGT(uint32_t m, uint32_t n)
 void sh_common_execution::CMPHI(uint32_t m, uint32_t n)
 {
 	if ((uint32_t) m_sh2_state->r[n] > (uint32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -460,9 +441,9 @@ void sh_common_execution::CMPHI(uint32_t m, uint32_t n)
 void sh_common_execution::CMPHS(uint32_t m, uint32_t n)
 {
 	if ((uint32_t) m_sh2_state->r[n] >= (uint32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -472,9 +453,9 @@ void sh_common_execution::CMPHS(uint32_t m, uint32_t n)
 void sh_common_execution::CMPPL(uint32_t n)
 {
 	if ((int32_t) m_sh2_state->r[n] > 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -484,9 +465,9 @@ void sh_common_execution::CMPPL(uint32_t n)
 void sh_common_execution::CMPPZ(uint32_t n)
 {
 	if ((int32_t) m_sh2_state->r[n] >= 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -503,9 +484,9 @@ void sh_common_execution::CMPSTR(uint32_t m, uint32_t n)
 	LH = (temp >> 8) & 0xff;
 	LL = temp & 0xff;
 	if (HH && HL && LH && LL)
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	else
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -517,9 +498,9 @@ void sh_common_execution::CMPIM(uint32_t i)
 	uint32_t imm = (uint32_t)(int32_t)(int16_t)(int8_t)i;
 
 	if (m_sh2_state->r[0] == imm)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -529,17 +510,17 @@ void sh_common_execution::CMPIM(uint32_t i)
 void sh_common_execution::DIV0S(uint32_t m, uint32_t n)
 {
 	if ((m_sh2_state->r[n] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~Q;
+		m_sh2_state->sr &= ~SH_Q;
 	else
-		m_sh2_state->sr |= Q;
+		m_sh2_state->sr |= SH_Q;
 	if ((m_sh2_state->r[m] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~M;
+		m_sh2_state->sr &= ~SH_M;
 	else
-		m_sh2_state->sr |= M;
+		m_sh2_state->sr |= SH_M;
 	if ((m_sh2_state->r[m] ^ m_sh2_state->r[n]) & 0x80000000)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  code                 cycles  t-bit
@@ -548,7 +529,7 @@ void sh_common_execution::DIV0S(uint32_t m, uint32_t n)
  */
 void sh_common_execution::DIV0U()
 {
-	m_sh2_state->sr &= ~(M | Q | T);
+	m_sh2_state->sr &= ~(SH_M | SH_Q | SH_T);
 }
 
 /*  code                 cycles  t-bit
@@ -560,90 +541,90 @@ void sh_common_execution::DIV1(uint32_t m, uint32_t n)
 	uint32_t tmp0;
 	uint32_t old_q;
 
-	old_q = m_sh2_state->sr & Q;
+	old_q = m_sh2_state->sr & SH_Q;
 	if (0x80000000 & m_sh2_state->r[n])
-		m_sh2_state->sr |= Q;
+		m_sh2_state->sr |= SH_Q;
 	else
-		m_sh2_state->sr &= ~Q;
+		m_sh2_state->sr &= ~SH_Q;
 
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
+	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & SH_T);
 
 	if (!old_q)
 	{
-		if (!(m_sh2_state->sr & M))
+		if (!(m_sh2_state->sr & SH_M))
 		{
 			tmp0 = m_sh2_state->r[n];
 			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
+			if(!(m_sh2_state->sr & SH_Q))
 				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 				else
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 			else
 				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 				else
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 		}
 		else
 		{
 			tmp0 = m_sh2_state->r[n];
 			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
+			if(!(m_sh2_state->sr & SH_Q))
 			{
 				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 				else
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 			}
 			else
 			{
 				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 				else
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 			}
 		}
 	}
 	else
 	{
-		if (!(m_sh2_state->sr & M))
+		if (!(m_sh2_state->sr & SH_M))
 		{
 			tmp0 = m_sh2_state->r[n];
 			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
+			if(!(m_sh2_state->sr & SH_Q))
 				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 				else
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 			else
 				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 				else
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 		}
 		else
 		{
 			tmp0 = m_sh2_state->r[n];
 			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
+			if(!(m_sh2_state->sr & SH_Q))
 				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 				else
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 			else
 				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
+					m_sh2_state->sr |= SH_Q;
 				else
-					m_sh2_state->sr &= ~Q;
+					m_sh2_state->sr &= ~SH_Q;
 		}
 	}
 
-	tmp0 = (m_sh2_state->sr & (Q | M));
+	tmp0 = (m_sh2_state->sr & (SH_Q | SH_M));
 	if((!tmp0) || (tmp0 == 0x300)) /* if Q == M set T else clear T */
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  DMULS.L Rm,Rn */
@@ -728,9 +709,9 @@ void sh_common_execution::DT(uint32_t n)
 {
 	m_sh2_state->r[n]--;
 	if (m_sh2_state->r[n] == 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 #if BUSY_LOOP_HACKS
 	{
 		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
@@ -906,7 +887,7 @@ void sh_common_execution::MAC_L(uint32_t m, uint32_t n)
 		else
 			Res0 = (~Res0) + 1;
 	}
-	if (m_sh2_state->sr & S)
+	if (m_sh2_state->sr & SH_S)
 	{
 		Res0 = m_sh2_state->macl + Res0;
 		if (m_sh2_state->macl > Res0)
@@ -970,7 +951,7 @@ void sh_common_execution::MAC_W(uint32_t m, uint32_t n)
 	else
 		ans = 1;
 	ans += dest;
-	if (m_sh2_state->sr & S)
+	if (m_sh2_state->sr & SH_S)
 	{
 		if (ans == 1)
 			{
@@ -1260,7 +1241,7 @@ void sh_common_execution::MOVA(uint32_t d)
 /*  MOVT    Rn */
 void sh_common_execution::MOVT(uint32_t n)
 {
-	m_sh2_state->r[n] = m_sh2_state->sr & T;
+	m_sh2_state->r[n] = m_sh2_state->sr & SH_T;
 }
 
 /*  MUL.L   Rm,Rn */
@@ -1294,11 +1275,11 @@ void sh_common_execution::NEGC(uint32_t m, uint32_t n)
 	uint32_t temp;
 
 	temp = m_sh2_state->r[m];
-	m_sh2_state->r[n] = -temp - (m_sh2_state->sr & T);
-	if (temp || (m_sh2_state->sr & T))
-		m_sh2_state->sr |= T;
+	m_sh2_state->r[n] = -temp - (m_sh2_state->sr & SH_T);
+	if (temp || (m_sh2_state->sr & SH_T))
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  NOP */
@@ -1341,34 +1322,34 @@ void sh_common_execution::ROTCL(uint32_t n)
 {
 	uint32_t temp;
 
-	temp = (m_sh2_state->r[n] >> 31) & T;
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | temp;
+	temp = (m_sh2_state->r[n] >> 31) & SH_T;
+	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & SH_T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | temp;
 }
 
 /*  ROTCR   Rn */
 void sh_common_execution::ROTCR(uint32_t n)
 {
 	uint32_t temp;
-	temp = (m_sh2_state->sr & T) << 31;
-	if (m_sh2_state->r[n] & T)
-		m_sh2_state->sr |= T;
+	temp = (m_sh2_state->sr & SH_T) << 31;
+	if (m_sh2_state->r[n] & SH_T)
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | temp;
 }
 
 /*  ROTL    Rn */
 void sh_common_execution::ROTL(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | ((m_sh2_state->r[n] >> 31) & SH_T);
 	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->r[n] >> 31);
 }
 
 /*  ROTR    Rn */
 void sh_common_execution::ROTR(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | (m_sh2_state->r[n] & SH_T);
 	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | (m_sh2_state->r[n] << 31);
 }
 
@@ -1382,27 +1363,27 @@ void sh_common_execution::RTS()
 /*  SETT */
 void sh_common_execution::SETT()
 {
-	m_sh2_state->sr |= T;
+	m_sh2_state->sr |= SH_T;
 }
 
 /*  SHAL    Rn      (same as SHLL) */
 void sh_common_execution::SHAL(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | ((m_sh2_state->r[n] >> 31) & SH_T);
 	m_sh2_state->r[n] <<= 1;
 }
 
 /*  SHAR    Rn */
 void sh_common_execution::SHAR(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | (m_sh2_state->r[n] & SH_T);
 	m_sh2_state->r[n] = (uint32_t)((int32_t)m_sh2_state->r[n] >> 1);
 }
 
 /*  SHLL    Rn      (same as SHAL) */
 void sh_common_execution::SHLL(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | ((m_sh2_state->r[n] >> 31) & SH_T);
 	m_sh2_state->r[n] <<= 1;
 }
 
@@ -1427,7 +1408,7 @@ void sh_common_execution::SHLL16(uint32_t n)
 /*  SHLR    Rn */
 void sh_common_execution::SHLR(uint32_t n)
 {
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
+	m_sh2_state->sr = (m_sh2_state->sr & ~SH_T) | (m_sh2_state->r[n] & SH_T);
 	m_sh2_state->r[n] >>= 1;
 }
 
@@ -1550,13 +1531,13 @@ void sh_common_execution::SUBC(uint32_t m, uint32_t n)
 
 	tmp1 = m_sh2_state->r[n] - m_sh2_state->r[m];
 	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 - (m_sh2_state->sr & T);
+	m_sh2_state->r[n] = tmp1 - (m_sh2_state->sr & SH_T);
 	if (tmp0 < tmp1)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	if (tmp1 < m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 }
 
 /*  SUBV    Rm,Rn */
@@ -1582,12 +1563,12 @@ void sh_common_execution::SUBV(uint32_t m, uint32_t n)
 	if (src == 1)
 	{
 		if (ans == 1)
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  SWAP.B  Rm,Rn */
@@ -1618,9 +1599,9 @@ void sh_common_execution::TAS(uint32_t n)
 	/* Bus Lock enable */
 	temp = RB( m_sh2_state->ea );
 	if (temp == 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	temp |= 0x80;
 	/* Bus Lock disable */
 	WB( m_sh2_state->ea, temp );
@@ -1631,9 +1612,9 @@ void sh_common_execution::TAS(uint32_t n)
 void sh_common_execution::TST(uint32_t m, uint32_t n)
 {
 	if ((m_sh2_state->r[n] & m_sh2_state->r[m]) == 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  TST     #imm,R0 */
@@ -1642,9 +1623,9 @@ void sh_common_execution::TSTI(uint32_t i)
 	uint32_t imm = i & 0xff;
 
 	if ((imm & m_sh2_state->r[0]) == 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 }
 
 /*  TST.B   #imm,@(R0,GBR) */
@@ -1654,9 +1635,9 @@ void sh_common_execution::TSTM(uint32_t i)
 
 	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
 	if ((imm & RB( m_sh2_state->ea )) == 0)
-		m_sh2_state->sr |= T;
+		m_sh2_state->sr |= SH_T;
 	else
-		m_sh2_state->sr &= ~T;
+		m_sh2_state->sr &= ~SH_T;
 	m_sh2_state->icount -= 2;
 }
 
@@ -2009,7 +1990,13 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 }
 
 // DRC / UML related
-
+void cfunc_unimplemented(void *param) { ((sh_common_execution *)param)->func_unimplemented(); }
+void cfunc_MAC_W(void *param) { ((sh_common_execution *)param)->func_MAC_W(); }
+void cfunc_MAC_L(void *param) { ((sh_common_execution *)param)->func_MAC_L(); }
+void cfunc_DIV1(void *param) { ((sh_common_execution *)param)->func_DIV1(); }
+void cfunc_ADDV(void *param) { ((sh_common_execution *)param)->func_ADDV(); }
+void cfunc_SUBV(void *param) { ((sh_common_execution *)param)->func_SUBV(); }
+void cfunc_printf_probe(void *param) { ((sh_common_execution *)param)->func_printf_probe(); }
 
 /*-------------------------------------------------
     sh2drc_add_fastram - add a new fastram
@@ -2029,7 +2016,6 @@ void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t r
 }
 
 using namespace uml;
-
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -2671,16 +2657,6 @@ void sh_common_execution::generate_delay_slot(drcuml_block *block, compiler_stat
 	compiler->labelnum = compiler_temp.labelnum;
 }
 
-
-void cfunc_fastirq(void *param) { ((sh_common_execution *)param)->func_fastirq(); };
-void cfunc_unimplemented(void *param) { ((sh_common_execution *)param)->func_unimplemented(); }
-void cfunc_MAC_W(void *param) { ((sh_common_execution *)param)->func_MAC_W(); }
-void cfunc_MAC_L(void *param) { ((sh_common_execution *)param)->func_MAC_L(); }
-void cfunc_DIV1(void *param) { ((sh_common_execution *)param)->func_DIV1(); }
-void cfunc_ADDV(void *param) { ((sh_common_execution *)param)->func_ADDV(); }
-void cfunc_SUBV(void *param) { ((sh_common_execution *)param)->func_SUBV(); }
-void cfunc_printf_probe(void *param) { ((sh_common_execution *)param)->func_printf_probe(); }
-
 void sh_common_execution::func_fastirq()
 {
 	sh2_exception("fastirq",m_sh2_state->irqline);
@@ -2815,6 +2791,9 @@ void sh_common_execution::func_printf_probe()
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
+
+static void cfunc_fastirq(void *param) { ((sh_common_execution *)param)->func_fastirq(); };
+
 void sh_common_execution::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
 	/* check full interrupts if pending */
@@ -3126,35 +3105,35 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 
 	case  7: // DIV0S(Rm, Rn);
 		UML_MOV(block, I0, mem(&m_sh2_state->sr));              // move r0, sr
-		UML_AND(block, I0, I0, ~(Q|M|T));       // and r0, r0, ~(Q|M|T) (clear the Q,M, and T bits)
+		UML_AND(block, I0, I0, ~(SH_Q|SH_M|SH_T));       // and r0, r0, ~(Q|M|T) (clear the Q,M, and T bits)
 
 		UML_TEST(block, R32(Rn), 0x80000000);           // test Rn, #0x80000000
 		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
 
-		UML_OR(block, I0, I0, Q);               // or r0, r0, Q
+		UML_OR(block, I0, I0, SH_Q);               // or r0, r0, Q
 		UML_LABEL(block, compiler->labelnum++);             // labelnum:
 
 		UML_TEST(block, R32(Rm), 0x80000000);           // test Rm, #0x80000000
 		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
 
-		UML_OR(block, I0, I0, M);               // or r0, r0, M
+		UML_OR(block, I0, I0, SH_M);               // or r0, r0, M
 		UML_LABEL(block, compiler->labelnum++);             // labelnum:
 
 		UML_XOR(block, I1, R32(Rn), R32(Rm));           // xor r1, Rn, Rm
 		UML_TEST(block, I1, 0x80000000);            // test r1, #0x80000000
 		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz labelnum
 
-		UML_OR(block, I0, I0, T);               // or r0, r0, T
+		UML_OR(block, I0, I0, SH_T);               // or r0, r0, T
 		UML_LABEL(block, compiler->labelnum++);             // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);              // mov sr, r0
 		return true;
 
 	case  8: // TST(Rm, Rn);
-		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
+		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 		UML_TEST(block, R32(Rm), R32(Rn));      // test Rm, Rn
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
-		UML_OR(block, I0, I0, T);   // or r0, r0, T
+		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
@@ -3174,7 +3153,7 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 
 		UML_AND(block, I7, I0, 0xff);   // and r7, r0, #0xff    (LL)
 
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T (clear the T bit)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 
 		UML_CMP(block, I1, 0);      // cmp r1, #0
 		UML_JMPc(block, COND_Z, compiler->labelnum);    // jnz labelnum
@@ -3186,7 +3165,7 @@ bool sh_common_execution::generate_group_2(drcuml_block *block, compiler_state *
 		UML_JMPc(block, COND_NZ, compiler->labelnum+1); // jnz labelnum
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum:
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum+1:
 		return true;
@@ -3293,7 +3272,7 @@ bool sh_common_execution::generate_group_3(drcuml_block *block, compiler_state *
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0); // carry = T (T is bit 0 of SR)
 		UML_SUBB(block, R32(Rn), R32(Rn), R32(Rm)); // addc Rn, Rn, Rm
 		UML_SETc(block, COND_C, I0);                // setc    i0, C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins sr,i0,0,T
 		return true;
 
 	case 11: // SUBV(Rm, Rn);
@@ -3307,7 +3286,7 @@ bool sh_common_execution::generate_group_3(drcuml_block *block, compiler_state *
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0); // carry = T (T is bit 0 of SR)
 		UML_ADDC(block, R32(Rn), R32(Rn), R32(Rm)); // addc Rn, Rn, Rm
 		UML_SETc(block, COND_C, I0);                // setc    i0, C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins sr,i0,0,T
 		return true;
 
 	case 15: // ADDV(Rm, Rn);
@@ -3435,13 +3414,13 @@ bool sh_common_execution::generate_group_6(drcuml_block *block, compiler_state *
 
 	case 10: // NEGC(Rm, Rn);
 		UML_MOV(block, I0, mem(&m_sh2_state->sr));      // mov r0, sr (save SR)
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T (clear the T bit)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 		UML_CARRY(block, I0, 0);    // carry = T (T is bit 0 of SR)
 		UML_SUBB(block, R32(Rn), 0, R32(Rm));   // subb Rn, #0, Rm
 
 		UML_JMPc(block, COND_NC, compiler->labelnum);   // jnc labelnum
 
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum:
 
@@ -3511,20 +3490,20 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 		return true;
 
 	case  8<< 8: // CMPIM(opcode & 0xff);
-		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
+		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 
 		UML_SEXT(block, I1, opcode&0xff, SIZE_BYTE);    // sext r1, opcode&0xff, BYTE
 		UML_CMP(block, I1, R32(0));         // cmp r1, R0
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum   (if negative)
 
-		UML_OR(block, I0, I0, T);   // or r0, r0, T
+		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
 
 	case  9<< 8: // BT(opcode & 0xff);
-		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
+		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
 		disp = ((int32_t)opcode << 24) >> 24;
@@ -3537,7 +3516,7 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 		return true;
 
 	case 11<< 8: // BF(opcode & 0xff);
-		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
+		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
 		disp = ((int32_t)opcode << 24) >> 24;
@@ -3552,7 +3531,7 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 	case 13<< 8: // BTS(opcode & 0xff);
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
-			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
+			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
 			disp = ((int32_t)opcode << 24) >> 24;
@@ -3573,7 +3552,7 @@ bool sh_common_execution::generate_group_8(drcuml_block *block, compiler_state *
 	case 15<< 8: // BFS(opcode & 0xff);
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
-			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
+			UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
 			disp = ((int32_t)opcode << 24) >> 24;
@@ -3696,12 +3675,12 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 	case  8<<8: // TSTI(opcode & 0xff);
 		scratch = opcode & 0xff;
 
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T (clear the T bit)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 		UML_AND(block, I0, R32(0), scratch);        // and r0, R0, scratch
 		UML_CMP(block, I0, 0);          // cmp r0, #0
 		UML_JMPc(block, COND_NZ, compiler->labelnum);       // jnz labelnum
 
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
 		return true;
@@ -3719,7 +3698,7 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 		return true;
 
 	case 12<<8: // TSTM(opcode & 0xff);
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T (clear the T bit)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T (clear the T bit)
 		UML_ADD(block, I0, R32(0), mem(&m_sh2_state->gbr)); // add r0, R0, gbr
 		UML_CALLH(block, *m_read8);              // read8
 
@@ -3727,7 +3706,7 @@ bool sh_common_execution::generate_group_12(drcuml_block *block, compiler_state 
 		UML_CMP(block, I0, 0);          // cmp r0, #0
 		UML_JMPc(block, COND_NZ, compiler->labelnum);       // jnz labelnum
 
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);         // labelnum:
 		return true;
@@ -3883,7 +3862,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 		break;
 
 	case 0x08: // CLRT();
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and r0, sr, ~T (clear the T bit)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and r0, sr, ~T (clear the T bit)
 		return true;
 
 	case 0x0a: // STSMACH(Rn);
@@ -3954,11 +3933,11 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x18: // SETT();
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 		return true;
 
 	case 0x19: // DIV0U();
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~(M|Q|T)); // and sr, sr, ~(M|Q|T)
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~(SH_M|SH_Q|SH_T)); // and sr, sr, ~(M|Q|T)
 		return true;
 
 	case 0x1a: // STSMACL(Rn);
@@ -4005,7 +3984,7 @@ bool sh_common_execution::generate_group_0(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x29: // MOVT(Rn);
-		UML_AND(block, R32(Rn), mem(&m_sh2_state->sr), T);      // and Rn, sr, T
+		UML_AND(block, R32(Rn), mem(&m_sh2_state->sr), SH_T);      // and Rn, sr, T
 		return true;
 
 	case 0x2a: // STSPR(Rn);
@@ -4023,7 +4002,7 @@ bool sh_common_execution::generate_group_4_LDCSR(drcuml_block *block, compiler_s
 {
 	// needs to be different on SH2 / 4
 	UML_MOV(block, I0, R32(Rn));        // mov r0, Rn
-	UML_AND(block, I0, I0, FLAGS);  // and r0, r0, FLAGS
+	UML_AND(block, I0, I0, SH_FLAGS);  // and r0, r0, FLAGS
 	UML_MOV(block, mem(&m_sh2_state->sr), I0);
 
 	compiler->checkints = true;
@@ -4051,25 +4030,25 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 	case 0x00: // SHLL(Rn);
 		UML_SHL(block, R32(Rn), R32(Rn), 1);        // shl Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins [sr],i0,0,T
 		return true;
 
 	case 0x01: // SHLR(Rn);
 		UML_SHR(block, R32(Rn), R32(Rn), 1);        // shr Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins [sr],i0,0,T
 		return true;
 
 	case 0x04: // ROTL(Rn);
 		UML_ROL(block, R32(Rn), R32(Rn), 1);        // rol Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins [sr],i0,0,T
 		return true;
 
 	case 0x05: // ROTR(Rn);
 		UML_ROR(block, R32(Rn), R32(Rn), 1);        // ror Rn, Rn, 1
 		UML_SETc(block, COND_C, I0);                    // set i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins [sr],i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins [sr],i0,0,T
 		return true;
 
 	case 0x02: // STSMMACH(Rn);
@@ -4163,11 +4142,11 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 	case 0x10: // DT(Rn);
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
-			UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
+			UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 			UML_SUB(block, R32(Rn), R32(Rn), 1);    // sub Rn, Rn, 1
 			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jz compiler->labelnum
 
-			UML_OR(block, I0, I0, T);   // or r0, r0, T
+			UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 			UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 			UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
@@ -4176,26 +4155,26 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		break;
 
 	case 0x11: // CMPPZ(Rn);
-		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
+		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 
 		UML_CMP(block, R32(Rn), 0);     // cmp Rn, 0
 		UML_JMPc(block, COND_S, compiler->labelnum);    // js compiler->labelnum    (if negative)
 
-		UML_OR(block, I0, I0, T);   // or r0, r0, T
+		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
 
 	case 0x15: // CMPPL(Rn);
-		UML_AND(block, I0, mem(&m_sh2_state->sr), ~T);  // and r0, sr, ~T (clear the T bit)
+		UML_AND(block, I0, mem(&m_sh2_state->sr), ~SH_T);  // and r0, sr, ~T (clear the T bit)
 
 		UML_CMP(block, R32(Rn), 0);     // cmp Rn, 0
 
 		UML_JMPc(block, COND_S, compiler->labelnum);    // js compiler->labelnum    (if negative)
 		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum    (if zero)
 
-		UML_OR(block, I0, I0, T);   // or r0, r0, T
+		UML_OR(block, I0, I0, SH_T);   // or r0, r0, T
 
 		UML_LABEL(block, compiler->labelnum++);         // desc->pc:
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
@@ -4254,12 +4233,12 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		SETEA(0);
 		UML_CALLH(block, *m_read8);          // call read8
 
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T
 
 		UML_CMP(block, I0, 0);      // cmp r0, #0
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz labelnum
 
-		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), T); // or sr, sr, T
+		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), SH_T); // or sr, sr, T
 
 		UML_LABEL(block, compiler->labelnum++);     // labelnum:
 
@@ -4277,16 +4256,16 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		return true;
 
 	case 0x20: // SHAL(Rn);
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T
 		UML_SHR(block, I0, R32(Rn), 31);        // shr r0, Rn, 31
-		UML_AND(block, I0, I0, T);      // and r0, r0, T
+		UML_AND(block, I0, I0, SH_T);      // and r0, r0, T
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), I0);    // or sr, sr, r0
 		UML_SHL(block, R32(Rn), R32(Rn), 1);        // shl Rn, Rn, 1
 		return true;
 
 	case 0x21: // SHAR(Rn);
-		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~T);   // and sr, sr, ~T
-		UML_AND(block, I0, R32(Rn), T);     // and r0, Rn, T
+		UML_AND(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), ~SH_T);   // and sr, sr, ~T
+		UML_AND(block, I0, R32(Rn), SH_T);     // and r0, Rn, T
 		UML_OR(block, mem(&m_sh2_state->sr), mem(&m_sh2_state->sr), I0);    // or sr, sr, r0
 		UML_SAR(block, R32(Rn), R32(Rn), 1);        // sar Rn, Rn, 1
 		return true;
@@ -4317,14 +4296,14 @@ bool sh_common_execution::generate_group_4(drcuml_block *block, compiler_state *
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0);         // carry sr,0
 		UML_ROLC(block, R32(Rn), R32(Rn), 1);           // rolc  Rn,Rn,1
 		UML_SETc(block, COND_C, I0);                        // set   i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins sr,i0,0,T
 		return true;
 
 	case 0x25: // ROTCR(Rn);
 		UML_CARRY(block, mem(&m_sh2_state->sr), 0);         // carry sr,0
 		UML_RORC(block, R32(Rn), R32(Rn), 1);           // rorc  Rn,Rn,1
 		UML_SETc(block, COND_C, I0);                        // set   i0,C
-		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, T); // rolins sr,i0,0,T
+		UML_ROLINS(block, mem(&m_sh2_state->sr), I0, 0, SH_T); // rolins sr,i0,0,T
 		return true;
 
 	case 0x26: // LDSMPR(Rn);

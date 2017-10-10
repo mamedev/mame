@@ -34,7 +34,6 @@
 #include "debugger.h"
 
 
-
 CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
@@ -454,12 +453,12 @@ inline void sh34_base_device::MOVCAL(const uint16_t opcode)
 
 inline void sh34_base_device::CLRS(const uint16_t opcode)
 {
-	m_sh2_state->sr &= ~S;
+	m_sh2_state->sr &= ~SH_S;
 }
 
 inline void sh34_base_device::SETS(const uint16_t opcode)
 {
-	m_sh2_state->sr |= S;
+	m_sh2_state->sr |= SH_S;
 }
 
 /*  LDC     Rm,SR */
@@ -1307,15 +1306,15 @@ inline void sh34_base_device::FCMP_EQ(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) == FP_RFD(m))
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 	else {              /* PR = 0 */
 		if (FP_RFS(n) == FP_RFS(m))
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 }
 
@@ -1329,15 +1328,15 @@ inline void sh34_base_device::FCMP_GT(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) > FP_RFD(m))
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 	else {              /* PR = 0 */
 		if (FP_RFS(n) > FP_RFS(m))
-			m_sh2_state->sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sh2_state->sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 }
 
@@ -2436,11 +2435,11 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, std:
 					m_sh2_state->sr & sRB ? "RB ":"   ",
 					m_sh2_state->sr & BL ? "BL ":"   ",
 					m_sh2_state->sr & FD ? "FD ":"   ",
-					m_sh2_state->sr & M ? 'M':'.',
-					m_sh2_state->sr & Q ? 'Q':'.',
-					(m_sh2_state->sr & I) >> 4,
-					m_sh2_state->sr & S ? 'S':'.',
-					m_sh2_state->sr & T ? 'T':'.');
+					m_sh2_state->sr & SH_M ? 'M':'.',
+					m_sh2_state->sr & SH_Q ? 'Q':'.',
+					(m_sh2_state->sr & SH_I) >> 4,
+					m_sh2_state->sr & SH_S ? 'S':'.',
+					m_sh2_state->sr & SH_T ? 'T':'.');
 			break;
 
 		case SH4_FR0:
@@ -2674,16 +2673,13 @@ void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_stat
 	compiler->cycles = 0;
 }
 
-
-
 /*-------------------------------------------------
     static_generate_entry_point - generate a
     static entry point
 -------------------------------------------------*/
 
 void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
-void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
-
+static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
 
 void sh34_base_device::static_generate_entry_point()
 {
@@ -2873,7 +2869,7 @@ bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *com
 }
 
 void sh34_base_device::func_STCRBANK() { STCRBANK(m_sh2_state->arg0); }
-void cfunc_STCRBANK(void *param) { ((sh34_base_device *)param)->func_STCRBANK(); };
+static void cfunc_STCRBANK(void *param) { ((sh34_base_device *)param)->func_STCRBANK(); };
 
 bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2885,7 +2881,7 @@ bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_STCSSR() { STCSSR(m_sh2_state->arg0); }
-void cfunc_STCSSR(void *param) { ((sh34_base_device *)param)->func_STCSSR(); };
+static void cfunc_STCSSR(void *param) { ((sh34_base_device *)param)->func_STCSSR(); };
 
 bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2897,7 +2893,7 @@ bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_STCSPC() { STCSPC(m_sh2_state->arg0); }
-void cfunc_STCSPC(void *param) { ((sh34_base_device *)param)->func_STCSPC(); };
+static void cfunc_STCSPC(void *param) { ((sh34_base_device *)param)->func_STCSPC(); };
 
 bool sh34_base_device::generate_group_0_STCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2909,7 +2905,7 @@ bool sh34_base_device::generate_group_0_STCSPC(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_PREFM() { PREFM(m_sh2_state->arg0); }
-void cfunc_PREFM(void *param) { ((sh34_base_device *)param)->func_PREFM(); };
+static void cfunc_PREFM(void *param) { ((sh34_base_device *)param)->func_PREFM(); };
 
 bool sh34_base_device::generate_group_0_PREFM(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2921,7 +2917,7 @@ bool sh34_base_device::generate_group_0_PREFM(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_MOVCAL() { MOVCAL(m_sh2_state->arg0); }
-void cfunc_MOVCAL(void *param) { ((sh34_base_device *)param)->func_MOVCAL(); };
+static void cfunc_MOVCAL(void *param) { ((sh34_base_device *)param)->func_MOVCAL(); };
 
 bool sh34_base_device::generate_group_0_MOVCAL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2933,7 +2929,7 @@ bool sh34_base_device::generate_group_0_MOVCAL(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_LDTLB() { LDTLB(m_sh2_state->arg0); }
-void cfunc_LDTLB(void *param) { ((sh34_base_device *)param)->func_LDTLB(); };
+static void cfunc_LDTLB(void *param) { ((sh34_base_device *)param)->func_LDTLB(); };
 
 bool sh34_base_device::generate_group_0_LDTLB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2945,7 +2941,7 @@ bool sh34_base_device::generate_group_0_LDTLB(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_CLRS() { CLRS(m_sh2_state->arg0); }
-void cfunc_CLRS(void *param) { ((sh34_base_device *)param)->func_CLRS(); };
+static void cfunc_CLRS(void *param) { ((sh34_base_device *)param)->func_CLRS(); };
 
 bool sh34_base_device::generate_group_0_CLRS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2957,7 +2953,7 @@ bool sh34_base_device::generate_group_0_CLRS(drcuml_block *block, compiler_state
 }
 
 void sh34_base_device::func_SETS() { SETS(m_sh2_state->arg0); }
-void cfunc_SETS(void *param) { ((sh34_base_device *)param)->func_SETS(); };
+static void cfunc_SETS(void *param) { ((sh34_base_device *)param)->func_SETS(); };
 
 bool sh34_base_device::generate_group_0_SETS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2969,7 +2965,7 @@ bool sh34_base_device::generate_group_0_SETS(drcuml_block *block, compiler_state
 }
 
 void sh34_base_device::func_STCSGR() { STCSGR(m_sh2_state->arg0); }
-void cfunc_STCSGR(void *param) { ((sh34_base_device *)param)->func_STCSGR(); };
+static void cfunc_STCSGR(void *param) { ((sh34_base_device *)param)->func_STCSGR(); };
 
 bool sh34_base_device::generate_group_0_STCSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2982,7 +2978,7 @@ bool sh34_base_device::generate_group_0_STCSGR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_STSFPUL() { STSFPUL(m_sh2_state->arg0); }
-void cfunc_STSFPUL(void *param) { ((sh34_base_device *)param)->func_STSFPUL(); };
+static void cfunc_STSFPUL(void *param) { ((sh34_base_device *)param)->func_STSFPUL(); };
 
 bool sh34_base_device::generate_group_0_STSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -2994,7 +2990,7 @@ bool sh34_base_device::generate_group_0_STSFPUL(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_STSFPSCR() { STSFPSCR(m_sh2_state->arg0); }
-void cfunc_STSFPSCR(void *param) { ((sh34_base_device *)param)->func_STSFPSCR(); };
+static void cfunc_STSFPSCR(void *param) { ((sh34_base_device *)param)->func_STSFPSCR(); };
 
 bool sh34_base_device::generate_group_0_STSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3006,7 +3002,7 @@ bool sh34_base_device::generate_group_0_STSFPSCR(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_STCDBR() { STCDBR(m_sh2_state->arg0); }
-void cfunc_STCDBR(void *param) { ((sh34_base_device *)param)->func_STCDBR(); };
+static void cfunc_STCDBR(void *param) { ((sh34_base_device *)param)->func_STCDBR(); };
 
 bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3018,7 +3014,7 @@ bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_RTE() { RTE(); }
-void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
+static void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
 
 bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3033,7 +3029,7 @@ bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state 
 }
 
 void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
-void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
+static void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
 
 bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3047,7 +3043,7 @@ bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_LDCSR() { LDCSR(m_sh2_state->arg0); }
-void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
+static void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
 
 bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3059,7 +3055,7 @@ bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_LDCMSR() { LDCMSR(m_sh2_state->arg0); }
-void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
+static void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
 
 bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3071,7 +3067,7 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
-void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
+static void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
 
 bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3083,7 +3079,7 @@ bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state
 }
 
 void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
-void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
+static void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
 
 bool sh34_base_device::generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3219,7 +3215,7 @@ bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *com
 
 
 void sh34_base_device::func_LDCRBANK() { LDCRBANK(m_sh2_state->arg0); }
-void cfunc_LDCRBANK(void *param) { ((sh34_base_device *)param)->func_LDCRBANK(); };
+static void cfunc_LDCRBANK(void *param) { ((sh34_base_device *)param)->func_LDCRBANK(); };
 
 bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3231,7 +3227,7 @@ bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_STCMRBANK() { STCMRBANK(m_sh2_state->arg0); }
-void cfunc_STCMRBANK(void *param) { ((sh34_base_device *)param)->func_STCMRBANK(); };
+static void cfunc_STCMRBANK(void *param) { ((sh34_base_device *)param)->func_STCMRBANK(); };
 
 bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3243,7 +3239,7 @@ bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_LDCMRBANK() { LDCMRBANK(m_sh2_state->arg0); }
-void cfunc_LDCMRBANK(void *param) { ((sh34_base_device *)param)->func_LDCMRBANK(); };
+static void cfunc_LDCMRBANK(void *param) { ((sh34_base_device *)param)->func_LDCMRBANK(); };
 
 bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3255,7 +3251,7 @@ bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_STCMSGR() { STCMSGR(m_sh2_state->arg0); }
-void cfunc_STCMSGR(void *param) { ((sh34_base_device *)param)->func_STCMSGR(); };
+static void cfunc_STCMSGR(void *param) { ((sh34_base_device *)param)->func_STCMSGR(); };
 
 bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3267,7 +3263,7 @@ bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_STCMSSR() { STCMSSR(m_sh2_state->arg0); }
-void cfunc_STCMSSR(void *param) { ((sh34_base_device *)param)->func_STCMSSR(); };
+static void cfunc_STCMSSR(void *param) { ((sh34_base_device *)param)->func_STCMSSR(); };
 
 bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3279,7 +3275,7 @@ bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCMSSR() { LDCMSSR(m_sh2_state->arg0); }
-void cfunc_LDCMSSR(void *param) { ((sh34_base_device *)param)->func_LDCMSSR(); };
+static void cfunc_LDCMSSR(void *param) { ((sh34_base_device *)param)->func_LDCMSSR(); };
 
 bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3291,7 +3287,7 @@ bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCSSR() { LDCSSR(m_sh2_state->arg0); }
-void cfunc_LDCSSR(void *param) { ((sh34_base_device *)param)->func_LDCSSR(); };
+static void cfunc_LDCSSR(void *param) { ((sh34_base_device *)param)->func_LDCSSR(); };
 
 bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3303,7 +3299,7 @@ bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_STCMSPC() { STCMSPC(m_sh2_state->arg0); }
-void cfunc_STCMSPC(void *param) { ((sh34_base_device *)param)->func_STCMSPC(); };
+static void cfunc_STCMSPC(void *param) { ((sh34_base_device *)param)->func_STCMSPC(); };
 
 bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3315,7 +3311,7 @@ bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCMSPC() { LDCMSPC(m_sh2_state->arg0); }
-void cfunc_LDCMSPC(void *param) { ((sh34_base_device *)param)->func_LDCMSPC(); };
+static void cfunc_LDCMSPC(void *param) { ((sh34_base_device *)param)->func_LDCMSPC(); };
 
 bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3327,7 +3323,7 @@ bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCSPC() { LDCSPC(m_sh2_state->arg0); }
-void cfunc_LDCSPC(void *param) { ((sh34_base_device *)param)->func_LDCSPC(); };
+static void cfunc_LDCSPC(void *param) { ((sh34_base_device *)param)->func_LDCSPC(); };
 
 bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3339,7 +3335,7 @@ bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_STSMFPUL() { STSMFPUL(m_sh2_state->arg0); }
-void cfunc_STSMFPUL(void *param) { ((sh34_base_device *)param)->func_STSMFPUL(); };
+static void cfunc_STSMFPUL(void *param) { ((sh34_base_device *)param)->func_STSMFPUL(); };
 
 bool sh34_base_device::generate_group_4_STSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3351,7 +3347,7 @@ bool sh34_base_device::generate_group_4_STSMFPUL(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_LDSMFPUL() { LDSMFPUL(m_sh2_state->arg0); }
-void cfunc_LDSMFPUL(void *param) { ((sh34_base_device *)param)->func_LDSMFPUL(); };
+static void cfunc_LDSMFPUL(void *param) { ((sh34_base_device *)param)->func_LDSMFPUL(); };
 
 bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3363,7 +3359,7 @@ bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_LDSFPUL() { LDSFPUL(m_sh2_state->arg0); }
-void cfunc_LDSFPUL(void *param) { ((sh34_base_device *)param)->func_LDSFPUL(); };
+static void cfunc_LDSFPUL(void *param) { ((sh34_base_device *)param)->func_LDSFPUL(); };
 
 bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3375,7 +3371,7 @@ bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_STSMFPSCR() { STSMFPSCR(m_sh2_state->arg0); }
-void cfunc_STSMFPSCR(void *param) { ((sh34_base_device *)param)->func_STSMFPSCR(); };
+static void cfunc_STSMFPSCR(void *param) { ((sh34_base_device *)param)->func_STSMFPSCR(); };
 
 bool sh34_base_device::generate_group_4_STSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3387,7 +3383,7 @@ bool sh34_base_device::generate_group_4_STSMFPSCR(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_LDSMFPSCR() { LDSMFPSCR(m_sh2_state->arg0); }
-void cfunc_LDSMFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSMFPSCR(); };
+static void cfunc_LDSMFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSMFPSCR(); };
 
 
 bool sh34_base_device::generate_group_4_LDSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
@@ -3401,7 +3397,7 @@ bool sh34_base_device::generate_group_4_LDSMFPSCR(drcuml_block *block, compiler_
 
 
 void sh34_base_device::func_LDSFPSCR() { LDSFPSCR(m_sh2_state->arg0); }
-void cfunc_LDSFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSFPSCR(); };
+static void cfunc_LDSFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSFPSCR(); };
 
 bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3413,7 +3409,7 @@ bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_STCMDBR() { STCMDBR(m_sh2_state->arg0); }
-void cfunc_STCMDBR(void *param) { ((sh34_base_device *)param)->func_STCMDBR(); };
+static void cfunc_STCMDBR(void *param) { ((sh34_base_device *)param)->func_STCMDBR(); };
 
 bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3425,7 +3421,7 @@ bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCMDBR() { LDCMDBR(m_sh2_state->arg0); }
-void cfunc_LDCMDBR(void *param) { ((sh34_base_device *)param)->func_LDCMDBR(); };
+static void cfunc_LDCMDBR(void *param) { ((sh34_base_device *)param)->func_LDCMDBR(); };
 
 bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3437,7 +3433,7 @@ bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_LDCDBR() { LDCDBR(m_sh2_state->arg0); }
-void cfunc_LDCDBR(void *param) { ((sh34_base_device *)param)->func_LDCDBR(); };
+static void cfunc_LDCDBR(void *param) { ((sh34_base_device *)param)->func_LDCDBR(); };
 
 bool sh34_base_device::generate_group_4_LDCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3476,19 +3472,19 @@ bool sh34_base_device::generate_group_15(drcuml_block *block, compiler_state *co
 }
 
 void sh34_base_device::func_FADD() { FADD(m_sh2_state->arg0); }
-void cfunc_FADD(void *param) { ((sh34_base_device *)param)->func_FADD(); };
+static void cfunc_FADD(void *param) { ((sh34_base_device *)param)->func_FADD(); };
 
 bool sh34_base_device::generate_group_15_FADD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	save_fast_iregs(block); 
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_LDCMSPC, this);
+	UML_CALLC(block, cfunc_FADD, this);
 	load_fast_iregs(block);
 	return true;
 }
 
 void sh34_base_device::func_FSUB() { FSUB(m_sh2_state->arg0); }
-void cfunc_FSUB(void *param) { ((sh34_base_device *)param)->func_FSUB(); };
+static void cfunc_FSUB(void *param) { ((sh34_base_device *)param)->func_FSUB(); };
 
 bool sh34_base_device::generate_group_15_FSUB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3500,7 +3496,7 @@ bool sh34_base_device::generate_group_15_FSUB(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_FMUL() { FMUL(m_sh2_state->arg0); }
-void cfunc_FMUL(void *param) { ((sh34_base_device *)param)->func_FMUL(); };
+static void cfunc_FMUL(void *param) { ((sh34_base_device *)param)->func_FMUL(); };
 
 bool sh34_base_device::generate_group_15_FMUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3512,7 +3508,7 @@ bool sh34_base_device::generate_group_15_FMUL(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_FDIV() { FDIV(m_sh2_state->arg0); }
-void cfunc_FDIV(void *param) { ((sh34_base_device *)param)->func_FDIV(); };
+static void cfunc_FDIV(void *param) { ((sh34_base_device *)param)->func_FDIV(); };
 
 bool sh34_base_device::generate_group_15_FDIV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3524,7 +3520,7 @@ bool sh34_base_device::generate_group_15_FDIV(drcuml_block *block, compiler_stat
 }
 
 void sh34_base_device::func_FCMP_EQ() { FCMP_EQ(m_sh2_state->arg0); }
-void cfunc_FCMP_EQ(void *param) { ((sh34_base_device *)param)->func_FCMP_EQ(); };
+static void cfunc_FCMP_EQ(void *param) { ((sh34_base_device *)param)->func_FCMP_EQ(); };
 
 bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3536,7 +3532,7 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_FCMP_GT() { FCMP_GT(m_sh2_state->arg0); }
-void cfunc_FCMP_GT(void *param) { ((sh34_base_device *)param)->func_FCMP_GT(); };
+static void cfunc_FCMP_GT(void *param) { ((sh34_base_device *)param)->func_FCMP_GT(); };
 
 bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3548,7 +3544,7 @@ bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block *block, compiler_s
 }
 
 void sh34_base_device::func_FMOVS0FR() { FMOVS0FR(m_sh2_state->arg0); }
-void cfunc_FMOVS0FR(void *param) { ((sh34_base_device *)param)->func_FMOVS0FR(); };
+static void cfunc_FMOVS0FR(void *param) { ((sh34_base_device *)param)->func_FMOVS0FR(); };
 
 bool sh34_base_device::generate_group_15_FMOVS0FR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3560,7 +3556,7 @@ bool sh34_base_device::generate_group_15_FMOVS0FR(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_FMOVFRS0() { FMOVFRS0(m_sh2_state->arg0); }
-void cfunc_FMOVFRS0(void *param) { ((sh34_base_device *)param)->func_FMOVFRS0(); };
+static void cfunc_FMOVFRS0(void *param) { ((sh34_base_device *)param)->func_FMOVFRS0(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRS0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3572,7 +3568,7 @@ bool sh34_base_device::generate_group_15_FMOVFRS0(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_FMOVMRFR() { FMOVMRFR(m_sh2_state->arg0); }
-void cfunc_FMOVMRFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRFR(); };
+static void cfunc_FMOVMRFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRFR(); };
 
 bool sh34_base_device::generate_group_15_FMOVMRFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3584,7 +3580,7 @@ bool sh34_base_device::generate_group_15_FMOVMRFR(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_FMOVMRIFR() { FMOVMRIFR(m_sh2_state->arg0); }
-void cfunc_FMOVMRIFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRIFR(); };
+static void cfunc_FMOVMRIFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRIFR(); };
 
 bool sh34_base_device::generate_group_15_FMOVMRIFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3596,7 +3592,7 @@ bool sh34_base_device::generate_group_15_FMOVMRIFR(drcuml_block *block, compiler
 }
 
 void sh34_base_device::func_FMOVFRMR() { FMOVFRMR(m_sh2_state->arg0); }
-void cfunc_FMOVFRMR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMR(); };
+static void cfunc_FMOVFRMR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMR(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRMR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3608,7 +3604,7 @@ bool sh34_base_device::generate_group_15_FMOVFRMR(drcuml_block *block, compiler_
 }
 
 void sh34_base_device::func_FMOVFRMDR() { FMOVFRMDR(m_sh2_state->arg0); }
-void cfunc_FMOVFRMDR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMDR(); };
+static void cfunc_FMOVFRMDR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMDR(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3620,7 +3616,7 @@ bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block *block, compiler
 }
 
 void sh34_base_device::func_FMOVFR() { FMOVFR(m_sh2_state->arg0); }
-void cfunc_FMOVFR(void *param) { ((sh34_base_device *)param)->func_FMOVFR(); };
+static void cfunc_FMOVFR(void *param) { ((sh34_base_device *)param)->func_FMOVFR(); };
 
 bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3632,7 +3628,7 @@ bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block *block, compiler_st
 }
 
 void sh34_base_device::func_FMAC() { FMAC(m_sh2_state->arg0); }
-void cfunc_FMAC(void *param) { ((sh34_base_device *)param)->func_FMAC(); };
+static void cfunc_FMAC(void *param) { ((sh34_base_device *)param)->func_FMAC(); };
 
 bool sh34_base_device::generate_group_15_FMAC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3668,7 +3664,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13(drcuml_block *block, compil
 }
 
 void sh34_base_device::func_FSTS() { FSTS(m_sh2_state->arg0); }
-void cfunc_FSTS(void *param) { ((sh34_base_device *)param)->func_FSTS(); };
+static void cfunc_FSTS(void *param) { ((sh34_base_device *)param)->func_FSTS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3680,7 +3676,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block *block, c
 }
 
 void sh34_base_device::func_FLDS() { FLDS(m_sh2_state->arg0); }
-void cfunc_FLDS(void *param) { ((sh34_base_device *)param)->func_FLDS(); };
+static void cfunc_FLDS(void *param) { ((sh34_base_device *)param)->func_FLDS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3692,7 +3688,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block *block, c
 }
 
 void sh34_base_device::func_FLOAT() { FLOAT(m_sh2_state->arg0); }
-void cfunc_FLOAT(void *param) { ((sh34_base_device *)param)->func_FLOAT(); };
+static void cfunc_FLOAT(void *param) { ((sh34_base_device *)param)->func_FLOAT(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3704,7 +3700,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block *block, 
 }
 
 void sh34_base_device::func_FTRC() { FTRC(m_sh2_state->arg0); }
-void cfunc_FTRC(void *param) { ((sh34_base_device *)param)->func_FTRC(); };
+static void cfunc_FTRC(void *param) { ((sh34_base_device *)param)->func_FTRC(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3716,7 +3712,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block *block, c
 }
 
 void sh34_base_device::func_FNEG() { FNEG(m_sh2_state->arg0); }
-void cfunc_FNEG(void *param) { ((sh34_base_device *)param)->func_FNEG(); };
+static void cfunc_FNEG(void *param) { ((sh34_base_device *)param)->func_FNEG(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3728,7 +3724,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block *block, c
 }
 
 void sh34_base_device::func_FABS() { FNEG(m_sh2_state->arg0); }
-void cfunc_FABS(void *param) { ((sh34_base_device *)param)->func_FABS(); };
+static void cfunc_FABS(void *param) { ((sh34_base_device *)param)->func_FABS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3740,7 +3736,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, c
 }
 
 void sh34_base_device::func_FSQRT() { FSQRT(m_sh2_state->arg0); }
-void cfunc_FSQRT(void *param) { ((sh34_base_device *)param)->func_FSQRT(); };
+static void cfunc_FSQRT(void *param) { ((sh34_base_device *)param)->func_FSQRT(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3752,7 +3748,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block *block, 
 }
 
 void sh34_base_device::func_FSRRA() { FSRRA(m_sh2_state->arg0); }
-void cfunc_FSRRA(void *param) { ((sh34_base_device *)param)->func_FSRRA(); };
+static void cfunc_FSRRA(void *param) { ((sh34_base_device *)param)->func_FSRRA(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3764,7 +3760,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block *block, 
 }
 
 void sh34_base_device::func_FLDI0() { FLDI0(m_sh2_state->arg0); }
-void cfunc_FLDI0(void *param) { ((sh34_base_device *)param)->func_FLDI0(); };
+static void cfunc_FLDI0(void *param) { ((sh34_base_device *)param)->func_FLDI0(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDI0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3776,7 +3772,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDI0(drcuml_block *block, 
 }
 
 void sh34_base_device::func_FLDI1() { FLDI1(m_sh2_state->arg0); }
-void cfunc_FLDI1(void *param) { ((sh34_base_device *)param)->func_FLDI1(); };
+static void cfunc_FLDI1(void *param) { ((sh34_base_device *)param)->func_FLDI1(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3788,7 +3784,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block *block, 
 }
 
 void sh34_base_device::func_FCNVSD() { FCNVSD(m_sh2_state->arg0); }
-void cfunc_FCNVSD(void *param) { ((sh34_base_device *)param)->func_FCNVSD(); };
+static void cfunc_FCNVSD(void *param) { ((sh34_base_device *)param)->func_FCNVSD(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3800,7 +3796,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block *block,
 }
 
 void sh34_base_device::func_FCNVDS() { FCNVDS(m_sh2_state->arg0); }
-void cfunc_FCNVDS(void *param) { ((sh34_base_device *)param)->func_FCNVDS(); };
+static void cfunc_FCNVDS(void *param) { ((sh34_base_device *)param)->func_FCNVDS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3812,7 +3808,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block *block,
 }
 
 void sh34_base_device::func_FIPR() { FIPR(m_sh2_state->arg0); }
-void cfunc_FIPR(void *param) { ((sh34_base_device *)param)->func_FIPR(); };
+static void cfunc_FIPR(void *param) { ((sh34_base_device *)param)->func_FIPR(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3851,7 +3847,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13(drcuml_block *
 }
 
 void sh34_base_device::func_FSCHG() { FSCHG(); }
-void cfunc_FSCHG(void *param) { ((sh34_base_device *)param)->func_FSCHG(); };
+static void cfunc_FSCHG(void *param) { ((sh34_base_device *)param)->func_FSCHG(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3863,7 +3859,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_b
 }
 
 void sh34_base_device::func_FRCHG() { FRCHG(); }
-void cfunc_FRCHG(void *param) { ((sh34_base_device *)param)->func_FRCHG(); };
+static void cfunc_FRCHG(void *param) { ((sh34_base_device *)param)->func_FRCHG(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3875,7 +3871,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_b
 }
 
 void sh34_base_device::func_FTRV() { FTRV(m_sh2_state->arg0); }
-void cfunc_FTRV(void *param) { ((sh34_base_device *)param)->func_FTRV(); };
+static void cfunc_FTRV(void *param) { ((sh34_base_device *)param)->func_FTRV(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3887,7 +3883,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_bl
 }
 
 void sh34_base_device::func_FSSCA() { FSSCA(m_sh2_state->arg0); }
-void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
+static void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {

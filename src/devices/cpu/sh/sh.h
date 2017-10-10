@@ -1,14 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
+#ifndef MAME_CPU_SH_SH_H
+#define MAME_CPU_SH_SH_H
+
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
-
-/* size of the execution code cache */
-#define CACHE_SIZE                  (32 * 1024 * 1024)
-
-#define SH2_MAX_FASTRAM       4
-
 
 /***************************************************************************
     DEBUGGING
@@ -16,27 +16,6 @@
 
 #define DISABLE_FAST_REGISTERS              (0) // set to 1 to turn off usage of register caching
 #define SINGLE_INSTRUCTION_MODE             (0)
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES         64
-#define COMPILE_FORWARDS_BYTES          256
-#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
-#define COMPILE_MAX_SEQUENCE            64
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define R32(reg)        m_regmap[reg]
-
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
 
 #define SET_EA                      (0) // makes slower but "shows work" in the EA fake register like the interpreter
 
@@ -49,6 +28,27 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+/* speed up delay loops, bail out of tight loops (can cause timer issues) */
+#define BUSY_LOOP_HACKS 0 
+
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         64
+#define COMPILE_FORWARDS_BYTES          256
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
+#define COMPILE_MAX_SEQUENCE            64
+
+#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
+#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
+#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+
+#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
+#define SH2DRC_FASTEST_OPTIONS  (0)
+
+/* size of the execution code cache */
+#define CACHE_SIZE                  (32 * 1024 * 1024)
+
+#define SH2_MAX_FASTRAM       4
 
 /* map variables */
 #define MAPVAR_PC                   M0
@@ -67,17 +67,17 @@
 #define CPU_TYPE_SH3    (2)
 #define CPU_TYPE_SH4    (3)
 
-/***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
-***************************************************************************/
+#define Rn  ((opcode>>8)&15)
+#define Rm  ((opcode>>4)&15)
 
-#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
-#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
-#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+/* Bits in SR */
+#define SH_T   0x00000001
+#define SH_S   0x00000002
+#define SH_I   0x000000f0
+#define SH_Q   0x00000100
+#define SH_M   0x00000200
 
-#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
-#define SH2DRC_FASTEST_OPTIONS  (0)
-
+#define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
 #define REGFLAG_R(n)                                        (1 << (n))
 
@@ -89,10 +89,15 @@
 #define REGFLAG_VBR                     (1 << 4)
 #define REGFLAG_SR                      (1 << 5)
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
 #define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)) // sh2
 #define SH34LE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6)) // naomi
 #define SH34BE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0)) // cave
 
+#define R32(reg)        m_regmap[reg]
 
 extern unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode);
 
@@ -103,10 +108,6 @@ enum
 	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA
 };
 
-
-
-
-
 class sh_common_execution : public cpu_device
 {
 
@@ -116,7 +117,6 @@ public:
 		, m_sh2_state(nullptr)
 		, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 		, m_drcuml(nullptr)
-		//, m_drcuml(*this, m_cache, 0, 1, 32, 1)
 		, m_drcoptions(0)
 		, m_entry(nullptr)
 		, m_read8(nullptr)
@@ -327,8 +327,6 @@ protected:
 	virtual void TRAPA(uint32_t i) = 0;
 	virtual	void ILLEGAL() = 0;
 
-
-
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 
 public:
@@ -343,7 +341,6 @@ public:
 	} m_fastram[SH2_MAX_FASTRAM];
 
 	int m_pcfsel;                 // last pcflush entry set
-	//int m_maxpcfsel;              // highest valid pcflush entry
 	uint32_t m_pcflushes[16];           // pcflush entries
 
 	virtual void init_drc_frontend() = 0;
@@ -361,11 +358,6 @@ public:
 
 	/* internal stuff */
 	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
-
-	/* parameters for subroutines */
-	//uint64_t              m_numcycles;              /* return value from gettotalcycles */
-	//uint32_t              m_arg1;                   /* print_debug argument 2 */
-	//uint32_t              m_irq;                /* irq we're taking */
 
 	/* register mappings */
 	uml::parameter      m_regmap[16];                 /* parameter to register mappings for all 16 integer registers */
@@ -479,13 +471,4 @@ protected:
 	int m_xor;
 };
 
-// cfunc callbacks for the UML DRC
-extern void cfunc_fastirq(void *param);
-extern void cfunc_unimplemented(void *param);
-extern void cfunc_MAC_W(void *param);
-extern void cfunc_MAC_L(void *param);
-extern void cfunc_DIV1(void *param);
-extern void cfunc_ADDV(void *param);
-extern void cfunc_SUBV(void *param);
-extern void cfunc_printf_probe(void *param);
-
+#endif // MAME_CPU_SH2_SH2_H

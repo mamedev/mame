@@ -207,9 +207,6 @@ offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uin
 }
 
 
-/* speed up delay loops, bail out of tight loops */
-#define BUSY_LOOP_HACKS     1
-
 uint8_t sh2_device::RB(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
@@ -372,7 +369,7 @@ void sh2_device::device_reset()
 
 	m_sh2_state->pc = RL(0);
 	m_sh2_state->r[15] = RL(4);
-	m_sh2_state->sr = I;
+	m_sh2_state->sr = SH_I;
 	m_sh2_state->sleep_mode = 0;
 
 	m_sh2_state->internal_irq_level = -1;
@@ -529,11 +526,11 @@ void sh2_device::state_string_export(const device_state_entry &entry, std::strin
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%d%c%c",
-					m_sh2_state->sr & M ? 'M':'.',
-					m_sh2_state->sr & Q ? 'Q':'.',
-					(m_sh2_state->sr & I) >> 4,
-					m_sh2_state->sr & S ? 'S':'.',
-					m_sh2_state->sr & T ? 'T':'.');
+					m_sh2_state->sr & SH_M ? 'M':'.',
+					m_sh2_state->sr & SH_Q ? 'Q':'.',
+					(m_sh2_state->sr & SH_I) >> 4,
+					m_sh2_state->sr & SH_S ? 'S':'.',
+					m_sh2_state->sr & SH_T ? 'T':'.');
 			break;
 	}
 }
@@ -651,9 +648,9 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 		/* set I flags in SR */
 		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
+			m_sh2_state->sr = m_sh2_state->sr | SH_I;
 		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
 	} else {
@@ -664,9 +661,9 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 		/* set I flags in SR */
 		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
+			m_sh2_state->sr = m_sh2_state->sr | SH_I;
 		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 		/* fetch PC */
 		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
@@ -703,6 +700,8 @@ const opcode_desc* sh2_device::get_desclist(offs_t pc)
     static_generate_entry_point - generate a
     static entry point
 -------------------------------------------------*/
+
+static void cfunc_fastirq(void *param) { ((sh_common_execution *)param)->func_fastirq(); };
 
 void sh2_device::static_generate_entry_point()
 {

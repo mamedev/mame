@@ -13,6 +13,8 @@
 #ifndef __SH4COMN_H__
 #define __SH4COMN_H__
 
+#include "sh.h"
+
 #define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
@@ -43,12 +45,6 @@ enum
 	OVF  = 0x00020000
 };
 
-/* Bits in SR */
-#define T   0x00000001
-#define S   0x00000002
-#define I   0x000000f0
-#define Q   0x00000100
-#define M   0x00000200
 
 
 #define FD  0x00008000
@@ -59,7 +55,7 @@ enum
 /* 29 bits */
 #define SH34_AM  0x1fffffff
 
-#define FLAGS   (MD|sRB|BL|FD|M|Q|I|S|T)
+#define FLAGS   (MD|sRB|BL|FD|SH_M|SH_Q|SH_I|SH_S|SH_T)
 
 /* Bits in FPSCR */
 #define RM  0x00000003

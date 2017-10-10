@@ -39,14 +39,11 @@
 #define SH2_INT_15      15
 #define SH2_INT_ABUS    16
 
-
-
 #define SH2_DMA_KLUDGE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
 #define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
-
 
 #define MCFG_SH2_IS_SLAVE(_slave) \
 	sh2_device::set_is_slave(*device, _slave);
@@ -59,8 +56,6 @@
 
 #define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
 	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
-
-
 
 
 class sh2_frontend;
@@ -122,17 +117,8 @@ private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
 	uint32_t  m_cpu_off;
-	//uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
 	uint32_t  m_test_irq;
 	
-	/*
-	struct
-	{
-		int irq_vector;
-		int irq_priority;
-	} m_irq_queue[16];
-	*/
-
 	int8_t    m_irq_line_state[17];
 
 private:

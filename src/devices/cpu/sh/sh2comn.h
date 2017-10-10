@@ -13,10 +13,6 @@
 
 #pragma once
 
-
-
-
-
 enum
 {
 	ICF  = 0x00800000,
@@ -25,20 +21,13 @@ enum
 	OVF  = 0x00020000
 };
 
-#define T   0x00000001
-#define S   0x00000002
-#define I   0x000000f0
-#define Q   0x00000100
-#define M   0x00000200
 
 #define SH12_AM  0xc7ffffff
 
-#define FLAGS   (M|Q|I|S|T)
+#define FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
 #define Rn  ((opcode>>8)&15)
 #define Rm  ((opcode>>4)&15)
-
-
 
 
 #define CHECK_PENDING_IRQ(message)              \
