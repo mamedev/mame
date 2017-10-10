@@ -15,13 +15,7 @@
 
 
 
-// do we use a timer for the DMA, or have it in CPU_EXECUTE
-#define USE_TIMER_FOR_DMA
 
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
-
-#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
 
 enum
 {
@@ -37,25 +31,15 @@ enum
 #define Q   0x00000100
 #define M   0x00000200
 
-#define AM  0xc7ffffff
+#define SH12_AM  0xc7ffffff
 
 #define FLAGS   (M|Q|I|S|T)
 
 #define Rn  ((opcode>>8)&15)
 #define Rm  ((opcode>>4)&15)
 
-#define CPU_TYPE_SH1    (0)
-#define CPU_TYPE_SH2    (1)
 
-#define REGFLAG_R(n)                                        (1 << (n))
 
-/* register flags 1 */
-#define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                        (1 << 1)
-#define REGFLAG_MACH                        (1 << 2)
-#define REGFLAG_GBR                     (1 << 3)
-#define REGFLAG_VBR                     (1 << 4)
-#define REGFLAG_SR                      (1 << 5)
 
 #define CHECK_PENDING_IRQ(message)              \
 do {                                            \
