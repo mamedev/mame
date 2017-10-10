@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"

@@ -41,6 +41,7 @@ To do:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"

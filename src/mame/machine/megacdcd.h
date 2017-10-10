@@ -4,6 +4,7 @@
 #define MAME_MACHINE_SEGACDCD_H
 
 #include "imagedev/chd_cd.h"
+#include "machine/timer.h"
 #include "sound/cdda.h"
 
 

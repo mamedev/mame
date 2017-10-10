@@ -7,6 +7,7 @@
 #pragma once
 
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "video/scn2674.h"
 
 #define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \

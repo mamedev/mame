@@ -53,6 +53,7 @@ Usage:
 
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 

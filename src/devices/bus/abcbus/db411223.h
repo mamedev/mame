@@ -2,18 +2,17 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    MyAB Turbo-Kontroller disk controller emulation
+    Databoard 4112-23 floppy disk controller emulation
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_TURBO_H
-#define MAME_BUS_ABCBUS_TURBO_H
+#ifndef MAME_BUS_ABCBUS_DATABOARD_4112_23_H
+#define MAME_BUS_ABCBUS_DATABOARD_4112_23_H
 
 #pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
 
 
 
@@ -21,14 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> turbo_kontroller_device
+// ======================> databoard_4112_23_t
 
-class turbo_kontroller_device :  public device_t,
-									public device_abcbus_card_interface
+class databoard_4112_23_t :  public device_t,
+				   			 public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	databoard_4112_23_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -38,17 +37,24 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
+	virtual uint8_t abcbus_inp() override;
+	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_stat() override;
+	virtual void abcbus_c1(uint8_t data) override;
+	virtual void abcbus_c3(uint8_t data) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	bool m_cs;
 };
 
 
 // device type definition
-extern const device_type TURBO_KONTROLLER;
-DECLARE_DEVICE_TYPE(TURBO_KONTROLLER, turbo_kontroller_device)
+DECLARE_DEVICE_TYPE(DATABOARD_4112_23, databoard_4112_23_t)
 
-#endif // MAME_BUS_ABCBUS_TURBO_H
+#endif // MAME_BUS_ABCBUS_DATABOARD_4112_23_H

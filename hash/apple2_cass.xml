@@ -3,21 +3,414 @@
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
 
+<!-- To load and run a tape:
+1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
+2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
+3. Play the tape, then press <Return>.
+4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
+
+	<software name="aligren" supported="partial">
+		<description>Alignment Test Tone / Renumber</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2024-00" />
+		<info name="usage" value="]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Alignment Test Tone" />
+			<dataarea name="cass" size="5677100">
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Renumber/Append" />
+			<dataarea name="cass" size="2207020">
+				<rom name="renumber - append (1979)(apple computer).wav" size="2207020" crc="0f49d611" sha1="65042e4ebfcfdf1692cbf05619f0746d685029d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aligsam" supported="partial">
+		<description>Alignment Test Tone / Sampler</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-0002-02" />
+		<info name="usage" value="cass1 >Load 16K, cass2 >HIMEM:16384 >Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="ALIGNMENT TEST TONE" />
+			<dataarea name="cass" size="5677100">
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="SAMPLER" />
+			<dataarea name="cass" size="3583788">
+				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplbowl">
+		<description>Apple Bowl</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2022-00" />
+		<info name="usage" value=">Load" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="APPLE BOWL Requires 16K and PROGRAMMERS AID #1" />
+			<dataarea name="cass" size="3903776">
+				<rom name="apple bowl 16k (1979)(apple computer).wav" size="3903776" crc="4d56f9ac" sha1="0a6ebe430c3819f09fd982b24cc4ccf3d384afe1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="APPLE BOWL 32K Without PROGRAMMERS AID #1" />
+			<dataarea name="cass" size="6263596">
+				<rom name="apple bowl 32k (1979)(apple computer).wav" size="6263596" crc="d5e8bee7" sha1="9c2c6cf2357b292c05de657b8862496733ee0db5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplesoft">
+		<description>Applesoft IIa</description>
+		<year>1977</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value=">Load 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="APPLESOFT IIa" />
+			<dataarea name="cass" size="9322474">
+				<rom name="applesoft (1977)(apple computer).wav" size="9322474" crc="eddd44f1" sha1="308bae54e399eca2ceab134198d217cf5b895135" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asftfpd">
+		<description>Applesoft ][ Floating Point BASIC / Floating Point BASIC Demo</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2006-00" />
+		<info name="P/N" value="A2T0004X" />
+		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
+			<dataarea name="cass" size="3260004">
+				<rom name="applesoft ][ floating point basic (1978)(apple computer).wav" size="3260004" crc="9e4fa8e5" sha1="cedcd667a787567add8814d6aa76e5b78c621d92" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Floating Point BASIC Demo (APPLESOFT LOADED)" />
+			<dataarea name="cass" size="1984556">
+				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplstqrt" supported="no">
+		<description>Apple Stock Quote Reporter</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="000-0017-00" />
+		<info name="usage" value="]Load 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Apple Stock Quote Reporter" />
+			<dataarea name="cass" size="6640828">
+				<rom name="apple stock quote reporter (1978)(apple computer).wav" size="6640828" crc="d8079d0b" sha1="f70d91cc12dd3ff3a045255c84a61f0c14ee3167" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apl2trk" cloneof="apltrek">
+		<description>Apple-2 Trek</description>
+		<year>1977</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value=">HIMEM:16384 >Load 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Apple-2 Trek" />
+			<dataarea name="cass" size="8449462">
+				<rom name="apple-2 trek (1977)(apple computer).wav" size="8449462" crc="3edd69cf" sha1="5b260523993893fa6cce5520d955cab425a9ecc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apltrek">
+		<description>Apple Trek</description>
+		<year>1977</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2013-01" />
+		<info name="usage" value=">Load 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Apple Trek" />
+			<dataarea name="cass" size="3996802">
+				<rom name="applesoft (1977)(apple computer).wav" size="3996802" crc="3e8e5ada" sha1="61d67a606c63bfe3d5e8090af5ef710aeceb4c6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplvbio">
+		<description>Apple-Vision / Biorhythms</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="685-0005-00" />
+		<info name="usage" value="cass1  >HIMEM:16384 >Load 16K, cass2 Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="APPLEVISION" />
+			<dataarea name="cass" size="2063394">
+				<rom name="apple-vision (1979)(apple computer).wav" size="2063394" crc="09a87b3d" sha1="5f8924a88220a7a1c93ddd358d50a8b85f6b1f51" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="BIORHYTHM" />
+			<dataarea name="cass" size="6070316">
+				<rom name="biorhythms (1979)(apple computer).wav" size="6070316" crc="fb1acbfa" sha1="d080c895bd6bd942dc089bfdef3253518824cdb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finapen">
+		<description>Basic Finance I/ Penny Arcade</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2025-00" />
+		<info name="usage" value="]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Finance I" />
+			<dataarea name="cass" size="2721326">
+				<rom name="finance (1979)(apple computer).wav" size="2721326" crc="75bc99b2" sha1="ac6294eca74b899c9cc8ac105df1b1a38253ecbb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Penny Arcade" />
+			<dataarea name="cass" size="3288108">
+				<rom name="penny arcade (1979)(apple computer).wav" size="3288108" crc="e2caf89c" sha1="f5d1e377bb84b37e05db6a9887a705e4aaf30cab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="briapho">
+		<description>Brian's Theme / Phone List</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2027-00"/>
+		<info name="usage" value="]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Brian's Theme" />
+			<dataarea name="cass" size="1075026">
+				<rom name="brian's theme (1979)(apple computer).wav" size="1075026" crc="27e117bc" sha1="077bd439a3773145ac1538054c1454fb019fc933" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Phone List" />
+			<dataarea name="cass" size="6736940">
+				<rom name="phone list (1979)(apple computer).wav" size="6736940" crc="3c2205e6" sha1="9ca9be28f29f5b60fac17d98285f8b0f66d24e97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="briccol">
+		<description>Brick out / Color Demonstration Programs</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="685-0003-00" />
+		<info name="usage" value=">Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="BRICK OUT" />
+			<dataarea name="cass" size="4003116">
+				<rom name="brick out (1978)(apple computer).wav" size="4003116" crc="d976632e" sha1="98af4863cbfb26c2dd5c4eeaa7aec7a0caa23d63" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="COLOR DEMO" />
+			<dataarea name="cass" size="1192748">
+				<rom name="color demo (1978)(apple computer).wav" size="1192748" crc="2a4993cd" sha1="4e614be8bcffec53b122792ee1de873f235a7e6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brkocol">
+		<description>Breakout / Color Graphics</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2014-00" />
+		<info name="P/N" value="A2T0003X" />
+		<info name="usage" value=">Load 4K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Breakout" />
+			<dataarea name="cass" size="1127548">
+				<rom name="color graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Color Graphics" />
+			<dataarea name="cass" size="1544236">
+				<rom name="breakout (1978)(apple computer).wav" size="1544236" crc="64441f07" sha1="37da93d0a057a718031395f6c83c57c9a8d3daf0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brkocla" cloneof="brkocol">
+		<description>Breakout / Color Demos</description>
+		<year>1977</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value=">Load 4K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="BREAKOUT" />
+			<dataarea name="cass" size="1409068">
+				<rom name="breakout (1977)(apple computer).wav" size="1409068" crc="f71de074" sha1="53b200528b26173104e453cc392605d1e12eb25e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="COLOR DEMOS" />
+			<dataarea name="cass" size="1333036">
+				<rom name="4k color demos (1977)(apple computer).wav" size="1333036" crc="e03d6568" sha1="00654b4370bc6317241c1f20ae5e8a57d998df26" offset="0" />
+			</dataarea>
+		</part>
+
+	</software>
+
 	<software name="clrdlbo">
 		<description>Color Demosoft / Little Brickout</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value="16K ]Load" />
+		<info name="serial" value="600-2023-00" />
+		<info name="usage" value="]Load 16K" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Side A: Color Demosoft"/>
+			<feature name="part_id" value="Color Demosoft" />
 			<dataarea name="cass" size="1391234">
 				<rom name="color demosoft (1979)(apple computer).wav" size="1391234" crc="2ba255a5" sha1="3b3340d96435a8e377e897ecbfa36aa0d901188d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Side B: Little Brickout"/>
+			<feature name="part_id" value="Little Brickout" />
 			<dataarea name="cass" size="3092524">
 				<rom name="little brickout (1979)(apple computer).wav" size="3092524" crc="8aa1ca88" sha1="a19b143204faeb88d61001f4f57ba4d4ca8939fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkbk">
+		<description>Checkbook</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="usage" value=">Load 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Checkbook 1" />
+			<dataarea name="cass" size="3815212">
+				<rom name="checkbook (1978)(apple computer).wav" size="3815212" crc="bd524dca" sha1="5ea924cffdb112ac3ef84f97560821936c63ab95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colosup">
+		<description>Color Sketch / Supermath</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="685-0004-00" />
+		<info name="usage" value=">Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="COLORSKETCH" />
+			<dataarea name="cass" size="4058668">
+				<rom name="color sketch (1979)(apple computer).wav" size="4058668" crc="af861101" sha1="49862c931d8abdf6590c15208128c56d89158c93" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="SUPERMATH" />
+			<dataarea name="cass" size="4156716">
+				<rom name="supermath (1979)(apple computer).wav" size="4156716" crc="d49f1024" sha1="e951066dd8e3130cf2a6d466d7f05b2fb76a35ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datmtel" supported="partial">
+		<description>Datamover / Telepong</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="002-0016-00" />
+		<info name="P/N" value="A2T0012X" />
+		<info name="usage" value="cass1 *800.A4FR >LOMEM:2700 4K, cass2 >Load 4K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Datamover (Machine Language Load)" />
+			<dataarea name="cass" size="456748">
+				<rom name="datamover (1978)(apple computer).wav" size="456748" crc="2facd401" sha1="897d7b9e596067b3b9e2716e5bf7b46345d34822" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Telepong (Integer BASIC)" />
+			<dataarea name="cass" size="1844268">
+				<rom name="telepong (1978)(apple computer).wav" size="1844268" crc="26f60636" sha1="b25301a352dc939fbe71c629ca56650e7da141d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiresgra">
+		<description>High Resolution Graphics</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2016-00" />
+		<info name="usage" value="*C00.FFFR >Load >HIMEM:8192 16K" />
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="High Resolution Graphics (2 Program Load Machine and Basic)" />
+			<dataarea name="cass" size="2788396">
+				<rom name="hi resolution graphics (1978)(apple computer).wav" size="2788396" crc="0f2afcb9" sha1="aa8fc667ee0ec4bd97c91f11486f9f1292d43d7e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hngmclrm">
+		<description>Hangman / Color Math</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="002-0010-00" />
+		<info name="P/N" value="A2T0007X" />
+		<info name="usage" value=">Load 4K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Hangman" />
+			<dataarea name="cass" size="1365000">
+				<rom name="hangman (1978)(apple computer).wav" size="1365000" crc="7cb17ef7" sha1="0f9f5c19ad9b29f660cafadbd07182e820dc0480" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Color Math" />
+			<dataarea name="cass" size="1874220">
+				<rom name="color math (1978)(apple computer).wav" size="1874220" crc="8e6e9d4a" sha1="24a6f70ec9e79cc509fe16d97faba8e20ddac9ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopalemn">
+		<description>Hopalong Cassidy / Lemonade Stand</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="600-2026-00" />
+		<info name="usage" value="]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Hopalong Cassidy" />
+			<dataarea name="cass" size="4846636">
+				<rom name="hopalong cassidy (1979)(apple computer).wav" size="4846636" crc="f51cefd7" sha1="04241ab8698bf0cfc49fda9867b410ad784ab4a0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Lemonade Stand" />
+			<dataarea name="cass" size="3955722">
+				<rom name="lemonade (1979)(apple computer).wav" size="3955722" crc="0e4ef59c" sha1="fb6c1dfd3293235583a29a770e7a2af50438d0cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leasloan">
+		<description>Leases / Loans</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="002-0014-00" />
+		<info name="P/N" value="A2T0011X" />
+		<info name="usage" value="]Load 16K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Leases (Applesoft BASIC)" />
+			<dataarea name="cass" size="1874784">
+				<rom name="leases (1978)(apple computer).wav" size="1874784" crc="3dda6da2" sha1="042d146c5d1981ae8d7d7a0b010f53cd804137f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Loans (Applesoft BASIC)" />
+			<dataarea name="cass" size="2752556">
+				<rom name="loans (1978)(apple computer).wav" size="2752556" crc="1e771ac1" sha1="4c8c278c540128f34f442523fda1ad5f044ebf07" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -26,10 +419,32 @@
 		<description>Lords of Karma</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
-		<info name="usage" value="32K 0800.7FFFR 0800G" />
+		<info name="usage" value="*0800.7FFFR 0800G 32K" />
 		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Lords of Karma" />
 			<dataarea name="cass" size="8095936">
 				<rom name="lords of karma (1980)(microcomputer games).wav" size="8095936" crc="295520d8" sha1="ddaf810d7c610da485620738a506fb0436319303" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="savgfin">
+		<description>Savings / Finance</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="002-0015-00" />
+		<info name="P/N" value="A2T0011X" />
+		<info name="usage" value="]Load 16K, ]Load 20K" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="Savings (Applesoft BASIC)" />
+			<dataarea name="cass" size="3288108">
+				<rom name="savings (1978)(apple computer).wav" size="3288108" crc="84f9d02a" sha1="350c0efa6abec4aac01d79933fae7cadaa978ebe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="Finance (Applesoft BASIC)" />
+			<dataarea name="cass" size="3279916">
+				<rom name="finance (1978)(apple computer).wav" size="3279916" crc="37360e3d" sha1="d9eaec167a3ad69e449d4607c1a206effaea9fbf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -38,17 +453,39 @@
 		<description>Startrek / Starwars</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value="16K >Load" />
+		<info name="serial" value="002-0006-00" />
+		<info name="P/N" value="A2T0002X" />
+		<info name="usage" value=">Load 16K" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Side A: Startrek"/>
+			<feature name="part_id" value="Startrek" />
 			<dataarea name="cass" size="4134574">
 				<rom name="startrek (1978)(apple computer).wav" size="4134574" crc="7112bff5" sha1="279545abc5bf9b57dc79e7ea322df59b733803b0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Side B: Starwars"/>
+			<feature name="part_id" value="Starwars" />
 			<dataarea name="cass" size="2590032">
 				<rom name="starwars (1978)(apple computer).wav" size="2590032" crc="d2ea22a1" sha1="823ac3669a4b98fb7ca41f90db0d562c624d4904" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapmatt" supported="no">
+		<description>Tape Measure / Alignment Test Tone</description>
+		<year>1978</year>
+		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="685-0001-00" />
+		<info name="usage" value="*C100G" />
+		<part name="cass1" interface="apple2_cass">
+			<feature name="part_id" value="TAPE MEASURE (USE WITH PROM CARD IN SLOT 1)" />
+			<dataarea name="cass" size="5863468">
+				<rom name="tape measure (1979)(apple computer).wav" size="5863468" crc="195b6bb8" sha1="054eeddfd41176e0d9a1e33a1593202ec828c46f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apple2_cass">
+			<feature name="part_id" value="ALIGNMENT TEST TONE" />
+			<dataarea name="cass" size="5677100">
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>

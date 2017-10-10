@@ -328,6 +328,7 @@ Notes:
 #include "includes/harddriv.h"
 
 #include "includes/slapstic.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"

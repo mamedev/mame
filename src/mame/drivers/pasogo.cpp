@@ -108,6 +108,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "softlist.h"
 

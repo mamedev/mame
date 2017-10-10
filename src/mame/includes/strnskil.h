@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Uki
+
+#include "machine/timer.h"
+
 class strnskil_state : public driver_device
 {
 public:

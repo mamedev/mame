@@ -20,6 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 

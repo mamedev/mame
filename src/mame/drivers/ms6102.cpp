@@ -13,7 +13,6 @@
     To do:
     - why DMA stops after 2nd char on each row?
     - what does second 8275 do?
-    - what is the layout of chargen ROM?
     - keyboard (MS7002)
 
     Chips:
@@ -69,17 +68,15 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-		, m_p_charmap(*this, "charmap")
 		{ }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state?0:1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
+	DECLARE_DRIVER_INIT(ms6102);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 
 	DECLARE_WRITE8_MEMBER(pic_w);
@@ -95,6 +92,8 @@ private:
 	bool m_kbd_ready;
 	uint8_t m_kbd_data;
 
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
@@ -105,7 +104,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
-	required_region_ptr<u8> m_p_charmap;
 };
 
 static ADDRESS_MAP_START(ms6102_mem, AS_PROGRAM, 8, ms6102_state)
@@ -130,13 +128,13 @@ ADDRESS_MAP_END
 
 static const gfx_layout ms6102_charlayout =
 {
-	7, 8,
-	RGN_FRAC(1,1),
+	8, 12,
+	256,
 	1,
 	{ 0 },
 	{ STEP8(1,1) },
-	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8, 1*8, },
-	8*8
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	16*8
 };
 
 static GFXDECODE_START(ms6102)
@@ -160,19 +158,16 @@ READ8_MEMBER(ms6102_state::memory_read_byte)
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
-	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 dd64 = m_p_charmap[((linecount >> 1) & 7) + ((charcode >> 2) & 0x18) + ((lineattr & 2) << 4)] ^ 0xff;
-	u8 gfx  = m_p_chargen[(linecount & 3) + ((dd64 & 1) << 2) + ((charcode & 0x1f) << 3) + ((dd64 & 0xe) << 7)];
+	u8 gfx = (lten) ? 0xff : 0;
+	if (linecount < 12 && !vsp)
+		gfx = m_p_chargen[linecount | (charcode << 4)];
 
-	if (lten)
-	{
-		gfx = 0xff;
-	}
-	for (i = 0; i < 8; i++)
-	{
-		bitmap.pix32(y, x + i) = palette[(gfx >> (7 - i)) & 1 ? (hlgt ? 2 : 1) : 0];
-	}
+	if (rvv)
+		gfx ^= 0xff;
+
+	for(u8 i=0; i<8; i++)
+		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 
@@ -214,6 +209,41 @@ void ms6102_state::machine_reset()
 void ms6102_state::machine_start()
 {
 	m_pic->etlg_w(1);
+}
+
+DRIVER_INIT_MEMBER( ms6102_state, ms6102 )
+{
+	// rearrange the chargen to be easier for us to access
+	int i,j;
+	for (i = 0; i < 0x100; i++)
+		for (j = 0; j < 2; j++)
+			m_p_chargen[0x1800+i*8+j+6] = m_p_chargen[0x1000+i*8+j];
+	for (i = 0; i < 0x100; i++)
+		for (j = 2; j < 8; j++)
+			m_p_chargen[0x1800+i*8+j-2] = m_p_chargen[0x1000+i*8+j];
+	// since we don't know which codes are for the russian symbols, give each unused char a unique marker
+	for (i = 0; i < 256; i++)
+		m_p_chargen[i*16] = i;
+	// copy over the ascii chars into their new positions (lines 0-7)
+	for (i = 0x20; i < 0x80; i++)
+		for (j = 0; j < 8; j++)
+			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+	// copy the russian symbols to codes 0xc0-0xff for now
+	for (i = 0xc0; i < 0x100; i++)
+		for (j = 0; j < 8; j++)
+			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+	// for punctuation, get the last 4 lines into place
+	for (i = 0x20; i < 0x40; i++)
+		for (j = 0; j < 4; j++)
+			m_p_chargen[i*16+8+j] = m_p_chargen[0x1700+i*8+j];
+	// for letters, get the last 4 lines into place
+	for (i = 0x40; i < 0x80; i++)
+		for (j = 0; j < 4; j++)
+			m_p_chargen[i*16+8+j] = m_p_chargen[0x1a00+i*8+j];
+	// for russian, get the last 4 lines into place
+	for (i = 0xc0; i < 0x100; i++)
+		for (j = 0; j < 4; j++)
+			m_p_chargen[i*16+8+j] = m_p_chargen[0x1604+i*8+j];
 }
 
 
@@ -271,7 +301,7 @@ static MACHINE_CONFIG_START( ms6102 )
 MACHINE_CONFIG_END
 
 ROM_START( ms6102 )
-	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x3000, "maincpu", 0)
 	ROM_LOAD("MC6102_02_KS573RF2_DD26",   0x0000, 0x0800, CRC(f96ba806) SHA1(60d155b781e97e86d31dc2194ad367030470eeb6))
 	ROM_LOAD("MC6102_02_KS573RF2_DD30",   0x0800, 0x0800, CRC(1d69ba62) SHA1(bf7d19400fe606239ce8a057850cf4c63ff4cdb2))
 	ROM_LOAD("MC6102_02_KS573RF2_0034",   0x1000, 0x0800, CRC(4bce121a) SHA1(e97c635c2fab70a71a31db3b53284209b5881f2c))
@@ -279,14 +309,14 @@ ROM_START( ms6102 )
 	ROM_LOAD("MC6102_02_KS573RF2_0045",   0x2000, 0x0800, CRC(fd741cfe) SHA1(153abb57ca4833286811082ff50c7b36136274dc))
 	ROM_LOAD("MC6102_02_KS573RF2_DD49",   0x2800, 0x0800, CRC(748f6cee) SHA1(a35e6495ea108824f2f1f9907f5e651174e9cf15))
 
-	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
-	ROM_LOAD("MC6102_02_K555RE4_chargen", 0x0000, 0x0800, CRC(b0e3546b) SHA1(25aca264cc64f368ffcefdfd356120a314a44947))
+	ROM_REGION(0x2000, "chargen", ROMREGION_ERASE00)
+	ROM_LOAD("MC6102_02_K555RE4_chargen", 0x1000, 0x0800, CRC(b0e3546b) SHA1(25aca264cc64f368ffcefdfd356120a314a44947))
 
-	ROM_REGION(0x0100, "charmap", ROMREGION_ERASE00)
+	ROM_REGION(0x0100, "charmap", 0)
 	ROM_LOAD("MC6102_02_K556RT4_D64",     0x0000, 0x0100, CRC(a59fdaa7) SHA1(0851a8b12e838e8f7e5ce840a0262facce303442))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT                   COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0,      "Elektronika", "MS 6102.02", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
+COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  ms6102, "Elektronika", "MS 6102.02", MACHINE_IS_SKELETON)

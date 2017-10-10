@@ -141,6 +141,11 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "speaker.h"
 
 
+WRITE16_MEMBER(spbactn_state::main_irq_ack_w)
+{
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
@@ -157,8 +162,9 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	/* this are an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
 	AM_RANGE(0x90010, 0x90011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-//  AM_RANGE(0x90020, 0x90021) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x90020, 0x90021) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x90030, 0x90031) AM_WRITENOP
+	AM_RANGE(0x90050, 0x90051) AM_WRITENOP
 
 	AM_RANGE(0x90080, 0x90081) AM_WRITENOP
 	AM_RANGE(0x90090, 0x90091) AM_WRITENOP
@@ -197,14 +203,14 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
 
-	AM_RANGE(0x90002, 0x90003) AM_WRITE( spbatnp_90002_w )
-	AM_RANGE(0x90006, 0x90007) AM_WRITE( spbatnp_90006_w )
-	AM_RANGE(0x9000a, 0x9000b) AM_WRITE( spbatnp_9000a_w )
-	AM_RANGE(0x9000c, 0x9000d) AM_WRITE( spbatnp_9000c_w )
-	AM_RANGE(0x9000e, 0x9000f) AM_WRITE( spbatnp_9000e_w )
+	AM_RANGE(0x90002, 0x90003) AM_WRITE(main_irq_ack_w)
+	AM_RANGE(0x90006, 0x90007) AM_WRITE(spbatnp_90006_w)
+	AM_RANGE(0x9000a, 0x9000b) AM_WRITE(spbatnp_9000a_w)
+	AM_RANGE(0x9000c, 0x9000d) AM_WRITE(spbatnp_9000c_w)
+	AM_RANGE(0x9000e, 0x9000f) AM_WRITE(spbatnp_9000e_w)
 
-	AM_RANGE(0x90124, 0x90125) AM_WRITE( spbatnp_90124_w ) // bg scroll
-	AM_RANGE(0x9012c, 0x9012d) AM_WRITE( spbatnp_9012c_w ) // bg scroll
+	AM_RANGE(0x90124, 0x90125) AM_WRITE(spbatnp_90124_w) // bg scroll
+	AM_RANGE(0x9012c, 0x9012d) AM_WRITE(spbatnp_9012c_w) // bg scroll
 
 
 
@@ -401,17 +407,23 @@ static MACHINE_CONFIG_START( spbactn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+#if 0
+	// actual blanking frequencies unknown, but should be close to NTSC
+	MCFG_SCREEN_RAW_PARAMS(XTAL_22_656MHz / 2, 720, 0, 512, 262, 16, 240)
+#else
+	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+#endif
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
@@ -448,7 +460,7 @@ static MACHINE_CONFIG_START( spbactnp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)

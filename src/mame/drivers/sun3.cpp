@@ -185,6 +185,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "machine/z80scc.h"
 
 #include "bus/rs232/rs232.h"

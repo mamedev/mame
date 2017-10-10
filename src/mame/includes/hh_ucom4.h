@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_HH_UCOM4_H
 
 #include "cpu/ucom4/ucom4.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 

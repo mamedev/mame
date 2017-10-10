@@ -672,6 +672,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 {
 	// parse the INI file
 	std::ostringstream error;
+	osd_setup_osd_specific_emu_options(m_opts);
 	mame_options::parse_standard_inis(m_opts, error, m_drv);
 	setup_bios();
 }

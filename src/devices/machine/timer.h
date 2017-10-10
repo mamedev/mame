@@ -10,12 +10,8 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef MAME_EMU_TIMER_H
-#define MAME_EMU_TIMER_H
+#ifndef MAME_MACHINE_TIMER_H
+#define MAME_MACHINE_TIMER_H
 
 
 
@@ -153,4 +149,4 @@ private:
 DECLARE_DEVICE_TYPE(TIMER, timer_device)
 
 
-#endif // MAME_EMU_TIMER_H
+#endif // MAME_MACHINE_TIMER_H

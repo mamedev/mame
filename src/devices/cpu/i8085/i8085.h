@@ -13,6 +13,7 @@
 #define I8085_RST55_LINE    1
 #define I8085_RST65_LINE    2
 #define I8085_RST75_LINE    3
+#define I8085_TRAP_LINE     INPUT_LINE_NMI
 
 
 // STATUS changed callback

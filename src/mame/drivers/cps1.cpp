@@ -8704,6 +8704,39 @@ ROM_START( knightsja )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
+// dumper's note: This board has bad priority layers - The 'flag' is behind the characters on one demo mode level for example
+
+ROM_START( knightsb2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "left.code.040",   0x00000, 0x80000, CRC(95d00a7e) SHA1(2da1c47aa15d44aa842a8d79e030e7e7b69bec19) )
+	ROM_LOAD16_BYTE( "right.code.040",  0x00001, 0x80000, CRC(5a9d0b64) SHA1(6ff312879c3d675ceee6fd3e262f797fabb9871e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same ROM arrangement as sfm8. Same bootlegger?
+	ROMX_LOAD( "spe-a.japan9207d.mask1.801",    0x000000, 0x40000, CRC(14a15fcd) SHA1(8bb9d79145dd652e9a7c6e433a3f423d5518cd41), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000004, 0x40000)
+	ROM_CONTINUE(          0x200000, 0x40000)
+	ROM_CONTINUE(          0x200004, 0x40000)
+	ROMX_LOAD( "spe-b.japan9207d.mask2.801",    0x000001, 0x40000, CRC(250d2957) SHA1(067bc46e3fc8b9166da1fb25f7fe9dbd80d9fda4), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000005, 0x40000)
+	ROM_CONTINUE(          0x200001, 0x40000)
+	ROM_CONTINUE(          0x200005, 0x40000)
+	ROMX_LOAD( "spe-c.japan9207d.mask4.801",    0x000002, 0x40000, CRC(0721c26d) SHA1(6211a723520fd1c2594e95b353ea6deb70d7ce90), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000006, 0x40000)
+	ROM_CONTINUE(          0x200002, 0x40000)
+	ROM_CONTINUE(          0x200006, 0x40000)
+	ROMX_LOAD( "spe-d.japan9207d.mask3.801",    0x000003, 0x40000, CRC(db97f56a) SHA1(bf61dd97b0e3790b27b0f67bb98ecae69ffa048f), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000007, 0x40000)
+	ROM_CONTINUE(          0x200003, 0x40000)
+	ROM_CONTINUE(          0x200007, 0x40000)
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sound.code.512",  0x00000, 0x08000, CRC(5e44d9ee) SHA1(47a7503321be8d52b5c44af838e3bb82ee15a415) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "spe-e.japan9208d.snd.mask.020",  0x00000, 0x40000, CRC(85f837a0) SHA1(21a3fe8fdad10bfc994777e0b85c2c4b23943534) )
+ROM_END
+
 /* B-Board 91635B-2 */
 ROM_START( sf2ce )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -12638,6 +12671,7 @@ GAME( 1991, knights,     0,        cps1_10MHz, knights,  cps_state,   cps1,     
 GAME( 1991, knightsu,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (USA 911127)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsj,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsja,   knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 89625B-1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, knightsb2,   knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (bootleg, World 911127)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // i.e. player selection screen problems
 GAME( 1992, sf2ce,       0,        cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920513)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceea,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920313)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceua,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920313)", MACHINE_SUPPORTS_SAVE )

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "machine/timer.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

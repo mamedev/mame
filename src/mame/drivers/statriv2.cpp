@@ -1060,6 +1060,32 @@ ROM_START( nsupertr3 )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
+ROM_START( bbchall ) // ROMs came from a blister, Baby Boom Challenge title found in bbu2.2b
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bbu.1b",   0x0000, 0x1000, CRC(d329bd36) SHA1(165fa6d4c99efac3e563d60005ee7e56cdf49252) )
+	ROM_LOAD( "bbu.2b",   0x1000, 0x1000, CRC(f5a0e022) SHA1(0224267cc500a45da86c881907c25a521b360f68) )
+	ROM_LOAD( "bbu.3b",   0x2000, 0x1000, CRC(e83ca1c9) SHA1(dd71c5e44f881b2a6067998882605abb0037182d) )
+	ROM_LOAD( "bbu.4b",   0x3000, 0x1000, CRC(dbad980c) SHA1(f4ec5f51185eeda7ed59b8cb7da9a293fe701389) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "bbu.0b",   0x0000, 0x1000, CRC(4d2f5878) SHA1(8f6b7278e43c1c505580fd9a02f4bdec51dc2284) )
+
+	ROM_REGION( 0x40000, "questions", 0 )
+	ROM_LOAD( "q1.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q2.rom", 0x08000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q3.rom", 0x10000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q4.rom", 0x18000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q5.rom", 0x20000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q6.rom", 0x28000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q7.rom", 0x30000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q8.rom", 0x38000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x0140, "proms", 0 ) // no PROMs in the blister, but should exist
+	ROM_LOAD( "prom1", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "prom2", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "prom3", 0x0040, 0x0100, NO_DUMP )
+ROM_END
+
 ROM_START( cstrip )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astrip-1g.u7", 0x0000, 0x1000, CRC(4f47a25d) SHA1(104cf9b7e4489b94df1aa699cde561e4464d527b) )
@@ -1283,6 +1309,7 @@ GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, addr_xhl,
 GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, 0,         ROT0,  "Status Games",       "Baby Boom Challenge",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
 GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0,  "Status Games",       "Super Triv II",             MACHINE_SUPPORTS_SAVE )
 GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Super Triv III",            MACHINE_SUPPORTS_SAVE )
 GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems

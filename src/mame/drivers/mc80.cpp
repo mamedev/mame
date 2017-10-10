@@ -10,6 +10,8 @@
 
 Real workings of mc8020 keyboard need to be understood and implemented.
 
+mc80.3x: http://www.ycdt.net/mc80.3x/
+
 mc8030: very little info available. The area from FFD8-FFFF is meant for
 interrupt vectors and so on, but most of it is zeroes. Appears the keyboard
 is an ascii keyboard with built-in beeper. It communicates via the SIO,
@@ -297,6 +299,40 @@ ROM_START( mc8030 )
 	ROM_LOAD( "spe_2.rom", 0x2400, 0x0400, CRC(98320040) SHA1(6baf87e196f1ccdf44912deafa6042becbfb0679))
 
 	ROM_REGION( 0x4000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x4000, "user1", 0 )
+	// marked as "80.3x"
+	ROM_LOAD( "mc80.3-x-2c00-c63c.bin", 0x2c00, 0x0400, CRC(469be754) SHA1(a7fea257a1c0970349f75504c0870a2649b50303) )
+	ROM_LOAD( "mc80.3-ccd-3000-f10a.bin", 0x3000, 0x0400, CRC(7d220128) SHA1(bb6070c9d460ec7ea1a1b46b19ca9520d55e127c) ) // 80.3x ccd test system
+	ROM_LOAD( "mc80.3-x-3800-7280.bin", 0x3800, 0x0400, CRC(09976efb) SHA1(1a708adbf1cd68d450a9bfccafe1f82e755e5885) )
+	// marked as "80.3x rk"
+	ROM_LOAD( "mc80.3-rk-3000-5642.bin", 0x3000, 0x0400, CRC(280b2211) SHA1(d2c05ff7f7ea534776bf7e92263f1c10192e5385) )
+	ROM_LOAD( "mc80.3-rk-3400-c6a7.bin", 0x3400, 0x0400, CRC(fc5656f3) SHA1(0ad5abb6536665719693063bf8da2993238c84dd) )
+	ROM_LOAD( "mc80.3-rk-3800-1678.bin", 0x3800, 0x0400, CRC(34d7e1cf) SHA1(14d3e49f34e0c2a95967613538b33a671998e7a8) )
+	// marked as "80.30e v1"
+	ROM_LOAD( "mc80.30e-0000.bin", 0x0000, 0x0800, CRC(ebdf766f) SHA1(d06f1e4467104f59554168d17cd15b98d107375e) )
+	// marked as "80.30e v2"
+	ROM_LOAD( "mc80.30e-0000v2.bin", 0x0000, 0x0800, CRC(259b55e9) SHA1(6e8fd84f1b225f33bc0fd30ecc6e30b8063eaeed) )
+	ROM_LOAD( "mc80.30e-0800v2.bin", 0x0800, 0x0800, CRC(fe7a01a7) SHA1(6531cde5b9dea2a15a813598937aa3d9540a8066) )
+	// marked as "80.31e"
+	ROM_LOAD( "mc80.31e-2400-d0d7.bin", 0x2400, 0x0400, CRC(43c22046) SHA1(a179fe83b5cbbbc5f92a4b2ef1012099ccb333d9) )
+	ROM_LOAD( "mc80.31e-3000-0d15.bin", 0x3000, 0x0400, CRC(cf6f090b) SHA1(0bc352ca42f41cfe7e28052c099dcd020b776dd5) )
+	ROM_LOAD( "mc80.31e-3400-9993.bin", 0x3400, 0x0400, CRC(918d2b55) SHA1(b6dec17e996c464cf189a699d24d270494540b49) )
+	ROM_LOAD( "mc80.31e-3800-7a4c.bin", 0x3800, 0x0400, CRC(62d9f989) SHA1(a20b731daed51270d86f486751302055eb93dd1c) )
+	// marked as "80.31e?"
+	ROM_LOAD( "mc80.3s-2000.bin", 0x2000, 0x0400, CRC(28f1df56) SHA1(9752c9eab3d9f72c23b5f5618a5db1a038953e29) )
+	ROM_LOAD( "mc80.3s-2400.bin", 0x2400, 0x0400, CRC(43c22046) SHA1(a179fe83b5cbbbc5f92a4b2ef1012099ccb333d9) )
+	ROM_LOAD( "mc80.3s-2800.bin", 0x2800, 0x0400, CRC(4b52deb1) SHA1(f8a9ddb4363f8389990fd263985e882a73265c5d) )
+	ROM_LOAD( "mc80.3s-2c00.bin", 0x2c00, 0x0400, CRC(a13d8302) SHA1(1fcdcd6b7af8ef4b18a0658a1a50d0db26b7f214) )
+	ROM_LOAD( "mc80.3s-3000.bin", 0x3000, 0x0400, CRC(cf6f090b) SHA1(0bc352ca42f41cfe7e28052c099dcd020b776dd5) )
+	ROM_LOAD( "mc80.3s-3400.bin", 0x3400, 0x0400, CRC(918d2b55) SHA1(b6dec17e996c464cf189a699d24d270494540b49) )
+	ROM_LOAD( "mc80.3s-3800.bin", 0x3800, 0x0400, CRC(6104646b) SHA1(630f7c57e928db0eb4070139a66f2d313a6314b4) )
+	ROM_LOAD( "mc80.3s-3c00.bin", 0x3c00, 0x0400, CRC(2f82d032) SHA1(fe8f642b94a0ba8852ec56d8cbb7a52bb7e5d55a) )
+	// marked as "80.33 original"
+	ROM_LOAD( "mc80.33-1000.bin", 0x1000, 0x0800, CRC(c7e062b1) SHA1(81b999655b32d9b39287a08896a274278a2f739c) )
+	// random set, zve_1 - 4 same as main set
+	ROM_LOAD( "spe_1a.rom",    0x2000, 0x000800, CRC(37c71c68) SHA1(951650698b00f65facf5ccfbd8dd13628a93425d) )
+	ROM_LOAD( "spe_2a.rom",    0x2800, 0x000400, CRC(9ec8f287) SHA1(cdf5a9583d898814ba480ffbc8d906a642c6dc81) )
 ROM_END
 
 /* Driver */

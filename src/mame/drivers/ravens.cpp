@@ -81,18 +81,15 @@ ToDo:
 #include "ravens.lh"
 
 
-#define TERMINAL_TAG "terminal"
-
 class ravens_state : public driver_device
 {
 public:
 	ravens_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_cass(*this, "cassette")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_cass(*this, "cassette")
+	{ }
 
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
@@ -105,6 +102,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
+
+private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -358,7 +357,7 @@ static MACHINE_CONFIG_START( ravens2 )
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
 
 	/* quickload */

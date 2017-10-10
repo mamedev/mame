@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "screen.h"

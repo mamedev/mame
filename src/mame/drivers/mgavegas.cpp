@@ -21,6 +21,7 @@ Ver. 2.2 should exist
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "sound/msm5205.h"

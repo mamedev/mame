@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 {
 	int scanline = param;
 
-	if (!(m_mw_irq_control & 0x02)) return;
+	if (!(m_mw_irq_control & 0x40)) return;
 
 	if(scanline == 247)
 	{
@@ -409,26 +409,38 @@ WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
 
 READ16_MEMBER(mystwarr_state::mccontrol_r)
 {
-	return m_mw_irq_control<<8;
+	// unknown, buggy watchdog reset code ?
+	return 0;
 }
 
 WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_mw_irq_control = data>>8;
-		// bit 0 = watchdog
-		// bit 1 = IRQ enable
-		// bit 2 = OBJCHA
+		// bit 0 = AFR watchdog?
+		// bit 1 = MUTE
+		// bit 2 = OCHARA OBJCHA
 
 		m_k055673->k053246_set_objcha_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-
-//      if (data & 0xf8) logerror("Unk write %x to mccontrol\n", data);
-
 	}
-
 //  else logerror("write %x to LSB of mccontrol\n", data);
+}
 
+WRITE16_MEMBER(mystwarr_state::mceeprom_w)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		m_mw_irq_control = data >> 8;
+		// bit 0 EEPROM DI
+		// bit 1 EEPROM CS
+		// bit 2 EEPROM CLK
+		// bit 3 COINCNT1
+		// bit 4 COINCNT2
+		// bit 5 OBJDMAEN
+		// bit 6 VINTEN
+		ioport("EEPROMOUT")->write(data, 0xffff);
+	}
+	//  logerror("unknown LSB write %x to eeprom\n", data);
 }
 
 /* Martial Champion */
@@ -443,7 +455,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x40a000, 0x40a01f) AM_DEVWRITE("k054338", k054338_device, word_w)                // CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_DEVWRITE("k056832", k056832_device,word_w)                // VACSET
 	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)      // protection
-	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
+	AM_RANGE(0x410000, 0x410001) AM_WRITE(mceeprom_w)
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
 	AM_RANGE(0x414000, 0x414001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x414002, 0x414003) AM_READ_PORT("P3_P4")
@@ -762,7 +774,7 @@ static INPUT_PORTS_START( martchmp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* NCPU game loops if this is set */
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )

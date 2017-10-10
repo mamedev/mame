@@ -210,6 +210,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"

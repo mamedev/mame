@@ -1421,11 +1421,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	for(int i=0; i != result_pos; i++)
 		LOG(" %02x", result[i]);
 	LOG("\n");
-	fi.sub_state = IDLE;
-	if(data_completion) {
-		fi.main_state = IDLE;
+	fi.main_state = fi.sub_state = IDLE;
+	if(data_completion)
 		data_irq = true;
-	} else {
+	else {
 		other_irq = true;
 		fi.st0_filled = true;
 	}
@@ -2600,6 +2599,36 @@ void i82072_device::execute_command(int cmd)
 		upd765_family_device::execute_command(cmd);
 		break;
 	}
+}
+
+/*
+ * The Intel datasheet says that the drive busy bits in the MSR are supposed to remain
+ * set after a seek or recalibrate until a sense interrupt status status command is
+ * executed. The InterPro 2000 diagnostic routine goes further, and tests the drive
+ * status bits before and after the first sense interrupt status result byte is read,
+ * and expects the drive busy bit to clear only after.
+ *
+ * The Amstrad CPC6128 uses a upd765a and seems to expect the busy bits to be cleared
+ * immediately after the seek/recalibrate interrupt is generated.
+ *
+ * Special casing the i82072 here seems the only way to reconcile this apparently
+ * different behaviour for now.
+ */
+void i82072_device::command_end(floppy_info &fi, bool data_completion)
+{
+	LOG("command done (%s) -", data_completion ? "data" : "seek");
+	for(int i=0; i != result_pos; i++)
+		LOG(" %02x", result[i]);
+	LOG("\n");
+	fi.sub_state = IDLE;
+	if(data_completion) {
+		fi.main_state = IDLE;
+		data_irq = true;
+	} else {
+		other_irq = true;
+		fi.st0_filled = true;
+	}
+	check_irq();
 }
 
 void i82072_device::motor_control(int fid, bool start_motor)

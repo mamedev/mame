@@ -9,6 +9,7 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "bus/scsi/scsi.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"

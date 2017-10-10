@@ -17,6 +17,7 @@
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"

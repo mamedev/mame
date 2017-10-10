@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "sound/discrete.h"
 #include "screen.h"
 

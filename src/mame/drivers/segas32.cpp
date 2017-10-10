@@ -3078,7 +3078,7 @@ ROM_START( alien3 )
 	ROM_LOAD16_BYTE( "mpr-15854.ic9",  0x100001, 0x080000, CRC(d1aec392) SHA1(f48804fe0151e83ad45e912b55db8ae8ddebd2ad) )
 
 	ROM_REGION( 0x500000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD_x4( "epr-15859.ic36", 0x100000, 0x040000, CRC(91b55bd0) SHA1(23b85a006a91c2a5eb1cee14172fd0d8b7732518) )
+	ROM_LOAD_x4( "epr-15859a.ic36",0x100000, 0x040000, CRC(91b55bd0) SHA1(23b85a006a91c2a5eb1cee14172fd0d8b7732518) )
 	ROM_LOAD( "mpr-15858.ic35",    0x200000, 0x100000, CRC(2eb64c10) SHA1(b2dbe86b82e889f4a9850cf4aa6596a139c1c3d6) )
 	ROM_LOAD( "mpr-15857.ic34",    0x300000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
 	ROM_LOAD( "mpr-15856.ic24",    0x400000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
@@ -3119,7 +3119,7 @@ ROM_START( alien3u )
 	ROM_LOAD16_BYTE( "mpr-15854.ic9",  0x100001, 0x080000, CRC(d1aec392) SHA1(f48804fe0151e83ad45e912b55db8ae8ddebd2ad) )
 
 	ROM_REGION( 0x500000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD_x4( "epr-15859.ic36", 0x100000, 0x040000, CRC(91b55bd0) SHA1(23b85a006a91c2a5eb1cee14172fd0d8b7732518) )
+	ROM_LOAD_x4( "epr-15859a.ic36",0x100000, 0x040000, CRC(91b55bd0) SHA1(23b85a006a91c2a5eb1cee14172fd0d8b7732518) )
 	ROM_LOAD( "mpr-15858.ic35",    0x200000, 0x100000, CRC(2eb64c10) SHA1(b2dbe86b82e889f4a9850cf4aa6596a139c1c3d6) )
 	ROM_LOAD( "mpr-15857.ic34",    0x300000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
 	ROM_LOAD( "mpr-15856.ic24",    0x400000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
@@ -3142,6 +3142,46 @@ ROM_START( alien3u )
 	ROM_LOAD16_WORD( "93c45_eeprom.ic76", 0x0000, 0x0080, CRC(6e1d9df3) SHA1(2fd818bc393fb96e945fa37a63c8a3c4aff2f79f) )
 ROM_END
 
+/**************************************************************************************************************************
+    Alien 3: The Gun (Japan)
+    not protected
+
+    Sega Game ID codes:
+       Game BD: 834-9877
+    Rom PCB No: 837-9878
+      Main PCB: 837-7428-03 (SYSTEM 32 COM)
+     A/D BD NO. 837-7536
+*/
+ROM_START( alien3j )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x2( "epr-15861.ic17",     0x000000, 0x040000, CRC(e970603f) SHA1(b67cf4cb5269d808ff8adc007202cb6e18d5b6a9) )
+	ROM_LOAD_x2( "epr-15860.ic8",      0x080000, 0x040000, CRC(9af0d996) SHA1(3fb06947712947da4830200db2382d9c433a18a9) )
+	ROM_LOAD16_BYTE( "mpr-15855.ic18", 0x100000, 0x080000, CRC(a6fadabe) SHA1(328bbb54651eef197ba13f1bd9228f3f4de7ee5e) )
+	ROM_LOAD16_BYTE( "mpr-15854.ic9",  0x100001, 0x080000, CRC(d1aec392) SHA1(f48804fe0151e83ad45e912b55db8ae8ddebd2ad) )
+
+	ROM_REGION( 0x500000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-15859.ic36", 0x100000, 0x040000, CRC(7eeda800) SHA1(d0599730a8a2adbed08fec4160b8b3963e8ac0f6) )
+	ROM_LOAD( "mpr-15858.ic35",    0x200000, 0x100000, CRC(2eb64c10) SHA1(b2dbe86b82e889f4a9850cf4aa6596a139c1c3d6) )
+	ROM_LOAD( "mpr-15857.ic34",    0x300000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
+	ROM_LOAD( "mpr-15856.ic24",    0x400000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
+
+	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
+	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) , ROM_SKIP(6)|ROM_GROUPWORD )
+
+	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
+	ROM_LOAD16_WORD( "93c45_eeprom.ic76", 0x0000, 0x0080, CRC(6e1d9df3) SHA1(2fd818bc393fb96e945fa37a63c8a3c4aff2f79f) )
+ROM_END
 
 /**************************************************************************************************************************
  **************************************************************************************************************************
@@ -4839,6 +4879,10 @@ ROM_END
  **************************************************************************************************************************
     Super Visual Football
     protected via FD1149 317-0222
+
+    Sega Game ID codes:
+     Game: 833-10851-02
+Rom board: 834-10852-02
 */
 ROM_START( svf )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -5615,6 +5659,7 @@ GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725,     arescue,
 
 GAME( 1993, alien3,    0,        sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, alien3u,   alien3,   sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3j,   alien3,   sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1991, arabfgt,   0,        sega_system32_arf, arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
 GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf, arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )

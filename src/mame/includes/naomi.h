@@ -19,7 +19,7 @@ naomi.h -> NAOMI includes
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
 #include "machine/awboard.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "machine/aicartc.h"

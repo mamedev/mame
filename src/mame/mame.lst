@@ -1098,6 +1098,7 @@ altos8600
 
 @source:alvg.cpp
 agsoccer                        //
+agsoccer07                      //
 dinoeggs                        //
 mystcast                        //
 mystcasta                       //
@@ -1210,6 +1211,9 @@ draw88pkr                       // 1988, BTE, Inc.
 
 @source:amust.cpp
 amust                           //
+
+@source:anes.cpp
+tonpuu                          // 200?, ANES
 
 @source:angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
@@ -9141,9 +9145,10 @@ cabal                           // (c) 1988 Tad + Fabtek license
 cabala                          // (c) 1988 Tad + Fabtek license
 cabalbl                         // bootleg
 cabalbl2                        // bootleg
+cabaluk                         // (c) 1988 Tad + Electrocoin license
+cabalukj                        // (c) 1988 Tad + Electrocoin license
 cabalus                         // (c) 1988 Tad + Fabtek license
 cabalus2                        // (c) 1988 Tad + Fabtek license
-cabaluk                         //
 
 @source:cabaret.cpp
 cabaret                         // (c) 1992 AMT
@@ -10001,6 +10006,7 @@ ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
 ghoulsu                         // 12/1988 (c) 1988 (USA)
 knights                         // 27/11/1991 (c) 1991 (World)
+knightsb2                       // bootleg
 knightsj                        // 27/11/1991 (c) 1991 (Japan)
 knightsja                       // 27/11/1991 (c) 1991 (Japan)
 knightsu                        // 27/11/1991 (c) 1991 (USA)
@@ -13776,6 +13782,9 @@ goindolk                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
+@source:gokidetor.cpp
+gokidetor                       // (c) 1992 Taito
+
 @source:goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
@@ -14052,6 +14061,7 @@ ppchamp                         // (c) 1997 Dongsung + "presented by Para"
 3stoogesa                       // GV-113 (c) 1984 Mylstar
 argusg                          // GV-??? (c) 1982 Gottlieb - never released
 cobram3                         // ...... (c) 1984 Data East
+cobram3a                        // ...... (c) 1984 Data East
 curvebal                        // GV-134 (c) 1984 Mylstar
 insector                        // GV-??? (c) 1982 Gottlieb - never released
 kngtmare                        // GV-??? (c) 1983 Gottlieb - never released
@@ -14159,6 +14169,7 @@ gstrikera                       // (c) [1993] Human
 gstrikerj                       // (c) [1993] Human
 twcup94                         // (c) 1994 Tecmo
 twcup94a                        // (c) 1994 Tecmo
+twcup94b                        // (c) 1994 Tecmo
 vgoalsca                        // (c) 199? Tecmo
 vgoalsoc                        // (c) 199? Tecmo
 
@@ -14642,10 +14653,13 @@ ktmnt                           // Konami
 ktopgun                         // Konami
 nupogodi                        // Elektronika
 taltbeast                       // Tiger
+tbatman                         // Tiger
 tddragon                        // Tiger
 tgaunt                          // Tiger
+tjdredd                         // Tiger
 tsjam                           // Tiger
 tsonic                          // Tiger
+tswampt                         // Tiger
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
@@ -20355,6 +20369,7 @@ phantasm                        // (c) 1991 (Japan)
 plusalph                        // (c) 1989
 rittam                          // Prototype or hack of Rod-Land
 rodland                         // (c) 1990
+rodlanda                        // (c) 1990
 rodlandj                        // (c) 1990 (Japan)
 rodlandjb                       // bootleg
 soldam                          // (c) 1992
@@ -20926,6 +20941,7 @@ pangbb                          // bootleg
 pangbold                        // bootleg
 pkladies                        // (c) 1989 Mitchell
 pkladiesbl                      // bootleg
+pkladiesbl2                     // bootleg
 pkladiesl                       // (c) 1989 Leprechaun
 pkladiesla                      // (c) 1989 Leprechaun
 pompingw                        // (c) 1989 Mitchell (Japan)
@@ -28978,7 +28994,8 @@ trghearto                       // 2006.05 Trigger Heart Exelica
 trizeal                         // 2004.09 Trizeal
 undefeat                        // 2005.10 Under Defeat
 usagiym                         // 2003.06 Usagi Yamashiro Mahjong Hen
-vathlete                        // 2002.03 Virtua Athletics / Virtua Athlete
+vathlete                        // 2001.12 Virtua Athletics / Virtua Athlete
+vathletep                       // 2001.10 Virtua Athletics / Virtua Athlete (prototype)
 vf4                             // 2002.01.31 Virtua Fighter 4 (Rev C) (cartridge)
 vf4b                            // 2001.08.20 Virtua Fighter 4 (Rev B) (cartridge)
 vf4cart                         // 2001.08.02 Virtua Fighter 4 (cartridge)
@@ -29772,6 +29789,9 @@ pma                             // 1983, PMA
 smshilo                         // (c) 1983 SMS Manufacturing Corp.
 ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
+
+@source:notechan.cpp
+notechan                        // (c) 1995 Banpresto
 
 @source:notetaker.cpp
 notetakr                        //
@@ -32663,6 +32683,7 @@ pomp_l1                         //
 stlwr_l2                        //
 taurs_l1                        //
 tmwrp_l2                        //
+tmwrp_l3                        //
 tmwrp_t2                        //
 topaz_l1                        //
 trizn_l1                        //
@@ -33257,6 +33278,7 @@ hangon                          // (c) 1985 (Rev A)
 hangon1                         // (c) 1985
 hangon2                         // (c) 1985
 shangonrb                       // (c) 1992 (but bootleg, hangon hw?)
+shangonrb2                      // bootleg (Beta)
 shangonro                       // (c) 1987 (FD1094)
 shangonho                       // (c) 1987 (FD1094)
 sharrier                        // (c) 1985
@@ -33416,6 +33438,7 @@ fpoint1                         // (c) 1989 (Japan, FD1094)
 fpoint1d                        //
 fpointbj                        // (c) 1989 (Datsu bootleg, Japan)
 fpointbl                        // (c) 1989 (Datsu bootleg)
+fpointbla						//
 fpointd                         //
 goldnaxe                        // (c) 1989 (8751)
 goldnaxe1                       // (c) 1989 (FD1094)
@@ -33569,6 +33592,7 @@ sspirtfc                        // 1988.?? Scramble Spirits (FD1094)
 @source:segas32.cpp
 alien3                          // 1993.?? Aliens 3 (World)
 alien3u                         // 1993.11 Aliens 3 (US)
+alien3j                         // 1993.?? Aliens 3 (Japan)
 arabfgt                         // 1992.?? Arabian Fight (World)
 arabfgtj                        // 1992.03 Arabian Fight (Japan)
 arabfgtu                        // 1992.03 Arabian Fight (US)
@@ -33630,6 +33654,7 @@ dinokior                        //
 loveber3                        //
 lovebero                        //
 lovebery                        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+ochaken                         //
 segasp                          //
 tetgiano                        //
 tetgiant                        //
@@ -33693,7 +33718,8 @@ gforce2j                        // 1988.07 Galaxy Force II (Japan)
 gforce2ja                       // 1988.07 Galaxy Force II (Japan)
 gforce2sd                       // 1988.?? Galaxy Force II (World, Super Deluxe unit)
 gloc                            // 1990.?? G-LOC Air Battle (World)
-glocr360                        // 1990.?? G-LOC (R360, World?)
+glocr360                        // 1990.?? G-LOC (R360, World)
+glocr360j                       // 1990.?? G-LOC (R360, Japan)
 glocu                           // 1990.04 G-LOC Air Battle (US)
 pdrift                          // 1988.?? Power Drift (World)
 pdrifta                         // 1988.?? Power Drift (World)
@@ -33704,6 +33730,11 @@ rchase                          // 1991.09 Rail Chase (World)
 rchasej                         // 1991.09 Rail Chase (Japan)
 strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
+
+@source:seibucats.cpp
+emjjoshi						// (c) 1999 Seibu Kaihatsu / CATS
+emjscanb						// (c) 2001 Seibu Kaihatsu / CATS
+emjtrapz						// (c) 2001 Seibu Kaihatsu / CATS
 
 @source:seibuspi.cpp
 batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)
@@ -34460,6 +34491,7 @@ alphamis                        // (c) 1985
 arian                           // (c) 1985
 aso                             // (c) 1985
 athena                          // 'UP' (c) 1986
+athenab                         // bootleg?
 bermudat                        // (c) 1987
 bermudata                       // A6004 'WW' (c) 1987
 bermudatj                       // (c) 1987
@@ -34976,6 +35008,7 @@ starwarso                       // 136021           (c) 1983
 tomcatsw                        // (proto)          (c) 1983
 
 @source:statriv2.cpp
+bbchall                         // (c) 1986 Status Games
 bigcsino                        // (c) 1984 Status Games
 cstrip                          // (c) 1984 Status Games
 cstripix                        // (c) 1985 Status Games

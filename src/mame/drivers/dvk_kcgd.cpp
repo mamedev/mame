@@ -21,6 +21,7 @@
 #include "cpu/t11/t11.h"
 #include "machine/clock.h"
 #include "machine/ms7004.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 

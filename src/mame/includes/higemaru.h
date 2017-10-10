@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 class higemaru_state : public driver_device
 {
 public:

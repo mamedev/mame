@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+
+#include "machine/timer.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
 

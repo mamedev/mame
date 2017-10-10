@@ -12,6 +12,7 @@
 #include "cpu/arm/arm.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/timer.h"
 #include "video/hd44780.h"
 #include "screen.h"
 #include "speaker.h"
@@ -587,8 +588,11 @@ ROM_START(academy)
 	ROMX_LOAD("acad4000.bin", 0x4000, 0x4000, CRC(ee1222b5) SHA1(98541d87755a7186b69b9723cc4adbd07f20f0e2), ROM_BIOS(1))
 	ROMX_LOAD("acad8000.bin", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "de", "German" )
-	ROMX_LOAD("acad4000_de.bin", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e), ROM_BIOS(2))
-	ROMX_LOAD("acad8000_de.bin", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256), ROM_BIOS(2))
+	ROMX_LOAD("academy_2_4000.bin", 0x4000, 0x4000, CRC(900a0001) SHA1(174a6bc3bde55994c603e232fcb45fccd62f11f6), ROM_BIOS(2))
+	ROMX_LOAD("academy_1_8000.bin", 0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "de_old", "German Old" )
+	ROMX_LOAD("acad4000_de.bin", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e), ROM_BIOS(3))
+	ROMX_LOAD("acad8000_de.bin", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256), ROM_BIOS(3))
 ROM_END
 
 ROM_START(milano)

@@ -52,7 +52,14 @@ INTERRUPT_GEN_MEMBER(segag80r_state::segag80r_vblank_start)
 
 	/* if interrupts are enabled, clock one */
 	if (m_video_control & 0x04)
-		irq0_line_hold(device);
+		device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+IRQ_CALLBACK_MEMBER(segag80r_state::segag80r_irq_ack)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 
@@ -63,7 +70,7 @@ INTERRUPT_GEN_MEMBER(segag80r_state::sindbadm_vblank_start)
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
 	/* by bit 2 of video_control like a standard G80 */
-	irq0_line_assert(device);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 

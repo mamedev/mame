@@ -582,11 +582,13 @@ WRITE8_MEMBER( z80sti_device::write )
 	case REGISTER_TBDR:
 		LOG("Z80STI Timer B Data Register: %x\n", tag(), data);
 		m_tdr[TIMER_B] = data;
+		m_tmc[TIMER_B] = data;
 		break;
 
 	case REGISTER_TADR:
 		LOG("Z80STI Timer A Data Register: %x\n", tag(), data);
 		m_tdr[TIMER_A] = data;
+		m_tmc[TIMER_A] = data;
 		break;
 
 	case REGISTER_UCR:

@@ -42,6 +42,7 @@ ToDo (granny):
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

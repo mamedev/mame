@@ -1745,39 +1745,39 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 				});
 
 		// generate tiled views
-		for (unsigned minor = 2; ((screens + minor - 1) / minor) >= minor; ++minor)
+		for (unsigned mindim = 2; ((screens + mindim - 1) / mindim) >= mindim; ++mindim)
 		{
-			unsigned const major((screens + minor - 1) / minor);
-			unsigned const remainder(screens % major);
-			if (!remainder || (((major + 1) / 2) <= remainder))
+			unsigned const majdim((screens + mindim - 1) / mindim);
+			unsigned const remainder(screens % majdim);
+			if (!remainder || (((majdim + 1) / 2) <= remainder))
 			{
 				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", major, minor).c_str(),
-						[major, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
 						{
-							boundsnode.set_attribute_float("x", (i % major) * (stdwidth + 0.03f));
-							boundsnode.set_attribute_float("y", (i / major) * (stdheight + 0.03f));
+							boundsnode.set_attribute_float("x", (i % majdim) * (stdwidth + 0.03f));
+							boundsnode.set_attribute_float("y", (i / majdim) * (stdheight + 0.03f));
 						});
 				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", major, minor).c_str(),
-						[major, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
 						{
-							boundsnode.set_attribute_int("x", (i % major) * stdwidth);
-							boundsnode.set_attribute_int("y", (i / major) * stdheight);
+							boundsnode.set_attribute_int("x", (i % majdim) * stdwidth);
+							boundsnode.set_attribute_int("y", (i / majdim) * stdheight);
 						});
 				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", minor, major).c_str(),
-						[major, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
 						{
-							boundsnode.set_attribute_float("x", (i / major) * (stdwidth + 0.03f));
-							boundsnode.set_attribute_float("y", (i % major) * (stdheight + 0.03f));
+							boundsnode.set_attribute_float("x", (i / majdim) * (stdwidth + 0.03f));
+							boundsnode.set_attribute_float("y", (i % majdim) * (stdheight + 0.03f));
 						});
 				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", minor, major).c_str(),
-						[major, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
 						{
-							boundsnode.set_attribute_int("x", (i / major) * stdwidth);
-							boundsnode.set_attribute_int("y", (i % major) * stdheight);
+							boundsnode.set_attribute_int("x", (i / majdim) * stdwidth);
+							boundsnode.set_attribute_int("y", (i % majdim) * stdheight);
 						});
 			}
 		}
@@ -1890,7 +1890,7 @@ bool render_target::load_layout_file(const char *dirname, util::xml::data_node c
 	{
 		m_filelist.emplace_back(m_manager.machine(), rootnode, dirname);
 	}
-	catch (emu_fatalerror &err)
+	catch (emu_fatalerror)
 	{
 		return false;
 	}

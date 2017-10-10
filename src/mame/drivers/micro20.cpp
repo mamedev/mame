@@ -14,6 +14,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/68230pit.h"
 #include "bus/rs232/rs232.h"

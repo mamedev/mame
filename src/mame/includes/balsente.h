@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/cem3394.h"
 #include "screen.h"
 

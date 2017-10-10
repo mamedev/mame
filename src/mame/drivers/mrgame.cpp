@@ -36,6 +36,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"

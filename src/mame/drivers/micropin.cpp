@@ -27,6 +27,7 @@ ToDo:
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "speaker.h"
 

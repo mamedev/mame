@@ -351,7 +351,7 @@ function cheatfind.startplugin()
 					local r
 					name, r = incdec(event, name, 1, #c)
 					if (event == "select" or event == "comment") and name == 1 then
-						manager:machine():popmessage(_("Default name is ") .. cheat_save.name)
+						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 					end
 					return r
 				end
@@ -396,7 +396,7 @@ function cheatfind.startplugin()
 								file = io.open(cheat_save.path .. "/cheat.simple", "a")
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage(_("Cheat written to ") .. cheat_save.filename .. _(" and added to cheat.simple"))
+								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), cheat_save.filename))
 							end
 							written = true
 						elseif not devtable[devcur].space.shortname then
@@ -409,7 +409,7 @@ function cheatfind.startplugin()
 							end
 						end
 						if not written then
-							manager:machine():popmessage(_("Unable to write file\nCheck cheatpath dir exists"))
+							manager:machine():popmessage(_("Unable to write file\nEnsure that cheatpath folder exists"))
 						end
 						cheat_save = nil
 						return true

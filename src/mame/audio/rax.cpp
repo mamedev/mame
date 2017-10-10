@@ -168,7 +168,9 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 			}
 			else
 			{
-				fatalerror("DMA to byte memory!");
+				// TODO: last stage in Batman Forever!?
+				// page = 0, dir = 1, type = 1, src_addr = 0xfd
+				fatalerror("%s DMA to byte memory!",this->tag());
 			}
 
 			attotime word_period = attotime::from_hz(m_cpu->unscaled_clock());

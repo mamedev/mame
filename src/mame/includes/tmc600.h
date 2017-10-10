@@ -11,6 +11,7 @@
 #include "imagedev/snapquik.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/cdp1869.h"
 
 #define SCREEN_TAG      "screen"

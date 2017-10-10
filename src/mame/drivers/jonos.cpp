@@ -12,13 +12,13 @@ CP/M. However, this one appears to be an 8085-based terminal.
 Haven't found any info.
 
 There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
-Data presented at 5000 will appear on screen in a dumb-terminal format.
 
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/keyboard.h"
 #include "screen.h"
 
 
@@ -27,18 +27,24 @@ class jonos_state : public driver_device
 public:
 	jonos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		{ }
 
-	DECLARE_DRIVER_INIT(jonos);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(cursor_w);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void kbd_put(u8 data);
 
 private:
+	u8 m_framecnt;
+	u8 m_term_data;
+	u8 m_curs_ctrl;
+	u16 m_curs_pos;
 	virtual void machine_reset() override;
-	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -48,9 +54,9 @@ static ADDRESS_MAP_START(jonos_mem, AS_PROGRAM, 8, jonos_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1800, 0x27ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3001) // unknown device
+	AM_RANGE(0x3000, 0x3001) AM_WRITE(cursor_w) // unknown device
 	AM_RANGE(0x4000, 0x4001) // unknown device
-	AM_RANGE(0x5000, 0x5003) // unknown device
+	AM_RANGE(0x5000, 0x5003) AM_READ(keyboard_r) // unknown device
 	AM_RANGE(0x6000, 0x6001) // unknown device
 ADDRESS_MAP_END
 
@@ -58,29 +64,72 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jonos )
 INPUT_PORTS_END
 
+void jonos_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+}
+
+READ8_MEMBER( jonos_state::keyboard_r )
+{
+	if (offset == 0)
+	{
+		u8 data = m_term_data;
+		m_term_data = 0;
+		return data;
+	}
+	else
+	if (m_term_data && offset == 2)
+		return 0x20;
+
+	return 0;
+}
+
+WRITE8_MEMBER( jonos_state::cursor_w )
+{
+	if (offset == 1) // control byte
+		m_curs_ctrl = (data == 0x80) ? 1 : 0;
+	else
+	if (m_curs_ctrl == 1)
+	{
+		m_curs_pos = (m_curs_pos & 0xff00) | data;
+		m_curs_ctrl++;
+	}
+	else
+	if (m_curs_ctrl == 2)
+		m_curs_pos = (m_curs_pos & 0xff) | (data << 8);
+}
+
 void jonos_state::machine_reset()
 {
+	m_curs_ctrl = 0;
+	m_curs_pos = 0;
+	m_term_data = 0;
 }
 
 uint32_t jonos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	m_framecnt++;
+	u8 y,ra,chr,gfx,inv;
+	u16 sy=0,x;
+	u16 ma = (m_p_videoram[0x7da] + (m_p_videoram[0x7db] << 8)) & 0x7ff;
 
-	for (y = 0; y < 25; y++)
+	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
+			u16 cpos = y << 8;
 
 			for (x = ma; x < ma + 80; x++)
 			{
 				chr = m_p_videoram[x];
+				inv = (BIT(chr, 7) ^ ((cpos == m_curs_pos) && BIT(m_framecnt, 5))) ? 0xff : 0;
+				chr &= 0x7f;
 
 				if (ra < 8)
-					gfx = m_p_chargen[(chr<<3) | ra ];
+					gfx = m_p_chargen[(chr<<3) | ra ] ^ inv;
 				else
-					gfx = m_p_chargen[(chr<<3) | (ra&7) | 0x400];
+					gfx = m_p_chargen[(chr<<3) | (ra&7) | 0x400] ^ inv;
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 0);
@@ -91,9 +140,12 @@ uint32_t jonos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 7);
+				cpos++;
 			}
 		}
 		ma+=80;
+		if (ma > 0x77f)
+			ma -= 0x780;
 	}
 	return 0;
 }
@@ -127,17 +179,17 @@ static MACHINE_CONFIG_START( jonos )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(jonos_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 299)
+	MCFG_SCREEN_SIZE(640, 288)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 287)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jonos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(jonos_state, kbd_put))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(jonos_state,jonos)
-{
-}
 
 /* ROM definition */
 ROM_START( jonos )
@@ -154,4 +206,4 @@ ROM_END
 /* Driver */
 
 //   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT     COMPANY  FULLNAME  FLAGS
-COMP( 198?, jonos,  0,      0,       jonos,   jonos, jonos_state, jonos,   "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, jonos,  0,      0,       jonos,   jonos, jonos_state, 0,       "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -50,6 +50,7 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "cpu/m6502/m6502.h"
 #include "machine/ins8154.h"
 #include "machine/74145.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "speaker.h"
