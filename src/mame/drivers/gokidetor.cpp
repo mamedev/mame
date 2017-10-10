@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "speaker.h"
 #include "cpu/z80/z80.h"
+//#include "machine/m66240.h"
 #include "machine/te7750.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gokidetor_state )
 	// d101 = ?output
 	// d1c0 = ?output
 	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
-	// da00-da01 ?output
+	//AM_RANGE(0xda00, 0xda01) AM_DEVWRITE("pwm", m66240_device, write)
 	// de00 ?input
 	// df00 ?input
 	AM_RANGE(0xe000, 0xe003) AM_READNOP // ?input
