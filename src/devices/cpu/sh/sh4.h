@@ -663,10 +663,6 @@ protected:
 
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
-	virtual void sh2_exception(const char *message, int irqline) override
-	{
-
-	}
 
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
@@ -691,6 +687,16 @@ public:
 	void func_LDCMSSR();
 	void func_STCMRBANK();
 	void func_LDCMRBANK();
+	void func_PREFM();
+	void func_FADD();
+	void func_FSUB();
+	void func_FMUL();
+	void func_FDIV();
+	void func_FCMP_EQ();
+	void func_FCMP_GT();
+
+	
+
 };
 
 

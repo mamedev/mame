@@ -240,7 +240,9 @@ bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev,
 	case 0x0c:  return true; // FMOVFR(opcode); break;
 	case 0x0d:  return describe_op1111_0x13(desc, prev, opcode); // break;
 	case 0x0e:  return true; // FMAC(opcode); break;
-	case 0x0f:  return false; // dbreak(opcode); break;
+	case 0x0f:
+		if (opcode == 0xffff) return true; 	// atomiswave uses ffff as NOP?
+		return false; // dbreak(opcode); break;
 	}
 	return false;
 }

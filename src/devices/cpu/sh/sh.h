@@ -390,7 +390,7 @@ public:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 	
-	virtual void sh2_exception(const char *message, int irqline) = 0;
+	virtual void sh2_exception(const char *message, int irqline) { };
 
 	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 

@@ -133,8 +133,6 @@ private:
 	} m_irq_queue[16];
 	*/
 
-
-
 	int8_t    m_irq_line_state[17];
 
 private:
@@ -171,10 +169,6 @@ private:
 
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 
-
-
-
-
 	uint32_t m_debugger_temp;
 
 	inline uint8_t RB(offs_t A) override;
@@ -190,8 +184,6 @@ private:
 	virtual void RTE() override;
 	virtual	void ILLEGAL() override;
 
-	//virtual void execute_one_0000(uint16_t opcode) override;
-	//virtual void execute_one_4000(uint16_t opcode) override;
 	virtual void execute_one_f000(uint16_t opcode) override;
 
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
@@ -203,20 +195,11 @@ private:
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();
 
-
-
-
-
-
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 	
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
-	
-	//virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-	//virtual bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-
 };
 
 class sh2a_device : public sh2_device
@@ -273,14 +256,11 @@ public:
 protected:
 
 private:
-	//virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
-	//virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
 
 DECLARE_DEVICE_TYPE(SH1,  sh1_device)
 DECLARE_DEVICE_TYPE(SH2,  sh2_device)
 DECLARE_DEVICE_TYPE(SH2A, sh2a_device)
-
 
 #endif // MAME_CPU_SH2_SH2_H
