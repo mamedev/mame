@@ -643,18 +643,15 @@ public:
 	void func_LDCSR();
 	void func_LDCMSR();
 	void func_RTE();
-
 	void func_SHAD();
 	void func_SHLD();
-
 	void func_CHECKIRQ();
-	
 	void func_STCRBANK();
 	void func_LDCRBANK();
-	
-	
-
-
+	void func_STCMSPC();
+	void func_LDCMSPC();
+	void func_STCMSSR();
+	void func_LDCMSSR();
 };
 
 

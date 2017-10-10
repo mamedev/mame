@@ -2704,7 +2704,7 @@ void sh34_base_device::static_generate_entry_point()
 	/* load fast integer registers */
 	load_fast_iregs(block);
 
-	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	save_fast_iregs(block); 
 	UML_CALLC(block, cfunc_CHECKIRQ, this);
 	load_fast_iregs(block);
 	
@@ -2881,7 +2881,7 @@ bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_s
 {
 //	printf("generate_group_0_STCRBANK\n");
 
-	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	save_fast_iregs(block); 
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 	UML_CALLC(block, cfunc_STCRBANK, this);
 	load_fast_iregs(block);
@@ -3092,7 +3092,7 @@ bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state 
 {
 	generate_delay_slot(block, compiler, desc, 0xffffffff);
 
-	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	save_fast_iregs(block); 
 	UML_CALLC(block, cfunc_RTE, this);
 	load_fast_iregs(block);
 
@@ -3108,7 +3108,7 @@ bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_sta
 {
 	//printf("generate_group_12_TRAPA\n");
 
-	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	save_fast_iregs(block); 
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 	UML_MOV(block, mem(&m_sh2_state->pc), desc->pc + 2); // copy the PC because we need to use it
 	UML_CALLC(block, cfunc_TRAPA, this);
@@ -3117,24 +3117,6 @@ bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_sta
 	
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); 
 
-	/*
-	uint32_t scratch = (opcode & 0xff) * 4;
-	UML_ADD(block, mem(&m_sh2_state->ea), mem(&m_sh2_state->vbr), scratch); // add ea, vbr, scratch
-
-	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-	UML_MOV(block, I0, R32(15));                // mov r0, R15
-	UML_MOV(block, I1, mem(&m_sh2_state->sr));              // mov r1, sr
-	UML_CALLH(block, *m_write32);                    // write32
-
-	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-	UML_MOV(block, I0, R32(15));                // mov r0, R15
-	UML_MOV(block, I1, desc->pc + 2);             // mov r1, pc+2
-	UML_CALLH(block, *m_write32);                    // write32
-
-	UML_MOV(block, I0, mem(&m_sh2_state->ea));              // mov r0, ea
-	UML_CALLH(block, *m_read32);                 // read32
-	UML_HASHJMP(block, 0, I0, *m_nocode);        // jmp (r0)
-	*/
 	return true;
 }
 
@@ -3321,7 +3303,7 @@ bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_s
 {
 	//printf("generate_group_4_LDCRBANK\n");
 
-	save_fast_iregs(block); // uses r15 and potentially changes banks too, so need the regs for the c code
+	save_fast_iregs(block); 
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 	UML_CALLC(block, cfunc_LDCRBANK, this);
 	load_fast_iregs(block);
@@ -3348,15 +3330,33 @@ bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_st
 	return true;
 }
 
+void sh34_base_device::func_STCMSSR() { STCMSSR(m_sh2_state->arg0); }
+void cfunc_STCMSSR(void *param) { ((sh34_base_device *)param)->func_STCMSSR(); };
+
 bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_STCMSSR\n");
+	//printf("generate_group_4_STCMSSR\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSSR, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
+void sh34_base_device::func_LDCMSSR() { LDCMSSR(m_sh2_state->arg0); }
+void cfunc_LDCMSSR(void *param) { ((sh34_base_device *)param)->func_LDCMSSR(); };
+
 bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCMSSR\n");
+	//printf("generate_group_4_LDCMSSR\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSSR, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
@@ -3366,15 +3366,33 @@ bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block *block, compiler_sta
 	return true;
 }
 
+void sh34_base_device::func_STCMSPC() { STCMSPC(m_sh2_state->arg0); }
+void cfunc_STCMSPC(void *param) { ((sh34_base_device *)param)->func_STCMSPC(); };
+
 bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_STCMSPC\n");
+	//printf("generate_group_4_STCMSPC\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSPC, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
+void sh34_base_device::func_LDCMSPC() { LDCMSPC(m_sh2_state->arg0); }
+void cfunc_LDCMSPC(void *param) { ((sh34_base_device *)param)->func_LDCMSPC(); };
+
 bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCMSPC\n");
+	//printf("generate_group_4_LDCMSPC\n");
+
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSPC, this);
+	load_fast_iregs(block);
+
 	return true;
 }
 
