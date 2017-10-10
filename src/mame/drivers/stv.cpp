@@ -1811,7 +1811,7 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 */
 
 #define STV_BIOS \
-	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */ \
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */ \
 	ROM_SYSTEM_BIOS( 0,  "jp",    "EPR-20091 (Japan 97/08/21)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
 	ROM_SYSTEM_BIOS( 1,  "jp1",   "EPR-19730 (Japan 97/02/17)" ) \
@@ -2876,7 +2876,7 @@ a curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC ma
 ROM_START( sfish2 )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_FILL( 0x809c, 1, 'U' ) // TODO: hardcoded country code???
 
@@ -2897,7 +2897,7 @@ ROM_END
 ROM_START( sfish2j )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_FILL( 0x809c, 1, 'J' ) // TODO: hardcoded country code???
 
