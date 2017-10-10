@@ -247,7 +247,7 @@ void sega_scu_device::device_start()
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
 	
-	m_hostcpu = machine().device<sh2_device>(m_hostcpu_tag);//machine().device(m_hostcpu_tag);
+	m_hostcpu = machine().device<sh2_device>(m_hostcpu_tag);
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
 	m_dma_timer[0] = timer_alloc(DMALV0_ID);

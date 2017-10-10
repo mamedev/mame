@@ -904,6 +904,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 		return;
 	}
 
+	if(x >= 1024 || y >= 512)
+		return;
+	
 	if ( stv2_current_sprite.ispoly )
 	{
 		pix = stv2_current_sprite.CMDCOLR&0xffff;
@@ -2001,7 +2004,9 @@ void saturn_state::stv_vdp1_process_list( void )
 	m_vdp1.copr = (position * 0x20) >> 3;
 
 	/* TODO: what's the exact formula? Guess it should be a mix between number of pixels written and actual command data fetched. */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
+	// if spritecount = 10000 don't send a vdp1 draw end
+	if(spritecount < 10000)
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }
