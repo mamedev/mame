@@ -450,9 +450,9 @@ class sh_frontend : public drc_frontend
 {
 public:
 	sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-	void set_xor(int intxor) { m_xor = intxor; }
 
 protected:
+	virtual uint16_t read_word(opcode_desc &desc);
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
@@ -468,7 +468,6 @@ protected:
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
 
 	sh_common_execution *m_sh;
-	int m_xor;
 };
 
 #endif // MAME_CPU_SH2_SH2_H

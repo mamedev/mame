@@ -21,7 +21,6 @@
 sh_frontend::sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend(*device, window_start, window_end, max_sequence)
 	, m_sh(device)
-	, m_xor(0)
 {
 }
 
@@ -30,14 +29,17 @@ sh_frontend::sh_frontend(sh_common_execution *device, uint32_t window_start, uin
     of a single instruction
 -------------------------------------------------*/
 
+inline uint16_t sh_frontend::read_word(opcode_desc &desc)
+{
+	return m_sh->m_direct->read_word(desc.physpc, SH2_CODE_XOR(0));
+}
+
 bool sh_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
 	uint16_t opcode;
 
 	/* fetch the opcode */
-	if (m_xor == 0) opcode = desc.opptr.w[0] = m_sh->m_direct->read_word(desc.physpc, SH2_CODE_XOR(0));
-	else if (m_xor == 1) opcode = desc.opptr.w[0] = m_sh->m_direct->read_word(desc.physpc, SH34LE_CODE_XOR(0));
-	else opcode = desc.opptr.w[0] = m_sh->m_direct->read_word(desc.physpc, SH34BE_CODE_XOR(0));
+	opcode = desc.opptr.w[0] = read_word(desc);
 
 	/* all instructions are 2 bytes and most are a single cycle */
 	desc.length = 2;

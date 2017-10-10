@@ -2255,7 +2255,6 @@ void sh34_base_device::device_start()
 
 
 	drc_start();
-	m_drcfe->set_xor(m_xor);
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -2582,17 +2581,46 @@ void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 
 using namespace uml;
 
-const opcode_desc* sh34_base_device::get_desclist(offs_t pc)
+const opcode_desc* sh4be_device::get_desclist(offs_t pc)
 {
 	return m_drcfe->describe_code(pc);
 }
 
+void sh4be_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
 
-void sh34_base_device::init_drc_frontend()
+
+const opcode_desc* sh4_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh4_device::init_drc_frontend()
 {
 	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 }
 
+const opcode_desc* sh3be_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh3be_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+const opcode_desc* sh3_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh3_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
 
 /*-------------------------------------------------
     generate_update_cycles - generate code to

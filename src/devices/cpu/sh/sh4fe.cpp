@@ -23,6 +23,17 @@ sh4_frontend::sh4_frontend(sh_common_execution *device, uint32_t window_start, u
 {
 }
 
+inline uint16_t sh4_frontend::read_word(opcode_desc &desc)
+{
+	return m_sh->m_direct->read_word(desc.physpc, SH34LE_CODE_XOR(0));
+}
+
+inline uint16_t sh4be_frontend::read_word(opcode_desc &desc)
+{
+	return m_sh->m_direct->read_word(desc.physpc, SH34BE_CODE_XOR(0));
+}
+
+
 bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0xff)

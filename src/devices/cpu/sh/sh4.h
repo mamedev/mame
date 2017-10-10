@@ -191,12 +191,11 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
 
 class sh4_frontend;
+class sh4be_frontend;
 
 class sh34_base_device : public sh_common_execution
 {
 public:
-
-	friend class sh4_frontend;
 
 	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }
 	static void set_md1(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md1 = md0; }
@@ -664,13 +663,11 @@ protected:
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
 
-	virtual void init_drc_frontend() override;
-	virtual const opcode_desc* get_desclist(offs_t pc) override;
-
-	private:
-		std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
-
 public:
+
+	void func_STCRBANK();
+
+
 	// DRC C-substitute ops
 	void func_TRAPA();
 	void func_LDCSR();
@@ -679,7 +676,6 @@ public:
 	void func_SHAD();
 	void func_SHLD();
 	void func_CHECKIRQ();
-	void func_STCRBANK();
 	void func_LDCRBANK();
 	void func_STCMSPC();
 	void func_LDCMSPC();
@@ -794,15 +790,24 @@ protected:
 
 class sh3_device : public sh3_base_device
 {
+	friend class sh4_frontend;
 public:
 	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+	virtual void init_drc_frontend() override;
 };
 
 
 class sh3be_device : public sh3_base_device
 {
+	friend class sh4be_frontend;
+
 public:
 	sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	std::unique_ptr<sh4be_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+	virtual void init_drc_frontend() override;
 
 protected:
 	virtual void execute_run() override;
@@ -812,15 +817,26 @@ protected:
 
 class sh4_device : public sh4_base_device
 {
+	friend class sh4_frontend;
+
 public:
 	sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+	virtual void init_drc_frontend() override;
+
 };
 
 
 class sh4be_device : public sh4_base_device
 {
+	friend class sh4be_frontend;
+
 public:
 	sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	std::unique_ptr<sh4be_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
+	virtual void init_drc_frontend() override;
 
 protected:
 	virtual void execute_run() override;
@@ -833,6 +849,7 @@ public:
 	sh4_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
+	virtual uint16_t read_word(opcode_desc &desc) override;
 
 private:
 	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
@@ -842,7 +859,15 @@ private:
 	bool describe_op1111_0xf13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 };
 
-
+class sh4be_frontend : public sh4_frontend
+{
+public:
+	sh4be_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence) :
+		sh4_frontend(device, window_start, window_end, max_sequence)
+	{}
+protected:
+	virtual uint16_t read_word(opcode_desc &desc) override;
+};
 
 DECLARE_DEVICE_TYPE(SH3LE, sh3_device)
 DECLARE_DEVICE_TYPE(SH3BE, sh3be_device)
