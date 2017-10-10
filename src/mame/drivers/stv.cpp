@@ -980,14 +980,14 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 }
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
-	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
+	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("abus", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
@@ -1001,8 +1001,6 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
-	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
-	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
@@ -1813,7 +1811,7 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 */
 
 #define STV_BIOS \
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */ \
+	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */ \
 	ROM_SYSTEM_BIOS( 0,  "jp",    "EPR-20091 (Japan 97/08/21)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
 	ROM_SYSTEM_BIOS( 1,  "jp1",   "EPR-19730 (Japan 97/02/17)" ) \
@@ -1838,9 +1836,6 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
 	ROM_SYSTEM_BIOS( 11, "dev",   "Development (bios 1.061)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
-	\
-	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */ \
-	ROM_COPY( "maincpu",0,0,0x080000) \
 	\
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 
@@ -2881,11 +2876,9 @@ a curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC ma
 ROM_START( sfish2 )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
+	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_FILL( 0x809c, 1, 'U' ) // TODO: hardcoded country code???
-	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18427.ic13",  0x0000001, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
@@ -2904,12 +2897,9 @@ ROM_END
 ROM_START( sfish2j )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
+	ROM_REGION( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_FILL( 0x809c, 1, 'J' ) // TODO: hardcoded country code???
-
-	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18344.a",      0x0000001, 0x0100000, CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )
