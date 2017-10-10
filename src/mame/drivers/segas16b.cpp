@@ -1752,20 +1752,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map_fpointbla, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x02002e, 0x02002f) AM_READ(fpointbla_2002e_r)
-
-	AM_RANGE(0x443002, 0x443003) AM_READ(fpointbla_2002e_r)
-	AM_RANGE(0x44301a, 0x44301b) AM_READ(fpointbla_2002e_r)
-	AM_RANGE(0x44302a, 0x44302b) AM_READ(fpointbla_2002e_r)
-
+	AM_RANGE(0x02000e, 0x02000f) AM_READ_PORT("P2")
+	AM_RANGE(0x0a0000, 0x0a001f) AM_RAM AM_SHARE("bootleg_scroll")
+	AM_RANGE(0x0a0020, 0x0a0027) AM_RAM AM_SHARE("bootleg_page")
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x443002, 0x443003) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-
-	AM_RANGE(0x843000, 0x843001) AM_READWRITE(bootleg_custom_io_r, bootleg_custom_io_w)
-	AM_RANGE(0x843018, 0x843019) AM_READ(fpointbla_2002e_r)
-
+	AM_RANGE(0x843018, 0x843019) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfe000c, 0xfe000d) AM_READ_PORT("P1")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
@@ -1836,11 +1832,6 @@ static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
-READ16_MEMBER(segas16b_state::fpointbla_2002e_r)
-{
-	return 0xffff;
-}
 
 READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
 {
@@ -3718,12 +3709,6 @@ static MACHINE_CONFIG_DERIVED( system16b_split, system16b )
 	MCFG_DEVICE_REMOVE("mapper")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16b_fpointbla, system16b_split )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
-MACHINE_CONFIG_END
-
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
 {
 	// grab the page regsisters from where the bootleg stores them instead, then convert them to the format the original video emulation code expects
@@ -3770,6 +3755,18 @@ static MACHINE_CONFIG_DERIVED( fpointbl, system16b )
 	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
 
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fpointbla, fpointbl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_DEVICE_MODIFY("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lockonph )
 
@@ -8779,9 +8776,9 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state, generic_5358_fpointbla)
+DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
 {
-	init_generic(ROM_BOARD_171_5358);
+	DRIVER_INIT_CALL(generic_bootleg);
 
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -9044,7 +9041,7 @@ GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b
 // bootlegs with modified hardware
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
 GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", 0 )
-GAME( 1989, fpointbla,   fpoint,    system16b_fpointbla, fpoint, segas16b_state, generic_5358_fpointbla, ROT0, "bootleg", "Flash Point (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 
