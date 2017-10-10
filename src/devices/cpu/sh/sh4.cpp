@@ -2884,15 +2884,27 @@ bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_s
 	return true;
 }
 
+void sh34_base_device::func_STCSSR() { STCSSR(m_sh2_state->arg0); }
+void cfunc_STCSSR(void *param) { ((sh34_base_device *)param)->func_STCSSR(); };
+
 bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_STCSSR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSSR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
+void sh34_base_device::func_STCSPC() { STCSPC(m_sh2_state->arg0); }
+void cfunc_STCSPC(void *param) { ((sh34_base_device *)param)->func_STCSPC(); };
+
 bool sh34_base_device::generate_group_0_STCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_STCSPC\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSPC, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -2908,34 +2920,65 @@ bool sh34_base_device::generate_group_0_PREFM(drcuml_block *block, compiler_stat
 	return true;
 }
 
+void sh34_base_device::func_MOVCAL() { MOVCAL(m_sh2_state->arg0); }
+void cfunc_MOVCAL(void *param) { ((sh34_base_device *)param)->func_MOVCAL(); };
+
 bool sh34_base_device::generate_group_0_MOVCAL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_MOVCAL\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_MOVCAL, this);
+	load_fast_iregs(block);
 	return true;
 }
+
+void sh34_base_device::func_LDTLB() { LDTLB(m_sh2_state->arg0); }
+void cfunc_LDTLB(void *param) { ((sh34_base_device *)param)->func_LDTLB(); };
 
 bool sh34_base_device::generate_group_0_LDTLB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_LDTLB\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDTLB, this);
+	load_fast_iregs(block);
 	return true;
 }
+
+void sh34_base_device::func_CLRS() { CLRS(m_sh2_state->arg0); }
+void cfunc_CLRS(void *param) { ((sh34_base_device *)param)->func_CLRS(); };
 
 bool sh34_base_device::generate_group_0_CLRS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_CLRS\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_CLRS, this);
+	load_fast_iregs(block);
 	return true;
 }
+
+void sh34_base_device::func_SETS() { SETS(m_sh2_state->arg0); }
+void cfunc_SETS(void *param) { ((sh34_base_device *)param)->func_SETS(); };
 
 bool sh34_base_device::generate_group_0_SETS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_SETS\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SETS, this);
+	load_fast_iregs(block);
 	return true;
 }
 
+void sh34_base_device::func_STCSGR() { STCSGR(m_sh2_state->arg0); }
+void cfunc_STCSGR(void *param) { ((sh34_base_device *)param)->func_STCSGR(); };
+
 bool sh34_base_device::generate_group_0_STCSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_STCSGR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSGR, this);
+	load_fast_iregs(block);
 	return true;
+
 }
 
 void sh34_base_device::func_STSFPUL() { STSFPUL(m_sh2_state->arg0); }
@@ -2962,9 +3005,15 @@ bool sh34_base_device::generate_group_0_STSFPSCR(drcuml_block *block, compiler_s
 	return true;
 }
 
+void sh34_base_device::func_STCDBR() { STCDBR(m_sh2_state->arg0); }
+void cfunc_STCDBR(void *param) { ((sh34_base_device *)param)->func_STCDBR(); };
+
 bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_0_STCDBR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCDBR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3205,9 +3254,15 @@ bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_
 	return true;
 }
 
+void sh34_base_device::func_STCMSGR() { STCMSGR(m_sh2_state->arg0); }
+void cfunc_STCMSGR(void *param) { ((sh34_base_device *)param)->func_STCMSGR(); };
+
 bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_STCMSGR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSGR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3271,9 +3326,15 @@ bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_st
 	return true;
 }
 
+void sh34_base_device::func_LDCSPC() { LDCSPC(m_sh2_state->arg0); }
+void cfunc_LDCSPC(void *param) { ((sh34_base_device *)param)->func_LDCSPC(); };
+
 bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCSPC\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCSPC, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3351,15 +3412,27 @@ bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block *block, compiler_s
 	return true;
 }
 
+void sh34_base_device::func_STCMDBR() { STCMDBR(m_sh2_state->arg0); }
+void cfunc_STCMDBR(void *param) { ((sh34_base_device *)param)->func_STCMDBR(); };
+
 bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_STCMDBR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMDBR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
+void sh34_base_device::func_LDCMDBR() { LDCMDBR(m_sh2_state->arg0); }
+void cfunc_LDCMDBR(void *param) { ((sh34_base_device *)param)->func_LDCMDBR(); };
+
 bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_4_LDCMDBR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMDBR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3546,7 +3619,6 @@ bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block *block, compiler
 	return true;
 }
 
-
 void sh34_base_device::func_FMOVFR() { FMOVFR(m_sh2_state->arg0); }
 void cfunc_FMOVFR(void *param) { ((sh34_base_device *)param)->func_FMOVFR(); };
 
@@ -3667,15 +3739,27 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, c
 	return true;
 }
 
+void sh34_base_device::func_FSQRT() { FSQRT(m_sh2_state->arg0); }
+void cfunc_FSQRT(void *param) { ((sh34_base_device *)param)->func_FSQRT(); };
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_FSQRT\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSQRT, this);
+	load_fast_iregs(block);
 	return true;
 }
 
+void sh34_base_device::func_FSRRA() { FSRRA(m_sh2_state->arg0); }
+void cfunc_FSRRA(void *param) { ((sh34_base_device *)param)->func_FSRRA(); };
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_FSRRA\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSRRA, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3703,21 +3787,39 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block *block, 
 	return true;
 }
 
+void sh34_base_device::func_FCNVSD() { FCNVSD(m_sh2_state->arg0); }
+void cfunc_FCNVSD(void *param) { ((sh34_base_device *)param)->func_FCNVSD(); };
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_FCNVSD\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCNVSD, this);
+	load_fast_iregs(block);
 	return true;
 }
+
+void sh34_base_device::func_FCNVDS() { FCNVDS(m_sh2_state->arg0); }
+void cfunc_FCNVDS(void *param) { ((sh34_base_device *)param)->func_FCNVDS(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_FCNVDS\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCNVDS, this);
+	load_fast_iregs(block);
 	return true;
 }
 
+void sh34_base_device::func_FIPR() { FIPR(m_sh2_state->arg0); }
+void cfunc_FIPR(void *param) { ((sh34_base_device *)param)->func_FIPR(); };
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_FIPR\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FIPR, this);
+	load_fast_iregs(block);
 	return true;
 }
 
@@ -3784,9 +3886,15 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_bl
 	return true;
 }
 
+void sh34_base_device::func_FSSCA() { FSSCA(m_sh2_state->arg0); }
+void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
+
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	printf("generate_group_15_op1111_0x13_op1111_0xf13_FSSCA\n");
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSSCA, this);
+	load_fast_iregs(block);
 	return true;
 }
 

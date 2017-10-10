@@ -726,6 +726,24 @@ public:
 	void func_FLDS();
 	void func_FTRV();
 	void func_FSTS();
+	void func_FSSCA();
+	void func_FCNVSD();
+	void func_FIPR();
+	void func_FSRRA();
+	void func_FSQRT();
+	void func_FCNVDS();
+	void func_LDCMDBR();
+	void func_STCMDBR();
+	void func_LDCSPC();
+	void func_STCMSGR();
+	void func_STCDBR();
+	void func_STCSGR();
+	void func_SETS();
+	void func_CLRS();
+	void func_LDTLB();
+	void func_MOVCAL();
+	void func_STCSSR();
+	void func_STCSPC();
 };
 
 
