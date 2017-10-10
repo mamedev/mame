@@ -1360,6 +1360,28 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( batmanfr )
+	PORT_INCLUDE( stv )
+	
+	PORT_MODIFY("PORTA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( stv6b )
 	PORT_INCLUDE( stv )
 
@@ -3572,7 +3594,7 @@ GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   stv,        ROT
 /* Playable */
 GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, batmanfr, stv,      stv_state,   batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

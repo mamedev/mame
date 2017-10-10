@@ -213,12 +213,46 @@ void sega_scu_device::device_start()
 	save_item(NAME(m_t1s));
 	save_item(NAME(m_t1md));
 	
+	save_item(NAME(m_dma[0].src));
+	save_item(NAME(m_dma[0].dst));
+	save_item(NAME(m_dma[0].src_add));
+	save_item(NAME(m_dma[0].dst_add));
+	save_item(NAME(m_dma[0].size));
+	save_item(NAME(m_dma[0].index));
+	save_item(NAME(m_dma[0].start_factor));
+	save_item(NAME(m_dma[0].enable_mask));
+	save_item(NAME(m_dma[0].indirect_mode));
+	save_item(NAME(m_dma[0].rup));
+	save_item(NAME(m_dma[0].wup));
+	save_item(NAME(m_dma[1].src));
+	save_item(NAME(m_dma[1].dst));
+	save_item(NAME(m_dma[1].src_add));
+	save_item(NAME(m_dma[1].dst_add));
+	save_item(NAME(m_dma[1].size));
+	save_item(NAME(m_dma[1].index));
+	save_item(NAME(m_dma[1].start_factor));
+	save_item(NAME(m_dma[1].enable_mask));
+	save_item(NAME(m_dma[1].indirect_mode));
+	save_item(NAME(m_dma[1].rup));
+	save_item(NAME(m_dma[1].wup));
+	save_item(NAME(m_dma[2].src));
+	save_item(NAME(m_dma[2].dst));
+	save_item(NAME(m_dma[2].src_add));
+	save_item(NAME(m_dma[2].dst_add));
+	save_item(NAME(m_dma[2].size));
+	save_item(NAME(m_dma[2].index));
+	save_item(NAME(m_dma[2].start_factor));
+	save_item(NAME(m_dma[2].enable_mask));
+	save_item(NAME(m_dma[2].indirect_mode));
+	save_item(NAME(m_dma[2].rup));
+	save_item(NAME(m_dma[2].wup));
+	
 	m_hostcpu = machine().device<sh2_device>(m_hostcpu_tag);//machine().device(m_hostcpu_tag);
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
 	m_dma_timer[0] = timer_alloc(DMALV0_ID);
 	m_dma_timer[1] = timer_alloc(DMALV1_ID);
-	m_dma_timer[2] = timer_alloc(DMALV2_ID);
+	m_dma_timer[2] = timer_alloc(DMALV2_ID);	
 }
 
 

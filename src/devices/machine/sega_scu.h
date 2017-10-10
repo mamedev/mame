@@ -130,7 +130,6 @@ private:
 		bool        indirect_mode;
 		bool        rup;
 		bool        wup;
-		uint32_t    illegal_factor;
 	}m_dma[3];
 	
 	uint32_t dma_common_r(uint8_t offset,uint8_t level);

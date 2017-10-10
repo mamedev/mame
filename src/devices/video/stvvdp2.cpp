@@ -6066,7 +6066,7 @@ uint8_t saturn_state::get_odd_bit( void )
 int saturn_state::get_vblank_start_position( void )
 {
 	/* TODO: test says that second setting happens at 241, might need further investigation ... */
-	const int d_vres[4] = { 224, 240, 256, 256 };
+	const int d_vres[4] = { 240, 240, 256, 256 };
 	int vres_mask;
 	int vblank_line;
 
