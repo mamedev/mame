@@ -3379,14 +3379,20 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 					if (!alphaTest(vd, stats, vd->reg[alphaMode].u, color.get_a()))
 						goto nextpixel;
 
+				/* perform fogging */
+				preFog.set(color);
+				if (FOGMODE_ENABLE_FOG(vd->reg[fogMode].u))
+					applyFogging(vd, vd->reg[fbzMode].u, vd->reg[fogMode].u, vd->reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
 
 				/* wait for any outstanding work to finish */
 				poly_wait(vd->poly, "LFB Write");
 
-				/* pixel pipeline part 2 handles color blending, fog, alpha, and final output */
-				PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth,
-					vd->reg[fbzMode].u, vd->reg[fbzColorPath].u, vd->reg[alphaMode].u, vd->reg[fogMode].u,
-					iterz, iterw, iterargb, biasdepth) { };
+				/* perform alpha blending */
+				if (ALPHAMODE_ALPHABLEND(vd->reg[alphaMode].u))
+					alphaBlend(vd->reg[fbzMode].u, vd->reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565);
+
+				/* pixel pipeline part 2 handles final output */
+				PIXEL_PIPELINE_END(stats, dither_lookup, x, dest, depth, vd->reg[fbzMode].u) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
