@@ -34,8 +34,6 @@ public:
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( opcode_r );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
 
 protected:
 	// device-level overrides

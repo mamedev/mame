@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START(tube_z80_io, AS_IO, 8, bbc_tube_z80_device)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ula", tube_device, parasite_r, parasite_w)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -172,18 +172,6 @@ WRITE8_MEMBER(bbc_tube_z80_device::mem_w)
 {
 	m_ram->pointer()[offset] = data;
 }
-
-
-READ8_MEMBER(bbc_tube_z80_device::io_r)
-{
-	return m_ula->parasite_r(space, offset);
-}
-
-WRITE8_MEMBER(bbc_tube_z80_device::io_w)
-{
-	m_ula->parasite_w(space, offset, data);
-}
-
 
 WRITE_LINE_MEMBER(bbc_tube_z80_device::nmi_w)
 {
