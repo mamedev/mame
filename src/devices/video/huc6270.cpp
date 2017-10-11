@@ -501,40 +501,6 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 			/* Check for low->high VSYNC transition */
 			// VBlank IRQ happens at the beginning of HDW period after VDW ends
 			handle_vblank();
-
-			/* Should we perform VRAM-VRAM dma.
-			   The timing for this is incorrect.
-			 */
-			if ( m_dma_enabled )
-			{
-				int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
-				int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
-
-				LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
-				
-				do {
-					uint16_t data;
-					
-					// area 0x8000-0xffff cannot be r/w (open bus)
-					if((m_sour & 0x8000) == 0)
-						data = m_vram[ m_sour & m_vram_mask ];
-					else
-						data = 0;
-					
-					if((m_desr & 0x8000) == 0)
-						m_vram[ m_desr & m_vram_mask ] = data;
-					m_sour += sour_inc;
-					m_desr += desr_inc;
-					m_lenr -= 1;
-				} while ( m_lenr != 0xFFFF );
-
-				if ( m_dcr & 0x0002 )
-				{
-					m_status |= HUC6270_DV;
-					m_irq_changed_cb( ASSERT_LINE );
-				}
-				m_dma_enabled = 0;
-			}
 		}
 	}
 
@@ -577,6 +543,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			while ( m_horz_to_go == 0 )
 				next_horz_state();
 
+			handle_dma();
 		}
 		else
 		{
@@ -593,6 +560,42 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 	m_hsync = state;
 }
 
+inline void huc6270_device::handle_dma()
+{
+	/* Should we perform VRAM-VRAM dma.
+	   The timing for this is incorrect.
+	 */
+	if ( m_dma_enabled )
+	{
+		int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
+		int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
+
+		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
+		
+		do {
+			uint16_t data;
+			
+			// area 0x8000-0xffff cannot be r/w (open bus)
+			if((m_sour & 0x8000) == 0)
+				data = m_vram[ m_sour & m_vram_mask ];
+			else
+				data = 0;
+			
+			if((m_desr & 0x8000) == 0)
+				m_vram[ m_desr & m_vram_mask ] = data;
+			m_sour += sour_inc;
+			m_desr += desr_inc;
+			m_lenr -= 1;
+		} while ( m_lenr != 0xFFFF );
+
+		if ( m_dcr & 0x0002 )
+		{
+			m_status |= HUC6270_DV;
+			m_irq_changed_cb( ASSERT_LINE );
+		}
+		m_dma_enabled = 0;
+	}
+}
 
 READ8_MEMBER( huc6270_device::read )
 {

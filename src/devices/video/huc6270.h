@@ -52,6 +52,7 @@ protected:
 	inline void handle_vblank();
 	inline void next_vert_state();
 	inline void next_horz_state();
+	inline void handle_dma();
 
 private:
 	enum class v_state : u8 {
