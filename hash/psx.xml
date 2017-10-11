@@ -2,16 +2,22 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-<!-- redump.org US PS1 discs (1719 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
+<!-- redump.org US PS1 discs (1795 of 1799), based on 'Sony - PlayStation - Datfile (8777) (2017-10-10 01-37-51)'
 
 These CHDs have been converted from redump.org disc images.
 
-    (Madden NFL 96 (USA) (Beta))*
-    (Twisted Metal 2 (USA) (Beta))*
+The following dumps are currently missing from this set:
 
+	- 16 Tales 1 (USA)
+	- 16 Tales 3 (USA)
+	* (Madden NFL 96 (USA) (Beta))
+	- Online Connection CD - For the PlayStation Game Console (USA) (Demo)
+	* (Twisted Metal 2 (USA) (Beta))
+	- Unknown Variable 1 - Masque Manor (USA)
+	
     *) These dumps are not included in the official redump.org datfiles as they are marked with "Possible bad dump" status
 
-Furthermore, for an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
+For an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
 
 -->
 
@@ -10473,23 +10479,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="gtalon69">
 		<!-- Original images (Redump)
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA).cue" size="2366" crc="02675c17" sha1="7c9466ee417da9dd64ec476d76a5c494657e5644"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 01).bin" size="42949872" crc="8760df1a" sha1="7ee948c0d8e695e1642a8b582c83850d24b15666"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 02).bin" size="16057104" crc="98f0c9b2" sha1="8454bdeff232006c7248f110668928f330883131"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 03).bin" size="49883568" crc="7936bd90" sha1="5cb1805feecd02e419aba343d1ab9505fb5dfc67"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 04).bin" size="60970896" crc="885dc11e" sha1="3055234fdcf092bb461fb68228f3bd1e54e54799"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 05).bin" size="20281296" crc="ce11304a" sha1="405080ce67be831ab94b2ca1572897673d6887b0"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 06).bin" size="33929952" crc="3728b7b0" sha1="9a777a2a841f02be6e3fe6f298744dfcf1cc0428"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 07).bin" size="52981152" crc="265bd0e7" sha1="a4cbbecd7d49bdc483057d4565ce8da1d085625c"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 08).bin" size="74215008" crc="ac9b3c66" sha1="8eec6f1ad5fcd3437e757ec33bc5d628d844fc1d"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 09).bin" size="25117008" crc="417443a0" sha1="7a673de89a4b8089141f2acd519513f51a184ed8"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 10).bin" size="77305536" crc="a050f3df" sha1="5b786dd436334ba8ed5a213d5da18fb2e1392639"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 11).bin" size="61443648" crc="8cf586df" sha1="e36219cd309343cbf7d493010bd62a3e5aa69559"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 12).bin" size="33447792" crc="c0d26483" sha1="ce379e2bf03a983e4bb82741959145be01fac3c3"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 13).bin" size="29315328" crc="b9d43b25" sha1="9b4fd36c79b564a4c7a58011480aee38fa0b57e9"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 14).bin" size="31780224" crc="2d1664ef" sha1="3b850eec1ca5647d9a2b6bb30a623c3cf4ccf347"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 15).bin" size="12486768" crc="7d1654eb" sha1="dc6f792618d0d68d11a3a2bc41b80bf12d313ca1"/>
-		<rom name="Grand Theft Auto - Mission Pack #1 - London 1969 (USA) (Track 16).bin" size="34151040" crc="a730f80f" sha1="e59017e8aa04a00678bacaecdae0423c3a1817ad"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA).cue" size="2350" crc="7fe49147" sha1="3831d07c5fb649eed9819748a5a8d1616396c3f3"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 01).bin" size="42949872" crc="8760df1a" sha1="7ee948c0d8e695e1642a8b582c83850d24b15666"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 02).bin" size="16057104" crc="98f0c9b2" sha1="8454bdeff232006c7248f110668928f330883131"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 03).bin" size="49883568" crc="7936bd90" sha1="5cb1805feecd02e419aba343d1ab9505fb5dfc67"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 04).bin" size="60970896" crc="885dc11e" sha1="3055234fdcf092bb461fb68228f3bd1e54e54799"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 05).bin" size="20281296" crc="ce11304a" sha1="405080ce67be831ab94b2ca1572897673d6887b0"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 06).bin" size="33929952" crc="3728b7b0" sha1="9a777a2a841f02be6e3fe6f298744dfcf1cc0428"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 07).bin" size="52981152" crc="265bd0e7" sha1="a4cbbecd7d49bdc483057d4565ce8da1d085625c"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 08).bin" size="74215008" crc="ac9b3c66" sha1="8eec6f1ad5fcd3437e757ec33bc5d628d844fc1d"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 09).bin" size="25117008" crc="417443a0" sha1="7a673de89a4b8089141f2acd519513f51a184ed8"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 10).bin" size="77305536" crc="a050f3df" sha1="5b786dd436334ba8ed5a213d5da18fb2e1392639"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 11).bin" size="61443648" crc="8cf586df" sha1="e36219cd309343cbf7d493010bd62a3e5aa69559"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 12).bin" size="33447792" crc="c0d26483" sha1="ce379e2bf03a983e4bb82741959145be01fac3c3"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 13).bin" size="29315328" crc="b9d43b25" sha1="9b4fd36c79b564a4c7a58011480aee38fa0b57e9"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 14).bin" size="31780224" crc="2d1664ef" sha1="3b850eec1ca5647d9a2b6bb30a623c3cf4ccf347"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 15).bin" size="12486768" crc="7d1654eb" sha1="dc6f792618d0d68d11a3a2bc41b80bf12d313ca1"/>
+		<rom name="Grand Theft Auto - Mission Pack 1 - London 1969 (USA) (Track 16).bin" size="34151040" crc="a730f80f" sha1="e59017e8aa04a00678bacaecdae0423c3a1817ad"/>
 		-->
 		<description>Grand Theft Auto - Mission Pack #1 - London 1969 (USA)</description>
 		<year>1999</year>
@@ -10498,7 +10504,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="grand theft auto - mission pack #1 - london 1969 (usa)" sha1="c7387613ee8abbabbc0d2549a538f0b0957a36d5"/>
+				<disk name="grand theft auto - mission pack 1 - london 1969 (usa)" sha1="c7387613ee8abbabbc0d2549a538f0b0957a36d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13140,7 +13146,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 	<software name="legorace">
 		<!-- Original images (Redump)
 		<rom name="LEGO Racers (USA) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).cue" size="115" crc="cc678293" sha1="bb774207e3961eef3337e7a05b573ac6ac07fc1b"/>
-		<rom name="LEGO Racers (USA) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).bin" size="527746464" crc="45f798a0" sha1="84ba324160a4acb1697cd78bf76ebd52452709c3"/>
+		<rom name="LEGO Racers (USA) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).bin" size="527746464" crc="35a01906" sha1="b18603d8ee85120fd27ac41f2e4bd652fa8fe6b1"/>
 		-->
 		<description>LEGO Racers (USA)</description>
 		<year>1999</year>
@@ -13149,7 +13155,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lego racers (usa) (en,fr,de,es,it,nl,sv,no,da,fi)" sha1="cbc8b7b97c4f0a06647c4c66ee3ed7dff0a243a1"/>
+				<disk name="lego racers (usa) (en,fr,de,es,it,nl,sv,no,da,fi)" sha1="4ed513ffb858031fb58150021d61772566dbf227"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24556,8 +24562,8 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="ssdancec">
 		<!-- Original images (Redump)
-		<rom name="Superstar Dance Club - #1 Hits!!! (USA).cue" size="105" crc="50241bb6" sha1="a2e5233712878ec7726ef90e38c7b15620c90b14"/>
-		<rom name="Superstar Dance Club - #1 Hits!!! (USA).bin" size="125260464" crc="87345da3" sha1="4cd6c1a1a3b856b36358d6f690fbace619428cc8"/>
+		<rom name="Superstar Dance Club - 1 Hits!!! (USA).cue" size="104" crc="82bd069c" sha1="7653b3471bde59e12b26ffe827e7d160a4acf89a"/>
+		<rom name="Superstar Dance Club - 1 Hits!!! (USA).bin" size="125260464" crc="87345da3" sha1="4cd6c1a1a3b856b36358d6f690fbace619428cc8"/>
 		-->
 		<description>Superstar Dance Club - #1 Hits!!! (USA)</description>
 		<year>2002</year>
@@ -24566,7 +24572,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="superstar dance club - #1 hits!!! (usa)" sha1="1c967d46d1357a43d5acc445dddd9e6a07b6fe3d"/>
+				<disk name="superstar dance club - 1 hits!!! (usa)" sha1="1c967d46d1357a43d5acc445dddd9e6a07b6fe3d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25899,7 +25905,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 	<software name="teletub">
 		<!-- Original images (Redump)
 		<rom name="Play with the Teletubbies (USA).cue" size="232" crc="f8ebb192" sha1="b768ef4c6d1930a79f3cfa5ca12e4dcab0550e55"/>
-		<rom name="Play with the Teletubbies (USA) (Track 1).bin" size="716649696" crc="c510c017" sha1="272872506d54b3af92139d1d1f08f265fb5558c1"/>
+		<rom name="Play with the Teletubbies (USA) (Track 1).bin" size="716649696" crc="5c600354" sha1="99b3cda54614ad1cecaf4595ab027d378d0f2cef"/>
 		<rom name="Play with the Teletubbies (USA) (Track 2).bin" size="32356464" crc="f6f33c3b" sha1="0fd16cbb03e546647dee93fdd2a62a916efbcac6"/>
 		-->
 		<description>Play with the Teletubbies (USA)</description>
@@ -25909,7 +25915,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="play with the teletubbies (usa)" sha1="5873580300414e257eb4d458d008d517ea1b8cf2"/>
+				<disk name="play with the teletubbies (usa)" sha1="b24f0cdc41061ce13d430a073f131ce5c1f8aa76"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26569,36 +26575,36 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="tobal1">
 		<!-- Original images (Redump)
-		<rom name="Tobal No.1 (USA).cue" size="2202" crc="7cd45de9" sha1="a0bd3928b93c9c8ac2682a096383bfe13c93b0c7"/>
-		<rom name="Tobal No.1 (USA) (Track 01).bin" size="65183328" crc="98d915fc" sha1="c2f05f69e9257de1e5558ea4948f06d0505ddf06"/>
-		<rom name="Tobal No.1 (USA) (Track 02).bin" size="26302416" crc="92f90880" sha1="23671b5f340410d89c3f0265f769a82f8fb25416"/>
-		<rom name="Tobal No.1 (USA) (Track 03).bin" size="32539920" crc="227e65d9" sha1="096bfa1d082fd393608554944872b741b33209d8"/>
-		<rom name="Tobal No.1 (USA) (Track 04).bin" size="2881200" crc="4e1c497c" sha1="547c8c5fdc778ca291a7b09d503adfe90d88158b"/>
-		<rom name="Tobal No.1 (USA) (Track 05).bin" size="43234464" crc="5dd7c9ec" sha1="306bdf367e57698af75457cd90ab7316570047ad"/>
-		<rom name="Tobal No.1 (USA) (Track 06).bin" size="1230096" crc="f611cce0" sha1="412535a8f3d7fe721bcaa9a4085bf72e3194a9cd"/>
-		<rom name="Tobal No.1 (USA) (Track 07).bin" size="33398400" crc="cd4b72d2" sha1="7bc0b6daa00b92dc224298099997e25152d6e07a"/>
-		<rom name="Tobal No.1 (USA) (Track 08).bin" size="32673984" crc="9925883f" sha1="d9b1008139144b5e9a5c8f315b4f374fd7ab9633"/>
-		<rom name="Tobal No.1 (USA) (Track 09).bin" size="34339200" crc="00fa9961" sha1="ab6dc3f858b7293da37c5b0c791713d489e3c472"/>
-		<rom name="Tobal No.1 (USA) (Track 10).bin" size="30162048" crc="f497633c" sha1="836b8bca5a2b2f37152e2ae48b6e8f86e0c051c3"/>
-		<rom name="Tobal No.1 (USA) (Track 11).bin" size="17905776" crc="d3a702eb" sha1="99e4da9f13d25486093aed5a5469a947cfdd4b81"/>
-		<rom name="Tobal No.1 (USA) (Track 12).bin" size="28647360" crc="ae057bd7" sha1="21e3049be83acdffcd40bf7555597b56415f2df5"/>
-		<rom name="Tobal No.1 (USA) (Track 13).bin" size="31900176" crc="59098827" sha1="d65eaad1e140fd1a598881b4758a17737273dec5"/>
-		<rom name="Tobal No.1 (USA) (Track 14).bin" size="32133024" crc="b1ebc63c" sha1="d993f34593f0887879b745de6e41bd7a6094df88"/>
-		<rom name="Tobal No.1 (USA) (Track 15).bin" size="33111456" crc="22f30988" sha1="1efa69c040448265ee2dc3ffa9f534ec4df5714e"/>
-		<rom name="Tobal No.1 (USA) (Track 16).bin" size="15407952" crc="99f16354" sha1="0bdfdd9ea244d52fc262e126048e12494e686242"/>
-		<rom name="Tobal No.1 (USA) (Track 17).bin" size="34409760" crc="e1fa8f08" sha1="0ec9016e89b1011b15fc7d2903d6e1dc2626554d"/>
-		<rom name="Tobal No.1 (USA) (Track 18).bin" size="1474704" crc="484b80c2" sha1="be54672b0a379c29a2e577ee1909bc5b4f232ee6"/>
-		<rom name="Tobal No.1 (USA) (Track 19).bin" size="1754592" crc="ad72fc84" sha1="efe6753268aaffbeb5822f99604787a4a2c85094"/>
-		<rom name="Tobal No.1 (USA) (Track 20).bin" size="34771968" crc="555da3ae" sha1="b3b10fc37bb67f39448a7fb6b7803195b8513c52"/>
+		<rom name="Tobal No. 1 (USA).cue" size="2222" crc="2f29ef74" sha1="5d1800bdee7352ea9b58ad55608c445a0e890d19"/>
+		<rom name="Tobal No. 1 (USA) (Track 01).bin" size="65183328" crc="98d915fc" sha1="c2f05f69e9257de1e5558ea4948f06d0505ddf06"/>
+		<rom name="Tobal No. 1 (USA) (Track 02).bin" size="26302416" crc="92f90880" sha1="23671b5f340410d89c3f0265f769a82f8fb25416"/>
+		<rom name="Tobal No. 1 (USA) (Track 03).bin" size="32539920" crc="227e65d9" sha1="096bfa1d082fd393608554944872b741b33209d8"/>
+		<rom name="Tobal No. 1 (USA) (Track 04).bin" size="2881200" crc="4e1c497c" sha1="547c8c5fdc778ca291a7b09d503adfe90d88158b"/>
+		<rom name="Tobal No. 1 (USA) (Track 05).bin" size="43234464" crc="5dd7c9ec" sha1="306bdf367e57698af75457cd90ab7316570047ad"/>
+		<rom name="Tobal No. 1 (USA) (Track 06).bin" size="1230096" crc="f611cce0" sha1="412535a8f3d7fe721bcaa9a4085bf72e3194a9cd"/>
+		<rom name="Tobal No. 1 (USA) (Track 07).bin" size="33398400" crc="cd4b72d2" sha1="7bc0b6daa00b92dc224298099997e25152d6e07a"/>
+		<rom name="Tobal No. 1 (USA) (Track 08).bin" size="32673984" crc="9925883f" sha1="d9b1008139144b5e9a5c8f315b4f374fd7ab9633"/>
+		<rom name="Tobal No. 1 (USA) (Track 09).bin" size="34339200" crc="00fa9961" sha1="ab6dc3f858b7293da37c5b0c791713d489e3c472"/>
+		<rom name="Tobal No. 1 (USA) (Track 10).bin" size="30162048" crc="f497633c" sha1="836b8bca5a2b2f37152e2ae48b6e8f86e0c051c3"/>
+		<rom name="Tobal No. 1 (USA) (Track 11).bin" size="17905776" crc="d3a702eb" sha1="99e4da9f13d25486093aed5a5469a947cfdd4b81"/>
+		<rom name="Tobal No. 1 (USA) (Track 12).bin" size="28647360" crc="ae057bd7" sha1="21e3049be83acdffcd40bf7555597b56415f2df5"/>
+		<rom name="Tobal No. 1 (USA) (Track 13).bin" size="31900176" crc="59098827" sha1="d65eaad1e140fd1a598881b4758a17737273dec5"/>
+		<rom name="Tobal No. 1 (USA) (Track 14).bin" size="32133024" crc="b1ebc63c" sha1="d993f34593f0887879b745de6e41bd7a6094df88"/>
+		<rom name="Tobal No. 1 (USA) (Track 15).bin" size="33111456" crc="22f30988" sha1="1efa69c040448265ee2dc3ffa9f534ec4df5714e"/>
+		<rom name="Tobal No. 1 (USA) (Track 16).bin" size="15407952" crc="99f16354" sha1="0bdfdd9ea244d52fc262e126048e12494e686242"/>
+		<rom name="Tobal No. 1 (USA) (Track 17).bin" size="34409760" crc="e1fa8f08" sha1="0ec9016e89b1011b15fc7d2903d6e1dc2626554d"/>
+		<rom name="Tobal No. 1 (USA) (Track 18).bin" size="1474704" crc="484b80c2" sha1="be54672b0a379c29a2e577ee1909bc5b4f232ee6"/>
+		<rom name="Tobal No. 1 (USA) (Track 19).bin" size="1754592" crc="ad72fc84" sha1="efe6753268aaffbeb5822f99604787a4a2c85094"/>
+		<rom name="Tobal No. 1 (USA) (Track 20).bin" size="34771968" crc="555da3ae" sha1="b3b10fc37bb67f39448a7fb6b7803195b8513c52"/>
 		-->
-		<description>Tobal No.1 (USA)</description>
+		<description>Tobal No. 1 (USA)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94208"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tobal no.1 (usa)" sha1="1d05a921227ce78db8d2462db94c5e025ec4893c"/>
+				<disk name="tobal no. 1 (usa)" sha1="1d05a921227ce78db8d2462db94c5e025ec4893c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26956,17 +26962,34 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="toystor2">
 		<!-- Original images (Redump)
-		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA).cue" size="128" crc="e981e356" sha1="1628b1f0df46a8a7a5c0c1d391d41b4dc975c32b"/>
-		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA).bin" size="633125472" crc="5942db1f" sha1="ef20f5fcae59c80dd1d0d1bfc51ba51d8c64e967"/>
+		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA) (v1.1).cue" size="135" crc="e19a9425" sha1="63828ba1cae9ecbc69360f3bc5410a9d021d7d3a"/>
+		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA) (v1.1).bin" size="633120768" crc="6ae25059" sha1="6355d725e7e6d8305c2937def14e646107ef39e5"/>
 		-->
-		<description>Disney/Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA)</description>
+		<description>Disney/Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA, v1.1)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="SLUS-00893CE"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa) (v1.1)" sha1="4a11d05ba86c1ecbee178d3c931c93d440319533"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="toystor2a" cloneof="toystor2">
+		<!-- Original images (Redump)
+		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA) (v1.0).cue" size="135" crc="57817455" sha1="fe9dfeee296a9e001457a13ff7c46fa09d84903d"/>
+		<rom name="Disney-Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA) (v1.0).bin" size="633125472" crc="5942db1f" sha1="ef20f5fcae59c80dd1d0d1bfc51ba51d8c64e967"/>
+		-->
+		<description>Disney/Pixar Toy Story 2 - Buzz Lightyear to the Rescue! (USA, v1.0)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="SLUS-00893"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa)" sha1="3bb8e056c1ab462e4babfb934901b864acb06e08"/>
+				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa) (v1.0)" sha1="3bb8e056c1ab462e4babfb934901b864acb06e08"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31004,6 +31027,56 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="arpsxps1">
+		<!-- Original images (Redump)
+		<rom name="Action Replay for PSX &amp; PSone (USA).cue" size="101" crc="ae636a90" sha1="eba4965dfe91aadc9b53b49e1909877d7ff8eb3c"/>
+		<rom name="Action Replay for PSX &amp; PSone (USA).bin" size="80316096" crc="2e5d6764" sha1="18a3b00b624aee322661803950b0971f0e3d9640"/>
+		-->
+		<description>Action Replay for PSX &amp; PSone (USA)</description>
+		<year>2000</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="serial" value="DUS0005-I"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="action replay for psx &amp; psone (usa)" sha1="c7fa3ea66df31ef551bffc3a4c1392cbc3b802e6"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="bbsf2k1">
+		<!-- Original images (Redump)
+		<rom name="Blockbuster Presents - GameShark Top 50 - Summer Fall 2001 (USA) (Unl).cue" size="136" crc="c69ea948" sha1="f026936c289dfa0187e34ecb3a39497641b68582"/>
+		<rom name="Blockbuster Presents - GameShark Top 50 - Summer Fall 2001 (USA) (Unl).bin" size="79083648" crc="8b6e1b5a" sha1="19576b0cc3576d8a11c96e37fac858f45779cc85"/>
+		-->
+		<description>Blockbuster Presents - GameShark Top 50 - Summer/Fall 2001 (USA)</description>
+		<year>2001</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="blockbuster presents - gameshark top 50 - summer fall 2001 (usa) (unl)" sha1="da349daef5f44f9ad0fd28973d176153f578f17d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cheatsv1">
+		<!-- Original images (Redump)
+		<rom name="Cheats 'N Codes Volume 1 (USA).cue" size="96" crc="41e3b2db" sha1="89f0d9ec700bd825f1d06876cd37de70d991ed5a"/>
+		<rom name="Cheats 'N Codes Volume 1 (USA).bin" size="119966112" crc="aaba0221" sha1="b84aaabbbd92bb9c3c2a7a2d98510bd13546f518"/>
+		-->
+		<description>Cheats 'N Codes Volume 1 (USA)</description>
+		<year>2000</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="serial" value="G-22811"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cheats 'n codes volume 1 (usa)" sha1="85f72ba7474b5c1798c2b31e9dad71c31516151b"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="codebrk">
 		<!-- Original images (Redump)
@@ -31036,6 +31109,38 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="gamepro1">
+		<!-- Original images (Redump)
+		<rom name="GamePro Action Disc 1 (USA) (Unl).cue" size="99" crc="57827c68" sha1="19800f2a779de940b5e565c0a7cf8289d611e0c7"/>
+		<rom name="GamePro Action Disc 1 (USA) (Unl).bin" size="455695296" crc="16f09cd5" sha1="0658a8d26fb5027c9d09461cabd4b9b24e0eb7bc"/>
+		-->
+		<description>GamePro Action Disc 1 (USA)</description>
+		<year>2001</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gamepro action disc 1 (usa) (unl)" sha1="7a0fe8aecb25e9122b7607f4182e409b69f66396"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="gamepro2">
+		<!-- Original images (Redump)
+		<rom name="GamePro Action Disc 2 (USA) (Unl).cue" size="99" crc="94a79e3b" sha1="0c4c181b36ca28000d82660abc33945fe565ef6a"/>
+		<rom name="GamePro Action Disc 2 (USA) (Unl).bin" size="574972272" crc="8816d345" sha1="6bad0c4a8a2ff303e85891f38e60bbde778151b6"/>
+		-->
+		<description>GamePro Action Disc 2 (USA)</description>
+		<year>2001</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gamepro action disc 2 (usa) (unl)" sha1="f1c1f062bf2ea610a0ad1cb5d4e7b90ad2c82798"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="gshark2">
 		<!-- Original images (Redump)
@@ -31052,6 +31157,47 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="gshark22">
+		<!-- Original images (Redump)
+		<rom name="GameShark Enhancement CD Version 2.2 (USA).cue" size="3539" crc="cc230d12" sha1="ccb7beeb7af0cf53544c2f62b32c3f0955252d63"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 01).bin" size="1185408" crc="ce72bc9c" sha1="a6d504e4c0912414ff3482e1ed5a61fb176bea5b"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 02).bin" size="6061104" crc="f277b64e" sha1="d249245a1427bcbfc65bc8a48d5118a2d63acdc4"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 03).bin" size="8288448" crc="ee2f0efe" sha1="64839d442d6be8f0f66989b29494287e999f37f4"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 04).bin" size="8316672" crc="49327ac2" sha1="14921f5d6586fc5bb8817548951f1325c790387b"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 05).bin" size="3544464" crc="7c6a5a6e" sha1="0deef939c435d87c4b2fffebe30a62ef404592f8"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 06).bin" size="3043488" crc="5f10de67" sha1="f36ec19382ec68f7e9a0cabcb2edddfb03ca3dd5"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 07).bin" size="2260272" crc="d8b6a3e7" sha1="214fa7d83ea85fb761060f10dc698bb56fd0a5e4"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 08).bin" size="7895664" crc="7fbaeb60" sha1="417d56ce9421c4732c968a1cb0985068553730f3"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 09).bin" size="7895664" crc="716b94ac" sha1="90a106335ea45c1d10b756dec60da508da3d4ca0"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 10).bin" size="7895664" crc="5ea7b915" sha1="ba1c2d4bfac3543fb7a3992fe60556993dcdf413"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 11).bin" size="7895664" crc="0d4f29b7" sha1="1079b737170d3384b521c5c17a134609e599c013"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 12).bin" size="7945056" crc="0894c9cc" sha1="99a621c4e501c62313c1899277a87839ba673ec2"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 13).bin" size="7848624" crc="6ddad765" sha1="d55e57f57f2a99dc7d72a96a8e2e8381752d07c5"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 14).bin" size="7914480" crc="4ea0ec9d" sha1="dce1ba344ec35db2ff6dda66261ab2138e08eebc"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 15).bin" size="7876848" crc="4549a4f3" sha1="f44154ec19c28b840d4dfe6c923122838319f379"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 16).bin" size="7893312" crc="accf5675" sha1="5f1dad50fad9ebd9cc276316304b3a3de86021db"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 17).bin" size="7895664" crc="ebb709fe" sha1="834e6ffa544ee2caef01297ad3fb42939c042037"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 18).bin" size="7895664" crc="734208af" sha1="fe3ab2b4583f495b291e544f7911b77bccae8737"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 19).bin" size="7895664" crc="3e4ba035" sha1="c9bb7fd07a00366e4392971fe88cfc2e7bc44764"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 20).bin" size="8944656" crc="e0b42ee9" sha1="9c191fe90db5ff4a8b9cb8d2a1281f9eb22da7bc"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 21).bin" size="8747088" crc="399aeb71" sha1="87e0264d67dfbfbeac713a2dba817b098aba9317"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 22).bin" size="8446032" crc="3c2c0959" sha1="021ba81e13e09427c214e38660b734e6b96259ad"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 23).bin" size="8199072" crc="7d2fbed3" sha1="fcb65e346161669df2c6b665d5719fa461190e33"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 24).bin" size="2518992" crc="552a5a25" sha1="483814c987f884ba5674568c4af131f5560d838c"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 25).bin" size="7462896" crc="3824abe8" sha1="cafe5c1df57f6dfc8c86c53b786b76d9371e8a05"/>
+		<rom name="GameShark Enhancement CD Version 2.2 (USA) (Track 26).bin" size="9572640" crc="18512a8c" sha1="8c326f49207bbd8270719965d694963d480e94e3"/>
+		-->
+		<description>GameShark Enhancement CD Version 2.2 (USA)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gameshark enhancement cd version 2.2 (usa)" sha1="c6a7342e2a4995032a03bbb0fa18d1a477027630"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="gshark33">
 		<!-- Original images (Redump)
@@ -31373,7 +31519,109 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="eccs1">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 1 (USA).cue" size="97" crc="487c8fce" sha1="1593d5954422eb1e7acc437c0ec00d09543eae7c"/>
+		<rom name="Every Child Can Succeed 1 (USA).bin" size="512119776" crc="7ab75152" sha1="7536a36426a5f5ea4d1bc5627e8ec3ea6adba1da"/>
+		-->
+		<description>Every Child Can Succeed 1 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019101"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 1 (usa)" sha1="104e1bf8344001383c9b07bfe6783c21715d79d4"/>
+			</diskarea>
+		</part>
+	</software>
 
+	<software name="eccs2">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 2 (USA).cue" size="97" crc="04cfa567" sha1="46c225f0fed3a23bc34043cf1a461381a2a3851c"/>
+		<rom name="Every Child Can Succeed 2 (USA).bin" size="607486320" crc="ebab397c" sha1="8bdb7b321784e807d5c567695097c514a1669ab5"/>
+		-->
+		<description>Every Child Can Succeed 2 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019201"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 2 (usa)" sha1="7cd178a6b1b44e8e57ef578ce3ada16373397c6c"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="eccs3">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 3 (USA).cue" size="97" crc="898e413f" sha1="4fbe94d428b855b7da8f3a0713c5ac23215a18df"/>
+		<rom name="Every Child Can Succeed 3 (USA).bin" size="572335680" crc="de900e2f" sha1="30052bb423d040d953bd75f0bef2412ef52806c8"/>
+		-->
+		<description>Every Child Can Succeed 3 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019301"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 3 (usa)" sha1="340bff5622e5f6122de7b0f919333abed1a2f299"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="eccs4">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 4 (USA).cue" size="97" crc="9da9f035" sha1="01b2e3d20c4a67b65ae8ed3d911a996ba2e97d9c"/>
+		<rom name="Every Child Can Succeed 4 (USA).bin" size="590683632" crc="06b7171d" sha1="233b8e620dbceca1c27866b6bb907125eb517979"/>
+		-->
+		<description>Every Child Can Succeed 4 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019401"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 4 (usa)" sha1="be33bc99d4b794576ab4e03f2876cd3644bd86f8"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="eccs5">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 5 (USA).cue" size="97" crc="10e8146d" sha1="9e8a4decc8bd56361abdc8659e5d2e796f54965e"/>
+		<rom name="Every Child Can Succeed 5 (USA).bin" size="611404752" crc="58ff35bd" sha1="e6f9d11501005ab0b43d02c14c11b4e7802b64f8"/>
+		-->
+		<description>Every Child Can Succeed 5 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019501"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 5 (usa)" sha1="3e12300f0bdcadb53c8e84e26afdc4f3ccf55ece"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="eccs7">
+		<!-- Original images (Redump)
+		<rom name="Every Child Can Succeed 7 (USA).cue" size="97" crc="d11ada9c" sha1="60240e2c5a61fc35b5a7d546b658b7d250aff97c"/>
+		<rom name="Every Child Can Succeed 7 (USA).bin" size="618467808" crc="2a80772c" sha1="e34fbc67acaeaaf03772bce19ffc9d886ef1c3c1"/>
+		-->
+		<description>Every Child Can Succeed 7 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99019701"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="every child can succeed 7 (usa)" sha1="ce574c6dd28936204f83a8deb7dd4e38916ec7ff"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="fairelng">
 		<!-- Original images (Redump)
 		<rom name="Faire Games - Language Arts (USA).cue" size="99" crc="98d37972" sha1="ef13ce2123f53ed6e52778fddb0f58590edb1960"/>
@@ -32158,17 +32406,17 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="pkplace2">
 		<!-- Original images (Redump)
-		<rom name="P.K.'s Place 2 - Hoopo at Sea (USA).cue" size="101" crc="734c3f9d" sha1="8855e4198ca371fc3f54e277204e7f7b33bbac4e"/>
-		<rom name="P.K.'s Place 2 - Hoopo at Sea (USA).bin" size="142627632" crc="b7c6d86c" sha1="351b5e7c80d8a461c68a053cbe24896e09c69efd"/>
+		<rom name="P.K.'s Place 2 - Hoopo at Sea! (USA).cue" size="102" crc="cc875f54" sha1="bb1063d79c7c020b66bf8bea028b9b7dbd23e85c"/>
+		<rom name="P.K.'s Place 2 - Hoopo at Sea! (USA).bin" size="142627632" crc="b7c6d86c" sha1="351b5e7c80d8a461c68a053cbe24896e09c69efd"/>
 		-->
-		<description>P.K.'s Place 2 - Hoopo at Sea (USA)</description>
+		<description>P.K.'s Place 2 - Hoopo at Sea! (USA)</description>
 		<year>1997</year>
 		<publisher>The Lightspan Partnership</publisher>
 		<info name="serial" value="LSP-180210, LSP-18021001"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="p.k.'s place 2 - hoopo at sea (usa)" sha1="719f7a63121310cd0a8b847709bbb6e03a7294a7"/>
+				<disk name="p.k.'s place 2 - hoopo at sea! (usa)" sha1="719f7a63121310cd0a8b847709bbb6e03a7294a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32529,13 +32777,217 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="unkvar2">
+		<!-- Original images (Redump)
+		<rom name="Unknown Variable 2 - Raven's Ridge (USA).cue" size="106" crc="c3139daa" sha1="bdd2bb8350b06ed7b285dfd2383157dbbf641712"/>
+		<rom name="Unknown Variable 2 - Raven's Ridge (USA).bin" size="447230448" crc="3a54a1c5" sha1="d8c875af8ebc3c13e3e4b14d1ca15630819ba9c5"/>
+		-->
+		<description>Unknown Variable 2 - Raven's Ridge (USA)</description>
+		<year>1998</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-909022"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="unknown variable 2 - raven's ridge (usa)" sha1="fd7c3bde8c164d2d79ba5572d4abf463a9354f9d"/>
+			</diskarea>
+		</part>
+	</software>	
 
+	<software name="writea10">
+		<!-- Original images (Redump)
+		<rom name="Write Away 10 (USA).cue" size="85" crc="3b4e0c24" sha1="d08ed88fdc8694581a0a3d370c66879f4c4d8692"/>
+		<rom name="Write Away 10 (USA).bin" size="588522144" crc="fb6f7369" sha1="d382eb5c39668d554e85f14de943a7bd32b70e08"/>
+		-->
+		<description>Write Away 10 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99011901"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 10 (usa)" sha1="f017cef8e152b50f337f24b9d063e529fb075ceb"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw1">
+		<!-- Original images (Redump)
+		<rom name="Write Away 1 (USA).cue" size="84" crc="d41d7b60" sha1="931d091a95734ee22ba7f2c9e5287bb10dda1639"/>
+		<rom name="Write Away 1 (USA).bin" size="523470528" crc="10bdd5d8" sha1="c374b843e22d63e11f28d6323573104ffb00d920"/>
+		-->
+		<description>Write Away 1 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-17011001"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 1 (usa)" sha1="a795a4ce115110ab56c19f5ee27a88bf6411eba8"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw2">
+		<!-- Original images (Redump)
+		<rom name="Write Away 2 (USA).cue" size="84" crc="98ae51c9" sha1="b48706a907b29f1e95edd4cbb409a7d0092c7510"/>
+		<rom name="Write Away 2 (USA).bin" size="518870016" crc="2d1a69f5" sha1="9a5e4b5f0617f87719ac5ca330d0faf0ed40cbf5"/>
+		-->
+		<description>Write Away 2 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-17011101"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 2 (usa)" sha1="f727def6e52f53e0378a48dc38696866fb07633b"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw3">
+		<!-- Original images (Redump)
+		<rom name="Write Away 3 (USA).cue" size="84" crc="15efb591" sha1="d15af4ff54977c6dfca00b56c3b8270be6a0a0dc"/>
+		<rom name="Write Away 3 (USA).bin" size="651475776" crc="878a6194" sha1="bf142cbfbcfc79879be1efb33e2d2ff7d9a4f8a2"/>
+		-->
+		<description>Write Away 3 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-17011201"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 3 (usa)" sha1="c76bd29a542fa4eb65f059b4f2acd66bbf7648fb"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw4">
+		<!-- Original images (Redump)
+		<rom name="Write Away 4 (USA).cue" size="84" crc="01c8049b" sha1="8711648712b805d8e1e82f800f99851421c94d01"/>
+		<rom name="Write Away 4 (USA).bin" size="611077824" crc="7925508c" sha1="4671c0d9bc34833b63fcc59227478c67e44f7d9b"/>
+		-->
+		<description>Write Away 4 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-17011301"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 4 (usa)" sha1="16007e466520149d9a304ab4b6957a9946434024"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw5">
+		<!-- Original images (Redump)
+		<rom name="Write Away 5 (USA).cue" size="84" crc="8c89e0c3" sha1="df07b94df514750274bc495862c07c3f27541ded"/>
+		<rom name="Write Away 5 (USA).bin" size="692854512" crc="4240f2eb" sha1="4dbfe65df19e1be4306e110ec24c8c7436f443bf"/>
+		-->
+		<description>Write Away 5 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99011401"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 5 (usa)" sha1="b2ceb3dbcc579f236cfe3ffd10bf14a9fa92a683"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw6">
+		<!-- Original images (Redump)
+		<rom name="Write Away 6 (USA).cue" size="84" crc="c03aca6a" sha1="e3ca60715951d150e7ac39ffdc2ab7ebef70cd34"/>
+		<rom name="Write Away 6 (USA).bin" size="733525296" crc="1fccbae8" sha1="6454285762e4a2f20ee344fb11be8b6ae70173e6"/>
+		-->
+		<description>Write Away 6 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99011501"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 6 (usa)" sha1="13d3fff33f8f130536080e9579075d6f7422cf62"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="writeaw7">
+		<!-- Original images (Redump)
+		<rom name="Write Away 7 (USA).cue" size="84" crc="4d7b2e32" sha1="25f026d7d034b4d948071ef45188668006376adf"/>
+		<rom name="Write Away 7 (USA).bin" size="571013856" crc="d786289b" sha1="6f11849015e6648f9d5558b923ac32703e116a7f"/>
+		-->
+		<description>Write Away 7 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99011601"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 7 (usa)" sha1="0282d53179ad7b9f3763ac3f0f4b6fa6ad579b0c"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="writeaw9">
+		<!-- Original images (Redump)
+		<rom name="Write Away 9 (USA).cue" size="84" crc="65344c26" sha1="7eef235d7f5fb65248e38a9dbe9aba24cafb4224"/>
+		<rom name="Write Away 9 (USA).bin" size="462779520" crc="99dfebf8" sha1="eaa792515362de4c6ff6f3b57df5411821d91431"/>
+		-->
+		<description>Write Away 9 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99011801"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="write away 9 (usa)" sha1="b65ea8fdd53c7cef38584fe837df08aebbcdba2a"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 
 <!-- GAME DEMOS AND DEMO COMPILATIONS FROM REDUMP SET -->
 
 
 <!-- GAME DEMOS -->
 
+	<software name="1000armsd" cloneof="1000arms">
+		<!-- Original images (Redump)
+		<rom name="Thousand Arms (USA) (Demo).cue" size="92" crc="0143e7f9" sha1="988067267b460098323702d3b010e5189c534bc7"/>
+		<rom name="Thousand Arms (USA) (Demo).bin" size="235089456" crc="be868278" sha1="62b1f853a09578f1e9e33068f355b0b76d69908d"/>
+		-->
+		<description>Thousand Arms (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Atlus U.S.A.</publisher>
+		<info name="serial" value="SLUS-90059"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thousand arms (usa) (demo)" sha1="dd9555b4722ed3d2c4fd5c35c8e5d154b272fcc2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="abeodyssd" cloneof="abeodyss">
+		<!-- Original images (Redump)
+		<rom name="Oddworld - Abe's Oddysee (USA) (Demo).cue" size="103" crc="a213da4b" sha1="b2c599d7f9341cffd9facc4ee567788875fbd264"/>
+		<rom name="Oddworld - Abe's Oddysee (USA) (Demo).bin" size="44401056" crc="15e38fa1" sha1="4c24bdc94d2771313b7e3db6036cb85f7eea315d"/>
+		-->
+		<description>Oddworld - Abe's Oddysee (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>GT Interactive Software</publisher>
+		<info name="serial" value="SLUS-90004"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oddworld - abe's oddysee (usa) (demo)" sha1="9ed29844c8d0fb1d0e8de6ae899e98dde0a00270"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="apescaped" cloneof="apescape">
 		<!-- Original images (Redump)
 		<rom name="Ape Escape (USA) (Demo).cue" size="216" crc="d80d42bf" sha1="67f0412520017a0342d9abad8f41cfd2b5ff5008"/>
@@ -32571,6 +33023,54 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
+	<software name="broadd" cloneof="broad">
+		<!-- Original images (Redump)
+		<rom name="Burning Road (USA) (Demo).cue" size="3822" crc="a55681e2" sha1="a5cc71f76582855a61fafe913c4ffe2ed04135bf"/>
+		<rom name="Burning Road (USA) (Demo) (Track 01).bin" size="10892112" crc="43e4087c" sha1="2f938593ef673f41efa3ffce5606b11911eb0285"/>
+		<rom name="Burning Road (USA) (Demo) (Track 02).bin" size="21400848" crc="8619f41d" sha1="8a764dd16f68708f509a7e425a018d12a3294d2c"/>
+		<rom name="Burning Road (USA) (Demo) (Track 03).bin" size="38673936" crc="e00b5840" sha1="6a7e95c7479162a92029b24d2bad63921ff19ca0"/>
+		<rom name="Burning Road (USA) (Demo) (Track 04).bin" size="44151744" crc="1fbbcdeb" sha1="e1ead946d31daa34c46a5ae560b9e17486f9f10c"/>
+		<rom name="Burning Road (USA) (Demo) (Track 05).bin" size="47757360" crc="5f8eb4a5" sha1="71f7e0e09f764085d1ace8b15aaedf01caf5e06b"/>
+		<rom name="Burning Road (USA) (Demo) (Track 06).bin" size="33591264" crc="285273dd" sha1="ce792ffe0d22a76f6a51ee99035df933eeeba280"/>
+		<rom name="Burning Road (USA) (Demo) (Track 07).bin" size="6369216" crc="f2804b42" sha1="2bf434220399c2695b9ca2f765d7deb0e612b94c"/>
+		<rom name="Burning Road (USA) (Demo) (Track 08).bin" size="4094832" crc="946ed54e" sha1="f15076991bea3c96fe347e240e0b77e8eab8d775"/>
+		<rom name="Burning Road (USA) (Demo) (Track 09).bin" size="4217136" crc="a69727cc" sha1="2638387208d7ce42e5c3fd648666c95a1e5c4611"/>
+		<rom name="Burning Road (USA) (Demo) (Track 10).bin" size="4233600" crc="9ba9a3db" sha1="2ff1ee22ff3b4b9992a25cd86e7143173581b692"/>
+		<rom name="Burning Road (USA) (Demo) (Track 11).bin" size="4240656" crc="ee937a20" sha1="d8b1ea0034a96c82ee63e39f00e44123697774c3"/>
+		<rom name="Burning Road (USA) (Demo) (Track 12).bin" size="4250064" crc="18c5d662" sha1="b91f59e31505bbdea340fb5f465c0d4e065ffab3"/>
+		<rom name="Burning Road (USA) (Demo) (Track 13).bin" size="3906672" crc="aae0fc09" sha1="1080554796a2f54202dadb5dd07961cb83985d24"/>
+		<rom name="Burning Road (USA) (Demo) (Track 14).bin" size="4036032" crc="f9399d75" sha1="86d1ac26e68bf3adbd9c6f5001d7155ec117155f"/>
+		<rom name="Burning Road (USA) (Demo) (Track 15).bin" size="35399952" crc="96e579f6" sha1="7e4fcd702afc5ed1b8cc071c8f128595fc68711d"/>
+		<rom name="Burning Road (USA) (Demo) (Track 16).bin" size="32191824" crc="6396ae16" sha1="6661a3d2012ce0826a7feee1490b65531362c322"/>
+		<rom name="Burning Road (USA) (Demo) (Track 17).bin" size="22757952" crc="570b4866" sha1="12fffbca889bce68e3742c2ab1d52eb1e9ff9f45"/>
+		<rom name="Burning Road (USA) (Demo) (Track 18).bin" size="25498032" crc="da59d2ec" sha1="e49693ccf37bca4b5f5f9e84aab3a99e886e1f7e"/>
+		<rom name="Burning Road (USA) (Demo) (Track 19).bin" size="27711264" crc="049cafa4" sha1="6f1217d235bae72400f0cd2dfa07e52e9d684ed9"/>
+		<rom name="Burning Road (USA) (Demo) (Track 20).bin" size="22814400" crc="4b63e4ba" sha1="5dbd02746634e74d97e41d7202fa93c9e6af9d3b"/>
+		<rom name="Burning Road (USA) (Demo) (Track 21).bin" size="6369216" crc="b23256ae" sha1="c9e878ff8b6d9baf0c5d4307851575e257a2cb98"/>
+		<rom name="Burning Road (USA) (Demo) (Track 22).bin" size="4146576" crc="05b512e0" sha1="fd4504b6bfae7cebfdb3bac319f9142302047348"/>
+		<rom name="Burning Road (USA) (Demo) (Track 23).bin" size="4212432" crc="be86183c" sha1="844ede7bb75f1eb70fff0b6bd8b66493abe4a3af"/>
+		<rom name="Burning Road (USA) (Demo) (Track 24).bin" size="4193616" crc="7f44797b" sha1="a9d5a6695c738345a5425ada65941f6ffd618dc2"/>
+		<rom name="Burning Road (USA) (Demo) (Track 25).bin" size="4167744" crc="b951f208" sha1="953033278297b5d4662d3fed43413f1f7c839b50"/>
+		<rom name="Burning Road (USA) (Demo) (Track 26).bin" size="4219488" crc="f6c8b8f9" sha1="b6d024c8e446b5e3b3ddc3af5360f1ef0fee7945"/>
+		<rom name="Burning Road (USA) (Demo) (Track 27).bin" size="4306512" crc="a5f06c8b" sha1="346759b4477ea00180e48f61d7cd9a82c286357a"/>
+		<rom name="Burning Road (USA) (Demo) (Track 28).bin" size="4294752" crc="dad5182b" sha1="1d5c82098a443c5d209b67b29edd4186d8b8b2ce"/>
+		<rom name="Burning Road (USA) (Demo) (Track 29).bin" size="6249264" crc="00ee65a7" sha1="572aaeee247769a0ad2bbad70daa3a5ac0843eb4"/>
+		<rom name="Burning Road (USA) (Demo) (Track 30).bin" size="4280640" crc="aea723ca" sha1="68b34aec93f859a5499ceb1f80caeadd00ff5dfb"/>
+		<rom name="Burning Road (USA) (Demo) (Track 31).bin" size="27525456" crc="02c27366" sha1="656bb3fb8ecff4b045ee39be408bff5bf7884493"/>
+		<rom name="Burning Road (USA) (Demo) (Track 32).bin" size="27525456" crc="02c27366" sha1="656bb3fb8ecff4b045ee39be408bff5bf7884493"/>
+		-->
+		<description>Burning Road (USA, Demo)</description>
+		<year>1996</year>
+		<publisher>Playmates Interactive Entertainment</publisher>
+		<info name="serial" value="SLUS-90002"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="burning road (usa) (demo)" sha1="c3b39124961f14b82c5a44fba61ceb701eab3628"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="cbsdemo">
 		<!-- Original images (Redump)
 		<rom name="Crash Bash &amp; Spyro - Year of the Dragon (USA) (Demo).cue" size="274" crc="62eed13b" sha1="64bc8ec995a7c540d25f43644777bce67982dc00"/>
@@ -32589,6 +33089,61 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
+	<software name="contendrd" cloneof="contendr">
+		<!-- Original images (Redump)
+		<rom name="Contender (USA) (Demo).cue" size="562" crc="1be79ebe" sha1="4cb97cf7d7445ec3779b59a784737766f95f519b"/>
+		<rom name="Contender (USA) (Demo) (Track 1).bin" size="89284272" crc="ab1a028a" sha1="1c7a6780c1eca4c39cdaca06dd7c781168690780"/>
+		<rom name="Contender (USA) (Demo) (Track 2).bin" size="24387888" crc="cb3ff488" sha1="0c9ab1d3119559d6a9209344de6fa33bb25013bf"/>
+		<rom name="Contender (USA) (Demo) (Track 3).bin" size="1681680" crc="0d4dae67" sha1="0eb15c23dc7ae344823c73865ce9a75d5aa709e3"/>
+		<rom name="Contender (USA) (Demo) (Track 4).bin" size="1667568" crc="9cd75aa3" sha1="aba2f37bbf17638c8df90a9e8a51282f1a846c22"/>
+		<rom name="Contender (USA) (Demo) (Track 5).bin" size="32354112" crc="e49b3127" sha1="01de730b1e7a8f18f9effe9341266681c2145db8"/>
+		-->
+		<description>Contender (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94380"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="contender (usa) (demo)" sha1="f17849011a1892ab8a4a2e2cea79ca8a058d70c0"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="coolb2k1d" cloneof="coolb2k1">
+		<!-- Original images (Redump)
+		<rom name="Cool Boarders 2001 (USA) (Demo).cue" size="97" crc="363d80c1" sha1="071db7da2f531614854fc342171b3eb1a3848e97"/>
+		<rom name="Cool Boarders 2001 (USA) (Demo).bin" size="99804768" crc="fdc70f6e" sha1="86ace60872cd133c37af1bcaf5dd8017863137d8"/>
+		-->
+		<description>Cool Boarders 2001 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94625"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cool boarders 2001 (usa) (demo)" sha1="fd57c6f3cca63688a686f4f94b5c5b4ce4235f5c"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="coolboa4d" cloneof="coolboa4">
+		<!-- Original images (Redump)
+		<rom name="Cool Boarders 4 (USA) (Demo).cue" size="94" crc="1c9a897b" sha1="aea14fd65155c0ee591c13b935bf9c6bcaef2241"/>
+		<rom name="Cool Boarders 4 (USA) (Demo).bin" size="233146704" crc="07ea6292" sha1="e3177665d71d9f9575f3c06df3cc4f4cf32a507d"/>
+		-->
+		<description>Cool Boarders 4 (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>989 Studios</publisher>
+		<info name="serial" value="SCUS-94388"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cool boarders 4 (usa) (demo)" sha1="4fef61871a790ab7443db4c606d756c391424ad7"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="crimekld" cloneof="crimekl">
 		<!-- Original images (Redump)
 		<rom name="Crime Killer (USA) (Demo).cue" size="220" crc="5d1fba24" sha1="a542f472bf46d44baaf1d08a358b422a14e960b3"/>
@@ -32623,6 +33178,27 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="cwarsvngd" cloneof="cwarsvng">
+		<!-- Original images (Redump)
+		<rom name="Colony Wars - Vengeance (USA) (Demo).cue" size="632" crc="ef8552f4" sha1="ad2e5c04eb29f26e7e8dd4f20fbd18d400af0445"/>
+		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 1).bin" size="361215456" crc="e7475439" sha1="5b7c521ad07cd23e22f613f2abe58de5ac4e562a"/>
+		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 2).bin" size="17896368" crc="b0b7fc09" sha1="e45f08e2b6a34157133af25def21efa3d9d078a9"/>
+		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 3).bin" size="57301776" crc="71ebf0da" sha1="43ab1b265dfadd8fec7c81277c103154ab01986d"/>
+		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 4).bin" size="17896368" crc="b0b7fc09" sha1="e45f08e2b6a34157133af25def21efa3d9d078a9"/>
+		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 5).bin" size="17896368" crc="b0b7fc09" sha1="e45f08e2b6a34157133af25def21efa3d9d078a9"/>
+		-->
+		<description>Colony Wars - Vengeance (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SLUS-90037A"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="colony wars - vengeance (usa) (demo)" sha1="0121275db6215166b5078579fbaa6a434203a533"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="dinocrisd" cloneof="dinocris">
 		<!-- Original images (Redump)
@@ -32640,7 +33216,24 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
+	
+	<software name="driver2d" cloneof="driver2">
+		<!-- Original images (Redump)
+		<rom name="Driver 2 (USA) (Demo).cue" size="87" crc="469e7dc3" sha1="3bae84f9cda154bfe5c0dccbe18cb6f890279796"/>
+		<rom name="Driver 2 (USA) (Demo).bin" size="83063232" crc="291ce1d7" sha1="17c63ce45ffb7a4f20fe163f3515f220a19e32fd"/>
+		-->
+		<description>Driver 2 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="SLUS 90094"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="driver 2 (usa) (demo)" sha1="2fbdc282d41448ff2619329c17d31315525d01b3"/>
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="driverd" cloneof="driver">
 		<!-- Original images (Redump)
 		<rom name="Driver - You Are the Wheelman (USA) (Demo).cue" size="108" crc="7323b33c" sha1="4be74dcdd19335fbbddb232cc6112c50ec0e3337"/>
@@ -32709,6 +33302,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
+	<software name="grindsesd" cloneof="grindses">
+		<!-- Original images (Redump)
+		<rom name="Grind Session (USA) (Demo).cue" size="92" crc="deba2585" sha1="c19adb9ce04d16c967e7773881e6e2e6147ff26d"/>
+		<rom name="Grind Session (USA) (Demo).bin" size="94764432" crc="581a4f4f" sha1="70ee799a91d94dc6078800375c6ec28e8fedfa1a"/>
+		-->
+		<description>Grind Session (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94598"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="grind session (usa) (demo)" sha1="eadf8387dae11a211f1842e0f73bef6484f57f1e"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="gtd" cloneof="gt1">
 		<!-- Original images (Redump)
 		<rom name="Gran Turismo (USA) (Demo).cue" size="91" crc="dbe9eb9c" sha1="b0e46e8c44bae1ba7baa4dc58b26eb22d72d22fc"/>
@@ -32725,6 +33335,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="hotshot2d" cloneof="hotshot2">
+		<!-- Original images (Redump)
+		<rom name="Hot Shots Golf 2 (USA) (Demo).cue" size="95" crc="e781caf4" sha1="e98a6dc0e1ca77c6cdb031a4e697ec47ed21bb9a"/>
+		<rom name="Hot Shots Golf 2 (USA) (Demo).bin" size="70691712" crc="8e864d2e" sha1="3a90864d607aede257090ede2de2cd73019fb310"/>
+		-->
+		<description>Hot Shots Golf 2 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94495"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hot shots golf 2 (usa) (demo)" sha1="38c5ba3adde63437763686e3fff8c5e14b7311dc"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="ironblodd" cloneof="ironblod">
 		<!-- Original images (Redump)
@@ -32776,6 +33403,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="jetmoto3d" cloneof="jetmoto3">
+		<!-- Original images (Redump)
+		<rom name="Jet Moto 3 (USA) (Demo).cue" size="89" crc="e1b1767f" sha1="5042f1d7ea924d141aac86ed84b2e21b6493239c"/>
+		<rom name="Jet Moto 3 (USA) (Demo).bin" size="348517008" crc="a697e172" sha1="c6ba7ec4347d407ee4cf96f9cc7ea1e91db88ddd"/>
+		-->
+		<description>Jet Moto 3 (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>989 Studios</publisher>
+		<info name="serial" value="SCUS-94384"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet moto 3 (usa) (demo)" sha1="0b4d465eabd550d2b8fd373009ba1c79cf8e36e2"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="kagerod" cloneof="kagero">
 		<!-- Original images (Redump)
@@ -32828,6 +33472,25 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="lunard" cloneof="lunar">
+		<!-- Original images (Redump)
+		<rom name="Lunar - Silver Star Story Complete (USA) (Demo).cue" size="405" crc="b131e982" sha1="ab9784db21288fc16a1d31d9ef6bfc11c1a746b9"/>
+		<rom name="Lunar - Silver Star Story Complete (USA) (Demo) (Track 1).bin" size="263346384" crc="2ff74033" sha1="7c9920cbfd7955d31d331be87cc555d5e9113ef0"/>
+		<rom name="Lunar - Silver Star Story Complete (USA) (Demo) (Track 2).bin" size="26570544" crc="242e16cb" sha1="733c9ae32570590e2dff34e483792b7325f16dd7"/>
+		<rom name="Lunar - Silver Star Story Complete (USA) (Demo) (Track 3).bin" size="8041488" crc="c3d61aa5" sha1="4aa2fa14f8cee60cccb308f2380e35d83bc49c7b"/>
+		-->
+		<description>Lunar - Silver Star Story Complete (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Working Designs</publisher>
+		<info name="serial" value="SLUS-90055"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lunar - silver star story complete (usa) (demo)" sha1="d4f2b758dd1de9a1ec93d4c109968c3ec7798421"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="medievild" cloneof="medievil">
 		<!-- Original images (Redump)
@@ -32862,6 +33525,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="mlb2k2d" cloneof="mlb2k2">
+		<!-- Original images (Redump)
+		<rom name="MLB 2002 (USA) (Demo).cue" size="87" crc="34d78c6b" sha1="ca44c53ca5ec7770e63d3ec09a03af9d165a6162"/>
+		<rom name="MLB 2002 (USA) (Demo).bin" size="634501392" crc="1f815d7e" sha1="ce8697022c979e0ca393e13801048f860ada0e55"/>
+		-->
+		<description>MLB 2002 (USA, Demo)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94648"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mlb 2002 (usa) (demo)" sha1="c9384f8342262935430105b01075e93675c6f01f"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="mmleg2d" cloneof="mmleg2">
 		<!-- Original images (Redump)
@@ -32880,6 +33560,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="mgsd" cloneof="mgs">
+		<!-- Original images (Redump)
+		<rom name="Metal Gear Solid (USA) (Demo).cue" size="95" crc="2c5cd004" sha1="1561b0f1bc13e39a2bf99fa493d701d8b71c5ef8"/>
+		<rom name="Metal Gear Solid (USA) (Demo).bin" size="93101568" crc="d8b049de" sha1="6ecbc0109e44e23bf8214e5c3b2cd80067f8a16a"/>
+		-->
+		<description>Metal Gear Solid (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>Konami of America</publisher>
+		<info name="serial" value="SLUS-90035"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal gear solid (usa) (demo)" sha1="a60798e76326ef480e2ef551bb27f14868d02b0c"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="mgsvrd" cloneof="mgsvr">
 		<!-- Original images (Redump)
@@ -32897,6 +33594,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="mranchr2d" cloneof="mranchr2">
+		<!-- Original images (Redump)
+		<rom name="Monster Rancher 2 (USA) (Demo).cue" size="96" crc="309666c0" sha1="ffdab990c595d662c914aa0efdd3b19c5d1fda80"/>
+		<rom name="Monster Rancher 2 (USA) (Demo).bin" size="451280592" crc="5224ffa3" sha1="94db63a03aed73b97241273a2d7fe531c45efb6c"/>
+		-->
+		<description>Monster Rancher 2 (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Tecmo</publisher>
+		<info name="serial" value="SLUS-90071"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="monster rancher 2 (usa) (demo)" sha1="47bb17b37c099cc5f6d0125da4636c84b56a98c0"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="mspacmmd" cloneof="mspacmm">
 		<!-- Original images (Redump)
@@ -32920,6 +33634,78 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="nbaso2k1d" cloneof="nbaso2k1">
+		<!-- Original images (Redump)
+		<rom name="NBA ShootOut 2001 (USA) (Demo).cue" size="230" crc="68de8965" sha1="ef1eb6cdbd4d1e3262346980987c7d76117ed5df"/>
+		<rom name="NBA ShootOut 2001 (USA) (Demo) (Track 1).bin" size="294021168" crc="ee049800" sha1="23a3fa47325add5bc014e96524429dc8ea09c686"/>
+		<rom name="NBA ShootOut 2001 (USA) (Demo) (Track 2).bin" size="43678992" crc="8fb5bc0d" sha1="7fd700a8db314aaa74bd5f261f6fd9e6fa953d11"/>
+		-->
+		<description>NBA ShootOut 2001 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94582"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nba shootout 2001 (usa) (demo)" sha1="a08bcd53da068fc7f84fb389a9ee9a0e90f80879"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="nbaso2k2d" cloneof="nbaso2k2">
+		<!-- Original images (Redump)
+		<rom name="NBA ShootOut 2002 (USA) (Demo).cue" size="230" crc="d0eac222" sha1="7bd66276bd45ce892db7026436a319547ce74e71"/>
+		<rom name="NBA ShootOut 2002 (USA) (Demo) (Track 1).bin" size="261568272" crc="e0e6c0c5" sha1="fb099c8611b1618f03cee08ff043ab60a9eb825e"/>
+		<rom name="NBA ShootOut 2002 (USA) (Demo) (Track 2).bin" size="52106208" crc="09a8b170" sha1="1f762b7237ec674f5a5f8e6be77a51bc4624f000"/>
+		-->
+		<description>NBA ShootOut 2002 (USA, Demo)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94660"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nba shootout 2002 (usa) (demo)" sha1="3868c3d4a74ad8001045b50b35521b63c7fffc16"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ncaag2k1d" cloneof="ncaag2k1">
+		<!-- Original images (Redump)
+		<rom name="NCAA GameBreaker 2001 (USA) (Demo).cue" size="238" crc="76aff15f" sha1="ec6abfbf31cf73fe93a91be933d3ad9317d1f21e"/>
+		<rom name="NCAA GameBreaker 2001 (USA) (Demo) (Track 1).bin" size="556946544" crc="2b263a75" sha1="b79a68a5dc35e066fc41ef87673ee13639040f06"/>
+		<rom name="NCAA GameBreaker 2001 (USA) (Demo) (Track 2).bin" size="13361712" crc="b0ef8b04" sha1="8ff5d315ca7b0b9ffd9865e9ca8720db35b2db16"/>
+		-->
+		<description>NCAA GameBreaker 2001 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94574"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ncaa gamebreaker 2001 (usa) (demo)" sha1="fe414195d4f9d70d53b20f380bad7e1c0fc74ce3"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="nflgd99d" cloneof="nflgd99">
+		<!-- Original images (Redump)
+		<rom name="NFL GameDay 99 (USA) (Demo).cue" size="224" crc="6b153dd4" sha1="7a3a87baea987fd1c75bc75433a9acc446c580fa"/>
+		<rom name="NFL GameDay 99 (USA) (Demo) (Track 1).bin" size="626422272" crc="d78bee54" sha1="cb48070a3017727474961e8ca585ea766572e5c2"/>
+		<rom name="NFL GameDay 99 (USA) (Demo) (Track 2).bin" size="13361712" crc="b0ef8b04" sha1="8ff5d315ca7b0b9ffd9865e9ca8720db35b2db16"/>
+		-->
+		<description>NFL GameDay 99 (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>989 Sports</publisher>
+		<info name="serial" value="SCUS-94285"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nfl gameday 99 (usa) (demo)" sha1="6f7f3a9ae60741b5e077682f642a3ab67f42aebc"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="nflxtremd" cloneof="nflxtrem">
 		<!-- Original images (Redump)
@@ -32937,6 +33723,119 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="nhlfc2k1d" cloneof="nhlfc2k1">
+		<!-- Original images (Redump)
+		<rom name="NHL Faceoff 2001 (USA) (Demo).cue" size="95" crc="6e2cc0d6" sha1="cd97b9f9000dd1b18f1f06681fc4685f873bc326"/>
+		<rom name="NHL Faceoff 2001 (USA) (Demo).bin" size="465256176" crc="50417a67" sha1="fab02afa8313511deb991b63412598d63fad813b"/>
+		-->
+		<description>NHL FaceOff 2001 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94578"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nhl faceoff 2001 (usa) (demo)" sha1="13d807ef4a9d7a9ba8b1e006cfb8498a504042bf"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="nhlfce99d" cloneof="nhlfce99">
+		<!-- Original images (Redump)
+		<rom name="NHL FaceOff 99 (USA) (Demo).cue" size="93" crc="7f8813b8" sha1="e3af74efe23ee713e07229e22232905da054824c"/>
+		<rom name="NHL FaceOff 99 (USA) (Demo).bin" size="441404544" crc="c4adf9f2" sha1="c3ec8ccf76fc061bcdeac23f4a9493c97d8243c0"/>
+		-->
+		<description>NHL FaceOff 99 (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>989 Sports</publisher>
+		<info name="serial" value="SCUS-94372"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nhl faceoff 99 (usa) (demo)" sha1="8af284fd8537bc91035afa80bb9f1ff234cfc8eb"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="nstriked" cloneof="nstrike">
+		<!-- Original images (Redump)
+		<rom name="Nuclear Strike - The Lost Missions (USA) (Demo).cue" size="113" crc="280cee08" sha1="079b5f007e5dc06ece8d9f46b21c905f57603dfe"/>
+		<rom name="Nuclear Strike - The Lost Missions (USA) (Demo).bin" size="165449088" crc="2118b7e9" sha1="063e8ed5f8c65520057641e2438672c87fe34ad5"/>
+		-->
+		<description>Nuclear Strike - The Lost Missions (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLUS 90006"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nuclear strike - the lost missions (usa) (demo)" sha1="b7a7924bf7a505730402e677429d3ed0b7aa81fa"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="odtd" cloneof="odt">
+		<!-- Original images (Redump)
+		<rom name="O.D.T. (USA) (Demo).cue" size="85" crc="be61b0ca" sha1="5bfba467fb8d5944446f2aa190d4c7162a3b20ca"/>
+		<rom name="O.D.T. (USA) (Demo).bin" size="158755296" crc="c3fe7e0c" sha1="1d8267703f72b2979dcf09e780bb8bb9a8d49f50"/>
+		-->
+		<description>O.D.T. (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SLUS-90043"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="o.d.t. (usa) (demo)" sha1="4db137f4eaa999d45c0393d6beca85df95122ccd"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="pacmnwldd" cloneof="pacmnwld">
+		<!-- Original images (Redump)
+		<rom name="Pac-Man World (USA) (Demo) (v1.1).cue" size="1518" crc="75d5fabc" sha1="53ae3989be4fda8f2dc3078c12568c9d286d60e8"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 01).bin" size="57986208" crc="82f0f3a1" sha1="be88f5287f125876229b52941b161a0e98cfb3c7"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 02).bin" size="16245264" crc="a8d7a903" sha1="476e78fc78f0238de91ae66f81e0e08182c0e0ba"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 03).bin" size="1298304" crc="a0f01584" sha1="edb3854c424c42b63cec0608179c85d7311098f0"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 04).bin" size="1378272" crc="88ca41e3" sha1="3859c9bd1ae31a2de4fa67c17a8b28bc9e45ba5b"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 05).bin" size="1342992" crc="a5ea517a" sha1="20dc4b8209cb078c4a48d1523bcc7be86c0ca631"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 06).bin" size="1270080" crc="33f18253" sha1="cd6e3be2773aa0804c9f7ff96ca52595a13403f2"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 07).bin" size="1397088" crc="2957a5f9" sha1="fe809aa530e21088c33a172db39276a71cd36026"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 08).bin" size="1260672" crc="d510eefa" sha1="35fbccaccc2ba0a4bf452ad8ee5ef7f5fa55fb7b"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 09).bin" size="16623936" crc="df5c9f6c" sha1="3f2233da47a4e4cff3fb81ba86093b1438beb00d"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 10).bin" size="11117904" crc="83d7ace7" sha1="c18cc078ca902ee843808e80f8e6808a798bdefd"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 11).bin" size="8979936" crc="e3f637dc" sha1="62cba665e8e678c44d3b8285d07702a282fc6d24"/>
+		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 12).bin" size="28002912" crc="53138a3e" sha1="53bf773f2fd1e9ac3bf219555bf61a36c93a19a9"/>
+		-->
+		<description>Pac-Man World (USA, Demo, v1.1)</description>
+		<year>1999</year>
+		<publisher>Namco Hometek</publisher>
+		<info name="serial" value="SLUS-90057"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pac-man world (usa) (demo) (v1.1)" sha1="d68d4bf76d6a7c63fd71a856092f6045bc08f483"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="parappad" cloneof="parappa">
+		<!-- Original images (Redump)
+		<rom name="PaRappa the Rapper (USA) (Demo).cue" size="97" crc="83dad869" sha1="60eb46b05e8dfc32e864b9e38f6fc28c806c190f"/>
+		<rom name="PaRappa the Rapper (USA) (Demo).bin" size="59985408" crc="b358f4ea" sha1="7628db1f549cfd6c175b18edba7b919d4b0b80df"/>
+		-->
+		<description>PaRappa the Rapper (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS 94195"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="parappa the rapper (usa) (demo)" sha1="008caf8508fa1f4d3814ded30c24481e52aed4c7"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="pitfl3dd" cloneof="pitfl3d">
 		<!-- Original images (Redump)
@@ -33066,20 +33965,191 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
-	<software name="spyrod" cloneof="spyro">
+	
+	<software name="runwildd" cloneof="runwild">
 		<!-- Original images (Redump)
-		<rom name="Spyro the Dragon (USA) (Demo).cue" size="95" crc="52e09718" sha1="53a449fff8d893241c162d4350cab67ac0086679"/>
-		<rom name="Spyro the Dragon (USA) (Demo).bin" size="106286880" crc="ed3e533a" sha1="32e7a2efc0a946294466ef32ae7ec3d52895d624"/>
+		<rom name="Running Wild (USA) (Demo).cue" size="4488" crc="edc79853" sha1="26d3ee9352dac985e4d9ad2e65dd48f82c710f4a"/>
+		<rom name="Running Wild (USA) (Demo) (Track 01).bin" size="44864400" crc="e3cb0f75" sha1="5b52271f61bc7994aee9744d183fcd9956f21438"/>
+		<rom name="Running Wild (USA) (Demo) (Track 02).bin" size="20003760" crc="72828af6" sha1="66c1c4e56708251310ca7772489dd88ddba7363d"/>
+		<rom name="Running Wild (USA) (Demo) (Track 03).bin" size="16198224" crc="e5d70921" sha1="19e2ae2fda6248d54f842d6901706d8ff9dbb821"/>
+		<rom name="Running Wild (USA) (Demo) (Track 04).bin" size="10689840" crc="296c8c2e" sha1="93dcbb2984a28ef324cfe4e5228e198a76459f06"/>
+		<rom name="Running Wild (USA) (Demo) (Track 05).bin" size="11647104" crc="4cbe42ce" sha1="b06267c00987bdf31324ea72a7a86d42c23fad86"/>
+		<rom name="Running Wild (USA) (Demo) (Track 06).bin" size="12025776" crc="3edbd186" sha1="cb274741c6912304744965e02883bf100f640191"/>
+		<rom name="Running Wild (USA) (Demo) (Track 07).bin" size="13493424" crc="3503c34e" sha1="5a285d61bc7649b79ca5ebb25fc91519680d8c60"/>
+		<rom name="Running Wild (USA) (Demo) (Track 08).bin" size="10487568" crc="61c09809" sha1="d71541c1f8c6e49402f2466464547c9c7e82cd78"/>
+		<rom name="Running Wild (USA) (Demo) (Track 09).bin" size="10487568" crc="51d6d0b6" sha1="0b1ef16dd5f2b488e40ff13298f75577dfbe4f17"/>
+		<rom name="Running Wild (USA) (Demo) (Track 10).bin" size="12547920" crc="d3386e6f" sha1="3a64bcd610318b544100c3a0d8bc038effc403f7"/>
+		<rom name="Running Wild (USA) (Demo) (Track 11).bin" size="9405648" crc="f5e1cbef" sha1="52fb9b4fbf0b8464c36ca5c1662eedcd75ba188c"/>
+		<rom name="Running Wild (USA) (Demo) (Track 12).bin" size="11870544" crc="38c49ed0" sha1="04280d3fb312d157fcde78c83fc0627c806e3b49"/>
+		<rom name="Running Wild (USA) (Demo) (Track 13).bin" size="10621632" crc="b1233012" sha1="790e7c1cd7d220b4f5e6b8e68de59c578ffa490a"/>
+		<rom name="Running Wild (USA) (Demo) (Track 14).bin" size="11555376" crc="1d3ff1a4" sha1="961255b41fd9ee336c3c03d2ebbfe7d2c897c2e4"/>
+		<rom name="Running Wild (USA) (Demo) (Track 15).bin" size="9071664" crc="7da98b33" sha1="40a07b798ed4844bf66edef9251f6b1e1f3e3630"/>
+		<rom name="Running Wild (USA) (Demo) (Track 16).bin" size="13956768" crc="304f0871" sha1="1c86b9d877b81aafbac79c5d7bacd11c10cb2647"/>
+		<rom name="Running Wild (USA) (Demo) (Track 17).bin" size="13006560" crc="98f5fdd9" sha1="464aeb6ae5665e5d7b097966ab1727d46f7e2295"/>
+		<rom name="Running Wild (USA) (Demo) (Track 18).bin" size="10572240" crc="0f9c5142" sha1="c73aa49430f4df3fb3f3a8e958b0fd556d83cd51"/>
+		<rom name="Running Wild (USA) (Demo) (Track 19).bin" size="10075968" crc="bd454f75" sha1="5c2f8e2a4f7e6bdc6b451190d82048e09c302e03"/>
+		<rom name="Running Wild (USA) (Demo) (Track 20).bin" size="11776464" crc="9b367b28" sha1="80fb1f8a196287ee53e418085613369dcc9bd0a0"/>
+		<rom name="Running Wild (USA) (Demo) (Track 21).bin" size="8704752" crc="662ae85f" sha1="22cb4a1c57d396bd83e2dcc5ae516152967daee2"/>
+		<rom name="Running Wild (USA) (Demo) (Track 22).bin" size="10569888" crc="20722a0c" sha1="80c3a822cd4a59ae6033fb7673ff475f86de0a44"/>
+		<rom name="Running Wild (USA) (Demo) (Track 23).bin" size="10078320" crc="e29a24f9" sha1="a8a303109feca73b1f373c1b1ed49446d683fda0"/>
+		<rom name="Running Wild (USA) (Demo) (Track 24).bin" size="11009712" crc="1e6f7b25" sha1="ffc094f6ee1f38533dc5333ecd7a56b0f6b44057"/>
+		<rom name="Running Wild (USA) (Demo) (Track 25).bin" size="9139872" crc="3b1c93f7" sha1="54159d8535a4227c85e0b7e2b4ffd9e81b37068d"/>
+		<rom name="Running Wild (USA) (Demo) (Track 26).bin" size="12898368" crc="4d9f7ea7" sha1="c93f3728a6847dfcf14bf8a72497d8ab68953a7f"/>
+		<rom name="Running Wild (USA) (Demo) (Track 27).bin" size="11019120" crc="9ff2bb2c" sha1="1f4df7a091353dcc3ef783e75d574c7c6d63edf3"/>
+		<rom name="Running Wild (USA) (Demo) (Track 28).bin" size="9349200" crc="1cad4766" sha1="c90ccd1915416e2ade7d5f1977c7e83e18e43184"/>
+		<rom name="Running Wild (USA) (Demo) (Track 29).bin" size="11644752" crc="7c7a0363" sha1="5ca4a5499fcf8911443e4aea962365b47119f37e"/>
+		<rom name="Running Wild (USA) (Demo) (Track 30).bin" size="12025776" crc="f49a491c" sha1="2a68123f2ae287ef9f28ce6622f0acefc607dd24"/>
+		<rom name="Running Wild (USA) (Demo) (Track 31).bin" size="13493424" crc="e2bc6b8a" sha1="24e7f26cce1e8f54d7c274c7ded08f4ee043c676"/>
+		<rom name="Running Wild (USA) (Demo) (Track 32).bin" size="10842720" crc="9fbd37e9" sha1="d63cef17988fbaf83eb2aeaefc2e5f1398a9629f"/>
+		<rom name="Running Wild (USA) (Demo) (Track 33).bin" size="9993648" crc="db55108d" sha1="7bc5708fbb26401fe4479308139b7e2e28dcf3a4"/>
+		<rom name="Running Wild (USA) (Demo) (Track 34).bin" size="11193168" crc="66fa8c36" sha1="7403fe82f0cebff33fb7d648f29187f53a1639f4"/>
+		<rom name="Running Wild (USA) (Demo) (Track 35).bin" size="9405648" crc="430e62be" sha1="d6530e400af37e2376dfbda53f10874cc722b4a9"/>
+		<rom name="Running Wild (USA) (Demo) (Track 36).bin" size="13227648" crc="48287e5d" sha1="725931cd1c15a64adc30b020efaf3acfd725fbd4"/>
+		<rom name="Running Wild (USA) (Demo) (Track 37).bin" size="13190016" crc="68ad6830" sha1="03ec5780c2e3699c434a458b1694416e5d211550"/>
+		<rom name="Running Wild (USA) (Demo) (Track 38).bin" size="9135168" crc="64cdb576" sha1="bb4c5f4668690f8b9c2b1d4f9ac8d1c4b4ee9488"/>
+		<rom name="Running Wild (USA) (Demo) (Track 39).bin" size="11012064" crc="45d60652" sha1="0e46fc91c0deb23eedf3e28ae790d538a4c98406"/>
+		<rom name="Running Wild (USA) (Demo) (Track 40).bin" size="973728" crc="62eae1f5" sha1="2f91b30e6a1ed6f8de3d561b4be67f79d80331d1"/>
+		<rom name="Running Wild (USA) (Demo) (Track 41).bin" size="983136" crc="c8e05f9a" sha1="47e4608314b746cffc2ca8b635baef0b5eccb5b5"/>
 		-->
-		<description>Spyro the Dragon (USA, Demo)</description>
+		<description>Running Wild (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>989 Studios</publisher>
+		<info name="serial" value="SCUS-94373"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="running wild (usa) (demo)" sha1="479664cf0a84c54d1780338b8f7a75fcd88aedd8"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="scircuitd" cloneof="scircuit">
+		<!-- Original images (Redump)
+		<rom name="SuperCross Circuit (USA) (Demo).cue" size="1242" crc="a058f488" sha1="ecb2dbfcabe0e4319e4c0f4ddaa6d5ece7de0fec"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 01).bin" size="136002048" crc="b5cd507e" sha1="8baa90839b3d4de829351520af3c62f8534280af"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 02).bin" size="26269488" crc="a3c2223f" sha1="df445e5e40a21bb0b65309ce7aaa42cd5105c9db"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 03).bin" size="21539616" crc="cee2bbd1" sha1="367724c7f0241448856c16a816e18fdba87a575c"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 04).bin" size="33579504" crc="11c6f75d" sha1="888f6aebf539246693b466d8041e543ef32408c6"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 05).bin" size="37488528" crc="dab85d72" sha1="61718e32c966ca3a9bb6427777b8f771d381693c"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 06).bin" size="22391040" crc="93dda3a7" sha1="c3a684281c2343e65552afc80349802fb7af04ce"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 07).bin" size="21210336" crc="17f445b8" sha1="61aaf3c066e82ffc386825ba8054e2dc626442c4"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 08).bin" size="25697952" crc="c343bde0" sha1="9e3ce0a669452112fa969831e128697ca351930d"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 09).bin" size="27396096" crc="4b8488da" sha1="bb421a61504d69f7ed6df1915616357360f33244"/>
+		<rom name="SuperCross Circuit (USA) (Demo) (Track 10).bin" size="21539616" crc="cee2bbd1" sha1="367724c7f0241448856c16a816e18fdba87a575c"/>
+		-->
+		<description>SuperCross Circuit (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>989 Sports</publisher>
+		<info name="serial" value="SCUS-94396"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="supercross circuit (usa) (demo)" sha1="dcb7240d69f4b36032cfcff9390201bf7820a122"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="shadwmadd" cloneof="shadwmad">
+		<!-- Original images (Redump)
+		<rom name="Shadow Madness (USA) (Demo).cue" size="345" crc="a016f941" sha1="e969620ae45a91d16a472e8d1da1957995e38eb8"/>
+		<rom name="Shadow Madness (USA) (Demo) (Track 1).bin" size="193868304" crc="aff2ca49" sha1="dc581009a29e950913d0e0887b21b691380a7d54"/>
+		<rom name="Shadow Madness (USA) (Demo) (Track 2).bin" size="8603616" crc="759c43f5" sha1="938f593b06411e6f5d68f8be77ffc28f0c2efbc0"/>
+		<rom name="Shadow Madness (USA) (Demo) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Shadow Madness (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Crave Entertainment</publisher>
+		<info name="serial" value="SLUS-90031"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow madness (usa) (demo)" sha1="a8d5f920f3b99d01cba5cf98bce69254d25a4d68"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="shpwreckd" cloneof="shpwreck">
+		<!-- Original images (Redump)
+		<rom name="Shipwreckers! (USA) (Demo).cue" size="92" crc="37c95992" sha1="174e6e1e74f7c2af0464d3efc166c83af930a6cd"/>
+		<rom name="Shipwreckers! (USA) (Demo).bin" size="44937312" crc="6af9ce38" sha1="22bb814f2b7b118b7e471dce46078125ead480b9"/>
+		-->
+		<description>Shipwreckers! (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SLUS-90013"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shipwreckers! (usa) (demo)" sha1="9c8525261228feb96c817ed7a18935b1b29e0528"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="spdpunksd" cloneof="spdpunks">
+		<!-- Original images (Redump)
+		<rom name="Speed Punks (USA) (Demo).cue" size="90" crc="01c912a5" sha1="f8aef610ce24cd417369d0917ea24914d5302cf3"/>
+		<rom name="Speed Punks (USA) (Demo).bin" size="119352240" crc="d9f60418" sha1="aa1288cf5c8c974caf823a37f242d8ad18c70c96"/>
+		-->
+		<description>Speed Punks (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94572"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="speed punks (usa) (demo)" sha1="d81868083a1511c109a3aae1284855a382fcd816"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="spyro2d" cloneof="spyro2">
+		<!-- Original images (Redump)
+		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo).cue" size="242" crc="67e7cffd" sha1="fab8136a37c23c606420fe3aa7e5fad1e2cef136"/>
+		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo) (Track 1).bin" size="110341728" crc="d4685fa2" sha1="4e8b7cd677c4e73ea87f0e439af15afed83a98ca"/>
+		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Spyro 2 - Ripto's Rage! (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94460"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spyro 2 - ripto's rage! (usa) (demo)" sha1="cb34c01d0956bb2c4e9389ec4f9415f04060f225"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="spyrod1" cloneof="spyro">
+		<!-- Original images (Redump)
+		<rom name="Spyro the Dragon (USA) (Demo 1).cue" size="97" crc="b7cbca0e" sha1="e2f505a39df3586e214c89ac6895dda3da96a916"/>
+		<rom name="Spyro the Dragon (USA) (Demo 1).bin" size="106286880" crc="ed3e533a" sha1="32e7a2efc0a946294466ef32ae7ec3d52895d624"/>
+		-->
+		<description>Spyro the Dragon (USA, Demo 1)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94290"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro the dragon (usa) (demo)" sha1="2687140c78ae665b268e23ba7dbe53e0bfcd0cf5"/>
+				<disk name="spyro the dragon (usa) (demo 1)" sha1="2687140c78ae665b268e23ba7dbe53e0bfcd0cf5"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="spyrod2" cloneof="spyro">
+		<!-- Original images (Redump)
+		<rom name="Spyro the Dragon (USA) (Demo 2).cue" size="97" crc="b696ecdf" sha1="a2c5fc46f531441dc56b9cb577afd60c553b6b04"/>
+		<rom name="Spyro the Dragon (USA) (Demo 2).bin" size="132062448" crc="d4bba3d5" sha1="b3d03bcc3ad71145eafb5e473c4f93a62899950a"/>
+		-->
+		<description>Spyro the Dragon (USA, Demo 2)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94439"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spyro the dragon (usa) (demo 2)" sha1="fc5cf643addd83406524e02620f8ff68ce2458aa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33103,6 +34173,58 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="tailcond" cloneof="tailcon">
+		<!-- Original images (Redump)
+		<rom name="Tail Concerto (USA) (Demo).cue" size="222" crc="baa13ec1" sha1="32af7d26cdf9d1a034c0608d14a68131bffaeadd"/>
+		<rom name="Tail Concerto (USA) (Demo) (Track 1).bin" size="548077152" crc="eec9708f" sha1="f882452b26f204fdc501f4aa172ca5f7f67911e1"/>
+		<rom name="Tail Concerto (USA) (Demo) (Track 2).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		-->
+		<description>Tail Concerto (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Atlus U.S.A.</publisher>
+		<info name="serial" value="SLUS-90060"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tail concerto (usa) (demo)" sha1="05c32d6bdcd10d45e47b35ff9046e33dd095f09c"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="thrasherd" cloneof="thrasher">
+		<!-- Original images (Redump)
+		<rom name="Thrasher - Skate and Destroy (USA) (Demo).cue" size="107" crc="1e477ff9" sha1="e643df934de5b34507156fe238e9a361a745ff0f"/>
+		<rom name="Thrasher - Skate and Destroy (USA) (Demo).bin" size="35254128" crc="032dc4c0" sha1="6181ca097180c0e8a135ffb8ac04a43a66541e69"/>
+		-->
+		<description>Thrasher - Skate and Destroy (USA, Demo)</description>
+		<year>1999</year>
+		<publisher>Rockstar Games</publisher>
+		<info name="serial" value="SLUS-90067"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thrasher - skate and destroy (usa) (demo)" sha1="27a206a5d20daec5aedd9568dcb458b92956c04f"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="titanaed">
+		<!-- Original images (Redump)
+		<rom name="Titan A.E. (USA) (Demo).cue" size="89" crc="8aebad86" sha1="b98ce70f9d49808d19ccf2c0d3cd736b1c5b53ab"/>
+		<rom name="Titan A.E. (USA) (Demo).bin" size="421835904" crc="c025c351" sha1="ae164c823569b34ebdd027dcae143622d5a78bca"/>
+		-->
+		<description>Titan A.E. (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Fox Interactive</publisher>
+		<info name="serial" value="SLUS-90082"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="titan a.e. (usa) (demo)" sha1="87401e6e59fc0a19c3fcb7b6dd61a8c9ecf5da9a"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="tombad" cloneof="tomba">
 		<!-- Original images (Redump)
@@ -33139,6 +34261,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
+	<software name="tycorcd" cloneof="tycorc">
+		<!-- Original images (Redump)
+		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).cue" size="112" crc="7f2351e0" sha1="a424f3d09970ef5738ead698e88a7346cfaf581d"/>
+		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).bin" size="12169248" crc="fb6ec55b" sha1="5b16aa056dee14eff92891c24ca7cf71d263077d"/>
+		-->
+		<description>Tyco R/C - Assault with a Battery (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Mattel Interactive</publisher>
+		<info name="serial" value="SLUS-90085"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tyco r-c - assault with a battery (usa) (demo)" sha1="087fbc2cebe250f9de6f1223ffab2eda541f98df"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="vigil8d" cloneof="vigil8">
 		<!-- Original images (Redump)
 		<rom name="Vigilante 8 (USA) (Demo).cue" size="1291" crc="6637add6" sha1="ef3e3d8921e6f13217f6204f197d6542b952a1f1"/>
@@ -33165,6 +34304,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="wildarm2d" cloneof="wildarm2">
+		<!-- Original images (Redump)
+		<rom name="Wild Arms 2 (USA) (Demo).cue" size="90" crc="065985d5" sha1="52224ae14dc72549c027ad70aad1a2f01b29fc8c"/>
+		<rom name="Wild Arms 2 (USA) (Demo).bin" size="212338560" crc="26e97cd6" sha1="771142196075e9680de8955a7571b0b8b2fb66f8"/>
+		-->
+		<description>Wild Arms 2 (USA, Demo)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94592"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wild arms 2 (usa) (demo)" sha1="a1f6bb6a4d4d3a7a3ae22f5c659257530024aea7"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="wipeout3d" cloneof="wipeout3">
 		<!-- Original images (Redump)
@@ -33238,6 +34394,28 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="eidoscd3">
+		<!-- Original images (Redump)
+		<rom name="Eidos Demo CD Volume 3 (USA).cue" size="714" crc="f81cade4" sha1="f2776bae5fcd09ab42de201506294bb191ff12f9"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 1).bin" size="190072176" crc="45a27b5c" sha1="ca44bf895de5c9d694cdefb928ef082ec0b355a8"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 2).bin" size="26093088" crc="2ba81cab" sha1="94cf45af4c58ed8aeed6b91bddcac553688f8135"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 3).bin" size="4010160" crc="8c7c12f7" sha1="2dc6f9a6009f60a4423e15e2fe8e34f0dcf8a6ff"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 4).bin" size="27643056" crc="48555318" sha1="d74b00464a1700a844f9b341f70908b4dd7d1c6e"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 5).bin" size="24914736" crc="2a0fca91" sha1="bd90fbe22f8d3e864d77e6fd73eb9883b0779779"/>
+		<rom name="Eidos Demo CD Volume 3 (USA) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Eidos Demo CD Volume 3 (USA)</description>
+		<year>1998</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLUS-90047"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="eidos demo cd volume 3 (usa)" sha1="4ece51f1a6b6717fe7e0032248d1008bafea53c9"/>
+			</diskarea>
+		</part>
+	</software>		
 
 	<software name="eidoscd4">
 		<!-- Original images (Redump)
@@ -33260,6 +34438,26 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="eidoscd6">
+		<!-- Original images (Redump)
+		<rom name="Eidos Demo CD Volume 6 (USA).cue" size="470" crc="00cfb0d7" sha1="029939df2ded97ac20ee5f0c35c6f37888a77b52"/>
+		<rom name="Eidos Demo CD Volume 6 (USA) (Track 1).bin" size="286842864" crc="c924713f" sha1="dbcd39cb0b8473c5be84829c0f74af7d3a29b769"/>
+		<rom name="Eidos Demo CD Volume 6 (USA) (Track 2).bin" size="27643056" crc="48555318" sha1="d74b00464a1700a844f9b341f70908b4dd7d1c6e"/>
+		<rom name="Eidos Demo CD Volume 6 (USA) (Track 3).bin" size="24914736" crc="2a0fca91" sha1="bd90fbe22f8d3e864d77e6fd73eb9883b0779779"/>
+		<rom name="Eidos Demo CD Volume 6 (USA) (Track 4).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Eidos Demo CD Volume 6 (USA)</description>
+		<year>1999</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLUS-90074"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="eidos demo cd volume 6 (usa)" sha1="0bd18a1521045c6a61f27e23745e91f05f7be7ac"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="eidoscd">
 		<!-- Original images (Redump)
@@ -33282,6 +34480,49 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="icdsmp1">
+		<!-- Original images (Redump)
+		<rom name="Interactive CD Sampler Volume 1 (USA).cue" size="3546" crc="cc3c8d80" sha1="161c35969ea121e3f40dd5e9904d8ab5ab384947"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 01).bin" size="247460976" crc="d4253639" sha1="5b58ec9c37db618c6873b30dcc76e637a31af411"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 02).bin" size="57588720" crc="c1ce2207" sha1="14cd3a70ad99167412bf45f45d4da514647780f3"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 03).bin" size="1234800" crc="0b5dff4e" sha1="5662f62570a4b9d79248040b68e1d3642d860fab"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 04).bin" size="12105744" crc="73bee6ef" sha1="adf092ac831d302b2cec90f9e66c5addb7606a34"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 05).bin" size="1234800" crc="739453f7" sha1="11a40f2de5cd4658c4e8ff99ecec163b47ad5b61"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 06).bin" size="1234800" crc="dc08b17b" sha1="673e7c526698b83db9b5f566dbb247952892c078"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 07).bin" size="1234800" crc="21cf13a3" sha1="c59b9721a99e579f83507e1ea4653a0518bad9ec"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 08).bin" size="1234800" crc="f8f652c4" sha1="4c321978493d6408fc603af05d2822372286a807"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 09).bin" size="1234800" crc="f83106d5" sha1="5dd5669a078d148f8cbb807f4c98233186a8768a"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 10).bin" size="2918832" crc="c5f20f50" sha1="74602875de23716d56a8205d3a0a86f69a35873d"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 11).bin" size="19568640" crc="05a15c2d" sha1="e2f7113604e2b7c68b7b7486e7fe489a2d7d7ce3"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 12).bin" size="28576800" crc="f18c29f0" sha1="c1f28840f89fe82eae03e057867973aff6468726"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 13).bin" size="28576800" crc="fcdb9f60" sha1="7d6ab4a233b1a6a252236c638735266c18d5640d"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 14).bin" size="1234800" crc="e23706a1" sha1="d9e1a6e2103cdc8486d3a8ca03c0b8ea2ab8e932"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 15).bin" size="19394592" crc="89789a79" sha1="89ceb3abf9a125099f25463106f38c4f9e42f9e3"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 16).bin" size="17656464" crc="0b53842c" sha1="64580e6efe1410e629b01f34d27ea96ee3f171e7"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 17).bin" size="1234800" crc="860848f2" sha1="b35cfaa198d17b1cbdca41811a8d8f6c6cb31893"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 18).bin" size="3697344" crc="826308e0" sha1="fa5c7d0498bcfa3fb7e6c7034ba15cf99e90f1f1"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 19).bin" size="38448144" crc="5fb793d6" sha1="be50622767a7300c23fae0a7f1c803fe5d920ba9"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 20).bin" size="3175200" crc="371bbeb6" sha1="4bfc0df2fd9e4bcd894cca75929e11bba2a025e3"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 21).bin" size="31408608" crc="029d17a4" sha1="294a92cc8a415db3ad038da019c474e2d8540872"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 22).bin" size="33158496" crc="b5fc7989" sha1="b269bf100ce3f5f8f8ed20c060dd965d5187dbfe"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 23).bin" size="3685584" crc="2210dbee" sha1="63d22e75c6124750fbcbe7a1f50e79d801d7a566"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 24).bin" size="55215552" crc="5a93aff9" sha1="d7cc86f878f78d7f24027fc8f45c0023d2367cc6"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 25).bin" size="10155936" crc="e3b3cdbb" sha1="969a0647722f546e4434fb08850ac48f801bab38"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 26).bin" size="31147536" crc="c22e1059" sha1="7b96c2ba41faf20274603eee7a73189020ca2984"/>
+		<rom name="Interactive CD Sampler Volume 1 (USA) (Track 27).bin" size="37453248" crc="397c82c3" sha1="0d7a7e72f0f312541f76ca76016caecf18d94f85"/>
+		-->
+		<description>Interactive CD Sampler Volume 1 (USA)</description>
+		<year>1995</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS 94955"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="interactive cd sampler volume 1 (usa)" sha1="f1248884f1a8226f0c64abb22467984fb251507e"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="icdsmp10">
 		<!-- Original images (Redump)
@@ -33303,8 +34544,28 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 				<disk name="interactive cd sampler disc vol. 10 (usa)" sha1="dd5779d41b6b5976c4e50d5d82bb9a05a9c7fe1d"/>
 			</diskarea>
 		</part>
-	</software>
+	</software>	
 
+	<software name="icdsmp11">
+		<!-- Original images (Redump)
+		<rom name="Interactive CD Sampler Disc Vol. 11 (USA).cue" size="522" crc="d565df46" sha1="1869da9d729eb7ab994e228229a2d593c587a964"/>
+		<rom name="Interactive CD Sampler Disc Vol. 11 (USA) (Track 1).bin" size="499661232" crc="bce9b476" sha1="6860f273544bc600c60542f04aae7f3392343f77"/>
+		<rom name="Interactive CD Sampler Disc Vol. 11 (USA) (Track 2).bin" size="1667568" crc="9cd75aa3" sha1="aba2f37bbf17638c8df90a9e8a51282f1a846c22"/>
+		<rom name="Interactive CD Sampler Disc Vol. 11 (USA) (Track 3).bin" size="1681680" crc="0d4dae67" sha1="0eb15c23dc7ae344823c73865ce9a75d5aa709e3"/>
+		<rom name="Interactive CD Sampler Disc Vol. 11 (USA) (Track 4).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Interactive CD Sampler Disc Vol. 11 (USA)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94463"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="interactive cd sampler disc vol. 11 (usa)" sha1="a220a8f68019c3aece616e6d62ca4c6381bfe5e2"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="icdsmp2">
 		<!-- Original images (Redump)
 		<rom name="Interactive CD Sampler Pack Volume 2 (USA).cue" size="798" crc="87af3d03" sha1="9242af8aed11e38a77b849b324b338b14afe51e7"/>
@@ -33485,25 +34746,47 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
+	
 	<software name="icdsmp7">
 		<!-- Original images (Redump)
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA).cue" size="798" crc="3f41a03f" sha1="b9423fd9a863ecd6169dd4227380bed0d8a1f029"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 1).bin" size="670418784" crc="d07bc47a" sha1="e818258ad14ea00defebbba7cde037b08ca22ed1"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 2).bin" size="28386288" crc="c980d46c" sha1="7d67c9ca5c6961f89d3e2beb1c6e0750923b7fbe"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 3).bin" size="20349504" crc="8219081c" sha1="55eef285d51fc96c13aa579a0bcc2a3eae387d4c"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 4).bin" size="11625936" crc="c72df971" sha1="ab563444dbdae638bdd045b6ef997e50c8596bec"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 5).bin" size="1331232" crc="6c7a0b09" sha1="a7824841ce0fd60a2cac7a81faf75a6084299b0a"/>
-		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1).cue" size="840" crc="49d7ce41" sha1="21b5a471cc02fa051b2926729e6965a715bbefb3"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 1).bin" size="670418784" crc="782133fa" sha1="751fc68fb48e9aa0b10d38566dc2d03caf5d4d41"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 2).bin" size="28386288" crc="c980d46c" sha1="7d67c9ca5c6961f89d3e2beb1c6e0750923b7fbe"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 3).bin" size="20349504" crc="8219081c" sha1="55eef285d51fc96c13aa579a0bcc2a3eae387d4c"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 4).bin" size="11625936" crc="c72df971" sha1="ab563444dbdae638bdd045b6ef997e50c8596bec"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 5).bin" size="1331232" crc="6c7a0b09" sha1="a7824841ce0fd60a2cac7a81faf75a6084299b0a"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Interactive CD Sampler Disc Volume 7 (USA)</description>
+		<description>Interactive CD Sampler Disc Volume 7 (USA, v1.1)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="PBPX-95006"/>
+		<info name="serial" value="SCUS-94262"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc volume 7 (usa)" sha1="74da2221802432ae62f01f29fa354866059eb55e"/>
+				<disk name="interactive cd sampler disc volume 7 (usa) (v1.1)" sha1="5b480002edf2aa7c5ed1daf4950c0291ef6f5b36"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="icdsmp7a" cloneof="icdsmp7">
+		<!-- Original images (Redump)
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0).cue" size="840" crc="69b417ec" sha1="14d6cecb020eddea9820a8a8fabfb15edd0ef7d2"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 1).bin" size="670418784" crc="d07bc47a" sha1="e818258ad14ea00defebbba7cde037b08ca22ed1"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 2).bin" size="28386288" crc="c980d46c" sha1="7d67c9ca5c6961f89d3e2beb1c6e0750923b7fbe"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 3).bin" size="20349504" crc="8219081c" sha1="55eef285d51fc96c13aa579a0bcc2a3eae387d4c"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 4).bin" size="11625936" crc="c72df971" sha1="ab563444dbdae638bdd045b6ef997e50c8596bec"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 5).bin" size="1331232" crc="6c7a0b09" sha1="a7824841ce0fd60a2cac7a81faf75a6084299b0a"/>
+		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.0) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Interactive CD Sampler Disc Volume 7 (USA, v1.0)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="PBPX-95006, SCUS-94258"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="interactive cd sampler disc volume 7 (usa) (v1.0)" sha1="74da2221802432ae62f01f29fa354866059eb55e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33530,21 +34813,42 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="icdsmp9">
 		<!-- Original images (Redump)
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA).cue" size="652" crc="d517a31b" sha1="6b249ea751c3a0b4af1678f99b12924588aba5b6"/>
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (Track 1).bin" size="654872064" crc="e46241b7" sha1="b008fc91103c22debf2e877da784175985ab5778"/>
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (Track 2).bin" size="20114304" crc="9b407fd2" sha1="d8aca1375de808914cf6eef42a440ca563ad42bf"/>
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (Track 3).bin" size="10678080" crc="7c51bb00" sha1="0939872cc375a6457326ac9a478265dc59220cc0"/>
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (Track 4).bin" size="45901632" crc="56084ed3" sha1="cde487457b2fcc0e478dbde5ad03ddac7e44cdab"/>
-		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (Track 5).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295).cue" size="717" crc="2d88bd58" sha1="fe11800bef46d3d84906b70a83bdbf4cd7007419"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295) (Track 1).bin" size="654872064" crc="c93e2088" sha1="b09e10a3a6c7be736e4fa79e9277788e11b530e9"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295) (Track 2).bin" size="20114304" crc="9b407fd2" sha1="d8aca1375de808914cf6eef42a440ca563ad42bf"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295) (Track 3).bin" size="10678080" crc="7c51bb00" sha1="0939872cc375a6457326ac9a478265dc59220cc0"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295) (Track 4).bin" size="45901632" crc="56084ed3" sha1="cde487457b2fcc0e478dbde5ad03ddac7e44cdab"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (SCUS-94295) (Track 5).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Interactive CD Sampler Disc Vol. 9 (USA)</description>
+		<description>Interactive CD Sampler Disc Vol. 9 (USA, SCUS-94295)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94295"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="interactive cd sampler disc vol. 9 (usa) (scus-94295)" sha1="a0abb3d42d57d0f7498ca034ca2edc1ff258d05f"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="icdsmp9a" cloneof="icdsmp9">
+		<!-- Original images (Redump)
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010).cue" size="717" crc="d95ef50e" sha1="f58c8b647e2e9f708943f25c61b10b736c8f483c"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010) (Track 1).bin" size="654872064" crc="e46241b7" sha1="b008fc91103c22debf2e877da784175985ab5778"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010) (Track 2).bin" size="20114304" crc="9b407fd2" sha1="d8aca1375de808914cf6eef42a440ca563ad42bf"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010) (Track 3).bin" size="10678080" crc="7c51bb00" sha1="0939872cc375a6457326ac9a478265dc59220cc0"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010) (Track 4).bin" size="45901632" crc="56084ed3" sha1="cde487457b2fcc0e478dbde5ad03ddac7e44cdab"/>
+		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010) (Track 5).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Interactive CD Sampler Disc Vol. 9 (USA, PBPX-95010)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="PBPX-95010"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc vol. 9 (usa)" sha1="133e2b1af617206a4205b18dd121f1d097a795eb"/>
+				<disk name="interactive cd sampler disc vol. 9 (usa) (pbpx-95010)" sha1="133e2b1af617206a4205b18dd121f1d097a795eb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33682,6 +34986,24 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="psdemo14">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Demo Disc Version 1.4 (USA).cue" size="248" crc="e29191b0" sha1="00af7f1020de6ff2e9ec354837ce98c5a30ba114"/>
+		<rom name="PlayStation Demo Disc Version 1.4 (USA) (Track 1).bin" size="426384672" crc="a7f44836" sha1="0fe32c0b7c65e96096c1c8a7639ca9f670bf16bf"/>
+		<rom name="PlayStation Demo Disc Version 1.4 (USA) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>PlayStation Demo Disc Version 1.4 (USA)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94650"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation demo disc version 1.4 (usa)" sha1="74b0aba04289d0790c73be9c7fbd15bdb64ddf1a"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="psdemo15">
 		<!-- Original images (Redump)
@@ -33701,31 +35023,82 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
+	
+	<software name="psdems2k">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Demo Disc - Spring 2000 (USA).cue" size="387" crc="f508e10a" sha1="211e0dbeadc12241b87bcb0aab4bb9fa5d336d28"/>
+		<rom name="PlayStation Demo Disc - Spring 2000 (USA) (Track 1).bin" size="515509008" crc="c5cd5516" sha1="46642d85ef4a71ffd9ccb53ff0c90f01745ced9f"/>
+		<rom name="PlayStation Demo Disc - Spring 2000 (USA) (Track 2).bin" size="35103600" crc="acbd2e8a" sha1="5ded4fd4e5df366a4a68a6692d326eda6e48fad9"/>
+		<rom name="PlayStation Demo Disc - Spring 2000 (USA) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>PlayStation Demo Disc - Spring 2000 (USA)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94595"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation demo disc - spring 2000 (usa)" sha1="d4d356ed89d6ff3c605450586433ee70152f4137"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="psdevdmo">
 		<!-- Original images (Redump)
-		<rom name="PlayStation Developer's Demo Disc (USA).cue" size="1590" crc="92e43e84" sha1="ff5351050cd271e883b89c110c362cc8223cde57"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 01).bin" size="52075632" crc="d4de4516" sha1="99e1d0d674d725595774c20693441be1a55d5aca"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 02).bin" size="24632496" crc="9bb40e62" sha1="7e6757223c2cdeda89802fa1a7dbfef76bdb6b25"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 03).bin" size="28233408" crc="cd76eb0a" sha1="4b54693c74db0ea836d6db50ac5b22cac05f18ad"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 04).bin" size="46127424" crc="0283e207" sha1="cfa0392657a3ada9c35ca2b9e91b5ed05dd33eb9"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 05).bin" size="39480672" crc="78a17f81" sha1="17f2923fb41842366eabce62cf9e5a33434be4de"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 06).bin" size="50894928" crc="ca5b077b" sha1="3dddb59af17edd1b9e5cfbc7aef36ed9b4714594"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 07).bin" size="39163152" crc="4a9ff8c1" sha1="b9bbbc9edcc499a8d8744fe755afe401501af3d5"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 08).bin" size="11501280" crc="152643a6" sha1="5f7a328ffb5eb3f0649318745e9a44aeed46a2ac"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 09).bin" size="11821152" crc="1e57d80b" sha1="da08f0ffbe41663fe45d28f0dd6ec20f202bf7ab"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 10).bin" size="36975792" crc="db6202de" sha1="3930c25e3895c456d38444fb249c873d7467f0fb"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 11).bin" size="13886208" crc="605e9c21" sha1="5c35a6ac9d3d6b55bb7a5b58b2ab5a1775554793"/>
-		<rom name="PlayStation Developer's Demo Disc (USA) (Track 12).bin" size="1373568" crc="388b85d1" sha1="88cb2b89bacbfe382b97d509fbf773e73592d8db"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954).cue" size="2334" crc="a5cdcdc7" sha1="bbbc16fcf2744ddbac3c4cdb0fd3d25bf5c511c6"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 01).bin" size="52075632" crc="772c98f8" sha1="d3cc724a636e153d187be3800034130005d8f2dc"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 02).bin" size="20998656" crc="a2047f36" sha1="fe95000ea594c2ae357b2704ded5c2867acd7b78"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 03).bin" size="28233408" crc="cd76eb0a" sha1="4b54693c74db0ea836d6db50ac5b22cac05f18ad"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 04).bin" size="46127424" crc="0283e207" sha1="cfa0392657a3ada9c35ca2b9e91b5ed05dd33eb9"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 05).bin" size="39480672" crc="78a17f81" sha1="17f2923fb41842366eabce62cf9e5a33434be4de"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 06).bin" size="50894928" crc="ca5b077b" sha1="3dddb59af17edd1b9e5cfbc7aef36ed9b4714594"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 07).bin" size="39163152" crc="4a9ff8c1" sha1="b9bbbc9edcc499a8d8744fe755afe401501af3d5"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 08).bin" size="931392" crc="a3d8d1ef" sha1="17298e96850693b35589ff153a3f9b6173140c1b"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 09).bin" size="11501280" crc="152643a6" sha1="5f7a328ffb5eb3f0649318745e9a44aeed46a2ac"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 10).bin" size="1032528" crc="69b8931b" sha1="63734c28e18d87157ca341d21dc7add869eccb59"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 11).bin" size="11821152" crc="1e57d80b" sha1="da08f0ffbe41663fe45d28f0dd6ec20f202bf7ab"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 12).bin" size="1180704" crc="633a9e39" sha1="d1da3e5f6ec8f8d31707f4f6548e5c5a28c945c9"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 13).bin" size="36975792" crc="db6202de" sha1="3930c25e3895c456d38444fb249c873d7467f0fb"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 14).bin" size="1201872" crc="722b160d" sha1="75a5688c8223d956390623dbf9754198e19225bf"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 15).bin" size="13886208" crc="605e9c21" sha1="5c35a6ac9d3d6b55bb7a5b58b2ab5a1775554793"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954) (Track 16).bin" size="1373568" crc="388b85d1" sha1="88cb2b89bacbfe382b97d509fbf773e73592d8db"/>
 		-->
-		<description>PlayStation Developer's Demo Disc (USA)</description>
+		<description>PlayStation Developer's Demo Disc (USA, SCUS-94954)</description>
+		<year>1995</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94954"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation developer's demo disc (usa) (scus-94954)" sha1="86ee33093e6d817cd19162b65238c29def7b2968"/>
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="psdevdmoa" cloneof="psdevdmo">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950).cue" size="1746" crc="76b6a18b" sha1="a2c3dd1b133784b67b6e9c36270ae54e08e9cdda"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 01).bin" size="52075632" crc="d4de4516" sha1="99e1d0d674d725595774c20693441be1a55d5aca"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 02).bin" size="24632496" crc="9bb40e62" sha1="7e6757223c2cdeda89802fa1a7dbfef76bdb6b25"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 03).bin" size="28233408" crc="cd76eb0a" sha1="4b54693c74db0ea836d6db50ac5b22cac05f18ad"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 04).bin" size="46127424" crc="0283e207" sha1="cfa0392657a3ada9c35ca2b9e91b5ed05dd33eb9"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 05).bin" size="39480672" crc="78a17f81" sha1="17f2923fb41842366eabce62cf9e5a33434be4de"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 06).bin" size="50894928" crc="ca5b077b" sha1="3dddb59af17edd1b9e5cfbc7aef36ed9b4714594"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 07).bin" size="39163152" crc="4a9ff8c1" sha1="b9bbbc9edcc499a8d8744fe755afe401501af3d5"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 08).bin" size="11501280" crc="152643a6" sha1="5f7a328ffb5eb3f0649318745e9a44aeed46a2ac"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 09).bin" size="11821152" crc="1e57d80b" sha1="da08f0ffbe41663fe45d28f0dd6ec20f202bf7ab"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 10).bin" size="36975792" crc="db6202de" sha1="3930c25e3895c456d38444fb249c873d7467f0fb"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 11).bin" size="13886208" crc="605e9c21" sha1="5c35a6ac9d3d6b55bb7a5b58b2ab5a1775554793"/>
+		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94950) (Track 12).bin" size="1373568" crc="388b85d1" sha1="88cb2b89bacbfe382b97d509fbf773e73592d8db"/>
+		-->
+		<description>PlayStation Developer's Demo Disc (USA, SCUS-94950)</description>
 		<year>1995</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94950"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="playstation developer's demo disc (usa)" sha1="c56c1ad80f7d3390cdaaa25c193f02936d8b0e24"/>
+				<disk name="playstation developer's demo disc (usa) (scus-94950)" sha1="c56c1ad80f7d3390cdaaa25c193f02936d8b0e24"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33747,22 +35120,83 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
+	
+	<software name="psksk117">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Kiosk Demo Disc Version 1.17 (USA).cue" size="402" crc="8b75cf44" sha1="1f864d31504ddaace04a059880fdb26b3d74d781"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.17 (USA) (Track 1).bin" size="454651008" crc="9be0a29b" sha1="7380b7c10b318b3c8c3be0d502cd4f5363379e94"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.17 (USA) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.17 (USA) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>PlayStation Kiosk Demo Disc Version 1.17 (USA)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94663"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation kiosk demo disc version 1.17 (usa)" sha1="ebc3386565e8a66169fe714fae25dc436e9675e6"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="psksk118">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA).cue" size="962" crc="159f985c" sha1="b6338975750ad491400dc91066152d8b8b9bd691"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 1).bin" size="348472320" crc="80f1ad7a" sha1="b0c6d2316a2ebca32505847c397480f7c06ed0c2"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 2).bin" size="8417808" crc="a6b60c57" sha1="eaf0b5e28796945d2d14aa5b5e4d6f1ccc8afd33"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 3).bin" size="9537360" crc="c728e3f0" sha1="94c530d88fba64bc38352b546b1189ae3a396729"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 4).bin" size="19302864" crc="3924c7fe" sha1="89145b7a167e4a2cd4823abb6288e6627f8f9452"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 5).bin" size="9368016" crc="312a777b" sha1="db015eb12fbf1c3f56bd1983fb9f695f1707aa96"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 6).bin" size="27471360" crc="ad163759" sha1="32d6f74001d7370c05b5b970d56a389c19c4f8ca"/>
+		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA) (Track 7).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>PlayStation Kiosk Demo Disc Version 1.18 (USA)</description>
+		<year>2002</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94667"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation kiosk demo disc version 1.18 (usa)" sha1="accf949971774db48470a2e31d6aca3d64490715"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="psone">
 		<!-- Original images (Redump)
-		<rom name="PSone - Wherever, Whenever, Forever. (USA).cue" size="390" crc="93bfeafc" sha1="5323a3c9606c48c4daee44e6e9f35e98cb5d2259"/>
-		<rom name="PSone - Wherever, Whenever, Forever. (USA) (Track 1).bin" size="482174112" crc="7eaeff73" sha1="2ed0dc7870c97f6a213b5f1e28d04a99e944b502"/>
-		<rom name="PSone - Wherever, Whenever, Forever. (USA) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
-		<rom name="PSone - Wherever, Whenever, Forever. (USA) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC).cue" size="417" crc="1a6c4c6f" sha1="0bd28b9249d797b2e8c2c3e8dea4599886e91f24"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 1).bin" size="482174112" crc="e0c395a4" sha1="7ea4930d1d400b262bfedd0180fe7e30ff0aa425"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>PSone - Wherever, Whenever, Forever. (USA)</description>
+		<description>PSone - Wherever, Whenever, Forever. (USA, No EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94799"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="psone - wherever, whenever, forever. (usa)" sha1="b20d0d98cbdd6189e9ba019edc3fa2466a3d2a96"/>
+				<disk name="psone - wherever, whenever, forever. (usa) (no edc)" sha1="6ccedbc7ea59eb706c6ad16cc8b051081c330d07"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psonea" cloneof="psone">
+		<!-- Original images (Redump)
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC).cue" size="408" crc="259df54e" sha1="d0c1ac4472a576da4a33ece6a96978b953f0869f"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 1).bin" size="482174112" crc="7eaeff73" sha1="2ed0dc7870c97f6a213b5f1e28d04a99e944b502"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
+		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>PSone - Wherever, Whenever, Forever. (USA, EDC)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94799"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psone - wherever, whenever, forever. (usa) (edc)" sha1="b20d0d98cbdd6189e9ba019edc3fa2466a3d2a96"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33819,25 +35253,8 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-
+	
 	<software name="psshock">
-		<!-- Original images (Redump)
-		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94482).cue" size="127" crc="bb1dcdf3" sha1="788b70d1ef88d9463a852e0f6339edf2ef9e3346"/>
-		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94482).bin" size="588921984" crc="faf92986" sha1="912d2dce99c3ce6021f8975271674b74ab687c26"/>
-		-->
-		<description>PlayStation Demo Disc - Shock Your System! (USA, SCUS-94482)</description>
-		<year>1999</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="SCUS-94482"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="playstation demo disc - shock your system! (usa) (scus-94482)" sha1="f1988c825913bc11d437d82664be0ebc770b6c71"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="psshocka">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94496).cue" size="757" crc="876409f6" sha1="94e2979b98bb2afc8e2f85c63a0cc253947c32f1"/>
 		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94496) (Track 1).bin" size="571536000" crc="f0d9bbad" sha1="ff67b6d5cc7b4f01f2c6bdf168ce8b4a24c7da90"/>
@@ -33854,6 +35271,40 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="playstation demo disc - shock your system! (usa) (scus-94496)" sha1="da57a4f9dc00b0729ae657261d5b2de92d8cad32"/>
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="psshocka" cloneof="psshock">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94483).cue" size="127" crc="0d062d83" sha1="3b1d01429506a64aafecc2a5d3ff6a29ac0cdfa7"/>
+		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94483).bin" size="563031168" crc="ae1cfca2" sha1="51ac2f40239375214c6db9d09c639dfc2d800406"/>
+		-->
+		<description>PlayStation Demo Disc - Shock Your System! (USA, SCUS-94483)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94483"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation demo disc - shock your system! (usa) (scus-94483)" sha1="c2160d3bc4f4fcb3f4c8bcf814e2efcff5b478ae"/>
+			</diskarea>
+		</part>
+	</software>		
+
+	<software name="psshockb" cloneof="psshock">
+		<!-- Original images (Redump)
+		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94482).cue" size="127" crc="bb1dcdf3" sha1="788b70d1ef88d9463a852e0f6339edf2ef9e3346"/>
+		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94482).bin" size="588921984" crc="faf92986" sha1="912d2dce99c3ce6021f8975271674b74ab687c26"/>
+		-->
+		<description>PlayStation Demo Disc - Shock Your System! (USA, SCUS-94482)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94482"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playstation demo disc - shock your system! (usa) (scus-94482)" sha1="f1988c825913bc11d437d82664be0ebc770b6c71"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33948,6 +35399,28 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
+	<software name="toysdemo">
+		<!-- Original images (Redump)
+		<rom name="Toys R Us Demo Disc (USA).cue" size="696" crc="d8320973" sha1="448adcbb9af4cd21a7e2c522da4e1e1781a4bd8b"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 1).bin" size="669294528" crc="b924ccd4" sha1="35467058d8e01055b363541408d47fb884683b0d"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 2).bin" size="28386288" crc="c980d46c" sha1="7d67c9ca5c6961f89d3e2beb1c6e0750923b7fbe"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 3).bin" size="20349504" crc="8219081c" sha1="55eef285d51fc96c13aa579a0bcc2a3eae387d4c"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 4).bin" size="11625936" crc="c72df971" sha1="ab563444dbdae638bdd045b6ef997e50c8596bec"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 5).bin" size="1331232" crc="6c7a0b09" sha1="a7824841ce0fd60a2cac7a81faf75a6084299b0a"/>
+		<rom name="Toys R Us Demo Disc (USA) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
+		-->
+		<description>Toys &quot;R&quot; Us Demo Disc (USA)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94266"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toys r us demo disc (usa)" sha1="59d0e55281c3804344648b1f279ade207c7e60ac"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<software name="toyssmpl">
 		<!-- Original images (Redump)
 		<rom name="Toys R Us - Interactive CD Sampler Disc (USA).cue" size="399" crc="34ef7fba" sha1="46eff3bc496379afdc38b534800d6710d5a64e9e"/>
@@ -33968,7 +35441,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 	</software>
 
 
-<!-- COVERDISKS -->
+<!-- COVERDISCS -->
 
 	<software name="opm01">
 		<!-- Original images (Redump)
@@ -35746,7 +37219,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 <!-- Non-redump Interactive CD Sampler discs
 
-'Interactive CD Sampler Disc - Volume 01 (USA, M Rated)' and 'Interactive CD Sampler Disc - Volume 11 (USA)' have not been dumped for redump.org yet.
+'Interactive CD Sampler Disc - Volume 01 (USA, M Rated)' has not been dumped for redump.org yet.
 'Interactive CD Sampler Disc - Volume 06 (USA, EDC)' has EDC while the redump.org version does not; no other obvious differences.
 
 -->
@@ -35781,23 +37254,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 			</diskarea>
 		</part>
 	</software>
-
-	<software name="icdsmp11">
-		<!-- Unknown source
-		<rom name="interactive cd sampler volume 11 [scus-94463].bin" size="504059472" crc="0be789aa" sha1="0a0b125094f344d5552a840485021a2beda58aad"/>
-		<rom name="interactive cd sampler volume 11 [scus-94463].cue" size="301" crc="9948530c" sha1="95c782d5dca37dfd43b8c754e3a6903f2e665860"/>
-		-->
-		<description>Interactive CD Sampler Disc - Volume 11 (USA)</description>
-		<year>1999</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="SCUS-94463"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="interactive cd sampler disc - volume 11" sha1="0506aa051708f32f8470a19b7d6c8538ecedecc1"/>
-			</diskarea>
-		</part>
-	</software>
-
 
 	<!-- Non-redump JAPAN sets -->
 
@@ -55618,7 +57074,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 
-<!-- Demos & Extra Disks -->
+<!-- Demos & Extra Discs -->
 
 	<software name="ffantxc" supported="no">
 		<!-- Unknown source
@@ -55913,7 +57369,7 @@ A few comments on these:
 -->
 	<!-- todo, reconvert original dumps using current CHDMAN version - Feb 2014 -->
 
-<!-- Pirate disks -->
+<!-- Pirate discs -->
 
 	<software name="ddrdmp" cloneof="ddrdm" supported="no">
 		<!-- Original images (Kaylee)
@@ -55931,7 +57387,7 @@ A few comments on these:
 	</software>
 
 
-<!-- Prototype disks -->
+<!-- Prototype discs -->
 
 	<software name="bublbob2" >
 		<!-- Original images
@@ -56699,7 +58155,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 	</software>
 
 
-<!-- Demo disks -->
+<!-- Demo discs -->
 
 	<software name="revil2d" cloneof="revil2" supported="no">
 		<!-- Original images (unknown source)
@@ -56794,22 +58250,6 @@ use an alternate design found on the demo disk... It might be possible to enable
 		</part>
 	</software>
 
-	<software name="shpwreckd" cloneof="shpwreck">
-		<!-- Original images (unknown source)
-		<rom name="Shipwreckers! (USA) (Demo) [SLUS-90013].bin" size="44937312" crc="6af9ce38" sha1="22bb814f2b7b118b7e471dce46078125ead480b9"/>
-		<rom name="Shipwreckers! (USA) (Demo) [SLUS-90013].cue" size="105" crc="d2c44981" sha1="15954f6e9544bf9ae5beee5fd3d546db10a3e179"/>
-		-->
-		<description>Shipwreckers! (USA, Demo)</description>
-		<year>1997</year>
-		<publisher>Psygnosis</publisher>
-		<info name="serial" value="SLUS-90013"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="slus-90013" sha1="82f54b9e5a341c815dc7f713a01a465085609202"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="silenthtd" cloneof="silenth">
 		<!-- Original images (unknown source)
 		<rom name="Silent Hill (Trade Demo) [NTSC-U] [SLUS-80707].bin" size="615045648" crc="4f60c3ec" sha1="49695af2c2b8b19a31b01da4cd4dbc758445ccef"/>
@@ -56841,6 +58281,5 @@ use an alternate design found on the demo disk... It might be possible to enable
 			</diskarea>
 		</part>
 	</software>
-
 
 </softwarelist>
