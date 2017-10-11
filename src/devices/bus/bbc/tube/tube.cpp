@@ -128,7 +128,7 @@ WRITE8_MEMBER(bbc_tube_slot_device::host_w)
 #include "tube_casper.h"
 //#include "tube_x25.h"
 #include "tube_z80.h"
-//#include "tube_zep100.h"
+#include "tube_zep100.h"
 
 
 //-------------------------------------------------
@@ -144,7 +144,7 @@ SLOT_INTERFACE_START( bbc_extube_devices )
 	SLOT_INTERFACE("80286",  BBC_TUBE_80286)   /* Acorn 80286 2nd Processor */
 //  SLOT_INTERFACE("a500",  BBC_TUBE_A500)     /* Acorn A500 2nd Processor */
 	SLOT_INTERFACE("casper", BBC_TUBE_CASPER)  /* Casper 68000 2nd Processor */
-//  SLOT_INTERFACE("zep100", BBC_TUBE_ZEP100)  /* Torch Z80 Communicator (ZEP100) */
+	SLOT_INTERFACE("zep100", BBC_TUBE_ZEP100)  /* Torch Z80 Communicator (ZEP100) */
 	/* Acorn ANC21 Universal 2nd Processor Unit */
 	SLOT_INTERFACE("65c102", BBC_TUBE_65C102)  /* Acorn ADC06 65C102 co-processor */
 	SLOT_INTERFACE("80186",  BBC_TUBE_80186)   /* Acorn ADC08 80186 co-processor */
