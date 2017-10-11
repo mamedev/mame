@@ -98,8 +98,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gokidetor_state )
 	// de00 ?input
 	// df00 ?input
 	AM_RANGE(0xe000, 0xe003) AM_READNOP // ?input
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("pc060ha", tc0140syt_device, master_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("pc060ha", tc0140syt_device, master_comm_r, master_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
 	// f600 ?output
 	// f700 ?output
 ADDRESS_MAP_END
@@ -109,8 +109,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gokidetor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("pc060ha", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("pc060ha", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -137,9 +137,9 @@ MACHINE_CONFIG_START( gokidetor )
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("pc060ha", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("soundcpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("soundcpu")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

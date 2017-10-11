@@ -31,6 +31,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(TC0140SYT, tc0140syt_device, "tc0140syt", "Taito TC0140SYT")
+DEFINE_DEVICE_TYPE(PC060HA, pc060ha_device, "pc060ha", "Taito PC060HA CIU")
 
 
 //**************************************************************************
@@ -41,8 +42,8 @@ DEFINE_DEVICE_TYPE(TC0140SYT, tc0140syt_device, "tc0140syt", "Taito TC0140SYT")
 //  tc0140syt_device - constructor
 //-------------------------------------------------
 
-tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0140SYT, tag, owner, clock)
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_mainmode(0)
 	, m_submode(0)
 	, m_status(0)
@@ -52,6 +53,11 @@ tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *ta
 {
 	memset(m_slavedata, 0, sizeof(uint8_t)*4);
 	memset(m_masterdata, 0, sizeof(uint8_t)*4);
+}
+
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tc0140syt_device(mconfig, TC0140SYT, tag, owner, clock)
+{
 }
 
 
@@ -284,4 +290,14 @@ READ8_MEMBER( tc0140syt_device::slave_comm_r )
 	}
 
 	return res;
+}
+
+
+//-------------------------------------------------
+//  pc060ha_device - constructor
+//-------------------------------------------------
+
+pc060ha_device::pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tc0140syt_device(mconfig, PC060HA, tag, owner, clock)
+{
 }

@@ -53,8 +53,6 @@ Taito: 2 * PC080SN, PC060HA, TC0040IOC, 2 * TC0060DCA, PC050CM
 TODO Lists
 ==========
 
-Replace TC0140SYT with PC060HA
-
 Minor black glitches on the road: these are all on the right
 hand edge of the tilemap making up the "left" half: this is
 the upper of the two road tilemaps so any gunk will be visible.
@@ -384,8 +382,8 @@ static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_SHARE("raster_ctrl")
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0x880000, 0x880007) AM_WRITENOP // Lamps/outputs?
@@ -417,8 +415,8 @@ static ADDRESS_MAP_START( z80_prg, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("sndbank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xcfff) AM_WRITE(msm5205_command_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(volume_w)
 ADDRESS_MAP_END
@@ -598,9 +596,9 @@ static MACHINE_CONFIG_START( topspeed )
 	MCFG_PC080SN_OFFSETS(0, 8)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
