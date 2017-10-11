@@ -616,7 +616,9 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
-	std::fill(std::begin(m_chars), std::end(m_chars), char32_t(0));
+
+	for (int i = 0; i < ARRAY_LENGTH(m_chars); i++)
+		std::fill(std::begin(m_chars[i]), std::end(m_chars[i]), char32_t(0));
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -755,16 +757,20 @@ ioport_type_class ioport_field::type_class() const
 
 
 //-------------------------------------------------
-//  keyboard_code - accesses a particular keyboard
-//  code
+//  keyboard_codes - accesses a particular keyboard
+//  code list
 //-------------------------------------------------
 
-char32_t ioport_field::keyboard_code(int which) const
+std::vector<char32_t> ioport_field::keyboard_codes(int which) const
 {
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
-	return m_chars[which];
+	std::vector<char32_t> result;
+	for (int i = 0; i < ARRAY_LENGTH(m_chars[which]) && m_chars[which] != 0; i++)
+		result.push_back(m_chars[which][i]);
+
+	return result;
 }
 
 
@@ -774,7 +780,8 @@ char32_t ioport_field::keyboard_code(int which) const
 
 std::string ioport_field::key_name(int which) const
 {
-	char32_t ch = keyboard_code(which);
+	std::vector<char32_t> codes = keyboard_codes(which);
+	char32_t ch = codes.empty() ? 0 : codes[0];
 
 	// attempt to get the string from the character info table
 	switch (ch)
@@ -1373,8 +1380,8 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		// loop through each character on the field
 		for (int which = 0; which < 4; which++)
 		{
-			char32_t const ch = field.keyboard_code(which);
-			if (ch == 0)
+			std::vector<char32_t> const codes = field.keyboard_codes(which);
+			if (codes.empty())
 				break;
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
 		}
@@ -3059,16 +3066,27 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 //  field_add_char - add a character to a field
 //-------------------------------------------------
 
-ioport_configurer& ioport_configurer::field_add_char(char32_t ch)
+ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char32_t> charlist)
 {
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
-		if (m_curfield->m_chars[index] == 0)
+		if (m_curfield->m_chars[index][0] == 0)
 		{
-			m_curfield->m_chars[index] = ch;
+			const size_t char_count = ARRAY_LENGTH(m_curfield->m_chars[index]);
+			assert(charlist.size() > 0 && charlist.size() <= char_count);
+
+			for (size_t i = 0; i < char_count; i++)
+				m_curfield->m_chars[index][i] = i < charlist.size() ? *(charlist.begin() + i) : 0;
 			return *this;
 		}
 
-	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch);
+	std::ostringstream s;
+	bool is_first = true;
+	for (char32_t ch : charlist)
+	{
+		util::stream_format(s, "%s%d", is_first ? "" : ",", (int)ch);
+		is_first = false;
+	}
+	throw emu_fatalerror("PORT_CHAR(%s) could not be added - maximum amount exceeded\n", s.str().c_str());
 }
 
 

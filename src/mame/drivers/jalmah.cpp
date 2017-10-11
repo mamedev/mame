@@ -744,12 +744,16 @@ WRITE16_MEMBER(jalmah_state::urashima_dma_w)
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
+// TODO: hackish, how the MCU actually do this?
 void jalmah_state::daireika_palette_dma(uint16_t val)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
+	if(val == 0)
+		return;
+	
 	src_addr = 0x301c0 + (val * 0x40);
 //  popmessage("%08x",src_addr);
 	for(index_1 = 0; index_1 < 0x200; index_1 += 0x20)
@@ -769,7 +773,7 @@ void jalmah_state::daireika_mcu_run()
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
 
-	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != m_dma_old))
+	if((jm_shared_ram[0x540/2] & 0xf00) != m_dma_old && jm_shared_ram[0x54e/2] == 1)
 	{
 		m_dma_old = jm_shared_ram[0x540/2] & 0xf00;
 		daireika_palette_dma(((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
@@ -2144,8 +2148,8 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 
 		/*TX function?*/
 		jm_shared_ram[0x0126/2] = 0x4ef9;
-		jm_shared_ram[0x0128/2] = 0x0010;
-		jm_shared_ram[0x012a/2] = 0x8980;
+		jm_shared_ram[0x0128/2] = 0x0000;//0x0010;
+		jm_shared_ram[0x012a/2] = 0x2684;//0x8980;
 
 		//m_pri $f0590
 		jm_mcu_code[0x8980/2] = 0x33fc;

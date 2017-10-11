@@ -330,7 +330,10 @@ public:
 		m_value = _mm_slli_epi16(m_value, 4);
 		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
 		m_value = _mm_mulhi_epi16(m_value, tmp1);
-		// Unpack into 32 bit values
+		// Clamp to u8
+		m_value = _mm_packus_epi16(m_value, _mm_setzero_si128());
+		// Unpack up to s32
+		m_value = _mm_unpacklo_epi8(m_value, _mm_setzero_si128());
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 		add(other);
 		clamp_to_uint8();
