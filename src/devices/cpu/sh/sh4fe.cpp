@@ -23,7 +23,7 @@ sh4_frontend::sh4_frontend(sh_common_execution *device, uint32_t window_start, u
 {
 }
 
-inline uint16_t sh4_frontend::read_word(opcode_desc &desc)
+uint16_t sh4_frontend::read_word(opcode_desc &desc)
 {
 	if (desc.physpc >= 0xe0000000)
 		return m_sh->m_direct->read_word(desc.physpc, SH34LE_CODE_XOR(0));
@@ -31,7 +31,7 @@ inline uint16_t sh4_frontend::read_word(opcode_desc &desc)
 	return m_sh->m_direct->read_word(desc.physpc & SH34_AM, SH34LE_CODE_XOR(0));
 }
 
-inline uint16_t sh4be_frontend::read_word(opcode_desc &desc)
+uint16_t sh4be_frontend::read_word(opcode_desc &desc)
 {
 	if (desc.physpc >= 0xe0000000)
 		return m_sh->m_direct->read_word(desc.physpc, SH34BE_CODE_XOR(0));
