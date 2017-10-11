@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef OMTI5100_H_
-#define OMTI5100_H_
+#ifndef MAME_BUS_SCSI_OMTI5100_H
+#define MAME_BUS_SCSI_OMTI5100_H
 
-#include "emu.h"
 #include "scsi.h"
 #include "scsihd.h"
 #include "imagedev/harddriv.h"
@@ -11,15 +10,16 @@
 class omti5100_device : public scsihd_device
 {
 public:
-	omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	//virtual const rom_entry *device_rom_region() const;
+	omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void ExecCommand() override;
-	virtual void ReadData( UINT8 *data, int dataLength ) override;
-	virtual void WriteData( UINT8 *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+
+protected:
 	void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<harddisk_image_device> m_image0;
@@ -27,6 +27,6 @@ private:
 	hard_disk_info m_param[2];
 };
 
-extern const device_type OMTI5100;
+DECLARE_DEVICE_TYPE(OMTI5100, omti5100_device)
 
-#endif /* OMTI5100_H_ */
+#endif // MAME_BUS_SCSI_OMTI5100_H

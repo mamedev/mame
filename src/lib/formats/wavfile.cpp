@@ -23,25 +23,25 @@ static const char data_tag_id[4] = { 'd', 'a', 't', 'a' };
 
 
 
-static UINT32 get_leuint32(const void *ptr)
+static uint32_t get_leuint32(const void *ptr)
 {
-	UINT32 value;
+	uint32_t value;
 	memcpy(&value, ptr, sizeof(value));
 	return little_endianize_int32(value);
 }
 
 
 
-static UINT16 get_leuint16(const void *ptr)
+static uint16_t get_leuint16(const void *ptr)
 {
-	UINT16 value;
+	uint16_t value;
 	memcpy(&value, ptr, sizeof(value));
 	return little_endianize_int16(value);
 }
 
 
 
-static void put_leuint32(void *ptr, UINT32 value)
+static void put_leuint32(void *ptr, uint32_t value)
 {
 	value = little_endianize_int32(value);
 	memcpy(ptr, &value, sizeof(value));
@@ -49,7 +49,7 @@ static void put_leuint32(void *ptr, UINT32 value)
 
 
 
-static void put_leuint16(void *ptr, UINT16 value)
+static void put_leuint16(void *ptr, uint16_t value)
 {
 	value = little_endianize_int16(value);
 	memcpy(ptr, &value, sizeof(value));
@@ -58,21 +58,21 @@ static void put_leuint16(void *ptr, UINT16 value)
 
 
 static cassette_image::error wavfile_process(cassette_image *cassette, struct CassetteOptions *opts,
-	int read_waveform)
+	bool read_waveform)
 {
-	UINT8 file_header[12];
-	UINT8 tag_header[8];
-	UINT8 format_tag[16];
-	UINT32 stated_size;
-	UINT64 file_size;
-	UINT32 tag_size;
-	UINT32 tag_samples;
-	UINT64 offset;
-	int format_specified = FALSE;
+	uint8_t file_header[12];
+	uint8_t tag_header[8];
+	uint8_t format_tag[16];
+	uint32_t stated_size;
+	uint64_t file_size;
+	uint32_t tag_size;
+	uint32_t tag_samples;
+	uint64_t offset;
+	bool format_specified = false;
 
-	UINT16 format_type = 0;
-	UINT32 bytes_per_second = 0;
-//  UINT16 block_align = 0;
+	uint16_t format_type = 0;
+	uint32_t bytes_per_second = 0;
+//  uint16_t block_align = 0;
 	int waveform_flags = 0;
 
 	/* read header */
@@ -89,7 +89,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 	stated_size = get_leuint32(&file_header[4]) + 8;
 	file_size = cassette_image_size(cassette);
 	if (stated_size > file_size)
-		stated_size = (UINT32) file_size;
+		stated_size = (uint32_t) file_size;
 
 	while(offset < stated_size)
 	{
@@ -102,7 +102,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 			/* format tag */
 			if (format_specified || (tag_size < sizeof(format_tag)))
 				return cassette_image::error::INVALID_IMAGE;
-			format_specified = TRUE;
+			format_specified = true;
 
 			cassette_image_read(cassette, format_tag, offset, sizeof(format_tag));
 
@@ -160,7 +160,7 @@ static cassette_image::error wavfile_process(cassette_image *cassette, struct Ca
 
 static cassette_image::error wavfile_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
-	return wavfile_process(cassette, opts, FALSE);
+	return wavfile_process(cassette, opts, false);
 }
 
 
@@ -169,7 +169,7 @@ static cassette_image::error wavfile_load(cassette_image *cassette)
 {
 	struct CassetteOptions opts;
 	memset(&opts, 0, sizeof(opts));
-	return wavfile_process(cassette, &opts, TRUE);
+	return wavfile_process(cassette, &opts, true);
 }
 
 
@@ -177,24 +177,24 @@ static cassette_image::error wavfile_load(cassette_image *cassette)
 static cassette_image::error wavfile_save(cassette_image *cassette, const struct CassetteInfo *info)
 {
 	cassette_image::error err;
-	UINT8 consolidated_header[12 + 8 + 16 + 8];
-	UINT8 *header               = &consolidated_header[0];
-	UINT8 *format_tag_header    = &consolidated_header[12];
-	UINT8 *format_tag_data      = &consolidated_header[12 + 8];
-	UINT8 *data_tag_header      = &consolidated_header[12 + 8 + 16];
-	UINT32 file_size;
-	UINT32 bytes_per_second;
-	UINT16 bits_per_sample;
-	UINT32 data_size;
+	uint8_t consolidated_header[12 + 8 + 16 + 8];
+	uint8_t *header               = &consolidated_header[0];
+	uint8_t *format_tag_header    = &consolidated_header[12];
+	uint8_t *format_tag_data      = &consolidated_header[12 + 8];
+	uint8_t *data_tag_header      = &consolidated_header[12 + 8 + 16];
+	uint32_t file_size;
+	uint32_t bytes_per_second;
+	uint16_t bits_per_sample;
+	uint32_t data_size;
 	size_t bytes_per_sample = 2;
 	int waveform_flags = CASSETTE_WAVEFORM_16BITLE;
-	UINT16 block_align;
+	uint16_t block_align;
 
-	bits_per_sample = (UINT16) (bytes_per_sample * 8);
+	bits_per_sample = (uint16_t) (bytes_per_sample * 8);
 	bytes_per_second = info->sample_frequency * bytes_per_sample * info->channels;
-	data_size = (UINT32) (info->sample_count * bytes_per_sample * info->channels);
+	data_size = (uint32_t) (info->sample_count * bytes_per_sample * info->channels);
 	file_size = data_size + sizeof(consolidated_header) - 8;
-	block_align = (UINT16) (bytes_per_sample * info->channels);
+	block_align = (uint16_t) (bytes_per_sample * info->channels);
 
 	/* set up header */
 	memcpy(&header[0],                  magic1, 4);
@@ -257,8 +257,8 @@ void wavfile_testload(const char *fname)
 	FILE *f;
 	long offset;
 	int freq, samples, i;
-	INT32 cassamp;
-	INT16 wavsamp;
+	int32_t cassamp;
+	int16_t wavsamp;
 
 	f = fopen(fname, "rb");
 	if (!f)
@@ -280,7 +280,7 @@ void wavfile_testload(const char *fname)
 
 		fseek(f, offset + i * 2, SEEK_SET);
 		fread(&wavsamp, 1, 2, f);
-		assert(cassamp == (((UINT32) wavsamp) << 16));
+		assert(cassamp == (((uint32_t) wavsamp) << 16));
 	}
 
 	cassette_close(cassette);

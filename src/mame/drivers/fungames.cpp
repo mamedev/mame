@@ -10,7 +10,7 @@
  Race! (1976)
  Take 5 (1975)
  Take 7 (1975)
- Tankers (1975)
+ Tankers (1975) - there is bootleg of this released by Alca called "Battleground"
 
 ***************************************************************************/
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
@@ -90,7 +90,7 @@ void fungames_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( fungames, fungames_state )
+static MACHINE_CONFIG_START( fungames )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -134,5 +134,5 @@ ROM_START( take5 )
 ROM_END
 
 
-GAME( 1976, biplane4,  0, fungames, 0, driver_device,  0, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, take5,     0, fungames, 0, driver_device,  0, ROT0, "Fun Games", "Take 5 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, biplane4,  0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, take5,     0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )

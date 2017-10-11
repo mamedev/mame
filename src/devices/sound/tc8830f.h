@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_TC8830F_H
+#define MAME_SOUND_TC8830F_H
 
-#ifndef __TC8830F_H__
-#define __TC8830F_H__
+#pragma once
 
 
 //**************************************************************************
@@ -32,12 +32,10 @@ class tc8830f_device : public device_t,
 {
 public:
 	// construction/destruction
-	tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void reset();
-	void write_p(UINT8 data);
-
-	sound_stream *m_stream;
+	void write_p(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -48,23 +46,25 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	sound_stream *m_stream;
+
 	bool m_playing;
-	UINT32 m_address;
-	UINT32 m_stop_address;
-	UINT8 m_bitcount;
-	UINT8 m_bitrate;
-	UINT8 m_prevbits;
+	uint32_t m_address;
+	uint32_t m_stop_address;
+	uint8_t m_bitcount;
+	uint8_t m_bitrate;
+	uint8_t m_prevbits;
 	int m_delta;
 	int m_output;
-	UINT8 m_command;
+	uint8_t m_command;
 	int m_cmd_rw;
-	UINT8 m_phrase;
+	uint8_t m_phrase;
 
-	required_region_ptr<UINT8> m_mem;
+	required_region_ptr<uint8_t> m_mem;
 };
 
 
 // device type definition
-extern const device_type TC8830F;
+DECLARE_DEVICE_TYPE(TC8830F, tc8830f_device)
 
-#endif /* __TC8830F_H__ */
+#endif // MAME_SOUND_TC8830F_H

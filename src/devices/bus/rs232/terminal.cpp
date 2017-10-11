@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "terminal.h"
 
-serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__)
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: generic_terminal_device(mconfig, SERIAL_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
@@ -29,12 +30,6 @@ INPUT_PORTS_END
 ioport_constructor serial_terminal_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(serial_terminal);
-}
-
-void serial_terminal_device::device_start()
-{
-	generic_terminal_device::device_start();
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
 WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
@@ -71,13 +66,7 @@ void serial_terminal_device::device_reset()
 	update_serial(0);
 }
 
-void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	generic_terminal_device::device_timer(timer, id, param, ptr);
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-void serial_terminal_device::send_key(UINT8 code)
+void serial_terminal_device::send_key(uint8_t code)
 {
 	transmit_byte(code);
 }
@@ -87,9 +76,9 @@ void serial_terminal_device::tra_callback()
 	output_rxd(transmit_register_get_data_bit());
 }
 
-void serial_terminal_device::received_byte(UINT8 byte)
+void serial_terminal_device::received_byte(uint8_t byte)
 {
 	term_write(byte);
 }
 
-const device_type SERIAL_TERMINAL = &device_creator<serial_terminal_device>;
+DEFINE_DEVICE_TYPE(SERIAL_TERMINAL, serial_terminal_device, "serial_terminal", "Serial Terminal")

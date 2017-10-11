@@ -60,7 +60,7 @@ WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
 
 void sderby_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs;
 	int height = m_gfxdecode->gfx(0)->height();
 	int colordiv = m_gfxdecode->gfx(0)->granularity() / 16;
@@ -98,7 +98,7 @@ void sderby_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0);
@@ -107,7 +107,7 @@ UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);

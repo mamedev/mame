@@ -9,7 +9,7 @@ On Microsoft Windows, ledutil.exe can take control of your keyboard LEDs to mirr
 
 Start **ledutil.exe** from the command line to enable LED handling. Run **ledutil.exe -kill** to stop the handler.
 
-On SDLMAME platforms such as Mac OS X and Linux, **ledutil.sh** can be used. Use **ledutil.sh -a** to have it automatically close when you exit SDLMAME. 
+On SDLMAME platforms such as Mac OS X and Linux, **ledutil.sh** can be used. Use **ledutil.sh -a** to have it automatically close when you exit SDLMAME.
 
 
 Developer-focused tools included with MAME
@@ -45,7 +45,7 @@ ldresample
 This tool recompresses video data for laserdisc and VHS dumps. Most users will not need to work with this.
 
 
-ldverify 
+ldverify
 --------
 
 This tool is used for comparing laserdisc or VHS CHD images with the source AVI. Most users will not need to work with this.

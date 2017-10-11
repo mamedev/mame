@@ -10,9 +10,9 @@
 #include "includes/subs.h"
 #include "sound/discrete.h"
 
-WRITE8_MEMBER(subs_state::invert1_w)
+WRITE_LINE_MEMBER(subs_state::invert1_w)
 {
-	if ((offset & 0x01) == 1)
+	if (state)
 	{
 		m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 		m_palette->set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
@@ -24,9 +24,9 @@ WRITE8_MEMBER(subs_state::invert1_w)
 	}
 }
 
-WRITE8_MEMBER(subs_state::invert2_w)
+WRITE_LINE_MEMBER(subs_state::invert2_w)
 {
-	if ((offset & 0x01) == 1)
+	if (state)
 	{
 		m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
 		m_palette->set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
@@ -39,7 +39,7 @@ WRITE8_MEMBER(subs_state::invert2_w)
 }
 
 
-UINT32 subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -109,13 +109,13 @@ UINT32 subs_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitma
 	}
 
 	/* Update sound */
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_discrete->write(space, SUBS_LAUNCH_DATA, m_spriteram[5] & 0x0f);   // Launch data
 	m_discrete->write(space, SUBS_CRASH_DATA, m_spriteram[5] >> 4);      // Crash/explode data
 	return 0;
 }
 
-UINT32 subs_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subs_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */

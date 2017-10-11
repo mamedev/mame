@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "turbo232.h"
 
 
@@ -29,14 +30,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_TURBO232 = &device_creator<c64_turbo232_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", "C64 Turbo232 cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
+MACHINE_CONFIG_MEMBER( c64_turbo232_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_3_6864MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))
@@ -48,17 +49,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_turbo232_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_turbo232 );
-}
 
 
 //-------------------------------------------------
@@ -98,8 +88,8 @@ ioport_constructor c64_turbo232_cartridge_device::device_input_ports() const
 //  c64_turbo232_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_TURBO232, "C64 Turbo232 cartridge", tag, owner, clock, "c64_turbo232", __FILE__),
+c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_TURBO232, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MOS6551_TAG),
 	m_rs232(*this, RS232_TAG),
@@ -137,7 +127,7 @@ void c64_turbo232_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))
@@ -164,7 +154,7 @@ UINT8 c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t offse
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))

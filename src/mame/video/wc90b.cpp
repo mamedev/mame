@@ -92,7 +92,7 @@ WRITE8_MEMBER(wc90b_state::txvideoram_w)
 
 void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
@@ -123,7 +123,7 @@ void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	}
 }
 
-UINT32 wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,8 * (m_scroll2x[0] & 0x7f) + 256 - 4 + (m_scroll_x_lo[0] & 0x07));
 	m_bg_tilemap->set_scrolly(0,m_scroll2y[0] + 1 + ((m_scroll2x[0] & 0x80) ? 256 : 0));

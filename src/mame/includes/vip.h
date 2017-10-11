@@ -5,7 +5,6 @@
 #ifndef __VIP__
 #define __VIP__
 
-#include "emu.h"
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -70,7 +69,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_interrupts();
 
@@ -123,7 +122,7 @@ public:
 	int m_keylatch;
 
 	// expansion state
-	UINT8 m_byteio_data;
+	uint8_t m_byteio_data;
 };
 
 #endif

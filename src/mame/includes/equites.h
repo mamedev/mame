@@ -8,9 +8,11 @@
 
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 
 class equites_state : public driver_device
@@ -37,30 +39,29 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	std::unique_ptr<UINT8[]> m_fg_videoram;    // 8bits
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_spriteram_2;
-	optional_shared_ptr<UINT8> m_mcuram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	std::unique_ptr<uint8_t[]> m_fg_videoram;    // 8bits
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_spriteram_2;
+	optional_shared_ptr<uint8_t> m_mcuram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	int       m_fg_char_bank;
-	UINT8     m_bgcolor;
-	UINT16    m_splndrbt_bg_scrollx;
-	UINT16    m_splndrbt_bg_scrolly;
+	uint8_t     m_bgcolor;
+	uint16_t    m_splndrbt_bg_scrollx;
+	uint16_t    m_splndrbt_bg_scrolly;
 
 	/* misc */
 	int       m_sound_prom_address;
-	UINT8     m_dac_latch;
-	UINT8     m_eq8155_port_b;
-	UINT8     m_eq8155_port_a;
-	UINT8     m_eq8155_port_c;
-	UINT8     m_ay_port_a;
-	UINT8     m_ay_port_b;
-	UINT8     m_eq_cymbal_ctrl;
-	emu_timer *m_nmi_timer;
+	uint8_t     m_dac_latch;
+	uint8_t     m_eq8155_port_b;
+	uint8_t     m_eq8155_port_a;
+	uint8_t     m_eq8155_port_c;
+	uint8_t     m_ay_port_a;
+	uint8_t     m_ay_port_b;
+	uint8_t     m_eq_cymbal_ctrl;
 	emu_timer *m_adjuster_timer;
 	float     m_cymvol;
 	float     m_hihatvol;
@@ -77,29 +78,30 @@ public:
 	required_device<alpha_8201_device> m_alpha_8201;
 	optional_device<cpu_device> m_fakemcu;
 	required_device<msm5232_device> m_msm;
-	required_device<dac_device> m_dac_1;
-	required_device<dac_device> m_dac_2;
+	required_device<dac_byte_interface> m_dac_1;
+	required_device<dac_byte_interface> m_dac_2;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
-	DECLARE_WRITE8_MEMBER(equites_8155_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
+	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
 	DECLARE_WRITE8_MEMBER(mcu_ram_w);
-	DECLARE_WRITE16_MEMBER(mcu_start_w);
-	DECLARE_WRITE16_MEMBER(mcu_switch_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
 	DECLARE_READ8_MEMBER(equites_fg_videoram_r);
 	DECLARE_WRITE8_MEMBER(equites_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(equites_bgcolor_w);
 	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_selchar_w);
-	DECLARE_WRITE16_MEMBER(equites_flipw_w);
-	DECLARE_WRITE8_MEMBER(equites_flipb_w);
+	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
@@ -115,9 +117,9 @@ public:
 	DECLARE_PALETTE_INIT(equites);
 	DECLARE_VIDEO_START(splndrbt);
 	DECLARE_PALETTE_INIT(splndrbt);
-	UINT32 screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(equites_nmi_callback);
+	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);

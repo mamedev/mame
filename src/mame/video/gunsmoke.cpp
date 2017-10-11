@@ -20,7 +20,7 @@
 
 PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -39,21 +39,21 @@ PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
 	/* characters use colors 0x40-0x4f */
 	for (i = 0; i < 0x80; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | 0x40;
+		uint8_t ctabentry = color_prom[i] | 0x40;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* background tiles use colors 0-0x3f */
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x03) << 4);
+		uint8_t ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x03) << 4);
 		palette.set_pen_indirect(i - 0x80, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xff */
 	for (i = 0x300; i < 0x400; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x07) << 4) | 0x80;
+		uint8_t ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x07) << 4) | 0x80;
 		palette.set_pen_indirect(i - 0x180, ctabentry);
 	}
 }
@@ -102,7 +102,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 
 TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx4")->base();
+	uint8_t *tilerom = memregion("gfx4")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -134,7 +134,7 @@ void gunsmoke_state::video_start()
 
 void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
@@ -165,7 +165,7 @@ void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx[0] + 256 * m_scrollx[1]);
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0]);

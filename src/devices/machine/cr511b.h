@@ -30,12 +30,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_CR511B_H
+#define MAME_MACHINE_CR511B_H
+
 #pragma once
 
-#ifndef __CR511B_H__
-#define __CR511B_H__
-
-#include "emu.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 
@@ -75,26 +74,26 @@ class cr511b_device : public device_t
 {
 public:
 	// construction/destruction
-	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _Object> static devcb_base &set_stch_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_stch_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_stch_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_stch_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_sten_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_sten_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_sten_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_sten_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_dten_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_dten_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_dten_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_dten_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_scor_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_scor_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_scor_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_scor_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_xaen_handler(device_t &device, _Object object)
-		{ return downcast<cr511b_device &>(device).m_xaen_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_xaen_handler(device_t &device, Object &&cb)
+	{ return downcast<cr511b_device &>(device).m_xaen_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER ( write );
@@ -106,7 +105,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -141,10 +140,10 @@ private:
 	int m_cmd;
 
 	// data transfer
-	//UINT8 m_sector_buffer[CD_MAX_SECTOR_DATA];
+	//uint8_t m_sector_buffer[CD_MAX_SECTOR_DATA];
 };
 
 // device type definition
-extern const device_type CR511B;
+DECLARE_DEVICE_TYPE(CR511B, cr511b_device)
 
-#endif
+#endif // MAME_MACHINE_CR511B_H

@@ -125,7 +125,7 @@ void airbustr_state::video_start()
 }
 
 
-UINT32 airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -136,7 +136,7 @@ UINT32 airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void airbustr_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
 {
 	// rising edge
 	if (state)

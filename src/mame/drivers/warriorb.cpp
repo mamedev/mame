@@ -147,13 +147,25 @@ Colscroll effects?
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "rendlay.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/warriorb.h"
 #include "includes/taitoipt.h"
 
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/2610intf.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+WRITE8_MEMBER(warriorb_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
 
 
 /***********************************************************
@@ -420,7 +432,7 @@ void warriorb_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( darius2d, warriorb_state )
+static MACHINE_CONFIG_START( darius2d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
@@ -435,6 +447,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -508,7 +521,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( warriorb, warriorb_state )
+static MACHINE_CONFIG_START( warriorb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
@@ -523,6 +536,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -776,8 +790,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia, driver_device,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, driver_device, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,MONITOR,COMPANY,FULLNAME,          FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

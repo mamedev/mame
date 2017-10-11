@@ -55,13 +55,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/timer.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "screen.h"
+#include "speaker.h"
+
+#define VERBOSE 0
+#include "logmacro.h"
 
 #define MAIN_CLOCK 15974400
-#define LOG 0
 
 class fp1100_state : public driver_device
 {
@@ -102,32 +107,32 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
 private:
-	UINT8 m_irq_mask;
-	UINT8 m_main_latch;
-	UINT8 m_sub_latch;
-	UINT8 m_slot_num;
-	UINT8 m_kbd_row;
-	UINT8 m_col_border;
-	UINT8 m_col_cursor;
-	UINT8 m_col_display;
-	UINT8 m_centronics_busy;
-	UINT8 m_cass_data[4];
+	uint8_t m_irq_mask;
+	uint8_t m_main_latch;
+	uint8_t m_sub_latch;
+	uint8_t m_slot_num;
+	uint8_t m_kbd_row;
+	uint8_t m_col_border;
+	uint8_t m_col_cursor;
+	uint8_t m_col_display;
+	uint8_t m_centronics_busy;
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 
 	struct {
-		UINT8 id;
+		uint8_t id;
 	}m_slot[8];
 
 	struct {
-		UINT8 porta;
-		UINT8 portb;
-		UINT8 portc;
+		uint8_t porta;
+		uint8_t portb;
+		uint8_t portc;
 	}m_upd7801;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<mc6845_device> m_crtc;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_ioport_array<16> m_keyboard;
 	required_device<beep_device> m_beep;
 	required_device<centronics_device> m_centronics;
@@ -137,9 +142,9 @@ private:
 MC6845_UPDATE_ROW( fp1100_state::fp1100_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 r,g,b,col,i;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t r,g,b,col,i;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	if (BIT(m_upd7801.porta, 4))
 	{ // green screen
@@ -189,7 +194,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	machine().scheduler().synchronize(); // force resync
 	m_irq_mask = data;
 	m_subcpu->set_input_line(UPD7810_INTF2, BIT(data, 7) ? HOLD_LINE : CLEAR_LINE);
-	if (LOG) printf("%s: IRQmask=%X\n",machine().describe_context(),data);
+	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
@@ -197,14 +202,14 @@ WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 	m_sub_latch = data;
-	if (LOG) printf("%s: From main:%X\n",machine().describe_context(),data);
+	LOG("%s: From main:%X\n",machine().describe_context(),data);
 }
 
 READ8_MEMBER( fp1100_state::sub_to_main_r )
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
-	if (LOG) printf("%s: To main:%X\n",machine().describe_context(),m_main_latch);
+	LOG("%s: To main:%X\n",machine().describe_context(),m_main_latch);
 	return m_main_latch;
 }
 
@@ -239,7 +244,7 @@ READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
-	if (LOG) printf("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
+	LOG("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
 	return m_sub_latch;
 }
 
@@ -248,7 +253,7 @@ WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	m_main_latch = data;
-	if (LOG) printf("%s: From sub:%X\n",machine().describe_context(),data);
+	LOG("%s: From sub:%X\n",machine().describe_context(),data);
 }
 
 /*
@@ -294,7 +299,6 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" doesn't seem to be used
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(colour_control_w)
 	AM_RANGE(0xf400, 0xff7f) AM_ROM AM_REGION("sub_ipl",0x2400)
-	AM_RANGE(0xff80, 0xffff) AM_RAM     /* upd7801 internal RAM */
 ADDRESS_MAP_END
 
 /*
@@ -316,7 +320,7 @@ WRITE8_MEMBER( fp1100_state::porta_w )
 
 READ8_MEMBER( fp1100_state::portb_r )
 {
-	UINT8 data = m_keyboard[m_kbd_row]->read() ^ 0xff;
+	uint8_t data = m_keyboard[m_kbd_row]->read() ^ 0xff;
 	//m_subcpu->set_input_line(UPD7810_INTF0, BIT(data, 7) ? HOLD_LINE : CLEAR_LINE);
 	return data;
 }
@@ -342,18 +346,11 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 {
 	if (BIT(m_irq_mask, 4))
 		m_maincpu->set_input_line_and_vector(0, BIT(data, 3) ? CLEAR_LINE : HOLD_LINE, 0xf0);
-	if (LOG) printf("%s: PortC:%X\n",machine().describe_context(),data);
+	LOG("%s: PortC:%X\n",machine().describe_context(),data);
 	m_upd7801.portc = data;
 	m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_centronics->write_strobe(BIT(data, 6));
 }
-
-static ADDRESS_MAP_START(fp1100_slave_io, AS_IO, 8, fp1100_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(porta_w)
-	AM_RANGE(0x01, 0x01) AM_READ(portb_r) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(portc_r,portc_w)
-ADDRESS_MAP_END
 
 
 /* Input ports */
@@ -603,8 +600,8 @@ INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
 {
 	int i;
-	UINT8 slot_type;
-	const UINT8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
+	uint8_t slot_type;
+	const uint8_t id_type[4] = { 0xff, 0x00, 0x01, 0x04};
 	for(i=0;i<8;i++)
 	{
 		slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
@@ -631,15 +628,15 @@ MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
 
 DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
 {
-	UINT8 *main = memregion("ipl")->base();
-	UINT8 *wram = memregion("wram")->base();
+	uint8_t *main = memregion("ipl")->base();
+	uint8_t *wram = memregion("wram")->base();
 
 	membank("bankr0")->configure_entry(1, &wram[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x0000]);
 	membank("bankw0")->configure_entry(0, &wram[0x0000]);
 }
 
-static MACHINE_CONFIG_START( fp1100, fp1100_state )
+static MACHINE_CONFIG_START( fp1100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(fp1100_map)
@@ -648,7 +645,11 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 
 	MCFG_CPU_ADD( "sub", UPD7801, MAIN_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )
-	MCFG_CPU_IO_MAP( fp1100_slave_io )
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fp1100_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(fp1100_state, portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(fp1100_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fp1100_state, portc_w))
 	MCFG_UPD7810_TXD(WRITELINE(fp1100_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(fp1100_state, fp1100)
@@ -700,5 +701,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS            INIT    COMPANY    FULLNAME       FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT      COMPANY    FULLNAME   FLAGS */
 COMP( 1983, fp1100,  0,      0,       fp1100,     fp1100, fp1100_state,  fp1100,   "Casio",   "FP-1100", MACHINE_NOT_WORKING)

@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MICRODRV_H
+#define MAME_MACHINE_MICRODRV_H
 
-#ifndef __MICRODRV__
-#define __MICRODRV__
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -43,10 +43,10 @@ class microdrive_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdrive_image_device();
 
-	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
+	template <class Object> static devcb_base &set_comms_out_wr_callback(device_t &device, Object &&cb) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -72,9 +72,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( data2_w );
 	DECLARE_READ_LINE_MEMBER ( data1_r );
 	DECLARE_READ_LINE_MEMBER ( data2_r );
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
@@ -86,8 +86,8 @@ private:
 	int m_erase;
 	int m_read_write;
 
-	std::unique_ptr<UINT8[]> m_left;
-	std::unique_ptr<UINT8[]> m_right;
+	std::unique_ptr<uint8_t[]> m_left;
+	std::unique_ptr<uint8_t[]> m_right;
 
 	int m_bit_offset;
 	int m_byte_offset;
@@ -97,8 +97,6 @@ private:
 
 
 // device type definition
-extern const device_type MICRODRIVE;
+DECLARE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MICRODRV_H

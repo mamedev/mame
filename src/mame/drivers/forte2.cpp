@@ -40,6 +40,8 @@ found/dumped yet. */
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class forte2_state : public driver_device
@@ -52,7 +54,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	UINT8 m_input_mask;
+	uint8_t m_input_mask;
 
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
@@ -115,7 +117,7 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo, forte2_state )
+static MACHINE_CONFIG_START( pesadelo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -139,7 +141,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 {
-	UINT8 *mem = memregion("maincpu")->base();
+	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
 
 	// data swap
@@ -149,7 +151,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	dynamic_buffer buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{

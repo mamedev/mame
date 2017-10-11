@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -38,7 +38,7 @@ public:
 	{
 		m_bw = _width/64;
 		m_bh = _height/numBlocks;
-		memset(m_mem, 0xff, sizeof(m_mem) );
+		bx::memSet(m_mem, 0xff, sizeof(m_mem) );
 	}
 
 	bool find(uint16_t _width, uint16_t _height, Pack2D& _pack)

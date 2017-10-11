@@ -36,7 +36,7 @@
 #define STM_0       20
 #define STM_L       1
 
-static int fill_wave_1(INT16 *buffer, int offs)
+static int fill_wave_1(int16_t *buffer, int offs)
 {
 	buffer[offs++] = HI;
 	buffer[offs++] = HI;
@@ -45,14 +45,14 @@ static int fill_wave_1(INT16 *buffer, int offs)
 	return LONG_PULSE;
 }
 
-static int fill_wave_0(INT16 *buffer, int offs)
+static int fill_wave_0(int16_t *buffer, int offs)
 {
 	buffer[offs++] = HI;
 	buffer[offs++] = LO;
 	return SHORT_PULSE;
 }
 
-static int fill_wave_b(INT16 *buffer, int offs, int byte)
+static int fill_wave_b(int16_t *buffer, int offs, int byte)
 {
 	int i, count = 0;
 
@@ -69,10 +69,10 @@ static int fill_wave_b(INT16 *buffer, int offs, int byte)
 	return count;
 }
 
-static int fill_wave(INT16 *buffer, int length, UINT8 *code)
+static int fill_wave(int16_t *buffer, int length, uint8_t *code)
 {
-	static INT16 *beg;
-	static UINT16 csum = 0;
+	static int16_t *beg;
+	static uint16_t csum = 0;
 	static int header = 1, bytecount = 0;
 	int count = 0;
 
@@ -123,7 +123,7 @@ static int fill_wave(INT16 *buffer, int length, UINT8 *code)
 	if( code == CODE_TRAILER )
 	{
 		int i, file_length;
-		INT16 *end = buffer;
+		int16_t *end = buffer;
 
 		/* is there insufficient space for the CHKF? */
 		if( count + 2 * BYTE_SAMPLES > length )
@@ -145,12 +145,12 @@ static int fill_wave(INT16 *buffer, int length, UINT8 *code)
 		for (i = 0; i < 256; i++)
 			count += fill_wave_0(buffer, count);
 
-		file_length = (int)(end - beg) / sizeof(INT16);
+		file_length = (int)(end - beg) / sizeof(int16_t);
 		/* is there insufficient space for the FILEC ? */
 		if( count + file_length > length )
 			return -1;
 		LOG(1,"mz700_fill_wave",("FILEC %d samples\n", file_length));
-		memcpy(buffer + count, beg, file_length * sizeof(INT16));
+		memcpy(buffer + count, beg, file_length * sizeof(int16_t));
 		count += file_length;
 
 		/* is there insufficient space for the CHKF ? */
@@ -177,7 +177,7 @@ static int fill_wave(INT16 *buffer, int length, UINT8 *code)
 	if( header == 1 && bytecount == 128 )
 	{
 		int i, hdr_length;
-		INT16 *end = buffer;
+		int16_t *end = buffer;
 
 		/* is there insufficient space for the CHKH ? */
 		if( count + 2 * BYTE_SAMPLES > length )
@@ -199,12 +199,12 @@ static int fill_wave(INT16 *buffer, int length, UINT8 *code)
 		for (i = 0; i < 256; i++)
 			count += fill_wave_0(buffer, count);
 
-		hdr_length = (int)(end - beg) / sizeof(INT16);
+		hdr_length = (int)(end - beg) / sizeof(int16_t);
 		/* is there insufficient space for the HDRC ? */
 		if( count + hdr_length > length )
 			return -1;
 		LOG(1,"mz700_fill_wave",("HDRC %d samples\n", hdr_length));
-		memcpy(buffer + count, beg, hdr_length * sizeof(INT16));
+		memcpy(buffer + count, beg, hdr_length * sizeof(int16_t));
 		count += hdr_length;
 
 		/* is there insufficient space for CHKH ? */

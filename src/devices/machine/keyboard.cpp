@@ -24,12 +24,13 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/keyboard.ipp"
 
 
 
 namespace {
-UINT8 const TRANSLATION_TABLE[][2][4][16] = {
+u8 const TRANSLATION_TABLE[][2][4][16] = {
 	{
 		{   // ANSI
 			{ '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=',   0x08U, 0x7fU, 0x1bU },
@@ -233,7 +234,7 @@ INPUT_PORTS_END
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-device_type const GENERIC_KEYBOARD = &device_creator<generic_keyboard_device>;
+DEFINE_DEVICE_TYPE(GENERIC_KEYBOARD, generic_keyboard_device, "generic_keyboard", "Generic Keyboard")
 
 
 
@@ -244,24 +245,21 @@ device_type const GENERIC_KEYBOARD = &device_creator<generic_keyboard_device>;
 generic_keyboard_device::generic_keyboard_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "GENKBD_ROW0", "GENKBD_ROW1", "GENKBD_ROW2", "GENKBD_ROW3")
 	, m_config(*this, "GENKBD_CFG")
 	, m_modifiers(*this, "GENKBD_MOD")
 	, m_last_modifiers(0U)
-	, m_keyboard_cb(*this)
+	, m_keyboard_cb()
 {
 }
 
 
-generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
-	: generic_keyboard_device(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock, "generic_keyboard", __FILE__)
+generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: generic_keyboard_device(mconfig, GENERIC_KEYBOARD, tag, owner, clock)
 {
 }
 
@@ -274,7 +272,7 @@ ioport_constructor generic_keyboard_device::device_input_ports() const
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve_safe();
+	m_keyboard_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_last_modifiers));
 }
@@ -290,46 +288,41 @@ void generic_keyboard_device::device_reset()
 }
 
 
-void generic_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-}
-
-
-void generic_keyboard_device::key_make(UINT8 row, UINT8 column)
+void generic_keyboard_device::key_make(u8 row, u8 column)
 {
 	send_translated((row << 4) | column);
 	typematic_start(row, column, typematic_delay(), typematic_period());
 }
 
 
-void generic_keyboard_device::key_repeat(UINT8 row, UINT8 column)
+void generic_keyboard_device::key_repeat(u8 row, u8 column)
 {
 	send_translated((row << 4) | column);
 }
 
 
-void generic_keyboard_device::send_key(UINT8 code)
+void generic_keyboard_device::send_key(u8 code)
 {
-	m_keyboard_cb(offs_t(0), code);
+	assert(!m_keyboard_cb.isnull());
+	m_keyboard_cb(code);
 }
 
 
-bool generic_keyboard_device::translate(UINT8 code, UINT8 &translated) const
+bool generic_keyboard_device::translate(u8 code, u8 &translated) const
 {
 	unsigned const row((code >> 4) & 0x03U);
 	unsigned const col((code >> 0) & 0x0fU);
 
 	unsigned const layout(m_config->read() & 0x0001U);
 
-	UINT16 const modifiers(m_modifiers->read());
+	u16 const modifiers(m_modifiers->read());
 	bool const shift(bool(modifiers & 0x02U) != (bool(modifiers & 0x04U) && CAPS_TABLE[row][col]));
 	bool const ctrl(modifiers & 0x01U);
 	bool const meta(modifiers & 0x08U);
 
 	unsigned const map(ctrl ? 2U : shift ? 1U : 0U);
-	UINT8 const result(TRANSLATION_TABLE[map][layout][row][col]);
-	if (result == UINT8(~0U))
+	u8 const result(TRANSLATION_TABLE[map][layout][row][col]);
+	if (result == u8(~0U))
 	{
 		return false;
 	}
@@ -341,9 +334,9 @@ bool generic_keyboard_device::translate(UINT8 code, UINT8 &translated) const
 }
 
 
-void generic_keyboard_device::will_scan_row(UINT8 row)
+void generic_keyboard_device::will_scan_row(u8 row)
 {
-	UINT16 const modifiers(m_modifiers->read());
+	u16 const modifiers(m_modifiers->read());
 	if (modifiers != m_last_modifiers)
 		typematic_restart(typematic_delay(), typematic_period());
 
@@ -351,9 +344,9 @@ void generic_keyboard_device::will_scan_row(UINT8 row)
 }
 
 
-void generic_keyboard_device::send_translated(UINT8 code)
+void generic_keyboard_device::send_translated(u8 code)
 {
-	UINT8 translated;
+	u8 translated;
 	if (translate(code, translated))
 		send_key(translated);
 }

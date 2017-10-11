@@ -6,18 +6,19 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "scsihd.h"
 
 // device type definition
-const device_type SCSIHD = &device_creator<scsihd_device>;
+DEFINE_DEVICE_TYPE(SCSIHD, scsihd_device, "scsihd", "SCSI HD")
 
-scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, SCSIHD, "SCSI HD", tag, owner, clock, "scsihd", __FILE__)
+scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: scsihd_device(mconfig, SCSIHD, tag, owner, clock)
 {
 }
 
-scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	scsihle_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -28,12 +29,7 @@ void scsihd_device::device_start()
 	scsihle_device::device_start();
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
+MACHINE_CONFIG_MEMBER(scsihd_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
-
-machine_config_constructor scsihd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_harddisk);
-}

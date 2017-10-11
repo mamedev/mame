@@ -31,21 +31,21 @@
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 {
-	UINT16 tile = m_videoram[tile_index];
+	uint16_t tile = m_videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,tile&0xfff,tile>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf1_tile_info)
 {
-	UINT16 tile = m_pf1_data[tile_index];
+	uint16_t tile = m_pf1_data[tile_index];
 
 	SET_TILE_INFO_MEMBER(3,tile&0xfff,tile>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
 {
-	UINT16 tile = m_pf2_data[tile_index];
+	uint16_t tile = m_pf2_data[tile_index];
 
 	SET_TILE_INFO_MEMBER(4,tile&0xfff,tile>>12,0);
 }
@@ -111,7 +111,7 @@ VIDEO_START_MEMBER(bbusters_state,mechatt)
 		else if (dy&0x40) code+=32;             \
 		else if (dx&0x40) code+=16
 
-inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block)
+inline const uint8_t *bbusters_state::get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block)
 {
 	int code=0;
 
@@ -149,21 +149,21 @@ inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 spri
 	return gfx->get_data((sprite+code) % gfx->elements()) + ((dy%16) * gfx->rowbytes());
 }
 
-void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(bank);
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	UINT32 xinc=(m_scale_line_count * 0x10000 ) / size;
-	UINT8 pixel;
+	uint32_t xinc=(m_scale_line_count * 0x10000 ) / size;
+	uint8_t pixel;
 	int x_index;
 	int dy=y;
 	int sx, ex = m_scale_line_count;
 
 	while (m_scale_line_count) {
 		if (dy>=16 && dy<240) {
-			UINT16 *destline = &dest.pix16(dy);
-			UINT8 srcline=*m_scale_table_ptr;
-			const UINT8 *srcptr=nullptr;
+			uint16_t *destline = &dest.pix16(dy);
+			uint8_t srcline=*m_scale_table_ptr;
+			const uint8_t *srcptr=nullptr;
 
 			if (!flipy)
 				srcline=size-srcline-1;
@@ -194,14 +194,14 @@ void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flip
 	}
 }
 
-void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask)
+void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask)
 {
-	const UINT8 *scale_table=memregion("user1")->base();
+	const uint8_t *scale_table=memregion("user1")->base();
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {
 		int x,sprite,colour,fx,fy,scale;
-		INT16 y;
+		int16_t y;
 		int block;
 
 		sprite=source[offs+1];
@@ -271,7 +271,7 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, in
 
 /******************************************************************************/
 
-UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
 	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
@@ -287,7 +287,7 @@ UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
 	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);

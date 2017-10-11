@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Sony LDP-1450 laserdisc emulation.
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LDP1450_H
+#define MAME_MACHINE_LDP1450_H
 
-#ifndef __LDP1450DEV_H__
-#define __LDP1450DEV_H__
+#pragma once
 
 #include "laserdsc.h"
 
@@ -25,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type SONY_LDP1450;
+DECLARE_DEVICE_TYPE(SONY_LDP1450, sony_ldp1450_device)
 
 // ======================> sony_ldp1450_device
 
@@ -33,11 +34,11 @@ class sony_ldp1450_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations TODO: both actually protected
-	void command_w(UINT8 data);
-	UINT8 status_r() const { return m_status; }
+	void command_w(uint8_t data);
+	uint8_t status_r() const { return m_status; }
 
 protected:
 	// device-level overrides
@@ -47,14 +48,14 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
-	UINT8 m_ld_frame_index;
-	UINT8 m_ld_frame[5];
-	UINT8 m_ld_command_current_byte;
-	UINT8 m_ld_command_to_send[5];
-	UINT8 m_ld_command_total_bytes;
+	uint8_t m_ld_frame_index;
+	uint8_t m_ld_frame[5];
+	uint8_t m_ld_command_current_byte;
+	uint8_t m_ld_command_to_send[5];
+	uint8_t m_ld_command_total_bytes;
 
 	enum LD_INPUT_STATE
 	{
@@ -77,28 +78,17 @@ protected:
 	};
 
 private:
-	UINT8 m_command;
-	UINT8 m_status;
+	uint8_t m_command;
+	uint8_t m_status;
 	ldp1450_player_state m_player_state;
 	bool m_audio_enable[2];
 	void set_new_player_state(ldp1450_player_state which);
-	void set_new_player_bcd(UINT8 data);
-	UINT32 bcd_to_raw();
+	void set_new_player_bcd(uint8_t data);
+	uint32_t bcd_to_raw();
 	void exec_enter_cmd();
-	UINT8 m_internal_bcd[0x10];
-	UINT8 m_index_state;
+	uint8_t m_internal_bcd[0x10];
+	uint8_t m_index_state;
 
 };
 
-
-
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_MACHINE_LDP1450_H

@@ -78,7 +78,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
-	UINT8 *gfx = memregion("gfx5")->base();
+	uint8_t *gfx = memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(BG_GFX,
 			code,
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
-	UINT16 code = m_fgram[tile_index];
+	uint16_t code = m_fgram[tile_index];
 	SET_TILE_INFO_MEMBER(FG_GFX,
 			code,
 			code >> 12,
@@ -117,7 +117,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
-	UINT16 code = m_txtram[tile_index];
+	uint16_t code = m_txtram[tile_index];
 	SET_TILE_INFO_MEMBER(TXT_GFX,
 			code,
 			code >> 12,
@@ -204,7 +204,7 @@ Offset:         Values:         Format:
 
 void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < (m_spriteram.bytes() >> 1); offs += 4)
@@ -237,7 +237,7 @@ void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprec
 }
 
 
-UINT32 ginganin_state::screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ginganin_state::screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl1 = m_layers_ctrl;
 

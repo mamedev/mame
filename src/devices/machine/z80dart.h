@@ -142,49 +142,17 @@
 
 ***************************************************************************/
 
-#ifndef __Z80DART_H__
-#define __Z80DART_H__
+#ifndef MAME_MACHINE_Z80DART_H
+#define MAME_MACHINE_Z80DART_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/z80/z80daisy.h"
 
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
-
-#define MCFG_Z80DART_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80DART, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO0_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO0, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO1_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO1, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO2_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO2, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO3_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO3, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_Z80SIO4_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO4, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, I8274, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
-	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
-
 
 #define MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80dart_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
@@ -246,29 +214,17 @@ class z80dart_device;
 class z80dart_channel : public device_t,
 						public device_serial_interface
 {
-	friend class z80dart_device;
-
+	friend class z80dart_device; // FIXME: still accesses m_rr and m_wr directly in a couple of places
 public:
-	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	enum
+	{
+		INT_TRANSMIT = 0,
+		INT_EXTERNAL,
+		INT_RECEIVE,
+		INT_SPECIAL
+	};
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_serial_interface overrides
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
-	virtual void rcv_complete() override;
-
-	UINT8 control_read();
-	void control_write(UINT8 data);
-
-	UINT8 data_read();
-	void data_write(UINT8 data);
-
-	void receive_data(UINT8 data);
+	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -278,21 +234,43 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
 
+	uint8_t control_read();
+	void control_write(uint8_t data);
+
+	uint8_t data_read();
+	void data_write(uint8_t data);
+
+	void set_rxc(int rxc) { m_rxc = rxc; }
+	void set_txc(int txc) { m_txc = txc; }
+
+	void clr_interrupt_pending() { m_rr[0] &= ~RR0_INTERRUPT_PENDING; }
+	void set_interrupt_pending() { m_rr[0] |= RR0_INTERRUPT_PENDING; }
+
+	uint8_t get_vector() const { return m_rr[2]; }
+	void set_vector(uint8_t vector) { m_rr[2] = vector; }
+
+	bool get_status_vector() const { return m_wr[1] & WR1_STATUS_VECTOR; }
+	bool get_priority() const { return m_wr[2] & WR2_PRIORITY; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_serial_interface overrides
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
+
+	void receive_data(uint8_t data);
+
 	int m_rxc;
 	int m_txc;
 
 	// register state
-	UINT8 m_rr[3];              // read register
-	UINT8 m_wr[6];              // write register
-
-protected:
-	enum
-	{
-		INT_TRANSMIT = 0,
-		INT_EXTERNAL,
-		INT_RECEIVE,
-		INT_SPECIAL
-	};
+	uint8_t m_rr[3];              // read register
+	uint8_t m_wr[6];              // write register
 
 	enum
 	{
@@ -428,15 +406,14 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	UINT8 m_rx_data_fifo[3];    // receive data FIFO
-	UINT8 m_rx_error_fifo[3];   // receive error FIFO
-	UINT8 m_rx_error;           // current receive error
-	int m_rx_fifo;              // receive FIFO pointer
+	util::fifo<uint8_t, 3> m_rx_data_fifo;
+	util::fifo<uint8_t, 3> m_rx_error_fifo;
 
+	uint8_t m_rx_error;           // current receive error
 	int m_rx_clock;             // receive clock pulse count
 	int m_rx_first;             // first character received
 	int m_rx_break;             // receive break condition
-	UINT8 m_rx_rr0_latch;       // read register 0 latched
+	uint8_t m_rx_rr0_latch;       // read register 0 latched
 
 	int m_rxd;
 	int m_ri;                   // ring indicator latch
@@ -444,14 +421,14 @@ protected:
 	int m_dcd;                  // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;            // transmit data register
+	uint8_t m_tx_data;            // transmit data register
 	int m_tx_clock;             // transmit clock pulse count
 
 	int m_dtr;                  // data terminal ready
 	int m_rts;                  // request to send
 
 	// synchronous state
-	UINT16 m_sync;              // sync character
+	uint16_t m_sync;              // sync character
 
 	int m_index;
 	z80dart_device *m_uart;
@@ -467,24 +444,23 @@ class z80dart_device :  public device_t,
 
 public:
 	// construction/destruction
-	z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txda_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_dtra_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rtsa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rtsa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_wrdya_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_wrdya_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_synca_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_synca_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dtrb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_dtrb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rtsb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rtsb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_wrdyb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_wrdyb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_syncb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_txda_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dtra_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rtsa_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wrdya_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_synca_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dtrb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rtsb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wrdyb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_syncb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdrqa_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_txdrqa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdrqb_callback(device_t &device, Object &&cb) { return downcast<z80dart_device &>(device).m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
@@ -530,10 +506,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
 
 protected:
+	z80dart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
@@ -593,17 +571,17 @@ protected:
 
 	int m_int_state[8];     // interrupt state
 
-	int m_variant;
+	int const m_variant;
 };
 
 
 // ======================> z80sio0_device
 
-class z80sio0_device :  public z80dart_device
+class z80sio0_device : public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -613,7 +591,7 @@ class z80sio1_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -623,7 +601,7 @@ class z80sio2_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -633,7 +611,7 @@ class z80sio3_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -643,7 +621,7 @@ class z80sio4_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -653,7 +631,7 @@ class i8274_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( inta_r ) { return m1_r(); };
 };
@@ -665,20 +643,19 @@ class upd7201_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
-extern const device_type Z80DART_CHANNEL;
-extern const device_type Z80DART;
-extern const device_type Z80SIO0;
-extern const device_type Z80SIO1;
-extern const device_type Z80SIO2;
-extern const device_type Z80SIO3;
-extern const device_type Z80SIO4;
-extern const device_type I8274;
-extern const device_type UPD7201;
+DECLARE_DEVICE_TYPE(Z80DART_CHANNEL, z80dart_channel)
+DECLARE_DEVICE_TYPE(Z80DART,         z80dart_device)
+DECLARE_DEVICE_TYPE(Z80SIO0,         z80sio0_device)
+DECLARE_DEVICE_TYPE(Z80SIO1,         z80sio1_device)
+DECLARE_DEVICE_TYPE(Z80SIO2,         z80sio2_device)
+DECLARE_DEVICE_TYPE(Z80SIO3,         z80sio3_device)
+DECLARE_DEVICE_TYPE(Z80SIO4,         z80sio4_device)
+DECLARE_DEVICE_TYPE(I8274,           i8274_device)
+DECLARE_DEVICE_TYPE(UPD7201,         upd7201_device)
 
-
-#endif
+#endif // MAME_MACHINE_Z80DART_H

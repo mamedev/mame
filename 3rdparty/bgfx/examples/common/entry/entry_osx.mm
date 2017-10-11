@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -9,7 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
 #include <bx/uint32_t.h>
 #include <bx/thread.h>
@@ -58,7 +58,7 @@ namespace entry
 		bgfx::setPlatformData(pd);
 	}
 
-	static WindowHandle s_defaultWindow = { 0 };	// TODO: Add support for more windows
+	static WindowHandle s_defaultWindow = { 0 };
 	static uint8_t s_translateKey[256];
 
 	struct MainThreadEntry
@@ -283,7 +283,6 @@ namespace entry
 
 					case NSLeftMouseDown:
 					{
-						// TODO: remove!
 						// Command + Left Mouse Button acts as middle! This just a temporary solution!
 						// This is because the average OSX user doesn't have middle mouse click.
 						MouseButton::Enum mb = ([event modifierFlags] & NSCommandKeyMask) ? MouseButton::Middle : MouseButton::Left;
@@ -486,9 +485,12 @@ namespace entry
 
 			while (!(m_exit = [dg applicationHasTerminated]) )
 			{
-				if (bgfx::RenderFrame::Exiting == bgfx::renderFrame() )
+				@autoreleasepool
 				{
-					break;
+					if (bgfx::RenderFrame::Exiting == bgfx::renderFrame() )
+					{
+						break;
+					}
 				}
 
 				while (dispatchEvent(peekEvent() ) )

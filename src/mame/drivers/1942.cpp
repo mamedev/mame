@@ -62,21 +62,26 @@ correctly.
 ***************************************************************************/
 
 /* 12mhz OSC */
-#define MAIN_CPU_CLOCK      (XTAL_12MHz/3)
-#define SOUND_CPU_CLOCK     (XTAL_12MHz/4)
-#define AUDIO_CLOCK     (XTAL_12MHz/8)
+#define MASTER_CLOCK      (XTAL_12MHz)
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK/3)
+#define SOUND_CPU_CLOCK     (MASTER_CLOCK/4)
+#define AUDIO_CLOCK     (MASTER_CLOCK/8)
 /* 20mhz OSC - both Z80s are 4 MHz */
-#define MAIN_CPU_CLOCK_1942P      (XTAL_20MHz/5)
-#define SOUND_CPU_CLOCK_1942P     (XTAL_20MHz/5)
-#define AUDIO_CLOCK_1942P     (XTAL_20MHz/16)
+#define MASTER_CLOCK_1942P     (XTAL_20MHz)
+#define MAIN_CPU_CLOCK_1942P      (MASTER_CLOCK_1942P/5)
+#define SOUND_CPU_CLOCK_1942P     (MASTER_CLOCK_1942P/5)
+#define AUDIO_CLOCK_1942P     (MASTER_CLOCK_1942P/16)
 
 #include "emu.h"
+#include "includes/1942.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
+#include "screen.h"
+#include "speaker.h"
 
-#include "includes/1942.h"
+#include "netlist/devices/net_lib.h"
 
 #define NLFILT(RA, R1, C1, R2) \
 	NET_C(RA.1, V5)             \
@@ -210,12 +215,6 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -234,7 +233,7 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_WRITE(c1942p_palette_w)  AM_SHARE("protopal")
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(c1942p_soundlatch_w)
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(c1942p_f600_w)
 
 	AM_RANGE(0xf700, 0xf700) AM_READ_PORT("DSWA")
@@ -555,7 +554,7 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( 1942, _1942_state )
+static MACHINE_CONFIG_START( 1942 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
@@ -623,7 +622,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 1942p, _1942_state )
+static MACHINE_CONFIG_START( 1942p )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
@@ -657,6 +656,7 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK_1942P) /* 1.25 MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -948,7 +948,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_1942_state,1942)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 

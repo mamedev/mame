@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef NEXTMO_H
-#define NEXTMO_H
+#ifndef MAME_MACHINE_NEXTMO_H
+#define MAME_MACHINE_NEXTMO_H
+
+#pragma once
 
 #define MCFG_NEXTMO_IRQ_CALLBACK(_write) \
 	devcb = &nextmo_device::set_irq_wr_callback(*device, DEVCB_##_write);
@@ -12,10 +14,10 @@
 class nextmo_device : public device_t
 {
 public:
-	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<nextmo_device &>(device).irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<nextmo_device &>(device).drq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_ADDRESS_MAP(map, 32);
 
@@ -38,16 +40,16 @@ public:
 	DECLARE_READ8_MEMBER(r10_r);
 	DECLARE_WRITE8_MEMBER(r10_w);
 
-	UINT8 dma_r();
-	void dma_w(UINT8 data);
+	uint8_t dma_r();
+	void dma_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	UINT8 sector[0x510];
-	UINT8 r4, r5, r6, r7;
+	uint8_t sector[0x510];
+	uint8_t r4, r5, r6, r7;
 	devcb_write_line irq_cb, drq_cb;
 	int sector_pos;
 
@@ -58,4 +60,4 @@ private:
 
 extern const device_type NEXTMO;
 
-#endif
+#endif // MAME_MACHINE_NEXTMO_H

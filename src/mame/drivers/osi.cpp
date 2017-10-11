@@ -216,8 +216,13 @@ PRINT FRE(0)
 */
 
 
+#include "emu.h"
 #include "includes/osi.h"
+
 #include "machine/clock.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Sound */
 
@@ -269,24 +274,11 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	if (m_io_reset->read())
 		m_maincpu->reset();
 
-	UINT8 data = 0xff;
+	u8 i, data = 0xff;
 
-	if (!BIT(m_keylatch, 0))
-		data &= m_io_row0->read();
-	if (!BIT(m_keylatch, 1))
-		data &= m_io_row1->read();
-	if (!BIT(m_keylatch, 2))
-		data &= m_io_row2->read();
-	if (!BIT(m_keylatch, 3))
-		data &= m_io_row3->read();
-	if (!BIT(m_keylatch, 4))
-		data &= m_io_row4->read();
-	if (!BIT(m_keylatch, 5))
-		data &= m_io_row5->read();
-	if (!BIT(m_keylatch, 6))
-		data &= m_io_row6->read();
-	if (!BIT(m_keylatch, 7))
-		data &= m_io_row7->read();
+	for (i = 0; i < 8; i++)
+		if (!BIT(m_keylatch, i))
+			data &= m_io_keyboard[i]->read();
 
 	return data;
 }
@@ -690,7 +682,7 @@ void c1pmf_state::machine_start()
 
 	// drive select logic missing
 	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(sb2m600_state::floppy_index_callback), this));
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&sb2m600_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -719,7 +711,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( osi600, sb2m600_state )
+static MACHINE_CONFIG_START( osi600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(osi600_mem)
@@ -750,7 +742,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( uk101, uk101_state )
+static MACHINE_CONFIG_START( uk101 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(uk101_mem)
@@ -775,7 +767,7 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c1p, c1p_state )
+static MACHINE_CONFIG_START( c1p )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(c1p_mem)
@@ -812,7 +804,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_RAM_EXTRA_OPTIONS("20K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
+static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
 
@@ -889,7 +881,7 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(300);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");
+		assert_always(false, "Unknown id in sb2m600_state::device_timer");
 	}
 }
 
@@ -901,9 +893,9 @@ DRIVER_INIT_MEMBER(c1p_state,c1p)
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT      INIT   COMPANY            FULLNAME
-COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, driver_device,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P Series 2", MACHINE_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1p_state,    c1p, "Ohio Scientific", "Challenger 1P MF Series 2", MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101, driver_device,     0,   "Compukit",        "UK101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY            FULLNAME                            FLAGS
+COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,     c1p,  "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1pmf_state,   c1p,  "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101,  uk101_state,   0,    "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

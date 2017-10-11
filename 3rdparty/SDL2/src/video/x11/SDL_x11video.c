@@ -39,6 +39,10 @@
 #include "SDL_x11opengles.h"
 #endif
 
+#ifdef X_HAVE_UTF8_STRING
+#include <locale.h>
+#endif
+
 /* Initialization/Query functions */
 static int X11_VideoInit(_THIS);
 static void X11_VideoQuit(_THIS);
@@ -175,6 +179,8 @@ X11_CreateDevice(int devindex)
     }
     device->driverdata = data;
 
+    data->global_mouse_changed = SDL_TRUE;
+
     /* FIXME: Do we need this?
        if ( (SDL_strncmp(X11_XDisplayName(display), ":", 1) == 0) ||
        (SDL_strncmp(X11_XDisplayName(display), "unix:", 5) == 0) ) {
@@ -216,6 +222,7 @@ X11_CreateDevice(int devindex)
     device->VideoQuit = X11_VideoQuit;
     device->GetDisplayModes = X11_GetDisplayModes;
     device->GetDisplayBounds = X11_GetDisplayBounds;
+    device->GetDisplayUsableBounds = X11_GetDisplayUsableBounds;
     device->GetDisplayDPI = X11_GetDisplayDPI;
     device->SetDisplayMode = X11_SetDisplayMode;
     device->SuspendScreenSaver = X11_SuspendScreenSaver;
@@ -229,6 +236,10 @@ X11_CreateDevice(int devindex)
     device->SetWindowSize = X11_SetWindowSize;
     device->SetWindowMinimumSize = X11_SetWindowMinimumSize;
     device->SetWindowMaximumSize = X11_SetWindowMaximumSize;
+    device->GetWindowBordersSize = X11_GetWindowBordersSize;
+    device->SetWindowOpacity = X11_SetWindowOpacity;
+    device->SetWindowModalFor = X11_SetWindowModalFor;
+    device->SetWindowInputFocus = X11_SetWindowInputFocus;
     device->ShowWindow = X11_ShowWindow;
     device->HideWindow = X11_HideWindow;
     device->RaiseWindow = X11_RaiseWindow;
@@ -236,6 +247,7 @@ X11_CreateDevice(int devindex)
     device->MinimizeWindow = X11_MinimizeWindow;
     device->RestoreWindow = X11_RestoreWindow;
     device->SetWindowBordered = X11_SetWindowBordered;
+    device->SetWindowResizable = X11_SetWindowResizable;
     device->SetWindowFullscreen = X11_SetWindowFullscreen;
     device->SetWindowGammaRamp = X11_SetWindowGammaRamp;
     device->SetWindowGrab = X11_SetWindowGrab;
@@ -278,7 +290,7 @@ X11_CreateDevice(int devindex)
     device->StartTextInput = X11_StartTextInput;
     device->StopTextInput = X11_StopTextInput;
     device->SetTextInputRect = X11_SetTextInputRect;
-    
+
     device->free = X11_DeleteDevice;
 
     return device;
@@ -373,11 +385,65 @@ X11_VideoInit(_THIS)
     /* Get the process PID to be associated to the window */
     data->pid = getpid();
 
+    /* I have no idea how random this actually is, or has to be. */
+    data->window_group = (XID) (((size_t) data->pid) ^ ((size_t) _this));
+
     /* Open a connection to the X input manager */
 #ifdef X_HAVE_UTF8_STRING
     if (SDL_X11_HAVE_UTF8) {
-        data->im =
-            X11_XOpenIM(data->display, NULL, data->classname, data->classname);
+        /* Set the locale, and call XSetLocaleModifiers before XOpenIM so that 
+           Compose keys will work correctly. */
+        char *prev_locale = setlocale(LC_ALL, NULL);
+        char *prev_xmods  = X11_XSetLocaleModifiers(NULL);
+        const char *new_xmods = "";
+#if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX_FRONTEND_H)
+        const char *env_xmods = SDL_getenv("XMODIFIERS");
+#endif
+        SDL_bool has_dbus_ime_support = SDL_FALSE;
+
+        if (prev_locale) {
+            prev_locale = SDL_strdup(prev_locale);
+        }
+
+        if (prev_xmods) {
+            prev_xmods = SDL_strdup(prev_xmods);
+        }
+
+        /* IBus resends some key events that were filtered by XFilterEvents
+           when it is used via XIM which causes issues. Prevent this by forcing
+           @im=none if XMODIFIERS contains @im=ibus. IBus can still be used via 
+           the DBus implementation, which also has support for pre-editing. */
+#ifdef HAVE_IBUS_IBUS_H
+        if (env_xmods && SDL_strstr(env_xmods, "@im=ibus") != NULL) {
+            has_dbus_ime_support = SDL_TRUE;
+        }
+#endif
+#ifdef HAVE_FCITX_FRONTEND_H
+        if (env_xmods && SDL_strstr(env_xmods, "@im=fcitx") != NULL) {
+            has_dbus_ime_support = SDL_TRUE;
+        }
+#endif
+        if (has_dbus_ime_support) {
+            new_xmods = "@im=none";
+        }
+
+        setlocale(LC_ALL, "");
+        X11_XSetLocaleModifiers(new_xmods);
+
+        data->im = X11_XOpenIM(data->display, NULL, data->classname, data->classname);
+
+        /* Reset the locale + X locale modifiers back to how they were,
+           locale first because the X locale modifiers depend on it. */
+        setlocale(LC_ALL, prev_locale);
+        X11_XSetLocaleModifiers(prev_xmods);
+
+        if (prev_locale) {
+            SDL_free(prev_locale);
+        }
+
+        if (prev_xmods) {
+            SDL_free(prev_xmods);
+        }
     }
 #endif
 
@@ -385,19 +451,26 @@ X11_VideoInit(_THIS)
 #define GET_ATOM(X) data->X = X11_XInternAtom(data->display, #X, False)
     GET_ATOM(WM_PROTOCOLS);
     GET_ATOM(WM_DELETE_WINDOW);
+    GET_ATOM(WM_TAKE_FOCUS);
     GET_ATOM(_NET_WM_STATE);
     GET_ATOM(_NET_WM_STATE_HIDDEN);
     GET_ATOM(_NET_WM_STATE_FOCUSED);
     GET_ATOM(_NET_WM_STATE_MAXIMIZED_VERT);
     GET_ATOM(_NET_WM_STATE_MAXIMIZED_HORZ);
     GET_ATOM(_NET_WM_STATE_FULLSCREEN);
+    GET_ATOM(_NET_WM_STATE_ABOVE);
+    GET_ATOM(_NET_WM_STATE_SKIP_TASKBAR);
+    GET_ATOM(_NET_WM_STATE_SKIP_PAGER);
     GET_ATOM(_NET_WM_ALLOWED_ACTIONS);
     GET_ATOM(_NET_WM_ACTION_FULLSCREEN);
     GET_ATOM(_NET_WM_NAME);
     GET_ATOM(_NET_WM_ICON_NAME);
     GET_ATOM(_NET_WM_ICON);
     GET_ATOM(_NET_WM_PING);
+    GET_ATOM(_NET_WM_WINDOW_OPACITY);
+    GET_ATOM(_NET_WM_USER_TIME);
     GET_ATOM(_NET_ACTIVE_WINDOW);
+    GET_ATOM(_NET_FRAME_EXTENTS);
     GET_ATOM(UTF8_STRING);
     GET_ATOM(PRIMARY);
     GET_ATOM(XdndEnter);

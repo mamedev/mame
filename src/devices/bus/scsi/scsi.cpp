@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
+#include "emu.h"
 #include "scsi.h"
 
-SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SCSI_PORT, "SCSI Port", tag, owner, clock, "scsi", __FILE__),
+scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SCSI_PORT, tag, owner, clock),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
 	m_cd_handler(*this),
@@ -60,7 +61,7 @@ SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *ta
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( scsi_port )
+MACHINE_CONFIG_MEMBER( scsi_port_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE1, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE2, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE3, SCSI_PORT_SLOT, 0 )
@@ -70,12 +71,7 @@ static MACHINE_CONFIG_FRAGMENT( scsi_port )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE7, SCSI_PORT_SLOT, 0 )
 MACHINE_CONFIG_END
 
-machine_config_constructor SCSI_PORT_DEVICE::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( scsi_port );
-}
-
-void SCSI_PORT_DEVICE::device_start()
+void scsi_port_device::device_start()
 {
 	const char *deviceName[] =
 	{
@@ -92,7 +88,7 @@ void SCSI_PORT_DEVICE::device_start()
 
 	for (int i = 0; i < 7; i++)
 	{
-		SCSI_PORT_SLOT_device *slot = subdevice<SCSI_PORT_SLOT_device>(deviceName[i]);
+		scsi_port_slot_device *slot = subdevice<scsi_port_slot_device>(deviceName[i]);
 		m_slot[i] = slot;
 
 		if (slot != nullptr)
@@ -137,7 +133,7 @@ void SCSI_PORT_DEVICE::device_start()
 	m_rst_handler(0);
 }
 
-void SCSI_PORT_DEVICE::update_bsy()
+void scsi_port_device::update_bsy()
 {
 	int bsy = m_bsy_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -159,7 +155,7 @@ void SCSI_PORT_DEVICE::update_bsy()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_sel()
+void scsi_port_device::update_sel()
 {
 	int sel = m_sel_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -181,7 +177,7 @@ void SCSI_PORT_DEVICE::update_sel()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_cd()
+void scsi_port_device::update_cd()
 {
 	int cd = m_cd_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -203,7 +199,7 @@ void SCSI_PORT_DEVICE::update_cd()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_io()
+void scsi_port_device::update_io()
 {
 	int io = m_io_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -225,7 +221,7 @@ void SCSI_PORT_DEVICE::update_io()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_msg()
+void scsi_port_device::update_msg()
 {
 	int msg = m_msg_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -247,7 +243,7 @@ void SCSI_PORT_DEVICE::update_msg()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_req()
+void scsi_port_device::update_req()
 {
 	int req = m_req_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -269,7 +265,7 @@ void SCSI_PORT_DEVICE::update_req()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_ack()
+void scsi_port_device::update_ack()
 {
 	int ack = m_ack_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -291,7 +287,7 @@ void SCSI_PORT_DEVICE::update_ack()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_atn()
+void scsi_port_device::update_atn()
 {
 	int atn = m_atn_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -313,7 +309,7 @@ void SCSI_PORT_DEVICE::update_atn()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_rst()
+void scsi_port_device::update_rst()
 {
 	int rst = m_rst_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -335,7 +331,7 @@ void SCSI_PORT_DEVICE::update_rst()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data0()
+void scsi_port_device::update_data0()
 {
 	int data0 = m_data0_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -357,7 +353,7 @@ void SCSI_PORT_DEVICE::update_data0()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data1()
+void scsi_port_device::update_data1()
 {
 	int data1 = m_data1_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -379,7 +375,7 @@ void SCSI_PORT_DEVICE::update_data1()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data2()
+void scsi_port_device::update_data2()
 {
 	int data2 = m_data2_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -401,7 +397,7 @@ void SCSI_PORT_DEVICE::update_data2()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data3()
+void scsi_port_device::update_data3()
 {
 	int data3 = m_data3_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -423,7 +419,7 @@ void SCSI_PORT_DEVICE::update_data3()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data4()
+void scsi_port_device::update_data4()
 {
 	int data4 = m_data4_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -445,7 +441,7 @@ void SCSI_PORT_DEVICE::update_data4()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data5()
+void scsi_port_device::update_data5()
 {
 	int data5 = m_data5_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -467,7 +463,7 @@ void SCSI_PORT_DEVICE::update_data5()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data6()
+void scsi_port_device::update_data6()
 {
 	int data6 = m_data6_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -489,7 +485,7 @@ void SCSI_PORT_DEVICE::update_data6()
 	}
 }
 
-void SCSI_PORT_DEVICE::update_data7()
+void scsi_port_device::update_data7()
 {
 	int data7 = m_data7_in;
 	for (int i = 0; i < m_device_count; i++)
@@ -511,7 +507,7 @@ void SCSI_PORT_DEVICE::update_data7()
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_bsy )
+WRITE_LINE_MEMBER( scsi_port_device::write_bsy )
 {
 	if (m_bsy_in != state)
 	{
@@ -520,7 +516,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_bsy )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_sel )
+WRITE_LINE_MEMBER( scsi_port_device::write_sel )
 {
 	if (m_sel_in != state)
 	{
@@ -529,7 +525,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_cd )
+WRITE_LINE_MEMBER( scsi_port_device::write_cd )
 {
 	if (m_cd_in != state)
 	{
@@ -538,7 +534,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_cd )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_io )
+WRITE_LINE_MEMBER( scsi_port_device::write_io )
 {
 	if (m_io_in != state)
 	{
@@ -547,7 +543,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_io )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_msg )
+WRITE_LINE_MEMBER( scsi_port_device::write_msg )
 {
 	if (m_msg_in != state)
 	{
@@ -556,7 +552,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_msg )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_req )
+WRITE_LINE_MEMBER( scsi_port_device::write_req )
 {
 	if (m_req_in != state)
 	{
@@ -565,7 +561,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_req )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_ack )
+WRITE_LINE_MEMBER( scsi_port_device::write_ack )
 {
 	if (m_ack_in != state)
 	{
@@ -574,7 +570,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_ack )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_atn )
+WRITE_LINE_MEMBER( scsi_port_device::write_atn )
 {
 	if (m_atn_in != state)
 	{
@@ -583,7 +579,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_atn )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_rst )
+WRITE_LINE_MEMBER( scsi_port_device::write_rst )
 {
 	if (m_rst_in != state)
 	{
@@ -592,7 +588,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_rst )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data0 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data0 )
 {
 	if (m_data0_in != state)
 	{
@@ -601,7 +597,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data0 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data1 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data1 )
 {
 	if (m_data1_in != state)
 	{
@@ -610,7 +606,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data1 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data2 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data2 )
 {
 	if (m_data2_in != state)
 	{
@@ -619,7 +615,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data2 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data3 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data3 )
 {
 	if (m_data3_in != state)
 	{
@@ -628,7 +624,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data3 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data4 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data4 )
 {
 	if (m_data4_in != state)
 	{
@@ -637,7 +633,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data4 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data5 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data5 )
 {
 	if (m_data5_in != state)
 	{
@@ -646,7 +642,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data5 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data6 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data6 )
 {
 	if (m_data6_in != state)
 	{
@@ -655,7 +651,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data6 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
+WRITE_LINE_MEMBER( scsi_port_device::write_data7 )
 {
 	if (m_data7_in != state)
 	{
@@ -664,10 +660,10 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
 	}
 }
 
-const device_type SCSI_PORT = &device_creator<SCSI_PORT_DEVICE>;
+DEFINE_DEVICE_TYPE(SCSI_PORT, scsi_port_device, "scsi", "SCSI Port")
 
-SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SCSI_PORT_SLOT, "SCSI Connector", tag, owner, clock, "scsi_slot", __FILE__),
+scsi_port_slot_device::scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SCSI_PORT_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_dev(nullptr),
 	m_bsy(0),
@@ -687,24 +683,24 @@ SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, cons
 	m_data6(0),
 	m_data7(0)
 {
-	m_port = dynamic_cast<SCSI_PORT_DEVICE *>(device().owner());
+	m_port = dynamic_cast<scsi_port_device *>(device().owner());
 }
 
-void SCSI_PORT_SLOT_device::device_config_complete()
+void scsi_port_slot_device::device_config_complete()
 {
 	m_dev = dynamic_cast<scsi_port_interface *>(get_card_device());
 }
 
-void SCSI_PORT_SLOT_device::device_start()
+void scsi_port_slot_device::device_start()
 {
 }
 
-const device_type SCSI_PORT_SLOT = &device_creator<SCSI_PORT_SLOT_device>;
+DEFINE_DEVICE_TYPE(SCSI_PORT_SLOT, scsi_port_slot_device, "scsi_slot", "SCSI Connector")
 
 scsi_port_interface::scsi_port_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
-	m_slot = dynamic_cast<SCSI_PORT_SLOT_device *>(device.owner());
+	m_slot = dynamic_cast<scsi_port_slot_device *>(device.owner());
 }
 
 scsi_port_interface::~scsi_port_interface()

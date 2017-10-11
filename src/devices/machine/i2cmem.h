@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I2CMEM_H
+#define MAME_MACHINE_I2CMEM_H
 
-#ifndef __I2CMEM_H__
-#define __I2CMEM_H__
+#pragma once
 
 
 /***************************************************************************
@@ -89,7 +89,7 @@ class i2cmem_device :
 {
 public:
 	// construction/destruction
-	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	static void set_address(device_t &device, int address) { downcast<i2cmem_device &>(device).m_slave_address = address; }
 	static void set_page_size(device_t &device, int page_size) { downcast<i2cmem_device &>(device).m_page_size = page_size; }
@@ -126,7 +126,7 @@ protected:
 	optional_memory_region m_region;
 
 	// internal state
-	std::unique_ptr<UINT8[]> m_data;
+	std::unique_ptr<uint8_t[]> m_data;
 	int m_slave_address;
 	int m_page_size;
 	int m_data_size;
@@ -142,12 +142,12 @@ protected:
 	int m_shift;
 	int m_devsel;
 	int m_byteaddr;
-	dynamic_buffer m_page;
+	std::vector<uint8_t> m_page;
 	int m_page_offset;
 };
 
 
 // device type definition
-extern const device_type I2CMEM;
+DECLARE_DEVICE_TYPE(I2CMEM, i2cmem_device)
 
-#endif  /* __I2CMEM_H__ */
+#endif // MAME_MACHINE_I2CMEM_H

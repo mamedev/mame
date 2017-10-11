@@ -7,9 +7,11 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "zippath.h"
 #include "floppy.h"
+
+#include "speaker.h"
 #include "formats/imageutl.h"
+#include "zippath.h"
 
 /*
     Debugging flags. Set to 0 or 1.
@@ -24,96 +26,100 @@
 #define FLOPSND_TAG "floppysound"
 
 // device type definition
-const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
+DEFINE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
 
 // generic 3" drives
-const device_type FLOPPY_3_SSDD = &device_creator<floppy_3_ssdd>;
-const device_type FLOPPY_3_DSDD = &device_creator<floppy_3_dsdd>;
+DEFINE_DEVICE_TYPE(FLOPPY_3_SSDD, floppy_3_ssdd, "floppy_3_ssdd", "3\" single-sided floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-sided floppy drive")
 
 // generic 3.5" drives
-const device_type FLOPPY_35_SSDD = &device_creator<floppy_35_ssdd>;
-const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
-const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
-const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
+DEFINE_DEVICE_TYPE(FLOPPY_35_SSDD, floppy_35_ssdd, "floppy_35_ssdd", "3.5\" single-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_35_DD,   floppy_35_dd,   "floppy_35_dd",   "3.5\" double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_35_HD,   floppy_35_hd,   "floppy_35_hd",   "3.5\" high density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_35_ED,   floppy_35_ed,   "floppy_35_ed",   "3.5\" extended density floppy drive")
 
 // generic 5.25" drives
-const device_type FLOPPY_525_SSSD_35T = &device_creator<floppy_525_sssd_35t>;
-const device_type FLOPPY_525_SD_35T = &device_creator<floppy_525_sd_35t>;
-const device_type FLOPPY_525_SSSD = &device_creator<floppy_525_sssd>;
-const device_type FLOPPY_525_SD = &device_creator<floppy_525_sd>;
-const device_type FLOPPY_525_SSDD = &device_creator<floppy_525_ssdd>;
-const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
-const device_type FLOPPY_525_SSQD = &device_creator<floppy_525_ssqd>;
-const device_type FLOPPY_525_QD = &device_creator<floppy_525_qd>;
-const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
+DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_525_sssd_35t", "5.25\" single-sided single density 35-track floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_525_sd_35t",   "5.25\" double-sided single density 35-track floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_525_sssd",     "5.25\" single-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_525_sd",       "5.25\" single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd",     "5.25\" single-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_525_dd",       "5.25\" double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_525_ssqd",     "5.25\" single-sided quad density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_525_qd",       "5.25\" quad density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_525_hd",       "5.25\" high density floppy drive")
 
 // generic 8" drives
-const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
-const device_type FLOPPY_8_DSSD = &device_creator<floppy_8_dssd>;
-const device_type FLOPPY_8_SSDD = &device_creator<floppy_8_ssdd>;
-const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
+DEFINE_DEVICE_TYPE(FLOPPY_8_SSSD, floppy_8_sssd, "floppy_8_sssd", "8\" single-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_8_DSSD, floppy_8_dssd, "floppy_8_dssd", "8\" double-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_8_SSDD, floppy_8_ssdd, "floppy_8_ssdd", "8\" single-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_8_DSDD, floppy_8_dsdd, "floppy_8_dsdd", "8\" double-sided double density floppy drive")
 
 // Epson 3.5" drives
 #if 0
-const device_type EPSON_SMD_110 = &device_creator<epson_smd_110>;
-const device_type EPSON_SMD_120 = &device_creator<epson_smd_120>;
-const device_type EPSON_SMD_125 = &device_creator<epson_smd_125>;
-const device_type EPSON_SMD_130 = &device_creator<epson_smd_130>;
-const device_type EPSON_SMD_140 = &device_creator<epson_smd_140>;
-const device_type EPSON_SMD_150 = &device_creator<epson_smd_150>;
-const device_type EPSON_SMD_160 = &device_creator<epson_smd_160>;
+DEFINE_DEVICE_TYPE(EPSON_SMD_110,   epson_smd_110,   "epson_smd_110",   "EPSON SMD-110 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_120,   epson_smd_120,   "epson_smd_120",   "EPSON SMD-120 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_125,   epson_smd_125,   "epson_smd_125",   "EPSON SMD-125 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_130,   epson_smd_130,   "epson_smd_130",   "EPSON SMD-130 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_140,   epson_smd_140,   "epson_smd_140",   "EPSON SMD-140 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_150,   epson_smd_150,   "epson_smd_150",   "EPSON SMD-150 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_160,   epson_smd_160,   "epson_smd_160",   "EPSON SMD-160 Floppy Disk Drive")
 #endif
-const device_type EPSON_SMD_165 = &device_creator<epson_smd_165>;
+DEFINE_DEVICE_TYPE(EPSON_SMD_165,   epson_smd_165,   "epson_smd_165",   "EPSON SMD-165 Floppy Disk Drive")
 #if 0
-const device_type EPSON_SMD_170 = &device_creator<epson_smd_170>;
-const device_type EPSON_SMD_180 = &device_creator<epson_smd_180>;
-const device_type EPSON_SMD_240L = &device_creator<epson_smd_240l>;
-const device_type EPSON_SMD_280HL = &device_creator<epson_smd_280hl>;
-const device_type EPSON_SMD_440L = &device_creator<epson_smd_440l>;
-const device_type EPSON_SMD_449L = &device_creator<epson_smd_449l>;
-const device_type EPSON_SMD_480LM = &device_creator<epson_smd_480lm>;
-const device_type EPSON_SMD_489M = &device_creator<epson_smd_489m>;
+DEFINE_DEVICE_TYPE(EPSON_SMD_170,   epson_smd_170,   "epson_smd_170",   "EPSON SMD-170 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_180,   epson_smd_180,   "epson_smd_180",   "EPSON SMD-180 Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_240L,  epson_smd_240l,  "epson_smd_240l",  "EPSON SMD-240L Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_280HL, epson_smd_280hl, "epson_smd_280hl", "EPSON SMD-280HL Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_440L,  epson_smd_440l,  "epson_smd_440l",  "EPSON SMD-440L Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_449L,  epson_smd_449l,  "epson_smd_449l",  "EPSON SMD-449L Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_480LM, epson_smd_480lm, "epson_smd_480lm", "EPSON SMD-480LM Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SMD_489M,  epson_smd_489m,  "epson_smd_489m",  "EPSON SMD-489M Floppy Disk Drive")
 #endif
 
 // Epson 5.25" drives
 #if 0
-const device_type EPSON_SD_311 = &device_creator<epson_sd_311>;
+DEFINE_DEVICE_TYPE(EPSON_SD_311,  epson_sd_311,  "epson_sd_311",  "EPSON SD-311 Mini-Floppy Disk Drive")
 #endif
-const device_type EPSON_SD_320 = &device_creator<epson_sd_320>;
-const device_type EPSON_SD_321 = &device_creator<epson_sd_321>;
+DEFINE_DEVICE_TYPE(EPSON_SD_320,  epson_sd_320,  "epson_sd_320",  "EPSON SD-320 Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_321,  epson_sd_321,  "epson_sd_321",  "EPSON SD-321 Mini-Floppy Disk Drive")
 #if 0
-const device_type EPSON_SD_521L = &device_creator<epson_sd_531l>;
-const device_type EPSON_SD_525 = &device_creator<epson_sd_525>;
-const device_type EPSON_SD_543 = &device_creator<epson_sd_543>;
-const device_type EPSON_SD_545 = &device_creator<epson_sd_545>;
-const device_type EPSON_SD_560 = &device_creator<epson_sd_560>;
-const device_type EPSON_SD_580L = &device_creator<epson_sd_580l>;
-const device_type EPSON_SD_581L = &device_creator<epson_sd_581l>;
-const device_type EPSON_SD_621L = &device_creator<epson_sd_621l>;
-const device_type EPSON_SD_680L = &device_creator<epson_sd_680l>;
+DEFINE_DEVICE_TYPE(EPSON_SD_521L, epson_sd_531l, "epson_sd_531l", "EPSON SD-531L Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_525,  epson_sd_525,  "epson_sd_525",  "EPSON SD-525 Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_543,  epson_sd_543,  "epson_sd_543",  "EPSON SD-543 Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_545,  epson_sd_545,  "epson_sd_545",  "EPSON SD-545 Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_560,  epson_sd_560,  "epson_sd_560",  "EPSON SD-560 Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_580L, epson_sd_580l, "epson_sd_580l", "EPSON SD-580L Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_581L, epson_sd_581l, "epson_sd_581l", "EPSON SD-581L Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_621L, epson_sd_621l, "epson_sd_621l", "EPSON SD-621L Mini-Floppy Disk Drive")
+DEFINE_DEVICE_TYPE(EPSON_SD_680L, epson_sd_680l, "epson_sd_680l", "EPSON SD-680L Mini-Floppy Disk Drive")
 #endif
 
 // Sony 3.5" drives
-const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
-const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
-const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
+DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Micro Floppydisk Drive")
+DEFINE_DEVICE_TYPE(SONY_OA_D32W, sony_oa_d32w, "sony_oa_d32w", "Sony OA-D32W Micro Floppydisk Drive")
+DEFINE_DEVICE_TYPE(SONY_OA_D32V, sony_oa_d32v, "sony_oa_d32v", "Sony OA-D32V Micro Floppydisk Drive")
 
 // TEAC 5.25" drives
 #if 0
-const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
-const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
+DEFINE_DEVICE_TYPE(TEAC_FD_55A, teac_fd_55a, "teac_fd_55a", "TEAC FD-55A FDD")
+DEFINE_DEVICE_TYPE(TEAC_FD_55B, teac_fd_55b, "teac_fd_55b", "TEAC FD-55B FDD")
 #endif
-const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
-const device_type TEAC_FD_55F = &device_creator<teac_fd_55f>;
-const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
+DEFINE_DEVICE_TYPE(TEAC_FD_55E, teac_fd_55e, "teac_fd_55e", "TEAC FD-55E FDD")
+DEFINE_DEVICE_TYPE(TEAC_FD_55F, teac_fd_55f, "teac_fd_55f", "TEAC FD-55F FDD")
+DEFINE_DEVICE_TYPE(TEAC_FD_55G, teac_fd_55g, "teac_fd_55g", "TEAC FD-55G FDD")
 
 // ALPS 5.25" drives
-const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
+DEFINE_DEVICE_TYPE(ALPS_3255190X, alps_3255190x, "alps_3255190x", "ALPS 32551901/32551902 Floppy Drive")
+
+// IBM 8" drives
+DEFINE_DEVICE_TYPE(IBM_6360, ibm_6360, "ibm_6360", "IBM 6360 8\" single-sided single density floppy drive")
 
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_DFI_FORMAT,
+	FLOPPY_HFE_FORMAT,
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_IPF_FORMAT,
 	FLOPPY_MFI_FORMAT,
@@ -124,8 +130,8 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	nullptr
 };
 
-floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
+floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
 	m_enable_sound(false)
@@ -164,8 +170,8 @@ floppy_image_device *floppy_connector::get_device()
 //  floppy_image_device - constructor
 //-------------------------------------------------
 
-floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this),
 		input_format(nullptr),
@@ -177,7 +183,9 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		sides(0),
 		form_factor(0),
 		motor_always_on(false),
-		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0),
+		dskchg_writable(false),
+		has_trk00_sensor(true),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
 		floppy_ratio_1(0),
@@ -232,6 +240,11 @@ void floppy_image_device::setup_wpt_cb(wpt_cb cb)
 	cur_wpt_cb = cb;
 }
 
+void floppy_image_device::setup_led_cb(led_cb cb)
+{
+	cur_led_cb = cb;
+}
+
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	extension_list[0] = '\0';
@@ -249,9 +262,6 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 floppy_image_format_t *floppy_image_device::get_formats() const
@@ -262,11 +272,6 @@ floppy_image_format_t *floppy_image_device::get_formats() const
 floppy_image_format_t *floppy_image_device::get_load_format() const
 {
 	return input_format;
-}
-
-void floppy_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void floppy_image_device::set_rpm(float _rpm)
@@ -311,6 +316,11 @@ void floppy_image_device::device_start()
 {
 	rpm = 0;
 	motor_always_on = false;
+	dskchg_writable = false;
+	has_trk00_sensor = true;
+
+	// better would be an extra parameter in the MCFG macro
+	drive_index = atoi(owner()->basetag());
 
 	idx = 0;
 
@@ -320,6 +330,7 @@ void floppy_image_device::device_start()
 	cyl = 0;
 	subcyl = 0;
 	ss  = 0;
+	ds = -1;
 	stp = 1;
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
@@ -347,12 +358,8 @@ void floppy_image_device::device_reset()
 	revolution_start_time = attotime::never;
 	revolution_count = 0;
 	mon = 1;
-	if(!ready) {
-		ready = true;
-		if(!cur_ready_cb.isnull())
-			cur_ready_cb(this, ready);
-	}
-	if(motor_always_on)
+	set_ready(true);
+	if(motor_always_on && image)
 		mon_w(0);
 }
 
@@ -447,6 +454,9 @@ image_init_result floppy_image_device::call_load()
 	} else if(!mon)
 		ready_counter = 2;
 
+	if (dskchg_writable)
+		dskchg = 1;
+
 	return image_init_result::PASS;
 }
 
@@ -475,11 +485,9 @@ void floppy_image_device::call_unload()
 	if (motor_always_on) {
 		// When disk is removed, stop motor
 		mon_w(1);
-	} else if(!ready) {
-		ready = true;
-		if(!cur_ready_cb.isnull())
-			cur_ready_cb(this, ready);
 	}
+
+	set_ready(true);
 }
 
 image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -508,6 +516,10 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 		return image_init_result::FAIL;
 	}
 
+	if (motor_always_on)
+		// When disk is inserted, start motor
+		mon_w(0);
+
 	return image_init_result::PASS;
 }
 
@@ -526,9 +538,7 @@ void floppy_image_device::mon_w(int state)
 		if (motor_always_on) {
 			// Drives with motor that is always spinning are immediately ready when a disk is loaded
 			// because there is no spin-up time
-			ready = false;
-			if(!cur_ready_cb.isnull())
-				cur_ready_cb(this, ready);
+			set_ready(false);
 		} else {
 			ready_counter = 2;
 		}
@@ -541,11 +551,7 @@ void floppy_image_device::mon_w(int state)
 			commit_image();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
-		if(!ready) {
-			ready = true;
-			if(!cur_ready_cb.isnull())
-				cur_ready_cb(this, ready);
-		}
+		set_ready(true);
 	}
 
 	// Create a motor sound (loaded or empty)
@@ -592,9 +598,8 @@ void floppy_image_device::index_resync()
 		if(idx && ready) {
 			ready_counter--;
 			if(!ready_counter) {
-				ready = false;
-				if(!cur_ready_cb.isnull())
-					cur_ready_cb(this, ready);
+				// logerror("Drive spun up\n");
+				set_ready(false);
 			}
 		}
 		if (!cur_index_pulse_cb.isnull())
@@ -605,6 +610,23 @@ void floppy_image_device::index_resync()
 bool floppy_image_device::ready_r()
 {
 	return ready;
+}
+
+void floppy_image_device::set_ready(bool state)
+{
+	if (state != ready)
+	{
+		ready = state;
+		check_led();
+		if (!cur_ready_cb.isnull())
+			cur_ready_cb(this, ready);
+	}
+}
+
+void floppy_image_device::check_led()
+{
+	if(!cur_led_cb.isnull())
+		cur_led_cb(this, (ds == drive_index) && !ready ? 1 : 0);
 }
 
 double floppy_image_device::get_pos()
@@ -623,6 +645,11 @@ bool floppy_image_device::twosid_r()
 
 void floppy_image_device::stp_w(int state)
 {
+	// Before spin-up is done, ignore step pulses
+	// TODO: There are reports about drives supporting step operation with
+	// stopped spindle. Need to check that on real drives.
+	// if (ready_counter > 0) return;
+
 	if ( stp != state ) {
 		stp = state;
 		if ( stp == 0 ) {
@@ -634,13 +661,13 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != cyl)
 			{
-				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				if (TRACE_STEP) logerror("track %d\n", cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
 			}
 			/* Update disk detection if applicable */
-			if (exists())
+			if (exists() && !dskchg_writable)
 			{
 				if (dskchg==0) dskchg = 1;
 			}
@@ -682,15 +709,15 @@ void floppy_image_device::seek_phase_w(int phases)
 	subcyl = next_pos & 3;
 
 	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("%s: track %d.%d\n", tag(), cyl, subcyl);
+		logerror("track %d.%d\n", cyl, subcyl);
 
 	/* Update disk detection if applicable */
-	if (exists())
+	if (exists() && !dskchg_writable)
 		if (dskchg==0)
 			dskchg = 1;
 }
 
-int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &buf)
+int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)
 {
 	int spos = (buf.size() >> 1)-1;
 	int step;
@@ -709,7 +736,7 @@ int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &
 	}
 }
 
-UINT32 floppy_image_device::find_position(attotime &base, const attotime &when)
+uint32_t floppy_image_device::find_position(attotime &base, const attotime &when)
 {
 	base = revolution_start_time;
 	attotime delta = when - base;
@@ -723,12 +750,19 @@ UINT32 floppy_image_device::find_position(attotime &base, const attotime &when)
 		base -= rev_time;
 	}
 
-	return (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	uint32_t res = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	if (res >= 200000000) {
+		// Due to rounding errors in the previous operation,
+		// 'res' sometimes overflows 2E+8
+		res -= 200000000;
+		base += rev_time;
+	}
+	return res;
 }
 
-attotime floppy_image_device::get_next_index_time(std::vector<UINT32> &buf, int index, int delta, attotime base)
+attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, int index, int delta, attotime base)
 {
-	UINT32 next_position;
+	uint32_t next_position;
 	int cells = buf.size();
 	if(index+delta < cells)
 		next_position = buf[index+delta] & floppy_image::TIME_MASK;
@@ -739,7 +773,7 @@ attotime floppy_image_device::get_next_index_time(std::vector<UINT32> &buf, int 
 		next_position = 200000000 + (buf[index] & floppy_image::TIME_MASK);
 	}
 
-	return base + attotime::from_nsec((UINT64(next_position)*2000/floppy_ratio_1+1)/2);
+	return base + attotime::from_nsec((uint64_t(next_position)*2000/floppy_ratio_1+1)/2);
 }
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
@@ -747,13 +781,20 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	std::vector<UINT32> &buf = image->get_buffer(cyl, ss, subcyl);
-	UINT32 cells = buf.size();
+	// If the drive is still spinning up, pretend that no transitions will come
+	// TODO: Implement a proper spin-up ramp for transition times, also in order
+	// to cover potential copy protection measures that have direct device
+	// access (mz)
+	if (ready_counter > 0)
+		return attotime::never;
+
+	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
+	uint32_t cells = buf.size();
 	if(cells <= 1)
 		return attotime::never;
 
 	attotime base;
-	UINT32 position = find_position(base, from_when);
+	uint32_t position = find_position(base, from_when);
 
 	int index = find_index(position, buf);
 
@@ -780,7 +821,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	for(int i=0; i != transition_count; i++)
 		trans_pos[i] = find_position(base, transitions[i]);
 
-	std::vector<UINT32> &buf = image->get_buffer(cyl, ss, subcyl);
+	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 
 	int index;
 	if(!buf.empty())
@@ -793,17 +834,17 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	if(index && (buf[index] & floppy_image::TIME_MASK) == start_pos)
 		index--;
 
-	UINT32 cur_mg = buf[index] & floppy_image::MG_MASK;
+	uint32_t cur_mg = buf[index] & floppy_image::MG_MASK;
 	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
 		cur_mg = floppy_image::MG_A;
 
-	UINT32 pos = start_pos;
+	uint32_t pos = start_pos;
 	int ti = 0;
 	int cells = buf.size();
 	while(pos != end_pos) {
 		if(buf.size() < cells+10)
 			buf.resize(cells+200);
-		UINT32 next_pos;
+		uint32_t next_pos;
 		if(ti != transition_count)
 			next_pos = trans_pos[ti++];
 		else
@@ -822,15 +863,15 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	buf.resize(cells);
 }
 
-void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg)
+void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg)
 {
 	while(spos < epos) {
 		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
 			index++;
 
-		UINT32 ref_start = buf[index] & floppy_image::TIME_MASK;
-		UINT32 ref_end   = index == cells-1 ? 200000000 : buf[index+1] & floppy_image::TIME_MASK;
-		UINT32 ref_mg    = buf[index] & floppy_image::MG_MASK;
+		uint32_t ref_start = buf[index] & floppy_image::TIME_MASK;
+		uint32_t ref_end   = index == cells-1 ? 200000000 : buf[index+1] & floppy_image::TIME_MASK;
+		uint32_t ref_mg    = buf[index] & floppy_image::MG_MASK;
 
 		// Can't overwrite a damaged zone
 		if(ref_mg == floppy_image::MG_D) {
@@ -848,25 +889,25 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 		if(spos == ref_start) {
 			if(epos >= ref_end) {
 				// Full overlap, that cell is dead, we need to see which ones we can extend
-				UINT32 prev_mg = index != 0       ? buf[index-1] & floppy_image::MG_MASK : ~0;
-				UINT32 next_mg = index != cells-1 ? buf[index+1] & floppy_image::MG_MASK : ~0;
+				uint32_t prev_mg = index != 0       ? buf[index-1] & floppy_image::MG_MASK : ~0;
+				uint32_t next_mg = index != cells-1 ? buf[index+1] & floppy_image::MG_MASK : ~0;
 				if(prev_mg == mg) {
 					if(next_mg == mg) {
 						// Both match, merge all three in one
-						memmove(buf+index, buf+index+2, (cells-index-2)*sizeof(UINT32));
+						memmove(buf+index, buf+index+2, (cells-index-2)*sizeof(uint32_t));
 						cells -= 2;
 						index--;
 
 					} else {
 						// Previous matches, drop the current cell
-						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(UINT32));
+						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(uint32_t));
 						cells --;
 					}
 
 				} else {
 					if(next_mg == mg) {
 						// Following matches, extend it
-						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(UINT32));
+						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(uint32_t));
 						cells --;
 						buf[index] = mg | spos;
 					} else {
@@ -885,7 +926,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 				else {
 					// Otherwise we need to insert a new cell
 					if(index != cells-1)
-						memmove(buf+index+1, buf+index, (cells-index)*sizeof(UINT32));
+						memmove(buf+index+1, buf+index, (cells-index)*sizeof(uint32_t));
 					cells++;
 					buf[index] = mg | spos;
 					buf[index+1] = ref_mg | epos;
@@ -899,7 +940,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 				// If we can't just extend the following cell, we need to insert a new one
 				if(index == cells-1 || (buf[index+1] & floppy_image::MG_MASK) != mg) {
 					if(index != cells-1)
-						memmove(buf+index+2, buf+index+1, (cells-index-1)*sizeof(UINT32));
+						memmove(buf+index+2, buf+index+1, (cells-index-1)*sizeof(uint32_t));
 					cells++;
 				}
 				buf[index+1] = mg | spos;
@@ -910,7 +951,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 				// Full inclusion
 				// We need to split the zone in 3
 				if(index != cells-1)
-					memmove(buf+index+3, buf+index+1, (cells-index-1)*sizeof(UINT32));
+					memmove(buf+index+3, buf+index+1, (cells-index-1)*sizeof(uint32_t));
 				cells += 2;
 				buf[index+1] = mg | spos;
 				buf[index+2] = ref_mg | epos;
@@ -931,12 +972,12 @@ void floppy_image_device::set_write_splice(const attotime &when)
 	}
 }
 
-UINT32 floppy_image_device::get_form_factor() const
+uint32_t floppy_image_device::get_form_factor() const
 {
 	return form_factor;
 }
 
-UINT32 floppy_image_device::get_variant() const
+uint32_t floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
 }
@@ -1018,8 +1059,8 @@ static const char *const floppy525_sample_names[] =
 	nullptr
 };
 
-floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__),
+floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: samples_device(mconfig, FLOPPYSOUND, tag, owner, clock),
 		m_sound(nullptr),
 		m_step_base(0),
 		m_spin_samples(0),
@@ -1211,7 +1252,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
-	INT16 out;
+	int16_t out;
 	stream_sample_t *samplebuffer = outputs[0];
 	int idx = 0;
 	int sampleend = 0;
@@ -1316,18 +1357,14 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_FRAGMENT( floppy_img )
+MACHINE_CONFIG_MEMBER( floppy_image_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
 MACHINE_CONFIG_END
 
-machine_config_constructor floppy_image_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( floppy_img );
-}
 
-const device_type FLOPPYSOUND = &device_creator<floppy_sound_device>;
+DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
 
 
 //**************************************************************************
@@ -1338,8 +1375,8 @@ const device_type FLOPPYSOUND = &device_creator<floppy_sound_device>;
 //  3" single-sided double density
 //-------------------------------------------------
 
-floppy_3_ssdd::floppy_3_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_3_SSDD, "3\" single sided floppy drive", tag, owner, clock, "floppy_3_ssdd", __FILE__)
+floppy_3_ssdd::floppy_3_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_SSDD, tag, owner, clock)
 {
 }
 
@@ -1355,7 +1392,7 @@ void floppy_3_ssdd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_3_ssdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_3_ssdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSDD;
@@ -1365,8 +1402,8 @@ void floppy_3_ssdd::handled_variants(UINT32 *variants, int &var_count) const
 //  3" double-sided double density
 //-------------------------------------------------
 
-floppy_3_dsdd::floppy_3_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_3_DSDD, "3\" double sided floppy drive", tag, owner, clock, "floppy_3_dsdd", __FILE__)
+floppy_3_dsdd::floppy_3_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_DSDD, tag, owner, clock)
 {
 }
 
@@ -1382,7 +1419,7 @@ void floppy_3_dsdd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_3_dsdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_3_dsdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSDD;
@@ -1393,8 +1430,8 @@ void floppy_3_dsdd::handled_variants(UINT32 *variants, int &var_count) const
 //  3.5" single-sided double density
 //-------------------------------------------------
 
-floppy_35_ssdd::floppy_35_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_35_SSDD, "3.5\" single-sided double density floppy drive", tag, owner, clock, "floppy_35_ssdd", __FILE__)
+floppy_35_ssdd::floppy_35_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_SSDD, tag, owner, clock)
 {
 }
 
@@ -1410,7 +1447,7 @@ void floppy_35_ssdd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_35_ssdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_35_ssdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1421,8 +1458,8 @@ void floppy_35_ssdd::handled_variants(UINT32 *variants, int &var_count) const
 //  3.5" double-sided double density
 //-------------------------------------------------
 
-floppy_35_dd::floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_35_DD, "3.5\" double density floppy drive", tag, owner, clock, "floppy_35_dd", __FILE__)
+floppy_35_dd::floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_DD, tag, owner, clock)
 {
 }
 
@@ -1438,7 +1475,7 @@ void floppy_35_dd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_35_dd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_35_dd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1450,8 +1487,8 @@ void floppy_35_dd::handled_variants(UINT32 *variants, int &var_count) const
 //  3.5" high density
 //-------------------------------------------------
 
-floppy_35_hd::floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_35_HD, "3.5\" high density floppy drive", tag, owner, clock, "floppy_35_hd", __FILE__)
+floppy_35_hd::floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_HD, tag, owner, clock)
 {
 }
 
@@ -1467,7 +1504,7 @@ void floppy_35_hd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_35_hd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_35_hd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1480,8 +1517,8 @@ void floppy_35_hd::handled_variants(UINT32 *variants, int &var_count) const
 //  3.5" extended density
 //-------------------------------------------------
 
-floppy_35_ed::floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_35_ED, "3.5\" extended density floppy drive", tag, owner, clock, "floppy_35_ed", __FILE__)
+floppy_35_ed::floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_ED, tag, owner, clock)
 {
 }
 
@@ -1497,7 +1534,7 @@ void floppy_35_ed::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_35_ed::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_35_ed::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1511,8 +1548,8 @@ void floppy_35_ed::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" single-sided single density 35 tracks
 //-------------------------------------------------
 
-floppy_525_sssd_35t::floppy_525_sssd_35t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_SSSD_35T, "5.25\" single-sided single density 35-track floppy drive", tag, owner, clock, "floppy_525_sssd_35t", __FILE__)
+floppy_525_sssd_35t::floppy_525_sssd_35t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SSSD_35T, tag, owner, clock)
 {
 }
 
@@ -1528,7 +1565,7 @@ void floppy_525_sssd_35t::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_sssd_35t::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_sssd_35t::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1538,8 +1575,8 @@ void floppy_525_sssd_35t::handled_variants(UINT32 *variants, int &var_count) con
 //  5.25" double-sided single density 35 tracks
 //-------------------------------------------------
 
-floppy_525_sd_35t::floppy_525_sd_35t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_SD_35T, "5.25\" single density 35-track floppy drive", tag, owner, clock, "floppy_525_sd_35t", __FILE__)
+floppy_525_sd_35t::floppy_525_sd_35t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SD_35T, tag, owner, clock)
 {
 }
 
@@ -1555,7 +1592,7 @@ void floppy_525_sd_35t::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_sd_35t::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_sd_35t::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1565,8 +1602,8 @@ void floppy_525_sd_35t::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" single-sided single density
 //-------------------------------------------------
 
-floppy_525_sssd::floppy_525_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_SSSD, "5.25\" single-sided single density floppy drive", tag, owner, clock, "floppy_525_sssd", __FILE__)
+floppy_525_sssd::floppy_525_sssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SSSD, tag, owner, clock)
 {
 }
 
@@ -1582,7 +1619,7 @@ void floppy_525_sssd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_sssd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_sssd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1592,8 +1629,8 @@ void floppy_525_sssd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" double-sided single density
 //-------------------------------------------------
 
-floppy_525_sd::floppy_525_sd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_SD, "5.25\" single density floppy drive", tag, owner, clock, "floppy_525_sd", __FILE__)
+floppy_525_sd::floppy_525_sd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SD, tag, owner, clock)
 {
 }
 
@@ -1609,7 +1646,7 @@ void floppy_525_sd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_sd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_sd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1619,8 +1656,8 @@ void floppy_525_sd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" single-sided double density
 //-------------------------------------------------
 
-floppy_525_ssdd::floppy_525_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_SSDD, "5.25\" single-sided double density floppy drive", tag, owner, clock, "floppy_525_ssdd", __FILE__)
+floppy_525_ssdd::floppy_525_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SSDD, tag, owner, clock)
 {
 }
 
@@ -1636,7 +1673,7 @@ void floppy_525_ssdd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_ssdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_ssdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1647,8 +1684,8 @@ void floppy_525_ssdd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" double-sided double density
 //-------------------------------------------------
 
-floppy_525_dd::floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_DD, "5.25\" double density floppy drive", tag, owner, clock, "floppy_525_dd", __FILE__)
+floppy_525_dd::floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_DD, tag, owner, clock)
 {
 }
 
@@ -1664,7 +1701,7 @@ void floppy_525_dd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_dd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_dd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1676,8 +1713,8 @@ void floppy_525_dd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" single-sided quad density
 //-------------------------------------------------
 
-floppy_525_ssqd::floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
+floppy_525_ssqd::floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_SSQD, tag, owner, clock)
 {
 }
 
@@ -1693,7 +1730,7 @@ void floppy_525_ssqd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_ssqd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_ssqd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1705,8 +1742,8 @@ void floppy_525_ssqd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" double-sided quad density
 //-------------------------------------------------
 
-floppy_525_qd::floppy_525_qd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" quad density floppy drive", tag, owner, clock, "floppy_525_qd", __FILE__)
+floppy_525_qd::floppy_525_qd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_QD, tag, owner, clock)
 {
 }
 
@@ -1722,7 +1759,7 @@ void floppy_525_qd::setup_characteristics()
 	set_rpm(300);
 }
 
-void floppy_525_qd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_qd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1737,8 +1774,8 @@ void floppy_525_qd::handled_variants(UINT32 *variants, int &var_count) const
 //  5.25" high density
 //-------------------------------------------------
 
-floppy_525_hd::floppy_525_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_HD, "5.25\" high density floppy drive", tag, owner, clock, "floppy_525_hd", __FILE__)
+floppy_525_hd::floppy_525_hd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_HD, tag, owner, clock)
 {
 }
 
@@ -1754,7 +1791,7 @@ void floppy_525_hd::setup_characteristics()
 	set_rpm(360);
 }
 
-void floppy_525_hd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_525_hd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1769,8 +1806,8 @@ void floppy_525_hd::handled_variants(UINT32 *variants, int &var_count) const
 //  8" single-sided single density
 //-------------------------------------------------
 
-floppy_8_sssd::floppy_8_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density single sided floppy drive", tag, owner, clock, "floppy_8_sssd", __FILE__)
+floppy_8_sssd::floppy_8_sssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, tag, owner, clock)
 {
 }
 
@@ -1787,7 +1824,7 @@ void floppy_8_sssd::setup_characteristics()
 	set_rpm(360);
 }
 
-void floppy_8_sssd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_8_sssd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1797,8 +1834,8 @@ void floppy_8_sssd::handled_variants(UINT32 *variants, int &var_count) const
 //  8" double-sided single density
 //-------------------------------------------------
 
-floppy_8_dssd::floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_DSSD, "8\" single density double sided floppy drive", tag, owner, clock, "floppy_8_dssd", __FILE__)
+floppy_8_dssd::floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_DSSD, tag, owner, clock)
 {
 }
 
@@ -1815,7 +1852,7 @@ void floppy_8_dssd::setup_characteristics()
 	set_rpm(360);
 }
 
-void floppy_8_dssd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_8_dssd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1826,8 +1863,8 @@ void floppy_8_dssd::handled_variants(UINT32 *variants, int &var_count) const
 //  8" single-sided double density
 //-------------------------------------------------
 
-floppy_8_ssdd::floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSDD, "8\" double density single sided floppy drive", tag, owner, clock, "floppy_8_ssdd", __FILE__)
+floppy_8_ssdd::floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSDD, tag, owner, clock)
 {
 }
 
@@ -1844,7 +1881,7 @@ void floppy_8_ssdd::setup_characteristics()
 	set_rpm(360);
 }
 
-void floppy_8_ssdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_8_ssdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1855,8 +1892,8 @@ void floppy_8_ssdd::handled_variants(UINT32 *variants, int &var_count) const
 //  8" double-sided double density
 //-------------------------------------------------
 
-floppy_8_dsdd::floppy_8_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_DSDD, "8\" double density double sided floppy drive", tag, owner, clock, "floppy_8_dsdd", __FILE__)
+floppy_8_dsdd::floppy_8_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_DSDD, tag, owner, clock)
 {
 }
 
@@ -1873,7 +1910,7 @@ void floppy_8_dsdd::setup_characteristics()
 	set_rpm(360);
 }
 
-void floppy_8_dsdd::handled_variants(UINT32 *variants, int &var_count) const
+void floppy_8_dsdd::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1896,8 +1933,8 @@ void floppy_8_dsdd::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, EPSON_SMD_165, tag, owner, clock)
 {
 }
 
@@ -1913,7 +1950,7 @@ void epson_smd_165::setup_characteristics()
 	set_rpm(300);
 }
 
-void epson_smd_165::handled_variants(UINT32 *variants, int &var_count) const
+void epson_smd_165::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1947,8 +1984,8 @@ void epson_smd_165::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-epson_sd_320::epson_sd_320(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, EPSON_SD_320, "EPSON SD-320 Mini-Floppy Disk Drive", tag, owner, clock, "epson_sd_320", __FILE__)
+epson_sd_320::epson_sd_320(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, EPSON_SD_320, tag, owner, clock)
 {
 }
 
@@ -1964,7 +2001,7 @@ void epson_sd_320::setup_characteristics()
 	set_rpm(300);
 }
 
-void epson_sd_320::handled_variants(UINT32 *variants, int &var_count) const
+void epson_sd_320::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -1979,8 +2016,8 @@ void epson_sd_320::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-epson_sd_321::epson_sd_321(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SD-321 Mini-Floppy Disk Drive", tag, owner, clock, "epson_sd_321", __FILE__)
+epson_sd_321::epson_sd_321(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, EPSON_SD_321, tag, owner, clock)
 {
 }
 
@@ -1996,7 +2033,7 @@ void epson_sd_321::setup_characteristics()
 	set_rpm(300);
 }
 
-void epson_sd_321::handled_variants(UINT32 *variants, int &var_count) const
+void epson_sd_321::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2014,8 +2051,8 @@ void epson_sd_321::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-sony_oa_d31v::sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D31V, "Sony OA-D31V Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d31v", __FILE__)
+sony_oa_d31v::sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, SONY_OA_D31V, tag, owner, clock)
 {
 }
 
@@ -2028,10 +2065,11 @@ void sony_oa_d31v::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 70;
 	sides = 1;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
-void sony_oa_d31v::handled_variants(UINT32 *variants, int &var_count) const
+void sony_oa_d31v::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2049,8 +2087,8 @@ void sony_oa_d31v::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-sony_oa_d32w::sony_oa_d32w(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D32W, "Sony OA-D32W Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d32w", __FILE__)
+sony_oa_d32w::sony_oa_d32w(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, SONY_OA_D32W, tag, owner, clock)
 {
 }
 
@@ -2063,10 +2101,11 @@ void sony_oa_d32w::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 80;
 	sides = 2;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
-void sony_oa_d32w::handled_variants(UINT32 *variants, int &var_count) const
+void sony_oa_d32w::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2085,8 +2124,8 @@ void sony_oa_d32w::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-sony_oa_d32v::sony_oa_d32v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D32V, "Sony OA-D32V Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d32v", __FILE__)
+sony_oa_d32v::sony_oa_d32v(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, SONY_OA_D32V, tag, owner, clock)
 {
 }
 
@@ -2099,10 +2138,11 @@ void sony_oa_d32v::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 80;
 	sides = 1;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
-void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
+void sony_oa_d32v::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2119,8 +2159,8 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
+teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, TEAC_FD_55E, tag, owner, clock)
 {
 }
 
@@ -2136,7 +2176,7 @@ void teac_fd_55e::setup_characteristics()
 	set_rpm(300);
 }
 
-void teac_fd_55e::handled_variants(UINT32 *variants, int &var_count) const
+void teac_fd_55e::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2154,8 +2194,8 @@ void teac_fd_55e::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-teac_fd_55f::teac_fd_55f(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55F FDD", tag, owner, clock, "teac_fd_55f", __FILE__)
+teac_fd_55f::teac_fd_55f(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, TEAC_FD_55F, tag, owner, clock)
 {
 }
 
@@ -2171,7 +2211,7 @@ void teac_fd_55f::setup_characteristics()
 	set_rpm(300);
 }
 
-void teac_fd_55f::handled_variants(UINT32 *variants, int &var_count) const
+void teac_fd_55f::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2192,8 +2232,8 @@ void teac_fd_55f::handled_variants(UINT32 *variants, int &var_count) const
 //
 //-------------------------------------------------
 
-teac_fd_55g::teac_fd_55g(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, TEAC_FD_55G, "TEAC FD-55G FDD", tag, owner, clock, "teac_fd_55g", __FILE__)
+teac_fd_55g::teac_fd_55g(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, TEAC_FD_55G, tag, owner, clock)
 {
 }
 
@@ -2209,7 +2249,7 @@ void teac_fd_55g::setup_characteristics()
 	set_rpm(360);
 }
 
-void teac_fd_55g::handled_variants(UINT32 *variants, int &var_count) const
+void teac_fd_55g::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
@@ -2226,8 +2266,8 @@ void teac_fd_55g::handled_variants(UINT32 *variants, int &var_count) const
 //  used in the Commodoere 1541 disk drive
 //-------------------------------------------------
 
-alps_3255190x::alps_3255190x(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, ALPS_3255190x, "ALPS 32551901/32551902 Floppy Drive", tag, owner, clock, "alps_3255190x", __FILE__)
+alps_3255190x::alps_3255190x(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, ALPS_3255190X, tag, owner, clock)
 {
 }
 
@@ -2244,8 +2284,38 @@ void alps_3255190x::setup_characteristics()
 	cyl = 34;
 }
 
-void alps_3255190x::handled_variants(UINT32 *variants, int &var_count) const
+void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
+
+//-------------------------------------------------
+//  IBM 6360 -- 8" single-sided single density
+//-------------------------------------------------
+
+ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, IBM_6360, tag, owner, clock)
+{
+}
+
+ibm_6360::~ibm_6360()
+{
+}
+
+void ibm_6360::setup_characteristics()
+{
+	form_factor = floppy_image::FF_8;
+	tracks = 77;
+	sides = 1;
+	motor_always_on = true;
+	has_trk00_sensor = false;
+	set_rpm(360);
+}
+
+void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+}
+

@@ -9,15 +9,6 @@
 namespace glm{
 namespace detail
 {
-	template<std::size_t N> struct aligned {};
-	template<> GLM_ALIGNED_STRUCT(1) aligned<1>{};
-	template<> GLM_ALIGNED_STRUCT(2) aligned<2>{};
-	template<> GLM_ALIGNED_STRUCT(4) aligned<4>{};
-	template<> GLM_ALIGNED_STRUCT(8) aligned<8>{};
-	template<> GLM_ALIGNED_STRUCT(16) aligned<16>{};
-	template<> GLM_ALIGNED_STRUCT(32) aligned<32>{};
-	template<> GLM_ALIGNED_STRUCT(64) aligned<64>{};
-
 	template <typename T, std::size_t size, bool aligned>
 	struct storage
 	{
@@ -26,15 +17,22 @@ namespace detail
 		} type;
 	};
 
-	template <typename T, std::size_t size>
-	struct storage<T, size, true>
-	{
-		struct type : aligned<size>
-		{
-			uint8 data[size];
+	#define GLM_ALIGNED_STORAGE_TYPE_STRUCT(x) \
+		template <typename T> \
+		struct storage<T, x, true> { \
+			GLM_ALIGNED_STRUCT(x) type { \
+				uint8 data[x]; \
+			}; \
 		};
-	};
 
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(1)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(2)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(4)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(8)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(16)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(32)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(64)
+		
 #	if GLM_ARCH & GLM_ARCH_SSE2_BIT
 		template <>
 		struct storage<float, 16, true>

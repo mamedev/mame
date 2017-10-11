@@ -28,7 +28,7 @@ void ac1_state::video_start()
 {
 }
 
-UINT32 ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -44,7 +44,7 @@ UINT32 ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 ac1_state::screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ac1_state::screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	address_space &space = m_maincpu->space(AS_PROGRAM);

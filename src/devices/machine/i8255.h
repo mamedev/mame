@@ -29,12 +29,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_I8255_H
+#define MAME_MACHINE_I8255_H
+
 #pragma once
 
-#ifndef __I8255__
-#define __I8255__
-
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -58,33 +57,42 @@
 #define MCFG_I8255_OUT_PORTC_CB(_devcb) \
 	devcb = &i8255_device::set_out_pc_callback(*device, DEVCB_##_devcb);
 
+// output state when pins are in tri-state, default 0xff
+#define MCFG_I8255_TRISTATE_PORTA_CB(_devcb) \
+	devcb = &i8255_device::set_tri_pa_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_I8255_TRISTATE_PORTB_CB(_devcb) \
+	devcb = &i8255_device::set_tri_pb_callback(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> i8255_device
 
-class i8255_device :  public device_t
+class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pc_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb)  { return downcast<i8255_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb)  { return downcast<i8255_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pc_callback(device_t &device, Object &&cb)  { return downcast<i8255_device &>(device).m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8255_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8255_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pc_callback(device_t &device, Object &&cb) { return downcast<i8255_device &>(device).m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tri_pa_callback(device_t &device, Object &&cb) { return downcast<i8255_device &>(device).m_tri_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tri_pb_callback(device_t &device, Object &&cb) { return downcast<i8255_device &>(device).m_tri_pb_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( pa_r );
-	UINT8 pa_r();
+	uint8_t pa_r();
 
 	DECLARE_READ8_MEMBER( pb_r );
-	UINT8 pb_r();
+	uint8_t pb_r();
 
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc4_w );
@@ -108,15 +116,15 @@ private:
 	inline int port_c_lower_mode();
 	inline int port_c_upper_mode();
 
-	UINT8 read_mode0(int port);
-	UINT8 read_mode1(int port);
-	UINT8 read_mode2();
-	UINT8 read_pc();
-	void write_mode0(int port, UINT8 data);
-	void write_mode1(int port, UINT8 data);
-	void write_mode2(UINT8 data);
+	uint8_t read_mode0(int port);
+	uint8_t read_mode1(int port);
+	uint8_t read_mode2();
+	uint8_t read_pc();
+	void write_mode0(int port, uint8_t data);
+	void write_mode1(int port, uint8_t data);
+	void write_mode2(uint8_t data);
 	void output_pc();
-	void set_mode(UINT8 data);
+	void set_mode(uint8_t data);
 	void set_pc_bit(int bit, int state);
 
 	devcb_read8        m_in_pa_cb;
@@ -127,9 +135,12 @@ private:
 	devcb_write8       m_out_pb_cb;
 	devcb_write8       m_out_pc_cb;
 
-	UINT8 m_control;            // mode control word
-	UINT8 m_output[3];          // output latch
-	UINT8 m_input[3];           // input latch
+	devcb_read8        m_tri_pa_cb;
+	devcb_read8        m_tri_pb_cb;
+
+	uint8_t m_control;            // mode control word
+	uint8_t m_output[3];          // output latch
+	uint8_t m_input[3];           // input latch
 
 	int m_ibf[2];               // input buffer full flag
 	int m_obf[2];               // output buffer full flag, negative logic
@@ -141,8 +152,7 @@ private:
 
 
 // device type definition
-extern const device_type I8255;
+DECLARE_DEVICE_TYPE(I8255, i8255_device)
 extern const device_type I8255A;
 
-
-#endif
+#endif // MAME_MACHINE_I8255_H

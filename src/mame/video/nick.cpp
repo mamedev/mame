@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nick.h"
 
 
@@ -72,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NICK = &device_creator<nick_device>;
+DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
@@ -87,7 +88,7 @@ DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nick_map, AS_0, 8, nick_device )
+static ADDRESS_MAP_START( nick_map, 0, 8, nick_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -101,8 +102,8 @@ ADDRESS_MAP_END
 //  nick_device - constructor
 //-------------------------------------------------
 
-nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
+nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NICK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
@@ -203,9 +204,11 @@ void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *nick_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector nick_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -213,7 +216,7 @@ const address_space_config *nick_device::memory_space_config(address_spacenum sp
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 nick_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nick_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
@@ -329,9 +332,9 @@ void nick_device::initialize_palette()
 		int ba = BIT(i, 2);
 		int bb = BIT(i, 5);
 
-		UINT8 r = combine_3_weights(color_weights_rg, rc, rb, ra);
-		UINT8 g = combine_3_weights(color_weights_rg, gc, gb, ga);
-		UINT8 b = combine_2_weights(color_weights_b, bb, ba);
+		uint8_t r = combine_3_weights(color_weights_rg, rc, rb, ra);
+		uint8_t g = combine_3_weights(color_weights_rg, gc, gb, ga);
+		uint8_t b = combine_2_weights(color_weights_b, bb, ba);
 
 		m_palette[i] = rgb_t(r, g, b);
 	}
@@ -380,12 +383,12 @@ void nick_device::write_border(int clocks)
 
 void nick_device::do_left_margin()
 {
-	UINT8 left = NICK_GET_LEFT_MARGIN(m_LPT.LM);
+	uint8_t left = NICK_GET_LEFT_MARGIN(m_LPT.LM);
 
 	if (left > m_first_visible_clock)
 	{
 		/* some of the left margin is visible */
-		UINT8 left_visible = left - m_first_visible_clock;
+		uint8_t left_visible = left - m_first_visible_clock;
 
 		/* render the border */
 		write_border(left_visible);
@@ -394,12 +397,12 @@ void nick_device::do_left_margin()
 
 void nick_device::do_right_margin()
 {
-	UINT8 right = NICK_GET_RIGHT_MARGIN(m_LPT.RM);
+	uint8_t right = NICK_GET_RIGHT_MARGIN(m_LPT.RM);
 
 	if (right < m_last_visible_clock)
 	{
 		/* some of the right margin is visible */
-		UINT8 right_visible = m_last_visible_clock - right;
+		uint8_t right_visible = m_last_visible_clock - right;
 
 		/* render the border */
 		write_border(right_visible);
@@ -414,11 +417,11 @@ int nick_device::get_color_index(int pen_index)
 		return m_LPT.COL[pen_index];
 }
 
-void nick_device::write_pixels2color(UINT8 pen0, UINT8 pen1, UINT8 data_byte)
+void nick_device::write_pixels2color(uint8_t pen0, uint8_t pen1, uint8_t data_byte)
 {
 	int col_index[2];
 	int pen_index;
-	UINT8 data = data_byte;
+	uint8_t data = data_byte;
 
 	col_index[0] = get_color_index(pen0);
 	col_index[1] = get_color_index(pen1);
@@ -431,11 +434,11 @@ void nick_device::write_pixels2color(UINT8 pen0, UINT8 pen1, UINT8 data_byte)
 	}
 }
 
-void nick_device::write_pixels2color_lpixel(UINT8 pen0, UINT8 pen1, UINT8 data_byte)
+void nick_device::write_pixels2color_lpixel(uint8_t pen0, uint8_t pen1, uint8_t data_byte)
 {
 	int col_index[2];
 	int pen_index;
-	UINT8 data = data_byte;
+	uint8_t data = data_byte;
 
 	col_index[0] = get_color_index(pen0);
 	col_index[1] = get_color_index(pen1);
@@ -450,14 +453,14 @@ void nick_device::write_pixels2color_lpixel(UINT8 pen0, UINT8 pen1, UINT8 data_b
 }
 
 
-void nick_device::write_pixels(UINT8 data_byte, UINT8 char_idx)
+void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
 {
 	/* pen index colour 2-C (0,1), 4-C (0..3) 16-C (0..16) */
 	int pen_idx;
 	/* Col index = EP colour value */
 	int pal_idx;
-	UINT8 color_mode = NICK_GET_COLOUR_MODE(m_LPT.MB);
-	UINT8 data = data_byte;
+	uint8_t color_mode = NICK_GET_COLOUR_MODE(m_LPT.MB);
+	uint8_t data = data_byte;
 
 	switch (color_mode)
 	{
@@ -603,14 +606,14 @@ void nick_device::write_pixels(UINT8 data_byte, UINT8 char_idx)
 	}
 }
 
-void nick_device::write_pixels_lpixel(UINT8 data_byte, UINT8 char_idx)
+void nick_device::write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx)
 {
 	/* pen index colour 2-C (0,1), 4-C (0..3) 16-C (0..16) */
 	int pen_idx;
 	/* Col index = EP colour value */
 	int pal_idx;
-	UINT8 color_mode = NICK_GET_COLOUR_MODE(m_LPT.MB);
-	UINT8 data = data_byte;
+	uint8_t color_mode = NICK_GET_COLOUR_MODE(m_LPT.MB);
+	uint8_t data = data_byte;
 
 	switch (color_mode)
 	{
@@ -773,7 +776,7 @@ void nick_device::write_pixels_lpixel(UINT8 data_byte, UINT8 char_idx)
 
 void nick_device::do_pixel(int clocks_visible)
 {
-	UINT8 buf1, buf2;
+	uint8_t buf1, buf2;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -791,7 +794,7 @@ void nick_device::do_pixel(int clocks_visible)
 
 void nick_device::do_lpixel(int clocks_visible)
 {
-	UINT8 buf1;
+	uint8_t buf1;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -804,7 +807,7 @@ void nick_device::do_lpixel(int clocks_visible)
 
 void nick_device::do_attr(int clocks_visible)
 {
-	UINT8 buf1, buf2;
+	uint8_t buf1, buf2;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -815,8 +818,8 @@ void nick_device::do_attr(int clocks_visible)
 		m_LD2++;
 
 		{
-			UINT8 bg_color = ((buf1 >> 4) & 0x0f);
-			UINT8 fg_color = (buf1 & 0x0f);
+			uint8_t bg_color = ((buf1 >> 4) & 0x0f);
+			uint8_t fg_color = (buf1 & 0x0f);
 
 			write_pixels2color_lpixel(bg_color, fg_color, buf2);
 		}
@@ -825,7 +828,7 @@ void nick_device::do_attr(int clocks_visible)
 
 void nick_device::do_ch256(int clocks_visible)
 {
-	UINT8 buf1, buf2;
+	uint8_t buf1, buf2;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -839,7 +842,7 @@ void nick_device::do_ch256(int clocks_visible)
 
 void nick_device::do_ch128(int clocks_visible)
 {
-	UINT8 buf1, buf2;
+	uint8_t buf1, buf2;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -853,7 +856,7 @@ void nick_device::do_ch128(int clocks_visible)
 
 void nick_device::do_ch64(int clocks_visible)
 {
-	UINT8 buf1, buf2;
+	uint8_t buf1, buf2;
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
@@ -869,16 +872,16 @@ void nick_device::do_ch64(int clocks_visible)
 void nick_device::do_display()
 {
 	LPT_ENTRY *pLPT = &m_LPT;
-	UINT8 clocks_visible;
-	UINT8 right_margin = NICK_GET_RIGHT_MARGIN(pLPT->RM);
-	UINT8 left_margin = NICK_GET_LEFT_MARGIN(pLPT->LM);
+	uint8_t clocks_visible;
+	uint8_t right_margin = NICK_GET_RIGHT_MARGIN(pLPT->RM);
+	uint8_t left_margin = NICK_GET_LEFT_MARGIN(pLPT->LM);
 
 	clocks_visible = right_margin - left_margin;
 
 	if (clocks_visible)
 	{
 		/* get display mode */
-		UINT8 display_mode = NICK_GET_DISPLAY_MODE(pLPT->MB);
+		uint8_t display_mode = NICK_GET_DISPLAY_MODE(pLPT->MB);
 
 		if (m_scanline_count == 0)   // ||
 			//((pLPT->MB & NICK_MB_VRES)==0))
@@ -969,7 +972,7 @@ void nick_device::do_display()
 
 void nick_device::update_lpt()
 {
-	UINT16 CurLPT = (m_LPL & 0x0ff) | ((m_LPH & 0x0f) << 8);
+	uint16_t CurLPT = (m_LPL & 0x0ff) | ((m_LPH & 0x0f) << 8);
 	CurLPT++;
 	m_LPL = CurLPT & 0x0ff;
 	m_LPH = (m_LPH & 0x0f0) | ((CurLPT >> 8) & 0x0f);
@@ -979,7 +982,7 @@ void nick_device::update_lpt()
 void nick_device::reload_lpt()
 {
 	/* get addr of LPT */
-	UINT32 LPT_Addr = ((m_LPL & 0x0ff) << 4) | ((m_LPH & 0x0f) << (8+4));
+	uint32_t LPT_Addr = ((m_LPL & 0x0ff) << 4) | ((m_LPH & 0x0f) << (8+4));
 
 	/* update internal LPT state */
 	m_LPT.SC = space().read_byte(LPT_Addr);
@@ -1003,7 +1006,7 @@ void nick_device::reload_lpt()
 /* call here to render a line of graphics */
 void nick_device::do_line()
 {
-	UINT8 scanline;
+	uint8_t scanline;
 
 	m_write_virq((m_LPT.MB & NICK_MB_VIRQ) ? ASSERT_LINE : CLEAR_LINE);
 

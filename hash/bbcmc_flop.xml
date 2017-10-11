@@ -10,10 +10,46 @@
 
 <softwarelist name="bbcmc_flop" description="BBC Master Compact disks">
 
+	<software name="alps24">
+		<description>ALPS - Adventure Language Programming System</description>
+		<year>1988</year>
+		<publisher>Alpine Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="alps24.adl" size="655360" crc="82b20916" sha1="fcf1c0290afb523cbab11069373fef28478b1ad3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrobl">
+		<description>Astro Blaster</description>
+		<year>2016</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="95488">
+				<rom name="AstroBlaster.adf" size="95488" crc="372f352b" sha1="cc247c41bad2c00f99639af93e89bfb29692b00f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnival">
+		<description>Carnival</description>
+		<year>2014</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="25600">
+				<rom name="carnival.adf" size="25600" crc="cbe0d763" sha1="5caf371370a1358540e8d042ccdb02db2c1470d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elite">
 		<description>Elite</description>
 		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SUG60" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
@@ -22,7 +58,7 @@
 	</software>
 
 	<software name="welcome">
-		<description>BBC Master Compact Welcome Disc</description>
+		<description>Welcome &amp; Utilities Disc for Master Compact</description>
 		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -55,6 +91,30 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
 				<rom name="animated_numbers.adl" size="655360" crc="a8b8d04d" sha1="7d633419ac6012c80f9376210e47642ca3d70d82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bikes">
+		<description>Bikes</description>
+		<year>1990</year>
+		<publisher>Department of Education and The Arts Tasmania</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes I"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes 1 Version 2.0-06-90.adl" size="655360" crc="3ca4ba99" sha1="397501a286ed9b1ebd5421a980e3ce3d5ca9008d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes II"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes 2 Version 2.0-06-90.adl" size="655360" crc="06fcff2e" sha1="30888334f787a5762ed3d31e9ddf387888997674" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Bikes Toolkit"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Bikes Toolkit Version 2.0-06-90.adl" size="655360" crc="37eab1ee" sha1="033c50aea500c95ff334d60ec31625d95ae2fe3a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

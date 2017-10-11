@@ -98,7 +98,7 @@ int test_inversesqrt()
 	glm::uint ulp(0);
 	float diff(0.0f);
 
-	for(float f = 0.001f; f < 10.f; f *= 1.001f)
+	for(float f = 0.001f; f < 10.f; f *= 1.01f)
 	{
 		glm::lowp_fvec1 u(f);
 		glm::lowp_fvec1 lowp_v = glm::inversesqrt(u);
@@ -106,6 +106,7 @@ int test_inversesqrt()
 
 		ulp = glm::max(glm::float_distance(lowp_v.x, defaultp_v), ulp);
 		diff = glm::abs(lowp_v.x - defaultp_v);
+		Error += diff > 0.1f ? 1 : 0;
 	}
 
 	return Error;

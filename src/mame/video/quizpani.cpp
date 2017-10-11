@@ -76,7 +76,7 @@ void quizpani_state::video_start()
 	save_item(NAME(m_txtbank));
 }
 
-UINT32 quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollreg[0] - 64);
 	m_bg_tilemap->set_scrolly(0, m_scrollreg[1] + 16);

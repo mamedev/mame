@@ -22,23 +22,30 @@ be found!
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "screen.h"
 
 
 class pv9234_state : public driver_device
 {
 public:
 	pv9234_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_ram(*this, "p_ram"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_ram(*this, "p_ram")
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_WRITE32_MEMBER(debug_w);
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
-	required_shared_ptr<UINT32> m_p_ram;
+
+	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_shared_ptr<uint32_t> m_p_ram;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -76,7 +83,7 @@ WRITE32_MEMBER( pv9234_state::debug_w )
 
 WRITE32_MEMBER( pv9234_state::debug1_w )
 {
-	UINT8 i,j;
+	uint8_t i,j;
 	if (data)
 	{
 		for (i = 0; i < 4; i++)
@@ -131,12 +138,12 @@ void pv9234_state::video_start()
 {
 }
 
-UINT32 pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pv9234, pv9234_state )
+static MACHINE_CONFIG_START( pv9234 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
 	MCFG_CPU_PROGRAM_MAP(pv9234_map)
@@ -166,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-SYST( 1997, pv9234,  0,       0,     pv9234,    pv9234, driver_device,   0,  "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY               FULLNAME         FLAGS
+SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, 0,    "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

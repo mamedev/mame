@@ -7,7 +7,7 @@
 /* Similar as Iron Horse */
 PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -30,7 +30,7 @@ PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
 
 		for (j = 0; j < 8; j++)
 		{
-			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
+			uint8_t ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
 			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
@@ -127,7 +127,7 @@ void scotrsht_state::video_start()
 	save_item(NAME(m_palette_bank));
 }
 
-UINT32 scotrsht_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t scotrsht_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int col = 0; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, m_scroll[col]);

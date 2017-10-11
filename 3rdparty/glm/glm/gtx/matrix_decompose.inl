@@ -125,7 +125,7 @@ namespace detail
 		{
 			for(length_t i = 0; i < 3; i++)
 			{
-				Scale.x *= static_cast<T>(-1);
+				Scale[i] *= static_cast<T>(-1);
 				Row[i] *= static_cast<T>(-1);
 			}
 		}

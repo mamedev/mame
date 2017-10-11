@@ -58,7 +58,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 	flip_screen_y_set(data & 0x01);
 	flip_screen_x_set(data & 0x02);
 
-	m_bg_on = data & 0x04;
+	m_bg_clip_on = data & 0x04;
 	m_sky_on = data & 0x08;
 
 	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
@@ -88,8 +88,12 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 	/* prevent wraparound */
 	rectangle clip = cliprect;
-	if (flip_screen_x()) clip.min_x += 8*8;
-	else clip.max_x -= 8*8;
+	// enable clipping if on (title screen disable this to cover all of the area)
+	if(m_bg_clip_on)
+	{
+		if (flip_screen_x()) clip.min_x += 8*8;
+		else clip.max_x -= 8*8;
+	}
 
 	for (offs = 0; offs < 0x400; offs++)
 	{
@@ -155,7 +159,7 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	const UINT8 *gfx;
+	const uint8_t *gfx;
 
 	g_profiler.start(PROFILER_USER1);
 
@@ -163,8 +167,8 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;
-		const UINT8 *lookup;
-		const UINT8 *zoomx_rom, *zoomy_rom;
+		const uint8_t *lookup;
+		const uint8_t *zoomx_rom, *zoomy_rom;
 
 		sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
 		sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
@@ -192,7 +196,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				for (ch = 0; ch < 4; ch++)
 				{
 					int pos, code, realflipy;
-					const UINT8 *pendata;
+					const uint8_t *pendata;
 
 					pos = base_pos + 2 * ch;
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
@@ -223,15 +227,14 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else
-		bitmap.fill(0, cliprect);
+		bitmap.fill(0x20, cliprect); // stage 3 disables sky, wants background pen to be blue
 
-	if (m_bg_on)
-		draw_bg(bitmap, cliprect);
+	draw_bg(bitmap, cliprect);
 
 	draw_sprites(bitmap, cliprect);
 

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
+#include "sound/3812intf.h"
 
 class bloodbro_state : public driver_device
 {
@@ -12,6 +13,7 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
+		m_ymsnd(*this, "ymsnd"),
 		m_spriteram(*this, "spriteram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
@@ -22,18 +24,22 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 	required_device<seibu_sound_device> m_seibu_sound;
+	required_device<ym3812_device> m_ymsnd;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_bgvideoram;
-	required_shared_ptr<UINT16> m_fgvideoram;
-	required_shared_ptr<UINT16> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_txvideoram;
 
-	UINT16 m_scrollram[6];
-	UINT16 m_layer_en;
+	uint16_t m_scrollram[6];
+	uint16_t m_layer_en;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+
+	bool m_weststry_opl_irq;
+	bool m_weststry_soundnmi_mask;
 
 	DECLARE_WRITE16_MEMBER(bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(fgvideoram_w);
@@ -42,6 +48,10 @@ public:
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
 	DECLARE_WRITE8_MEMBER(weststry_soundlatch_w);
+	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
+	DECLARE_WRITE8_MEMBER(weststry_opl_w);
+	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);
+	void weststry_soundnmi_update();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -49,9 +59,9 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

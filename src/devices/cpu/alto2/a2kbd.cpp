@@ -5,6 +5,7 @@
  *   Xerox AltoII memory mapped I/O keyboard
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 /**
@@ -15,7 +16,7 @@
  */
 READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 {
-	UINT16 data = 0177777;
+	uint16_t data = 0177777;
 	switch (offset & 3) {
 	case 0:
 		data = machine().root_device().ioport("ROW0")->read();
@@ -31,11 +32,11 @@ READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 		break;
 	}
 	m_kbd.matrix[offset & 03] = data;
-	if (!space.debugger_access()) {
+	if (!machine().side_effect_disabled()) {
 		LOG((this,LOG_KBD,2,"    read KBDAD+%o (%#o)\n", offset & 3, data));
 	}
 	if (0 == (offset & 3) && (m_kbd.bootkey != 0177777)) {
-		if (!space.debugger_access()) {
+		if (!machine().side_effect_disabled()) {
 			LOG((this,0,2,"  boot keys (%#o & %#o)\n", data, m_kbd.bootkey));
 		}
 		data &= m_kbd.bootkey;
@@ -44,7 +45,7 @@ READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 	return data;
 }
 
-void alto2_cpu_device::init_kbd(UINT16 bootkey)
+void alto2_cpu_device::init_kbd(uint16_t bootkey)
 {
 	m_kbd.bootkey = bootkey;
 }

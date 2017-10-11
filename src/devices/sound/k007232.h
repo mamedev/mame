@@ -4,25 +4,21 @@
 /*    Konami PCM controller                              */
 /*********************************************************/
 
+#ifndef MAME_SOUND_K007232_H
+#define MAME_SOUND_K007232_H
+
 #pragma once
-
-#ifndef __K007232_H__
-#define __K007232_H__
-
-#define  KDAC_A_PCM_MAX    (2)      /* Channels per chip */
 
 #define MCFG_K007232_PORT_WRITE_HANDLER(_devcb) \
 	devcb = &k007232_device::set_port_write_handler(*device, DEVCB_##_devcb);
 
 
-class k007232_device : public device_t,
-									public device_sound_interface
+class k007232_device : public device_t, public device_sound_interface
 {
 public:
-	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k007232_device() {}
+	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -49,26 +45,27 @@ protected:
 	void KDAC_A_make_fncode();
 
 private:
-	// internal state
-	required_region_ptr<UINT8> m_rom;
+	static constexpr unsigned KDAC_A_PCM_MAX = 2;      /* Channels per chip */
 
-	UINT8           m_vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
-	UINT32          m_addr[KDAC_A_PCM_MAX];
-	UINT32          m_start[KDAC_A_PCM_MAX];
-	UINT32          m_step[KDAC_A_PCM_MAX];
-	UINT32          m_bank[KDAC_A_PCM_MAX];
+	// internal state
+	required_region_ptr<uint8_t> m_rom;
+
+	uint8_t           m_vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
+	uint32_t          m_addr[KDAC_A_PCM_MAX];
+	uint32_t          m_start[KDAC_A_PCM_MAX];
+	uint32_t          m_step[KDAC_A_PCM_MAX];
+	uint32_t          m_bank[KDAC_A_PCM_MAX];
 	int             m_play[KDAC_A_PCM_MAX];
 
-	UINT8           m_wreg[0x10]; /* write data */
+	uint8_t           m_wreg[0x10]; /* write data */
 
-	UINT32          m_pcmlimit;
+	uint32_t          m_pcmlimit;
 
 	sound_stream *  m_stream;
-	UINT32          m_fncode[0x200];
+	uint32_t          m_fncode[0x200];
 	devcb_write8 m_port_write_handler;
 };
 
-extern const device_type K007232;
+DECLARE_DEVICE_TYPE(K007232, k007232_device)
 
-
-#endif /* __K007232_H__ */
+#endif // MAME_SOUND_K007232_H

@@ -56,7 +56,7 @@ const int c3040_format::c3040_gap2[] =
 	12, 12, 12, 12, 12                                                  // 31-35
 };
 
-floppy_image_format_t::desc_e* c3040_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)
+floppy_image_format_t::desc_e* c3040_format::get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2)
 {
 	static floppy_image_format_t::desc_e desc[] = {
 		/* 00 */ { SECTOR_LOOP_START, 0, -1 },

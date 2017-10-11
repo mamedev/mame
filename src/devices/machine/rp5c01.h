@@ -18,12 +18,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_RP5C01_H
+#define MAME_MACHINE_RP5C01_H
+
 #pragma once
 
-#ifndef __RP5C01__
-#define __RP5C01__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -51,9 +51,9 @@ class rp5c01_device :   public device_t,
 {
 public:
 	// construction/destruction
-	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_alarm_callback(device_t &device, Object &&cb) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(std::forward<Object>(cb)); }
 	static void remove_battery(device_t &device) { downcast<rp5c01_device &>(device).m_battery_backed = false; }
 
 	DECLARE_READ8_MEMBER( read );
@@ -62,13 +62,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
 
 protected:
+	// construction/destruction
+	rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual bool rtc_battery_backed() const override { return m_battery_backed; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	// device_nvram_interface overrides
@@ -88,11 +91,11 @@ private:
 	devcb_write_line m_out_alarm_cb;
 	bool m_battery_backed;
 
-	UINT8 m_reg[2][13];         // clock registers
-	UINT8 m_ram[13];            // RAM
+	uint8_t m_reg[2][13];         // clock registers
+	uint8_t m_ram[13];            // RAM
 
-	UINT8 m_mode;               // mode register
-	UINT8 m_reset;              // reset register
+	uint8_t m_mode;               // mode register
+	uint8_t m_reset;              // reset register
 	int m_alarm;                // alarm output
 	int m_alarm_on;             // alarm condition
 	int m_1hz;                  // 1 Hz condition
@@ -103,10 +106,18 @@ private:
 	emu_timer *m_16hz_timer;
 };
 
+// ======================> tc8521_device
+
+class tc8521_device : public rp5c01_device
+{
+public:
+	// construction/destruction
+	tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
-extern const device_type RP5C01;
+DECLARE_DEVICE_TYPE(RP5C01, rp5c01_device)
+DECLARE_DEVICE_TYPE(TC8521, tc8521_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_RP5C01_H

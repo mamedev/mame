@@ -41,6 +41,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/mpz80.h"
 #include "softlist.h"
 
@@ -147,9 +148,9 @@ inline void mpz80_state::check_interrupt()
 
 inline offs_t mpz80_state::get_address(offs_t offset)
 {
-	UINT16 map_addr = ((m_task & 0x0f) << 5) | ((offset & 0xf000) >> 11);
-	UINT8 map = m_map_ram[map_addr];
-	//UINT8 attr = m_map_ram[map_addr + 1];
+	uint16_t map_addr = ((m_task & 0x0f) << 5) | ((offset & 0xf000) >> 11);
+	uint8_t map = m_map_ram[map_addr];
+	//uint8_t attr = m_map_ram[map_addr + 1];
 
 	//logerror("task %02x map_addr %03x map %02x attr %02x address %06x\n", m_task, map_addr, map, attr, offset);
 
@@ -164,8 +165,11 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 
 READ8_MEMBER( mpz80_state::mmu_r )
 {
+	if (m_trap && offset >= m_trap_start && offset <= m_trap_start + 0xf)
+		return m_rom->base()[0x3f0 | (m_trap_reset << 10) | (offset - m_trap_start)];
+
 	m_addr = get_address(offset);
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_pretrap)
 	{
@@ -205,7 +209,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 		}
 		else if (offset < 0xc00)
 		{
-			UINT16 rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
+			uint16_t rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
 			data = m_rom->base()[rom_addr];
 		}
 		else
@@ -458,7 +462,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// trap reset
 	data |= m_trap_reset;
@@ -543,7 +547,6 @@ static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
     AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 */
 ADDRESS_MAP_END
-
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mpz80_io )
@@ -706,7 +709,7 @@ void mpz80_state::machine_reset()
 //  MACHINE_CONFIG( mpz80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mpz80, mpz80_state )
+static MACHINE_CONFIG_START( mpz80 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
@@ -771,37 +774,9 @@ ROM_START( mpz80 )
 ROM_END
 
 
-
-//**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( mpz80 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
-{
-	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
-	{
-		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, m_rom->base() + ((m_trap_reset << 10) | 0x3f0));
-		return ~0;
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(mpz80_state,mpz80)
-{
-	address_space &program = machine().device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(FUNC(mpz80_state::mpz80_direct_update_handler), this));
-}
-
-
-
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_EEPROMSER_H
+#define MAME_MACHINE_EEPROMSER_H
 
-#ifndef __EEPROMSER_H__
-#define __EEPROMSER_H__
+#pragma once
 
 #include "eeprom.h"
 
@@ -19,6 +19,13 @@
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
+
+// optional enable for streaming reads
+#define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
+	eeprom_serial_base_device::static_enable_streaming(*device);
+// optional enable for output on falling clock
+#define MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	eeprom_serial_base_device::static_enable_output_on_falling_clock(*device);
 
 // standard 93CX6 class of 16-bit EEPROMs
 #define MCFG_EEPROM_SERIAL_93C06_ADD(_tag) \
@@ -61,13 +68,25 @@
 #define MCFG_EEPROM_SERIAL_MSM16911_16BIT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_MSM16911_16BIT, 0)
 
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+#define MCFG_EEPROM_SERIAL_S29190_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29190_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+#define MCFG_EEPROM_SERIAL_S29290_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29290_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+#define MCFG_EEPROM_SERIAL_S29390_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29390_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+
 // X24c44 16 bit ram/eeprom combo
 #define MCFG_EEPROM_SERIAL_X24C44_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_X24C44_16BIT, 0)
 
-// optional enable for streaming reads
-#define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	eeprom_serial_base_device::static_enable_streaming(*device);
 // pass-throughs to the base class for setting default data
 #define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
@@ -83,16 +102,16 @@
 
 class eeprom_serial_base_device : public eeprom_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// inline configuration helpers
 	static void static_set_address_bits(device_t &device, int addrbits);
 	static void static_enable_streaming(device_t &device);
+	static void static_enable_output_on_falling_clock(device_t &device);
 
 protected:
+	// construction/destruction
+	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -100,7 +119,7 @@ protected:
 	// read interfaces differ between implementations
 
 	// commands
-	enum eeprom_command
+	enum eeprom_command : u8
 	{
 		COMMAND_INVALID,
 		COMMAND_READ,
@@ -115,7 +134,7 @@ protected:
 	};
 
 	// states
-	enum eeprom_state
+	enum eeprom_state : u8
 	{
 		STATE_IN_RESET,
 		STATE_WAIT_FOR_START_BIT,
@@ -126,7 +145,7 @@ protected:
 	};
 
 	// events
-	enum eeprom_event
+	enum eeprom_event : u8
 	{
 		EVENT_CS_RISING_EDGE = 1 << 0,
 		EVENT_CS_FALLING_EDGE = 1 << 1,
@@ -152,22 +171,23 @@ protected:
 
 
 	// configuration state
-	UINT8           m_command_address_bits;     // number of address bits in a command
+	uint8_t         m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
+	bool            m_output_on_falling_clock_enabled;  // true if the output pin is updated on the falling edge of the clock
 
 	// runtime state
 	eeprom_state    m_state;                    // current internal state
-	UINT8           m_cs_state;                 // state of the CS line
+	uint8_t         m_cs_state;                 // state of the CS line
 	attotime        m_last_cs_rising_edge_time; // time of the last CS rising edge
-	UINT8           m_oe_state;                 // state of the OE line
-	UINT8           m_clk_state;                // state of the CLK line
-	UINT8           m_di_state;                 // state of the DI line
+	uint8_t         m_oe_state;                 // state of the OE line
+	uint8_t         m_clk_state;                // state of the CLK line
+	uint8_t         m_di_state;                 // state of the DI line
 	bool            m_locked;                   // are we locked against writes?
-	UINT32          m_bits_accum;               // number of bits accumulated
-	UINT32          m_command_address_accum;    // accumulator of command+address bits
+	uint32_t        m_bits_accum;               // number of bits accumulated
+	uint32_t        m_command_address_accum;    // accumulator of command+address bits
 	eeprom_command  m_command;                  // current command
-	UINT32          m_address;                  // current address extracted from command
-	UINT32          m_shift_register;           // holds data coming in/going out
+	uint32_t        m_address;                  // current address extracted from command
+	uint32_t        m_shift_register;           // holds data coming in/going out
 };
 
 
@@ -176,10 +196,6 @@ protected:
 
 class eeprom_serial_93cxx_device : public eeprom_serial_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);  // combined DO+READY/BUSY
@@ -190,6 +206,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 };
@@ -199,10 +218,6 @@ protected:
 
 class eeprom_serial_er5911_device : public eeprom_serial_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);          // DO
@@ -214,6 +229,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 };
@@ -225,10 +243,6 @@ class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 {
 		//async recall not implemented
 		//async store not implemented
-protected:
-	// construction/destruction
-	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);          // DO
@@ -239,6 +253,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 	void handle_event(eeprom_event event) override;
@@ -247,10 +264,10 @@ protected:
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
 	void device_start() override;
-	UINT8 m_ram_length;
-	UINT16 m_ram_data[16];
-	UINT16 m_reading;
-	UINT8 m_store_latch;
+	uint8_t m_ram_length;
+	uint16_t m_ram_data[16];
+	uint16_t m_reading;
+	uint8_t m_store_latch;
 };
 
 
@@ -264,9 +281,10 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 }; \
-extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT;
+DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
+
 // standard 93CX6 class of 16-bit EEPROMs
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 16)
@@ -290,6 +308,13 @@ DECLARE_SERIAL_EEPROM_DEVICE(er5911, er5911, ER5911, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, msm16911, MSM16911, 8)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, msm16911, MSM16911, 16)
 
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16)
+
 // X24c44 8 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)
-#endif
+
+#endif // MAME_MACHINE_EEPROMSER_H

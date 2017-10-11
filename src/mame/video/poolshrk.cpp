@@ -27,7 +27,7 @@ void poolshrk_state::video_start()
 }
 
 
-UINT32 poolshrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t poolshrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 

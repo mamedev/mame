@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cdp1852.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CDP1852 = &device_creator<cdp1852_device>;
+DEFINE_DEVICE_TYPE(CDP1852, cdp1852_device, "cdp1852", "RCA CDP1852 I/O")
 
 
 
@@ -38,12 +39,13 @@ enum
 //  cdp1852_device - constructor
 //-------------------------------------------------
 
-cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CDP1852, "CDP1852 I/O", tag, owner, clock, "cdp1852", __FILE__),
+cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CDP1852, tag, owner, clock),
 	m_read_mode(*this),
 	m_write_sr(*this),
 	m_read_data(*this),
-	m_write_data(*this), m_new_data(0), m_data(0), m_next_data(0), m_sr(0), m_next_sr(0), m_scan_timer(nullptr)
+	m_write_data(*this),
+	m_new_data(0), m_data(0), m_next_data(0), m_sr(0), m_next_sr(0), m_scan_timer(nullptr)
 {
 }
 

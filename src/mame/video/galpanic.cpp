@@ -43,7 +43,7 @@ void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);

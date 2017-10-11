@@ -27,12 +27,12 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 
 	m_rdp = state->rdp();
 
-	for(INT32 i = 0; i < 0x10000; i++)
+	for(int32_t i = 0; i < 0x10000; i++)
 	{
 		m_expand_16to32_table[i] = color_t((i & 1) ? 0xff : 0x00, m_rdp->m_replicated_rgba[(i >> 11) & 0x1f], m_rdp->m_replicated_rgba[(i >>  6) & 0x1f], m_rdp->m_replicated_rgba[(i >>  1) & 0x1f]);
 	}
 
-	for(UINT32 i = 0; i < 0x80000; i++)
+	for(uint32_t i = 0; i < 0x80000; i++)
 	{
 		if (i & 0x40000)
 		{
@@ -65,8 +65,8 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 
 void n64_texture_pipe_t::mask(rgbaint_t& sstt, const n64_tile_t& tile)
 {
-	UINT32 s_mask_bits = m_maskbits_table[tile.mask_s];
-	UINT32 t_mask_bits = m_maskbits_table[tile.mask_t];
+	uint32_t s_mask_bits = m_maskbits_table[tile.mask_s];
+	uint32_t t_mask_bits = m_maskbits_table[tile.mask_t];
 	rgbaint_t maskbits(s_mask_bits, s_mask_bits, t_mask_bits, t_mask_bits);
 
 	rgbaint_t do_wrap(sstt);
@@ -113,7 +113,7 @@ inline void n64_texture_pipe_t::shift_copy(rgbaint_t& st, const n64_tile_t& tile
 	st.shl(tile.lshift);
 }
 
-void n64_texture_pipe_t::clamp_cycle(rgbaint_t& st, rgbaint_t& stfrac, rgbaint_t& maxst, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
+void n64_texture_pipe_t::clamp_cycle(rgbaint_t& st, rgbaint_t& stfrac, rgbaint_t& maxst, const int32_t tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
 {
 	rgbaint_t not_clamp(tile.clamp_st);
 	not_clamp.xor_imm(0xffffffff);
@@ -146,7 +146,7 @@ void n64_texture_pipe_t::clamp_cycle(rgbaint_t& st, rgbaint_t& stfrac, rgbaint_t
 	st.or_reg(clamp_diff);
 }
 
-void n64_texture_pipe_t::clamp_cycle_light(rgbaint_t& st, rgbaint_t& maxst, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
+void n64_texture_pipe_t::clamp_cycle_light(rgbaint_t& st, rgbaint_t& maxst, const int32_t tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
 {
 	rgbaint_t not_clamp(tile.clamp_st);
 	not_clamp.xor_imm(0xffffffff);
@@ -178,17 +178,17 @@ void n64_texture_pipe_t::clamp_cycle_light(rgbaint_t& st, rgbaint_t& maxst, cons
 	st.or_reg(clamp_diff);
 }
 
-void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, int32_t SSS, int32_t SST, uint32_t tilenum, uint32_t cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t& tile = object.m_tiles[tilenum];
-	const UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
+	const uint32_t index = (tile.format << 4) | (tile.size << 2) | ((uint32_t) object.m_other_modes.en_tlut << 1) | (uint32_t) object.m_other_modes.tlut_type;
 
 	rgbaint_t st(0, SSS, 0, SST);
 	rgbaint_t maxst = shift_cycle(st, tile);
 	clamp_cycle_light(st, maxst, tilenum, tile, userdata);
 	mask(st, tile);
 
-	UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
+	uint32_t tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
 	rgbaint_t t0;
 	((this)->*(m_texel_fetch[index]))(t0, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
@@ -211,25 +211,25 @@ void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, INT32 SSS, I
 	TEX->and_imm(0x1ff);
 }
 
-void n64_texture_pipe_t::cycle_nearest_lerp(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::cycle_nearest_lerp(color_t* TEX, color_t* prev, int32_t SSS, int32_t SST, uint32_t tilenum, uint32_t cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t& tile = object.m_tiles[tilenum];
-	const UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
+	const uint32_t index = (tile.format << 4) | (tile.size << 2) | ((uint32_t) object.m_other_modes.en_tlut << 1) | (uint32_t) object.m_other_modes.tlut_type;
 
 	rgbaint_t st(0, SSS, 0, SST);
 	rgbaint_t maxst = shift_cycle(st, tile);
 	clamp_cycle_light(st, maxst, tilenum, tile, userdata);
 	mask(st, tile);
 
-	UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
+	uint32_t tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
 	((this)->*(m_texel_fetch[index]))(*TEX, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
 }
 
-void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, int32_t SSS, int32_t SST, uint32_t tilenum, uint32_t cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t& tile = object.m_tiles[tilenum];
-	const UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
+	const uint32_t index = (tile.format << 4) | (tile.size << 2) | ((uint32_t) object.m_other_modes.en_tlut << 1) | (uint32_t) object.m_other_modes.tlut_type;
 
 	rgbaint_t st(0, SSS, 0, SST);
 	rgbaint_t maxst = shift_cycle(st, tile);
@@ -238,7 +238,7 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 
 	mask(st, tile);
 
-	const UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
+	const uint32_t tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
 	rgbaint_t t0;
 	((this)->*(m_texel_fetch[index]))(t0, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
@@ -261,12 +261,12 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 	TEX->and_imm(0x1ff);
 }
 
-void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, int32_t SSS, int32_t SST, uint32_t tilenum, uint32_t cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t& tile = object.m_tiles[tilenum];
 
-	UINT32 tpal = tile.palette;
-	UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
+	uint32_t tpal = tile.palette;
+	uint32_t index = (tile.format << 4) | (tile.size << 2) | ((uint32_t) object.m_other_modes.en_tlut << 1) | (uint32_t) object.m_other_modes.tlut_type;
 
 	rgbaint_t sstt(SSS, SSS, SST, SST);
 	rgbaint_t maxst = shift_cycle(sstt, tile);
@@ -279,8 +279,8 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 
 	mask(sstt, tile);
 
-	const UINT32 tbase1 = tile.tmem + ((tile.line * sstt.get_b32()) & 0x1ff);
-	const UINT32 tbase2 = tile.tmem + ((tile.line * sstt.get_g32()) & 0x1ff);
+	const uint32_t tbase1 = tile.tmem + ((tile.line * sstt.get_b32()) & 0x1ff);
+	const uint32_t tbase2 = tile.tmem + ((tile.line * sstt.get_g32()) & 0x1ff);
 
 	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
 
@@ -346,7 +346,7 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 	}
 }
 
-void n64_texture_pipe_t::copy(color_t* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux* userdata)
+void n64_texture_pipe_t::copy(color_t* TEX, int32_t SSS, int32_t SST, uint32_t tilenum, const rdp_poly_state& object, rdp_span_aux* userdata)
 {
 	const n64_tile_t* tiles = object.m_tiles;
 	const n64_tile_t& tile = tiles[tilenum];
@@ -364,16 +364,16 @@ void n64_texture_pipe_t::copy(color_t* TEX, INT32 SSS, INT32 SST, UINT32 tilenum
 	st.and_imm(0x1fff);
 	mask(st, tile);
 
-	const UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
-	const UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
+	const uint32_t index = (tile.format << 4) | (tile.size << 2) | ((uint32_t) object.m_other_modes.en_tlut << 1) | (uint32_t) object.m_other_modes.tlut_type;
+	const uint32_t tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 	((this)->*(m_texel_fetch[index]))(*TEX, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
 }
 
-void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_1cycle(int32_t* sss, int32_t* sst, const int32_t s, const int32_t t, const int32_t w, const int32_t dsinc, const int32_t dtinc, const int32_t dwinc, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	const INT32 nextsw = (w + dwinc) >> 16;
-	INT32 nexts = (s + dsinc) >> 16;
-	INT32 nextt = (t + dtinc) >> 16;
+	const int32_t nextsw = (w + dwinc) >> 16;
+	int32_t nexts = (s + dsinc) >> 16;
+	int32_t nextt = (t + dtinc) >> 16;
 
 	if (object.m_other_modes.persp_tex_en)
 	{
@@ -388,10 +388,10 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 	userdata->m_precomp_s = nexts;
 	userdata->m_precomp_t = nextt;
 
-	const INT32 lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
+	const int32_t lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
 
-	INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
-	INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
+	int32_t horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
+	int32_t vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
 	if (horstep & 0x20000)
 	{
 		horstep = ~horstep & 0x1ffff;
@@ -401,7 +401,7 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 		vertstep = ~vertstep & 0x1ffff;
 	}
 
-	INT32 lod = (horstep >= vertstep) ? horstep : vertstep;
+	int32_t lod = (horstep >= vertstep) ? horstep : vertstep;
 
 	*sss = m_lod_lookup[*sss & 0x7ffff];
 	*sst = m_lod_lookup[*sst & 0x7ffff];
@@ -415,11 +415,11 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	INT32 l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
-	UINT8 lod_fraction = ((lod << 3) >> l_tile) & 0xff;
+	uint8_t lod_fraction = ((lod << 3) >> l_tile) & 0xff;
 
 	if(!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
 	{
@@ -442,11 +442,11 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 	*/
 }
 
-void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_2cycle(int32_t* sss, int32_t* sst, const int32_t s, const int32_t t, const int32_t w, const int32_t dsinc, const int32_t dtinc, const int32_t dwinc, const int32_t prim_tile, int32_t* t1, int32_t* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	const INT32 nextsw = (w + dwinc) >> 16;
-	INT32 nexts = (s + dsinc) >> 16;
-	INT32 nextt = (t + dtinc) >> 16;
+	const int32_t nextsw = (w + dwinc) >> 16;
+	int32_t nexts = (s + dsinc) >> 16;
+	int32_t nextt = (t + dtinc) >> 16;
 
 	if (object.m_other_modes.persp_tex_en)
 	{
@@ -461,10 +461,10 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 	userdata->m_precomp_s = nexts;
 	userdata->m_precomp_t = nextt;
 
-	const INT32 lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
+	const int32_t lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
 
-	INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
-	INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
+	int32_t horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
+	int32_t vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
 	if (horstep & 0x20000)
 	{
 		horstep = ~horstep & 0x1ffff;
@@ -474,7 +474,7 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 		vertstep = ~vertstep & 0x1ffff;
 	}
 
-	INT32 lod = (horstep >= vertstep) ? horstep : vertstep;
+	int32_t lod = (horstep >= vertstep) ? horstep : vertstep;
 
 	*sss = m_lod_lookup[*sss & 0x7ffff];
 	*sst = m_lod_lookup[*sst & 0x7ffff];
@@ -488,11 +488,11 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	INT32 l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
-	UINT8 lod_fraction = ((lod << 3) >> l_tile) & 0xff;
+	uint8_t lod_fraction = ((lod << 3) >> l_tile) & 0xff;
 
 	if(!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
 	{
@@ -555,11 +555,11 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 	}
 }
 
-void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_2cycle_limited(int32_t* sss, int32_t* sst, const int32_t s, const int32_t t, const int32_t w, const int32_t dsinc, const int32_t dtinc, const int32_t dwinc, const int32_t prim_tile, int32_t* t1, const rdp_poly_state& object)
 {
-	const INT32 nextsw = (w + dwinc) >> 16;
-	INT32 nexts = (s + dsinc) >> 16;
-	INT32 nextt = (t + dtinc) >> 16;
+	const int32_t nextsw = (w + dwinc) >> 16;
+	int32_t nexts = (s + dsinc) >> 16;
+	int32_t nextt = (t + dtinc) >> 16;
 
 	if (object.m_other_modes.persp_tex_en)
 	{
@@ -570,10 +570,10 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 		m_rdp->tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 
-	const INT32 lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
+	const int32_t lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
 
-	INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
-	INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
+	int32_t horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
+	int32_t vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
 	if (horstep & 0x20000)
 	{
 		horstep = ~horstep & 0x1ffff;
@@ -583,7 +583,7 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 		vertstep = ~vertstep & 0x1ffff;
 	}
 
-	INT32 lod = (horstep >= vertstep) ? horstep : vertstep;
+	int32_t lod = (horstep >= vertstep) ? horstep : vertstep;
 
 	*sss = m_lod_lookup[*sss & 0x7ffff];
 	*sst = m_lod_lookup[*sst & 0x7ffff];
@@ -597,7 +597,7 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	INT32 l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = (lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level);
 
@@ -626,22 +626,22 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 	}
 }
 
-void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::calculate_clamp_diffs(uint32_t prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t* tiles = object.m_tiles;
 	if (object.m_other_modes.cycle_type == CYCLE_TYPE_2)
 	{
 		if (object.m_other_modes.tex_lod_en)
 		{
-			for (INT32 start = 0; start <= 7; start++)
+			for (int32_t start = 0; start <= 7; start++)
 			{
 				userdata->m_clamp_diff[start].set((tiles[start].sh >> 2) - (tiles[start].sl >> 2), (tiles[start].sh >> 2) - (tiles[start].sl >> 2), (tiles[start].th >> 2) - (tiles[start].tl >> 2), (tiles[start].th >> 2) - (tiles[start].tl >> 2));
 			}
 		}
 		else
 		{
-			const INT32 start = prim_tile;
-			const INT32 end = (prim_tile + 1) & 7;
+			const int32_t start = prim_tile;
+			const int32_t end = (prim_tile + 1) & 7;
 			userdata->m_clamp_diff[start].set((tiles[start].sh >> 2) - (tiles[start].sl >> 2), (tiles[start].sh >> 2) - (tiles[start].sl >> 2), (tiles[start].th >> 2) - (tiles[start].tl >> 2), (tiles[start].th >> 2) - (tiles[start].tl >> 2));
 			userdata->m_clamp_diff[end].set((tiles[end].sh >> 2) - (tiles[end].sl >> 2), (tiles[end].sh >> 2) - (tiles[end].sl >> 2), (tiles[end].th >> 2) - (tiles[end].tl >> 2), (tiles[end].th >> 2) - (tiles[end].tl >> 2));
 		}
@@ -654,15 +654,15 @@ void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* u
 
 #define USE_64K_LUT (1)
 
-static INT32 sTexAddrSwap16[2] = { WORD_ADDR_XOR, WORD_XOR_DWORD_SWAP };
-static INT32 sTexAddrSwap8[2] = { BYTE_ADDR_XOR, BYTE_XOR_DWORD_SWAP };
+static int32_t sTexAddrSwap16[2] = { WORD_ADDR_XOR, WORD_XOR_DWORD_SWAP };
+static int32_t sTexAddrSwap8[2] = { BYTE_ADDR_XOR, BYTE_XOR_DWORD_SWAP };
 
-void n64_texture_pipe_t::fetch_rgba16_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba16_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
+	int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
 
-	UINT16 c = ((UINT16*)userdata->m_tmem)[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
+	uint16_t c = ((uint16_t*)userdata->m_tmem)[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -671,22 +671,22 @@ void n64_texture_pipe_t::fetch_rgba16_tlut0(rgbaint_t& out, INT32 s, INT32 t, IN
 #endif
 }
 
-void n64_texture_pipe_t::fetch_rgba16_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba16_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
 
-	UINT16 c = ((UINT16*)userdata->m_tmem)[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
+	uint16_t c = ((uint16_t*)userdata->m_tmem)[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_rgba16_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba16_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
 
-	const UINT16 c = ((UINT16*)userdata->m_tmem)[taddr];
+	const uint16_t c = ((uint16_t*)userdata->m_tmem)[taddr];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -695,13 +695,13 @@ void n64_texture_pipe_t::fetch_rgba16_raw(rgbaint_t& out, INT32 s, INT32 t, INT3
 #endif
 }
 
-void n64_texture_pipe_t::fetch_rgba32_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba32_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT32 *tc = ((UINT32*)userdata->m_tmem);
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const uint32_t *tc = ((uint32_t*)userdata->m_tmem);
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	UINT32 c = tc[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 24) << 2];
+	uint32_t c = tc[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 24) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -710,42 +710,42 @@ void n64_texture_pipe_t::fetch_rgba32_tlut0(rgbaint_t& out, INT32 s, INT32 t, IN
 #endif
 }
 
-void n64_texture_pipe_t::fetch_rgba32_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba32_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT32 *tc = ((UINT32*)userdata->m_tmem);
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const uint32_t *tc = ((uint32_t*)userdata->m_tmem);
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	UINT32 c = tc[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 24) << 2];
+	uint32_t c = tc[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 24) << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_rgba32_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_rgba32_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	const UINT16 cl = ((UINT16*)userdata->m_tmem)[taddr];
-	const UINT16 ch = ((UINT16*)userdata->m_tmem)[taddr | 0x400];
+	const uint16_t cl = ((uint16_t*)userdata->m_tmem)[taddr];
+	const uint16_t ch = ((uint16_t*)userdata->m_tmem)[taddr | 0x400];
 
 	out.set(ch & 0xff, cl >> 8, cl & 0xff, ch >> 8);
 }
 
-void n64_texture_pipe_t::fetch_nop(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata) { }
+void n64_texture_pipe_t::fetch_nop(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata) { }
 
-void n64_texture_pipe_t::fetch_yuv(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_yuv(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT16 *tc = ((UINT16*)userdata->m_tmem);
+	const uint16_t *tc = ((uint16_t*)userdata->m_tmem);
 
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
-	const INT32 taddrlow = ((taddr >> 1) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const int32_t taddrlow = ((taddr >> 1) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	const UINT16 c = tc[taddrlow];
+	const uint16_t c = tc[taddrlow];
 
-	INT32 y = userdata->m_tmem[taddr | 0x800];
-	INT32 u = c >> 8;
-	INT32 v = c & 0xff;
+	int32_t y = userdata->m_tmem[taddr | 0x800];
+	int32_t u = c >> 8;
+	int32_t v = c & 0xff;
 
 	v ^= 0x80; u ^= 0x80;
 	u |= ((u & 0x80) << 1);
@@ -754,13 +754,13 @@ void n64_texture_pipe_t::fetch_yuv(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase
 	out.set(y & 0xff, y & 0xff, u & 0xff, v & 0xff);
 }
 
-void n64_texture_pipe_t::fetch_ci4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci4_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
+	const uint8_t p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -769,36 +769,36 @@ void n64_texture_pipe_t::fetch_ci4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32
 #endif
 }
 
-void n64_texture_pipe_t::fetch_ci4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci4_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
+	const uint8_t p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_ci4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci4_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	UINT8 p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	uint8_t p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
 	p = (tpal << 4) | p;
 
 	out.set(p, p, p, p);
 }
 
-void n64_texture_pipe_t::fetch_ci8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci8_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = tc[taddr];
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[p << 2];
+	const uint8_t p = tc[taddr];
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[p << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -807,34 +807,34 @@ void n64_texture_pipe_t::fetch_ci8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32
 #endif
 }
 
-void n64_texture_pipe_t::fetch_ci8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci8_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = tc[taddr];
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[p << 2];
+	const uint8_t p = tc[taddr];
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[p << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_ci8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ci8_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	const UINT8 p = tc[taddr];
+	const uint8_t p = tc[taddr];
 	out.set(p, p, p, p);
 }
 
-void n64_texture_pipe_t::fetch_ia4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia4_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
+	const uint8_t p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -843,37 +843,37 @@ void n64_texture_pipe_t::fetch_ia4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32
 #endif
 }
 
-void n64_texture_pipe_t::fetch_ia4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia4_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
+	const uint8_t p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | p) << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_ia4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia4_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	const UINT8 p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-	UINT8 i = p & 0xe;
+	const uint8_t p = ((s) & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
+	uint8_t i = p & 0xe;
 	i = (i << 4) | (i << 1) | (i >> 2);
 
 	out.set((p & 1) * 0xff, i, i, i);
 }
 
-void n64_texture_pipe_t::fetch_ia8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia8_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = tc[taddr];
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[p << 2];
+	const uint8_t p = tc[taddr];
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[p << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -882,37 +882,37 @@ void n64_texture_pipe_t::fetch_ia8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32
 #endif
 }
 
-void n64_texture_pipe_t::fetch_ia8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia8_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 p = tc[taddr];
-	const UINT16 c = ((UINT16*)(userdata->m_tmem + 0x800))[p << 2];
+	const uint8_t p = tc[taddr];
+	const uint16_t c = ((uint16_t*)(userdata->m_tmem + 0x800))[p << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_ia8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia8_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	const UINT8 p = tc[taddr];
-	UINT8 i = p & 0xf0;
+	const uint8_t p = tc[taddr];
+	uint8_t i = p & 0xf0;
 	i |= (i >> 4);
 
 	out.set(((p << 4) | (p & 0xf)) & 0xff, i, i, i);
 }
 
-void n64_texture_pipe_t::fetch_ia16_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia16_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT16 *tc = ((UINT16*)userdata->m_tmem);
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const uint16_t *tc = ((uint16_t*)userdata->m_tmem);
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	UINT16 c = tc[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
+	uint16_t c = tc[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[c]);
@@ -921,36 +921,36 @@ void n64_texture_pipe_t::fetch_ia16_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT3
 #endif
 }
 
-void n64_texture_pipe_t::fetch_ia16_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia16_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT16 *tc = ((UINT16*)userdata->m_tmem);
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
+	const uint16_t *tc = ((uint16_t*)userdata->m_tmem);
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
-	UINT16 c = tc[taddr];
-	c = ((UINT16*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
+	uint16_t c = tc[taddr];
+	c = ((uint16_t*)(userdata->m_tmem + 0x800))[(c >> 8) << 2];
 
-	const UINT8 k = (c >> 8) & 0xff;
+	const uint8_t k = (c >> 8) & 0xff;
 	out.set(c & 0xff, k, k, k);
 }
 
-void n64_texture_pipe_t::fetch_ia16_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_ia16_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT16 *tc = ((UINT16*)userdata->m_tmem);
-	const INT32 taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
+	const uint16_t *tc = ((uint16_t*)userdata->m_tmem);
+	const int32_t taddr = (((tbase << 2) + s) ^ sTexAddrSwap16[t & 1]) & 0x7ff;
 
-	const UINT16 c = tc[taddr];
-	const UINT8 i = (c >> 8);
+	const uint16_t c = tc[taddr];
+	const uint8_t i = (c >> 8);
 	out.set(c & 0xff, i, i, i);
 }
 
-void n64_texture_pipe_t::fetch_i4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i4_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 byteval = tc[taddr];
-	const UINT8 c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
-	const UINT16 k = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
+	const uint8_t byteval = tc[taddr];
+	const uint8_t c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[k]);
@@ -959,38 +959,38 @@ void n64_texture_pipe_t::fetch_i4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 
 #endif
 }
 
-void n64_texture_pipe_t::fetch_i4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i4_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 byteval = tc[taddr];
-	const UINT8 c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
-	const UINT16 k = ((UINT16*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
+	const uint8_t byteval = tc[taddr];
+	const uint8_t c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
 
-	const UINT8 i = (k >> 8) & 0xff;
+	const uint8_t i = (k >> 8) & 0xff;
 	out.set(k & 0xff, i, i, i);
 }
 
-void n64_texture_pipe_t::fetch_i4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i4_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = ((((tbase << 4) + s) >> 1) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	const UINT8 byteval = tc[taddr];
-	UINT8 c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
+	const uint8_t byteval = tc[taddr];
+	uint8_t c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
 	c |= (c << 4);
 
 	out.set(c, c, c, c);
 }
 
-void n64_texture_pipe_t::fetch_i8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i8_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 c = tc[taddr];
-	const UINT16 k = ((UINT16*)(userdata->m_tmem + 0x800))[c << 2];
+	const uint8_t c = tc[taddr];
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[c << 2];
 
 #if USE_64K_LUT
 	out.set(m_expand_16to32_table[k]);
@@ -999,24 +999,24 @@ void n64_texture_pipe_t::fetch_i8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 
 #endif
 }
 
-void n64_texture_pipe_t::fetch_i8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i8_tlut1(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
-	const UINT8 c = tc[taddr];
-	const UINT16 k = ((UINT16*)(userdata->m_tmem + 0x800))[c << 2];
+	const uint8_t c = tc[taddr];
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[c << 2];
 
-	const UINT8 i = (k >> 8) & 0xff;
+	const uint8_t i = (k >> 8) & 0xff;
 	out.set(k & 0xff, i, i, i);
 }
 
-void n64_texture_pipe_t::fetch_i8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata)
+void n64_texture_pipe_t::fetch_i8_raw(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
 {
-	const UINT8 *tc = userdata->m_tmem;
-	const INT32 taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
+	const uint8_t *tc = userdata->m_tmem;
+	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0xfff;
 
-	const UINT8 c = tc[taddr];
+	const uint8_t c = tc[taddr];
 
 	out.set(c, c, c, c);
 }

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_PET_DIAG264_LB_TAPE_H
+#define MAME_BUS_PET_DIAG264_LB_TAPE_H
+
 #pragma once
 
-#ifndef __DIAG264_CASSETTE_LOOPBACK__
-#define __DIAG264_CASSETTE_LOOPBACK__
-
-#include "emu.h"
 #include "cass.h"
 
 
@@ -27,7 +26,7 @@ class diag264_cassette_loopback_device :  public device_t,
 {
 public:
 	// construction/destruction
-	diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -47,7 +46,6 @@ private:
 
 // device type definition
 extern const device_type DIAG264_CASSETTE_LOOPBACK;
+DECLARE_DEVICE_TYPE(DIAG264_CASSETTE_LOOPBACK, diag264_cassette_loopback_device)
 
-
-
-#endif
+#endif // MAME_BUS_PET_DIAG264_LB_TAPE_H

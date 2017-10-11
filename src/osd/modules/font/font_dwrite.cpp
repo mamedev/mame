@@ -9,9 +9,8 @@
 #include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include <memory>
@@ -66,11 +65,6 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 #define HR_RET0( CALL ) HR_RET(CALL, 0)
 #define HR_RET1( CALL ) HR_RET(CALL, 1)
 
-// Typedefs for dynamically loaded functions
-typedef HRESULT (WINAPI *d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
-typedef int (WINAPI *get_user_default_locale_name)(LPWSTR, int);
-
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
 
@@ -86,17 +80,16 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
 
-	osd::dynamic_module::ptr d2d1_dll = osd::dynamic_module::open({ "d2d1.dll" });
-	osd::dynamic_module::ptr dwrite_dll = osd::dynamic_module::open({ "dwrite.dll" });
+	OSD_DYNAMIC_API(dwrite, "dwrite.dll");
+	OSD_DYNAMIC_API(d2d1, "d2d1.dll");
+	OSD_DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	OSD_DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 
-	d2d_create_factory_fn pfn_D2D1CreateFactory = d2d1_dll->bind<d2d_create_factory_fn>("D2D1CreateFactory");
-	dwrite_create_factory_fn pfn_DWriteCreateFactory = dwrite_dll->bind<dwrite_create_factory_fn>("DWriteCreateFactory");
-
-	if (!pfn_D2D1CreateFactory || !pfn_DWriteCreateFactory)
+	if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RETHR((*pfn_D2D1CreateFactory)(
+	HR_RETHR(OSD_DYNAMIC_CALL(D2D1CreateFactory,
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -106,7 +99,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RETHR((*pfn_DWriteCreateFactory)(
+	HR_RETHR(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
@@ -147,13 +140,13 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 	HRESULT result;
 
 	// Convert the bitmap into a form we understand and save it
-	std::unique_ptr<UINT32> pBitmap(new UINT32[bitmap.width() * bitmap.height()]);
+	std::unique_ptr<uint32_t> pBitmap(new uint32_t[bitmap.width() * bitmap.height()]);
 	for (int y = 0; y < bitmap.height(); y++)
 	{
-		UINT32* pRow = pBitmap.get() + (y * bitmap.width());
+		uint32_t* pRow = pBitmap.get() + (y * bitmap.width());
 		for (int x = 0; x < bitmap.width(); x++)
 		{
-			UINT32 pixel = bitmap.pix32(y, x);
+			uint32_t pixel = bitmap.pix32(y, x);
 			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
@@ -172,8 +165,8 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		bitmap.width(),
 		bitmap.height(),
 		GUID_WICPixelFormat32bppRGBA,
-		bitmap.width() * sizeof(UINT32),
-		bitmap.width() * bitmap.height() * sizeof(UINT32),
+		bitmap.width() * sizeof(uint32_t),
+		bitmap.width() * bitmap.height() * sizeof(uint32_t),
 		(BYTE*)pBitmap.get(),
 		&bmp2);
 
@@ -192,19 +185,19 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 class FontDimension
 {
 private:
-	UINT16  m_designUnitsPerEm;
+	uint16_t  m_designUnitsPerEm;
 	float   m_emSizeInDip;
 	float   m_designUnits;
 
 public:
-	FontDimension(UINT16 designUnitsPerEm, float emSizeInDip, float designUnits)
+	FontDimension(uint16_t designUnitsPerEm, float emSizeInDip, float designUnits)
 	{
 		m_designUnitsPerEm = designUnitsPerEm;
 		m_emSizeInDip = emSizeInDip;
 		m_designUnits = designUnits;
 	}
 
-	UINT16 DesignUnitsPerEm() const
+	uint16_t DesignUnitsPerEm() const
 	{
 		return m_designUnitsPerEm;
 	}
@@ -286,7 +279,7 @@ public:
 class FontDimensionFactory
 {
 private:
-	UINT16 m_designUnitsPerEm;
+	uint16_t m_designUnitsPerEm;
 	float m_emSizeInDip;
 
 public:
@@ -295,7 +288,7 @@ public:
 		return m_emSizeInDip;
 	}
 
-	FontDimensionFactory(UINT16 designUnitsPerEm, float emSizeInDip)
+	FontDimensionFactory(uint16_t designUnitsPerEm, float emSizeInDip)
 	{
 		m_designUnitsPerEm = designUnitsPerEm;
 		m_emSizeInDip = emSizeInDip;
@@ -348,6 +341,8 @@ public:
 	{
 	}
 
+	virtual ~osd_font_dwrite() { osd_font_dwrite::close(); }
+
 	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
 		if (m_d2dfactory == nullptr || m_dwriteFactory == nullptr || m_wicFactory == nullptr)
@@ -357,12 +352,17 @@ public:
 
 		// accept qualifiers from the name
 		std::string name(_name);
-		if (name.compare("default") == 0) name = "Tahoma";
+		if (name.compare("default") == 0)
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+			name = "Tahoma";
+#else
+			name = "Segoe UI";
+#endif
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 		// convert the face name
-		std::wstring familyName = wstring_from_utf8(name.c_str());
+		std::wstring familyName = osd::text::to_wstring(name.c_str());
 
 		// find the font
 		HR_RET0(find_font(
@@ -400,7 +400,7 @@ public:
 	//  pixel of a black & white font
 	//-------------------------------------------------
 
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
 	{
 		const int MEM_ALIGN_CONST = 31;
 		const int BITMAP_PAD = 50;
@@ -427,9 +427,9 @@ public:
 
 		FontDimensionFactory fdf(gdi_metrics.designUnitsPerEm, m_fontEmHeightInDips);
 
-		UINT32 tempChar = chnum;
-		UINT16 glyphIndex;
-		HR_RET0(face->GetGlyphIndicesW(&tempChar, 1, &glyphIndex));
+		uint32_t tempChar = chnum;
+		uint16_t glyphIndex;
+		HR_RET0(face->GetGlyphIndices(&tempChar, 1, &glyphIndex));
 
 		// get the width of this character
 		DWRITE_GLYPH_METRICS glyph_metrics = { 0 };
@@ -537,7 +537,7 @@ public:
 		for (actbounds.min_x = 0; actbounds.min_x < bmwidth; actbounds.min_x++)
 		{
 			BYTE *offs = pixels + actbounds.min_x;
-			UINT8 summary = 0;
+			uint8_t summary = 0;
 			for (int y = 0; y < bmheight; y++)
 				summary |= offs[y * bmwidth];
 			if (summary != 0)
@@ -551,7 +551,7 @@ public:
 		for (actbounds.max_x = bmwidth - 1; actbounds.max_x >= 0; actbounds.max_x--)
 		{
 			BYTE *offs = pixels + actbounds.max_x;
-			UINT8 summary = 0;
+			uint8_t summary = 0;
 
 			// Go through the entire column and build a summary
 			for (int y = 0; y < bmheight; y++)
@@ -570,8 +570,8 @@ public:
 			// copy the bits into it
 			for (int y = 0; y < bitmap.height(); y++)
 			{
-				UINT32 *dstrow = &bitmap.pix32(y);
-				UINT8 *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
+				uint32_t *dstrow = &bitmap.pix32(y);
+				uint8_t *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
 				for (int x = 0; x < bitmap.width(); x++)
 				{
 					int effx = x + actbounds.min_x;
@@ -646,12 +646,12 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	osd::dynamic_module::ptr     m_d2d1_dll;
-	osd::dynamic_module::ptr     m_dwrite_dll;
-	osd::dynamic_module::ptr     m_kernel32_dll;
-	d2d_create_factory_fn        m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn     m_pfnDWriteCreateFactory;
-	get_user_default_locale_name m_pfnGetUserDefaultLocaleName;
+	OSD_DYNAMIC_API(dwrite, "dwrite.dll");
+	OSD_DYNAMIC_API(d2d1, "d2d1.dll");
+	OSD_DYNAMIC_API(locale, "kernel32.dll");
+	OSD_DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	OSD_DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+	OSD_DYNAMIC_API_FN(locale, int, WINAPI, GetUserDefaultLocaleName, LPWSTR, int);
 	ComPtr<ID2D1Factory>         m_d2dfactory;
 	ComPtr<IDWriteFactory>       m_dwriteFactory;
 	ComPtr<IWICImagingFactory>   m_wicFactory;
@@ -660,9 +660,6 @@ public:
 	font_dwrite() :
 		osd_module(OSD_FONT_PROVIDER, "dwrite"),
 		font_module(),
-		m_pfnD2D1CreateFactory(nullptr),
-		m_pfnDWriteCreateFactory(nullptr),
-		m_pfnGetUserDefaultLocaleName(nullptr),
 		m_d2dfactory(nullptr),
 		m_dwriteFactory(nullptr),
 		m_wicFactory(nullptr)
@@ -671,14 +668,8 @@ public:
 
 	virtual bool probe() override
 	{
-		m_d2d1_dll = osd::dynamic_module::open({ "d2d1.dll" });
-		m_dwrite_dll = osd::dynamic_module::open({ "dwrite.dll" });
-
-		m_pfnD2D1CreateFactory = m_d2d1_dll->bind<d2d_create_factory_fn>("D2D1CreateFactory");
-		m_pfnDWriteCreateFactory = m_dwrite_dll->bind<dwrite_create_factory_fn>("DWriteCreateFactory");
-
 		// This module is available if it can load the expected API Functions
-		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
+		if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 			return false;
 
 		return true;
@@ -691,21 +682,16 @@ public:
 		osd_printf_verbose("FontProvider: Initializing DirectWrite\n");
 
 		// Make sure we can initialize our api functions
-		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
+		if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 		{
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
 
-		// Init our kernel32 dynamic functions
-		m_kernel32_dll = osd::dynamic_module::open({ "Kernel32.dll" });
-		assert(m_kernel32_dll != nullptr);
-
-		// Attempt to map this function. It only exists on Vista+, so we don't fail if it can't be mapped
-		m_pfnGetUserDefaultLocaleName = m_kernel32_dll->bind<get_user_default_locale_name>("GetUserDefaultLocaleName");
+		assert(OSD_DYNAMIC_API_TEST(GetUserDefaultLocaleName));
 
 		// Create a Direct2D factory.
-		HR_RET1((*m_pfnD2D1CreateFactory)(
+		HR_RET1(OSD_DYNAMIC_CALL(D2D1CreateFactory,
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
@@ -715,7 +701,7 @@ public:
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
-		HR_RET1((*m_pfnDWriteCreateFactory)(
+		HR_RET1(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
 			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));
@@ -757,7 +743,7 @@ public:
 			std::unique_ptr<WCHAR[]> name = nullptr;
 			HR_RET0(get_localized_familyname(names, name));
 
-			std::string utf8_name = utf8_from_wstring(name.get());
+			std::string utf8_name = osd::text::from_wstring(name.get());
 			name.reset();
 
 			// Review: should the config name, be unlocalized?
@@ -773,7 +759,7 @@ private:
 	HRESULT get_family_for_locale(ComPtr<IDWriteLocalizedStrings> family_names, const std::wstring &locale, std::unique_ptr<WCHAR[]> &family_name) const
 	{
 		HRESULT result;
-		UINT32 index;
+		uint32_t index;
 		BOOL exists = false;
 
 		result = family_names->FindLocaleName(locale.c_str(), &index, &exists);
@@ -787,7 +773,7 @@ private:
 			index = 0;
 
 		// Get the length and allocate our buffer
-		UINT32 name_length = 0;
+		uint32_t name_length = 0;
 		HR_RETHR(family_names->GetStringLength(index, &name_length));
 		auto name_buffer = std::make_unique<WCHAR[]>(name_length + 1);
 
@@ -804,10 +790,10 @@ private:
 
 		// Get the default locale for this user if possible.
 		// GetUserDefaultLocaleName doesn't exist on XP, so don't assume.
-		if (m_pfnGetUserDefaultLocaleName)
+		if (OSD_DYNAMIC_API_TEST(GetUserDefaultLocaleName))
 		{
 			wchar_t name_buffer[LOCALE_NAME_MAX_LENGTH];
-			int len = m_pfnGetUserDefaultLocaleName(name_buffer, LOCALE_NAME_MAX_LENGTH);
+			int len = OSD_DYNAMIC_CALL(GetUserDefaultLocaleName, name_buffer, LOCALE_NAME_MAX_LENGTH);
 			if (len != 0)
 				locale_name = name_buffer;
 		}

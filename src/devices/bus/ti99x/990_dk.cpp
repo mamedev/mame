@@ -40,10 +40,10 @@ enum
 	status_unit_shift   = 13
 };
 
-const device_type FD800 = &device_creator<fd800_legacy_device>;
+DEFINE_DEVICE_TYPE(TI99X_FD800, fd800_legacy_device, "ti99x_fd800", "TI FD800 Diablo floppy disk controller")
 
-fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),
+fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TI99X_FD800, tag, owner, clock),
 	m_recv_buf(0), m_stat_reg(0), m_xmit_buf(0), m_cmd_reg(0), m_interrupt_f_f(0),
 	m_int_line(*this), m_buf_pos(0), m_buf_mode(), m_unit(0), m_sector(0)
 {
@@ -58,39 +58,40 @@ void fd800_legacy_device::set_interrupt_line()
 }
 
 
-/* void fd800_legacy_device::unload_proc(device_image_interface &image)
+#if 0
+void fd800_legacy_device::unload_proc(device_image_interface &image)
 {
-    int unit = floppy_get_drive(&image.device());
+	int unit = floppy_get_drive(&image.device());
 
-    m_drv[unit].log_cylinder[0] = m_drv[unit].log_cylinder[1] = -1;
+	m_drv[unit].log_cylinder[0] = m_drv[unit].log_cylinder[1] = -1;
 }
 
 
 void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int state))
 {
-    int i;
+	int i;
 
-    m_machine = &machine;
-    m_interrupt_callback = interrupt_callback;
+	m_machine = &machine;
+	m_interrupt_callback = interrupt_callback;
 
-    m_stat_reg = 0;
-    m_interrupt_f_f = 1;
+	m_stat_reg = 0;
+	m_interrupt_f_f = 1;
 
-    m_buf_pos = 0;
-    m_buf_mode = bm_off;
+	m_buf_pos = 0;
+	m_buf_mode = bm_off;
 
-    for (i=0; i<MAX_FLOPPIES; i++)
-    {
-        m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
-        m_drv[i].phys_cylinder = -1;
-        m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
-        m_drv[i].seclen = 64;
-        floppy_install_unload_proc(&m_drv[i].img->device(), unload_proc);
-    }
+	for (i=0; i<MAX_FLOPPIES; i++)
+	{
+		m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
+		m_drv[i].phys_cylinder = -1;
+		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
+		m_drv[i].seclen = 64;
+		floppy_install_unload_proc(&m_drv[i].img->device(), unload_proc);
+	}
 
-    set_interrupt_line();
+	set_interrupt_line();
 }
-*/
+#endif
 
 /*
     Read the first id field that can be found on the floppy disk.
@@ -100,11 +101,11 @@ void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int
     cylinder_id: cylinder ID read
     sector_id: sector ID read
 
-    Return TRUE if an ID was found
+    Return true if an ID was found
 */
 int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
-	//UINT8 revolution_count;*/
+	//uint8_t revolution_count;*/
 	// chrn_id id;
 
 	//revolution_count = 0;*/
@@ -117,11 +118,11 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
 	            *cylinder_id = id.C;
 	        if (sector_id)
 	            *sector_id = id.R;
-	        return TRUE;
+	        return true;
 	    }
 	}*/
 
-	return FALSE;
+	return false;
 }
 
 /*
@@ -132,11 +133,11 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
     sector: sector ID to search
     data_id: data ID to be used when calling sector read/write functions
 
-    Return TRUE if the given sector ID was found
+    Return true if the given sector ID was found
 */
 int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_id)
 {
-/*  UINT8 revolution_count;
+/*  uint8_t revolution_count;
     chrn_id id;
 
     revolution_count = 0;
@@ -151,12 +152,12 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
                 *data_id = id.data_id;
                 // get ddam status
                 // w->ddam = id.flags & ID_FLAG_DELETED_DATA;
-                return TRUE;
+                return true;
             }
         }
     }
 */
-	return FALSE;
+	return false;
 }
 
 /*
@@ -166,7 +167,7 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
     cylinder: track to seek for
     head: head for which the seek is performed
 
-    Return FALSE if the seek was successful
+    Return false if the seek was successful
 */
 int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 {
@@ -175,13 +176,13 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
     if (cylinder > 76)
     {
         m_stat_reg |= status_invalid_cmd;
-        return TRUE;
+        return true;
     }
 
     if (m_drv[unit].img == nullptr || !m_drv[unit].img->exists())
     {
         m_stat_reg |= status_drv_not_ready;
-        return TRUE;
+        return true;
     }
 
     if (m_drv[unit].log_cylinder[head] == -1)
@@ -189,14 +190,14 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], nullptr))
         {
             m_stat_reg |= status_ID_not_found;
-            return TRUE;
+            return true;
         }
     }
 
     if (m_drv[unit].log_cylinder[head] == cylinder)
     {
 
-        return FALSE;
+        return false;
     }
     for (retries=0; retries<10; retries++)
     {
@@ -209,19 +210,19 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         {
             m_drv[unit].log_cylinder[head] = -1;
             m_stat_reg |= status_ID_not_found;
-            return TRUE;
+            return true;
         }
 
         if (m_drv[unit].log_cylinder[head] == cylinder)
         {
 
-            return FALSE;
+            return false;
         }
     }
 
     m_stat_reg |= status_seek_err;
     */
-	return TRUE;
+	return true;
 }
 
 /*
@@ -229,7 +230,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 
     unit: floppy drive index
 
-    Return FALSE if the restore was successful
+    Return false if the restore was successful
 */
 int fd800_legacy_device::do_restore(int unit)
 {
@@ -239,7 +240,7 @@ int fd800_legacy_device::do_restore(int unit)
     if (!m_drv[unit].img->exists())
     {
         m_stat_reg |= status_drv_not_ready;
-        return TRUE;
+        return true;
     }
 
 
@@ -265,7 +266,7 @@ int fd800_legacy_device::do_restore(int unit)
 /*
     Perform a read operation for one sector
 */
-void fd800_legacy_device::do_read(void)
+void fd800_legacy_device::do_read()
 {
 /*  int data_id;
 
@@ -294,7 +295,7 @@ void fd800_legacy_device::do_read(void)
 /*
     Perform a write operation for one sector
 */
-void fd800_legacy_device::do_write(void)
+void fd800_legacy_device::do_write()
 {
 /*  int data_id;
 
@@ -319,7 +320,7 @@ void fd800_legacy_device::do_write(void)
 /*
     Execute a fdc command
 */
-void fd800_legacy_device::do_cmd(void)
+void fd800_legacy_device::do_cmd()
 {
 /*
     int unit;
@@ -869,7 +870,7 @@ LEGACY_FLOPPY_OPTIONS_START(fd800)
 LEGACY_FLOPPY_OPTIONS_END
 #endif
 
-void fd800_legacy_device::device_start(void)
+void fd800_legacy_device::device_start()
 {
 	logerror("fd800: start\n");
 	m_int_line.resolve();
@@ -883,7 +884,7 @@ void fd800_legacy_device::device_start(void)
 	}
 }
 
-void fd800_legacy_device::device_reset(void)
+void fd800_legacy_device::device_reset()
 {
 	logerror("fd800: reset\n");
 	m_stat_reg = 0;

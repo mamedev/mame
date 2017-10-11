@@ -35,7 +35,7 @@ static int tables_computed = 0;
 
 
 // device type definition
-const device_type OKIM6258 = &device_creator<okim6258_device>;
+DEFINE_DEVICE_TYPE(OKIM6258, okim6258_device, "okim6258", "OKI MSM6258 ADPCM")
 
 
 //**************************************************************************
@@ -46,12 +46,11 @@ const device_type OKIM6258 = &device_creator<okim6258_device>;
 //  okim6258_device - constructor
 //-------------------------------------------------
 
-okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock, "okim6258", __FILE__),
+okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, OKIM6258, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_status(0),
-		m_master_clock(0),
-		m_divider(0),
+		m_divider(512),
 		m_adpcm_type(0),
 		m_data_in(0),
 		m_nibble_shift(0),
@@ -70,7 +69,7 @@ okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag,
 
 ***********************************************************************************************/
 
-static void compute_tables(void)
+static void compute_tables()
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -112,8 +111,6 @@ void okim6258_device::device_start()
 {
 	compute_tables();
 
-	m_master_clock = clock();
-
 	m_divider = dividers[m_start_divider];
 
 	m_stream = stream_alloc(0, 1, clock()/m_divider);
@@ -121,7 +118,7 @@ void okim6258_device::device_start()
 	m_signal = -2;
 	m_step = 0;
 
-	okim6258_state_save_register();
+	state_save_register();
 }
 
 
@@ -159,7 +156,7 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			int nibble = (m_data_in >> nibble_shift) & 0xf;
 
 			/* Output to the buffer */
-			INT16 sample = clock_adpcm(nibble);
+			int16_t sample = clock_adpcm(nibble);
 
 			nibble_shift ^= 4;
 
@@ -186,10 +183,9 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 ***********************************************************************************************/
 
-void okim6258_device::okim6258_state_save_register()
+void okim6258_device::state_save_register()
 {
 	save_item(NAME(m_status));
-	save_item(NAME(m_master_clock));
 	save_item(NAME(m_divider));
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_nibble_shift));
@@ -198,10 +194,10 @@ void okim6258_device::okim6258_state_save_register()
 }
 
 
-INT16 okim6258_device::clock_adpcm(UINT8 nibble)
+int16_t okim6258_device::clock_adpcm(uint8_t nibble)
 {
-	INT32 max = (1 << (m_output_bits - 1)) - 1;
-	INT32 min = -(1 << (m_output_bits - 1));
+	int32_t max = (1 << (m_output_bits - 1)) - 1;
+	int32_t min = -(1 << (m_output_bits - 1));
 
 	m_signal += diff_lookup[m_step * 16 + (nibble & 15)];
 
@@ -231,10 +227,8 @@ INT16 okim6258_device::clock_adpcm(UINT8 nibble)
 
 void okim6258_device::set_divider(int val)
 {
-	int divider = dividers[val];
-
 	m_divider = dividers[val];
-	m_stream->set_sample_rate(m_master_clock / divider);
+	notify_clock_changed();
 }
 
 
@@ -244,10 +238,9 @@ void okim6258_device::set_divider(int val)
 
 ***********************************************************************************************/
 
-void okim6258_device::set_clock(int val)
+void okim6258_device::device_clock_changed()
 {
-	m_master_clock = val;
-	m_stream->set_sample_rate(m_master_clock / m_divider);
+	m_stream->set_sample_rate(clock() / m_divider);
 }
 
 
@@ -259,7 +252,7 @@ void okim6258_device::set_clock(int val)
 
 int okim6258_device::get_vclk()
 {
-	return (m_master_clock / m_divider);
+	return (clock() / m_divider);
 }
 
 
@@ -269,7 +262,7 @@ int okim6258_device::get_vclk()
 
 ***********************************************************************************************/
 
-READ8_MEMBER( okim6258_device::okim6258_status_r )
+READ8_MEMBER( okim6258_device::status_r )
 {
 	m_stream->update();
 
@@ -282,7 +275,7 @@ READ8_MEMBER( okim6258_device::okim6258_status_r )
      okim6258_data_w -- write to the control port of an OKIM6258-compatible chip
 
 ***********************************************************************************************/
-WRITE8_MEMBER( okim6258_device::okim6258_data_w )
+WRITE8_MEMBER( okim6258_device::data_w )
 {
 	/* update the stream */
 	m_stream->update();
@@ -298,7 +291,7 @@ WRITE8_MEMBER( okim6258_device::okim6258_data_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
+WRITE8_MEMBER( okim6258_device::ctrl_w )
 {
 	m_stream->update();
 

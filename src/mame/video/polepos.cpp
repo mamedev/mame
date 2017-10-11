@@ -29,7 +29,7 @@
 
 PALETTE_INIT_MEMBER(polepos_state,polepos)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j;
 
 	/*******************************************************
@@ -145,7 +145,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 
 TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 {
-	UINT16 word = m_view16_memory[tile_index];
+	uint16_t word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
 	SET_TILE_INFO_MEMBER(1,
@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 {
-	UINT16 word = m_alpha16_memory[tile_index];
+	uint16_t word = m_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
 
@@ -339,17 +339,17 @@ WRITE8_MEMBER(polepos_state::polepos_alpha_w)
 
 void polepos_state::draw_road(bitmap_ind16 &bitmap)
 {
-	const UINT8 *road_control = memregion("gfx5")->base();
-	const UINT8 *road_bits1 = road_control + 0x2000;
-	const UINT8 *road_bits2 = road_control + 0x4000;
+	const uint8_t *road_control = memregion("gfx5")->base();
+	const uint8_t *road_bits1 = road_control + 0x2000;
+	const uint8_t *road_bits2 = road_control + 0x4000;
 	int x, y, i;
 
 	/* loop over the lower half of the screen */
 	for (y = 128; y < 256; y++)
 	{
 		int xoffs, yoffs, xscroll, roadpal;
-		UINT16 scanline[256 + 8];
-		UINT16 *dest = scanline;
+		uint16_t scanline[256 + 8];
+		uint16_t *dest = scanline;
 		pen_t pen_base;
 
 		/* first add the vertical position modifier and the vertical scroll */
@@ -413,13 +413,13 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 }
 
 void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
-		UINT32 code,UINT32 color,int flipx,int sx,int sy,
+		uint32_t code,uint32_t color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(big ? 3 : 2);
-	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
-	UINT8 *scaling_rom = memregion("gfx6")->base();
-	UINT32 transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
+	const uint8_t *gfxdata = gfx->get_data(code % gfx->elements());
+	uint8_t *scaling_rom = memregion("gfx6")->base();
+	uint32_t transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
 	int x,y;
 
@@ -436,7 +436,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 			int xx = sx & 0x3ff;
 			int siz = 0;
 			int offs = 0;
-			const UINT8 *src;
+			const uint8_t *src;
 
 			if (!big) dy >>= 1;
 			src = gfxdata + dy * gfx->rowbytes();
@@ -465,8 +465,8 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 
 void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *posmem = &m_sprite16_memory[0x380];
-	UINT16 *sizmem = &m_sprite16_memory[0x780];
+	uint16_t *posmem = &m_sprite16_memory[0x380];
+	uint16_t *sizmem = &m_sprite16_memory[0x780];
 	int i;
 
 	for (i = 0; i < 64; i++, posmem += 2, sizmem += 2)
@@ -492,7 +492,7 @@ void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip = cliprect;
 	clip.max_y = 127;

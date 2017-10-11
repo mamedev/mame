@@ -1,5 +1,5 @@
 /// @ref core
-/// @file glm/mat4x4.hpp
+/// @file glm/mat4x3.hpp
 
 #pragma once
 

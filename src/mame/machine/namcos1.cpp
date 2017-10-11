@@ -513,10 +513,6 @@ void namcos1_state::machine_start()
 	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	m_mcubank->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
 
-	save_item(NAME(m_dac0_value));
-	save_item(NAME(m_dac1_value));
-	save_item(NAME(m_dac0_gain));
-	save_item(NAME(m_dac1_gain));
 	save_item(NAME(m_key));
 	save_item(NAME(m_mcu_patch_data));
 	save_item(NAME(m_reset));
@@ -527,7 +523,6 @@ void namcos1_state::machine_reset()
 	/* mcu patch data clear */
 	m_mcu_patch_data = 0;
 
-	init_DACs();
 	memset(m_key, 0, sizeof(m_key));
 	m_key_quotient = 0;
 	m_key_reminder = 0;
@@ -607,7 +602,7 @@ void namcos1_state::driver_init()
 	{
 		if ((i & 0x010000) == 0)
 		{
-			UINT8 t = m_rom[i];
+			uint8_t t = m_rom[i];
 			m_rom[i] = m_rom[i + 0x010000];
 			m_rom[i + 0x010000] = t;
 		}
@@ -1046,12 +1041,11 @@ READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 			m_strobe_count = 0;
 			m_strobe ^= 0x40;
 			if (m_strobe == 0)
-			{
 				m_input_count = (m_input_count + 1) % 5;
-				if (m_input_count == 3) res |= 0x10;
-			}
 		}
 
+		// status bit, used to signal end of pressure sensitive button reads
+		if (m_input_count == 3) res |= 0x10;
 		res |= m_strobe;
 
 		return res;

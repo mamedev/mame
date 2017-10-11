@@ -4,8 +4,8 @@
 
 #include "emu.h"
 
-static UINT8 *filebuf;
-static UINT32 offset;
+static uint8_t *filebuf;
+static uint32_t offset;
 
 #define STANDALONE
 #include "34010dsm.c"
@@ -29,10 +29,10 @@ static void usage (void)
 
 int main (int argc,char *argv[])
 {
-		UINT8 i,j,n;
+		uint8_t i,j,n;
 		char *filename=0,buf[80];
 	FILE *f;
-		UINT32 begin=0,end=(UINT32)-1,filelen,len,pc;
+		uint32_t begin=0,end=(uint32_t)-1,filelen,len,pc;
 	printf ("DIS34010\n"
 						"Copyright Zsolt Vasvari/Aaron Giles\n");
 

@@ -13,6 +13,7 @@ real hardware, when run plugged-in to the SMS expansion slot.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "gender.h"
 
 
@@ -21,7 +22,7 @@ real hardware, when run plugged-in to the SMS expansion slot.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_GENDER_ADAPTER = &device_creator<sms_gender_adapter_device>;
+DEFINE_DEVICE_TYPE(SMS_GENDER_ADAPTER, sms_gender_adapter_device, "sms_gender_adapter", "SMSPower Gender Adapter")
 
 
 
@@ -33,8 +34,8 @@ const device_type SMS_GENDER_ADAPTER = &device_creator<sms_gender_adapter_device
 //  sms_gender_adapter_device - constructor
 //-------------------------------------------------
 
-sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SMS_GENDER_ADAPTER, "Gender Adapter", tag, owner, clock, "sms_gender_adapter", __FILE__),
+sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SMS_GENDER_ADAPTER, tag, owner, clock),
 	device_sms_expansion_slot_interface(mconfig, *this),
 	m_subslot(*this, "subslot")
 {
@@ -47,8 +48,7 @@ sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconf
 
 void sms_gender_adapter_device::device_start()
 {
-	if (m_subslot->m_cart)
-		m_subslot->m_cart->save_ram();
+	m_subslot->save_ram();
 }
 
 
@@ -68,10 +68,7 @@ READ8_MEMBER(sms_gender_adapter_device::read_ram)
 
 int sms_gender_adapter_device::get_lphaser_xoffs()
 {
-	if (m_subslot->m_cart)
-		return m_subslot->m_cart->get_lphaser_xoffs();
-	else
-		return 0;
+	return m_subslot->get_lphaser_xoffs();
 }
 
 
@@ -95,16 +92,9 @@ WRITE8_MEMBER(sms_gender_adapter_device::write_ram)
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( genderadp_slot )
+MACHINE_CONFIG_MEMBER( sms_gender_adapter_device::device_add_mconfig )
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor sms_gender_adapter_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( genderadp_slot );
-}

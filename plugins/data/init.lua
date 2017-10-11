@@ -35,7 +35,7 @@ function data.startplugin()
 		end
 	end)
 	emu.register_callback(function(set)
-		local ret
+		local ret = {}
 		if set == "" then
 			set = emu.romname()
 		end
@@ -54,11 +54,7 @@ function data.startplugin()
 			end
 			local name = scr.check(setname, softname)
 			if name then
-				if not ret then
-					ret = name
-				else
-					ret = ret .. "," .. name
-				end
+				ret[#ret + 1] = name
 				valid_lst[#valid_lst + 1] = scr
 			end
 		end

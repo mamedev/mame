@@ -52,6 +52,9 @@
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
     "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
+    * bit 28 (mode bit 0)
+    "M2" type carts: ROM_OFFSET - master/slave ROM board select
+
     * bit 0 can be set for "M4" type carts, function unknown
 
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
@@ -70,8 +73,8 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)
 	AM_RANGE(0x00, 0xff) AM_READ(default_r)
 ADDRESS_MAP_END
 
-naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
+naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: naomi_g1_device(mconfig, type, tag, owner, clock)
 {
 	eeprom_tag = nullptr;
 }
@@ -110,7 +113,7 @@ void naomi_board::device_reset()
 	dma_ready = false;
 }
 
-void naomi_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram)
+void naomi_board::dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram)
 {
 	if(!to_mainram) {
 		base = nullptr;
@@ -127,12 +130,12 @@ void naomi_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram)
 	}
 
 	board_get_buffer(base, limit);
-	UINT32 blimit = 0x20*dma_count - dma_cur_offset;
+	uint32_t blimit = 0x20*dma_count - dma_cur_offset;
 	if(0 && limit > blimit)
 		limit = blimit;
 }
 
-void naomi_board::dma_advance(UINT32 size)
+void naomi_board::dma_advance(uint32_t size)
 {
 	dma_cur_offset += size;
 	board_advance(size);
@@ -157,9 +160,9 @@ READ16_MEMBER(naomi_board::rom_data_r)
 		pio_ready = true;
 	}
 
-	UINT8 *buffer;
-	UINT32 size;
-	UINT16 res;
+	uint8_t *buffer;
+	uint32_t size;
+	uint16_t res;
 	board_get_buffer(buffer, size);
 	assert(size > 1);
 	res = buffer[0] | (buffer[1] << 8);
@@ -212,7 +215,7 @@ READ16_MEMBER(naomi_board::default_r)
 	return 0xffff;
 }
 
-void naomi_board::board_write(offs_t offset, UINT16 data)
+void naomi_board::board_write(offs_t offset, uint16_t data)
 {
 	logerror("NAOMIBD: unhandled board write %08x, %04x\n", offset, data);
 }

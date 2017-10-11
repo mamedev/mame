@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Vas Crabb
 
+#include "emu.h"
 #include "machine/m20_kbd.h"
 
 #include "machine/keyboard.ipp"
@@ -123,7 +124,7 @@ static INPUT_PORTS_START( m20_keyboard )
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S2")        PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .")  PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 
 	PORT_START("LINE7")
@@ -153,8 +154,8 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
-	: buffered_rs232_device(mconfig, M20_KEYBOARD, "M20 Keyboard", tag, owner, 0, "m20_keyboard", __FILE__)
+m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: buffered_rs232_device(mconfig, M20_KEYBOARD, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8")
 	, m_modifiers(*this, "MODIFIERS")
 {
@@ -188,18 +189,11 @@ void m20_keyboard_device::device_reset()
 }
 
 
-void m20_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m20_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	buffered_rs232_device::device_timer(timer, id, param, ptr);
-}
-
-
-void m20_keyboard_device::key_make(UINT8 row, UINT8 column)
-{
-	UINT8 const row_code(((row < 6U) ? row : (0x18U | (row - 6U))) << 3);
-	UINT8 const modifiers(m_modifiers->read());
-	UINT8 mod_code(0U);
+	uint8_t const row_code(((row < 6U) ? row : (0x18U | (row - 6U))) << 3);
+	uint8_t const modifiers(m_modifiers->read());
+	uint8_t mod_code(0U);
 	switch (modifiers)
 	{
 	case 0x01U: // COMMAND
@@ -218,7 +212,7 @@ void m20_keyboard_device::key_make(UINT8 row, UINT8 column)
 }
 
 
-void m20_keyboard_device::received_byte(UINT8 byte)
+void m20_keyboard_device::received_byte(uint8_t byte)
 {
 	switch (byte)
 	{
@@ -234,4 +228,4 @@ void m20_keyboard_device::received_byte(UINT8 byte)
 }
 
 
-const device_type M20_KEYBOARD = &device_creator<m20_keyboard_device>;
+DEFINE_DEVICE_TYPE(M20_KEYBOARD, m20_keyboard_device, "m20_kbd", "Olivetti M20 Keyboard")

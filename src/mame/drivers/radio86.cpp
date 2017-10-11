@@ -10,13 +10,19 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
 #include "includes/radio86.h"
+
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8, radio86_state )
@@ -122,7 +128,7 @@ INPUT_PORTS_START( radio86 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('\xA4')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0xA4)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
@@ -207,7 +213,7 @@ INPUT_PORTS_START( ms7007 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('\xA4') PORT_CHAR('4')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR(0xA4) PORT_CHAR('4')
 
 	PORT_START("LINE2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[')
@@ -337,7 +343,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( radio86, radio86_state )
+static MACHINE_CONFIG_START( radio86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(radio86_mem)
@@ -548,15 +554,15 @@ ROM_START( impuls03 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1986, radio86,  0,       0,   radio86,    radio86, radio86_state, radio86,  "<unknown>", "Radio-86RK",    0)
-COMP( 1986, radio16,  radio86, 0,   radio16,    radio86, radio86_state, radio86,  "<unknown>", "Radio-86RK (16K RAM)",  0)
-COMP( 1986, kr03,     radio86, 0,   radio86,    radio86, radio86_state, radio86,  "Elektronika", "KR-03",   0)
-COMP( 1986, radio4k,  radio86, 0,   radio86,    radio86, radio86_state, radio86,  "<unknown>", "Radio-86RK (4K ROM)",   0)
-COMP( 1986, radiorom, radio86, 0,   radiorom,   radio86, radio86_state, radio86,  "<unknown>", "Radio-86RK (ROM-Disk)", 0)
-COMP( 1986, radioram, radio86, 0,   radioram,   radio86, radio86_state, radioram, "<unknown>", "Radio-86RK (ROM/RAM Disk)", 0)
-COMP( 1986, spektr01, radio86, 0,   radio86,    radio86, radio86_state, radio86,  "<unknown>", "Spektr-001",    0)
-COMP( 1986, rk7007,   radio86, 0,   rk7007,     ms7007, radio86_state,  radio86,  "<unknown>", "Radio-86RK (MS7007)",   0)
-COMP( 1986, rk700716, radio86, 0,   rk700716,   ms7007, radio86_state,  radio86,  "<unknown>", "Radio-86RK (MS7007 16K RAM)",   0)
-COMP( 1986, mikron2,  radio86, 0,   mikron2,    radio86, radio86_state, radio86,  "<unknown>", "Mikron-2",  0)
-COMP( 1986, impuls03,  radio86, 0,  impuls03,   radio86, radio86_state, radio86,  "<unknown>", "Impuls-03", 0)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT    STATE          INIT      COMPANY        FULLNAME                       FLAGS
+COMP( 1986, radio86,  0,       0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK",                  0 )
+COMP( 1986, radio16,  radio86, 0,      radio16,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
+COMP( 1986, kr03,     radio86, 0,      radio86,   radio86, radio86_state, radio86,  "Elektronika", "KR-03",                       0 )
+COMP( 1986, radio4k,  radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
+COMP( 1986, radiorom, radio86, 0,      radiorom,  radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
+COMP( 1986, radioram, radio86, 0,      radioram,  radio86, radio86_state, radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
+COMP( 1986, spektr01, radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Spektr-001",                  0 )
+COMP( 1986, rk7007,   radio86, 0,      rk7007,    ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
+COMP( 1986, rk700716, radio86, 0,      rk700716,  ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
+COMP( 1986, mikron2,  radio86, 0,      mikron2,   radio86, radio86_state, radio86,  "<unknown>",   "Mikron-2",                    0 )
+COMP( 1986, impuls03, radio86, 0,      impuls03,  radio86, radio86_state, radio86,  "<unknown>",   "Impuls-03",                   0 )

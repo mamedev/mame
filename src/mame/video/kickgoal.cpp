@@ -92,7 +92,7 @@ TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_actionhwbg2)// 32x32 tiles
 
 void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
@@ -159,7 +159,7 @@ VIDEO_START_MEMBER(kickgoal_state,actionhw)
 
 
 
-UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll */
 	m_fgtm->set_scrollx(0, m_scrram[0]);

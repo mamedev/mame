@@ -22,16 +22,16 @@ public:
 	}
 
 	int m_sndram_bank;
-	UINT8 *m_sndram;
+	uint8_t *m_sndram;
 	int m_turntable_select;
-	UINT8 m_turntable_last_pos[2];
-	UINT16 m_turntable_pos[2];
-	UINT8 m_pending_vb_int;
-	UINT16 m_v_ctrl;
-	UINT32 m_obj_regs[0xa0/4];
-	const UINT8 *m_ata_user_password;
-	const UINT8 *m_ata_master_password;
-	required_shared_ptr<UINT32> m_obj_ram;
+	uint8_t m_turntable_last_pos[2];
+	uint16_t m_turntable_pos[2];
+	uint8_t m_pending_vb_int;
+	uint16_t m_v_ctrl;
+	uint32_t m_obj_regs[0xa0/4];
+	const uint8_t *m_ata_user_password;
+	const uint8_t *m_ata_master_password;
+	required_shared_ptr<uint32_t> m_obj_ram;
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
 	DECLARE_READ32_MEMBER(sndram_r);
 	DECLARE_WRITE32_MEMBER(sndram_w);
@@ -64,7 +64,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void sndram_set_bank();

@@ -40,10 +40,10 @@
     code from a line of video data
 -------------------------------------------------*/
 
-int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sourceshift, int expectedbits, UINT32 *result)
+int vbi_parse_manchester_code(const uint16_t *source, int sourcewidth, int sourceshift, int expectedbits, uint32_t *result)
 {
-	UINT8 srcabs[MAX_SOURCE_WIDTH];
-	UINT8 min, max, mid, srcabsval;
+	uint8_t srcabs[MAX_SOURCE_WIDTH];
+	uint8_t min, max, mid, srcabsval;
 	double clock, bestclock;
 	int x, firstedge;
 	int besterr;
@@ -57,7 +57,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	max = 0x00;
 	for (x = 0; x < sourcewidth; x++)
 	{
-		UINT8 rawsrc = source[x] >> sourceshift;
+		uint8_t rawsrc = source[x] >> sourceshift;
 		min = std::min(min, rawsrc);
 		max = std::max(max, rawsrc);
 	}
@@ -75,7 +75,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	srcabsval = (source[0] > mid);
 	for (x = 0; x < sourcewidth; x++)
 	{
-		UINT8 rawsrc = source[x] >> sourceshift;
+		uint8_t rawsrc = source[x] >> sourceshift;
 		if (rawsrc >= max)
 			srcabsval = 1;
 		else if (rawsrc <= min)
@@ -147,13 +147,13 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 		/* compute left and right average values */
 		leftavg = 0;
 		for (tx = leftstart; tx <= leftend; tx++)
-			leftavg += (UINT8)(source[tx] >> sourceshift) - mid;
+			leftavg += (uint8_t)(source[tx] >> sourceshift) - mid;
 		leftabs = (leftavg >= 0);
 		leftavg = (leftavg < 0) ? -leftavg : leftavg;
 
 		rightavg = 0;
 		for (tx = rightstart; tx <= rightend; tx++)
-			rightavg += (UINT8)(source[tx] >> sourceshift) - mid;
+			rightavg += (uint8_t)(source[tx] >> sourceshift) - mid;
 		rightabs = (rightavg >= 0);
 		rightavg = (rightavg < 0) ? -rightavg : rightavg;
 
@@ -174,7 +174,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
     flag" from a line of video data
 -------------------------------------------------*/
 
-int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
+bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshift)
 {
 	int histo[256] = { 0 };
 	int minval = 0xff;
@@ -187,7 +187,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	/* compute a histogram of values */
 	for (x = 0; x < sourcewidth; x++)
 	{
-		UINT8 yval = source[x] >> sourceshift;
+		uint8_t yval = source[x] >> sourceshift;
 		histo[yval]++;
 	}
 
@@ -216,7 +216,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	{
 		if (PRINTF_WHITE_FLAG)
 			printf("White flag NOT detected; threshold too low\n");
-		return FALSE;
+		return false;
 	}
 
 	/*
@@ -240,7 +240,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 		if (histo[x] > histo[peakval])
 			peakval = x;
 
-	/* return TRUE if it is above the 90% mark */
+	/* return true if it is above the 90% mark */
 	result = (peakval > minval + 9 * (maxval - minval) / 10);
 	if (PRINTF_WHITE_FLAG)
 		printf("White flag %s: peak=%02X thresh=%02X\n", result ? "detected" : "NOT detected", peakval, minval + 9 * (maxval - minval) / 10);
@@ -261,7 +261,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	thresh = minval + 3 * (maxval - minval) / 4;
 	for (x = 0; x < sourcewidth; x++)
 	{
-		UINT8 yval = source[x] >> sourceshift;
+		uint8_t yval = source[x] >> sourceshift;
 		above += (yval >= thresh);
 	}
 	/* if at least 80% of the pixels are above the threshold, we'll call it white */
@@ -277,7 +277,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 -------------------------------------------------*/
 
 /**
- * @fn  void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
+ * @fn  void vbi_parse_all(const uint16_t *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
  *
  * @brief   Vbi parse all.
  *
@@ -288,10 +288,10 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
  * @param [in,out]  vbi     If non-null, the vbi.
  */
 
-void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
+void vbi_parse_all(const uint16_t *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
 {
-	UINT32 bits[2][24];
-	UINT8 bitnum;
+	uint32_t bits[2][24];
+	uint8_t bitnum;
 
 	/* first reset it all */
 	memset(vbi, 0, sizeof(*vbi));
@@ -351,7 +351,7 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 -------------------------------------------------*/
 
 /**
- * @fn  void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
+ * @fn  void vbi_metadata_pack(uint8_t *dest, uint32_t framenum, const vbi_metadata *vbi)
  *
  * @brief   Vbi metadata pack.
  *
@@ -360,7 +360,7 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
  * @param   vbi             The vbi.
  */
 
-void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
+void vbi_metadata_pack(uint8_t *dest, uint32_t framenum, const vbi_metadata *vbi)
 {
 	dest[0] = framenum >> 16;
 	dest[1] = framenum >> 8;
@@ -387,7 +387,7 @@ void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
 -------------------------------------------------*/
 
 /**
- * @fn  void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
+ * @fn  void vbi_metadata_unpack(vbi_metadata *vbi, uint32_t *framenum, const uint8_t *source)
  *
  * @brief   Vbi metadata unpack.
  *
@@ -396,7 +396,7 @@ void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
  * @param   source              Source for the.
  */
 
-void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
+void vbi_metadata_unpack(vbi_metadata *vbi, uint32_t *framenum, const uint8_t *source)
 {
 	if (framenum != nullptr)
 		*framenum = (source[0] << 16) | (source[1] << 8) | source[2];

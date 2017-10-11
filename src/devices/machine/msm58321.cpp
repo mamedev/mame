@@ -16,19 +16,21 @@
 
 */
 
+#include "emu.h"
 #include "msm58321.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 
 // device type definition
-const device_type MSM58321 = &device_creator<msm58321_device>;
+DEFINE_DEVICE_TYPE(MSM58321, msm58321_device, "msm58321", "OKI MSM58321 RTC")
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 // registers
 enum
@@ -51,7 +53,7 @@ enum
 	REGISTER_REF1
 };
 
-static const char *reg_name(UINT8 address)
+static const char *reg_name(uint8_t address)
 {
 	switch(address)
 	{
@@ -171,8 +173,8 @@ inline void msm58321_device::write_counter(int address, int data)
 //  msm58321_device - constructor
 //-------------------------------------------------
 
-msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSM58321, "MSM58321", tag, owner, clock, "msm58321", __FILE__),
+msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSM58321, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_year0(0),
@@ -243,10 +245,6 @@ void msm58321_device::device_start()
 	save_item(NAME(m_cs1));
 	save_item(NAME(m_address));
 	save_item(NAME(m_reg));
-
-	set_current_time(machine());
-
-	update_output();
 }
 
 
@@ -337,7 +335,7 @@ void msm58321_device::nvram_write(emu_file &file)
 
 void msm58321_device::update_output()
 {
-	UINT8 data = 0xf;
+	uint8_t data = 0xf;
 
 	if (m_cs1 && m_cs2 && m_read)
 	{
@@ -358,7 +356,7 @@ void msm58321_device::update_output()
 			break;
 		}
 
-		if (LOG) logerror("MSM58321 '%s' Register Read %s (%01x): %01x\n", tag(), reg_name(m_address), m_address, data & 0x0f);
+		LOG("MSM58321 Register Read %s (%01x): %01x\n", reg_name(m_address), m_address, data & 0x0f);
 	}
 
 	int d0 = (data >> 0) & 1;
@@ -399,11 +397,11 @@ void msm58321_device::update_input()
 {
 	if (m_cs1 && m_cs2)
 	{
-		UINT8 data = m_d0_in | (m_d1_in << 1) | (m_d2_in << 2) | (m_d3_in << 3);
+		uint8_t data = m_d0_in | (m_d1_in << 1) | (m_d2_in << 2) | (m_d3_in << 3);
 
 		if (m_address_write)
 		{
-			if (LOG) logerror("MSM58321 '%s' Latch Address %01x\n", tag(), data);
+			LOG("MSM58321 Latch Address %01x\n", data);
 
 			// latch address
 			m_address = data;
@@ -414,7 +412,7 @@ void msm58321_device::update_input()
 			switch(m_address)
 			{
 			case REGISTER_RESET:
-				if (LOG) logerror("MSM58321 '%s' Reset\n", tag());
+				LOG("MSM58321 Reset\n");
 
 				if (!m_busy)
 				{
@@ -425,11 +423,11 @@ void msm58321_device::update_input()
 
 			case REGISTER_REF0:
 			case REGISTER_REF1:
-				if (LOG) logerror("MSM58321 '%s' Reference Signal\n", tag());
+				LOG("MSM58321 Reference Signal\n");
 				break;
 
 			default:
-				if (LOG) logerror("MSM58321 '%s' Register Write %s (%01x): %01x\n", tag(), reg_name(m_address), m_address, data);
+				LOG("MSM58321 Register Write %s (%01x): %01x\n", reg_name(m_address), m_address, data);
 
 				switch (m_address)
 				{
@@ -477,7 +475,7 @@ WRITE_LINE_MEMBER( msm58321_device::cs2_w )
 {
 	if (m_cs2 != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' CS2: %u\n", tag(), state);
+		LOG("MSM58321 CS2: %u\n", state);
 
 		m_cs2 = state;
 
@@ -494,7 +492,7 @@ WRITE_LINE_MEMBER( msm58321_device::write_w )
 {
 	if (m_write != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' WRITE: %u\n", tag(), state);
+		LOG("MSM58321 WRITE: %u\n", state);
 
 		m_write = state;
 
@@ -511,7 +509,7 @@ WRITE_LINE_MEMBER( msm58321_device::read_w )
 {
 	if (m_read != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' READ: %u\n", tag(), state);
+		LOG("MSM58321 READ: %u\n", state);
 
 		m_read = state;
 
@@ -589,7 +587,7 @@ WRITE_LINE_MEMBER( msm58321_device::address_write_w )
 {
 	if (m_address_write != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' ADDRESS WRITE: %u\n", tag(), state);
+		LOG("MSM58321 ADDRESS WRITE: %u\n", state);
 
 		m_address_write = state;
 
@@ -606,7 +604,7 @@ WRITE_LINE_MEMBER( msm58321_device::stop_w )
 {
 	if (m_stop != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' STOP: %u\n", tag(), state);
+		LOG("MSM58321 STOP: %u\n", state);
 
 		m_stop = state;
 	}
@@ -621,7 +619,7 @@ WRITE_LINE_MEMBER( msm58321_device::test_w )
 {
 	if (m_test != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' TEST: %u\n", tag(), state);
+		LOG("MSM58321 TEST: %u\n", state);
 
 		m_test = state;
 	}
@@ -637,7 +635,7 @@ WRITE_LINE_MEMBER( msm58321_device::cs1_w )
 {
 	if (m_cs1 != state)
 	{
-		if (LOG) logerror("MSM58321 '%s' CS1: %u\n", tag(), state);
+		LOG("MSM58321 CS1: %u\n", state);
 
 		m_cs1 = state;
 

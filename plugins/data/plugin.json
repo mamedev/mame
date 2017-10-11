@@ -1,9 +1,9 @@
 {
   "plugin": {
-    "name": "data",
+	"name": "data",
 	"description": "Data plugin",
-    "version": "0.0.1",
-    "author": "Carl",
+	"version": "0.0.1",
+	"author": "Carl",
 	"type": "plugin",
 	"start": "true"
   }

@@ -189,7 +189,7 @@ public:
 	image_init_result on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
-	UINT8 m_dma_page[4];
+	uint8_t m_dma_page[4];
 	int m_dack;
 
 	int m_timer2_irq;
@@ -450,7 +450,7 @@ READ8_MEMBER( wangpc_state::status_r )
 
 	*/
 
-	UINT8 data = 0x03;
+	uint8_t data = 0x03;
 
 	// floppy interrupts
 	data |= m_fdc->get_irq() << 3;
@@ -564,7 +564,7 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 	check_level2_interrupts();
 
-	UINT8 data = m_uart->read(space, 0);
+	uint8_t data = m_uart->read(space, 0);
 
 	if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
 
@@ -709,7 +709,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// FDC interrupt
 	data |= (m_fdc_dd0 || m_fdc_dd1 || (int) m_fdc->get_irq()) << 7;
@@ -941,7 +941,7 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 
 	*/
 
-	UINT8 data = 0x08 | 0x02 | 0x01;
+	uint8_t data = 0x08 | 0x02 | 0x01;
 
 	data |= m_dav << 2;
 	data |= m_centronics_busy << 4;
@@ -969,7 +969,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// timer 2 interrupt
 	data |= m_timer2_irq;
@@ -1178,10 +1178,10 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 void wangpc_state::machine_start()
 {
 	// connect floppy callbacks
-	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk0_load), this));
-	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
-	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk1_load), this));
-	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk1_unload), this));
+	m_floppy0->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk0_load, this));
+	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
+	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
+	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1265,7 +1265,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //  MACHINE_CONFIG( wangpc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc, wangpc_state )
+static MACHINE_CONFIG_START( wangpc )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
@@ -1289,7 +1289,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(wangpc_state, dack2_w))
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(wangpc_state, dack3_w))
 
-	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(wangpc_state, ppi_pa_r))
@@ -1305,7 +1306,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_t, write_rxd))
+	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
 
@@ -1386,4 +1387,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )

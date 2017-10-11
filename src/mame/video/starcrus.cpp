@@ -4,8 +4,9 @@
 /* Ramtek - Star Cruiser */
 
 #include "emu.h"
-#include "sound/samples.h"
 #include "includes/starcrus.h"
+#include "sound/samples.h"
+#include "screen.h"
 
 /* The collision detection techniques use in this driver
    are well explained in the comments in the sprint2 driver */
@@ -414,7 +415,7 @@ int starcrus_state::collision_check_s2p1p2()
 	return 0;
 }
 
-UINT32 starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

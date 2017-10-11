@@ -15,7 +15,7 @@
 
 PALETTE_INIT_MEMBER(markham_state, markham)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(markham_state, markham)
 	/* sprites lookup table */
 	for (i = 0; i < 0x400; i++)
 	{
-		UINT8 ctabentry = color_prom[i];
+		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -72,7 +72,7 @@ void markham_state::video_start()
 
 void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)
@@ -113,7 +113,7 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

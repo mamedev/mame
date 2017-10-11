@@ -26,7 +26,7 @@
 
 PALETTE_INIT_MEMBER(chaknpop_state, chaknpop)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 1024; i++)
 	{
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(chaknpop_state::get_tx_tile_info)
 
 void chaknpop_state::video_start()
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chaknpop_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
@@ -245,7 +245,7 @@ void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 chaknpop_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chaknpop_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

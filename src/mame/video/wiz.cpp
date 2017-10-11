@@ -29,7 +29,7 @@
 
 PALETTE_INIT_MEMBER(wiz_state, wiz)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
 	double rweights[4], gweights[4], bweights[4];
 
@@ -118,9 +118,9 @@ WRITE8_MEMBER(wiz_state::wiz_flipy_w)
 
 void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype)
 {
-	UINT8 *vram = layer ? m_videoram2 : m_videoram;
-	UINT8 *aram = layer ? m_attrram2 : m_attrram;
-	UINT8 *cram = layer ? m_colorram2 : m_colorram;
+	uint8_t *vram = layer ? m_videoram2 : m_videoram;
+	uint8_t *aram = layer ? m_attrram2 : m_attrram;
+	uint8_t *cram = layer ? m_colorram2 : m_colorram;
 	gfx_element *gfx = m_gfxdecode->gfx(charbank);
 	int palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
 
@@ -153,7 +153,7 @@ void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 
 void wiz_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank)
 {
-	UINT8 *sram = set ? m_spriteram2 : m_spriteram;
+	uint8_t *sram = set ? m_spriteram2 : m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(charbank);
 	int palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
 
@@ -184,7 +184,7 @@ void wiz_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 /**************************************************************************/
 
-UINT32 wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	draw_tiles(bitmap, cliprect, 0, 2 + m_charbank[0], 1);
@@ -194,7 +194,7 @@ UINT32 wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	draw_tiles(bitmap, cliprect, 0, 2 + ((m_charbank[0] << 1) | m_charbank[1]), 1);
@@ -210,7 +210,7 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-UINT32 wiz_state::screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wiz_state::screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	draw_tiles(bitmap, cliprect, 0, 2 + m_charbank[0], 0);

@@ -80,11 +80,14 @@
 
 
 #include "emu.h"
+#include "includes/gridlee.h"
+
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/gridlee.h"
+#include "speaker.h"
 
 
 /* constants */
@@ -169,7 +172,7 @@ void gridlee_state::machine_reset()
 READ8_MEMBER(gridlee_state::analog_port_r)
 {
 	int delta, sign, magnitude;
-	UINT8 newval;
+	uint8_t newval;
 	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
@@ -220,11 +223,11 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 
 void gridlee_state::poly17_init()
 {
-	UINT32 i, x = 0;
-	UINT8 *p, *r;
+	uint32_t i, x = 0;
+	uint8_t *p, *r;
 
 	/* allocate memory */
-	m_poly17 = std::make_unique<UINT8[]>(2 * (POLY17_SIZE + 1));
+	m_poly17 = std::make_unique<uint8_t[]>(2 * (POLY17_SIZE + 1));
 	p = m_poly17.get();
 	r = m_rand17 = m_poly17.get() + POLY17_SIZE + 1;
 
@@ -250,7 +253,7 @@ void gridlee_state::poly17_init()
 
 READ8_MEMBER(gridlee_state::random_num_r)
 {
-	UINT32 cc;
+	uint32_t cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = m_maincpu->total_cycles();
@@ -268,24 +271,24 @@ READ8_MEMBER(gridlee_state::random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::led_0_w)
+WRITE_LINE_MEMBER(gridlee_state::led_0_w)
 {
-	output().set_led_value(0, data & 1);
-	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
+	output().set_led_value(0, state);
+	logerror("LED 0 %s\n", state ? "on" : "off");
 }
 
 
-WRITE8_MEMBER(gridlee_state::led_1_w)
+WRITE_LINE_MEMBER(gridlee_state::led_1_w)
 {
-	output().set_led_value(1, data & 1);
-	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
+	output().set_led_value(1, state);
+	logerror("LED 1 %s\n", state ? "on" : "off");
 }
 
 
-WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
+WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	logerror("coin counter %s\n", (data & 1) ? "on" : "off");
+	machine().bookkeeping().coin_counter_w(0, state);
+	logerror("coin counter %s\n", state ? "on" : "off");
 }
 
 
@@ -300,11 +303,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
-	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
-	AM_RANGE(0x9020, 0x9020) AM_WRITE(gridlee_coin_counter_w)
-/*  { 0x9060, 0x9060, unknown - only written to at startup */
-	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
+	AM_RANGE(0x9000, 0x9000) AM_SELECT(0x0070) AM_DEVWRITE_MOD("latch", ls259_device, write_d0, rshift<4>)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
@@ -408,7 +407,7 @@ static const char *const sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gridlee, gridlee_state )
+static MACHINE_CONFIG_START( gridlee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
@@ -417,6 +416,13 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gridlee_state, led_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gridlee_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gridlee_state, coin_counter_w))
+	// Q6 unknown - only written to at startup
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gridlee_state, cocktail_flip_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,4 +482,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0,        gridlee, gridlee, driver_device, 0,     ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, gridlee, 0, gridlee, gridlee, gridlee_state, 0, ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

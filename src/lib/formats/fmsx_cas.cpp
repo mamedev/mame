@@ -8,7 +8,7 @@
 #define CAS_PERIOD        (16)
 #define CAS_HEADER_PERIODS (4000)
 #define CAS_EMPTY_PERIODS (1000)
-static const UINT8 CasHeader[8] = { 0x1F,0xA6,0xDE,0xBA,0xCC,0x13,0x7D,0x74 };
+static const uint8_t CasHeader[8] = { 0x1F,0xA6,0xDE,0xBA,0xCC,0x13,0x7D,0x74 };
 
 static int cas_size;
 
@@ -16,7 +16,7 @@ static int cas_size;
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
+static int fmsx_cas_to_wav_size (const uint8_t *casdata, int caslen)
 {
 	int     pos, size;
 
@@ -48,7 +48,7 @@ static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int fmsx_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	int cas_pos, bit, state = 1, samples_pos, size, n, i, p;
 

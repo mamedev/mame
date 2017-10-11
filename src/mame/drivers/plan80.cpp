@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class plan80_state : public driver_device
@@ -38,27 +39,27 @@ public:
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "p_videoram")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	required_shared_ptr<UINT8> m_p_videoram;
-	const UINT8* m_p_chargen;
-	UINT8 m_kbd_row;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(plan80);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
+private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	uint8_t m_kbd_row;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ8_MEMBER( plan80_state::plan80_04_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_kbd_row == 0xfe)
 		data = ioport("LINE0")->read();
@@ -88,7 +89,7 @@ static ADDRESS_MAP_START(plan80_mem, AS_PROGRAM, 8, plan80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -158,7 +159,7 @@ void plan80_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in plan80_state::device_timer");
+		assert_always(false, "Unknown id in plan80_state::device_timer");
 	}
 }
 
@@ -170,25 +171,20 @@ void plan80_state::machine_reset()
 
 DRIVER_INIT_MEMBER(plan80_state,plan80)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-void plan80_state::video_start()
+uint32_t plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma+48; x++)
 			{
@@ -228,14 +224,14 @@ static GFXDECODE_START( plan80 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( plan80, plan80_state )
+static MACHINE_CONFIG_START( plan80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2048000)
 	MCFG_CPU_PROGRAM_MAP(plan80_mem)
 	MCFG_CPU_IO_MAP(plan80_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(plan80_state, screen_update)
@@ -261,5 +257,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1988, plan80,  0,       0,     plan80,    plan80, plan80_state, plan80,   "Tesla Eltos",   "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY         FULLNAME   FLAGS
+COMP( 1988, plan80, 0,       0,     plan80,    plan80, plan80_state, plan80,  "Tesla Eltos",  "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -33,7 +33,7 @@
 
 PALETTE_INIT_MEMBER(espial_state, espial)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -70,9 +70,9 @@ PALETTE_INIT_MEMBER(espial_state, espial)
 
 TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
-	UINT8 col = m_colorram[tile_index];
-	UINT8 attr = m_attributeram[tile_index];
+	uint8_t code = m_videoram[tile_index];
+	uint8_t col = m_colorram[tile_index];
+	uint8_t attr = m_attributeram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 					code | ((attr & 0x03) << 8),
 					col & 0x3f,
@@ -219,7 +219,7 @@ void espial_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 espial_state::screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t espial_state::screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

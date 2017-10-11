@@ -11,7 +11,7 @@
 //  execute_swap - execute a swap instruction
 //-------------------------------------------------
 
-void mb86901_device::execute_swap(UINT32 op)
+void mb86901_device::execute_swap(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
@@ -62,8 +62,8 @@ void mb86901_device::execute_swap(UINT32 op)
 	);
 	*/
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (SWAP)
 	{
 		address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -88,8 +88,8 @@ void mb86901_device::execute_swap(UINT32 op)
 		}
 	}
 
-	UINT32 word = 0;
-	UINT32 temp = 0;
+	uint32_t word = 0;
+	uint32_t temp = 0;
 	if (!m_trap)
 	{
 		temp = RDREG;
@@ -134,7 +134,7 @@ void mb86901_device::execute_swap(UINT32 op)
 //  execute_mul - execute a multiply opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_mul(UINT32 op)
+void mb86901_device::execute_mul(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 172)
 
@@ -154,20 +154,20 @@ void mb86901_device::execute_mul(UINT32 op)
 	);
 	*/
 
-	UINT32 operand2 = (USEIMM ? SIMM13 : RS2REG);
+	uint32_t operand2 = (USEIMM ? SIMM13 : RS2REG);
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (UMUL || UMULCC)
 	{
-		UINT64 dresult = (UINT64)RS1REG * (UINT64)operand2;
-		Y = (UINT32)(dresult >> 32);
-		result = (UINT32)dresult;
+		uint64_t dresult = (uint64_t)RS1REG * (uint64_t)operand2;
+		Y = (uint32_t)(dresult >> 32);
+		result = (uint32_t)dresult;
 	}
 	else if (SMUL || SMULCC)
 	{
-		INT64 dresult = (INT64)(INT32)RS1REG * (INT64)(INT32)operand2;
-		Y = (UINT32)(dresult >> 32);
-		result = (UINT32)dresult;
+		int64_t dresult = (int64_t)(int32_t)RS1REG * (int64_t)(int32_t)operand2;
+		Y = (uint32_t)(dresult >> 32);
+		result = (uint32_t)dresult;
 	}
 
 	if (RD != 0)
@@ -187,7 +187,7 @@ void mb86901_device::execute_mul(UINT32 op)
 //  execute_div - execute a divide opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_div(UINT32 op)
+void mb86901_device::execute_div(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 176, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 173)
 
@@ -234,7 +234,7 @@ void mb86901_device::execute_div(UINT32 op)
 	);
 	*/
 
-	UINT32 operand2 = (USEIMM ? SIMM13 : RS2REG);
+	uint32_t operand2 = (USEIMM ? SIMM13 : RS2REG);
 
 	if (operand2 == 0)
 	{
@@ -243,24 +243,24 @@ void mb86901_device::execute_div(UINT32 op)
 	}
 	else
 	{
-		UINT32 result = 0;
+		uint32_t result = 0;
 		bool temp_v = false;
-		INT64 temp_64bit;
+		int64_t temp_64bit;
 		if (UDIV || UDIVCC)
 		{
-			temp_64bit = INT64(UINT64((UINT64(Y) << 32) | UINT64(RS1REG)) / operand2);
+			temp_64bit = int64_t(uint64_t((uint64_t(Y) << 32) | uint64_t(RS1REG)) / operand2);
 
-			result = UINT32(temp_64bit);
+			result = uint32_t(temp_64bit);
 
 			temp_v = ((temp_64bit & 0xffffffff00000000) == 0) ? false : true;
 		}
 		else if (SDIV || SDIVCC)
 		{
-			temp_64bit = INT64(INT64((UINT64(Y) << 32) | UINT64(RS1REG)) / operand2);
+			temp_64bit = int64_t(int64_t((uint64_t(Y) << 32) | uint64_t(RS1REG)) / operand2);
 
-			result = UINT32(temp_64bit);
+			result = uint32_t(temp_64bit);
 
-			UINT64 shifted = UINT64(temp_64bit) >> 31;
+			uint64_t shifted = uint64_t(temp_64bit) >> 31;
 			temp_v = (shifted == 0 || shifted == 0x1ffffffff) ? false : true;
 		}
 

@@ -12,7 +12,6 @@
 
     TODO:
 
-    - floppy
     - interlaced video
     - add-on ROM
     - add-on RAM
@@ -20,50 +19,37 @@
 
 */
 
-#define I8080_TAG   "ua2"
-#define TMS5501_TAG "ud2"
-#define CRT5027_TAG "uf9"
-#define RS232_TAG   "rs232"
-
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "screen.h"
 #include "softlist.h"
+
+#define I8080_TAG   "ua2"
+#define TMS5501_TAG "ud2"
+#define CRT5027_TAG "uf9"
+#define RS232_TAG   "rs232"
 
 class compucolor2_state : public driver_device
 {
 public:
-	compucolor2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8080_TAG),
-			m_mioc(*this, TMS5501_TAG),
-			m_vtac(*this, CRT5027_TAG),
-			m_palette(*this, "palette"),
-			m_rs232(*this, RS232_TAG),
-			m_floppy0(*this, "cd0"),
-			m_floppy1(*this, "cd1"),
-			m_char_rom(*this, "chargen"),
-			m_video_ram(*this, "videoram"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_y9(*this, "Y9"),
-			m_y10(*this, "Y10"),
-			m_y11(*this, "Y11"),
-			m_y12(*this, "Y12"),
-			m_y13(*this, "Y13"),
-			m_y14(*this, "Y14"),
-			m_y15(*this, "Y15"),
-			m_y128(*this, "Y128")
+	compucolor2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8080_TAG),
+		m_mioc(*this, TMS5501_TAG),
+		m_vtac(*this, CRT5027_TAG),
+		m_palette(*this, "palette"),
+		m_rs232(*this, RS232_TAG),
+		m_floppy0(*this, "cd0"),
+		m_floppy1(*this, "cd1"),
+		m_char_rom(*this, "chargen"),
+		m_video_ram(*this, "videoram"),
+		m_y(*this, "Y%u", 0),
+		m_y128(*this, "Y128")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,29 +60,14 @@ public:
 	required_device<compucolor_floppy_port_device> m_floppy0;
 	required_device<compucolor_floppy_port_device> m_floppy1;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
-	required_ioport m_y13;
-	required_ioport m_y14;
-	required_ioport m_y15;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<16> m_y;
 	required_ioport m_y128;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( xi_r );
 	DECLARE_WRITE8_MEMBER( xo_w );
@@ -104,7 +75,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER( int_ack );
 
-	UINT8 m_xo;
+	uint8_t m_xo;
 };
 
 static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
@@ -289,7 +260,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 INPUT_PORTS_END
 
-UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 32*8; y++)
 	{
@@ -297,13 +268,13 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 code = m_video_ram[offset++];
-			UINT8 attr = m_video_ram[offset++];
+			uint8_t code = m_video_ram[offset++];
+			uint8_t attr = m_video_ram[offset++];
 
 			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
 			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
 
-			UINT8 data = m_char_rom->base()[char_offs];
+			uint8_t data = m_char_rom->base()[char_offs];
 
 			rgb_t fg = m_palette->pen_color(attr & 0x07);
 			rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
@@ -322,30 +293,12 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 READ8_MEMBER( compucolor2_state::xi_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch ((m_xo >> 4) & 0x03)
 	{
 	case 0:
-		switch (m_xo & 0x0f)
-		{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 9: data &= m_y9->read(); break;
-		case 10: data &= m_y10->read(); break;
-		case 11: data &= m_y11->read(); break;
-		case 12: data &= m_y12->read(); break;
-		case 13: data &= m_y13->read(); break;
-		case 14: data &= m_y14->read(); break;
-		case 15: data &= m_y15->read(); break;
-		}
+		data &= m_y[m_xo & 0x0f]->read();
 
 		if (BIT(m_xo, 7))
 		{
@@ -434,7 +387,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
+static MACHINE_CONFIG_START( compucolor2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
@@ -504,4 +457,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, compucolor2_state, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

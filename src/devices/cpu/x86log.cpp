@@ -12,6 +12,7 @@
 #include <cassert>
 #include "emu.h"
 #include "x86log.h"
+#include "cpu/i386/i386dasm.h"
 
 
 
@@ -20,7 +21,6 @@
 ***************************************************************************/
 
 static void reset_log(x86log_context *log) noexcept;
-extern int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
 
 
 
@@ -111,7 +111,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 	/* loop from the start until the cache top */
 	while (cur < stop)
 	{
-		char buffer[100];
+		std::string buffer;
 		int bytes;
 
 		/* skip past any past data ranges */
@@ -129,10 +129,10 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 			switch (curdata->size)
 			{
 				default:
-				case 1:     sprintf(buffer, "db      %02X", *cur);              break;
-				case 2:     sprintf(buffer, "dw      %04X", *(UINT16 *)cur);    break;
-				case 4:     sprintf(buffer, "dd      %08X", *(UINT32 *)cur);    break;
-				case 8:     sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]);    break;
+				case 1:     buffer = string_format("db      %02X", *cur);              break;
+				case 2:     buffer = string_format("dw      %04X", *(uint16_t *)cur);    break;
+				case 4:     buffer = string_format("dd      %08X", *(uint32_t *)cur);    break;
+				case 8:     buffer = string_format("dq      %08X%08X", ((uint32_t *)cur)[1], ((uint32_t *)cur)[0]);    break;
 			}
 		}
 
@@ -146,7 +146,9 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		/* otherwise, do a disassembly of the current instruction */
 		else
 		{
-			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
+			std::stringstream strbuffer;
+			bytes = i386_dasm_one_ex(strbuffer, (uintptr_t)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
+			buffer = strbuffer.str();
 		}
 
 		/* if we have a matching comment, output it */
@@ -155,12 +157,12 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 			/* if we have additional matching comments at the same address, output them first */
 			for ( ; curcomment + 1 < lastcomment && cur == curcomment[1].base; curcomment++)
 				x86log_printf(log, "%p: %-50s; %s\n", cur, "", curcomment->string);
-			x86log_printf(log, "%p: %-50s; %s\n", cur, buffer, curcomment->string);
+			x86log_printf(log, "%p: %-50s; %s\n", cur, buffer.c_str(), curcomment->string);
 		}
 
 		/* if we don't, just print the disassembly and move on */
 		else
-			x86log_printf(log, "%p: %s\n", cur, buffer);
+			x86log_printf(log, "%p: %s\n", cur, buffer.c_str());
 
 		/* advance past this instruction */
 		cur += bytes;

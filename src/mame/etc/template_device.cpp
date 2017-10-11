@@ -16,7 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 // device type definition
-const device_type XXX = &device_creator<xxx_device>;
+DEFINE_DEVICE_TYPE(XXX, xxx_device, "xxx", "XXX")
 
 
 //**************************************************************************
@@ -27,12 +27,22 @@ const device_type XXX = &device_creator<xxx_device>;
 //  xxx_device - constructor
 //-------------------------------------------------
 
-xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, XXX, "xxx_longname", tag, owner, clock, "xxx", __FILE__)
+xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XXX, tag, owner, clock)
 {
 }
 
 
+
+
+//-------------------------------------------------
+//  device_add_mconfig - device-specific machine
+//  configuration addiitons
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(xxx_device::device_add_mconfig)
+	//MCFG_CPU_ADD(...)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

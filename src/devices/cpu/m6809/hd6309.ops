@@ -673,19 +673,19 @@ INDEXED:
 
 			case 0x05: case 0x25: case 0x45: case 0x65:
 			case 0x15: case 0x35: case 0x55: case 0x75:
-				m_temp.w = ireg() + (INT8) m_q.r.b;
+				m_temp.w = ireg() + (int8_t) m_q.r.b;
 				eat(2);
 				break;
 
 			case 0x06: case 0x26: case 0x46: case 0x66:
 			case 0x16: case 0x36: case 0x56: case 0x76:
-				m_temp.w = ireg() + (INT8) m_q.r.a;
+				m_temp.w = ireg() + (int8_t) m_q.r.a;
 				eat(2);
 				break;
 
 			case 0x08: case 0x28: case 0x48: case 0x68:
 			case 0x18: case 0x38: case 0x58: case 0x78:
-				@m_temp.w = ireg() + (INT8) read_opcode_arg();
+				@m_temp.w = ireg() + (int8_t) read_opcode_arg();
 				eat(1);
 				break;
 
@@ -706,7 +706,7 @@ INDEXED:
 			case 0x0C: case 0x2C: case 0x4C: case 0x6C:
 			case 0x1C: case 0x3C: case 0x5C: case 0x7C:
 				@m_temp.b.l = read_opcode_arg();
-				m_temp.w = m_pc.w + (INT8) m_temp.b.l;
+				m_temp.w = m_pc.w + (int8_t) m_temp.b.l;
 				eat(1);
 				break;
 
@@ -714,7 +714,7 @@ INDEXED:
 			case 0x1D: case 0x3D: case 0x5D: case 0x7D:
 				@m_temp.b.h = read_opcode_arg();
 				@m_temp.b.l = read_opcode_arg();
-				m_temp.w = m_pc.w + (INT16) m_temp.w;
+				m_temp.w = m_pc.w + (int16_t) m_temp.w;
 				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 4);
 				break;
 
@@ -727,14 +727,14 @@ INDEXED:
 			case 0x07: case 0x27: case 0x47: case 0x67:
 			case 0x17: case 0x37: case 0x57: case 0x77:
 				// 6309 specific mode
-				m_temp.w = ireg() + (INT8) m_q.r.e;
+				m_temp.w = ireg() + (int8_t) m_q.r.e;
 				eat(2);
 				break;
 
 			case 0x0A: case 0x2A: case 0x4A: case 0x6A:
 			case 0x1A: case 0x3A: case 0x5A: case 0x7A:
 				// 6309 specific mode
-				m_temp.w = ireg() + (INT8) m_q.r.f;
+				m_temp.w = ireg() + (int8_t) m_q.r.f;
 				eat(2);
 				break;
 
@@ -789,7 +789,7 @@ INDEXED:
 	else
 	{
 		// 5-bit offset
-		m_temp.w = ireg() + (INT8) ((m_opcode & 0x0F) | (m_opcode & 0x10 ? 0xF0 : 0x00));
+		m_temp.w = ireg() + (int8_t) ((m_opcode & 0x0F) | (m_opcode & 0x10 ? 0xF0 : 0x00));
 		eat(2);
 	}
 	@set_ea(m_temp.w);
@@ -797,7 +797,7 @@ INDEXED:
 
 EXG:
 	{
-		UINT8 param = read_opcode_arg();
+		uint8_t param = read_opcode_arg();
 		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
 		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
 		write_exgtfr_register(param >> 4, reg2);
@@ -808,7 +808,7 @@ EXG:
 
 TFR:
 	{
-		UINT8 param = read_opcode_arg();
+		uint8_t param = read_opcode_arg();
 		exgtfr_register reg = read_exgtfr_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg);
 	}
@@ -839,7 +839,7 @@ LDQ:
 	@m_q.r.b = read_operand(1);
 	@m_q.r.e = read_operand(2);
 	@m_q.r.f = read_operand(3);
-	set_flags<UINT32>(CC_NZV, m_q.q);
+	set_flags<uint32_t>(CC_NZV, m_q.q);
 	return;
 
 STQ:
@@ -847,13 +847,13 @@ STQ:
 	@write_operand(1, m_q.r.b);
 	@write_operand(2, m_q.r.e);
 	@write_operand(3, m_q.r.f);
-	set_flags<UINT32>(CC_NZV, m_q.q);
+	set_flags<uint32_t>(CC_NZV, m_q.q);
 	return;
 
 OIM:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_V;
-	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l | m_temp_im);
+	m_temp.b.l = set_flags(CC_NZ, (uint8_t)0, m_temp.b.l, m_temp.b.l | m_temp_im);
 	@eat(1);	// this is just a guess
 	@write_operand(m_temp.b.l);
 	return;
@@ -861,7 +861,7 @@ OIM:
 AIM:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_V;
-	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l & m_temp_im);
+	m_temp.b.l = set_flags(CC_NZ, (uint8_t)0, m_temp.b.l, m_temp.b.l & m_temp_im);
 	@eat(1);	// this is just a guess
 	@write_operand(m_temp.b.l);
 	return;
@@ -869,7 +869,7 @@ AIM:
 EIM:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_V;
-	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l ^ m_temp_im);
+	m_temp.b.l = set_flags(CC_NZ, (uint8_t)0, m_temp.b.l, m_temp.b.l ^ m_temp_im);
 	@eat(1);	// this is just a guess
 	@write_operand(m_temp.b.l);
 	return;
@@ -877,7 +877,7 @@ EIM:
 TIM:
 	@m_temp.b.l = read_operand();
 	m_cc &= ~CC_V;
-	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l & m_temp_im);
+	m_temp.b.l = set_flags(CC_NZ, (uint8_t)0, m_temp.b.l, m_temp.b.l & m_temp_im);
 	@eat(2);	// this is just a guess
 	return;
 
@@ -926,7 +926,7 @@ COM16:
 	m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_V;
 	m_cc |= CC_C;
-	m_temp.w = set_flags(CC_NZ, (UINT16) ~m_temp.w);
+	m_temp.w = set_flags(CC_NZ, (uint16_t) ~m_temp.w);
 	eat(hd6309_native_mode() ? 0 : 1);
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
@@ -950,28 +950,28 @@ AND16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_V;
-	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w & m_temp.w);
+	regop16().w = set_flags(CC_NZ, (uint16_t)0, regop16().w, regop16().w & m_temp.w);
 	return;
 
 BIT16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_V;
-	set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w & m_temp.w);
+	set_flags(CC_NZ, (uint16_t)0, regop16().w, regop16().w & m_temp.w);
 	return;
 
 OR16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_V;
-	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w | m_temp.w);
+	regop16().w = set_flags(CC_NZ, (uint16_t)0, regop16().w, regop16().w | m_temp.w);
 	return;
 
 EOR16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_V;
-	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w ^ m_temp.w);
+	regop16().w = set_flags(CC_NZ, (uint16_t)0, regop16().w, regop16().w ^ m_temp.w);
 	return;
 
 PSHSW:
@@ -1079,7 +1079,7 @@ DIVD:
 	return;
 
 SEXW:
-	m_q.r.d = set_flags<UINT16>(CC_N, (m_q.r.w & 0x8000) ? 0xFFFF : 0x0000);
+	m_q.r.d = set_flags<uint16_t>(CC_N, (m_q.r.w & 0x8000) ? 0xFFFF : 0x0000);
 	if ((m_q.r.d == 0x0000) && (m_q.r.w == 0x0000))
 		m_cc |= CC_Z;
 	else

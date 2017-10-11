@@ -15,40 +15,40 @@ diablo_hd_device* m_drive[2];       //!< two diablo_hd_device drives
 
 //! disk controller context
 struct {
-	UINT8 drive;                    //!< selected drive from KADDR[14] (written to data out with SENDADR)
-	UINT16 kaddr;                   //!< A[0-15] disk hardware address (sector, cylinder, head, drive, restore)
-	UINT16 kadr;                    //!< C[0-15] with read/write/check modes for header, label and data
-	UINT16 kstat;                   //!< S[0-15] disk status
-	UINT16 kcom;                    //!< disk command (5 bits kcom[1-5])
-	UINT8 krecno;                   //!< record number (2 bits indexing header, label, data, -/-)
-	UINT8 egate;                    //!< current erase gate signal to the DIABLO hd
-	UINT8 wrgate;                   //!< current write gate signal to the DIABLO hd
-	UINT8 rdgate;                   //!< current read gate signal to the DIABLO hd
-	UINT32 shiftin;                 //!< input shift register
-	UINT32 shiftout;                //!< output shift register
-	UINT32 datain;                  //!< disk data in latch
-	UINT32 dataout;                 //!< disk data out latch
-	UINT8 krwc;                     //!< read/write/check for current record
-	UINT8 kfer;                     //!< disk fatal error signal state
-	UINT8 wdtskena;                 //!< disk word task enable (active low)
-	UINT8 wddone;                   //!< previous state of WDDONE
-	UINT8 wdinit0;                  //!< disk word task init at the early microcycle
-	UINT8 wdinit;                   //!< disk word task init at the late microcycle
-	UINT8 strobe;                   //!< strobe (still) active
+	uint8_t drive;                    //!< selected drive from KADDR[14] (written to data out with SENDADR)
+	uint16_t kaddr;                   //!< A[0-15] disk hardware address (sector, cylinder, head, drive, restore)
+	uint16_t kadr;                    //!< C[0-15] with read/write/check modes for header, label and data
+	uint16_t kstat;                   //!< S[0-15] disk status
+	uint16_t kcom;                    //!< disk command (5 bits kcom[1-5])
+	uint8_t krecno;                   //!< record number (2 bits indexing header, label, data, -/-)
+	uint8_t egate;                    //!< current erase gate signal to the DIABLO hd
+	uint8_t wrgate;                   //!< current write gate signal to the DIABLO hd
+	uint8_t rdgate;                   //!< current read gate signal to the DIABLO hd
+	uint32_t shiftin;                 //!< input shift register
+	uint32_t shiftout;                //!< output shift register
+	uint32_t datain;                  //!< disk data in latch
+	uint32_t dataout;                 //!< disk data out latch
+	uint8_t krwc;                     //!< read/write/check for current record
+	uint8_t kfer;                     //!< disk fatal error signal state
+	uint8_t wdtskena;                 //!< disk word task enable (active low)
+	uint8_t wddone;                   //!< previous state of WDDONE
+	uint8_t wdinit0;                  //!< disk word task init at the early microcycle
+	uint8_t wdinit;                   //!< disk word task init at the late microcycle
+	uint8_t strobe;                   //!< strobe (still) active
 	emu_timer* strobon_timer;       //!< set strobe on timer
-	UINT8 bitclk;                   //!< current bitclk state (either crystal clock, or rdclk from the drive)
+	uint8_t bitclk;                   //!< current bitclk state (either crystal clock, or rdclk from the drive)
 	attoseconds_t bitclk_time[2];   //!< per drive time in attoseconds per bit
-	UINT8 datin;                    //!< current datin from the drive
-	UINT8 bitcount;                 //!< bit counter
-	UINT8 carry;                    //!< carry output of the bitcounter
-	UINT8 seclate;                  //!< sector late (monoflop output)
+	uint8_t datin;                    //!< current datin from the drive
+	uint8_t bitcount;                 //!< bit counter
+	uint8_t carry;                    //!< carry output of the bitcounter
+	uint8_t seclate;                  //!< sector late (monoflop output)
 	emu_timer* seclate_timer;       //!< sector late timer
-	UINT8 seekok;                   //!< seekok state (SKINC' & LAI' & ff_44a.Q')
-	UINT8 ok_to_run;                //!< ok to run signal (set to 1 some time after reset)
+	uint8_t seekok;                   //!< seekok state (SKINC' & LAI' & ff_44a.Q')
+	uint8_t ok_to_run;                //!< ok to run signal (set to 1 some time after reset)
 	emu_timer* ok_to_run_timer;     //!< ok to run timer
-	UINT8 ready_mf31a;              //!< ready monoflop 31a
+	uint8_t ready_mf31a;              //!< ready monoflop 31a
 	emu_timer* ready_timer;         //!< ready timer
-	UINT8 seclate_mf31b;            //!< seclate monoflop 31b
+	uint8_t seclate_mf31b;            //!< seclate monoflop 31b
 	jkff_t ff_21a;                  //!< JK flip-flop 21a (sector task)
 	jkff_t ff_21a_old;              //!< -"- previous state
 	jkff_t ff_21b;                  //!< JK flip-flop 21b (sector task)

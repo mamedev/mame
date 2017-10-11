@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type ER2055 = &device_creator<er2055_device>;
+DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM")
 
 static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8, er2055_device )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
@@ -33,8 +33,8 @@ ADDRESS_MAP_END
 //  er2055_device - constructor
 //-------------------------------------------------
 
-er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ER2055, "ER2055 EAROM", tag, owner, clock, "er2055", __FILE__),
+er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ER2055, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
@@ -65,9 +65,11 @@ void er2055_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *er2055_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector er2055_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -90,7 +92,7 @@ void er2055_device::nvram_default()
 		if (m_region->bytewidth() != 1)
 			fatalerror("er2055 region '%s' needs to be an 8-bit region\n", tag());
 
-		UINT8 *default_data = m_region->base();
+		uint8_t *default_data = m_region->base();
 		for (int byte = 0; byte < SIZE_DATA; byte++)
 			space(AS_PROGRAM).write_byte(byte, default_data[byte]);
 	}
@@ -104,7 +106,7 @@ void er2055_device::nvram_default()
 
 void er2055_device::nvram_read(emu_file &file)
 {
-	UINT8 buffer[SIZE_DATA];
+	uint8_t buffer[SIZE_DATA];
 	file.read(buffer, sizeof(buffer));
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		space(AS_PROGRAM).write_byte(byte, buffer[byte]);
@@ -118,7 +120,7 @@ void er2055_device::nvram_read(emu_file &file)
 
 void er2055_device::nvram_write(emu_file &file)
 {
-	UINT8 buffer[SIZE_DATA];
+	uint8_t buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = space(AS_PROGRAM).read_byte(byte);
 	file.write(buffer, sizeof(buffer));
@@ -136,10 +138,10 @@ void er2055_device::nvram_write(emu_file &file)
 //  reacts to various combinations
 //-------------------------------------------------
 
-void er2055_device::set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 ck)
+void er2055_device::set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2, uint8_t ck)
 {
 	// create a new composite control state
-	UINT8 oldstate = m_control_state;
+	uint8_t oldstate = m_control_state;
 	m_control_state = (ck != 0) ? CK : 0;
 	m_control_state |= (c1 != 0) ? C1 : 0;
 	m_control_state |= (c2 != 0) ? C2 : 0;

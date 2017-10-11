@@ -196,8 +196,8 @@ WRITE8_MEMBER(ajax_state::bankswitch_2_w)
 
 void ajax_state::machine_start()
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SUB  = memregion("sub")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SUB  = memregion("sub")->base();
 
 	membank("mainbank")->configure_entries(0, 4, &MAIN[0x00000], 0x2000);
 	membank("mainbank")->configure_entries(4, 8, &MAIN[0x10000], 0x2000);

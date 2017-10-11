@@ -15,16 +15,17 @@
 
 */
 
+#include "emu.h"
 #include "mccs1850.h"
+
+//#define VERBOSE 0
+#include "logmacro.h"
 
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 #define RAM_SIZE 0x80
 
@@ -99,7 +100,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type MCCS1850 = &device_creator<mccs1850_device>;
+DEFINE_DEVICE_TYPE(MCCS1850, mccs1850_device, "mccs1850", "MCCS1850 RTC")
 
 
 
@@ -113,8 +114,8 @@ const device_type MCCS1850 = &device_creator<mccs1850_device>;
 
 inline void mccs1850_device::check_interrupt()
 {
-	UINT8 status = m_ram[REGISTER_STATUS];
-	UINT8 control = m_ram[REGISTER_CONTROL];
+	uint8_t status = m_ram[REGISTER_STATUS];
+	uint8_t control = m_ram[REGISTER_CONTROL];
 
 	bool interrupt = (((status & STATUS_AI) && (control & CONTROL_AE))      // alarm interrupt
 					|| ((status & STATUS_LB) && (control & CONTROL_LBE))    // low battery
@@ -152,7 +153,7 @@ inline void mccs1850_device::set_pse_line(bool state)
 //  read_register -
 //-------------------------------------------------
 
-inline UINT8 mccs1850_device::read_register(offs_t offset)
+inline uint8_t mccs1850_device::read_register(offs_t offset)
 {
 	switch (offset)
 	{
@@ -170,7 +171,7 @@ inline UINT8 mccs1850_device::read_register(offs_t offset)
 	case REGISTER_TEST_KICK_START_COUNTER:
 	case REGISTER_TEST_PRESCALE_COUNTER:
 	case REGISTER_TEST_COUNTER_INCREMENT:
-		logerror("MCCS1850 '%s' Unsupported read from test register %02x!\n", tag(), offset);
+		logerror("MCCS1850 Unsupported read from test register %02x!\n", offset);
 		break;
 	}
 
@@ -182,7 +183,7 @@ inline UINT8 mccs1850_device::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
+inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -191,35 +192,35 @@ inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
 		break;
 
 	case REGISTER_CONTROL:
-		if (LOG) logerror("MCCS1850 '%s' Counter %s\n", tag(), (data & CONTROL_STR_STP) ? "Start" : "Stop");
+		LOG("MCCS1850 Counter %s\n", (data & CONTROL_STR_STP) ? "Start" : "Stop");
 		m_clock_timer->enable(data & CONTROL_STR_STP);
 
 		if (data & CONTROL_PD)
 		{
-			if (LOG) logerror("MCCS1850 '%s' Power Down\n", tag());
+			LOG("MCCS1850 Power Down\n");
 			set_pse_line(false);
 		}
 
 		if (data & CONTROL_AR)
 		{
-			if (LOG) logerror("MCCS1850 '%s' Auto Restart\n", tag());
+			LOG("MCCS1850 Auto Restart\n");
 		}
 
 		if (data & CONTROL_AC)
 		{
-			if (LOG) logerror("MCCS1850 '%s' Alarm Clear\n", tag());
+			LOG("MCCS1850 Alarm Clear\n");
 			m_ram[REGISTER_STATUS] &= ~STATUS_AI;
 		}
 
 		if (data & CONTROL_FTUC)
 		{
-			if (LOG) logerror("MCCS1850 '%s' First Time Up Clear\n", tag());
+			LOG("MCCS1850 First Time Up Clear\n");
 			m_ram[REGISTER_STATUS] &= ~STATUS_FTU;
 		}
 
 		if (data & CONTROL_RPCD)
 		{
-			if (LOG) logerror("MCCS1850 '%s' Request to Power Down Clear\n", tag());
+			LOG("MCCS1850 Request to Power Down Clear\n");
 			m_ram[REGISTER_STATUS] &= ~STATUS_RPD;
 		}
 
@@ -233,7 +234,7 @@ inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
 	case REGISTER_TEST_KICK_START_COUNTER:
 	case REGISTER_TEST_PRESCALE_COUNTER:
 	case REGISTER_TEST_COUNTER_INCREMENT:
-		logerror("MCCS1850 '%s' Unsupported write to test register %02x!\n", tag(), offset);
+		logerror("MCCS1850 Unsupported write to test register %02x!\n", offset);
 		break;
 
 	default:
@@ -248,7 +249,7 @@ inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
 
 inline void mccs1850_device::advance_seconds()
 {
-	UINT32 alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
+	uint32_t alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
 
 	m_counter++;
 
@@ -279,8 +280,8 @@ inline void mccs1850_device::advance_seconds()
 //  mccs1850_device - constructor
 //-------------------------------------------------
 
-mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MCCS1850, "MCCS1850", tag, owner, clock, "mccs1850", __FILE__),
+mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MCCS1850, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	int_cb(*this),
@@ -299,13 +300,17 @@ mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  set_counter - set the counter at startup time
+//  rtc_clock_changed -
 //-------------------------------------------------
 
-void mccs1850_device::set_counter(UINT32 value)
+void mccs1850_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_counter = value;
+	// FIXME: implement this properly
+	system_time systime;
+	machine().base_datetime(systime);
+	m_counter = systime.time;
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -376,7 +381,7 @@ void mccs1850_device::nvram_default()
 
 	if (machine().root_device().memregion(tag()) != nullptr)
 	{
-		UINT8 *nvram = machine().root_device().memregion(tag())->base();
+		uint8_t *nvram = machine().root_device().memregion(tag())->base();
 
 		// initialize NVRAM
 		memcpy(m_ram, nvram, 0x20);
@@ -441,7 +446,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 			if (m_bits == 8)
 			{
-				if (LOG) logerror("MCCS1850 '%s' %s Address %02x\n", tag(), BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
+				LOG("MCCS1850 %s Address %02x\n", BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
 
 				m_bits = 0;
 				m_state = STATE_DATA;
@@ -450,7 +455,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 				{
 					m_shift = read_register(m_address & 0x7f);
 
-					if (LOG) logerror("MCCS1850 '%s' Data Out %02x\n", tag(), m_shift);
+					LOG("MCCS1850 Data Out %02x\n", m_shift);
 				}
 			}
 		}
@@ -466,7 +471,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 			if (m_bits == 8)
 			{
-				if (LOG) logerror("MCCS1850 '%s' Data In %02x\n", tag(), m_shift);
+				LOG("MCCS1850 Data In %02x\n", m_shift);
 
 				write_register(m_address & 0x7f, m_shift);
 
@@ -492,7 +497,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 				m_address++;
 				m_address &= 0x7f;
 				m_shift = read_register(m_address & 0x7f);
-				if (LOG) logerror("MCCS1850 '%s' Data Out %02x\n", tag(), m_shift);
+				LOG("MCCS1850 Data Out %02x\n", m_shift);
 			}
 		}
 		break;
@@ -571,13 +576,13 @@ WRITE_LINE_MEMBER( mccs1850_device::test_w )
 {
 	if (state)
 	{
-		if (LOG) logerror("MCCS1850 '%s' Test Mode\n", tag());
+		LOG("MCCS1850 Test Mode\n");
 
 		m_ram[REGISTER_STATUS] |= STATUS_TM;
 	}
 	else
 	{
-		if (LOG) logerror("MCCS1850 '%s' Normal Operation\n", tag());
+		LOG("MCCS1850 Normal Operation\n");
 
 		m_ram[REGISTER_STATUS] &= ~STATUS_TM;
 	}

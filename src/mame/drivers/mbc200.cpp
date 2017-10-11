@@ -45,14 +45,16 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "video/mc6845.h"
+#include "machine/i8255.h"
+#include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
-#include "sound/speaker.h"
-#include "machine/keyboard.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class mbc200_state : public driver_device
 {
@@ -76,22 +78,22 @@ public:
 	DECLARE_WRITE8_MEMBER(pm_porta_w);
 	DECLARE_WRITE8_MEMBER(pm_portb_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT8 m_comm_latch;
-	UINT8 m_term_data;
+	uint8_t m_comm_latch;
+	uint8_t m_term_data;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
@@ -142,7 +144,7 @@ static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	//AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ(keyboard_r) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi_m", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
@@ -160,7 +162,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(mbc200_state::p2_porta_r)
 {
 	machine().scheduler().synchronize(); // force resync
-	UINT8 tmp = m_comm_latch;
+	uint8_t tmp = m_comm_latch;
 	m_comm_latch = 0;
 	m_ppi_m->pc6_w(0); // ppi_ack
 	return tmp;
@@ -181,7 +183,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mbc200_state::keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (offset)
 	{
 		if (m_term_data)
@@ -205,7 +207,7 @@ READ8_MEMBER( mbc200_state::keyboard_r )
 }
 
 // convert standard control keys to expected code;
-WRITE8_MEMBER( mbc200_state::kbd_put )
+void mbc200_state::kbd_put(u8 data)
 {
 	switch (data)
 	{
@@ -241,8 +243,8 @@ void mbc200_state::machine_start()
 
 void mbc200_state::machine_reset()
 {
-	UINT8* roms = memregion("roms")->base();
-	UINT8* main = memregion("maincpu")->base();
+	uint8_t* roms = memregion("roms")->base();
+	uint8_t* main = memregion("maincpu")->base();
 	memcpy(main, roms, 0x1000);
 }
 
@@ -253,9 +255,9 @@ SLOT_INTERFACE_END
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -288,7 +290,7 @@ static GFXDECODE_START( mbc200 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mbc200, mbc200_state )
+static MACHINE_CONFIG_START( mbc200 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
@@ -342,7 +344,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 
 	/* Keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mbc200_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(mbc200_state, kbd_put))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
@@ -359,5 +361,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, driver_device,   0,  "Sanyo",   "MBC-200", 0 )
+//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY   FULLNAME   FLAGS
+COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, mbc200_state,  0,    "Sanyo",  "MBC-200", 0 )

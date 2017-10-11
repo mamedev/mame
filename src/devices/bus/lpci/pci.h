@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef PCI_H
-#define PCI_H
+#ifndef MAME_BUS_LPCI_PCI_H
+#define MAME_BUS_LPCI_PCI_H
+
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,19 +24,21 @@ class pci_device_interface :  public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	pci_device_interface(const machine_config &mconfig, device_t &device);
 	virtual ~pci_device_interface();
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) = 0;
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) = 0;
+	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) = 0;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) = 0;
+
+protected:
+	pci_device_interface(const machine_config &mconfig, device_t &device);
 };
 
-class pci_connector: public device_t,
+class pci_connector_device : public device_t,
 						public device_slot_interface
 {
 public:
-	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~pci_connector();
+	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~pci_connector_device();
 
 	pci_device_interface *get_device();
 
@@ -42,7 +46,7 @@ protected:
 	virtual void device_start() override;
 };
 
-extern const device_type PCI_CONNECTOR;
+DECLARE_DEVICE_TYPE(PCI_CONNECTOR, pci_connector_device)
 
 // ======================> pci_bus_device
 
@@ -50,7 +54,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -73,24 +77,24 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	UINT8               m_busnum;
+	uint8_t               m_busnum;
 
 	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
 	const char *        m_father;
 	pci_bus_device *    m_siblings[8];
-	UINT8               m_siblings_busnum[8];
+	uint8_t               m_siblings_busnum[8];
 	int                 m_siblings_count;
 
 	offs_t              m_address;
-	INT8                m_devicenum; // device number we are addressing
-	INT8                m_busnumber; // pci bus number we are addressing
+	int8_t                m_devicenum; // device number we are addressing
+	int8_t                m_busnumber; // pci bus number we are addressing
 	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
 };
 
 // device type definition
-extern const device_type PCI_BUS;
+DECLARE_DEVICE_TYPE(PCI_BUS, pci_bus_device)
 
 
 /***************************************************************************
@@ -108,4 +112,4 @@ extern const device_type PCI_BUS;
 	downcast<pci_bus_device *>(device)->set_father(_father_tag);
 
 
-#endif /* PCI_H */
+#endif // MAME_BUS_LPCI_PCI_H

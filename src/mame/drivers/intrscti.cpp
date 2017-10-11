@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class intrscti_state : public driver_device
@@ -31,20 +32,20 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	DECLARE_DRIVER_INIT(intrscti);
 	virtual void video_start() override;
-	UINT32 screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void intrscti_state::video_start()
 {
 }
 
-UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	int count;
@@ -175,7 +176,7 @@ static GFXDECODE_START( intrscti )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( intrscti, intrscti_state )
+static MACHINE_CONFIG_START( intrscti )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */
@@ -218,7 +219,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 {
-	UINT8 *cpu = memregion( "maincpu" )->base();
+	uint8_t *cpu = memregion( "maincpu" )->base();
 	int i;
 	for (i=0;i<0x1000;i++)
 		cpu[i+0x8000]=0xc9; // ret

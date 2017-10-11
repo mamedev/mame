@@ -8,17 +8,18 @@
     the serial keyboard which may not be desirable.
 */
 
+#include "emu.h"
 #include "ngen_kb.h"
 
-ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
-	: serial_keyboard_device(mconfig, NGEN_KEYBOARD, "NGEN Keyboard", tag, owner, 0, "ngen_keyboard", __FILE__)
+ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: serial_keyboard_device(mconfig, NGEN_KEYBOARD, tag, owner, 0)
 	, m_keys_down(0U)
 	, m_last_reset(0U)
 {
 }
 
 
-void ngen_keyboard_device::write(UINT8 data)
+void ngen_keyboard_device::write(uint8_t data)
 {
 	// To be figured out
 	// Code 0x92 is sent on startup, perhaps resets the keyboard MCU
@@ -78,7 +79,7 @@ void ngen_keyboard_device::device_reset()
 {
 	serial_keyboard_device::device_reset();
 
-	m_keys_down = UINT8(~0U);
+	m_keys_down = uint8_t(~0U);
 	m_last_reset = 0U;
 }
 
@@ -88,21 +89,21 @@ void ngen_keyboard_device::rcv_complete()
 	write(get_received_char());
 }
 
-void ngen_keyboard_device::key_make(UINT8 row, UINT8 column)
+void ngen_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	serial_keyboard_device::key_make(row, column);
-	m_keys_down = UINT8((row << 4) | column);
+	m_keys_down = uint8_t((row << 4) | column);
 	m_last_reset = 0U;
 }
 
-void ngen_keyboard_device::key_break(UINT8 row, UINT8 column)
+void ngen_keyboard_device::key_break(uint8_t row, uint8_t column)
 {
 	serial_keyboard_device::key_break(row, column);
-	if (m_keys_down == UINT8((row << 4) | column))
+	if (m_keys_down == uint8_t((row << 4) | column))
 	{
-		m_keys_down = UINT8(~0U);
+		m_keys_down = uint8_t(~0U);
 		send_key(0xc0U);
 	}
 }
 
-const device_type NGEN_KEYBOARD = &device_creator<ngen_keyboard_device>;
+DEFINE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device, "ngen_kb", "NGEN Keyboard")

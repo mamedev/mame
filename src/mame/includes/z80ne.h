@@ -10,8 +10,10 @@
  *
  ****************************************************************************/
 
-#ifndef Z80NE_H_
-#define Z80NE_H_
+#ifndef MAME_INCLUDES_Z80NE_H
+#define MAME_INCLUDES_Z80NE_H
+
+#pragma once
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
@@ -59,8 +61,8 @@ struct z80ne_cass_data_t {
 struct wd17xx_state_t {
 	int drq;
 	int intrq;
-	UINT8 drive; /* current drive */
-	UINT8 head;  /* current head */
+	uint8_t drive; /* current drive */
+	uint8_t head;  /* current head */
 };
 
 
@@ -106,16 +108,15 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	optional_device<mc6847_base_device> m_vdg;
-	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_ay31015;
 	optional_device<kr2376_device> m_lx388_kr2376;
-	UINT8 m_lx383_scan_counter;
-	UINT8 m_lx383_key[LX383_KEYS];
+	uint8_t m_lx383_scan_counter;
+	uint8_t m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
-	int m_nmi_delay_counter;
-	int m_reset_delay_counter;
-	UINT8 m_lx385_ctrl;
+	uint8_t m_lx385_ctrl;
 	emu_timer *m_cassette_timer;
+	emu_timer *m_kbd_timer;
 	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
 	DECLARE_READ8_MEMBER(lx383_r);
@@ -126,9 +127,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
 	DECLARE_READ8_MEMBER(lx388_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_default);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_nmi_delay_count);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_reset_delay_count);
 	DECLARE_DRIVER_INIT(z80netf);
 	DECLARE_DRIVER_INIT(z80net);
 	DECLARE_DRIVER_INIT(z80netb);
@@ -153,6 +151,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
 
 protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -160,7 +160,7 @@ protected:
 	optional_device<floppy_connector> m_floppy3;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	optional_device<fd1771_t> m_wd1771;
+	optional_device<fd1771_device> m_wd1771;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -183,10 +183,13 @@ protected:
 	optional_ioport m_io_modifiers;
 	optional_ioport m_io_config;
 
+	emu_timer *m_timer_nmi;
+	emu_timer *m_timer_reset;
+
 	cassette_image_device *cassette_device_image();
 	void reset_lx388();
 	void reset_lx382_banking();
 	void reset_lx390_banking();
 };
 
-#endif /* Z80NE_H_ */
+#endif // MAME_INCLUDES_Z80NE_H

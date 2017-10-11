@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
-#pragma once
+#ifndef MAME_CPU_PDP1_PDP1_H
+#define MAME_CPU_PDP1_PDP1_H
 
-#ifndef __PDP1_H__
-#define __PDP1_H__
+#pragma once
 
 
 
@@ -45,41 +45,43 @@ struct pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 
-#define AND 001
-#define IOR 002
-#define XOR 003
-#define XCT 004
-#define CALJDA 007
-#define LAC 010
-#define LIO 011
-#define DAC 012
-#define DAP 013
-#define DIP 014
-#define DIO 015
-#define DZM 016
-#define ADD 020
-#define SUB 021
-#define IDX 022
-#define ISP 023
-#define SAD 024
-#define SAS 025
-#define MUS_MUL 026
-#define DIS_DIV 027
-#define JMP 030
-#define JSP 031
-#define SKP 032
-#define SFT 033
-#define LAW 034
-#define IOT 035
-#define OPR 037
-
-
 class pdp1_device : public cpu_device
 					, public pdp1_reset_param_t
 {
 public:
+	enum opcode
+	{
+		AND = 001,
+		IOR = 002,
+		XOR = 003,
+		XCT = 004,
+		CALJDA = 007,
+		LAC = 010,
+		LIO = 011,
+		DAC = 012,
+		DAP = 013,
+		DIP = 014,
+		DIO = 015,
+		DZM = 016,
+		ADD = 020,
+		SUB = 021,
+		IDX = 022,
+		ISP = 023,
+		SAD = 024,
+		SAS = 025,
+		MUS_MUL = 026,
+		DIS_DIV = 027,
+		JMP = 030,
+		JSP = 031,
+		SKP = 032,
+		SFT = 033,
+		LAW = 034,
+		IOT = 035,
+		OPR = 037
+	};
+
 	// construction/destruction
-	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_reset_param(device_t &device, const pdp1_reset_param_t *param) { downcast<pdp1_device &>(device).m_reset_param = param; }
 
@@ -97,14 +99,14 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 5; }
-	virtual UINT32 execute_max_cycles() const override { return 31; }
-	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual uint32_t execute_min_cycles() const override { return 5; }
+	virtual uint32_t execute_max_cycles() const override { return 31; }
+	virtual uint32_t execute_input_lines() const override { return 16; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -112,15 +114,15 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
 	/* processor registers */
-	UINT32 m_pc;      /* program counter (12, 15 or 16 bits) */
+	uint32_t m_pc;      /* program counter (12, 15 or 16 bits) */
 	int m_ir;         /* basic operation code of current instruction (5 bits) */
 	int m_mb;         /* memory buffer (used for holding the current instruction only) (18 bits) */
 	int m_ma;         /* memory address (12, 15 or 16 bits) */
@@ -153,11 +155,11 @@ private:
 	unsigned int m_ios;       /* i-o synchronizer: set on i-o operation completion */
 
 	/* sequence break system */
-	UINT16 m_irq_state;    /* mirrors the state of the interrupt pins */
-	UINT16 m_b1;           /* interrupt enable */
-	UINT16 m_b2;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
-	/*UINT16 m_b3;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
-	UINT16 m_b4;           /* interrupt in progress */
+	uint16_t m_irq_state;    /* mirrors the state of the interrupt pins */
+	uint16_t m_b1;           /* interrupt enable */
+	uint16_t m_b2;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
+	/*uint16_t m_b3;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
+	uint16_t m_b4;           /* interrupt in progress */
 
 	/* additional emulator state variables */
 	int m_rim_step;           /* current step in rim execution */
@@ -187,7 +189,7 @@ private:
 
 	address_space *m_program;
 	int m_icount;
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
 	void field_interrupt();
 	void execute_instruction();
@@ -196,11 +198,11 @@ private:
 };
 
 
-extern const device_type PDP1;
+DECLARE_DEVICE_TYPE(PDP1, pdp1_device)
 
 
 #define MCFG_PDP1_RESET_PARAM(_param) \
 	pdp1_device::static_set_reset_param(*device, &(_param));
 
 
-#endif /* __PDP1_H__ */
+#endif // MAME_CPU_PDP1_PDP1_H

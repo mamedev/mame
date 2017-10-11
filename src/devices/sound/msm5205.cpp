@@ -28,6 +28,9 @@
 
     Data is streamed from a CPU by means of a clock generated on the chip.
 
+    Holding the rate selector lines (S1 and S2) both high places the MSM5205 in an undocumented
+    mode which disables the sampling clock generator and makes VCK an input line.
+
     A reset signal is set high or low to determine whether playback (and interrupts) are occurring.
 
   MSM6585: is an upgraded MSM5205 voice synth IC.
@@ -38,49 +41,58 @@
 
    Differences between MSM6585 & MSM5205:
 
-                              MSM6586          MSM5205
+                              MSM6585          MSM5205
     Master clock frequency    640kHz           384kHz
     Sampling frequency        4k/8k/16k/32kHz  4k/6k/8kHz
     ADPCM bit length          4-bit            3-bit/4-bit
+    Data capture timing       5µsec            15.6µsec
     DA converter              12-bit           10-bit
     Low-pass filter           -40dB/oct        N/A
     Overflow prevent circuit  Included         N/A
 
-    Timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585)
+    Data capture follows VCK falling edge on MSM5205 (VCK rising edge on MSM6585)
 
    TODO:
    - lowpass filter for MSM6585
 
  */
 
-const device_type MSM5205 = &device_creator<msm5205_device>;
-const device_type MSM6585 = &device_creator<msm6585_device>;
+DEFINE_DEVICE_TYPE(MSM5205, msm5205_device, "msm5205", "MSM5205")
+DEFINE_DEVICE_TYPE(MSM6585, msm6585_device, "msm6585", "MSM6585")
 
 
-msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock, "msm5205", __FILE__),
-						device_sound_interface(mconfig, *this),
-						m_prescaler(0),
-						m_bitwidth(0),
-						m_select(0),
-						m_vclk_cb(*this)
+msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msm5205_device(mconfig, MSM5205, tag, owner, clock)
 {
 }
 
-msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sound_interface(mconfig, *this),
-						m_prescaler(0),
-						m_bitwidth(0),
-						m_select(0),
-						m_vclk_cb(*this)
+msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock),
+		device_sound_interface(mconfig, *this),
+		m_s1(false),
+		m_s2(false),
+		m_bitwidth(4),
+		m_vck_cb(*this),
+		m_vck_legacy_cb(*this)
 {
 }
 
 
-msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock, "msm6585", __FILE__)
+msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msm5205_device(mconfig, MSM6585, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  set_prescaler_selector - configuration helper
+//-------------------------------------------------
+
+void msm5205_device::set_prescaler_selector(device_t &device, int select)
+{
+	msm5205_device &msm = downcast<msm5205_device &>(device);
+	msm.m_s1 = BIT(select, 1);
+	msm.m_s2 = BIT(select, 0);
+	msm.m_bitwidth = (select & 4) ? 4 : 3;
 }
 
 //-------------------------------------------------
@@ -89,22 +101,23 @@ msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, d
 
 void msm5205_device::device_start()
 {
-	m_mod_clock = clock();
-	m_vclk_cb.resolve();
+	m_vck_cb.resolve_safe();
+	m_vck_legacy_cb.resolve();
 
 	/* compute the difference tables */
 	compute_tables();
 
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::vclk_callback), this));
+	m_vck_timer = timer_alloc(TIMER_VCK);
+	m_capture_timer = timer_alloc(TIMER_ADPCM_CAPTURE);
 
 	/* register for save states */
-	save_item(NAME(m_mod_clock));
 	save_item(NAME(m_data));
-	save_item(NAME(m_vclk));
+	save_item(NAME(m_vck));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_prescaler));
+	save_item(NAME(m_s1));
+	save_item(NAME(m_s2));
 	save_item(NAME(m_bitwidth));
 	save_item(NAME(m_signal));
 	save_item(NAME(m_step));
@@ -118,13 +131,10 @@ void msm5205_device::device_reset()
 {
 	/* initialize work */
 	m_data    = 0;
-	m_vclk    = 0;
+	m_vck     = 0;
 	m_reset   = 0;
 	m_signal  = 0;
 	m_step    = 0;
-
-	/* timer and bitwidth set */
-	playmode_w(m_select);
 }
 
 
@@ -170,17 +180,40 @@ void msm5205_device::compute_tables()
 	}
 }
 
-/* timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585) */
-TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void msm5205_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_VCK:
+			m_vck = !m_vck;
+			m_vck_cb(m_vck);
+			if (!m_vck)
+				m_capture_timer->adjust(attotime::from_nsec(15600));
+			break;
+
+		case TIMER_ADPCM_CAPTURE:
+			update_adpcm();
+			break;
+	}
+}
+
+// timer callback at VCK low edge on MSM5205 (at rising edge on MSM6585)
+void msm5205_device::update_adpcm()
 {
 	int val;
 	int new_signal;
 
-	/* callback user handler and latch next data */
-	if (!m_vclk_cb.isnull())
-		m_vclk_cb(1);
+	// callback user handler and latch next data
+	if (!m_vck_legacy_cb.isnull())
+		m_vck_legacy_cb(1);
 
-	/* reset check at last hiedge of VCLK */
+	// reset check at last hiedge of VCK
 	if (m_reset)
 	{
 		new_signal = 0;
@@ -213,21 +246,18 @@ TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
 
 
 /*
- *    Handle an update of the vclk status of a chip (1 is reset ON, 0 is reset OFF)
+ *    Handle an update of the VCK status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-void msm5205_device::vclk_w(int vclk)
+WRITE_LINE_MEMBER(msm5205_device::vclk_w)
 {
-	if (m_prescaler != 0)
-		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", this->device().tag());
+	if (get_prescaler() != 0)
+		logerror("Error: vclk_w() called but VCK selected master mode\n");
 	else
 	{
-		if (m_vclk != vclk)
-		{
-			m_vclk = vclk;
-			if (!vclk)
-				vclk_callback(this, 0);
-		}
+		if (m_vck && !state)
+			m_capture_timer->adjust(attotime::from_nsec(15600));
+		m_vck = state;
 	}
 }
 
@@ -235,9 +265,9 @@ void msm5205_device::vclk_w(int vclk)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-void msm5205_device::reset_w(int reset)
+WRITE_LINE_MEMBER(msm5205_device::reset_w)
 {
-	m_reset = reset;
+	m_reset = state;
 }
 
 /*
@@ -252,34 +282,41 @@ void msm5205_device::data_w(int data)
 		m_data = (data & 0x07) << 1; /* unknown */
 }
 
+WRITE8_MEMBER(msm5205_device::data_w)
+{
+	data_w(data);
+}
+
+int msm5205_device::get_prescaler() const
+{
+	if (m_s1)
+		return m_s2 ? 0 : 64;
+	else
+		return m_s2 ? 48 : 96;
+}
+
+int msm6585_device::get_prescaler() const
+{
+	return (m_s1 ? 20 : 40) * (m_s2 ? 1 : 4);
+}
+
 /*
  *    Handle a change of the selector
  */
 
 void msm5205_device::playmode_w(int select)
 {
-	static const int prescaler_table[2][4] =
-	{
-		{ 96, 48, 64,  0},
-		{160, 40, 80, 20}
-	};
-	int prescaler = prescaler_table[select >> 3 & 1][select & 3];
 	int bitwidth = (select & 4) ? 4 : 3;
 
-	if (m_prescaler != prescaler)
+	if ((select & 3) != ((m_s1 << 1) | m_s2))
 	{
 		m_stream->update();
 
-		m_prescaler = prescaler;
+		m_s1 = BIT(select, 1);
+		m_s2 = BIT(select, 0);
 
 		/* timer set */
-		if (prescaler)
-		{
-			attotime period = attotime::from_hz(m_mod_clock) * prescaler;
-			m_timer->adjust(period, 0, period);
-		}
-		else
-			m_timer->adjust(attotime::never);
+		notify_clock_changed();
 	}
 
 	if (m_bitwidth != bitwidth)
@@ -289,20 +326,47 @@ void msm5205_device::playmode_w(int select)
 	}
 }
 
-
-void msm5205_device::set_volume(int volume)
+WRITE_LINE_MEMBER(msm5205_device::s1_w)
 {
-	m_stream->set_output_gain(0,volume / 100.0);
+	if (m_s1 != bool(state))
+	{
+		m_stream->update();
+		m_s1 = state;
+		notify_clock_changed();
+	}
 }
 
-void msm5205_device::change_clock_w(INT32 clock)
+WRITE_LINE_MEMBER(msm5205_device::s2_w)
 {
-	attotime period;
+	if (m_s2 != bool(state))
+	{
+		m_stream->update();
+		m_s2 = state;
+		notify_clock_changed();
+	}
+}
 
-	m_mod_clock = clock;
 
-	period = attotime::from_hz(m_mod_clock) * m_prescaler;
-	m_timer->adjust(period, 0, period);
+//-------------------------------------------------
+//  device_clock_changed - called when the
+//  device clock is altered in any way
+//-------------------------------------------------
+
+void msm5205_device::device_clock_changed()
+{
+	int prescaler = get_prescaler();
+	if (prescaler != 0)
+	{
+		logerror("/%d prescaler selected\n", prescaler);
+
+		attotime half_period = clocks_to_attotime(prescaler / 2);
+		m_vck_timer->adjust(half_period, 0, half_period);
+	}
+	else
+	{
+		logerror("VCK slave mode selected\n");
+		m_vck_timer->adjust(attotime::never);
+	}
 }
 
 
@@ -326,6 +390,29 @@ void msm5205_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 	else
 		memset(buffer, 0, samples * sizeof(*buffer));
+}
+
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void msm6585_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_VCK:
+			m_vck = !m_vck;
+			m_vck_cb(m_vck);
+			if (m_vck)
+				m_capture_timer->adjust(attotime::from_usec(3));
+			break;
+
+		case TIMER_ADPCM_CAPTURE:
+			update_adpcm();
+			break;
+	}
 }
 
 

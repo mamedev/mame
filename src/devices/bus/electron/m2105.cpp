@@ -7,14 +7,16 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "m2105.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_M2105 = &device_creator<electron_m2105_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device, "electron_m2105", "Acorn M2105 Expansion")
 
 
 //-------------------------------------------------
@@ -49,14 +51,14 @@ ROM_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( m2105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( m2105 )
+MACHINE_CONFIG_MEMBER( electron_m2105_device::device_add_mconfig )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(electron_m2105_device, intrq_w))
 
 	/* system via */
@@ -65,7 +67,7 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_VIA6522_READPB_HANDLER(READ8(electron_m2105_device, m2105_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(electron_m2105_device, m2105_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(electron_m2105_device, m2105_via_system_write_portb))*/
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
@@ -73,11 +75,11 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(electron_m2105_device, m2105_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* duart */
 	MCFG_MC68681_ADD("sc2681", XTAL_3_6864MHz)
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_active_high_device, in2_w))
+	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(electron_m2105_device, sio_out_w))
 
@@ -96,17 +98,6 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor electron_m2105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2105 );
-}
-
 const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {
 	return ROM_NAME( m2105 );
@@ -120,16 +111,16 @@ const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 //  electron_m2105_device - constructor
 //-------------------------------------------------
 
-electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ELECTRON_M2105, "Acorn M2105 Expansion", tag, owner, clock, "electron_m2105", __FILE__),
-		device_electron_expansion_interface(mconfig, *this),
-		m_exp_rom(*this, "exp_rom"),
-		m_via6522_0(*this, "via6522_0"),
-		m_via6522_1(*this, "via6522_1"),
-		m_duart(*this, "sc2681"),
-		m_tms(*this, "tms5220"),
-		m_centronics(*this, "centronics"),
-		m_irqs(*this, "irqs")
+electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ELECTRON_M2105, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_via6522_0(*this, "via6522_0")
+	, m_via6522_1(*this, "via6522_1")
+	, m_duart(*this, "sc2681")
+	, m_tms(*this, "tms5220")
+	, m_centronics(*this, "centronics")
+	, m_irqs(*this, "irqs")
 {
 }
 

@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(cop01_state, cop01)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -39,7 +39,7 @@ PALETTE_INIT_MEMBER(cop01_state, cop01)
 	/* I'm only using the first 32 bytes because the rest is empty. */
 	for (i = 0x10; i < 0x90; i++)
 	{
-		UINT8 ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
+		uint8_t ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
 							(color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(cop01_state, cop01)
 	/* sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical) */
 	for (i = 0x90; i < 0x190; i++)
 	{
-		UINT8 ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
+		uint8_t ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -199,7 +199,7 @@ void cop01_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-UINT32 cop01_state::screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cop01_state::screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_vreg[1] + 256 * (m_vreg[2] & 1));
 	m_bg_tilemap->set_scrolly(0, m_vreg[3]);

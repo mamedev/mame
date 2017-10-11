@@ -1,28 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
-#include "sound/sn76496.h"
-#include "sound/speaker.h"
-#include "video/pc_t1t.h"
-#include "machine/ins8250.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/pc_fdc.h"
+#include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/pckeybrd.h"
-#include "machine/pc_lpt.h"
-#include "machine/pc_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "video/pc_t1t.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/isa/fdc.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"
-#include "bus/pc_joy/pc_joy.h"
-#include "bus/isa/fdc.h"
-#include "imagedev/cassette.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class pcjr_state : public driver_device
 {
@@ -69,24 +73,24 @@ public:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
-	void pc_speaker_set_spkrdata(UINT8 data);
+	void pc_speaker_set_spkrdata(uint8_t data);
 
-	UINT8 m_pc_spkrdata;
-	UINT8 m_pit_out2;
-	UINT8 m_pcjr_dor;
-	UINT8 m_pcjx_1ff_count;
-	UINT8 m_pcjx_1ff_val;
-	UINT8 m_pcjx_1ff_bankval;
-	UINT8 m_pcjx_1ff_bank[20][2];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
+	uint8_t m_pcjr_dor;
+	uint8_t m_pcjx_1ff_count;
+	uint8_t m_pcjx_1ff_val;
+	uint8_t m_pcjx_1ff_bankval;
+	uint8_t m_pcjx_1ff_bank[20][2];
 	int m_ppi_portc_switch_high;
-	UINT8 m_ppi_portb;
+	uint8_t m_ppi_portb;
 
-	UINT8 m_pc_keyb_data;
-	UINT8 m_transferring;
-	UINT8 m_latch;
-	UINT32 m_raw_keyb_data;
+	uint8_t m_pc_keyb_data;
+	uint8_t m_transferring;
+	uint8_t m_latch;
+	uint32_t m_raw_keyb_data;
 	int m_signal_count;
-	UINT8 m_nmi_enabled;
+	uint8_t m_nmi_enabled;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_pc_int_delay_timer;
@@ -186,7 +190,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
 {
-	UINT32 pc = m_maincpu->pc();
+	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
 	{
 		m_pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
@@ -202,7 +206,7 @@ WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
  *      PC Speaker related
  *
  *************************************************************************/
-void pcjr_state::pc_speaker_set_spkrdata(UINT8 data)
+void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 {
 	m_pc_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -256,9 +260,9 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().driver_data()->generic_space(), 0)))
+	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
 	{
-		UINT8   parity = 0;
+		uint8_t   parity = 0;
 		int     i;
 
 		m_latch = 1;
@@ -369,7 +373,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 {
 	logerror("fdc: dor = %02x\n", data);
-	UINT8 pdor = m_pcjr_dor;
+	uint8_t pdor = m_pcjr_dor;
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = nullptr;
 
@@ -438,10 +442,10 @@ READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
 
 image_init_result pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		int header_size = 0;
 
@@ -478,7 +482,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 		// the first chunk is unique, the second is repeated 4 times up to 0xa000 size
 
 		// mirroring
-		UINT8 *ROM = slot->get_rom_base();
+		uint8_t *ROM = slot->get_rom_base();
 		memcpy(ROM + 0xe000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xc000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xa000, ROM + 0x2000, 0x2000);
@@ -571,7 +575,7 @@ static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
+static MACHINE_CONFIG_START( ibmpcjr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
@@ -590,7 +594,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcjr_state, out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(pcjr_state, pic8259_set_int_line))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
@@ -657,6 +662,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( ibmpcjx )
@@ -680,7 +686,7 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 
 
@@ -708,7 +714,7 @@ ROM_START( ibmpcjx )
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE          INIT        COMPANY                            FULLNAME     FLAGS
 // pcjr
 COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
 COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

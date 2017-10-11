@@ -139,7 +139,7 @@ void bwing_state::video_start()
 //****************************************************************************
 // Realtime
 
-void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri )
+void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri )
 {
 	int attrib, fx, fy, code, x, y, color, i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
@@ -180,7 +180,7 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 }
 
 
-UINT32 bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	unsigned flip, x, y, shiftx;
 

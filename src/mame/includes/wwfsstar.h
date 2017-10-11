@@ -2,6 +2,8 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class wwfsstar_state : public driver_device
 {
@@ -25,9 +27,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_fg0_videoram;
-	required_shared_ptr<UINT16> m_bg0_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_fg0_videoram;
+	required_shared_ptr<uint16_t> m_bg0_videoram;
 
 	int m_vblank;
 	int m_scrollx;
@@ -36,7 +38,6 @@ public:
 	tilemap_t *m_bg0_tilemap;
 
 	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE16_MEMBER(irqack_w);
 	DECLARE_WRITE16_MEMBER(fg0_videoram_w);
@@ -52,6 +53,6 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

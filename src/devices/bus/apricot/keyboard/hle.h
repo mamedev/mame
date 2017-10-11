@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_APRICOT_KEYBOARD_HLE_H
+#define MAME_BUS_APRICOT_KEYBOARD_HLE_H
+
 #pragma once
 
-#ifndef __APRICOT_KEYBOARD_HLE_H__
-#define __APRICOT_KEYBOARD_HLE_H__
-
-#include "emu.h"
 #include "keyboard.h"
 #include "machine/keyboard.h"
 #include "machine/msm5832.h"
@@ -30,7 +29,7 @@ class apricot_keyboard_hle_device : public device_t,
 {
 public:
 	// construction/destruction
-	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from host
 	virtual void out_w(int state) override;
@@ -38,34 +37,37 @@ public:
 protected:
 	// device_t overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
-	virtual void received_byte(UINT8 byte) override;
+	virtual void received_byte(uint8_t byte) override;
 
 	// device_matrix_keyboard_interface overrides
-	virtual void key_make(UINT8 row, UINT8 column) override;
-	virtual void key_break(UINT8 row, UINT8 column) override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
 
 private:
-	required_device<msm5832_device> m_rtc;
-
 	enum {
 		CMD_REQ_TIME_AND_DATE = 0xe1,
-		CMD_SET_TIME_AND_DATE = 0xe4
+		CMD_SET_TIME_AND_DATE = 0xe4,
+		CMD_KEYBOARD_RESET    = 0xe8
 	};
+
+	enum {
+		ACK_DIAGNOSTICS = 0xfb
+	};
+
+	required_device<msm5832_device> m_rtc;
 
 	int m_rtc_index;
 };
 
 
 // device type definition
-extern const device_type APRICOT_KEYBOARD_HLE;
+DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD_HLE, apricot_keyboard_hle_device)
 
 
-#endif // __APRICOT_KEYBOARD_HLE_H__
+#endif // MAME_BUS_APRICOT_KEYBOARD_HLE_H

@@ -67,20 +67,6 @@
 		</part>
 	</software>
 
-	<!-- will be moved to the pc softlist oneday when one is created. These was sold also for the IBM PCjr-->
-	<software name="nortutil">
-		<description>The Norton Utilities 3.10</description>
-		<year>1986</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
-		<info name="usage" value="boot from PC DOS 2.1 and then load, using: nc /d1" />
-		<!-- marked as bad since source is questionable, needs a redump -->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="norton utilities 310.img" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" offset="0x00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="procm24">
 		<description>ProComm (Version 2.4.3)</description>
 		<year>1988</year>

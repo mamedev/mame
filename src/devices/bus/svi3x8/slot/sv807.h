@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_SLOT_SV807_H
+#define MAME_BUS_SVI3X8_SLOT_SV807_H
+
 #pragma once
 
-#ifndef __SVI3X8_SLOT_SV807_H__
-#define __SVI3X8_SLOT_SV807_H__
-
-#include "emu.h"
 #include "slot.h"
 
 
@@ -25,7 +24,7 @@ class sv807_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -45,8 +44,8 @@ protected:
 private:
 	required_ioport m_switch;
 
-	std::unique_ptr<UINT8[]> m_ram_bank1;
-	std::unique_ptr<UINT8[]> m_ram_bank2;
+	std::unique_ptr<uint8_t[]> m_ram_bank1;
+	std::unique_ptr<uint8_t[]> m_ram_bank2;
 
 	int m_bk21;
 	int m_bk22;
@@ -55,6 +54,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV807;
+DECLARE_DEVICE_TYPE(SV807, sv807_device)
 
-#endif // __SVI3X8_SLOT_SV807_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV807_H

@@ -30,8 +30,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/spkrdev.h"
 #include "video/sed1520.h"
-#include "sound/speaker.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class monty_state : public driver_device
@@ -54,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ioCommandWrite1_w);
 
 	// screen updates
-	UINT32 lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	uint32_t lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -63,8 +65,8 @@ private:
 	//required_device<sed1520_device> m_sed1;   // TODO: Also, there are 2 SED1503Fs on the board - one is flipped upside down
 
 	// Test
-	UINT8 m_writeUpper;
-	UINT32 m_pixels[42*32];
+	uint8_t m_writeUpper;
+	uint32_t m_pixels[42*32];
 	bool m_sound_sw;
 	bool m_dirty;
 };
@@ -187,8 +189,8 @@ WRITE8_MEMBER( monty_state::ioDisplayWrite_w )
 	// Offset directly corresponds to sed1503, DD RAM address (offset 0x7f may be special?)
 	//printf("(%04x) %02x %02x\n", m_maincpu->pc(), offset, data);
 
-	UINT8 x = offset & 0x3f;
-	UINT8 y = (BIT(offset, 6) + (m_writeUpper ? 2 : 0)) << 3;
+	uint8_t x = offset & 0x3f;
+	uint8_t y = (BIT(offset, 6) + (m_writeUpper ? 2 : 0)) << 3;
 
 	// Skip the controller and write straight to the LCD    (pc=134f)
 	for (int i = 0; i < 8; i++)
@@ -202,12 +204,12 @@ WRITE8_MEMBER( monty_state::ioDisplayWrite_w )
 }
 
 
-UINT32 monty_state::lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t monty_state::lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	if (!m_dirty)
 		return 1;
 
-	UINT8 x,y,z;
+	uint8_t x,y,z;
 	m_dirty = false;
 	for (y = 0; y < 32; y++)
 	{
@@ -235,7 +237,7 @@ SED1520_UPDATE_CB(monty_screen_update)
 
 
 // TODO: Additional machine definition - Master Monty has a different memory layout
-static MACHINE_CONFIG_START( monty, monty_state )
+static MACHINE_CONFIG_START( monty )
 	// Basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
 	MCFG_CPU_PROGRAM_MAP(monty_mem)
@@ -283,6 +285,6 @@ ROM_END
 
 
 // Drivers
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, monty,   0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
-COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  driver_device,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY   FULLNAME                 FLAGS
+COMP( 1980, monty,   0,      0,       monty,     monty,  monty_state,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
+COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  monty_state,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )

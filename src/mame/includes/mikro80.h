@@ -11,6 +11,7 @@
 
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
+#include "sound/dac.h"
 
 class mikro80_state : public driver_device
 {
@@ -38,12 +39,14 @@ public:
 		m_io_line6(*this, "LINE6"),
 		m_io_line7(*this, "LINE7"),
 		m_io_line8(*this, "LINE8") ,
+		m_dac(*this, "dac"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT8> m_cursor_ram;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_cursor_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	int m_keyboard_mask;
 	int m_key_mask;
+	DECLARE_WRITE8_MEMBER(radio99_sound_w);
 	DECLARE_READ8_MEMBER(mikro80_8255_portb_r);
 	DECLARE_READ8_MEMBER(mikro80_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(mikro80_8255_porta_w);
@@ -56,7 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(mikro80);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -74,6 +77,7 @@ protected:
 	required_ioport m_io_line6;
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
+	optional_device<dac_bit_interface> m_dac;
 	required_device<cpu_device> m_maincpu;
 };
 

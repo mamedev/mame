@@ -6,13 +6,16 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_I8089_I8089_H
+#define MAME_CPU_I8089_I8089_H
+
 #pragma once
 
-#ifndef __I8089_H__
-#define __I8089_H__
-
-#include "emu.h"
+#ifdef _MSC_VER
+// MSVC seems to want to actually instantiate templates when it gets an extern template declaration, effectively defeating the purpose of extern template declatations altogether
+// In this case it causes a problem because the required_device template can't be instantiated for the incomplete i8089_channel_device type
 #include "i8089_channel.h"
+#endif
 
 
 //**************************************************************************
@@ -23,10 +26,10 @@
 	i8089_device::set_databus_width(*device, _databus_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
-	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
+	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
 
 #define MCFG_I8089_SINTR2(_sintr2) \
-	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
+	devcb = &downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
 
 
 //**************************************************************************
@@ -34,24 +37,24 @@
 //**************************************************************************
 
 // forward declaration
-class i8089_channel;
+class i8089_channel_device;
 
 // ======================> i8089_device
 
 class i8089_device : public cpu_device
 {
-	friend class i8089_channel;
+	friend class i8089_channel_device;
 
 public:
 	// construction/destruction
-	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _sintr1> void set_sintr1_callback(_sintr1 sintr1) { m_write_sintr1.set_callback(sintr1); }
-	template<class _sintr2> void set_sintr2_callback(_sintr2 sintr2) { m_write_sintr2.set_callback(sintr2); }
+	template <class Object> devcb_base &set_sintr1_callback(Object &&sintr1) { return m_write_sintr1.set_callback(std::forward<Object>(sintr1)); }
+	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
 
 	// static configuration helpers
-	static void set_databus_width(device_t &device, UINT8 databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
+	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
@@ -60,10 +63,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq2_w );
 	DECLARE_WRITE_LINE_MEMBER( ext1_w );
 	DECLARE_WRITE_LINE_MEMBER( ext2_w );
-
-	// internal communication
-	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
-	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
 
 protected:
 	// device-level overrides
@@ -77,41 +76,45 @@ protected:
 	int m_icount;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 7; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 7; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	bool sysbus_width() const { return BIT(m_sysbus, 0); }
 	bool remotebus_width() const { return BIT(m_soc, 0); }
 	bool request_grant() const { return BIT(m_soc, 1); }
 
-	UINT8 read_byte(bool space, offs_t address);
-	UINT16 read_word(bool space, offs_t address);
-	void write_byte(bool space, offs_t address, UINT8 data);
-	void write_word(bool space, offs_t address, UINT16 data);
+	// internal communication
+	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
+	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
 
-	required_device<i8089_channel> m_ch1;
-	required_device<i8089_channel> m_ch2;
+	uint8_t read_byte(bool space, offs_t address);
+	uint16_t read_word(bool space, offs_t address);
+	void write_byte(bool space, offs_t address, uint8_t data);
+	void write_word(bool space, offs_t address, uint16_t data);
+
+	required_device<i8089_channel_device> m_ch1;
+	required_device<i8089_channel_device> m_ch2;
 
 	devcb_write_line m_write_sintr1;
 	devcb_write_line m_write_sintr2;
 
 	void initialize();
 
-	UINT8 m_databus_width;
+	uint8_t m_databus_width;
 	address_space *m_mem;
 	address_space *m_io;
 
@@ -134,9 +137,9 @@ private:
 	};
 
 	// system configuration
-	UINT8 m_sysbus;
+	uint8_t m_sysbus;
 	offs_t m_scb;
-	UINT8 m_soc;
+	uint8_t m_soc;
 
 	bool m_initialized;
 	bool m_master;
@@ -152,7 +155,6 @@ private:
 
 
 // device type definition
-extern const device_type I8089;
+DECLARE_DEVICE_TYPE(I8089, i8089_device)
 
-
-#endif  /* __I8089_H__ */
+#endif // MAME_CPU_I8089_I8089_H

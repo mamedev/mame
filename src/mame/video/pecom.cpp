@@ -9,14 +9,15 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
+
+#include "sound/wave.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {
-	UINT16 ma = m_cdp1802->get_memory_address();
+	uint16_t ma = m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
 	{
@@ -42,22 +43,22 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 	}
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, driver_device )
+static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, pecom_state )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 
 CDP1869_CHAR_RAM_READ_MEMBER(pecom_state::pecom_char_ram_r )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	return m_charram[charaddr];
 }
 
 CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_state::pecom_char_ram_w )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	m_charram[charaddr] = data;
 }
@@ -81,7 +82,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 VIDEO_START_MEMBER(pecom_state,pecom)
 {
 	/* allocate memory */
-	m_charram = std::make_unique<UINT8[]>(PECOM_CHAR_RAM_SIZE);
+	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));
@@ -89,15 +90,15 @@ VIDEO_START_MEMBER(pecom_state,pecom)
 	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
 }
 
-MACHINE_CONFIG_FRAGMENT( pecom_video )
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+MACHINE_CONFIG_START( pecom_video )
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	MCFG_VIDEO_START_OVERRIDE(pecom_state,pecom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(pecom_state, pecom_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(pecom_state, pecom_char_ram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(pecom_state, pecom_char_ram_w)

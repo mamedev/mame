@@ -5,12 +5,18 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/upd7810/upd7810.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class gmaster_state : public driver_device
 {
@@ -20,42 +26,47 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cart(*this, "cartslot")
-		, m_io_joy(*this, "JOY")
 	{ }
 
 	DECLARE_PALETTE_INIT(gmaster);
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
-	DECLARE_READ8_MEMBER(gmaster_port_r);
-	DECLARE_WRITE8_MEMBER(gmaster_port_w);
+	DECLARE_READ8_MEMBER(gmaster_portb_r);
+	DECLARE_READ8_MEMBER(gmaster_portc_r);
+	DECLARE_READ8_MEMBER(gmaster_portd_r);
+	DECLARE_READ8_MEMBER(gmaster_portf_r);
+	DECLARE_WRITE8_MEMBER(gmaster_porta_w);
+	DECLARE_WRITE8_MEMBER(gmaster_portb_w);
+	DECLARE_WRITE8_MEMBER(gmaster_portc_w);
+	DECLARE_WRITE8_MEMBER(gmaster_portd_w);
+	DECLARE_WRITE8_MEMBER(gmaster_portf_w);
 	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
-	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	virtual void machine_start() override;
 
 	struct
 	{
-		UINT8 data[8];
+		uint8_t data[8];
 		int index;
 		int x, y;
 		bool mode; // true read does not increase address
 		bool delayed;
-		UINT8 pixels[8][64];
+		uint8_t pixels[8][64];
 	} m_video;
 
-	UINT8 m_ports[5];
-	UINT8 m_ram[0x4000];
+	uint8_t m_ports[5];
+	uint8_t m_ram[0x4000];
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
-	required_ioport m_io_joy;
 };
 
 
 READ8_MEMBER(gmaster_state::gmaster_io_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_ports[2] & 1)
 	{
@@ -149,34 +160,78 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 }
 
 
-READ8_MEMBER(gmaster_state::gmaster_port_r)
+READ8_MEMBER(gmaster_state::gmaster_portb_r)
 {
-//  UINT8 data = m_ports[offset];
-	UINT8 data = 0xff;
-	switch (offset)
-	{
-	case UPD7810_PORTA:
-		data = m_io_joy->read();
-		break;
-	default:
-		logerror("%.4x port %d read %.2x\n", m_maincpu->pc(), offset, data);
-		break;
-	}
+//  uint8_t data = m_ports[1];
+	uint8_t data = 0xff;
+
+	logerror("%.4x port B read %.2x\n", m_maincpu->pc(), data);
+
+	return data;
+}
+
+READ8_MEMBER(gmaster_state::gmaster_portc_r)
+{
+//  uint8_t data = m_ports[2];
+	uint8_t data = 0xff;
+
+	logerror("%.4x port C read %.2x\n", m_maincpu->pc(), data);
+
+	return data;
+}
+
+READ8_MEMBER(gmaster_state::gmaster_portd_r)
+{
+//  uint8_t data = m_ports[3];
+	uint8_t data = 0xff;
+
+	logerror("%.4x port D read %.2x\n", m_maincpu->pc(), data);
+
+	return data;
+}
+
+READ8_MEMBER(gmaster_state::gmaster_portf_r)
+{
+//  uint8_t data = m_ports[4];
+	uint8_t data = 0xff;
+
+	logerror("%.4x port F read %.2x\n", m_maincpu->pc(), data);
+
 	return data;
 }
 
 
-WRITE8_MEMBER(gmaster_state::gmaster_port_w)
+WRITE8_MEMBER(gmaster_state::gmaster_porta_w)
 {
-	m_ports[offset] = data;
-	logerror("%.4x port %d written %.2x\n", m_maincpu->pc(), offset, data);
-	switch (offset)
-	{
-		case UPD7810_PORTC:
-			m_video.y = BLITTER_Y;
-			m_speaker->level_w(BIT(data, 4));
-			break;
-	}
+	m_ports[0] = data;
+	logerror("%.4x port A written %.2x\n", m_maincpu->pc(), data);
+}
+
+WRITE8_MEMBER(gmaster_state::gmaster_portb_w)
+{
+	m_ports[1] = data;
+	logerror("%.4x port B written %.2x\n", m_maincpu->pc(), data);
+}
+
+WRITE8_MEMBER(gmaster_state::gmaster_portc_w)
+{
+	m_ports[2] = data;
+	logerror("%.4x port C written %.2x\n", m_maincpu->pc(), data);
+
+	m_video.y = BLITTER_Y;
+	m_speaker->level_w(BIT(data, 4));
+}
+
+WRITE8_MEMBER(gmaster_state::gmaster_portd_w)
+{
+	m_ports[3] = data;
+	logerror("%.4x port D written %.2x\n", m_maincpu->pc(), data);
+}
+
+WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
+{
+	m_ports[4] = data;
+	logerror("%.4x port F written %.2x\n", m_maincpu->pc(), data);
 }
 
 
@@ -184,12 +239,6 @@ static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8, gmaster_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START(gmaster_io, AS_IO, 8, gmaster_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTF) AM_READWRITE(gmaster_port_r, gmaster_port_w )
 ADDRESS_MAP_END
 
 
@@ -230,15 +279,15 @@ PALETTE_INIT_MEMBER(gmaster_state, gmaster)
 }
 
 
-UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
 	{
 		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
 		{
-			UINT8 d = m_video.pixels[y][x];
-			UINT16 *line;
+			uint8_t d = m_video.pixels[y][x];
+			uint16_t *line;
 
 			line = &bitmap.pix16((y * 8), x);
 			line[0] = BIT(d, 0);
@@ -279,10 +328,19 @@ void gmaster_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( gmaster, gmaster_state )
+static MACHINE_CONFIG_START( gmaster )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
-	MCFG_CPU_IO_MAP( gmaster_io)
+	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(gmaster_state, gmaster_portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(gmaster_state, gmaster_portc_r))
+	MCFG_UPD7810_PORTD_READ_CB(READ8(gmaster_state, gmaster_portd_r))
+	MCFG_UPD7810_PORTF_READ_CB(READ8(gmaster_state, gmaster_portf_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gmaster_state, gmaster_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gmaster_state, gmaster_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(gmaster_state, gmaster_portc_w))
+	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(gmaster_state, gmaster_portd_w))
+	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(gmaster_state, gmaster_portf_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -22,6 +22,7 @@
 #include "sound/ym2413.h"
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
@@ -55,7 +56,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i80c51_device> m_mcu;
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	required_device<ay8910_device> m_ay;
 	optional_device<okim6376_device> m_msm6376;
 	optional_device<upd7759_device> m_upd7759;
@@ -72,9 +73,9 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
-	optional_region_ptr<UINT8> m_oki_region;
+	optional_region_ptr<uint8_t> m_oki_region;
 
-	UINT8 m_lamppos;
+	uint8_t m_lamppos;
 	int m_lamp_strobe;
 	int m_old_lamp_strobe;
 	int m_lamp_strobe2;
@@ -87,7 +88,7 @@ public:
 	int m_NMIENABLE;
 	int m_meter;
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
-	UINT8 m_Lamps[256];
+	uint8_t m_Lamps[256];
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
@@ -131,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
 	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
 
-	UINT8 m_main_to_mcu;
+	uint8_t m_main_to_mcu;
 
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);

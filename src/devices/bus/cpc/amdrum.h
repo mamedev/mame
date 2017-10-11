@@ -12,10 +12,11 @@
  *
  */
 
-#ifndef AMDRUM_H_
-#define AMDRUM_H_
+#ifndef MAME_BUS_CPC_AMDRUM_H
+#define MAME_BUS_CPC_AMDRUM_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 #include "sound/dac.h"
 
@@ -24,25 +25,26 @@ class cpc_amdrum_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(dac_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 };
 
 // device type definition
-extern const device_type CPC_AMDRUM;
+DECLARE_DEVICE_TYPE(CPC_AMDRUM, cpc_amdrum_device)
 
 
-#endif /* AMDRUM_H_ */
+#endif // MAME_BUS_CPC_AMDRUM_H

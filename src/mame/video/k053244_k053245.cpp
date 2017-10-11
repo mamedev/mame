@@ -33,7 +33,7 @@ main ram and the buffer.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 
@@ -41,7 +41,8 @@ main ram and the buffer.
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type K053244 = &device_creator<k05324x_device>;
+DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
+device_type const K053245 = K053244;
 
 const gfx_layout k05324x_device::spritelayout =
 {
@@ -81,8 +82,8 @@ GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_buffer(nullptr),
@@ -118,6 +119,9 @@ void k05324x_device::set_bpp(device_t &device, int bpp)
 
 void k05324x_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	/* decode the graphics */
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -128,8 +132,8 @@ void k05324x_device::device_start()
 	m_ramsize = 0x800;
 
 	m_z_rejection = -1;
-	m_ram = make_unique_clear<UINT16[]>(m_ramsize / 2);
-	m_buffer = make_unique_clear<UINT16[]>(m_ramsize / 2);
+	m_ram = make_unique_clear<uint16_t[]>(m_ramsize / 2);
+	m_buffer = make_unique_clear<uint16_t[]>(m_ramsize / 2);
 
 	// bind callbacks
 	m_k05324x_cb.bind_relative_to(*owner());
@@ -313,7 +317,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 	int offs, pri_code, i;
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
-	UINT8 drawmode_table[256];
+	uint8_t drawmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;

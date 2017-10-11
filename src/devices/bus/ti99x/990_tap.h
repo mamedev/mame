@@ -3,25 +3,20 @@
 /*
     990_tap.h: include file for 990_tap.c
 */
+#ifndef MAME_BUS_TI99X_990_TAP_H
+#define MAME_BUS_TI99X_990_TAP_H
 
-extern const device_type TI990_TAPE_CTRL;
-#define MAX_TAPE_UNIT 4
+#pragma once
 
-struct tape_unit_t
-{
-	device_image_interface *img;        // image descriptor
-	bool bot;   // TRUE if we are at the beginning of tape
-	bool eot;   // TRUE if we are at the end of tape
-	bool wp;    // TRUE if tape is write-protected
-};
+DECLARE_DEVICE_TYPE(TI990_TAPE_CTRL, tap_990_device)
 
 class tap_990_device : public device_t
 {
 public:
-	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
+	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb)
 	{
-		return downcast<tap_990_device &>(device).m_int_line.set_callback(object);
+		return downcast<tap_990_device &>(device).m_int_line.set_callback(std::forward<Object>(cb));
 	}
 
 	DECLARE_READ16_MEMBER( read );
@@ -37,11 +32,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	static constexpr unsigned MAX_TAPE_UNIT = 4;
+
+	struct tape_unit_t
+	{
+		device_image_interface *img;        // image descriptor
+		bool bot;   // true if we are at the beginning of tape
+		bool eot;   // true if we are at the end of tape
+		bool wp;    // true if tape is write-protected
+	};
+
 	int     cur_tape_unit();
 	void    update_interrupt();
 	void    cmd_read_binary_forward();
@@ -54,10 +58,12 @@ private:
 
 	devcb_write_line m_int_line;
 
-	UINT16 m_w[8];
+	uint16_t m_w[8];
 
 	tape_unit_t m_tape[MAX_TAPE_UNIT];
 };
 
 #define MCFG_TI990_TAPE_INT_HANDLER( _intcallb )  \
 	devcb = &tap_990_device::static_set_int_callback( *device, DEVCB_##_intcallb );
+
+#endif // MAME_BUS_TI99X_990_TAP_H

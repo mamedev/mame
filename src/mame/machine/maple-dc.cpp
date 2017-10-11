@@ -5,7 +5,7 @@
 #include "maple-dc.h"
 #include "mie.h"
 
-const device_type MAPLE_DC = &device_creator<maple_dc_device>;
+DEFINE_DEVICE_TYPE(MAPLE_DC, maple_dc_device, "maple_dc", "Dreamcast Maple Bus")
 
 DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)
@@ -28,8 +28,8 @@ void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running
 	maple_dc.irq_cb = irq_cb;
 }
 
-maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MAPLE_DC, "Dreamcast Maple Bus", tag, owner, clock, "maple_dc", __FILE__)
+maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MAPLE_DC, tag, owner, clock)
 {
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.
@@ -113,8 +113,8 @@ void maple_dc_device::dma_step()
 		switch(dma_state) {
 		case DMA_SEND: {
 			sh4_ddt_dma ddtdata;
-			UINT32 header[2];
-			UINT32 data[512];
+			uint32_t header[2];
+			uint32_t data[512];
 			ddtdata.source    = dma_adr; // source address
 			ddtdata.length    = 2;       // words to transfer
 			ddtdata.size      = 4;       // bytes per word
@@ -127,8 +127,8 @@ void maple_dc_device::dma_step()
 
 			dma_endflag    = header[0] & 0x80000000;
 			dma_port       = (header[0] >> 16) & 3;
-			UINT32 pattern = (header[0] >> 8) & 7;
-			UINT32 length  = (header[0] & 255) + 1;
+			uint32_t pattern = (header[0] >> 8) & 7;
+			uint32_t length  = (header[0] & 255) + 1;
 			dma_dest       = header[1];
 
 			ddtdata.source    = dma_adr; // source address
@@ -185,7 +185,7 @@ void maple_dc_device::dma_step()
 
 		case DMA_TIMEOUT: {
 			sh4_ddt_dma ddtdata;
-			UINT32 data = 0xffffffff;
+			uint32_t data = 0xffffffff;
 			ddtdata.destination = dma_dest; // destination address
 			ddtdata.length      = 1;        // words to transfer
 			ddtdata.size        = 4;        // bytes per word
@@ -202,8 +202,8 @@ void maple_dc_device::dma_step()
 			timer->adjust(attotime::never);
 
 			sh4_ddt_dma ddtdata;
-			UINT32 data[512];
-			UINT32 length = 0;
+			uint32_t data[512];
+			uint32_t length = 0;
 			bool partial = false;
 			if(devices[dma_port])
 				devices[dma_port]->maple_r(data, length, partial);
@@ -291,7 +291,7 @@ READ32_MEMBER(maple_dc_device::sb_mdst_r)
 
 WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
 {
-	UINT32 old = mdst;
+	uint32_t old = mdst;
 	mdst = data & 1;
 
 	if(!old && data && (mden & 1) && mdtsel == 0) {

@@ -22,7 +22,7 @@ public:
 	menu_sliders(mame_ui_manager &mui, render_container &container, bool menuless_mode = false);
 	virtual ~menu_sliders() override;
 
-	static UINT32 ui_handler(render_container &container, mame_ui_manager &mui);
+	static uint32_t ui_handler(render_container &container, mame_ui_manager &mui);
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -33,7 +33,7 @@ private:
 		INPUT_SPECIFIC,
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	bool m_menuless_mode;

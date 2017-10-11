@@ -21,8 +21,8 @@ Notes:
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
 - If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
   appears to japanese words for "RAM failed".
-- Playing with the debugger I've found this -> http://img444.imageshack.us/img444/2980/0000ti3.png (notice the "credit" at
-  the bottom). Maybe a non-BET version exists? Or there's a jumper setting?
+- Snippets of a non-BET Version are scattered thru the code (for example a credit display).
+  Might be either undumped revision or selectable somehow.
 
 CPU:    uPD70116C-8 (V30)
 Sound:  Z80-A
@@ -54,11 +54,15 @@ RSSENGO2.72   chr.
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
 #include "audio/seibu.h"
-#include "sound/3812intf.h"
-#include "video/seibu_crtc.h"
+
+#include "cpu/nec/nec.h"
 #include "machine/nvram.h"
+#include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sengokmj_state : public driver_device
@@ -79,21 +83,21 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
-	required_shared_ptr<UINT16> m_spriteram16;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	required_shared_ptr<uint16_t> m_sc1_vram;
+	required_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	required_shared_ptr<uint16_t> m_spriteram16;
 
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
 
-	UINT16 m_mux_data;
-	UINT8 m_hopper_io;
-	UINT16 m_layer_en;
-	UINT16 m_scrollram[6];
+	uint16_t m_mux_data;
+	uint8_t m_hopper_io;
+	uint16_t m_layer_en;
+	uint16_t m_scrollram[6];
 
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
@@ -117,7 +121,7 @@ public:
 	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -307,7 +311,7 @@ void sengokmj_state::video_start()
 	save_item(NAME(m_scrollram));
 }
 
-UINT32 sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -346,7 +350,7 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 {
 	const char *const mpnames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int i;
-	UINT16 res = 0xffff;
+	uint16_t res = 0xffff;
 
 	for(i=0;i<5;i++)
 	{
@@ -396,7 +400,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 
@@ -562,7 +566,7 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
+static MACHINE_CONFIG_START( sengokmj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
@@ -570,7 +574,8 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_CPU_IO_MAP(sengokmj_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  interrupt)
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -592,7 +597,20 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 
@@ -632,5 +650,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, driver_device, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

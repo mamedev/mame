@@ -42,7 +42,7 @@ TILEMAP_MAPPER_MEMBER(liberate_state::fix_scan)
 
 TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 {
-	const UINT8 *RAM = memregion("user1")->base();
+	const uint8_t *RAM = memregion("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
@@ -71,8 +71,8 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 
 TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 *colorram = m_colorram;
+	uint8_t *videoram = m_videoram;
+	uint8_t *colorram = m_colorram;
 	int tile, color;
 
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
@@ -210,7 +210,7 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_fg_gfx = memregion("fg_gfx")->base();
-	m_charram = std::make_unique<UINT8[]>(0x1800 * 2);
+	m_charram = std::make_unique<uint8_t[]>(0x1800 * 2);
 
 	save_pointer(NAME(m_charram.get()), 0x1800 * 2);
 	save_pointer(NAME(m_fg_gfx), 0x6000);
@@ -245,7 +245,7 @@ VIDEO_START_MEMBER(liberate_state,prosport)
 
 PALETTE_INIT_MEMBER(liberate_state,liberate)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)
@@ -278,7 +278,7 @@ PALETTE_INIT_MEMBER(liberate_state,liberate)
 
 void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	/* Sprites */
@@ -347,7 +347,7 @@ void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
@@ -410,7 +410,7 @@ void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color;
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
@@ -470,7 +470,7 @@ void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 void liberate_state::prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs, code, fx, fy, sx, sy;
 
 	for (offs = 0x000; offs < 0x400; offs += 4)
@@ -494,7 +494,7 @@ void liberate_state::prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 /***************************************************************************/
 
-UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
 	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);
@@ -510,10 +510,10 @@ UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 *colorram = m_colorram;
+	uint8_t *videoram = m_videoram;
+	uint8_t *colorram = m_colorram;
 	int mx, my, tile, offs, gfx_region;
 	int scrollx, scrolly;
 
@@ -553,7 +553,7 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
 	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);
@@ -572,7 +572,7 @@ UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_back_tilemap->set_scrolly(0,  m_io_ram[1]);
 	m_back_tilemap->set_scrollx(0, -m_io_ram[0]);

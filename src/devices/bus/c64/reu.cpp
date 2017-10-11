@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "reu.h"
 
 
@@ -21,32 +22,21 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REU1700 = &device_creator<c64_reu1700_cartridge_device>;
-const device_type C64_REU1750 = &device_creator<c64_reu1750_cartridge_device>;
-const device_type C64_REU1764 = &device_creator<c64_reu1764_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_REU1700, c64_reu1700_cartridge_device, "c64_1700reu", "1700 REU")
+DEFINE_DEVICE_TYPE(C64_REU1750, c64_reu1750_cartridge_device, "c64_1750reu", "1750 REU")
+DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "1764 REU")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_reu )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_reu )
+MACHINE_CONFIG_MEMBER( c64_reu_cartridge_device::device_add_mconfig )
 	MCFG_MOS8726_ADD(MOS8726R1_TAG)
 
 	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_reu_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_reu );
-}
 
 
 
@@ -58,8 +48,8 @@ machine_config_constructor c64_reu_cartridge_device::device_mconfig_additions() 
 //  c64_reu_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
 	m_eprom(*this, "rom"),
@@ -70,14 +60,14 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 {
 }
 
-c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c64_reu_cartridge_device(mconfig, C64_REU1700, "1700 REU", tag, owner, clock, TYPE_1700, 0, 128 * 1024, "c64_1700reu", __FILE__) { }
+c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: c64_reu_cartridge_device(mconfig, C64_REU1700, tag, owner, clock, TYPE_1700, 0, 128 * 1024) { }
 
-c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c64_reu_cartridge_device(mconfig, C64_REU1750, "1750 REU", tag, owner, clock, TYPE_1750, 1, 256 * 1024, "c64_1750reu", __FILE__) { }
+c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: c64_reu_cartridge_device(mconfig, C64_REU1750, tag, owner, clock, TYPE_1750, 1, 256 * 1024) { }
 
-c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c64_reu_cartridge_device(mconfig, C64_REU1764, "1764 REU", tag, owner, clock, TYPE_1764, 1, 512 * 1024, "c64_1764reu", __FILE__) { }
+c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: c64_reu_cartridge_device(mconfig, C64_REU1764, tag, owner, clock, TYPE_1764, 1, 512 * 1024) { }
 
 
 //-------------------------------------------------
@@ -109,7 +99,7 @@ void c64_reu_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_dmac->romsel_r(roml, romh))
 	{
@@ -128,7 +118,7 @@ UINT8 c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UI
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_reu_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_reu_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2)
 	{

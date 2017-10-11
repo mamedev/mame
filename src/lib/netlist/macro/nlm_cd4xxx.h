@@ -3,7 +3,7 @@
 #ifndef NLD_CD4XXX_H_
 #define NLD_CD4XXX_H_
 
-#include "nl_setup.h"
+#include "../nl_setup.h"
 
 /*
  * Devices:
@@ -21,6 +21,8 @@
 /* ----------------------------------------------------------------------------
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
+
+#ifndef NL_AUTO_DEVICES
 
 #define CD4001_NOR(name)                                                      \
 		NET_REGISTER_DEV(CD4001_NOR, name)
@@ -41,6 +43,10 @@
 #define CD4016_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4016_DIP, name)
 
+#define CD4316_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4016_DIP, name)
+
+#endif
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/

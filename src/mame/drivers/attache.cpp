@@ -52,19 +52,24 @@
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/ay8910.h"
+#include "machine/am9517a.h"
 #include "machine/msm5832.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
+#include "sound/ay8910.h"
 #include "video/tms9927.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class attache_state : public driver_device
 {
@@ -130,8 +135,7 @@ public:
 	};
 
 	// overrides
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_int(screen_device &screen, bool state);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -156,10 +160,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
-	void operation_strobe(address_space& space,UINT8 data);
+	void operation_strobe(address_space& space,uint8_t data);
 	void keyboard_clock_w(bool state);
-	UINT8 keyboard_data_r();
-	UINT16 get_key();
+	uint8_t keyboard_data_r();
+	uint16_t get_key();
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -190,25 +194,25 @@ private:
 
 	bool m_rom_active;
 	bool m_gfx_enabled;
-	UINT8 m_pio_porta;
-	UINT8 m_pio_portb;
-	UINT8 m_pio_select;
-	UINT8 m_pio_latch;
-	UINT8 m_crtc_reg_select;
-	UINT8 m_current_cmd;
-	UINT8 m_char_ram[128*32];
-	UINT8 m_attr_ram[128*32];
-	UINT8 m_gfx_ram[128*32*5];
-	UINT8 m_char_line;
-	UINT8 m_attr_line;
-	UINT8 m_gfx_line;
-	UINT8 m_cmos_ram[64];
-	UINT8 m_cmos_select;
-	UINT16 m_kb_current_key;
+	uint8_t m_pio_porta;
+	uint8_t m_pio_portb;
+	uint8_t m_pio_select;
+	uint8_t m_pio_latch;
+	uint8_t m_crtc_reg_select;
+	uint8_t m_current_cmd;
+	uint8_t m_char_ram[128*32];
+	uint8_t m_attr_ram[128*32];
+	uint8_t m_gfx_ram[128*32*5];
+	uint8_t m_char_line;
+	uint8_t m_attr_line;
+	uint8_t m_gfx_line;
+	uint8_t m_cmos_ram[64];
+	uint8_t m_cmos_select;
+	uint16_t m_kb_current_key;
 	bool m_kb_clock;
 	bool m_kb_empty;
-	UINT8 m_kb_bitpos;
-	UINT8 m_memmap;
+	uint8_t m_kb_bitpos;
+	uint8_t m_memmap;
 };
 
 // Attributes (based on schematics):
@@ -220,10 +224,10 @@ private:
 // bit 5 = underline
 // bit 6 = superscript
 // bit 7 = subscript (superscript and subscript combined produces strikethrough)
-UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,bit,scan,data;
-	UINT8 dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
+	uint8_t x,y,vy,start,bit,scan,data;
+	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
 							// as it can start on either odd or even character cells.
 
 	// Graphics output (if enabled)
@@ -265,12 +269,16 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// Text output
 	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
+		start = m_crtc->upscroll_offset();
+		vy = (start + y) % 24;
+
 		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
-			UINT8 ch = m_char_ram[(y*128)+x];
-			pen_t fg = m_palette->pen(m_attr_ram[(y*128)+x] & 0x08 ? 2 : 1); // brightness
-			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < ARRAY_LENGTH(m_char_ram));
+			uint8_t ch = m_char_ram[(vy*128)+x];
+			pen_t fg = m_palette->pen(m_attr_ram[(vy*128)+x] & 0x08 ? 2 : 1); // brightness
+			if(m_attr_ram[(vy*128)+x] & 0x10) // double-size
 				dbl_mode++;
 			else
 				dbl_mode = 0;
@@ -278,16 +286,16 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			for(scan=0;scan<10;scan++)  // 10 scanlines per line
 			{
 				data = m_char_rom->base()[ch*16+scan];
-				if((m_attr_ram[(y*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
+				if((m_attr_ram[(vy*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
 				{
-					if(m_attr_ram[(y*128)+x] & 0x40)  // superscript
+					if(m_attr_ram[(vy*128)+x] & 0x40)  // superscript
 					{
 						if(scan >= 5)
 							data = 0;
 						else
 							data = m_char_rom->base()[ch*16+(scan*2)+1];
 					}
-					if(m_attr_ram[(y*128)+x] & 0x80)  // subscript
+					if(m_attr_ram[(vy*128)+x] & 0x80)  // subscript
 					{
 						if(scan < 5)
 							data = 0;
@@ -295,15 +303,15 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 							data = m_char_rom->base()[ch*16+((scan-5)*2)+1];
 					}
 				}
-				if((m_attr_ram[(y*128)+x] & 0x20) && scan == 9)  // underline
+				if((m_attr_ram[(vy*128)+x] & 0x20) && scan == 9)  // underline
 					data = 0xff;
-				if((m_attr_ram[(y*128)+x] & 0xc0) == 0xc0 && scan == 3)  // strikethrough
+				if((m_attr_ram[(vy*128)+x] & 0xc0) == 0xc0 && scan == 3)  // strikethrough
 					data = 0xff;
-				if(m_attr_ram[(y*128)+x] & 0x04)  // reverse
+				if(m_attr_ram[(vy*128)+x] & 0x04)  // reverse
 					data = ~data;
-				if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+				if(m_attr_ram[(vy*128)+x] & 0x10) // double-size
 				{
-					UINT8 newdata = 0;
+					uint8_t newdata = 0;
 					if(dbl_mode & 1)
 					{
 						newdata = (data & 0x80) | ((data & 0x80) >> 1)
@@ -323,8 +331,8 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				for(bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					UINT16 xpos = x*8+bit;
-					UINT16 ypos = y*10+scan;
+					uint16_t xpos = x*8+bit;
+					uint16_t ypos = y*10+scan;
 
 					if(BIT(data,7-bit))
 						bitmap.pix32(ypos,xpos) = fg;
@@ -333,11 +341,6 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 	}
 	return 0;
-}
-
-void attache_state::vblank_int(screen_device &screen, bool state)
-{
-	m_ctc->trg2(state);
 }
 
 READ8_MEMBER(attache_state::rom_r)
@@ -353,10 +356,10 @@ WRITE8_MEMBER(attache_state::rom_w)
 	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
 
-UINT16 attache_state::get_key()
+uint16_t attache_state::get_key()
 {
-	UINT8 row,bits,data;
-	UINT8 res = 0;
+	uint8_t row,bits,data;
+	uint8_t res = 0;
 
 	// scan input ports
 	for(row=0;row<8;row++)
@@ -384,9 +387,9 @@ UINT16 attache_state::get_key()
 	return res;
 }
 
-UINT8 attache_state::keyboard_data_r()
+uint8_t attache_state::keyboard_data_r()
 {
-	UINT16 key;
+	uint16_t key;
 	if(m_kb_bitpos == 1)  // start bit, if data is available
 	{
 		key = get_key();
@@ -424,8 +427,8 @@ void attache_state::keyboard_clock_w(bool state)
 // TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
 READ8_MEMBER(attache_state::pio_portA_r)
 {
-	UINT8 ret = 0xff;
-	UINT8 porta = m_pio_porta;
+	uint8_t ret = 0xff;
+	uint8_t porta = m_pio_porta;
 
 	switch(m_pio_select)
 	{
@@ -473,12 +476,12 @@ READ8_MEMBER(attache_state::pio_portA_r)
 
 READ8_MEMBER(attache_state::pio_portB_r)
 {
-	UINT8 ret = m_pio_portb & 0xbf;
+	uint8_t ret = m_pio_portb & 0xbf;
 	ret |= keyboard_data_r();
 	return ret;
 }
 
-void attache_state::operation_strobe(address_space& space, UINT8 data)
+void attache_state::operation_strobe(address_space& space, uint8_t data)
 {
 	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
 	switch(m_pio_select)
@@ -491,10 +494,10 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		break;
 	case PIO_SEL_5832_WRITE:
 		m_rtc->cs_w(1);
-		m_rtc->write_w(1);
 		m_rtc->read_w(0);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		m_rtc->data_w(space,0,data & 0x0f);
+		m_rtc->write_w(1);
 		logerror("RTC: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
@@ -572,8 +575,8 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 // Display uses A8-A15 placed on the bus by the OUT instruction as an extra parameter
 READ8_MEMBER(attache_state::display_data_r)
 {
-	UINT8 ret = 0xff;
-	UINT8 param = (offset & 0xff00) >> 8;
+	uint8_t ret = 0xff;
+	uint8_t param = (offset & 0xff00) >> 8;
 
 	switch(m_current_cmd)
 	{
@@ -610,7 +613,7 @@ READ8_MEMBER(attache_state::display_data_r)
 
 WRITE8_MEMBER(attache_state::display_data_w)
 {
-	UINT8 param = (offset & 0xff00) >> 8;
+	uint8_t param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
 	{
 	case DISP_GFX_0:
@@ -630,6 +633,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 		break;
 	case DISP_CRTC:
 		m_crtc->write(space, m_crtc_reg_select, data);
+		//logerror("CRTC: write reg %02x, data %02x\n",m_crtc_reg_select,data);
 		break;
 	case DISP_ATTR:
 		m_attr_ram[(m_attr_line*128)+(param & 0x7f)] = data;
@@ -644,7 +648,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 
 WRITE8_MEMBER(attache_state::display_command_w)
 {
-	UINT8 cmd = (data & 0xe0) >> 5;
+	uint8_t cmd = (data & 0xe0) >> 5;
 
 	m_current_cmd = cmd;
 
@@ -682,8 +686,8 @@ WRITE8_MEMBER(attache_state::memmap_w)
 	// TODO: figure this out properly
 	// Tech manual says that RAM is split into 8kB chunks.
 	// Would seem that bit 4 is always 0 and bit 3 is always 1?
-	UINT8 bank = (data & 0xe0) >> 5;
-	UINT8 loc = data & 0x07;
+	uint8_t bank = (data & 0xe0) >> 5;
+	uint8_t loc = data & 0x07;
 	memory_bank* banknum[8] = { m_membank1, m_membank2, m_membank3, m_membank4, m_membank5, m_membank6, m_membank7, m_membank8 };
 	m_memmap = data;
 
@@ -704,7 +708,7 @@ WRITE8_MEMBER(attache_state::dma_mask_w)
 
 READ8_MEMBER(attache_state::fdc_dma_r)
 {
-	UINT8 ret = m_fdc->dma_r();
+	uint8_t ret = m_fdc->dma_r();
 	return ret;
 }
 
@@ -754,7 +758,7 @@ static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio",z80sio0_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio0_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
@@ -862,7 +866,7 @@ SLOT_INTERFACE_END
 
 void attache_state::driver_start()
 {
-	UINT8 *RAM = m_ram->pointer();
+	uint8_t *RAM = m_ram->pointer();
 
 	m_membank1->configure_entries(0, 8, &RAM[0x0000], 0x2000);
 	m_membank2->configure_entries(0, 8, &RAM[0x0000], 0x2000);
@@ -908,7 +912,7 @@ void attache_state::machine_reset()
 	m_kb_bitpos = 0;
 }
 
-static MACHINE_CONFIG_START( attache, attache_state )
+static MACHINE_CONFIG_START( attache )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
@@ -916,13 +920,13 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(64)) /* not accurate */
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
@@ -938,7 +942,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO0, XTAL_8MHz / 26)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -992,5 +996,5 @@ ROM_START( attache )
 	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS
+COMP( 1982, attache, 0,      0,         attache,    attache, attache_state,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS )

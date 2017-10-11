@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
 {
-	UINT8 *rom = memregion("gfx4")->base();
+	uint8_t *rom = memregion("gfx4")->base();
 	int code = rom[0x1000 * m_bg_image + tile_index];
 	SET_TILE_INFO_MEMBER(3 + m_bg_image,
 			code,
@@ -132,7 +132,7 @@ inline void citycon_state::changecolor_RRRRGGGGBBBBxxxx( int color, int indx )
 	m_palette->set_pen_color(color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs, scroll;
 

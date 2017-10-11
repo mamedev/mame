@@ -10,7 +10,6 @@
 #define INPUT_WIN_H_
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef interface
 
@@ -24,9 +23,9 @@
 // state information for a keyboard
 struct keyboard_state
 {
-	UINT8                   state[MAX_KEYS];
-	INT8                    oldkey[MAX_KEYS];
-	INT8                    currkey[MAX_KEYS];
+	uint8_t                   state[MAX_KEYS];
+	int8_t                    oldkey[MAX_KEYS];
+	int8_t                    currkey[MAX_KEYS];
 };
 
 // state information for a mouse (matches DIMOUSESTATE exactly)
@@ -49,6 +48,8 @@ public:
 			m_global_inputs_enabled(false)
 	{
 	}
+
+	virtual ~wininput_module() { }
 
 	virtual bool should_hide_mouse()
 	{

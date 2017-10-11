@@ -35,23 +35,28 @@ cha3    $10d8
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/tnzs.h"
-#include "sound/ay8910.h"
 
-class cchance_state : public tnzs_state
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+class cchance_state : public tnzs_base_state
 {
 public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_state(mconfig, type, tag) { }
+		: tnzs_base_state(mconfig, type, tag) { }
 
-	UINT8 m_hop_io;
-	UINT8 m_bell_io;
+	void machine_reset() override;
+	void machine_start() override;
+
+	uint8_t m_hop_io;
+	uint8_t m_bell_io;
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	DECLARE_MACHINE_START(cchance);
-	DECLARE_MACHINE_RESET(cchance);
 };
 
 
@@ -191,28 +196,24 @@ static GFXDECODE_START( cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(cchance_state,cchance)
+void cchance_state::machine_start()
 {
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));
 }
 
-MACHINE_RESET_MEMBER(cchance_state,cchance)
+void cchance_state::machine_reset()
 {
-	m_mcu_type = -1;
+	tnzs_base_state::machine_reset();
 	m_hop_io = 0;
 	m_bell_io = 0;
-
 }
 
-static MACHINE_CONFIG_START( cchance, cchance_state )
+static MACHINE_CONFIG_START( cchance )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
-
-	MCFG_MACHINE_START_OVERRIDE(cchance_state,cchance)
-	MCFG_MACHINE_RESET_OVERRIDE(cchance_state,cchance)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
 
@@ -226,15 +227,15 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_DRIVER(cchance_state, screen_eof_tnzs)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cchance_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(cchance_state,arknoid2)
+	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000/2)
+	MCFG_SOUND_ADD("aysnd", YM2149, 1500000/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -255,4 +256,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance, driver_device,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987?, cchance,  0,    cchance, cchance, cchance_state,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

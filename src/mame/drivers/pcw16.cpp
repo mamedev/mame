@@ -89,10 +89,13 @@ TODO:
    epp/ecp modes in parallel port not supported yet
    so ui disabled */
 
+#include "emu.h"
 #include "includes/pcw16.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 // interrupt counter
 /* controls which bank of 2mb address space is paged into memory */
@@ -149,7 +152,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_palette_w)
 	m_colour_palette[offset & 0x0f] = data & 31;
 }
 
-UINT8 pcw16_state::read_bank_data(UINT8 type, UINT16 offset)
+uint8_t pcw16_state::read_bank_data(uint8_t type, uint16_t offset)
 {
 	if(type & 0x80) // DRAM
 	{
@@ -172,7 +175,7 @@ UINT8 pcw16_state::read_bank_data(UINT8 type, UINT16 offset)
 	}
 }
 
-void pcw16_state::write_bank_data(UINT8 type, UINT16 offset, UINT8 data)
+void pcw16_state::write_bank_data(uint8_t type, uint16_t offset, uint8_t data)
 {
 	if(type & 0x80) // DRAM
 	{
@@ -193,7 +196,7 @@ void pcw16_state::write_bank_data(UINT8 type, UINT16 offset, UINT8 data)
 	}
 }
 
-UINT8 pcw16_state::pcw16_read_mem(UINT8 bank, UINT16 offset)
+uint8_t pcw16_state::pcw16_read_mem(uint8_t bank, uint16_t offset)
 {
 	switch(bank)
 	{
@@ -209,7 +212,7 @@ UINT8 pcw16_state::pcw16_read_mem(UINT8 bank, UINT16 offset)
 	return 0xff;
 }
 
-void pcw16_state::pcw16_write_mem(UINT8 bank, UINT16 offset, UINT8 data)
+void pcw16_state::pcw16_write_mem(uint8_t bank, uint16_t offset, uint8_t data)
 {
 	switch(bank)
 	{
@@ -528,7 +531,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 	{
 		int data;
 
-		data = m_keyboard->read(machine().driver_data()->generic_space(), 0);
+		data = m_keyboard->read(machine().dummy_space(), 0);
 
 		if (data)
 		{
@@ -1003,7 +1006,7 @@ static SLOT_INTERFACE_START(pcw16_com)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pcw16, pcw16_state )
+static MACHINE_CONFIG_START( pcw16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pcw16_map)
@@ -1090,5 +1093,5 @@ ROM_START(pcw16)
 ROM_END
 
 
-/*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,    0,        0,      pcw16,     pcw16, driver_device,    0,      "Amstrad plc",   "PcW16", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME */
+COMP( 1995, pcw16,   0,        0,      pcw16,   pcw16, pcw16_state, 0,    "Amstrad plc",  "PcW16", MACHINE_NOT_WORKING )

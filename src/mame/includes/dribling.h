@@ -27,16 +27,16 @@ public:
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* misc */
-	UINT8    m_abca;
-	UINT8    m_dr;
-	UINT8    m_ds;
-	UINT8    m_sh;
-	UINT8    m_input_mux;
-	UINT8    m_di;
+	uint8_t    m_abca;
+	uint8_t    m_dr;
+	uint8_t    m_ds;
+	uint8_t    m_sh;
+	uint8_t    m_input_mux;
+	uint8_t    m_di;
 
 	DECLARE_READ8_MEMBER(ioread);
 	DECLARE_WRITE8_MEMBER(iowrite);
@@ -50,6 +50,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dribling);
-	UINT32 screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
 };

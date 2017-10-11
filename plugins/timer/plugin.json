@@ -1,9 +1,9 @@
 {
   "plugin": {
-    "name": "timer",
+	"name": "timer",
 	"description": "Timer plugin",
-    "version": "0.0.1",
-    "author": "Carl",
+	"version": "0.0.1",
+	"author": "Carl",
 	"type": "plugin",
 	"start": "false"
   }

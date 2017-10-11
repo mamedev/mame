@@ -20,9 +20,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/sprint2.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #define MACHINE_IS_SPRINT1   (m_game == 1)
 #define MACHINE_IS_SPRINT2   (m_game == 2)
@@ -45,13 +47,11 @@ DRIVER_INIT_MEMBER(sprint2_state,dominos4)
 {
 	m_game = 3;
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0880, 0x0880, "SELFTTEST");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c50, 0x0c5f, write8_delegate(FUNC(sprint2_state::dominos4_lamp3_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c60, 0x0c6f, write8_delegate(FUNC(sprint2_state::dominos4_lamp4_w),this));
 }
 
 int sprint2_state::service_mode()
 {
-	UINT8 v = ioport("INB")->read();
+	uint8_t v = ioport("INB")->read();
 
 	if (MACHINE_IS_SPRINT1)
 	{
@@ -133,7 +133,7 @@ READ8_MEMBER(sprint2_state::sprint2_dip_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	UINT8 val = ioport("INA")->read();
+	uint8_t val = ioport("INA")->read();
 
 	if (m_game == 2)// (MACHINE_IS_SPRINT2)
 	{
@@ -151,7 +151,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	UINT8 val = ioport("INB")->read();
+	uint8_t val = ioport("INB")->read();
 
 	if (m_game == 1) // (MACHINE_IS_SPRINT1)
 	{
@@ -166,9 +166,9 @@ READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 
 READ8_MEMBER(sprint2_state::sprint2_sync_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
-	if (m_attract != 0)
+	if (m_outlatch->q0_r() != 0)
 		val |= 0x10;
 
 	if (m_screen->vpos() == 261)
@@ -210,12 +210,9 @@ WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
+WRITE8_MEMBER(sprint2_state::output_latch_w)
 {
-	m_attract = offset & 1;
-
-	// also DOMINOS_ATTRACT_EN
-	m_discrete->write(space, SPRINT2_ATTRACT_EN, m_attract);
+	m_outlatch->write_bit(offset >> 4, offset & 1);
 }
 
 
@@ -225,34 +222,24 @@ WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_skid1_w)
+WRITE_LINE_MEMBER(sprint2_state::lamp1_w)
 {
-	// also DOMINOS_TUMBLE_EN
-	m_discrete->write(space, SPRINT2_SKIDSND1_EN, offset & 1);
+	output().set_led_value(0, state);
 }
 
-WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
+WRITE_LINE_MEMBER(sprint2_state::lamp2_w)
 {
-	m_discrete->write(space, SPRINT2_SKIDSND2_EN, offset & 1);
+	output().set_led_value(1, state);
 }
 
-
-WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
+WRITE_LINE_MEMBER(sprint2_state::lamp3_w)
 {
-	output().set_led_value(0, offset & 1);
-}
-WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
-{
-	output().set_led_value(1, offset & 1);
+	output().set_led_value(2, state);
 }
 
-WRITE8_MEMBER(sprint2_state::dominos4_lamp3_w)
+WRITE_LINE_MEMBER(sprint2_state::lamp4_w)
 {
-	output().set_led_value(2, offset & 1);
-}
-WRITE8_MEMBER(sprint2_state::dominos4_lamp4_w)
-{
-	output().set_led_value(3, offset & 1);
+	output().set_led_value(3, state);
 }
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
@@ -266,12 +253,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
 	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(sprint2_attract_w)
-	AM_RANGE(0x0c10, 0x0c1f) AM_WRITE(sprint2_skid1_w)
-	AM_RANGE(0x0c20, 0x0c2f) AM_WRITE(sprint2_skid2_w)
-	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
-	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
-	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
+	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0c80, 0x0cff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
@@ -527,7 +509,7 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint2, sprint2_state )
+static MACHINE_CONFIG_START( sprint2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
@@ -543,7 +525,7 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
-	MCFG_SCREEN_VBLANK_DRIVER(sprint2_state, screen_eof_sprint2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint2)
@@ -553,6 +535,14 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // at H8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_ATTRACT_EN>)) // also DOMINOS_ATTRACT_EN
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND1_EN>)) // also DOMINOS_TUMBLE_EN
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sprint2_state, lamp1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sprint2_state, lamp2_w))
+	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, sprint2_spare_w))
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(sprint2)
@@ -588,6 +578,12 @@ static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(dominos)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( dominos4, dominos )
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint2_state, lamp3_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, lamp4_w))
 MACHINE_CONFIG_END
 
 ROM_START( sprint1 )
@@ -637,7 +633,7 @@ ROM_START( sprint2a )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
-	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(e80fd249) SHA1(7bcf7dfd72ca83fdd80593eaf392570da1f71298) )
+	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(e80fd249) SHA1(7bcf7dfd72ca83fdd80593eaf392570da1f71298) ) // sldh
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
@@ -719,4 +715,4 @@ GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "
 GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
 GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
 GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, dominos, ROT0, "Atari", "Dominos", 0 )
-GAME( 1977, dominos4, dominos, dominos, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", 0 )
+GAME( 1977, dominos4, dominos, dominos4, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", 0 )

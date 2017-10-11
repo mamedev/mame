@@ -120,6 +120,7 @@ uniform float RoundCornerAmount = 0.0f;
 uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
+uniform float3 LightReflectionColor = float3(1.0f, 0.90f, 0.80f); // color temperature 5.000 Kelvin
 
 uniform bool SwapXY = false;
 
@@ -232,20 +233,13 @@ float2 GetTextureCoords(float2 coord, float distortionAmount, float cubicDistort
 	return coord;
 }
 
-float2 GetQuadCoords(float2 coord, float distortionAmount, float cubicDistortionAmount)
+float2 GetQuadCoords(float2 coord, float2 scale, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5f;
 
-	// keep coords inside of the quad bounds of a single screen
-	if (ScreenCount == 1)
-	{
-		// base-target dimensions (without oversampling)
-		float2 BaseTargetDims = TargetDims / TargetScale;
-
-		// apply base-target/quad difference
-		coord *= BaseTargetDims / (SwapXY ? QuadDims.yx : QuadDims.xy);
-	}
+	// apply scale
+	coord *= scale;
 
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
@@ -271,15 +265,28 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// base-target dimensions (without oversampling)
 	float2 BaseTargetDims = TargetDims / TargetScale;
+	BaseTargetDims = SwapXY
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
+
+	// base-target/quad difference scale
+	float2 BaseTargetQuadScale = ScreenCount == 1
+		? BaseTargetDims / QuadDims // keeps the coords inside of the quad bounds of a single screen
+		: 1.0f;
 
 	// Screen Texture Curvature
 	float2 BaseCoord = GetTextureCoords(Input.TexCoord, distortionAmount, cubicDistortionAmount);
 
 	// Screen Quad Curvature
-	float2 QuadCoord = GetQuadCoords(Input.TexCoord, distortCornerAmount, 0.0f);
+	float2 QuadCoord = GetQuadCoords(Input.TexCoord, BaseTargetQuadScale, distortCornerAmount, 0.0f);
 
 	// clip border
-	clip(BaseCoord < 0.0f - TexelDims || BaseCoord > 1.0f + TexelDims ? -1 : 1);
+	if (BaseCoord.x < 0.0f - TexelDims.x || BaseCoord.y < 0.0f - TexelDims.y ||
+		BaseCoord.x > 1.0f + TexelDims.x || BaseCoord.y > 1.0f + TexelDims.y)
+	{
+		// we don't use the clip function, because we don't clear the render target before
+		return float4(0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
@@ -292,14 +299,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseColor.rgb *= VignetteFactor;
 
 	// Light Reflection Simulation
-	float3 LightColor = float3(1.0f, 0.90f, 0.80f); // color temperature 5.000 Kelvin
-
 	float2 SpotCoord = QuadCoord;
-	float2 NoiseCoord = QuadCoord;
 
-	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
-	float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
-	BaseColor.rgb += SpotAddend * NoiseFactor * LightColor;
+	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount) * LightReflectionColor;
+	BaseColor.rgb += SpotAddend * GetNoiseFactor(SpotAddend, random(SpotCoord));
 
 	// Round Corners Simulation
 	float2 RoundCornerCoord = QuadCoord;

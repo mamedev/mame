@@ -27,10 +27,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/poly88.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-#include "includes/poly88.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -175,9 +179,9 @@ static GFXDECODE_START( poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( poly88, poly88_state )
+static MACHINE_CONFIG_START( poly88 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 1853000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_16_5888MHz / 9) // uses 8224 clock generator
 	MCFG_CPU_PROGRAM_MAP(poly88_mem)
 	MCFG_CPU_IO_MAP(poly88_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
@@ -207,7 +211,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_DEVICE_ADD("uart", I8251, XTAL_16_5888MHz / 9)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(poly88_state,write_cas_tx))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(poly88_state,poly88_usart_rxready))
 
@@ -243,6 +247,6 @@ ROM_START( poly8813 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0)
-COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813",MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY                  FULLNAME     FLAGS
+COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0 )
+COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813", MACHINE_NOT_WORKING )

@@ -105,16 +105,14 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 }
 
 
-WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
+WRITE_LINE_MEMBER(asteroid_state::start1_led_w)
 {
-	int bank = BIT(data, 7);
-	m_ram1->set_entry(bank);
-	m_ram2->set_entry(bank);
+	output().set_led_value(0, state ? 0 : 1);
 }
 
-WRITE8_MEMBER(asteroid_state::astdelux_led_w)
+WRITE_LINE_MEMBER(asteroid_state::start2_led_w)
 {
-	output().set_led_value(offset, (data & 0x80) ? 0 : 1);
+	output().set_led_value(1, state ? 0 : 1);
 }
 
 void asteroid_state::machine_start()
@@ -122,8 +120,8 @@ void asteroid_state::machine_start()
 	/* configure RAM banks if present (not on llander) */
 	if (m_ram1.target() != nullptr)
 	{
-		UINT8 *ram1 = reinterpret_cast<UINT8 *>(memshare("ram1")->ptr());
-		UINT8 *ram2 = reinterpret_cast<UINT8 *>(memshare("ram2")->ptr());
+		uint8_t *ram1 = reinterpret_cast<uint8_t *>(memshare("ram1")->ptr());
+		uint8_t *ram2 = reinterpret_cast<uint8_t *>(memshare("ram2")->ptr());
 
 		/* swapped */
 		m_ram1->configure_entry(1, ram2);

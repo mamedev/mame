@@ -77,7 +77,7 @@ void widgets_manager::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source
 	for (y = 0; y < height; y++)
 	{
 		int linewidth = (y * (halfwidth - 1) + (height / 2)) * 255 * 2 / height;
-		UINT32 *target = &dest.pix32(y, halfwidth);
+		uint32_t *target = &dest.pix32(y, halfwidth);
 
 		// don't antialias if height < 12
 		if (dest.height() < 12)

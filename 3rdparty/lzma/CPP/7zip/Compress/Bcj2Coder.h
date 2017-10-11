@@ -72,7 +72,7 @@ class CDecoder:
   unsigned _extraReadSizes[BCJ2_NUM_STREAMS];
   UInt64 _inStreamsProcessed[BCJ2_NUM_STREAMS];
   HRESULT _readRes[BCJ2_NUM_STREAMS];
-  CMyComPtr<ISequentialInStream> inStreams[BCJ2_NUM_STREAMS];
+  CMyComPtr<ISequentialInStream> _inStreams[BCJ2_NUM_STREAMS];
 
   bool _finishMode;
   bool _outSizeDefined;

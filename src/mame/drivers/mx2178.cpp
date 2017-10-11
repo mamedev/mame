@@ -16,47 +16,41 @@
     - Need schematic / tech manual
     - Gets stuck waiting for E011 to become zero somehow. If you skip that, a status line appears.
     - Doesn't seem to be any dips, looks like all settings and modes are controlled by keystrokes.
+    - 8X305 is a 16-bit Microcontroller which should have an external ROM. It would communicate with
+      the Z80 via a common 8-bit I/O bus. No idea what it is used for here, but in another system it
+      acts as the floppy disk controller.
 
 ***************************************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "machine/keyboard.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class mx2178_state : public driver_device
 {
 public:
-	mx2178_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia"),
-		m_palette(*this, "palette")
+	mx2178_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
-
-protected:
-	virtual void machine_reset() override;
-
 private:
-	UINT8 m_term_data;
-	required_device<z80_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
-public:
+	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
@@ -69,11 +63,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	//AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	//AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
-	AM_RANGE(0xa0, 0xa1) AM_READ(keyin_r)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -81,30 +74,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mx2178 )
 INPUT_PORTS_END
 
-READ8_MEMBER( mx2178_state::keyin_r )
-{
-	if (offset)
-	{
-		UINT8 ret = m_term_data;
-		m_term_data = 0;
-		return ret;
-	}
-	else
-		return (m_term_data) ? 0x83 : 0x82;
-}
-
-WRITE8_MEMBER( mx2178_state::kbd_put )
-{
-	m_term_data = data;
-	m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -146,23 +121,16 @@ GFXDECODE_END
 
 void mx2178_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
-WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
-static MACHINE_CONFIG_START( mx2178, mx2178_state )
+static MACHINE_CONFIG_START( mx2178 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18869600/5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
@@ -177,16 +145,18 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
 
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 18869600/30)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	/// TODO: hook up acia to keyboard and memory map
-
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mx2178_state, kbd_put))
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mx2178_state, write_acia_clock))
-
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -200,5 +170,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY    FULLNAME        FLAGS
+COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, mx2178_state, 0,    "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )

@@ -19,7 +19,11 @@ WRITE_LINE_MEMBER(spc1000_vdp_exp_device::vdp_interrupt)
 	// nothing here?
 }
 
-static MACHINE_CONFIG_FRAGMENT(scp1000_vdp)
+//-------------------------------------------------
+//  device_add_mconfig
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(spc1000_vdp_exp_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL_10_738635MHz / 2) // TODO: which clock?
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -28,21 +32,12 @@ static MACHINE_CONFIG_FRAGMENT(scp1000_vdp)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  device_mconfig_additions
-//-------------------------------------------------
-
-machine_config_constructor spc1000_vdp_exp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( scp1000_vdp );
-}
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPC1000_VDP_EXP = &device_creator<spc1000_vdp_exp_device>;
+DEFINE_DEVICE_TYPE(SPC1000_VDP_EXP, spc1000_vdp_exp_device, "spc1000_vdp_exp", "SPC1000 VDP expansion")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,10 +47,10 @@ const device_type SPC1000_VDP_EXP = &device_creator<spc1000_vdp_exp_device>;
 //  spc1000_vdp_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_vdp_exp_device::spc1000_vdp_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, SPC1000_VDP_EXP, "SPC1000 VDP expansion", tag, owner, clock, "spc1000_vdp_exp", __FILE__),
-			device_spc1000_card_interface(mconfig, *this),
-			m_vdp(*this, "tms")
+spc1000_vdp_exp_device::spc1000_vdp_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SPC1000_VDP_EXP, tag, owner, clock)
+	, device_spc1000_card_interface(mconfig, *this)
+	, m_vdp(*this, "tms")
 {
 }
 

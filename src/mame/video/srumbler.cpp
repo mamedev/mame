@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 {
-	UINT8 attr = m_foregroundram[2*tile_index];
+	uint8_t attr = m_foregroundram[2*tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			m_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
 			(attr & 0x3c) >> 2,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 {
-	UINT8 attr = m_backgroundram[2*tile_index];
+	uint8_t attr = m_backgroundram[2*tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			m_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
@@ -110,7 +110,7 @@ WRITE8_MEMBER(srumbler_state::scroll_w)
 
 void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	/* Draw the sprites. */
@@ -155,7 +155,7 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(bitmap,cliprect);

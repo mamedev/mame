@@ -12,19 +12,20 @@
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
 
-const device_type AMIGA_FDC = &device_creator<amiga_fdc>;
+DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
 
-FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
+FLOPPY_FORMATS_MEMBER( amiga_fdc_device::floppy_formats )
 	FLOPPY_ADF_FORMAT
 FLOPPY_FORMATS_END
 
-amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__),
-	m_write_index(*this), floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
+amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, AMIGA_FDC, tag, owner, clock),
+	m_write_index(*this),
+	floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
 
-void amiga_fdc::device_start()
+void amiga_fdc_device::device_start()
 {
 	m_write_index.resolve_safe();
 
@@ -43,7 +44,7 @@ void amiga_fdc::device_start()
 }
 
 
-void amiga_fdc::device_reset()
+void amiga_fdc_device::device_reset()
 {
 	floppy = nullptr;
 	dsklen = 0x4000;
@@ -59,7 +60,7 @@ void amiga_fdc::device_reset()
 	live_abort();
 }
 
-void amiga_fdc::dma_done()
+void amiga_fdc_device::dma_done()
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 	if(dskbyt & 0x2000) {
@@ -71,7 +72,7 @@ void amiga_fdc::dma_done()
 	state->custom_chip_w(REG_INTREQ, INTENA_SETCLR | INTENA_DSKBLK);
 }
 
-void amiga_fdc::dma_write(UINT16 value)
+void amiga_fdc_device::dma_write(uint16_t value)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 	state->chip_ram_w(dskpt, value);
@@ -85,10 +86,10 @@ void amiga_fdc::dma_write(UINT16 value)
 		dma_done();
 }
 
-UINT16 amiga_fdc::dma_read()
+uint16_t amiga_fdc_device::dma_read()
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
-	UINT16 res = state->chip_ram_r(dskpt);
+	uint16_t res = state->chip_ram_r(dskpt);
 
 	dskpt += 2;
 	dsklen--;
@@ -102,7 +103,7 @@ UINT16 amiga_fdc::dma_read()
 	return res;
 }
 
-void amiga_fdc::live_start()
+void amiga_fdc_device::live_start()
 {
 	cur_live.tm = machine().time();
 	cur_live.state = RUNNING;
@@ -116,25 +117,25 @@ void amiga_fdc::live_start()
 	live_run();
 }
 
-void amiga_fdc::checkpoint()
+void amiga_fdc_device::checkpoint()
 {
 	cur_live.pll.commit(floppy, cur_live.tm);
 	checkpoint_live = cur_live;
 }
 
-void amiga_fdc::rollback()
+void amiga_fdc_device::rollback()
 {
 	cur_live = checkpoint_live;
 }
 
-void amiga_fdc::live_delay(int state)
+void amiga_fdc_device::live_delay(int state)
 {
 	cur_live.next_state = state;
 	if(cur_live.tm != machine().time())
 		t_gen->adjust(cur_live.tm - machine().time());
 }
 
-void amiga_fdc::live_sync()
+void amiga_fdc_device::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
@@ -159,7 +160,7 @@ void amiga_fdc::live_sync()
 	}
 }
 
-void amiga_fdc::live_abort()
+void amiga_fdc_device::live_abort()
 {
 	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
 		rollback();
@@ -172,7 +173,7 @@ void amiga_fdc::live_abort()
 	cur_live.next_state = -1;
 }
 
-void amiga_fdc::live_run(const attotime &limit)
+void amiga_fdc_device::live_run(const attotime &limit)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 
@@ -199,7 +200,7 @@ void amiga_fdc::live_run(const attotime &limit)
 				}
 
 				if(cur_live.bit_counter > 8)
-					fatalerror("amiga_fdc::live_run - cur_live.bit_counter > 8\n");
+					fatalerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n");
 
 				if(cur_live.bit_counter == 8) {
 					live_delay(RUNNING_SYNCPOINT);
@@ -222,7 +223,7 @@ void amiga_fdc::live_run(const attotime &limit)
 					return;
 				cur_live.bit_counter++;
 				if(cur_live.bit_counter > 8)
-					fatalerror("amiga_fdc::live_run - cur_live.bit_counter > 8\n");
+					fatalerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n");
 
 				if(cur_live.bit_counter == 8) {
 					live_delay(RUNNING_SYNCPOINT);
@@ -284,7 +285,7 @@ void amiga_fdc::live_run(const attotime &limit)
 				}
 			} else {
 				if(cur_live.bit_counter != 8)
-					fatalerror("amiga_fdc::live_run - cur_live.bit_counter != 8\n");
+					fatalerror("amiga_fdc_device::live_run - cur_live.bit_counter != 8\n");
 				cur_live.bit_counter = 0;
 
 				switch(dma_state) {
@@ -311,12 +312,12 @@ void amiga_fdc::live_run(const attotime &limit)
 	}
 }
 
-bool amiga_fdc::dma_enabled()
+bool amiga_fdc_device::dma_enabled()
 {
 	return (dsklen & 0x8000) && ((dmacon & 0x0210) == 0x0210);
 }
 
-void amiga_fdc::dma_check()
+void amiga_fdc_device::dma_check()
 {
 	bool was_writing = dskbyt & 0x2000;
 	dskbyt &= 0x9fff;
@@ -347,19 +348,19 @@ void amiga_fdc::dma_check()
 
 }
 
-void amiga_fdc::adkcon_set(UINT16 data)
+void amiga_fdc_device::adkcon_set(uint16_t data)
 {
 	live_sync();
 	adkcon = data;
 	live_run();
 }
 
-UINT16 amiga_fdc::adkcon_r(void)
+uint16_t amiga_fdc_device::adkcon_r(void)
 {
 	return adkcon;
 }
 
-void amiga_fdc::dsklen_w(UINT16 data)
+void amiga_fdc_device::dsklen_w(uint16_t data)
 {
 	live_sync();
 	if(!(data & 0x8000) || (data == pre_dsklen)) {
@@ -371,38 +372,38 @@ void amiga_fdc::dsklen_w(UINT16 data)
 	live_run();
 }
 
-void amiga_fdc::dskpth_w(UINT16 data)
+void amiga_fdc_device::dskpth_w(uint16_t data)
 {
 	live_sync();
 	dskpt = (dskpt & 0xffff) | (data << 16);
 	live_run();
 }
 
-void amiga_fdc::dskptl_w(UINT16 data)
+void amiga_fdc_device::dskptl_w(uint16_t data)
 {
 	live_sync();
 	dskpt = (dskpt & 0xffff0000) | data;
 	live_run();
 }
 
-UINT16 amiga_fdc::dskpth_r()
+uint16_t amiga_fdc_device::dskpth_r()
 {
 	return dskpt >> 16;
 }
 
-UINT16 amiga_fdc::dskptl_r()
+uint16_t amiga_fdc_device::dskptl_r()
 {
 	return dskpt;
 }
 
-void amiga_fdc::dsksync_w(UINT16 data)
+void amiga_fdc_device::dsksync_w(uint16_t data)
 {
 	live_sync();
 	dsksync = data;
 	live_run();
 }
 
-void amiga_fdc::dmacon_set(UINT16 data)
+void amiga_fdc_device::dmacon_set(uint16_t data)
 {
 	live_sync();
 	dmacon = data;
@@ -410,20 +411,20 @@ void amiga_fdc::dmacon_set(UINT16 data)
 	live_run();
 }
 
-UINT16 amiga_fdc::dskbytr_r()
+uint16_t amiga_fdc_device::dskbytr_r()
 {
-	UINT16 res = dskbyt;
+	uint16_t res = dskbyt;
 	dskbyt &= 0x7fff;
 	return res;
 }
 
-void amiga_fdc::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void amiga_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
 	live_run();
 }
 
-void amiga_fdc::setup_leds()
+void amiga_fdc_device::setup_leds()
 {
 	if(floppy) {
 		int drive =
@@ -442,7 +443,7 @@ void amiga_fdc::setup_leds()
 	}
 }
 
-WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
+WRITE8_MEMBER( amiga_fdc_device::ciaaprb_w )
 {
 	floppy_image_device *old_floppy = floppy;
 
@@ -463,7 +464,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 		if(old_floppy)
 			old_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		if(floppy)
-			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(amiga_fdc::index_callback), this));
+			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&amiga_fdc_device::index_callback, this));
 	}
 
 	if(floppy) {
@@ -484,9 +485,9 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 	live_run();
 }
 
-UINT8 amiga_fdc::ciaapra_r()
+uint8_t amiga_fdc_device::ciaapra_r()
 {
-	UINT8 ret = 0x3c;
+	uint8_t ret = 0x3c;
 	if(floppy) {
 		//if(!floppy->ready_r()) fixit: seems to not work well with multiple disk drives
 			ret &= ~0x20;
@@ -501,19 +502,19 @@ UINT8 amiga_fdc::ciaapra_r()
 	return ret;
 }
 
-void amiga_fdc::index_callback(floppy_image_device *floppy, int state)
+void amiga_fdc_device::index_callback(floppy_image_device *floppy, int state)
 {
 	/* Issue a index pulse when a disk revolution completes */
 	m_write_index(!state);
 }
 
-void amiga_fdc::pll_t::set_clock(const attotime &period)
+void amiga_fdc_device::pll_t::set_clock(const attotime &period)
 {
 	for(int i=0; i<38; i++)
 		delays[i] = period*(i+1);
 }
 
-void amiga_fdc::pll_t::reset(const attotime &when)
+void amiga_fdc_device::pll_t::reset(const attotime &when)
 {
 	counter = 0;
 	increment = 146;
@@ -527,7 +528,7 @@ void amiga_fdc::pll_t::reset(const attotime &when)
 	freq_sub  = 0x00;
 }
 
-int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
+int amiga_fdc_device::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	attotime when = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 
@@ -538,7 +539,7 @@ int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, co
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
 			transition_time = counter;
 		if(slot < 8) {
-			UINT8 mask = 1 << slot;
+			uint8_t mask = 1 << slot;
 			if(phase_add & mask)
 				counter += 258;
 			else if(phase_sub & mask)
@@ -562,15 +563,15 @@ int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, co
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
-		static const UINT8 pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
-		static const UINT8 phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
-		static const UINT8 freqa[4][8] = {
+		static const uint8_t pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
+		static const uint8_t phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
+		static const uint8_t freqa[4][8] = {
 			{ 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0, 0, 0 }
 		};
-		static const UINT8 freqs[4][8] = {
+		static const uint8_t freqs[4][8] = {
 			{ 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
@@ -601,19 +602,19 @@ int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, co
 	return bit;
 }
 
-void amiga_fdc::pll_t::start_writing(const attotime & tm)
+void amiga_fdc_device::pll_t::start_writing(const attotime & tm)
 {
 	write_start_time = tm;
 	write_position = 0;
 }
 
-void amiga_fdc::pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
+void amiga_fdc_device::pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	commit(floppy, tm);
 	write_start_time = attotime::never;
 }
 
-bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
+bool amiga_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	if(write_start_time.is_never()) {
 		write_start_time = ctime;
@@ -624,7 +625,7 @@ bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_devic
 		attotime etime = ctime+delays[slot];
 		if(etime > limit)
 			return true;
-		UINT16 pre_counter = counter;
+		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
 			if(write_position < ARRAY_LENGTH(write_buffer))
@@ -644,7 +645,7 @@ bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_devic
 }
 
 
-void amiga_fdc::pll_t::commit(floppy_image_device *floppy, const attotime &tm)
+void amiga_fdc_device::pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
 	if(write_start_time.is_never() || tm == write_start_time)
 		return;

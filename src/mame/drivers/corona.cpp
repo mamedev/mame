@@ -300,6 +300,18 @@
 **************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "re800.lh"
+#include "luckyrlt.lh"
+
+
 #define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
 #define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
 #define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
@@ -307,15 +319,6 @@
 #define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
 #define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 #define VIDEOBUF_SIZE       512*512
-
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "machine/gen_latch.h"
-#include "machine/nvram.h"
-#include "re800.lh"
-#include "luckyrlt.lh"
 
 
 class corona_state : public driver_device
@@ -328,13 +331,13 @@ public:
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	UINT8 m_blitter_x_reg;
-	UINT8 m_blitter_y_reg;
-	UINT8 m_blitter_aux_reg;
-	UINT8 m_blitter_unk_reg;
-	std::unique_ptr<UINT8[]> m_videobuf;
-	UINT8 m_lamp;
-	UINT8 m_lamp_old;
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
 	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
@@ -351,8 +354,8 @@ public:
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(corona);
-	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -366,7 +369,7 @@ public:
 
 PALETTE_INIT_MEMBER(corona_state, corona)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -465,10 +468,10 @@ WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
 
 void corona_state::video_start()
 {
-	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 }
 
-UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -479,7 +482,7 @@ UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -1340,7 +1343,7 @@ INPUT_PORTS_END
 *             Machine Drivers              *
 *******************************************/
 
-static MACHINE_CONFIG_START( winner81, corona_state )
+static MACHINE_CONFIG_START( winner81 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
@@ -1375,7 +1378,7 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( winner82, corona_state )
+static MACHINE_CONFIG_START( winner82 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
@@ -1409,7 +1412,7 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( re800, corona_state )
+static MACHINE_CONFIG_START( re800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1444,7 +1447,7 @@ static MACHINE_CONFIG_START( re800, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rcirulet, corona_state )
+static MACHINE_CONFIG_START( rcirulet )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1478,7 +1481,7 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( luckyrlt, corona_state )
+static MACHINE_CONFIG_START( luckyrlt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
@@ -1711,13 +1714,13 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
-GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1982, winner82,  0,        winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  198?, legrandc,  winner82, winner82, winner82, driver_device, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, driver_device, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                      layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
+GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

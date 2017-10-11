@@ -24,9 +24,9 @@ public:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<atari_jsa_i_device> m_jsa;
-	UINT8           m_playfield_tile_bank;
-	UINT16          m_playfield_xscroll;
-	UINT16          m_playfield_yscroll;
+	uint8_t           m_playfield_tile_bank;
+	uint16_t          m_playfield_xscroll;
+	uint16_t          m_playfield_yscroll;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(port1_r);
@@ -36,7 +36,7 @@ public:
 	DECLARE_MACHINE_START(vindictr);
 	DECLARE_MACHINE_RESET(vindictr);
 	DECLARE_VIDEO_START(vindictr);
-	UINT32 screen_update_vindictr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vindictr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( vindictr_paletteram_w );
 
 	static const atari_motion_objects_config s_mob_config;

@@ -36,6 +36,7 @@ public:
 		m_tc0150rod(*this, "tc0150rod"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0110pcr(*this, "tc0110pcr"),
+		m_tc0040ioc(*this, "tc0040ioc"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
@@ -43,17 +44,17 @@ public:
 		m_steer(*this, "STEER") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	int         m_sci_spriteframe;
 	int         m_road_palbank;
 
 	/* misc */
-	UINT16      m_cpua_ctrl;
-	INT32       m_sci_int6;
-	INT32       m_ioc220_port;
-	UINT16      m_eep_latch;
+	uint16_t      m_cpua_ctrl;
+	int32_t       m_sci_int6;
+	int32_t       m_ioc220_port;
+	uint16_t      m_eep_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -64,6 +65,7 @@ public:
 	optional_device<tc0150rod_device> m_tc0150rod;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0110pcr_device> m_tc0110pcr;
+	optional_device<tc0040ioc_device> m_tc0040ioc;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
@@ -74,14 +76,13 @@ public:
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
+	DECLARE_WRITE8_MEMBER(spacegun_eeprom_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
 	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
 	DECLARE_READ16_MEMBER(bshark_stick_r);
 	DECLARE_READ16_MEMBER(nightstr_stick_r);
 	DECLARE_WRITE16_MEMBER(bshark_stick_w);
 	DECLARE_READ16_MEMBER(sci_steer_input_r);
-	DECLARE_READ16_MEMBER(spacegun_input_bypass_r);
 	DECLARE_READ16_MEMBER(spacegun_lightgun_r);
 	DECLARE_WRITE16_MEMBER(spacegun_lightgun_w);
 	DECLARE_WRITE16_MEMBER(spacegun_gun_output_w);
@@ -89,6 +90,7 @@ public:
 	DECLARE_READ16_MEMBER(chasehq_motor_r);
 	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
 	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ16_MEMBER(aquajack_unknown_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
@@ -104,14 +106,14 @@ public:
 	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(bshark);
-	UINT32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
 	void contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );

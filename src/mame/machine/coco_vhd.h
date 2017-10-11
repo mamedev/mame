@@ -8,9 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef COCOVHD_H
-#define COCOVHD_H
+#ifndef MAME_MACHINE_COCO_VHD_H
+#define MAME_MACHINE_COCO_VHD_H
 
+#pragma once
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -23,7 +24,7 @@ class coco_vhd_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~coco_vhd_image_device();
 
 	// image-level overrides
@@ -41,26 +42,25 @@ public:
 	// specific implementation
 	DECLARE_READ8_MEMBER(read) { return read(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }
-	UINT8 read(offs_t offset);
-	void write(offs_t offset, UINT8 data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
-	void coco_vhd_readwrite(UINT8 data);
+	void coco_vhd_readwrite(uint8_t data);
 
 private:
 	cpu_device *            m_cpu;
 	address_space *         m_cpu_space;
-	UINT32                  m_logical_record_number;
-	UINT32                  m_buffer_address;
-	UINT8                   m_status;
+	uint32_t                  m_logical_record_number;
+	uint32_t                  m_buffer_address;
+	uint8_t                   m_status;
 };
 
 // device type definition
-extern const device_type COCO_VHD;
+DECLARE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -68,4 +68,5 @@ extern const device_type COCO_VHD;
 
 #define MCFG_COCO_VHD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0)
-#endif /* COCOVHD_H */
+
+#endif // MAME_MACHINE_COCO_VHD_H

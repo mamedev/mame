@@ -9,20 +9,16 @@
 #ifndef __OSDWINDOW__
 #define __OSDWINDOW__
 
-#include "emu.h"
 #include "render.h"
 #include "osdhelper.h"
 #include "../frontend/mame/ui/menuitem.h"
 
 // standard windows headers
 #ifdef OSD_WINDOWS
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <mmsystem.h>
 #endif
-#undef min
-#undef max
 
 #ifdef OSD_SDL
 // forward declaration
@@ -71,17 +67,18 @@ class osd_window : public std::enable_shared_from_this<osd_window>
 public:
 	osd_window(const osd_window_config &config)
 	:
-#ifndef OSD_SDL
+#ifdef OSD_WINDOWS
 		m_dc(nullptr), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
 		m_win_config(config),
 		m_index(0),
 		m_prescale(1),
-		m_platform_window(nullptr),
 		m_renderer(nullptr),
 		m_main(nullptr)
 		{}
+
+	virtual ~osd_window() { }
 
 	virtual render_target *target() = 0;
 	virtual int fullscreen() const = 0;
@@ -112,15 +109,6 @@ public:
 
 	virtual osd_monitor_info *monitor() const = 0;
 
-	template <class TWindow>
-	TWindow platform_window() const { return static_cast<TWindow>(m_platform_window); }
-
-	void set_platform_window(void *window)
-	{
-		assert(window == nullptr || m_platform_window == nullptr);
-		m_platform_window = window;
-	}
-
 	std::shared_ptr<osd_window> main_window() const { return m_main;    }
 	void set_main_window(std::shared_ptr<osd_window> main) { m_main = main; }
 
@@ -136,24 +124,45 @@ public:
 	virtual void update() = 0;
 	virtual void destroy() = 0;
 
-#ifndef OSD_SDL
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 	virtual bool win_has_menu() = 0;
-
-	HDC                     m_dc;       // only used by GDI renderer!
-
-	int                     m_resize_state;
 #endif
 
+#ifdef OSD_WINDOWS
+	HDC                     m_dc;       // only used by GDI renderer!
+	int                     m_resize_state;
+#endif
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
 	int                     m_index;
 protected:
 	int                     m_prescale;
 private:
-	void                           *m_platform_window;
 	std::unique_ptr<osd_renderer>  m_renderer;
 	std::shared_ptr<osd_window>    m_main;
 };
+
+template <class TWindowHandle>
+class osd_window_t : public osd_window
+{
+private:
+	TWindowHandle m_platform_window;
+public:
+	osd_window_t(const osd_window_config &config)
+		: osd_window(config),
+		m_platform_window(nullptr)
+	{
+	}
+
+	TWindowHandle platform_window() const { return m_platform_window; }
+
+	void set_platform_window(TWindowHandle window)
+	{
+		assert(window == nullptr || m_platform_window == nullptr);
+		m_platform_window = window;
+	}
+};
+
 
 class osd_renderer
 {
@@ -196,7 +205,7 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) { }
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) { }
 	virtual std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };

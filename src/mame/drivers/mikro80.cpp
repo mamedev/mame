@@ -11,11 +11,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "includes/mikro80.h"
 #include "formats/rk_cas.h"
-#include "sound/dac.h"
+#include "includes/mikro80.h"
+#include "sound/volt_reg.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )
@@ -41,7 +43,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( radio99_io , AS_IO, 8, mikro80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
-	AM_RANGE( 0x04, 0x04) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE( 0x04, 0x04) AM_WRITE(radio99_sound_w)
 	AM_RANGE( 0x05, 0x05) AM_READWRITE(mikro80_8255_portc_r, mikro80_8255_portc_w )
 	AM_RANGE( 0x06, 0x06) AM_READ(mikro80_8255_portb_r)
 	AM_RANGE( 0x07, 0x07) AM_WRITE(mikro80_8255_porta_w)
@@ -158,7 +160,7 @@ static GFXDECODE_START( mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikro80, mikro80_state )
+static MACHINE_CONFIG_START( mikro80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
@@ -181,9 +183,9 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rk8_cassette_formats)
@@ -199,8 +201,9 @@ static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(radio99_io)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kristall, mikro80 )
@@ -234,7 +237,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80,     0,      0, mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
-COMP( 1993, radio99, mikro80,    0, radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
-COMP( 1987, kristall2, mikro80,  0, kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    STATE          INIT     COMPANY      FULLNAME       FLAGS */
+COMP( 1983, mikro80,   0,       0,      mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
+COMP( 1993, radio99,   mikro80, 0,      radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
+COMP( 1987, kristall2, mikro80, 0,      kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)

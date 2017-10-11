@@ -8,12 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_74181_H
+#define MAME_MACHINE_74181_H
+
 #pragma once
 
-#ifndef __74181_H__
-#define __74181_H__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -33,17 +32,17 @@ class ttl74181_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inputs
-	void input_a_w(UINT8 data);
-	void input_b_w(UINT8 data);
-	void select_w(UINT8 data);
+	void input_a_w(uint8_t data);
+	void input_b_w(uint8_t data);
+	void select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( mode_w );
 	DECLARE_WRITE_LINE_MEMBER( carry_w );
 
 	// outputs
-	UINT8 function_r() { return m_f; }
+	uint8_t function_r() { return m_f; }
 	DECLARE_READ_LINE_MEMBER( carry_r ) { return m_cn; }
 	DECLARE_READ_LINE_MEMBER( generate_r ) { return m_g; }
 	DECLARE_READ_LINE_MEMBER( propagate_r ) { return m_p; }
@@ -58,14 +57,14 @@ private:
 	void update();
 
 	// inputs
-	UINT8 m_a;
-	UINT8 m_b;
-	UINT8 m_s;
+	uint8_t m_a;
+	uint8_t m_b;
+	uint8_t m_s;
 	int m_m;
 	int m_c;
 
 	// outputs
-	UINT8 m_f;
+	uint8_t m_f;
 	int m_cn;
 	int m_g;
 	int m_p;
@@ -74,7 +73,6 @@ private:
 
 
 // device type definition
-extern const device_type TTL74181;
+DECLARE_DEVICE_TYPE(TTL74181, ttl74181_device)
 
-
-#endif  /* __74181_H__ */
+#endif // MAME_MACHINE_74181_H

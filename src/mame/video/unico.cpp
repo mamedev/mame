@@ -55,7 +55,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_MEMBER(unico_state::unico_palette_w)
 {
-	UINT16 data1, data2;
+	uint16_t data1, data2;
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	data1 = m_generic_paletteram_16[offset & ~1];
 	data2 = m_generic_paletteram_16[offset |  1];
@@ -67,7 +67,7 @@ WRITE16_MEMBER(unico_state::unico_palette_w)
 
 WRITE32_MEMBER(unico_state::unico_palette32_w)
 {
-	UINT32 rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	uint32_t rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_palette->set_pen_color( offset,
 			(rgb0 >> 24) & 0xFC,
 			(rgb0 >> 16) & 0xFC,
@@ -92,9 +92,9 @@ WRITE32_MEMBER(unico_state::unico_palette32_w)
 
 TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 {
-	UINT16 *vram = (UINT16 *)tilemap.user_data();
-	UINT16 code = vram[2 * tile_index + 0 ];
-	UINT16 attr = vram[2 * tile_index + 1 ];
+	uint16_t *vram = (uint16_t *)tilemap.user_data();
+	uint16_t code = vram[2 * tile_index + 0 ];
+	uint16_t attr = vram[2 * tile_index + 1 ];
 	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
@@ -102,7 +102,7 @@ READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
 
 WRITE16_MEMBER(unico_state::unico_vram_w)
 {
-	UINT16 *vram = m_vram.get();
+	uint16_t *vram = m_vram.get();
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
 	m_tilemap[tile]->mark_tile_dirty((offset & 0x1fff)/2);
@@ -127,9 +127,9 @@ WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offs
 
 VIDEO_START_MEMBER(unico_state,unico)
 {
-	m_vram   = make_unique_clear<UINT16[]>(0xc000 / 2);
-	m_scroll = make_unique_clear<UINT16[]>(0x18 / 2);
-	m_spriteram = make_unique_clear<UINT16[]>(0x800 / 2);
+	m_vram   = make_unique_clear<uint16_t[]>(0xc000 / 2);
+	m_scroll = make_unique_clear<uint16_t[]>(0x18 / 2);
+	m_spriteram = make_unique_clear<uint16_t[]>(0x800 / 2);
 
 	save_pointer(NAME(m_vram.get()), 0xc000/2);
 	save_pointer(NAME(m_scroll.get()), 0x18/2);
@@ -194,7 +194,7 @@ VIDEO_START_MEMBER(unico_state,unico)
 
 void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram.get();
+	uint16_t *spriteram16 = m_spriteram.get();
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
@@ -255,7 +255,7 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-UINT32 unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

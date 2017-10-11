@@ -26,12 +26,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_IMI7000_IMI7000_H
+#define MAME_BUS_IMI7000_IMI7000_H
+
 #pragma once
 
-#ifndef __IMI7000_BUS__
-#define __IMI7000_BUS__
-
-#include "emu.h"
 
 
 
@@ -74,7 +73,7 @@ class imi7000_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -91,7 +90,7 @@ class imi7000_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -107,24 +106,20 @@ class device_imi7000_interface : public device_slot_card_interface
 {
 	friend class imi7000_slot_device;
 
-public:
+protected:
 	// construction/destruction
 	device_imi7000_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_imi7000_interface() { }
 
-protected:
 	imi7000_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type IMI7000_BUS;
-extern const device_type IMI7000_SLOT;
+DECLARE_DEVICE_TYPE(IMI7000_BUS,  imi7000_bus_device)
+DECLARE_DEVICE_TYPE(IMI7000_SLOT, imi7000_slot_device)
 
 
 // slot interface
 SLOT_INTERFACE_EXTERN( imi7000_devices );
 
-
-
-#endif
+#endif // MAME_BUS_IMI7000_IMI7000_H

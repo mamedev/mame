@@ -29,9 +29,9 @@ const char *svi_format::extensions() const
 	return "dsk";
 }
 
-int svi_format::identify(io_generic *io, UINT32 form_factor)
+int svi_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 
 	if (size == 172032 || size == 346112)
 		return 50;
@@ -39,9 +39,9 @@ int svi_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool svi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	int head_count;
 
 	switch (size)
@@ -61,7 +61,7 @@ bool svi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			int sector_size = (track == 0 && head == 0) ? 128 : 256;
 
 			desc_pc_sector sectors[20];
-			UINT8 sector_data[5000];
+			uint8_t sector_data[5000];
 			int sector_offset = 0;
 
 			for (int i = 0; i < sector_count; i++)
@@ -93,11 +93,11 @@ bool svi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 bool svi_format::save(io_generic *io, floppy_image *image)
 {
-	UINT8 bitstream[500000/8];
-	UINT8 sector_data[50000];
+	uint8_t bitstream[500000/8];
+	uint8_t sector_data[50000];
 	desc_xs sectors[256];
 	int track_size;
-	UINT64 file_offset = 0;
+	uint64_t file_offset = 0;
 
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);

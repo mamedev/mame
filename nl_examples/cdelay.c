@@ -37,7 +37,7 @@ NETLIST_START(cap_delay)
     SOLVER(Solver, P_FREQ)
     PARAM(Solver.ACCURACY, 1e-20)
 	PARAM(Solver.DYNAMIC_TS, P_DTS)
-	PARAM(Solver.MIN_TIMESTEP, 1e-6)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-6)
     CLOCK(clk, 5000)
 
     TTL_7400_NAND(n1,clk,clk)

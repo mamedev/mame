@@ -362,7 +362,7 @@ void hash_collection::begin(const char *types)
 //  buffer - add the given buffer to the hash
 //-------------------------------------------------
 
-void hash_collection::buffer(const UINT8 *data, UINT32 length)
+void hash_collection::buffer(const uint8_t *data, uint32_t length)
 {
 	assert(m_creator != nullptr);
 

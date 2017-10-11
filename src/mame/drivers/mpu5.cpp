@@ -44,7 +44,10 @@
 
 #include "emu.h"
 
+#include "machine/68340.h"
 #include "machine/sec.h"
+#include "speaker.h"
+
 #include "mpu5.lh"
 
 // MFME2MAME layouts:
@@ -196,8 +199,6 @@
 #include "m5xfact11.lh"
 
 
-#include "machine/68340.h"
-
 class mpu5_state : public driver_device
 {
 public:
@@ -205,20 +206,20 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
 
-	UINT8 m_led_strobe_temp;
-	UINT8 m_led_strobe;
-	UINT8 m_pic_clk;
+	uint8_t m_led_strobe_temp;
+	uint8_t m_led_strobe;
+	uint8_t m_pic_clk;
 	bool  m_pic_transfer_in_progress;
-	UINT8 m_pic_bit1;
-	UINT8 m_pic_data;
-	UINT8 m_pic_clocked_bits;
-	UINT8 m_pic_stored_input;
-	UINT8 m_pic_output_bit;
-	UINT8 m_input_strobe;
+	uint8_t m_pic_bit1;
+	uint8_t m_pic_data;
+	uint8_t m_pic_clocked_bits;
+	uint8_t m_pic_stored_input;
+	uint8_t m_pic_output_bit;
+	uint8_t m_input_strobe;
 
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
@@ -234,7 +235,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 	virtual void machine_start() override;
 };
 
@@ -269,7 +270,7 @@ READ8_MEMBER(mpu5_state::asic_r8)
 
 READ32_MEMBER(mpu5_state::asic_r32)
 {
-	UINT32 retdata = 0;
+	uint32_t retdata = 0;
 	if (ACCESSING_BITS_24_31) retdata |= asic_r8(space,(offset*4)+0) <<24;
 	if (ACCESSING_BITS_16_23) retdata |= asic_r8(space,(offset*4)+1) <<16;
 	if (ACCESSING_BITS_8_15) retdata |= asic_r8(space,(offset*4)+2) <<8;
@@ -534,13 +535,13 @@ INPUT_PORTS_END
 
 void mpu5_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 	m_pic_output_bit =0;
 }
 
 
-MACHINE_CONFIG_START( mpu5, mpu5_state )
+MACHINE_CONFIG_START( mpu5 )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

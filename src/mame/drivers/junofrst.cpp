@@ -80,17 +80,22 @@ Blitter source graphics
 
 
 #include "emu.h"
+#include "includes/tutankhm.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/konami1.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
-#include "machine/konami1.h"
-#include "includes/konamipt.h"
-#include "includes/tutankhm.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class junofrst_state : public tutankhm_state
@@ -110,7 +115,7 @@ public:
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
 
-	UINT8    m_blitterdata[4];
+	uint8_t    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
@@ -119,9 +124,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
@@ -159,7 +161,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = memregion("gfx1")->base();
+		uint8_t *gfx_rom = memregion("gfx1")->base();
 
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
@@ -173,7 +175,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 
 			for (j = 0; j < 16; j++)
 			{
-				UINT8 data;
+				uint8_t data;
 
 				if (src & 1)
 					data = gfx_rom[src >> 1] & 0x0f;
@@ -241,7 +243,7 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter[i]->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -272,25 +274,6 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::flip_screen_w)
-{
-	tutankhm_flip_screen_x_w(space, 0, data);
-	tutankhm_flip_screen_y_w(space, 0, data);
-}
-
-
-WRITE8_MEMBER(junofrst_state::coincounter_w)
-{
-	machine().bookkeeping().coin_counter_w(offset, data);
-}
-
-WRITE8_MEMBER(junofrst_state::irq_enable_w)
-{
-	m_irq_enable = data & 1;
-	if (!m_irq_enable)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -300,10 +283,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x8031, 0x8032) AM_WRITE(coincounter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_SHARE("scroll")  /* not used in Juno */
-	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x8030, 0x8037) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
@@ -333,8 +313,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 
@@ -392,8 +370,6 @@ MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 {
 	m_i8039_status = 0;
 	m_last_irq = 0;
-	m_flip_x = 0;
-	m_flip_y = 0;
 	m_blitterdata[0] = 0;
 	m_blitterdata[1] = 0;
 	m_blitterdata[2] = 0;
@@ -408,7 +384,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( junofrst, junofrst_state )
+static MACHINE_CONFIG_START( junofrst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
@@ -421,6 +397,16 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(junofrst_state, i8039_irqen_and_status_w))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(junofrst_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(junofrst_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(junofrst_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(junofrst_state, flip_screen_x_w)) // HFF
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(junofrst_state, flip_screen_y_w)) // VFLIP
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -439,7 +425,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -451,15 +437,16 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_FILTER_RC_ADD("filter.0.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_RC_ADD("filter.0.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_RC_ADD("filter.0.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

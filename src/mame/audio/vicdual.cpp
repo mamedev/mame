@@ -111,7 +111,7 @@ static const char *const frogs_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( frogs_audio )
+MACHINE_CONFIG_START( frogs_audio )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(frogs_sample_names)
@@ -445,7 +445,7 @@ static DISCRETE_SOUND_START(headon)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( headon_audio )
+MACHINE_CONFIG_START( headon_audio )
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(headon)
@@ -577,3 +577,56 @@ DISCRETE_SOUND_START(brdrline)
 
 DISCRETE_SOUND_END
 #endif
+
+static const char *const brdrline_sample_names[] =
+{
+	"*brdrline",
+	"boot_and_start",
+	"coin",
+	"crashes",
+	"end_level",
+	"engine_noise",
+	"field",
+	"fire",
+	nullptr
+};
+
+
+MACHINE_CONFIG_START( brdrline_audio )
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(7)
+	MCFG_SAMPLES_NAMES(brdrline_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+MACHINE_CONFIG_END
+
+WRITE8_MEMBER( vicdual_state::brdrline_audio_w )
+{
+	uint8_t res = data ^ 0xff;
+
+//  if(res & 2) // low fuel, MISSING
+
+	if(res & 8) // end level
+		m_samples->start(3, 3);
+
+	if(res & 0x10)  // moving in the brush
+		m_samples->start(5, 5);
+
+	if(res & 0x20) // fire
+		m_samples->start(6, 6);
+
+	if(res & 0x40)  // car engine noise
+		m_samples->start(4, 4);
+
+	if(res & 0x80)  // crashes
+		m_samples->start(2, 2);
+
+	//printf("%02x\n",res);
+}
+
+WRITE8_MEMBER( vicdual_state::brdrline_audio_aux_w )
+{
+	if(data & 0xfc) // coin, unknown which is the trigger
+		m_samples->start(1, 1);
+	else // boot sample
+		m_samples->start(0, 0);
+}

@@ -3248,6 +3248,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="サイバーボッツ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="cyberbots - fullmetal madness (japan) (1m)" sha1="22a1108b82ba25277ff4b5608a01db48c22fb0bf" />
@@ -3854,6 +3855,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="ダンジョンズ&amp;ドラゴンズ コレクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dungeons &amp; dragons collection (japan) (disc 2) (shadow over mystara)" sha1="c24a2edc0fa685240f9bfa946ec2014fb68bd57f" />
@@ -4112,6 +4114,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fighter's history dynamite (japan)" sha1="106f2ad4175bd1f9ad146c88c871e531b500e529" />
@@ -5260,6 +5263,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19960328"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'95"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:kof95"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '95, the (japan) (2m)" sha1="d8b84be89d9310986ee9a2e4b103ed71d5488d97" />
@@ -5276,6 +5280,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961231"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96, the (japan) (1m)" sha1="1f6515d4e1f69c571f7fafc1985aeaab3dbeebfd" />
@@ -5292,6 +5297,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961231"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96, the (japan) (4m, 5m)" sha1="411729d792a5c85a15d4de474180ab1654b2233b" />
@@ -5838,6 +5844,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19981022"/>
 		<info name="alt_title" value="マーヴル・スーパーヒーローズVS.ストリートファイター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="marvel super heroes vs. street fighter (japan)" sha1="920804c2a58bdb31c2c097475c34eaab46c68924" />
@@ -5870,6 +5877,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="メタルスラッグ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="metal slug - super vehicle-001 (japan)" sha1="5080a12568fbbebd2a1e3268bc697c47e66431c9" />
@@ -6747,6 +6755,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971223"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu special (japan) (en,ja)" sha1="13061474648552f146d24eb41f7b630f67bb6c71" />
@@ -7143,6 +7152,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971002"/>
 		<info name="alt_title" value="サムライスピリッツ 天草降臨"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai spirits - amakusa kourin (japan) (en,ja,es,pt)" sha1="d8a1908ad687a563eaa1a9c6d50f7132c7ab1dbc" />
@@ -8266,6 +8276,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19990805"/>
 		<info name="alt_title" value="ストリートファイターZERO3"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="street fighter zero 3 (japan)" sha1="7e2b2df23e5b57f49ab5ef7eb3f0a2ebb5c64e4c" />
@@ -8904,6 +8915,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="ヴァンパイア セイヴァー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vampire savior (japan)" sha1="1d0e40563287dc68b578d66e9503e1d28a3cbc7f" />
@@ -9417,6 +9429,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="エックスメンVS.ストリートファイター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="x-men vs. street fighter (japan) (1m)" sha1="5c924d2d4c8d226d1ec226246635672533fc1ee6" />
@@ -10413,6 +10426,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="メタルスラッグ (拡張ラム同梱「お買得セット」!!)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="doukonban ~ metal slug (jpn) (v1.002) (dw0073)" sha1="87a67eb5ae98632c951b6a953732b2eeb964ad23" />
@@ -10777,6 +10791,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19990429"/>
 		<info name="alt_title" value="フレンズ ～青春の輝き～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="friends - seishun no kagayaki (disc 1 of 2) (jpn) (dw0602)" sha1="7ade215fb7f07d4fb8adb6422fc91a67eb9a67e7" />
@@ -11491,6 +11506,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19960328"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'95"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:kof95"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '95, the (jpn) (dw0289)" sha1="502c80946144135fb83799b329340a8ed3de935a" />
@@ -11507,6 +11523,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961231"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96, the (jpn) (dw0139)" sha1="75b0ec646ea1731940fddb2b03c503f1672ee927" />
@@ -11523,6 +11540,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'97"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '97, the (jpn) (dw0540)" sha1="12aa5c5da5b4d7138bc0919c90e099024e6fbeb3" />
@@ -12558,6 +12576,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971223"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu special (jpn) (v1.001) (dw0140)" sha1="cfc47f91a8e8875fc46999216ec231d2be4e7911" />
@@ -12705,6 +12724,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971002"/>
 		<info name="alt_title" value="サムライスピリッツ 天草降臨"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai spirits amakusa kourin (jpn) (dw0141)" sha1="a0b4e4f1cfb6ceaf62d493c282548fc1182b1a32" />
@@ -13355,6 +13375,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19990805"/>
 		<info name="alt_title" value="ストリートファイターZERO3"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="street fighter zero 3 (jpn) (dw0037)" sha1="2b5ce219199bb3b12dc66dde669fce18e5283417" />
@@ -13998,6 +14019,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="ヴァンパイア セイヴァー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vampire savior (jpn) (dw0133)" sha1="0ed045a10f26351a88199d2589231d580010c743" />
@@ -17177,6 +17199,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19990429"/>
 		<info name="alt_title" value="フレンズ ～青春の輝き～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom1" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="friends - seishun no kagayaki disc 1 (t-20109g)" sha1="7214e6bd1ef8649da012b7ad883921f8cf5ac8bb" />
@@ -17792,6 +17815,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970516"/>
 		<info name="alt_title" value="グルーヴ オン ファイト 豪血寺一族3 (拡張ラムカートリッジ付き!)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="groove on fight ~gouketsuji ichizoku 3~ (doukonban) (t-14413g)" sha1="a1125dcb44f9c3c0c85b60158f1bcb320bb7ef4a" />
@@ -19233,6 +19257,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19981008"/>
 		<info name="alt_title" value="Pia♥キャロットへようこそ!!2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="pia carrot e youkoso!! 2 disc 1 (t-20114g)" sha1="eeacac1c1a8140953b958f91642f3b102cfdf603" />
@@ -19590,6 +19615,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971223"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu special (t-3117g)" sha1="285fd2ff04c7230b775272bbfa62daf353d6057d" />
@@ -19772,6 +19798,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961108"/>
 		<info name="alt_title" value="サムライスピリッツ 斬紅郎無双剣"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai spirits zankourou musouken (doukonban) (t-3104g)" sha1="6d46595e99d9564dbd6eef0d180b689373181072" />
@@ -20990,6 +21017,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961231"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'96"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the king of fighters '96 (t-3108g)" sha1="be76e215308aa77710440be4911160b4c91c32db" />
@@ -21007,6 +21035,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'97 (拡張ラムカートリッジ付き「お買得セット」!!)"/>
 		<info name="serial" value="T-3120G"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the king of fighters '97 (doukonban) (t-3120g)" sha1="d9465bffc585b3246fc44911ed37ee8119d786de" />
@@ -21466,7 +21495,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ウルトラマン 光の巨人伝説"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<sharedfeat name="requirement" value="sat_cart -ultraman"/>
+		<sharedfeat name="requirement" value="sat_cart:ultraman"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultraman (j) (t-13308g)" sha1="1232eee5dc6c2c031a4b3ce34862086f24684dff" />
@@ -22248,6 +22277,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19971127"/>
 		<info name="alt_title" value="エックスメンVS.ストリートファイター (拡張ラムカートリッジ4MB付属)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="x-men vs street fighter (doukonban) (t-1226g)" sha1="fe86897beea653730556b4dd70cecce7a49c0129" />
@@ -24338,6 +24368,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19981022"/>
 		<info name="alt_title" value="マーヴル・スーパーヒーローズVS.ストリートファイター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="marvel super heroes vs street fighter (t-1239g)" sha1="4dd3dfef1a79a64f576a5b841326db9684403c57" />
@@ -27432,6 +27463,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19960920"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout fatal fury (t-3105g)" sha1="27f9249679fb3907c58ed8b1b9acd5aea4ca1bf3" />
@@ -28644,6 +28676,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="20000330"/>
 		<info name="alt_title" value="ファイナルファイトリベンジ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="final fight revenge (japan)" sha1="b4f66aeb4e37310193376d693ba07916c429ed1d" />
@@ -29268,6 +29301,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980806"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説 ベストコレクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu (japan) (snk best collection) [t-3124g] (disc 1)" sha1="1a3753dfa9e81a31d2ddce8ca07993f65939f76e" />
@@ -29284,6 +29318,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19980806"/>
 		<info name="alt_title" value="リアルバウト餓狼伝説 ベストコレクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu (japan) (snk best collection) [t-3124g] (disc 2)" sha1="532444c8b3893e9333cf3c5c9b1788c24cd03dce" />
@@ -29889,6 +29924,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="わくわく7"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wakuwaku_7" sha1="03c82993e9379c16bed956927c023348af00a3c1" />
@@ -31846,7 +31882,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81088-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="sat_cart -kof95"/>
+		<sharedfeat name="requirement" value="sat_cart:kof95"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the king of fighters 95 (euro)" sha1="cdc783b083ab52c104be71259b6e654cbdd7ccca"/>

@@ -32,14 +32,14 @@ public:
 		{}
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_vram_1;
-	required_shared_ptr<UINT16> m_scroll_0;
-	required_shared_ptr<UINT16> m_scroll_1;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_head_layersize;
-	required_shared_ptr<UINT16> m_headpanic_platform_x;
-	required_shared_ptr<UINT16> m_headpanic_platform_y;
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_scroll_0;
+	required_shared_ptr<uint16_t> m_scroll_1;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_head_layersize;
+	required_shared_ptr<uint16_t> m_headpanic_platform_x;
+	required_shared_ptr<uint16_t> m_headpanic_platform_y;
 
 	/* video-related */
 	tilemap_t       *m_tilemap_0_16x16;
@@ -74,6 +74,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
 };

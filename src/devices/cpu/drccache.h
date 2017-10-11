@@ -30,7 +30,7 @@
 //**************************************************************************
 
 // generic code pointer
-typedef UINT8 *drccodeptr;
+typedef uint8_t *drccodeptr;
 
 
 // helper template for oob codegen
@@ -63,7 +63,7 @@ public:
 	void dealloc(void *memory, size_t bytes);
 
 	// codegen helpers
-	drccodeptr *begin_codegen(UINT32 reserve_bytes);
+	drccodeptr *begin_codegen(uint32_t reserve_bytes);
 	drccodeptr end_codegen();
 	void request_oob_codegen(drc_oob_delegate callback, void *param1 = nullptr, void *param2 = nullptr);
 
@@ -72,7 +72,7 @@ private:
 	static const size_t CODEGEN_MAX_BYTES = 65536;
 
 	// minimum alignment, in bytes (must be power of 2)
-	static const size_t CACHE_ALIGNMENT = 8;
+	static const size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
 
 	// largest permanent allocation we allow
 	static const size_t MAX_PERMANENT_ALLOC = 1024;

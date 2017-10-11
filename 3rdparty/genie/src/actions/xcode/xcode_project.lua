@@ -18,8 +18,8 @@
 --
 
 	function xcode.buildprjtree(prj)
-		local tr = premake.project.buildsourcetree(prj)
-		
+		local tr = premake.project.buildsourcetree(prj, true)
+
 		-- create a list of build configurations and assign IDs
 		tr.configs = {}
 		for _, cfgname in ipairs(prj.solution.configurations) do
@@ -31,14 +31,14 @@
 				table.insert(tr.configs, cfg)
 			end
 		end
-		
+
 		-- convert localized resources from their filesystem layout (English.lproj/MainMenu.xib)
 		-- to Xcode's display layout (MainMenu.xib/English).
 		tree.traverse(tr, {
 			onbranch = function(node)
 				if path.getextension(node.name) == ".lproj" then
 					local lang = path.getbasename(node.name)  -- "English", "French", etc.
-					
+
 					-- create a new language group for each file it contains
 					for _, filenode in ipairs(node.children) do
 						local grpnode = node.parent.children[filenode.name]
@@ -46,18 +46,18 @@
 							grpnode = tree.insert(node.parent, tree.new(filenode.name))
 							grpnode.kind = "vgroup"
 						end
-						
+
 						-- convert the file node to a language node and add to the group
 						filenode.name = path.getbasename(lang)
 						tree.insert(grpnode, filenode)
 					end
-					
+
 					-- remove this directory from the tree
 					tree.remove(node)
 				end
 			end
 		})
-		
+
 		-- fix .xcassets files, they should be treated as a file, not a folder
 		tree.traverse(tr, {
 			onbranch = function(node)
@@ -66,7 +66,7 @@
 				end
 			end
 		})
-				
+
 		-- the special folder "Frameworks" lists all linked frameworks
 		tr.frameworks = tree.new("Frameworks")
 		for cfg in premake.eachconfig(prj) do
@@ -78,12 +78,12 @@
 				end
 			end
 		end
-		
+
 		-- only add it to the tree if there are frameworks to link
-		if #tr.frameworks.children > 0 then 
+		if #tr.frameworks.children > 0 then
 			tree.insert(tr, tr.frameworks)
 		end
-		
+
 		-- the special folder "Products" holds the target produced by the project; this
 		-- is populated below
 		tr.products = tree.insert(tr, tree.new("Products"))
@@ -100,7 +100,7 @@
 			xcnode.productproxyid = xcode.newid(xcnode, "prodprox")
 			xcnode.targetproxyid  = xcode.newid(xcnode, "targprox")
 			xcnode.targetdependid = xcode.newid(xcnode, "targdep")
-			
+
 			-- create a grandchild node for the dependency's link target
 			local cfg = premake.getconfig(dep, prj.configurations[1])
 			node = tree.insert(xcnode, tree.new(cfg.linktarget.name))
@@ -117,7 +117,7 @@
 			onnode = function(node)
 				-- assign IDs to every node in the tree
 				node.id = xcode.newid(node)
-				
+
 				-- assign build IDs to buildable files
 				if xcode.getbuildcategory(node) then
 					node.buildid = xcode.newid(node, "build")
@@ -126,7 +126,7 @@
 				-- remember key files that are needed elsewhere
 				if string.endswith(node.name, "Info.plist") then
 					tr.infoplist = node
-				end						
+				end
 				if string.endswith(node.name, ".entitlements") then
 					tr.entitlements = node
 				end
@@ -171,7 +171,7 @@
 		xcode.PBXSourcesBuildPhase(tr,prj)
 		xcode.PBXVariantGroup(tr)
 		xcode.PBXTargetDependency(tr)
-		xcode.XCBuildConfiguration(tr)
+		xcode.XCBuildConfiguration(tr, prj)
 		xcode.XCBuildConfigurationList(tr)
 		xcode.Footer(tr)
 	end

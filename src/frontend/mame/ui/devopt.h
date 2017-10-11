@@ -23,7 +23,7 @@ public:
 	virtual ~menu_device_config() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	device_slot_interface *m_owner;

@@ -42,7 +42,7 @@ J Clegg
 
 PALETTE_INIT_MEMBER(travrusa_state, travrusa)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -108,14 +108,14 @@ PALETTE_INIT_MEMBER(travrusa_state, travrusa)
 	/* sprites */
 	for (i = 0x80; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
+		uint8_t ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -181,7 +181,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 	/* sprites */
 	for (i = 0x80; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
+		uint8_t ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -196,7 +196,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 
 TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 {
-	UINT8 attr = m_videoram[2 * tile_index + 1];
+	uint8_t attr = m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
 	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;   /* tunnels */
@@ -322,7 +322,7 @@ void travrusa_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 }
 
 
-UINT32 travrusa_state::screen_update_travrusa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t travrusa_state::screen_update_travrusa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(bitmap,cliprect);

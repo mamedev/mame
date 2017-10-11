@@ -35,16 +35,16 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 #include "disk.h"
 
 
-const device_type MSX_SLOT_DISK1 = &device_creator<msx_slot_disk1_device>;
-const device_type MSX_SLOT_DISK2 = &device_creator<msx_slot_disk2_device>;
-const device_type MSX_SLOT_DISK3 = &device_creator<msx_slot_disk3_device>;
-const device_type MSX_SLOT_DISK4 = &device_creator<msx_slot_disk4_device>;
-const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
-const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK1, msx_slot_disk1_device, "msx_slot_disk1", "MSX Internal floppy type 1")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK2, msx_slot_disk2_device, "msx_slot_disk2", "MSX Internal floppy type 2")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK3, msx_slot_disk3_device, "msx_slot_disk3", "MSX Internal floppy type 3")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device, "msx_slot_disk4", "MSX Internal floppy type 4")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device, "msx_slot_disk5", "MSX Internal floppy type 5")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device, "msx_slot_disk6", "MSX Internal floppy type 6")
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_floppy0(nullptr)
 	, m_floppy1(nullptr)
 	, m_floppy2(nullptr)
@@ -80,8 +80,8 @@ void msx_slot_disk_device::device_start()
 }
 
 
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(nullptr)
 {
 }
@@ -91,7 +91,7 @@ void msx_slot_wd_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
 
-	m_fdc = owner()->subdevice<wd_fdc_analog_t>(m_fdc_tag);
+	m_fdc = owner()->subdevice<wd_fdc_analog_device_base>(m_fdc_tag);
 
 	if (m_fdc == nullptr)
 	{
@@ -100,8 +100,8 @@ void msx_slot_wd_disk_device::device_start()
 }
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(nullptr)
 {
 }
@@ -121,8 +121,8 @@ void msx_slot_tc8566_disk_device::device_start()
 
 
 
-msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, "MSX Internal floppy type 1", tag, owner, clock, "msx_slot_disk1", __FILE__)
+msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, tag, owner, clock)
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -148,7 +148,7 @@ void msx_slot_disk1_device::device_reset()
 
 void msx_slot_disk1_device::post_load()
 {
-	UINT8 data = m_control;
+	uint8_t data = m_control;
 
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
@@ -157,7 +157,7 @@ void msx_slot_disk1_device::post_load()
 }
 
 
-void msx_slot_disk1_device::set_side_control(UINT8 data)
+void msx_slot_disk1_device::set_side_control(uint8_t data)
 {
 	m_side_control = data;
 
@@ -168,9 +168,9 @@ void msx_slot_disk1_device::set_side_control(UINT8 data)
 }
 
 
-void msx_slot_disk1_device::set_control(UINT8 data)
+void msx_slot_disk1_device::set_control(uint8_t data)
 {
-	UINT8 old_m_control = m_control;
+	uint8_t old_m_control = m_control;
 
 	m_control = data;
 
@@ -284,8 +284,8 @@ WRITE8_MEMBER(msx_slot_disk1_device::write)
 }
 
 
-msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, "MSX Internal floppy type 2", tag, owner, clock, "msx_slot_disk2", __FILE__)
+msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, tag, owner, clock)
 	, m_control(0)
 {
 }
@@ -309,7 +309,7 @@ void msx_slot_disk2_device::device_reset()
 
 void msx_slot_disk2_device::post_load()
 {
-	UINT8 data = m_control;
+	uint8_t data = m_control;
 
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
@@ -318,9 +318,9 @@ void msx_slot_disk2_device::post_load()
 }
 
 
-void msx_slot_disk2_device::set_control(UINT8 data)
+void msx_slot_disk2_device::set_control(uint8_t data)
 {
-	UINT8 old_m_control = m_control;
+	uint8_t old_m_control = m_control;
 
 	m_control = data;
 
@@ -423,8 +423,8 @@ WRITE8_MEMBER(msx_slot_disk2_device::write)
 
 
 
-msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, "MSX Internal floppy type 3", tag, owner, clock, "msx_slot_disk3", __FILE__)
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, tag, owner, clock)
 {
 }
 
@@ -469,8 +469,8 @@ READ8_MEMBER(msx_slot_disk3_device::read)
 
 
 
-msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4, "MSX Internal floppy type 4", tag, owner, clock, "msx_slot_disk4", __FILE__)
+msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4, tag, owner, clock)
 {
 }
 
@@ -521,8 +521,8 @@ READ8_MEMBER(msx_slot_disk4_device::read)
 
 
 
-msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, "MSX Internal floppy type 5", tag, owner, clock, "msx_slot_disk5", __FILE__)
+msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, tag, owner, clock)
 	, m_control(0)
 {
 }
@@ -555,7 +555,7 @@ void msx_slot_disk5_device::post_load()
 }
 
 
-void msx_slot_disk5_device::set_control(UINT8 control)
+void msx_slot_disk5_device::set_control(uint8_t control)
 {
 	m_control = control;
 
@@ -644,8 +644,8 @@ WRITE8_MEMBER(msx_slot_disk5_device::io_write)
 
 
 
-msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6, "MSX Internal floppy type 6", tag, owner, clock, "msx_slot_disk6", __FILE__)
+msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6, tag, owner, clock)
 	, m_side_motor(0)
 	, m_drive_select0(0)
 	, m_drive_select1(0)

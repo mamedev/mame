@@ -20,9 +20,9 @@ void ondra_state::video_start()
 	m_video_enable = 0;
 }
 
-UINT32 ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code1,code2;
+	uint8_t code1,code2;
 	int y, x, b;
 	int Vaddr = 0x2800;
 

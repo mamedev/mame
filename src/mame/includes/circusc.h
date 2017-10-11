@@ -14,7 +14,6 @@ class circusc_state : public driver_device
 public:
 	circusc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spritebank(*this, "spritebank"),
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -30,42 +29,45 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spritebank;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;
+	bool             m_spritebank;
 
 	/* sound-related */
-	UINT8          m_sn_latch;
+	uint8_t          m_sn_latch;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<sn76496_device> m_sn_1;
 	required_device<sn76496_device> m_sn_2;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<discrete_device> m_discrete;
 
-	UINT8          m_irq_mask;
+	bool             m_irq_mask;
+
 	DECLARE_READ8_MEMBER(circusc_sh_timer_r);
 	DECLARE_WRITE8_MEMBER(circusc_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(circusc_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(circusc_sound_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(circusc_videoram_w);
 	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
-	DECLARE_WRITE8_MEMBER(circusc_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
 	DECLARE_DRIVER_INIT(circusc);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(circusc);
-	UINT32 screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

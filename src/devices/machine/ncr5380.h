@@ -5,8 +5,10 @@
  *
  */
 
-#ifndef _NCR5380_H_
-#define _NCR5380_H_
+#ifndef MAME_MACHINE_NCR5380_H
+#define MAME_MACHINE_NCR5380_H
+
+#pragma once
 
 #include "legscsi.h"
 
@@ -41,13 +43,13 @@ class ncr5380_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// our API
-	UINT8 ncr5380_read_reg(UINT32 offset);
-	void ncr5380_write_reg(UINT32 offset, UINT8 data);
+	uint8_t ncr5380_read_reg(uint32_t offset);
+	void ncr5380_write_reg(uint32_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -56,15 +58,15 @@ protected:
 	virtual void device_stop() override;
 
 private:
-	UINT8 m_5380_Registers[8];
-	UINT8 m_last_id;
-	UINT8 m_5380_Command[32];
-	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
-	UINT8 m_5380_Data[512];
+	uint8_t m_5380_Registers[8];
+	uint8_t m_last_id;
+	uint8_t m_5380_Command[32];
+	int32_t m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
+	uint8_t m_5380_Data[512];
 	devcb_write_line m_irq_cb;  /* irq callback */
 };
 
 // device type definition
-extern const device_type NCR5380;
+DECLARE_DEVICE_TYPE(NCR5380, ncr5380_device)
 
-#endif
+#endif // MAME_MACHINE_NCR5380_H

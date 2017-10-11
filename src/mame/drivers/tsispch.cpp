@@ -112,11 +112,14 @@
 /* Core includes */
 #include "emu.h"
 #include "includes/tsispch.h"
-#include "cpu/upd7725/upd7725.h"
+
 #include "cpu/i86/i86.h"
+#include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
-#include "machine/pic8259.h"
-#include "machine/terminal.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 // defines
 #define DEBUG_PARAM 1
@@ -143,11 +146,6 @@ WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
 WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 {
 	m_pic->ir3_w(state);
-}
-
-WRITE8_MEMBER( tsispch_state::i8251_rxd )
-{
-	m_uart->receive_character(data);
 }
 
 /*****************************************************************************
@@ -188,7 +186,7 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	UINT8 temp;
+	uint8_t temp;
 	temp = upd7725->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
@@ -210,7 +208,7 @@ READ16_MEMBER( tsispch_state::dsp_status_r )
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	UINT8 temp;
+	uint8_t temp;
 	temp = upd7725->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
@@ -249,8 +247,8 @@ void tsispch_state::machine_reset()
 
 DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 {
-	UINT8 *dspsrc = (UINT8 *)(memregion("dspprgload")->base());
-	UINT32 *dspprg = (UINT32 *)(memregion("dspprg")->base());
+	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
+	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
 	fprintf(stderr,"driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
@@ -268,23 +266,23 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	UINT8 byte1t;
-	UINT16 byte23t;
+	uint8_t byte1t;
+	uint16_t byte23t;
 		for (int i = 0; i < 0x600; i+= 3)
 		{
 			byte1t = BITSWAP8(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
 			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
 			if ((byte1t&0x80) == 0x00) // op or rt instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if ((byte1t&0xC0) == 0x80) // jp instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
 			}
 			else // ld instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
 			}
 
 			*dspprg = byte1t<<24 | byte23t<<8;
@@ -374,7 +372,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static MACHINE_CONFIG_START( prose2k, tsispch_state )
+static MACHINE_CONFIG_START( prose2k )
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
@@ -392,7 +390,8 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
@@ -402,12 +401,13 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(tsispch_state, i8251_txempty_int))
 
 	/* sound hardware */
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(tsispch_state, i8251_rxd))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -542,6 +542,6 @@ ROM_START( prose2ko )
  Drivers
 ******************************************************************************/
 
-/*    YEAR      NAME   PARENT  COMPAT   MACHINE    INPUT          STATE     INIT                                   COMPANY                   FULLNAME                         FLAGS */
-COMP( 1987, prose2k,        0,      0,  prose2k, prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020 v3.4.1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k,      0,  prose2k, prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020 v1.1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY                                FULLNAME                  FLAGS
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

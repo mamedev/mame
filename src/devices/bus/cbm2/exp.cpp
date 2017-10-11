@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_EXPANSION_SLOT = &device_creator<cbm2_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device, "cbm2_expansion_slot", "CBM-II expansion port")
 
 
 
@@ -62,10 +63,11 @@ device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 //  cbm2_expansion_slot_device - constructor
 //-------------------------------------------------
 
-cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, CBM2_EXPANSION_SLOT, "CBM-II expansion port", tag, owner, clock, "cbm2_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this), m_card(nullptr)
+cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_card(nullptr)
 {
 }
 
@@ -107,7 +109,7 @@ image_init_result cbm2_expansion_slot_device::call_load()
 
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 
@@ -143,7 +145,7 @@ image_init_result cbm2_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string cbm2_expansion_slot_device::get_default_card_software()
+std::string cbm2_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }
@@ -153,7 +155,7 @@ std::string cbm2_expansion_slot_device::get_default_card_software()
 //  read - cartridge data read
 //-------------------------------------------------
 
-UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_expansion_slot_device::read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{
@@ -168,7 +170,7 @@ UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT
 //  write - cartridge data write
 //-------------------------------------------------
 
-void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
+void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{

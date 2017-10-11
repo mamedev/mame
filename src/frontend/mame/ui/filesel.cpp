@@ -22,7 +22,7 @@
 #include "zippath.h"
 
 #include <cstring>
-
+#include <locale>
 
 namespace ui {
 /***************************************************************************
@@ -89,8 +89,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	y1 += UI_BOX_TB_BORDER;
 
 	size_t hit_start = 0, hit_span = 0;
-	if (mouse_hit
-		&& layout.hit_test(mouse_x - x1, mouse_y - y1, hit_start, hit_span)
+	if (is_mouse_hit()
+		&& layout.hit_test(get_mouse_x() - x1, get_mouse_y() - y1, hit_start, hit_span)
 		&& m_current_directory.substr(hit_start, hit_span) != PATH_SEPARATOR)
 	{
 		// we're hovering over a directory!  highlight it
@@ -288,7 +288,7 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate()
+void menu_file_selector::populate(float &customtop, float &custombottom)
 {
 	util::zippath_directory *directory = nullptr;
 	osd_file::error err;
@@ -297,6 +297,7 @@ void menu_file_selector::populate()
 	const file_selector_entry *selected_entry = nullptr;
 	int i;
 	const char *volume_name;
+	uint8_t first;
 
 	// open the directory
 	err = util::zippath_opendir(m_current_directory, &directory);
@@ -332,6 +333,9 @@ void menu_file_selector::populate()
 		i++;
 	}
 
+	// mark first filename entry
+	first = m_entrylist.size() + 1;
+
 	// build the menu for each item
 	if (err == osd_file::error::NONE)
 	{
@@ -352,6 +356,15 @@ void menu_file_selector::populate()
 			}
 		}
 	}
+
+	// sort the menu entries
+	const std::collate<wchar_t>& coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+	std::sort(m_entrylist.begin()+first, m_entrylist.end(), [&coll](file_selector_entry const &x, file_selector_entry const &y)
+		{
+			std::wstring xstr = wstring_from_utf8(x.basename);
+			std::wstring ystr = wstring_from_utf8(y.basename);
+			return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
+		} );
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
@@ -507,7 +520,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate()
+void menu_select_rw::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), "", 0, itemref_from_result(result::READONLY));
@@ -540,7 +553,7 @@ void menu_select_rw::handle()
 
 void *menu_select_rw::itemref_from_result(menu_select_rw::result result)
 {
-	return (void *)(FPTR)(unsigned int)result;
+	return (void *)(uintptr_t)(unsigned int)result;
 }
 
 
@@ -550,7 +563,7 @@ void *menu_select_rw::itemref_from_result(menu_select_rw::result result)
 
 menu_select_rw::result menu_select_rw::result_from_itemref(void *itemref)
 {
-	return (menu_select_rw::result) (unsigned int) (FPTR)itemref;
+	return (menu_select_rw::result) (unsigned int) (uintptr_t)itemref;
 }
 
 

@@ -40,14 +40,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_top_videoram;
-	required_shared_ptr<UINT8> m_spr1_ctrlram;
-	required_shared_ptr<UINT8> m_spr2_ctrlram;
-	required_shared_ptr<UINT8> m_palettebank;
-	required_shared_ptr<UINT8> m_spr1_videoram;
-	required_shared_ptr<UINT8> m_spr2_videoram;
-	required_shared_ptr<UINT8> m_bg_bot_videoram;
-	optional_shared_ptr<UINT8> m_armwrest_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_top_videoram;
+	required_shared_ptr<uint8_t> m_spr1_ctrlram;
+	required_shared_ptr<uint8_t> m_spr2_ctrlram;
+	required_shared_ptr<uint8_t> m_palettebank;
+	required_shared_ptr<uint8_t> m_spr1_videoram;
+	required_shared_ptr<uint8_t> m_spr2_videoram;
+	required_shared_ptr<uint8_t> m_bg_bot_videoram;
+	optional_shared_ptr<uint8_t> m_armwrest_fg_videoram;
 
 	tilemap_t *m_bg_top_tilemap;
 	tilemap_t *m_bg_bot_tilemap;
@@ -56,21 +56,18 @@ public:
 	tilemap_t *m_spr1_tilemap_flipx;
 	tilemap_t *m_spr2_tilemap;
 
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
 	DECLARE_READ8_MEMBER(spunchout_exp_r);
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
 	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_reset_w);
 	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_clock_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_top_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_bot_videoram_w);
 	DECLARE_WRITE8_MEMBER(armwrest_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr1_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr2_videoram_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_reset_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_st_w);
-	DECLARE_WRITE8_MEMBER(punchout_speech_vcu_w);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(armwrest_top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
@@ -83,10 +80,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(armwrest);
 	DECLARE_MACHINE_RESET(spnchout);
-	UINT32 screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void armwrest_draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);

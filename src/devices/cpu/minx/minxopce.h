@@ -3,7 +3,7 @@
 
 void minx_cpu_device::execute_one_ce()
 {
-	const UINT8 opcode = rdop();
+	const uint8_t opcode = rdop();
 
 	switch (opcode)
 	{
@@ -469,70 +469,70 @@ void minx_cpu_device::execute_one_ce()
 		case 0xDF: { /* illegal operation? */ }
 			break;
 
-		case 0xE0: { INT8 d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE0: { int8_t d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE1: { INT8 d8 = rdop(); if ( ( m_F & FLAG_Z ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE1: { int8_t d8 = rdop(); if ( ( m_F & FLAG_Z ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE2: { INT8 d8 = rdop(); if ( !( m_F & FLAG_Z ) && ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE2: { int8_t d8 = rdop(); if ( !( m_F & FLAG_Z ) && ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE3: { INT8 d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE3: { int8_t d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE4: { INT8 d8 = rdop(); if ( ( m_F & FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE4: { int8_t d8 = rdop(); if ( ( m_F & FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE5: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE5: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_O ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE6: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_S ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE6: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_S ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE7: { INT8 d8 = rdop(); if ( ( m_F & FLAG_S ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE7: { int8_t d8 = rdop(); if ( ( m_F & FLAG_S ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE8: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X0 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE8: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X0 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE9: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X1 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE9: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X1 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xEA: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X2 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xEA: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X2 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xEB: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_DZ ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xEB: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_DZ ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xEC: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X0 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xEC: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X0 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xED: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X1 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xED: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X1 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xEE: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X2 ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xEE: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X2 ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xEF: { INT8 d8 = rdop(); if ( ( m_E & EXEC_DZ ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xEF: { int8_t d8 = rdop(); if ( ( m_E & EXEC_DZ ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
 
-		case 0xF0: { INT8 d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF0: { int8_t d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF1: { INT8 d8 = rdop(); if ( ( m_F & FLAG_Z ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF1: { int8_t d8 = rdop(); if ( ( m_F & FLAG_Z ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF2: { INT8 d8 = rdop(); if ( !( m_F & FLAG_Z ) && ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF2: { int8_t d8 = rdop(); if ( !( m_F & FLAG_Z ) && ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF3: { INT8 d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { CALL( m_PC + d8 - 1 ); } }
+		case 0xF3: { int8_t d8 = rdop(); if ( ( ( m_F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( m_F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { CALL( m_PC + d8 - 1 ); } }
 			break;
-		case 0xF4: { INT8 d8 = rdop(); if ( ( m_F & FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF4: { int8_t d8 = rdop(); if ( ( m_F & FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF5: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF5: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_O ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF6: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_S ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF6: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_S ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF7: { INT8 d8 = rdop(); if ( ( m_F & FLAG_S ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF7: { int8_t d8 = rdop(); if ( ( m_F & FLAG_S ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF8: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X0 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF8: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X0 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xF9: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X1 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xF9: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X1 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFA: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_X2 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFA: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_X2 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFB: { INT8 d8 = rdop(); if ( ! ( m_E & EXEC_DZ ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFB: { int8_t d8 = rdop(); if ( ! ( m_E & EXEC_DZ ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFC: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X0 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFC: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X0 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFD: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X1 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFD: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X1 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFE: { INT8 d8 = rdop(); if ( ( m_E & EXEC_X2 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFE: { int8_t d8 = rdop(); if ( ( m_E & EXEC_X2 ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xFF: { INT8 d8 = rdop(); if ( ( m_E & EXEC_DZ ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xFF: { int8_t d8 = rdop(); if ( ( m_E & EXEC_DZ ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
 	}
 

@@ -187,7 +187,7 @@ public:
         this->setg(begin, begin, end);
     }
 
-    typename std::basic_streambuf<T>::int_type underflow()
+    typename std::basic_streambuf<T>::int_type underflow() PUGIXML_OVERRIDE
     {
         return this->gptr() == this->egptr() ? std::basic_streambuf<T>::traits_type::eof() : std::basic_streambuf<T>::traits_type::to_int_type(*this->gptr());
     }

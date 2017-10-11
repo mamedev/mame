@@ -21,8 +21,12 @@
 
 */
 
+#include "emu.h"
 #include "includes/trs80m2.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 #define KEYBOARD_TAG "keyboard"
 
@@ -33,7 +37,7 @@
 
 READ8_MEMBER( trs80m2_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x800)
 	{
@@ -191,7 +195,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// 80/40 character mode*/
 	data |= m_80_40_char_en << 4;
@@ -389,9 +393,9 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = m_char_rom->base()[address];
+		uint8_t data = m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -433,11 +437,11 @@ void trs80m2_state::video_start()
 	m_video_ram.allocate(0x800);
 }
 
-UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	else
 	{
@@ -486,7 +490,7 @@ WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( trs80m2_state::kbd_w )
+void trs80m2_state::kbd_w(u8 data)
 {
 	// latch key data
 	m_key_data = data;
@@ -548,7 +552,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data |= (m_fdc->intrq_r() ? 0x01 : 0x00);
@@ -698,7 +702,7 @@ void trs80m2_state::machine_reset()
 //  MACHINE_CONFIG( trs80m2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
+static MACHINE_CONFIG_START( trs80m2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -706,7 +710,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_CPU_IO_MAP(z80_io)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
@@ -754,7 +758,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_8MHz/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
@@ -767,7 +771,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -783,7 +787,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( trs80m16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
+static MACHINE_CONFIG_START( trs80m16 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -796,7 +800,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
@@ -844,10 +848,11 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_8MHz/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NOOP)
+	MCFG_DEVICE_ADD(AM9519A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
@@ -859,7 +864,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -946,9 +951,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY              FULLNAME            FLAGS
+COMP( 1979, trs80m2,    0,       0,      trs80m2,    trs80m2, trs80m2_state,  0,    "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
+COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,    trs80m2, tandy6k_state,  0,    "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

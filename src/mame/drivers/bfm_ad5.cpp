@@ -15,11 +15,12 @@
 #include "includes/bfm_ad5.h"
 #include "machine/mcf5206e.h"
 #include "machine/bfm_sc45_helper.h"
+#include "speaker.h"
 
 DRIVER_INIT_MEMBER(adder5_state,ad5)
 {
 	// sc5 roms always start with SC5
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 //  printf("%02x %02x %02x %02x\n", src[0], src[1], src[2], src[3]);
 	if (((src[0] == 0x20) && (src[2] == 0x43)) || ((src[1] == 0x35) && (src[3] == 0x53)))
 	{
@@ -76,7 +77,7 @@ INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
 //  m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c);
 }
 
-MACHINE_CONFIG_START( bfm_ad5, adder5_state )
+MACHINE_CONFIG_START( bfm_ad5 )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(ad5_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)

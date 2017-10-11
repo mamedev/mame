@@ -60,13 +60,13 @@ enum {
 /*  TODO: THESE WILL BE REPLACED BY MAME FUNCTIONS
 #define BYTE_REV32(t)   \
   do { \
-    (t) = ((UINT32)(t) >> 16) | ((UINT32)(t) << 16); \
-    (t) = (((UINT32)(t) >> 8) & 0x00ff00ff) | (((UINT32)(t) << 8) & 0xff00ff00); \
+    (t) = ((uint32_t)(t) >> 16) | ((uint32_t)(t) << 16); \
+    (t) = (((uint32_t)(t) >> 8) & 0x00ff00ff) | (((uint32_t)(t) << 8) & 0xff00ff00); \
   } while (0);
 
 #define BYTE_REV16(t)   \
   do { \
-    (t) = (((UINT16)(t) >> 8) & 0x00ff) | (((UINT16)(t) << 8) & 0xff00); \
+    (t) = (((uint16_t)(t) >> 8) & 0x00ff) | (((uint16_t)(t) << 8) & 0xff00); \
   } while (0);
 #endif
 */
@@ -79,12 +79,12 @@ enum {
 float i860_cpu_device::get_fregval_s (int fr)
 {
 	float f;
-	UINT32 x;
-	UINT8 *tp;
+	uint32_t x;
+	uint8_t *tp;
 	fr = 31 - fr;
-	tp = (UINT8 *)(&m_frg[fr * 4]);
-	x = ((UINT32)tp[0] << 24) | ((UINT32)tp[1] << 16) |
-		((UINT32)tp[2] << 8) | ((UINT32)tp[3]);
+	tp = (uint8_t *)(&m_frg[fr * 4]);
+	x = ((uint32_t)tp[0] << 24) | ((uint32_t)tp[1] << 16) |
+		((uint32_t)tp[2] << 8) | ((uint32_t)tp[3]);
 	f = *(float *)(&x);
 	return f;
 }
@@ -92,27 +92,27 @@ float i860_cpu_device::get_fregval_s (int fr)
 double i860_cpu_device::get_fregval_d (int fr)
 {
 	double d;
-	UINT64 x;
-	UINT8 *tp;
+	uint64_t x;
+	uint8_t *tp;
 	fr = 31 - (fr + 1);
-	tp = (UINT8 *)(&m_frg[fr * 4]);
-	x = ((UINT64)tp[0] << 56) | ((UINT64)tp[1] << 48) |
-		((UINT64)tp[2] << 40) | ((UINT64)tp[3] << 32) |
-		((UINT64)tp[4] << 24) | ((UINT64)tp[5] << 16) |
-		((UINT64)tp[6] << 8) | ((UINT64)tp[7]);
+	tp = (uint8_t *)(&m_frg[fr * 4]);
+	x = ((uint64_t)tp[0] << 56) | ((uint64_t)tp[1] << 48) |
+		((uint64_t)tp[2] << 40) | ((uint64_t)tp[3] << 32) |
+		((uint64_t)tp[4] << 24) | ((uint64_t)tp[5] << 16) |
+		((uint64_t)tp[6] << 8) | ((uint64_t)tp[7]);
 	d = *(double *)(&x);
 	return d;
 }
 
 void i860_cpu_device::set_fregval_s (int fr, float s)
 {
-	UINT8 *f = (UINT8 *)&s;
-	UINT8 *tp;
+	uint8_t *f = (uint8_t *)&s;
+	uint8_t *tp;
 	int newfr = 31 - fr;
 	float jj = s;
-	tp = (UINT8 *)(&m_frg[newfr * 4]);
+	tp = (uint8_t *)(&m_frg[newfr * 4]);
 
-	f = (UINT8 *)(&jj);
+	f = (uint8_t *)(&jj);
 	if (fr == 0 || fr == 1)
 	{
 		tp[0] = 0; tp[1] = 0; tp[2] = 0; tp[3] = 0;
@@ -129,13 +129,13 @@ void i860_cpu_device::set_fregval_s (int fr, float s)
 
 void i860_cpu_device::set_fregval_d (int fr, double d)
 {
-	UINT8 *f = (UINT8 *)&d;
-	UINT8 *tp;
+	uint8_t *f = (uint8_t *)&d;
+	uint8_t *tp;
 	int newfr = 31 - (fr + 1);
 	double jj = d;
-	tp = (UINT8 *)(&m_frg[newfr * 4]);
+	tp = (uint8_t *)(&m_frg[newfr * 4]);
 
-	f = (UINT8 *)(&jj);
+	f = (uint8_t *)(&jj);
 
 	if (fr == 0)
 	{
@@ -280,7 +280,7 @@ void i860_cpu_device::set_fregval_d (int fr, double d)
 #define SET_FSR_SE(val)  (m_cregs[CR_FSR] = (m_cregs[CR_FSR] & ~(1 << 8)) | (((val) & 1) << 8))
 
 
-int i860_cpu_device::has_delay_slot(UINT32 insn)
+int i860_cpu_device::has_delay_slot(uint32_t insn)
 {
 	int opc = (insn >> 26) & 0x3f;
 	if (opc == 0x10 || opc == 0x1a || opc == 0x1b || opc == 0x1d ||
@@ -329,10 +329,10 @@ void i860_cpu_device::i860_gen_interrupt()
 /* Fetch instructions from instruction cache.
    Note: The instruction cache is not implemented for MAME version,
    this just fetches and returns 1 instruction from memory.  */
-UINT32 i860_cpu_device::ifetch (UINT32 pc)
+uint32_t i860_cpu_device::ifetch (uint32_t pc)
 {
-	UINT32 phys_pc = 0;
-	UINT32 w1 = 0;
+	uint32_t phys_pc = 0;
+	uint32_t w1 = 0;
 
 	/* If virtual mode, get translation.  */
 	if (GET_DIRBASE_ATE ())
@@ -368,21 +368,21 @@ UINT32 i860_cpu_device::ifetch (UINT32 pc)
 
    Page tables must always be in memory (not cached).  So the routine
    here only accesses memory.  */
-UINT32 i860_cpu_device::get_address_translation (UINT32 vaddr, int is_dataref, int is_write)
+uint32_t i860_cpu_device::get_address_translation (uint32_t vaddr, int is_dataref, int is_write)
 {
-	UINT32 vdir = (vaddr >> 22) & 0x3ff;
-	UINT32 vpage = (vaddr >> 12) & 0x3ff;
-	UINT32 voffset = vaddr & 0xfff;
-	UINT32 dtb = (m_cregs[CR_DIRBASE]) & 0xfffff000;
-	UINT32 pg_dir_entry_a = 0;
-	UINT32 pg_dir_entry = 0;
-	UINT32 pg_tbl_entry_a = 0;
-	UINT32 pg_tbl_entry = 0;
-	UINT32 pfa1 = 0;
-	UINT32 pfa2 = 0;
-	UINT32 ret = 0;
-	UINT32 ttpde = 0;
-	UINT32 ttpte = 0;
+	uint32_t vdir = (vaddr >> 22) & 0x3ff;
+	uint32_t vpage = (vaddr >> 12) & 0x3ff;
+	uint32_t voffset = vaddr & 0xfff;
+	uint32_t dtb = (m_cregs[CR_DIRBASE]) & 0xfffff000;
+	uint32_t pg_dir_entry_a = 0;
+	uint32_t pg_dir_entry = 0;
+	uint32_t pg_tbl_entry_a = 0;
+	uint32_t pg_tbl_entry = 0;
+	uint32_t pfa1 = 0;
+	uint32_t pfa2 = 0;
+	uint32_t ret = 0;
+	uint32_t ttpde = 0;
+	uint32_t ttpte = 0;
 
 	assert (GET_DIRBASE_ATE ());
 
@@ -514,7 +514,7 @@ UINT32 i860_cpu_device::get_address_translation (UINT32 vaddr, int is_dataref, i
 /* Read memory emulation.
      addr = address to read.
      size = size of read in bytes.  */
-UINT32 i860_cpu_device::readmemi_emu (UINT32 addr, int size)
+uint32_t i860_cpu_device::readmemi_emu (uint32_t addr, int size)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "readmemi_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
@@ -524,7 +524,7 @@ UINT32 i860_cpu_device::readmemi_emu (UINT32 addr, int size)
 	/* If virtual mode, do translation.  */
 	if (GET_DIRBASE_ATE ())
 	{
-		UINT32 phys = get_address_translation (addr, 1 /* is_dataref */, 0 /* is_write */);
+		uint32_t phys = get_address_translation (addr, 1 /* is_dataref */, 0 /* is_write */);
 		if (m_pending_trap && (GET_PSR_IAT () || GET_PSR_DAT ()))
 		{
 #ifdef TRACE_PAGE_FAULT
@@ -548,12 +548,12 @@ UINT32 i860_cpu_device::readmemi_emu (UINT32 addr, int size)
 	/* Now do the actual read.  */
 	if (size == 1)
 	{
-		UINT32 ret = m_program->read_byte(addr);
+		uint32_t ret = m_program->read_byte(addr);
 		return ret & 0xff;
 	}
 	else if (size == 2)
 	{
-		UINT32 ret = m_program->read_word(addr);
+		uint32_t ret = m_program->read_word(addr);
 #ifdef HOST_MSB
 		BYTE_REV16 (ret);
 #endif
@@ -561,7 +561,7 @@ UINT32 i860_cpu_device::readmemi_emu (UINT32 addr, int size)
 	}
 	else if (size == 4)
 	{
-		UINT32 ret = m_program->read_dword(addr);
+		uint32_t ret = m_program->read_dword(addr);
 #ifdef HOST_MSB
 		BYTE_REV32 (ret);
 #endif
@@ -578,7 +578,7 @@ UINT32 i860_cpu_device::readmemi_emu (UINT32 addr, int size)
      addr = address to write.
      size = size of write in bytes.
      data = data to write.  */
-void i860_cpu_device::writememi_emu (UINT32 addr, int size, UINT32 data)
+void i860_cpu_device::writememi_emu (uint32_t addr, int size, uint32_t data)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "writememi_emu: (ATE=%d) addr = 0x%08x, size = %d, data = 0x%08x\n",
@@ -588,7 +588,7 @@ void i860_cpu_device::writememi_emu (UINT32 addr, int size, UINT32 data)
 	/* If virtual mode, do translation.  */
 	if (GET_DIRBASE_ATE ())
 	{
-		UINT32 phys = get_address_translation (addr, 1 /* is_dataref */, 1 /* is_write */);
+		uint32_t phys = get_address_translation (addr, 1 /* is_dataref */, 1 /* is_write */);
 		if (m_pending_trap && (GET_PSR_IAT () || GET_PSR_DAT ()))
 		{
 #ifdef TRACE_PAGE_FAULT
@@ -635,7 +635,7 @@ void i860_cpu_device::writememi_emu (UINT32 addr, int size, UINT32 data)
      addr = address to read.
      size = size of read in bytes.
      dest = memory to put read data.  */
-void i860_cpu_device::fp_readmem_emu (UINT32 addr, int size, UINT8 *dest)
+void i860_cpu_device::fp_readmem_emu (uint32_t addr, int size, uint8_t *dest)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "fp_readmem_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
@@ -647,7 +647,7 @@ void i860_cpu_device::fp_readmem_emu (UINT32 addr, int size, UINT8 *dest)
 	/* If virtual mode, do translation.  */
 	if (GET_DIRBASE_ATE ())
 	{
-		UINT32 phys = get_address_translation (addr, 1 /* is_dataref */, 0 /* is_write */);
+		uint32_t phys = get_address_translation (addr, 1 /* is_dataref */, 0 /* is_write */);
 		if (m_pending_trap && (GET_PSR_IAT () || GET_PSR_DAT ()))
 		{
 #ifdef TRACE_PAGE_FAULT
@@ -702,7 +702,7 @@ void i860_cpu_device::fp_readmem_emu (UINT32 addr, int size, UINT8 *dest)
      size = size of read in bytes.
      data = pointer to the data.
      wmask = bit mask of bytes to write (only for pst.d).  */
-void i860_cpu_device::fp_writemem_emu (UINT32 addr, int size, UINT8 *data, UINT32 wmask)
+void i860_cpu_device::fp_writemem_emu (uint32_t addr, int size, uint8_t *data, uint32_t wmask)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "fp_writemem_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
@@ -714,7 +714,7 @@ void i860_cpu_device::fp_writemem_emu (UINT32 addr, int size, UINT8 *data, UINT3
 	/* If virtual mode, do translation.  */
 	if (GET_DIRBASE_ATE ())
 	{
-		UINT32 phys = get_address_translation (addr, 1 /* is_dataref */, 1 /* is_write */);
+		uint32_t phys = get_address_translation (addr, 1 /* is_dataref */, 1 /* is_write */);
 		if (m_pending_trap && GET_PSR_DAT ())
 		{
 #ifdef TRACE_PAGE_FAULT
@@ -743,7 +743,7 @@ void i860_cpu_device::fp_writemem_emu (UINT32 addr, int size, UINT8 *data, UINT3
 		m_program->write_byte(addr+1, data[2]);
 		m_program->write_byte(addr+0, data[3]);
 #else
-		UINT32 ddd = (data[3]) | (data[2] << 8) | (data[1] << 16) |(data[0] << 24);
+		uint32_t ddd = (data[3]) | (data[2] << 8) | (data[1] << 16) |(data[0] << 24);
 		m_program->write_dword(addr+0, ddd);
 #endif
 	}
@@ -801,10 +801,10 @@ void i860_cpu_device::dump_pipe (int type)
 		{
 			if (m_A[i].stat.arp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-							*(UINT64 *)(&m_A[i].val.d));
+							*(uint64_t *)(&m_A[i].val.d));
 			else
 				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
-							*(UINT32 *)(&m_A[i].val.s));
+							*(uint32_t *)(&m_A[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -818,10 +818,10 @@ void i860_cpu_device::dump_pipe (int type)
 		{
 			if (m_M[i].stat.mrp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-							*(UINT64 *)(&m_M[i].val.d));
+							*(uint64_t *)(&m_M[i].val.d));
 			else
 				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
-							*(UINT32 *)(&m_M[i].val.s));
+							*(uint32_t *)(&m_M[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -834,10 +834,10 @@ void i860_cpu_device::dump_pipe (int type)
 		{
 			if (m_L[i].stat.lrp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-							*(UINT64 *)(&m_L[i].val.d));
+							*(uint64_t *)(&m_L[i].val.d));
 			else
 				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
-							*(UINT32 *)(&m_L[i].val.s));
+							*(uint32_t *)(&m_L[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -848,10 +848,10 @@ void i860_cpu_device::dump_pipe (int type)
 		fprintf (stderr, "  I: ");
 		if (m_G.stat.irp)
 			fprintf (stderr, "[1d] 0x%016llx\n",
-						*(UINT64 *)(&m_G.val.d));
+						*(uint64_t *)(&m_G.val.d));
 		else
 			fprintf (stderr, "[1s] 0x%08x\n",
-						*(UINT32 *)(&m_G.val.s));
+						*(uint32_t *)(&m_G.val.s));
 	}
 }
 
@@ -876,7 +876,7 @@ void i860_cpu_device::dump_state (i860s *cpustate)
 		float ff = get_fregval_s (rn);
 		if ((rn % 4) == 0)
 			fprintf (stderr, "\n");
-		fprintf (stderr, "%%f%-3d: 0x%08x  ", rn, *(UINT32 *)&ff);
+		fprintf (stderr, "%%f%-3d: 0x%08x  ", rn, *(uint32_t *)&ff);
 	}
 	fprintf (stderr, "\n");
 
@@ -896,26 +896,26 @@ void i860_cpu_device::dump_state (i860s *cpustate)
 #endif
 
 /* Sign extend N-bit number.  */
-static inline INT32 sign_ext (UINT32 x, int n)
+static inline int32_t sign_ext (uint32_t x, int n)
 {
-	INT32 t;
+	int32_t t;
 	t = x >> (n - 1);
 	t = ((-t) << n) | x;
 	return t;
 }
 
 
-void i860_cpu_device::unrecog_opcode (UINT32 pc, UINT32 insn)
+void i860_cpu_device::unrecog_opcode (uint32_t pc, uint32_t insn)
 {
 	fprintf (stderr, "0x%08x: 0x%08x   (unrecognized opcode)\n", pc, insn);
 }
 
 
 /* Execute "ld.c csrc2,idest" instruction.  */
-void i860_cpu_device::insn_ld_ctrl (UINT32 insn)
+void i860_cpu_device::insn_ld_ctrl (uint32_t insn)
 {
-	UINT32 csrc2 = get_creg (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t csrc2 = get_creg (insn);
+	uint32_t idest = get_idest (insn);
 
 #ifdef TRACE_UNDEFINED_I860
 	if (csrc2 > 5)
@@ -946,10 +946,10 @@ void i860_cpu_device::insn_ld_ctrl (UINT32 insn)
 
 
 /* Execute "st.c isrc1,csrc2" instruction.  */
-void i860_cpu_device::insn_st_ctrl (UINT32 insn)
+void i860_cpu_device::insn_st_ctrl (uint32_t insn)
 {
-	UINT32 csrc2 = get_creg (insn);
-	UINT32 isrc1 = get_isrc1 (insn);
+	uint32_t csrc2 = get_creg (insn);
+	uint32_t isrc1 = get_isrc1 (insn);
 
 #ifdef TRACE_UNDEFINED_I860
 	if (csrc2 > 5)
@@ -980,7 +980,7 @@ void i860_cpu_device::insn_st_ctrl (UINT32 insn)
 	/* Update the register -- unless it is fir which cannot be updated.  */
 	if (csrc2 == CR_EPSR)
 	{
-		UINT32 enew = 0, tmp = 0;
+		uint32_t enew = 0, tmp = 0;
 		/* Make sure unchangeable EPSR bits stay unchanged (DCS, stepping,
 		   and type).  Also, some bits are only writeable in supervisor
 		   mode.  */
@@ -1001,8 +1001,8 @@ void i860_cpu_device::insn_st_ctrl (UINT32 insn)
 		/* Some PSR bits are only writeable in supervisor mode.  */
 		if (GET_PSR_U ())
 		{
-			UINT32 enew = get_iregval (isrc1) & ~PSR_SUPERVISOR_ONLY_MASK;
-			UINT32 tmp = m_cregs[CR_PSR] & PSR_SUPERVISOR_ONLY_MASK;
+			uint32_t enew = get_iregval (isrc1) & ~PSR_SUPERVISOR_ONLY_MASK;
+			uint32_t tmp = m_cregs[CR_PSR] & PSR_SUPERVISOR_ONLY_MASK;
 			m_cregs[CR_PSR] = enew | tmp;
 		}
 		else
@@ -1011,8 +1011,8 @@ void i860_cpu_device::insn_st_ctrl (UINT32 insn)
 	else if (csrc2 == CR_FSR)
 	{
 		/* I believe that only 21..17, 8..5, and 3..0 should be updated.  */
-		UINT32 enew = get_iregval (isrc1) & 0x003e01ef;
-		UINT32 tmp = m_cregs[CR_FSR] & ~0x003e01ef;
+		uint32_t enew = get_iregval (isrc1) & 0x003e01ef;
+		uint32_t tmp = m_cregs[CR_FSR] & ~0x003e01ef;
 		m_cregs[CR_FSR] = enew | tmp;
 	}
 	else if (csrc2 != CR_FIR)
@@ -1022,13 +1022,13 @@ void i860_cpu_device::insn_st_ctrl (UINT32 insn)
 
 /* Execute "ld.{s,b,l} isrc1(isrc2),idest" or
    "ld.{s,b,l} #const(isrc2),idest".  */
-void i860_cpu_device::insn_ldx (UINT32 insn)
+void i860_cpu_device::insn_ldx (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 eff = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t eff = 0;
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4};
 	int size = 0;
@@ -1045,7 +1045,7 @@ void i860_cpu_device::insn_ldx (UINT32 insn)
 	{
 		/* Chop off lower bits of displacement.  */
 		immsrc1 &= ~(size - 1);
-		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
+		eff = (uint32_t)(immsrc1 + (int32_t)(get_iregval (isrc2)));
 	}
 	else
 		eff = get_iregval (isrc1) + get_iregval (isrc2);
@@ -1068,7 +1068,7 @@ void i860_cpu_device::insn_ldx (UINT32 insn)
 	   is the target register).  */
 	if (size < 4)
 	{
-		UINT32 readval = sign_ext (readmemi_emu (eff, size), size * 8);
+		uint32_t readval = sign_ext (readmemi_emu (eff, size), size * 8);
 		/* Do not update register on page fault.  */
 		if (m_exiting_readmem)
 		{
@@ -1078,7 +1078,7 @@ void i860_cpu_device::insn_ldx (UINT32 insn)
 	}
 	else
 	{
-		UINT32 readval = readmemi_emu (eff, size);
+		uint32_t readval = readmemi_emu (eff, size);
 		/* Do not update register on page fault.  */
 		if (m_exiting_readmem)
 		{
@@ -1092,12 +1092,12 @@ void i860_cpu_device::insn_ldx (UINT32 insn)
 /* Execute "st.x isrc1ni,#const(isrc2)" instruction (there is no
    (reg + reg form).  Store uses the split immediate, not the normal
    16-bit immediate as in ld.x.  */
-void i860_cpu_device::insn_stx (UINT32 insn)
+void i860_cpu_device::insn_stx (uint32_t insn)
 {
-	INT32 immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 eff = 0;
+	int32_t immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t eff = 0;
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4};
 	int size = 0;
@@ -1109,7 +1109,7 @@ void i860_cpu_device::insn_stx (UINT32 insn)
 
 	/* Get effective address.  Chop off lower bits of displacement.  */
 	immsrc &= ~(size - 1);
-	eff = (UINT32)(immsrc + (INT32)get_iregval (isrc2));
+	eff = (uint32_t)(immsrc + (int32_t)get_iregval (isrc2));
 
 	/* Write data (value of reg isrc1) to memory at eff.  */
 	writememi_emu (eff, size, get_iregval (isrc1));
@@ -1121,13 +1121,13 @@ void i860_cpu_device::insn_stx (UINT32 insn)
 /* Execute "fst.y fdest,isrc1(isrc2)", "fst.y fdest,isrc1(isrc2)++",
            "fst.y fdest,#const(isrc2)" or "fst.y fdest,#const(isrc2)++"
    instruction.  */
-void i860_cpu_device::insn_fsty (UINT32 insn)
+void i860_cpu_device::insn_fsty (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
-	UINT32 eff = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
+	uint32_t eff = 0;
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 8, 4, 16, 4};
 	int size = 0;
@@ -1148,7 +1148,7 @@ void i860_cpu_device::insn_fsty (UINT32 insn)
 	{
 		/* Chop off lower bits of displacement.  */
 		immsrc1 &= ~(size - 1);
-		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
+		eff = (uint32_t)(immsrc1 + (int32_t)(get_iregval (isrc2)));
 	}
 	else
 		eff = get_iregval (isrc1) + get_iregval (isrc2);
@@ -1181,11 +1181,11 @@ void i860_cpu_device::insn_fsty (UINT32 insn)
 
 	/* Write data (value of freg fdest) to memory at eff.  */
 	if (size == 4)
-		fp_writemem_emu (eff, size, (UINT8 *)(&m_frg[4 * (31 - fdest)]), 0xff);
+		fp_writemem_emu (eff, size, (uint8_t *)(&m_frg[4 * (31 - fdest)]), 0xff);
 	else if (size == 8)
-		fp_writemem_emu (eff, size, (UINT8 *)(&m_frg[4 * (31 - (fdest + 1))]), 0xff);
+		fp_writemem_emu (eff, size, (uint8_t *)(&m_frg[4 * (31 - (fdest + 1))]), 0xff);
 	else
-		fp_writemem_emu (eff, size, (UINT8 *)(&m_frg[4 * (31 - (fdest + 3))]), 0xff);
+		fp_writemem_emu (eff, size, (uint8_t *)(&m_frg[4 * (31 - (fdest + 3))]), 0xff);
 
 }
 
@@ -1193,13 +1193,13 @@ void i860_cpu_device::insn_fsty (UINT32 insn)
 /* Execute "fld.y isrc1(isrc2),fdest", "fld.y isrc1(isrc2)++,idest",
            "fld.y #const(isrc2),fdest" or "fld.y #const(isrc2)++,idest".
    Where y = {l,d,q}.  Note, there is no pfld.q, though.  */
-void i860_cpu_device::insn_fldy (UINT32 insn)
+void i860_cpu_device::insn_fldy (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
-	UINT32 eff = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
+	uint32_t eff = 0;
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 8, 4, 16, 4};
 	int size = 0;
@@ -1228,7 +1228,7 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 	{
 		/* Chop off lower bits of displacement.  */
 		immsrc1 &= ~(size - 1);
-		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
+		eff = (uint32_t)(immsrc1 + (int32_t)(get_iregval (isrc2)));
 	}
 	else
 		eff = get_iregval (isrc1) + get_iregval (isrc2);
@@ -1269,11 +1269,11 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 		if (fdest > 1)
 		{
 			if (size == 4)
-				fp_readmem_emu (eff, size, (UINT8 *)&(m_frg[4 * (31 - fdest)]));
+				fp_readmem_emu (eff, size, (uint8_t *)&(m_frg[4 * (31 - fdest)]));
 			else if (size == 8)
-				fp_readmem_emu (eff, size, (UINT8 *)&(m_frg[4 * (31 - (fdest + 1))]));
+				fp_readmem_emu (eff, size, (uint8_t *)&(m_frg[4 * (31 - (fdest + 1))]));
 			else if (size == 16)
-				fp_readmem_emu (eff, size, (UINT8 *)&(m_frg[4 * (31 - (fdest + 3))]));
+				fp_readmem_emu (eff, size, (uint8_t *)&(m_frg[4 * (31 - (fdest + 3))]));
 		}
 	}
 	else
@@ -1282,7 +1282,7 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 		   for any traps before updating the pipeline.  The pipeline must
 		   stay unaffected after a trap so that the instruction can be
 		   properly restarted.  */
-		UINT8 bebuf[8];
+		uint8_t bebuf[8];
 		fp_readmem_emu (eff, size, bebuf);
 		if (m_pending_trap && m_exiting_readmem)
 			goto ab_op;
@@ -1307,7 +1307,7 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 		m_L[1] = m_L[0];
 		if (size == 8)
 		{
-			UINT8 *t = (UINT8 *)&(m_L[0].val.d);
+			uint8_t *t = (uint8_t *)&(m_L[0].val.d);
 #ifndef HOST_MSB
 			t[7] = bebuf[0]; t[6] = bebuf[1]; t[5] = bebuf[2]; t[4] = bebuf[3];
 			t[3] = bebuf[4]; t[2] = bebuf[5]; t[1] = bebuf[6]; t[0] = bebuf[7];
@@ -1319,7 +1319,7 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 		}
 		else
 		{
-			UINT8 *t = (UINT8 *)&(m_L[0].val.s);
+			uint8_t *t = (uint8_t *)&(m_L[0].val.s);
 #ifndef HOST_MSB
 			t[3] = bebuf[0]; t[2] = bebuf[1]; t[1] = bebuf[2]; t[0] = bebuf[3];
 #else
@@ -1335,17 +1335,17 @@ void i860_cpu_device::insn_fldy (UINT32 insn)
 
 /* Execute "pst.d fdest,#const(isrc2)" or "fst.d fdest,#const(isrc2)++"
    instruction.  */
-void i860_cpu_device::insn_pstd (UINT32 insn)
+void i860_cpu_device::insn_pstd (uint32_t insn)
 {
-	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
-	UINT32 eff = 0;
+	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
+	uint32_t eff = 0;
 	int auto_inc = (insn & 1);
-	UINT8 *bebuf = nullptr;
+	uint8_t *bebuf = nullptr;
 	int pm = GET_PSR_PM ();
 	int i;
-	UINT32 wmask;
+	uint32_t wmask;
 	int orig_pm = pm;
 
 	/* Get the pixel size, where:
@@ -1371,7 +1371,7 @@ void i860_cpu_device::insn_pstd (UINT32 insn)
 
 	/* Get effective address.  Chop off lower bits of displacement.  */
 	immsrc1 &= ~(8 - 1);
-	eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
+	eff = (uint32_t)(immsrc1 + (int32_t)(get_iregval (isrc2)));
 
 #ifdef TRACE_UNALIGNED_MEM
 	if (eff & (8 - 1))
@@ -1429,17 +1429,17 @@ void i860_cpu_device::insn_pstd (UINT32 insn)
 		}
 		orig_pm <<= 1;
 	}
-	bebuf = (UINT8 *)(&m_frg[4 * (31 - (fdest + 1))]);
+	bebuf = (uint8_t *)(&m_frg[4 * (31 - (fdest + 1))]);
 	fp_writemem_emu (eff, 8, bebuf, wmask);
 }
 
 
 /* Execute "ixfr isrc1ni,fdest" instruction.  */
-void i860_cpu_device::insn_ixfr (UINT32 insn)
+void i860_cpu_device::insn_ixfr (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 fdest = get_fdest (insn);
-	UINT32 iv = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t fdest = get_fdest (insn);
+	uint32_t iv = 0;
 
 	/* This is a bit-pattern transfer, not a conversion.  */
 	iv = get_iregval (isrc1);
@@ -1448,13 +1448,13 @@ void i860_cpu_device::insn_ixfr (UINT32 insn)
 
 
 /* Execute "addu isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_addu (UINT32 insn)
+void i860_cpu_device::insn_addu (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
-	UINT64 tmp = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
+	uint64_t tmp = 0;
 
 	src1val = get_iregval (get_isrc1 (insn));
 
@@ -1468,7 +1468,7 @@ void i860_cpu_device::insn_addu (UINT32 insn)
 	     OF = bit 31 carry
 	     CC = bit 31 carry.
 	 */
-	tmp = (UINT64)src1val + (UINT64)(get_iregval (isrc2));
+	tmp = (uint64_t)src1val + (uint64_t)(get_iregval (isrc2));
 	if ((tmp >> 32) & 1)
 	{
 		SET_PSR_CC (1);
@@ -1486,13 +1486,13 @@ void i860_cpu_device::insn_addu (UINT32 insn)
 
 
 /* Execute "addu #const,isrc2,idest".  */
-void i860_cpu_device::insn_addu_imm (UINT32 insn)
+void i860_cpu_device::insn_addu_imm (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
-	UINT64 tmp = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
+	uint64_t tmp = 0;
 
 	src1val = sign_ext (get_imm16 (insn), 16);
 
@@ -1506,7 +1506,7 @@ void i860_cpu_device::insn_addu_imm (UINT32 insn)
 	     OF = bit 31 carry
 	     CC = bit 31 carry.
 	 */
-	tmp = (UINT64)src1val + (UINT64)(get_iregval (isrc2));
+	tmp = (uint64_t)src1val + (uint64_t)(get_iregval (isrc2));
 	if ((tmp >> 32) & 1)
 	{
 		SET_PSR_CC (1);
@@ -1524,12 +1524,12 @@ void i860_cpu_device::insn_addu_imm (UINT32 insn)
 
 
 /* Execute "adds isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_adds (UINT32 insn)
+void i860_cpu_device::insn_adds (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 	int sa, sb, sres;
 
 	src1val = get_iregval (get_isrc1 (insn));
@@ -1553,7 +1553,7 @@ void i860_cpu_device::insn_adds (UINT32 insn)
 	else
 		SET_EPSR_OF (0);
 
-	if ((INT32)get_iregval (isrc2) < -(INT32)(src1val))
+	if ((int32_t)get_iregval (isrc2) < -(int32_t)(src1val))
 		SET_PSR_CC (1);
 	else
 		SET_PSR_CC (0);
@@ -1564,12 +1564,12 @@ void i860_cpu_device::insn_adds (UINT32 insn)
 
 
 /* Execute "adds #const,isrc2,idest".  */
-void i860_cpu_device::insn_adds_imm (UINT32 insn)
+void i860_cpu_device::insn_adds_imm (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 	int sa, sb, sres;
 
 	src1val = sign_ext (get_imm16 (insn), 16);
@@ -1593,7 +1593,7 @@ void i860_cpu_device::insn_adds_imm (UINT32 insn)
 	else
 		SET_EPSR_OF (0);
 
-	if ((INT32)get_iregval (isrc2) < -(INT32)(src1val))
+	if ((int32_t)get_iregval (isrc2) < -(int32_t)(src1val))
 		SET_PSR_CC (1);
 	else
 		SET_PSR_CC (0);
@@ -1604,12 +1604,12 @@ void i860_cpu_device::insn_adds_imm (UINT32 insn)
 
 
 /* Execute "subu isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_subu (UINT32 insn)
+void i860_cpu_device::insn_subu (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 
 	src1val = get_iregval (get_isrc1 (insn));
 
@@ -1625,7 +1625,7 @@ void i860_cpu_device::insn_subu (UINT32 insn)
 	     (i.e. CC set   if isrc2 <= isrc1
 	           CC clear if isrc2 > isrc1
 	 */
-	if ((UINT32)get_iregval (isrc2) <= (UINT32)src1val)
+	if ((uint32_t)get_iregval (isrc2) <= (uint32_t)src1val)
 	{
 		SET_PSR_CC (1);
 		SET_EPSR_OF (0);
@@ -1642,12 +1642,12 @@ void i860_cpu_device::insn_subu (UINT32 insn)
 
 
 /* Execute "subu #const,isrc2,idest".  */
-void i860_cpu_device::insn_subu_imm (UINT32 insn)
+void i860_cpu_device::insn_subu_imm (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 
 	src1val = sign_ext (get_imm16 (insn), 16);
 
@@ -1663,7 +1663,7 @@ void i860_cpu_device::insn_subu_imm (UINT32 insn)
 	     (i.e. CC set   if isrc2 <= isrc1
 	           CC clear if isrc2 > isrc1
 	 */
-	if ((UINT32)get_iregval (isrc2) <= (UINT32)src1val)
+	if ((uint32_t)get_iregval (isrc2) <= (uint32_t)src1val)
 	{
 		SET_PSR_CC (1);
 		SET_EPSR_OF (0);
@@ -1680,12 +1680,12 @@ void i860_cpu_device::insn_subu_imm (UINT32 insn)
 
 
 /* Execute "subs isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_subs (UINT32 insn)
+void i860_cpu_device::insn_subs (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 	int sa, sb, sres;
 
 	src1val = get_iregval (get_isrc1 (insn));
@@ -1709,7 +1709,7 @@ void i860_cpu_device::insn_subs (UINT32 insn)
 	else
 		SET_EPSR_OF (0);
 
-	if ((INT32)get_iregval (isrc2) > (INT32)(src1val))
+	if ((int32_t)get_iregval (isrc2) > (int32_t)(src1val))
 		SET_PSR_CC (1);
 	else
 		SET_PSR_CC (0);
@@ -1720,12 +1720,12 @@ void i860_cpu_device::insn_subs (UINT32 insn)
 
 
 /* Execute "subs #const,isrc2,idest".  */
-void i860_cpu_device::insn_subs_imm (UINT32 insn)
+void i860_cpu_device::insn_subs_imm (uint32_t insn)
 {
-	UINT32 src1val;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 tmp_dest_val = 0;
+	uint32_t src1val;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t tmp_dest_val = 0;
 	int sa, sb, sres;
 
 	src1val = sign_ext (get_imm16 (insn), 16);
@@ -1749,7 +1749,7 @@ void i860_cpu_device::insn_subs_imm (UINT32 insn)
 	else
 		SET_EPSR_OF (0);
 
-	if ((INT32)get_iregval (isrc2) > (INT32)(src1val))
+	if ((int32_t)get_iregval (isrc2) > (int32_t)(src1val))
 		SET_PSR_CC (1);
 	else
 		SET_PSR_CC (0);
@@ -1760,11 +1760,11 @@ void i860_cpu_device::insn_subs_imm (UINT32 insn)
 
 
 /* Execute "shl isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_shl (UINT32 insn)
+void i860_cpu_device::insn_shl (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = get_iregval (get_isrc1 (insn));
 	set_iregval (idest, get_iregval (isrc2) << src1val);
@@ -1772,11 +1772,11 @@ void i860_cpu_device::insn_shl (UINT32 insn)
 
 
 /* Execute "shl #const,isrc2,idest".  */
-void i860_cpu_device::insn_shl_imm (UINT32 insn)
+void i860_cpu_device::insn_shl_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = sign_ext (get_imm16 (insn), 16);
 	set_iregval (idest, get_iregval (isrc2) << src1val);
@@ -1784,15 +1784,15 @@ void i860_cpu_device::insn_shl_imm (UINT32 insn)
 
 
 /* Execute "shr isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_shr (UINT32 insn)
+void i860_cpu_device::insn_shr (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = get_iregval (get_isrc1 (insn));
 
-	/* The iregs array is UINT32, so this is a logical shift.  */
+	/* The iregs array is uint32_t, so this is a logical shift.  */
 	set_iregval (idest, get_iregval (isrc2) >> src1val);
 
 	/* shr also sets the SC in psr (shift count).  */
@@ -1801,15 +1801,15 @@ void i860_cpu_device::insn_shr (UINT32 insn)
 
 
 /* Execute "shr #const,isrc2,idest".  */
-void i860_cpu_device::insn_shr_imm (UINT32 insn)
+void i860_cpu_device::insn_shr_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = sign_ext (get_imm16 (insn), 16);
 
-	/* The iregs array is UINT32, so this is a logical shift.  */
+	/* The iregs array is uint32_t, so this is a logical shift.  */
 	set_iregval (idest, get_iregval (isrc2) >> src1val);
 
 	/* shr also sets the SC in psr (shift count).  */
@@ -1818,41 +1818,41 @@ void i860_cpu_device::insn_shr_imm (UINT32 insn)
 
 
 /* Execute "shra isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_shra (UINT32 insn)
+void i860_cpu_device::insn_shra (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = get_iregval (get_isrc1 (insn));
 
-	/* The iregs array is UINT32, so cast isrc2 to get arithmetic shift.  */
-	set_iregval (idest, (INT32)get_iregval (isrc2) >> src1val);
+	/* The iregs array is uint32_t, so cast isrc2 to get arithmetic shift.  */
+	set_iregval (idest, (int32_t)get_iregval (isrc2) >> src1val);
 }
 
 
 /* Execute "shra #const,isrc2,idest".  */
-void i860_cpu_device::insn_shra_imm (UINT32 insn)
+void i860_cpu_device::insn_shra_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
 
 	src1val = sign_ext (get_imm16 (insn), 16);
 
-	/* The iregs array is UINT32, so cast isrc2 to get arithmetic shift.  */
-	set_iregval (idest, (INT32)get_iregval (isrc2) >> src1val);
+	/* The iregs array is uint32_t, so cast isrc2 to get arithmetic shift.  */
+	set_iregval (idest, (int32_t)get_iregval (isrc2) >> src1val);
 }
 
 
 /* Execute "shrd isrc1ni,isrc2,idest" instruction.  */
-void i860_cpu_device::insn_shrd (UINT32 insn)
+void i860_cpu_device::insn_shrd (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 sc = GET_PSR_SC ();
-	UINT32 tmp;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t sc = GET_PSR_SC ();
+	uint32_t tmp;
 
 	/* Do the operation:
 	   idest = low_32(isrc1ni:isrc2 >> sc).  */
@@ -1868,12 +1868,12 @@ void i860_cpu_device::insn_shrd (UINT32 insn)
 
 
 /* Execute "and isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_and (UINT32 insn)
+void i860_cpu_device::insn_and (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	res = get_iregval (isrc1) & get_iregval (isrc2);
@@ -1889,12 +1889,12 @@ void i860_cpu_device::insn_and (UINT32 insn)
 
 
 /* Execute "and #const,isrc2,idest".  */
-void i860_cpu_device::insn_and_imm (UINT32 insn)
+void i860_cpu_device::insn_and_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -1911,12 +1911,12 @@ void i860_cpu_device::insn_and_imm (UINT32 insn)
 
 
 /* Execute "andh #const,isrc2,idest".  */
-void i860_cpu_device::insn_andh_imm (UINT32 insn)
+void i860_cpu_device::insn_andh_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -1933,12 +1933,12 @@ void i860_cpu_device::insn_andh_imm (UINT32 insn)
 
 
 /* Execute "andnot isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_andnot (UINT32 insn)
+void i860_cpu_device::insn_andnot (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	res = (~get_iregval (isrc1)) & get_iregval (isrc2);
@@ -1954,12 +1954,12 @@ void i860_cpu_device::insn_andnot (UINT32 insn)
 
 
 /* Execute "andnot #const,isrc2,idest".  */
-void i860_cpu_device::insn_andnot_imm (UINT32 insn)
+void i860_cpu_device::insn_andnot_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -1976,12 +1976,12 @@ void i860_cpu_device::insn_andnot_imm (UINT32 insn)
 
 
 /* Execute "andnoth #const,isrc2,idest".  */
-void i860_cpu_device::insn_andnoth_imm (UINT32 insn)
+void i860_cpu_device::insn_andnoth_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -1998,12 +1998,12 @@ void i860_cpu_device::insn_andnoth_imm (UINT32 insn)
 
 
 /* Execute "or isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_or (UINT32 insn)
+void i860_cpu_device::insn_or (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	res = get_iregval (isrc1) | get_iregval (isrc2);
@@ -2019,12 +2019,12 @@ void i860_cpu_device::insn_or (UINT32 insn)
 
 
 /* Execute "or #const,isrc2,idest".  */
-void i860_cpu_device::insn_or_imm (UINT32 insn)
+void i860_cpu_device::insn_or_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -2041,12 +2041,12 @@ void i860_cpu_device::insn_or_imm (UINT32 insn)
 
 
 /* Execute "orh #const,isrc2,idest".  */
-void i860_cpu_device::insn_orh_imm (UINT32 insn)
+void i860_cpu_device::insn_orh_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -2063,12 +2063,12 @@ void i860_cpu_device::insn_orh_imm (UINT32 insn)
 
 
 /* Execute "xor isrc1,isrc2,idest".  */
-void i860_cpu_device::insn_xor (UINT32 insn)
+void i860_cpu_device::insn_xor (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	res = get_iregval (isrc1) ^ get_iregval (isrc2);
@@ -2084,12 +2084,12 @@ void i860_cpu_device::insn_xor (UINT32 insn)
 
 
 /* Execute "xor #const,isrc2,idest".  */
-void i860_cpu_device::insn_xor_imm (UINT32 insn)
+void i860_cpu_device::insn_xor_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -2106,12 +2106,12 @@ void i860_cpu_device::insn_xor_imm (UINT32 insn)
 
 
 /* Execute "xorh #const,isrc2,idest".  */
-void i860_cpu_device::insn_xorh_imm (UINT32 insn)
+void i860_cpu_device::insn_xorh_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 idest = get_idest (insn);
-	UINT32 res = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t idest = get_idest (insn);
+	uint32_t res = 0;
 
 	/* Do the operation.  */
 	src1val = get_imm16 (insn);
@@ -2128,7 +2128,7 @@ void i860_cpu_device::insn_xorh_imm (UINT32 insn)
 
 
 /* Execute "trap isrc1ni,isrc2,idest" instruction.  */
-void i860_cpu_device::insn_trap (UINT32 insn)
+void i860_cpu_device::insn_trap (uint32_t insn)
 {
 	SET_PSR_IT (1);
 	m_pending_trap = 1;
@@ -2136,7 +2136,7 @@ void i860_cpu_device::insn_trap (UINT32 insn)
 
 
 /* Execute "intovr" instruction.  */
-void i860_cpu_device::insn_intovr (UINT32 insn)
+void i860_cpu_device::insn_intovr (uint32_t insn)
 {
 	if (GET_EPSR_OF ())
 	{
@@ -2147,19 +2147,19 @@ void i860_cpu_device::insn_intovr (UINT32 insn)
 
 
 /* Execute "bte isrc1,isrc2,sbroff".  */
-void i860_cpu_device::insn_bte (UINT32 insn)
+void i860_cpu_device::insn_bte (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 target_addr = 0;
-	INT32 sbroff = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t target_addr = 0;
+	int32_t sbroff = 0;
 	int res = 0;
 
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (sbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (src1val == get_iregval (isrc2));
@@ -2175,19 +2175,19 @@ void i860_cpu_device::insn_bte (UINT32 insn)
 
 
 /* Execute "bte #const5,isrc2,sbroff".  */
-void i860_cpu_device::insn_bte_imm (UINT32 insn)
+void i860_cpu_device::insn_bte_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 target_addr = 0;
-	INT32 sbroff = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t target_addr = 0;
+	int32_t sbroff = 0;
 	int res = 0;
 
 	src1val = (insn >> 11) & 0x1f;  /* 5-bit field, zero-extended.  */
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (sbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (src1val == get_iregval (isrc2));
@@ -2203,19 +2203,19 @@ void i860_cpu_device::insn_bte_imm (UINT32 insn)
 
 
 /* Execute "btne isrc1,isrc2,sbroff".  */
-void i860_cpu_device::insn_btne (UINT32 insn)
+void i860_cpu_device::insn_btne (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 target_addr = 0;
-	INT32 sbroff = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t target_addr = 0;
+	int32_t sbroff = 0;
 	int res = 0;
 
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (sbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (src1val != get_iregval (isrc2));
@@ -2231,19 +2231,19 @@ void i860_cpu_device::insn_btne (UINT32 insn)
 
 
 /* Execute "btne #const5,isrc2,sbroff".  */
-void i860_cpu_device::insn_btne_imm (UINT32 insn)
+void i860_cpu_device::insn_btne_imm (uint32_t insn)
 {
-	UINT32 src1val = 0;
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 target_addr = 0;
-	INT32 sbroff = 0;
+	uint32_t src1val = 0;
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t target_addr = 0;
+	int32_t sbroff = 0;
 	int res = 0;
 
 	src1val = (insn >> 11) & 0x1f;  /* 5-bit field, zero-extended.  */
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (sbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (src1val != get_iregval (isrc2));
@@ -2259,15 +2259,15 @@ void i860_cpu_device::insn_btne_imm (UINT32 insn)
 
 
 /* Execute "bc lbroff" instruction.  */
-void i860_cpu_device::insn_bc (UINT32 insn)
+void i860_cpu_device::insn_bc (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
 	int res = 0;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (GET_PSR_CC () == 1);
@@ -2283,15 +2283,15 @@ void i860_cpu_device::insn_bc (UINT32 insn)
 
 
 /* Execute "bnc lbroff" instruction.  */
-void i860_cpu_device::insn_bnc (UINT32 insn)
+void i860_cpu_device::insn_bnc (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
 	int res = 0;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (GET_PSR_CC () == 0);
@@ -2308,16 +2308,16 @@ void i860_cpu_device::insn_bnc (UINT32 insn)
 
 
 /* Execute "bc.t lbroff" instruction.  */
-void i860_cpu_device::insn_bct (UINT32 insn)
+void i860_cpu_device::insn_bct (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
 	int res = 0;
-	UINT32 orig_pc = m_pc;
+	uint32_t orig_pc = m_pc;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (GET_PSR_CC () == 1);
@@ -2352,16 +2352,16 @@ void i860_cpu_device::insn_bct (UINT32 insn)
 
 
 /* Execute "bnc.t lbroff" instruction.  */
-void i860_cpu_device::insn_bnct (UINT32 insn)
+void i860_cpu_device::insn_bnct (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
 	int res = 0;
-	UINT32 orig_pc = m_pc;
+	uint32_t orig_pc = m_pc;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Determine comparison result.  */
 	res = (GET_PSR_CC () == 0);
@@ -2396,15 +2396,15 @@ void i860_cpu_device::insn_bnct (UINT32 insn)
 
 
 /* Execute "call lbroff" instruction.  */
-void i860_cpu_device::insn_call (UINT32 insn)
+void i860_cpu_device::insn_call (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
-	UINT32 orig_pc = m_pc;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
+	uint32_t orig_pc = m_pc;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Execute the delay slot instruction.  */
 	m_pc += 4;
@@ -2428,15 +2428,15 @@ void i860_cpu_device::insn_call (UINT32 insn)
 
 
 /* Execute "br lbroff".  */
-void i860_cpu_device::insn_br (UINT32 insn)
+void i860_cpu_device::insn_br (uint32_t insn)
 {
-	UINT32 target_addr = 0;
-	INT32 lbroff = 0;
-	UINT32 orig_pc = m_pc;
+	uint32_t target_addr = 0;
+	int32_t lbroff = 0;
+	uint32_t orig_pc = m_pc;
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (lbroff << 2);
 
 	/* Execute the delay slot instruction.  */
 	m_pc += 4;
@@ -2459,12 +2459,12 @@ void i860_cpu_device::insn_br (UINT32 insn)
 /* Execute "bri isrc1ni" instruction.
    Note: I didn't merge this code with calli because bri must do
    a lot of flag manipulation if any trap bits are set.  */
-void i860_cpu_device::insn_bri (UINT32 insn)
+void i860_cpu_device::insn_bri (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 orig_pc = m_pc;
-	UINT32 orig_psr = m_cregs[CR_PSR];
-	UINT32 orig_src1_val = get_iregval (isrc1);
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t orig_pc = m_pc;
+	uint32_t orig_psr = m_cregs[CR_PSR];
+	uint32_t orig_src1_val = get_iregval (isrc1);
 
 #if 1 /* TURBO.  */
 	m_cregs[CR_PSR] &= ~PSR_ALL_TRAP_BITS_MASK;
@@ -2504,11 +2504,11 @@ void i860_cpu_device::insn_bri (UINT32 insn)
 }
 
 /* Execute "calli isrc1ni" instruction.  */
-void i860_cpu_device::insn_calli (UINT32 insn)
+void i860_cpu_device::insn_calli (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 orig_pc = m_pc;
-	UINT32 orig_src1_val = get_iregval (isrc1);
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t orig_pc = m_pc;
+	uint32_t orig_src1_val = get_iregval (isrc1);
 
 #ifdef TRACE_UNDEFINED_I860
 	/* Check for undefined behavior.  */
@@ -2542,15 +2542,15 @@ void i860_cpu_device::insn_calli (UINT32 insn)
 
 
 /* Execute "bla isrc1ni,isrc2,sbroff" instruction.  */
-void i860_cpu_device::insn_bla (UINT32 insn)
+void i860_cpu_device::insn_bla (uint32_t insn)
 {
-	UINT32 isrc1 = get_isrc1 (insn);
-	UINT32 isrc2 = get_isrc2 (insn);
-	UINT32 target_addr = 0;
-	INT32 sbroff = 0;
+	uint32_t isrc1 = get_isrc1 (insn);
+	uint32_t isrc2 = get_isrc2 (insn);
+	uint32_t target_addr = 0;
+	int32_t sbroff = 0;
 	int lcc_tmp = 0;
-	UINT32 orig_pc = m_pc;
-	UINT32 orig_isrc2val = get_iregval (isrc2);
+	uint32_t orig_pc = m_pc;
+	uint32_t orig_isrc2val = get_iregval (isrc2);
 
 #ifdef TRACE_UNDEFINED_I860
 	/* Check for undefined behavior.  */
@@ -2564,10 +2564,10 @@ void i860_cpu_device::insn_bla (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (int32_t)m_pc + 4 + (sbroff << 2);
 
 	/* Determine comparison result based on opcode.  */
-	lcc_tmp = ((INT32)get_iregval (isrc2) >= -(INT32)get_iregval (isrc1));
+	lcc_tmp = ((int32_t)get_iregval (isrc2) >= -(int32_t)get_iregval (isrc1));
 
 	set_iregval (isrc2, get_iregval (isrc1) + orig_isrc2val);
 
@@ -2597,12 +2597,12 @@ void i860_cpu_device::insn_bla (UINT32 insn)
 
 
 /* Execute "flush #const(isrc2)" or "flush #const(isrc2)++" instruction.  */
-void i860_cpu_device::insn_flush (UINT32 insn)
+void i860_cpu_device::insn_flush (uint32_t insn)
 {
-	UINT32 src1val = sign_ext (get_imm16 (insn), 16);
-	UINT32 isrc2 = get_isrc2 (insn);
+	uint32_t src1val = sign_ext (get_imm16 (insn), 16);
+	uint32_t isrc2 = get_isrc2 (insn);
 	int auto_inc = (insn & 1);
-	UINT32 eff = 0;
+	uint32_t eff = 0;
 
 	/* Technically, idest should be encoded as r0 because idest
 	   is undefined after the instruction.  We don't currently
@@ -2635,11 +2635,11 @@ void i860_cpu_device::insn_flush (UINT32 insn)
 
    The pfmul3.dd differs from pfmul.dd in that it treats the pipeline
    as 3 stages, even though it is a double precision multiply.  */
-void i860_cpu_device::insn_fmul (UINT32 insn)
+void i860_cpu_device::insn_fmul (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
@@ -2771,17 +2771,17 @@ void i860_cpu_device::insn_fmul (UINT32 insn)
 
 
 /* Execute "fmlow.dd fsrc1,fsrc2,fdest" instruction.  */
-void i860_cpu_device::insn_fmlow (UINT32 insn)
+void i860_cpu_device::insn_fmlow (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 
 	double v1 = get_fregval_d (fsrc1);
 	double v2 = get_fregval_d (fsrc2);
-	INT64 i1 = *(UINT64 *)&v1;
-	INT64 i2 = *(UINT64 *)&v2;
-	INT64 tmp = 0;
+	int64_t i1 = *(uint64_t *)&v1;
+	int64_t i2 = *(uint64_t *)&v2;
+	int64_t tmp = 0;
 
 	/* Only .dd is valid for fmlow.  */
 	if ((insn & 0x180) != 0x180)
@@ -2804,11 +2804,11 @@ void i860_cpu_device::insn_fmlow (UINT32 insn)
 
 
 /* Execute [p]fadd.{ss,sd,dd} fsrc1,fsrc2,fdest (.ds disallowed above).  */
-void i860_cpu_device::insn_fadd_sub (UINT32 insn)
+void i860_cpu_device::insn_fadd_sub (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
@@ -2969,11 +2969,11 @@ static const struct
 	/* 1111 */ { OP_SRC1, OP_SRC2,        OP_T,           OP_APIPE|FLAGM, 0, 0}
 };
 
-float i860_cpu_device::get_fval_from_optype_s (UINT32 insn, int optype)
+float i860_cpu_device::get_fval_from_optype_s (uint32_t insn, int optype)
 {
 	float retval = 0.0;
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
 
 	optype &= ~FLAGM;
 	switch (optype)
@@ -3008,11 +3008,11 @@ float i860_cpu_device::get_fval_from_optype_s (UINT32 insn, int optype)
 }
 
 
-double i860_cpu_device::get_fval_from_optype_d (UINT32 insn, int optype)
+double i860_cpu_device::get_fval_from_optype_d (uint32_t insn, int optype)
 {
 	double retval = 0.0;
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
 
 	optype &= ~FLAGM;
 	switch (optype)
@@ -3057,11 +3057,11 @@ double i860_cpu_device::get_fval_from_optype_d (UINT32 insn, int optype)
    floating point operations.  The S bit denotes the precision of the
    multiplication source, while the R bit denotes the precision of
    the addition source as well as precision of all results.  */
-void i860_cpu_device::insn_dualop (UINT32 insn)
+void i860_cpu_device::insn_dualop (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int is_pfam = insn & 0x400;      /* 1 = pfam, 0 = pfmam.  */
@@ -3318,10 +3318,10 @@ void i860_cpu_device::insn_dualop (UINT32 insn)
 
 
 /* Execute frcp.{ss,sd,dd} fsrc2,fdest (.ds disallowed above).  */
-void i860_cpu_device::insn_frcp (UINT32 insn)
+void i860_cpu_device::insn_frcp (uint32_t insn)
 {
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 
@@ -3347,9 +3347,9 @@ void i860_cpu_device::insn_frcp (UINT32 insn)
 			/* Real i860 isn't a precise as a real divide, but this should
 			   be okay.  */
 			SET_FSR_SE (0);
-			*((UINT64 *)&v) &= 0xfffff00000000000ULL;
+			*((uint64_t *)&v) &= 0xfffff00000000000ULL;
 			res = (double)1.0/v;
-			*((UINT64 *)&res) &= 0xfffff00000000000ULL;
+			*((uint64_t *)&res) &= 0xfffff00000000000ULL;
 			if (res_prec)
 				set_fregval_d (fdest, res);
 			else
@@ -3376,9 +3376,9 @@ void i860_cpu_device::insn_frcp (UINT32 insn)
 			/* Real i860 isn't a precise as a real divide, but this should
 			   be okay.  */
 			SET_FSR_SE (0);
-			*((UINT32 *)&v) &= 0xffff8000;
+			*((uint32_t *)&v) &= 0xffff8000;
 			res = (float)1.0/v;
-			*((UINT32 *)&res) &= 0xffff8000;
+			*((uint32_t *)&res) &= 0xffff8000;
 			if (res_prec)
 				set_fregval_d (fdest, (double)res);
 			else
@@ -3389,10 +3389,10 @@ void i860_cpu_device::insn_frcp (UINT32 insn)
 
 
 /* Execute frsqr.{ss,sd,dd} fsrc2,fdest (.ds disallowed above).  */
-void i860_cpu_device::insn_frsqr (UINT32 insn)
+void i860_cpu_device::insn_frsqr (uint32_t insn)
 {
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 
@@ -3430,9 +3430,9 @@ void i860_cpu_device::insn_frsqr (UINT32 insn)
 		else
 		{
 			SET_FSR_SE (0);
-			*((UINT64 *)&v) &= 0xfffff00000000000ULL;
+			*((uint64_t *)&v) &= 0xfffff00000000000ULL;
 			res = (double)1.0/sqrt (v);
-			*((UINT64 *)&res) &= 0xfffff00000000000ULL;
+			*((uint64_t *)&res) &= 0xfffff00000000000ULL;
 			if (res_prec)
 				set_fregval_d (fdest, res);
 			else
@@ -3457,10 +3457,10 @@ void i860_cpu_device::insn_frsqr (UINT32 insn)
 		else
 		{
 			SET_FSR_SE (0);
-			*((UINT32 *)&v) &= 0xffff8000;
+			*((uint32_t *)&v) &= 0xffff8000;
 			// FIXME: shouldn't this be 1.0f / sqrtf(v) ?
 			res = (float) (1.0/sqrt (v));
-			*((UINT32 *)&res) &= 0xffff8000;
+			*((uint32_t *)&res) &= 0xffff8000;
 			if (res_prec)
 				set_fregval_d (fdest, (double)res);
 			else
@@ -3471,15 +3471,15 @@ void i860_cpu_device::insn_frsqr (UINT32 insn)
 
 
 /* Execute fxfr fsrc1,idest.  */
-void i860_cpu_device::insn_fxfr (UINT32 insn)
+void i860_cpu_device::insn_fxfr (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 idest = get_idest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t idest = get_idest (insn);
 	float fv = 0;
 
 	/* This is a bit-pattern transfer, not a conversion.  */
 	fv = get_fregval_s (fsrc1);
-	set_iregval (idest, *(UINT32 *)&fv);
+	set_iregval (idest, *(uint32_t *)&fv);
 }
 
 
@@ -3491,10 +3491,10 @@ void i860_cpu_device::insn_fxfr (UINT32 insn)
    results.  Inconsistent.
    Update: The vendor SVR4 assembler does not accept .ss combination,
    so the latter sentence above appears to be the correct way.  */
-void i860_cpu_device::insn_ftrunc (UINT32 insn)
+void i860_cpu_device::insn_ftrunc (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
@@ -3512,7 +3512,7 @@ void i860_cpu_device::insn_ftrunc (UINT32 insn)
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (fsrc1);
-		INT32 iv = (INT32)v1;
+		int32_t iv = (int32_t)v1;
 		/* We always write a single, since the lower 32-bits of fdest
 		   get the result (and the even numbered reg is the lower).  */
 		set_fregval_s (fdest, *(float *)&iv);
@@ -3520,7 +3520,7 @@ void i860_cpu_device::insn_ftrunc (UINT32 insn)
 	else
 	{
 		float v1 = get_fregval_s (fsrc1);
-		INT32 iv = (INT32)v1;
+		int32_t iv = (int32_t)v1;
 		/* We always write a single, since the lower 32-bits of fdest
 		   get the result (and the even numbered reg is the lower).  */
 		set_fregval_s (fdest, *(float *)&iv);
@@ -3540,10 +3540,10 @@ void i860_cpu_device::insn_ftrunc (UINT32 insn)
 
 
 /* Execute [p]famov.{ss,sd,ds,dd} fsrc1,fdest.  */
-void i860_cpu_device::insn_famov (UINT32 insn)
+void i860_cpu_device::insn_famov (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
@@ -3617,11 +3617,11 @@ void i860_cpu_device::insn_famov (UINT32 insn)
 
 
 /* Execute [p]fiadd/sub.{ss,dd} fsrc1,fsrc2,fdest.  */
-void i860_cpu_device::insn_fiadd_sub (UINT32 insn)
+void i860_cpu_device::insn_fiadd_sub (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
@@ -3643,9 +3643,9 @@ void i860_cpu_device::insn_fiadd_sub (UINT32 insn)
 	{
 		double v1 = get_fregval_d (fsrc1);
 		double v2 = get_fregval_d (fsrc2);
-		UINT64 iv1 = *(UINT64 *)&v1;
-		UINT64 iv2 = *(UINT64 *)&v2;
-		UINT64 r;
+		uint64_t iv1 = *(uint64_t *)&v1;
+		uint64_t iv2 = *(uint64_t *)&v2;
+		uint64_t r;
 		if (is_sub)
 			r = iv1 - iv2;
 		else
@@ -3659,13 +3659,13 @@ void i860_cpu_device::insn_fiadd_sub (UINT32 insn)
 	{
 		float v1 = get_fregval_s (fsrc1);
 		float v2 = get_fregval_s (fsrc2);
-		UINT64 iv1 = (UINT64)(*(UINT32 *)&v1);
-		UINT64 iv2 = (UINT64)(*(UINT32 *)&v2);
-		UINT32 r;
+		uint64_t iv1 = (uint64_t)(*(uint32_t *)&v1);
+		uint64_t iv2 = (uint64_t)(*(uint32_t *)&v2);
+		uint32_t r;
 		if (is_sub)
-			r = (UINT32)(iv1 - iv2);
+			r = (uint32_t)(iv1 - iv2);
 		else
-			r = (UINT32)(iv1 + iv2);
+			r = (uint32_t)(iv1 + iv2);
 		if (res_prec)
 			assert (0);    /* .sd not allowed.  */
 		else
@@ -3717,11 +3717,11 @@ void i860_cpu_device::insn_fiadd_sub (UINT32 insn)
 
 /* Execute pf{gt,le,eq}.{ss,dd} fsrc1,fsrc2,fdest.
    Opcode pfgt has R bit cleared; pfle has R bit set.  */
-void i860_cpu_device::insn_fcmp (UINT32 insn)
+void i860_cpu_device::insn_fcmp (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	double dbl_tmp_dest = 0.0;
 	double sgl_tmp_dest = 0.0;
@@ -3796,20 +3796,20 @@ void i860_cpu_device::insn_fcmp (UINT32 insn)
 
 /* Execute [p]fzchk{l,s} fsrc1,fsrc2,fdest.
    The fzchk instructions have S and R bits set.  */
-void i860_cpu_device::insn_fzchk (UINT32 insn)
+void i860_cpu_device::insn_fzchk (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	int is_fzchks = insn & 8;        /* 1 = fzchks, 0 = fzchkl.  */
 	double dbl_tmp_dest = 0.0;
 	int i;
 	double v1 = get_fregval_d (fsrc1);
 	double v2 = get_fregval_d (fsrc2);
-	UINT64 iv1 = *(UINT64 *)&v1;
-	UINT64 iv2 = *(UINT64 *)&v2;
-	UINT64 r = 0;
+	uint64_t iv1 = *(uint64_t *)&v1;
+	uint64_t iv2 = *(uint64_t *)&v2;
+	uint64_t r = 0;
 	char pm = GET_PSR_PM ();
 
 	/* Check for S and R bits set.  */
@@ -3827,16 +3827,16 @@ void i860_cpu_device::insn_fzchk (UINT32 insn)
 		pm = (pm >> 4) & 0x0f;
 		for (i = 3; i >= 0; i--)
 		{
-			UINT16 ps1 = (iv1 >> (i * 16)) & 0xffff;
-			UINT16 ps2 = (iv2 >> (i * 16)) & 0xffff;
+			uint16_t ps1 = (iv1 >> (i * 16)) & 0xffff;
+			uint16_t ps2 = (iv2 >> (i * 16)) & 0xffff;
 			if (ps2 <= ps1)
 			{
-				r |= ((UINT64)ps2 << (i * 16));
+				r |= ((uint64_t)ps2 << (i * 16));
 				pm |= (1 << (7 - (3 - i)));
 			}
 			else
 			{
-				r |= ((UINT64)ps1 << (i * 16));
+				r |= ((uint64_t)ps1 << (i * 16));
 				pm &= ~(1 << (7 - (3 - i)));
 			}
 		}
@@ -3846,16 +3846,16 @@ void i860_cpu_device::insn_fzchk (UINT32 insn)
 		pm = (pm >> 2) & 0x3f;
 		for (i = 1; i >= 0; i--)
 		{
-			UINT32 ps1 = (iv1 >> (i * 32)) & 0xffffffff;
-			UINT32 ps2 = (iv2 >> (i * 32)) & 0xffffffff;
+			uint32_t ps1 = (iv1 >> (i * 32)) & 0xffffffff;
+			uint32_t ps2 = (iv2 >> (i * 32)) & 0xffffffff;
 			if (ps2 <= ps1)
 			{
-				r |= ((UINT64)ps2 << (i * 32));
+				r |= ((uint64_t)ps2 << (i * 32));
 				pm |= (1 << (7 - (1 - i)));
 			}
 			else
 			{
-				r |= ((UINT64)ps1 << (i * 32));
+				r |= ((uint64_t)ps1 << (i * 32));
 				pm &= ~(1 << (7 - (1 - i)));
 			}
 		}
@@ -3892,14 +3892,14 @@ void i860_cpu_device::insn_fzchk (UINT32 insn)
 
 /* Execute [p]form.dd fsrc1,fdest.
    The form.dd instructions have S and R bits set.  */
-void i860_cpu_device::insn_form (UINT32 insn)
+void i860_cpu_device::insn_form (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (fsrc1);
-	UINT64 iv1 = *(UINT64 *)&v1;
+	uint64_t iv1 = *(uint64_t *)&v1;
 
 	/* Check for S and R bits set.  */
 	if ((insn & 0x180) != 0x180)
@@ -3938,18 +3938,18 @@ void i860_cpu_device::insn_form (UINT32 insn)
 
 
 /* Execute [p]faddp fsrc1,fsrc2,fdest.  */
-void i860_cpu_device::insn_faddp (UINT32 insn)
+void i860_cpu_device::insn_faddp (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (fsrc1);
 	double v2 = get_fregval_d (fsrc2);
-	UINT64 iv1 = *(UINT64 *)&v1;
-	UINT64 iv2 = *(UINT64 *)&v2;
-	UINT64 r = 0;
+	uint64_t iv1 = *(uint64_t *)&v1;
+	uint64_t iv2 = *(uint64_t *)&v2;
+	uint64_t r = 0;
 	int ps = GET_PSR_PS ();
 
 	r = iv1 + iv2;
@@ -4003,18 +4003,18 @@ void i860_cpu_device::insn_faddp (UINT32 insn)
 
 
 /* Execute [p]faddz fsrc1,fsrc2,fdest.  */
-void i860_cpu_device::insn_faddz (UINT32 insn)
+void i860_cpu_device::insn_faddz (uint32_t insn)
 {
-	UINT32 fsrc1 = get_fsrc1 (insn);
-	UINT32 fsrc2 = get_fsrc2 (insn);
-	UINT32 fdest = get_fdest (insn);
+	uint32_t fsrc1 = get_fsrc1 (insn);
+	uint32_t fsrc2 = get_fsrc2 (insn);
+	uint32_t fdest = get_fdest (insn);
 	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (fsrc1);
 	double v2 = get_fregval_d (fsrc2);
-	UINT64 iv1 = *(UINT64 *)&v1;
-	UINT64 iv2 = *(UINT64 *)&v2;
-	UINT64 r = 0;
+	uint64_t iv1 = *(uint64_t *)&v1;
+	uint64_t iv2 = *(uint64_t *)&v2;
+	uint64_t r = 0;
 
 	r = iv1 + iv2;
 	dbl_tmp_dest = *(double *)&r;
@@ -4283,7 +4283,7 @@ const i860_cpu_device::decode_tbl_t i860_cpu_device::fp_decode_tbl[128] = {
  *  insn = instruction at the current PC to execute.
  *  non_shadow = This insn is not in the shadow of a delayed branch).
  */
-void i860_cpu_device::decode_exec (UINT32 insn, UINT32 non_shadow)
+void i860_cpu_device::decode_exec (uint32_t insn, uint32_t non_shadow)
 {
 	int upper_6bits = (insn >> 26) & 0x3f;
 	char flags = 0;
@@ -4428,7 +4428,7 @@ void i860_cpu_device::execute_run()
 	/* Decode and execute loop.  */
 	while (m_icount > 0)
 	{
-		UINT32 savepc = m_pc;
+		uint32_t savepc = m_pc;
 		m_pc_updated = 0;
 		m_pending_trap = 0;
 
@@ -4507,14 +4507,14 @@ extern unsigned disasm_i860 (char *buf, unsigned int pc, unsigned int insn);
 
 
 /* Disassemble `len' instructions starting at `addr'.  */
-void i860_cpu_device::disasm (UINT32 addr, int len)
+void i860_cpu_device::disasm (uint32_t addr, int len)
 {
-	UINT32 insn;
+	uint32_t insn;
 	int j;
 	for (j = 0; j < len; j++)
 	{
 		char buf[256];
-		UINT32 phys_addr = addr;
+		uint32_t phys_addr = addr;
 		if (GET_DIRBASE_ATE ())
 			phys_addr = get_address_translation (addr, 1  /* is_dataref */, 0 /* is_write */);
 
@@ -4537,9 +4537,9 @@ void i860_cpu_device::disasm (UINT32 addr, int len)
 
 
 /* Dump `len' bytes starting at `addr'.  */
-void i860_cpu_device::dbg_db (UINT32 addr, int len)
+void i860_cpu_device::dbg_db (uint32_t addr, int len)
 {
-	UINT8 b[16];
+	uint8_t b[16];
 	int i;
 	/* This will always dump a multiple of 16 bytes, even if 'len' isn't.  */
 	while (len > 0)
@@ -4549,7 +4549,7 @@ void i860_cpu_device::dbg_db (UINT32 addr, int len)
 		fprintf (stderr, "0x%08x: ", addr);
 		for (i = 0; i < 16; i++)
 		{
-			UINT32 phys_addr = addr;
+			uint32_t phys_addr = addr;
 			if (GET_DIRBASE_ATE ())
 				phys_addr = get_address_translation (addr, 1  /* is_dataref */, 0 /* is_write */);
 
@@ -4575,8 +4575,8 @@ void i860_cpu_device::dbg_db (UINT32 addr, int len)
 void debugger (i860s *cpustate)
 {
 	char buf[256];
-	UINT32 curr_disasm = m_pc;
-	UINT32 curr_dumpdb = 0;
+	uint32_t curr_disasm = m_pc;
+	uint32_t curr_dumpdb = 0;
 	int c = 0;
 
 	if (m_single_stepping > 1 && m_single_stepping != m_pc)
@@ -4658,7 +4658,7 @@ void debugger (i860s *cpustate)
 		}
 		else if (buf[0] == 'x' && buf[1] == '0')
 		{
-			UINT32 v;
+			uint32_t v;
 			sscanf (buf + 1, "%x", &v);
 			if (GET_DIRBASE_ATE ())
 				fprintf (stderr, "vma 0x%08x ==> phys 0x%08x\n", v,

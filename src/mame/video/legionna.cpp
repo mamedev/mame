@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "includes/legionna.h"
+#include "screen.h"
 
 
 /******************************************************************************/
@@ -217,11 +218,11 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 
 void legionna_state::common_video_allocate_ptr()
 {
-	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
-	m_fore_data =  make_unique_clear<UINT16[]>(0x800/2);
-	m_mid_data =  make_unique_clear<UINT16[]>(0x800/2);
-	m_textram =  make_unique_clear<UINT16[]>(0x1000/2);
-	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
+	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	m_textram =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_scrollram16 = std::make_unique<uint16_t[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -307,7 +308,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_sprite_pri_mask[2] = 0xfffe; // door at the end of sewers part in level 1
 	m_sprite_pri_mask[3] = 0x0000; // briefing guy in pre-stage and portraits before a boss fight
 
-//  m_background_layer->set_transparent_pen(15);
+	m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(7);//?
@@ -339,7 +340,7 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 	m_has_extended_banking = 0;
 	m_has_extended_priority = 1;
 
-	m_layer_config = std::make_unique<UINT16[]>(0x8/2);
+	m_layer_config = std::make_unique<uint16_t[]>(0x8/2);
 }
 
 /*************************************************************************
@@ -370,14 +371,14 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 
 void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,cur_pri;
 	int dx,dy,ax,ay;
 	int pri_mask;
 
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
-		UINT16 data = spriteram16[offs];
+		uint16_t data = spriteram16[offs];
 		if (!(data &0x8000)) continue;
 
 		pri_mask = 0;
@@ -419,7 +420,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
 			pri_mask = m_sprite_pri_mask[cur_pri];
 			#if 0
-			static UINT8 pri_test;
+			static uint8_t pri_test;
 
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test++;
@@ -433,7 +434,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			// quick and dirty priority tester
 			if(cur_pri == pri_test)
 			{
-				static UINT16 test = 0xffff;
+				static uint16_t test = 0xffff;
 
 				if(machine().input().code_pressed_once(KEYCODE_Q))
 					test^=1;
@@ -567,7 +568,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 	}
 }
 
-UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	screen.priority().fill(0, cliprect);
@@ -581,13 +582,13 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
 
-UINT32 legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	screen.priority().fill(0, cliprect);
@@ -602,17 +603,18 @@ UINT32 legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
 
 
-UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x0200, cliprect);
 	screen.priority().fill(0, cliprect);
+	// matches PCB recording for Denjin Makai, settable thru CRTC?
+	bitmap.fill(0xff, cliprect);
 
 	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
 	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
@@ -622,14 +624,14 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 
 	return 0;
 }
 
-UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -649,8 +651,8 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
+	//if (machine().input().code_pressed_once(KEYCODE_Z))
+	//	if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }

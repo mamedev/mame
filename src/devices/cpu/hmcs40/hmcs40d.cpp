@@ -46,7 +46,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
-static const INT8 s_bits[] =
+static const s8 s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 4,
@@ -65,7 +65,7 @@ static const INT8 s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] =
+static const u32 s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0,
@@ -81,17 +81,8 @@ static const UINT32 s_flags[] =
 	0
 };
 
-// next program counter in sequence (relative)
-static const INT8 s_next_pc[0x40] =
-{
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+0x40 /* rollback */,
-	-32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17,
-	-15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, -1
-};
 
-
-static const UINT8 hmcs40_mnemonic[0x400] =
+static const u8 hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
@@ -186,29 +177,28 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	UINT16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
-	char *dst = buffer;
-	UINT8 instr = hmcs40_mnemonic[op];
-	INT8 bits = s_bits[instr];
+	u16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	u8 instr = hmcs40_mnemonic[op];
+	s8 bits = s_bits[instr];
 
 	// special case for (XY) opcode
 	if (bits == 99)
 	{
-		dst += sprintf(dst, "%s", s_mnemonics[instr]);
+		util::stream_format(stream, "%s", s_mnemonics[instr]);
 
 		if (op & 1)
-			dst += sprintf(dst, "X");
+			stream << "X";
 		if (op & 2)
-			dst += sprintf(dst, "Y");
+			stream << "Y";
 	}
 	else
 	{
-		dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
+		util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
 
 		// opcode parameter
 		if (bits != 0)
 		{
-			UINT8 param = op;
+			u8 param = op;
 
 			// reverse bits
 			if (bits < 0)
@@ -221,12 +211,11 @@ CPU_DISASSEMBLE(hmcs40)
 			param &= ((1 << bits) - 1);
 
 			if (bits > 5)
-				dst += sprintf(dst, "$%02X", param);
+				util::stream_format(stream, "$%02X", param);
 			else
-				dst += sprintf(dst, "%d", param);
+				util::stream_format(stream, "%d", param);
 		}
 	}
 
-	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

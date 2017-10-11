@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/tms34010/tms34010.h"
+#include "screen.h"
+
 
 #define SCREEN_TAG "screen"
 
@@ -50,7 +52,7 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /* Memory Maps */
@@ -74,7 +76,7 @@ void tekxp330_state::video_start()
 {
 }
 
-UINT32 tekxp330_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tekxp330_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -87,7 +89,7 @@ void tekxp330_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tekxp330, tekxp330_state )
+static MACHINE_CONFIG_START( tekxp330 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3052, XTAL_20MHz) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
@@ -117,5 +119,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     CLASS          INIT    COMPANY      FULLNAME           FLAGS */
-COMP( 1992, tekxp330,   0,          0,      tekxp330,   tekxp330, driver_device,   0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME           FLAGS
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, 0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )

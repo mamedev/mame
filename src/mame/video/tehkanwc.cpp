@@ -121,7 +121,7 @@ void tehkanwc_state::video_start()
    bit 7 = enable (0 = display off)
  */
 
-void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player)
+void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player)
 {
 	if (led&0x80)
 		output().set_digit_value(player, led&0x7f);
@@ -158,7 +158,7 @@ void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 tehkanwc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tehkanwc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

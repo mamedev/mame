@@ -11,7 +11,7 @@
 
 PALETTE_INIT_MEMBER(speedatk_state, speedatk)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -46,7 +46,7 @@ PALETTE_INIT_MEMBER(speedatk_state, speedatk)
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -72,12 +72,12 @@ WRITE8_MEMBER(speedatk_state::m6845_w)
 	}
 }
 
-UINT32 speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
-	UINT16 tile;
-	UINT8 color, region;
+	uint16_t tile;
+	uint8_t color, region;
 
 	bitmap.fill(0, cliprect);
 

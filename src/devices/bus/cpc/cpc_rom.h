@@ -6,23 +6,23 @@
  *
  */
 
-#ifndef CPC_ROM_H_
-#define CPC_ROM_H_
+#ifndef MAME_BUS_CPC_CPC_ROM_H
+#define MAME_BUS_CPC_CPC_ROM_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 
 /*** ROM image device ***/
 
-// ======================> rom_image_device
+// ======================> cpc_rom_image_device
 
-class rom_image_device :    public device_t,
-							public device_image_interface
+class cpc_rom_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~rom_image_device();
+	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~cpc_rom_image_device();
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -38,24 +38,23 @@ public:
 	virtual const char *image_interface() const override { return "cpc_rom"; }
 	virtual const char *file_extensions() const override { return "rom,bin"; }
 
-	UINT8* base() { return m_base.get(); }
+	uint8_t* base() { return m_base.get(); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 
 private:
-	std::unique_ptr<UINT8[]> m_base;
+	std::unique_ptr<uint8_t[]> m_base;
 };
 
 
 // device type definition
-extern const device_type ROMSLOT;
+DECLARE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device)
 
 
-#define MCFG_ROMSLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ROMSLOT, 0)
+#define MCFG_CPC_ROMSLOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CPC_ROMSLOT, 0)
 
 /*** ROM box device ***/
 
@@ -64,26 +63,24 @@ class cpc_rom_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	UINT8* base(UINT8 slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return nullptr; }
+	uint8_t* base(uint8_t slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return nullptr; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	//cpc_expansion_slot_device *m_slot;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	rom_image_device* m_rom[8];
+private:
+	required_device_array<cpc_rom_image_device, 8> m_rom;
 };
 
 // device type definition
-extern const device_type CPC_ROM;
+DECLARE_DEVICE_TYPE(CPC_ROM, cpc_rom_device)
 
 
-#endif
+#endif // MAME_BUS_CPC_CPC_ROM_H

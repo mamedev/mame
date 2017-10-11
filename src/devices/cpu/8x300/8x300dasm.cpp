@@ -25,7 +25,7 @@ static const char *reg_names[32] =
 };
 
 // determines if right rotate or I/O field length is to be used
-static inline bool is_rot(UINT16 opcode)
+static inline bool is_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000) || (opcode & 0x0010))
 		return false;
@@ -33,7 +33,7 @@ static inline bool is_rot(UINT16 opcode)
 		return true;
 }
 
-static inline bool is_src_rot(UINT16 opcode)
+static inline bool is_src_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000))
 		return false;
@@ -41,108 +41,88 @@ static inline bool is_src_rot(UINT16 opcode)
 		return true;
 }
 
-CPU_DISASSEMBLE( n8x300 )
+CPU_DISASSEMBLE(n8x300)
 {
-	char tmp[16];
 	unsigned startpc = pc;
-	UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
-	UINT8 inst = opcode >> 13;
+	uint16_t opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
+	uint8_t inst = opcode >> 13;
 	pc+=2;
 
 	// determine instruction
 	switch (inst)
 	{
 	case 0x00:
-		sprintf(buffer,"MOVE ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "MOVE " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x01:
-		sprintf(buffer,"ADD  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "ADD  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x02:
-		sprintf(buffer,"AND  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "AND  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x03:
-		sprintf(buffer,"XOR  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "XOR  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x04:
-		sprintf(buffer,"XEC  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "XEC  " << reg_names[SRC];
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,",%02XH",IMM8);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%02XH", IMM8);
 		}
 		else
 		{
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
-			sprintf(tmp,",%02XH",IMM5);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%i", ROTLEN);
+			util::stream_format(stream, ",%02XH", IMM5);
 		}
 		break;
 	case 0x05:
-		sprintf(buffer,"NZT  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "NZT  " << reg_names[SRC];
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,",%02XH",IMM8);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%02XH", IMM8);
 		}
 		else
 		{
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
-			sprintf(tmp,",%02XH",IMM5);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%i", ROTLEN);
+			util::stream_format(stream, ",%02XH", IMM5);
 		}
 		break;
 	case 0x06:
-		sprintf(buffer,"XMIT ");
+		stream << "XMIT ";
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,"%02XH,",IMM8);
-			strcat(buffer,tmp);
-			strcat(buffer,reg_names[SRC]);
+			util::stream_format(stream, "%02XH,", IMM8);
+			stream << reg_names[SRC];
 		}
 		else
 		{
-			sprintf(tmp,"%02XH,",IMM5);
-			strcat(buffer,tmp);
-			strcat(buffer,reg_names[SRC]);
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
+			util::stream_format(stream, "%02XH,", IMM5);
+			stream << reg_names[SRC];
+			util::stream_format(stream, ",%i", ROTLEN);
 		}
 		break;
 	case 0x07:
-		sprintf(buffer,"JMP  %04XH",opcode & 0x1fff);
+		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff) << 1);
 		break;
 	}
 

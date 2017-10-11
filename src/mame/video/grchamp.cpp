@@ -15,7 +15,7 @@
 
 PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -180,8 +180,8 @@ void grchamp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	gfx_element *gfx = m_gfxdecode->gfx(5);
 	int bank = (m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;
-	const UINT8 *source = m_spriteram + 0x40;
-	const UINT8 *finish = source + 0x40;
+	const uint8_t *source = m_spriteram + 0x40;
+	const uint8_t *finish = source + 0x40;
 
 	while (source < finish)
 	{
@@ -202,7 +202,7 @@ void grchamp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 #endif
 
 
-void grchamp_state::draw_objects(int y, UINT8 *objdata)
+void grchamp_state::draw_objects(int y, uint8_t *objdata)
 {
 /*
     CPU 5/7:
@@ -239,7 +239,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 
 
 */
-	const UINT8 *prom = memregion("proms")->base() + 0x20;
+	const uint8_t *prom = memregion("proms")->base() + 0x20;
 	gfx_element *gfx;
 	int change = (m_cpu0_out[0] & 0x20) << 3;
 	int num;
@@ -272,7 +272,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 			int code = (codeflip & 0x3f) + (change >> 2);
 			int yflip = (codeflip & 0x80) ? 0x0f : 0x00;
 			int xflip = (codeflip & 0x40) ? 0x0f : 0x00;
-			const UINT8 *src = gfx->get_data(code) + ((dy ^ yflip) & 15) * gfx->rowbytes();
+			const uint8_t *src = gfx->get_data(code) + ((dy ^ yflip) & 15) * gfx->rowbytes();
 
 			/* the third byte is: color in bits 0-2 */
 			int color = (m_spriteram[0x42 + (dataoffs & ~0x20)] & 0x07) << 2;
@@ -316,7 +316,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 		int dy = sy + ~y;
 		int color = (m_spriteram[0x01 + dataoffs] & 0x07) << 2;
 		int code = m_videoram[hprime | ((dy & 0xf8) << 2)] + change;
-		const UINT8 *src = gfx->get_data(code) + (dy & 7) * gfx->rowbytes();
+		const uint8_t *src = gfx->get_data(code) + (dy & 7) * gfx->rowbytes();
 		int x;
 
 		/* draw 8 pixels */
@@ -343,7 +343,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 }
 
 
-UINT32 grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const rgb_t objpix_lookup[8] =
 	{
@@ -358,9 +358,9 @@ UINT32 grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	};
 
 	const pen_t *bgpen = m_palette->pens();
-	const UINT8 *amedata = memregion("gfx5")->base();
-	const UINT8 *headdata = memregion("gfx6")->base();
-	const UINT8 *pldata = memregion("gfx7")->base();
+	const uint8_t *amedata = memregion("gfx5")->base();
+	const uint8_t *headdata = memregion("gfx6")->base();
+	const uint8_t *pldata = memregion("gfx7")->base();
 	bitmap_ind16 &lpixmap = m_left_tilemap->pixmap();
 	bitmap_ind16 &rpixmap = m_right_tilemap->pixmap();
 	bitmap_ind16 &cpixmap = m_center_tilemap->pixmap();
@@ -394,10 +394,10 @@ UINT32 grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		/* get source/dest pointers */
 		/* the Y counter starts counting when VBLANK goes to 0, which is at Y=16 */
-		UINT16 *lrsrc = &lrpixmap.pix16((lryscroll + y - 16) & 0xff);
-		UINT16 *csrc = &cpixmap.pix16((cyscroll + y - 16) & 0xff);
-		UINT32 *dest = &bitmap.pix32(y);
-		UINT8 objdata[256];
+		uint16_t *lrsrc = &lrpixmap.pix16((lryscroll + y - 16) & 0xff);
+		uint16_t *csrc = &cpixmap.pix16((cyscroll + y - 16) & 0xff);
+		uint32_t *dest = &bitmap.pix32(y);
+		uint8_t objdata[256];
 
 		/* draw the objects for this scanline */
 		draw_objects(y, objdata);

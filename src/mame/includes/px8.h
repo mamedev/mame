@@ -6,9 +6,8 @@
 #define __PX8__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
@@ -42,12 +41,12 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;         /* LCD video RAM */
+	required_shared_ptr<uint8_t> m_video_ram;         /* LCD video RAM */
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( gah40m_r );
 	DECLARE_WRITE8_MEMBER( gah40m_w );
@@ -59,21 +58,21 @@ public:
 	DECLARE_WRITE8_MEMBER( ksc_w );
 
 	void bankswitch();
-	UINT8 krtn_read();
+	uint8_t krtn_read();
 
 	/* GAH40M state */
-	UINT16 m_icr;               /* input capture register */
-	UINT16 m_frc;               /* free running counter */
-	UINT8 m_ier;                /* interrupt acknowledge register */
-	UINT8 m_isr;                /* interrupt status register */
-	UINT8 m_sio;                /* serial I/O register */
+	uint16_t m_icr;               /* input capture register */
+	uint16_t m_frc;               /* free running counter */
+	uint8_t m_ier;                /* interrupt acknowledge register */
+	uint8_t m_isr;                /* interrupt status register */
+	uint8_t m_sio;                /* serial I/O register */
 	int m_bank0;                /* */
 
 	/* GAH40S state */
-	UINT16 m_cnt;               /* microcassette tape counter */
+	uint16_t m_cnt;               /* microcassette tape counter */
 	int m_swpr;             /* P-ROM power switch */
-	UINT16 m_pra;               /* P-ROM address */
-	UINT8 m_prd;                /* P-ROM data */
+	uint16_t m_pra;               /* P-ROM address */
+	uint8_t m_prd;                /* P-ROM data */
 
 	/* memory state */
 	int m_bk2;              /* */

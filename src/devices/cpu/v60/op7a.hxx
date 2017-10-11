@@ -28,9 +28,9 @@
 #define F7CCREATEBITMASK(x) \
 	x = ((1 << (x)) - 1)
 
-void v60_device::F7aDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func DecodeOp2, UINT8 dim2)
+void v60_device::F7aDecodeOperands(am_func DecodeOp1, uint8_t dim1, am_func DecodeOp2, uint8_t dim2)
 {
-	UINT8 appb;
+	uint8_t appb;
 	// Decode first operand
 	m_moddim = dim1;
 	m_modm = m_subop & 0x40;
@@ -62,9 +62,9 @@ void v60_device::F7aDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func Decode
 		m_lenop2 = appb;
 }
 
-void v60_device::F7bDecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
+void v60_device::F7bDecodeFirstOperand(am_func DecodeOp1, uint8_t dim1)
 {
-	UINT8 appb;
+	uint8_t appb;
 	// Decode first operand
 	m_moddim = dim1;
 	m_modm = m_subop & 0x40;
@@ -82,7 +82,7 @@ void v60_device::F7bDecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
 }
 
 
-void v60_device::F7bWriteSecondOperand(UINT8 dim2)
+void v60_device::F7bWriteSecondOperand(uint8_t dim2)
 {
 	m_moddim = dim2;
 	m_modm = m_subop & 0x20;
@@ -91,7 +91,7 @@ void v60_device::F7bWriteSecondOperand(UINT8 dim2)
 }
 
 
-void v60_device::F7bDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func DecodeOp2, UINT8 dim2)
+void v60_device::F7bDecodeOperands(am_func DecodeOp1, uint8_t dim1, am_func DecodeOp2, uint8_t dim2)
 {
 	// Decode first operand
 	F7bDecodeFirstOperand(DecodeOp1, dim1);
@@ -107,9 +107,9 @@ void v60_device::F7bDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func Decode
 	m_bamoffset2 = m_bamoffset;
 }
 
-void v60_device::F7cDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func DecodeOp2, UINT8 dim2)
+void v60_device::F7cDecodeOperands(am_func DecodeOp1, uint8_t dim1, am_func DecodeOp2, uint8_t dim2)
 {
-	UINT8 appb;
+	uint8_t appb;
 	// Decode first operand
 	m_moddim = dim1;
 	m_modm = m_subop & 0x40;
@@ -136,13 +136,13 @@ void v60_device::F7cDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func Decode
 
 #define F7CLOADOP1BYTE(appb) \
 	if (m_flag1) \
-		appb = (UINT8)(m_reg[m_op1]&0xFF); \
+		appb = (uint8_t)(m_reg[m_op1]&0xFF); \
 	else \
 		appb = m_program->read_byte(m_op1);
 
 #define F7CLOADOP2BYTE(appb) \
 	if (m_flag2) \
-		appb = (UINT8)(m_reg[m_op2]&0xFF); \
+		appb = (uint8_t)(m_reg[m_op2]&0xFF); \
 	else \
 		appb = m_program->read_byte(m_op2);
 
@@ -159,10 +159,10 @@ void v60_device::F7cDecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func Decode
 	else \
 		m_program->write_word_unaligned(m_op2, apph);
 
-UINT32 v60_device::opCMPSTRB(UINT8 bFill, UINT8 bStop)
+uint32_t v60_device::opCMPSTRB(uint8_t bFill, uint8_t bStop)
 {
-	UINT32 i, dest;
-	UINT8 c1, c2;
+	uint32_t i, dest;
+	uint8_t c1, c2;
 
 	F7aDecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAMAddress, 0);
 
@@ -172,12 +172,12 @@ UINT32 v60_device::opCMPSTRB(UINT8 bFill, UINT8 bStop)
 		if (m_lenop1 < m_lenop2)
 		{
 			for (i = m_lenop1; i < m_lenop2; i++)
-				m_program->write_byte(m_op1 + i,(UINT8)R26);
+				m_program->write_byte(m_op1 + i,(uint8_t)R26);
 		}
 		else if (m_lenop2 < m_lenop1)
 		{
 			for (i = m_lenop2; i < m_lenop1; i++)
-				m_program->write_byte(m_op2 + i,(UINT8)R26);
+				m_program->write_byte(m_op2 + i,(uint8_t)R26);
 		}
 	}
 
@@ -202,7 +202,7 @@ UINT32 v60_device::opCMPSTRB(UINT8 bFill, UINT8 bStop)
 		}
 
 		if (bStop)
-			if (c1 == (UINT8)R26 || c2 == (UINT8)R26)
+			if (c1 == (uint8_t)R26 || c2 == (uint8_t)R26)
 			{
 				_CY = 0;
 				break;
@@ -225,10 +225,10 @@ UINT32 v60_device::opCMPSTRB(UINT8 bFill, UINT8 bStop)
 	F7AEND();
 }
 
-UINT32 v60_device::opCMPSTRH(UINT8 bFill, UINT8 bStop)
+uint32_t v60_device::opCMPSTRH(uint8_t bFill, uint8_t bStop)
 {
-	UINT32 i, dest;
-	UINT16 c1, c2;
+	uint32_t i, dest;
+	uint16_t c1, c2;
 
 	F7aDecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAMAddress, 0);
 
@@ -238,12 +238,12 @@ UINT32 v60_device::opCMPSTRH(UINT8 bFill, UINT8 bStop)
 		if (m_lenop1 < m_lenop2)
 		{
 			for (i = m_lenop1; i < m_lenop2; i++)
-				m_program->write_word_unaligned(m_op1 + i * 2,(UINT16)R26);
+				m_program->write_word_unaligned(m_op1 + i * 2,(uint16_t)R26);
 		}
 		else if (m_lenop2 < m_lenop1)
 		{
 			for (i = m_lenop2; i < m_lenop1; i++)
-				m_program->write_word_unaligned(m_op2 + i * 2,(UINT16)R26);
+				m_program->write_word_unaligned(m_op2 + i * 2,(uint16_t)R26);
 		}
 	}
 
@@ -268,7 +268,7 @@ UINT32 v60_device::opCMPSTRH(UINT8 bFill, UINT8 bStop)
 		}
 
 		if (bStop)
-			if (c1 == (UINT16)R26 || c2 == (UINT16)R26)
+			if (c1 == (uint16_t)R26 || c2 == (uint16_t)R26)
 			{
 				_CY = 0;
 				break;
@@ -293,10 +293,10 @@ UINT32 v60_device::opCMPSTRH(UINT8 bFill, UINT8 bStop)
 
 
 
-UINT32 v60_device::opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0) */
+uint32_t v60_device::opMOVSTRUB(uint8_t bFill, uint8_t bStop) /* TRUSTED (0, 0) (1, 0) */
 {
-	UINT32 i, dest;
-	UINT8 c1;
+	uint32_t i, dest;
+	uint8_t c1;
 
 //  if (bStop)
 //  {
@@ -311,7 +311,7 @@ UINT32 v60_device::opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	{
 		m_program->write_byte(m_op2 + i,(c1 = m_program->read_byte(m_op1 + i)));
 
-		if (bStop && c1 == (UINT8)R26)
+		if (bStop && c1 == (uint8_t)R26)
 			break;
 	}
 
@@ -321,7 +321,7 @@ UINT32 v60_device::opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	if (bFill && m_lenop1 < m_lenop2)
 	{
 		for (;i < m_lenop2; i++)
-			m_program->write_byte(m_op2 + i,(UINT8)R26);
+			m_program->write_byte(m_op2 + i,(uint8_t)R26);
 
 		R27 = m_op2 + i;
 	}
@@ -330,10 +330,10 @@ UINT32 v60_device::opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	F7AEND();
 }
 
-UINT32 v60_device::opMOVSTRDB(UINT8 bFill, UINT8 bStop)
+uint32_t v60_device::opMOVSTRDB(uint8_t bFill, uint8_t bStop)
 {
-	UINT32 i, dest;
-	UINT8 c1;
+	uint32_t i, dest;
+	uint8_t c1;
 
 	F7aDecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAMAddress, 0);
 
@@ -343,7 +343,7 @@ UINT32 v60_device::opMOVSTRDB(UINT8 bFill, UINT8 bStop)
 	{
 		m_program->write_byte(m_op2 + (dest - i - 1),(c1 = m_program->read_byte(m_op1 + (dest - i - 1))));
 
-		if (bStop && c1 == (UINT8)R26)
+		if (bStop && c1 == (uint8_t)R26)
 			break;
 	}
 
@@ -353,7 +353,7 @@ UINT32 v60_device::opMOVSTRDB(UINT8 bFill, UINT8 bStop)
 	if (bFill && m_lenop1 < m_lenop2)
 	{
 		for (;i < m_lenop2; i++)
-			m_program->write_byte(m_op2 + dest + (m_lenop2 - i - 1),(UINT8)R26);
+			m_program->write_byte(m_op2 + dest + (m_lenop2 - i - 1),(uint8_t)R26);
 
 		R27 = m_op2 + (m_lenop2 - i - 1);
 	}
@@ -363,10 +363,10 @@ UINT32 v60_device::opMOVSTRDB(UINT8 bFill, UINT8 bStop)
 }
 
 
-UINT32 v60_device::opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0) */
+uint32_t v60_device::opMOVSTRUH(uint8_t bFill, uint8_t bStop) /* TRUSTED (0, 0) (1, 0) */
 {
-	UINT32 i, dest;
-	UINT16 c1;
+	uint32_t i, dest;
+	uint16_t c1;
 
 //  if (bStop)
 //  {   int a = 1; }
@@ -379,7 +379,7 @@ UINT32 v60_device::opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	{
 		m_program->write_word_unaligned(m_op2 + i * 2,(c1 = m_program->read_word_unaligned(m_op1 + i * 2)));
 
-		if (bStop && c1 == (UINT16)R26)
+		if (bStop && c1 == (uint16_t)R26)
 			break;
 	}
 
@@ -389,7 +389,7 @@ UINT32 v60_device::opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	if (bFill && m_lenop1 < m_lenop2)
 	{
 		for (;i < m_lenop2; i++)
-			m_program->write_word_unaligned(m_op2 + i * 2,(UINT16)R26);
+			m_program->write_word_unaligned(m_op2 + i * 2,(uint16_t)R26);
 
 		R27 = m_op2 + i * 2;
 	}
@@ -397,10 +397,10 @@ UINT32 v60_device::opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0, 0) (1, 0)
 	F7AEND();
 }
 
-UINT32 v60_device::opMOVSTRDH(UINT8 bFill, UINT8 bStop)
+uint32_t v60_device::opMOVSTRDH(uint8_t bFill, uint8_t bStop)
 {
-	UINT32 i, dest;
-	UINT16 c1;
+	uint32_t i, dest;
+	uint16_t c1;
 
 //  if (bFill | bStop)
 //  { int a = 1; }
@@ -416,7 +416,7 @@ UINT32 v60_device::opMOVSTRDH(UINT8 bFill, UINT8 bStop)
 	{
 		m_program->write_word_unaligned(m_op2 + (dest - i - 1) * 2,(c1 = m_program->read_word_unaligned(m_op1 + (dest - i - 1) * 2)));
 
-		if (bStop && c1 == (UINT16)R26)
+		if (bStop && c1 == (uint16_t)R26)
 			break;
 	}
 
@@ -426,7 +426,7 @@ UINT32 v60_device::opMOVSTRDH(UINT8 bFill, UINT8 bStop)
 	if (bFill && m_lenop1 < m_lenop2)
 	{
 		for (;i < m_lenop2; i++)
-			m_program->write_word_unaligned(m_op2 + (m_lenop2 - i - 1) * 2,(UINT16)R26);
+			m_program->write_word_unaligned(m_op2 + (m_lenop2 - i - 1) * 2,(uint16_t)R26);
 
 		R27 = m_op2 + (m_lenop2 - i - 1) * 2;
 	}
@@ -434,16 +434,16 @@ UINT32 v60_device::opMOVSTRDH(UINT8 bFill, UINT8 bStop)
 	F7AEND();
 }
 
-UINT32 v60_device::opSEARCHUB(UINT8 bSearch)
+uint32_t v60_device::opSEARCHUB(uint8_t bSearch)
 {
-	UINT8 appb;
-	UINT32 i;
+	uint8_t appb;
+	uint32_t i;
 
 	F7bDecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAM, 0);
 
 	for (i = 0; i < m_lenop1; i++)
 	{
-		appb = (m_program->read_byte(m_op1 + i) == (UINT8)m_op2);
+		appb = (m_program->read_byte(m_op1 + i) == (uint8_t)m_op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -460,16 +460,16 @@ UINT32 v60_device::opSEARCHUB(UINT8 bSearch)
 	F7BEND();
 }
 
-UINT32 v60_device::opSEARCHUH(UINT8 bSearch)
+uint32_t v60_device::opSEARCHUH(uint8_t bSearch)
 {
-	UINT8 appb;
-	UINT32 i;
+	uint8_t appb;
+	uint32_t i;
 
 	F7bDecodeOperands(&v60_device::ReadAMAddress, 1,&v60_device::ReadAM, 1);
 
 	for (i = 0; i < m_lenop1; i++)
 	{
-		appb = (m_program->read_word_unaligned(m_op1 + i * 2) == (UINT16)m_op2);
+		appb = (m_program->read_word_unaligned(m_op1 + i * 2) == (uint16_t)m_op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -485,16 +485,16 @@ UINT32 v60_device::opSEARCHUH(UINT8 bSearch)
 	F7BEND();
 }
 
-UINT32 v60_device::opSEARCHDB(UINT8 bSearch)
+uint32_t v60_device::opSEARCHDB(uint8_t bSearch)
 {
-	UINT8 appb;
-	INT32 i;
+	uint8_t appb;
+	int32_t i;
 
 	F7bDecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAM, 0);
 
 	for (i = m_lenop1; i >= 0; i--)
 	{
-		appb = (m_program->read_byte(m_op1 + i) == (UINT8)m_op2);
+		appb = (m_program->read_byte(m_op1 + i) == (uint8_t)m_op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -503,7 +503,7 @@ UINT32 v60_device::opSEARCHDB(UINT8 bSearch)
 	R27 = i;
 
 	// This is the opposite as stated in V60 manual...
-	if ((UINT32)i != m_lenop1)
+	if ((uint32_t)i != m_lenop1)
 		_Z = 0;
 	else
 		_Z = 1;
@@ -511,16 +511,16 @@ UINT32 v60_device::opSEARCHDB(UINT8 bSearch)
 	F7BEND();
 }
 
-UINT32 v60_device::opSEARCHDH(UINT8 bSearch)
+uint32_t v60_device::opSEARCHDH(uint8_t bSearch)
 {
-	UINT8 appb;
-	INT32 i;
+	uint8_t appb;
+	int32_t i;
 
 	F7bDecodeOperands(&v60_device::ReadAMAddress, 1,&v60_device::ReadAM, 1);
 
 	for (i = m_lenop1 - 1; i >= 0; i--)
 	{
-		appb = (m_program->read_word_unaligned(m_op1 + i * 2) == (UINT16)m_op2);
+		appb = (m_program->read_word_unaligned(m_op1 + i * 2) == (uint16_t)m_op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -528,7 +528,7 @@ UINT32 v60_device::opSEARCHDH(UINT8 bSearch)
 	R28 = m_op1 + i * 2;
 	R27 = i;
 
-	if ((UINT32)i != m_lenop1)
+	if ((uint32_t)i != m_lenop1)
 		_Z = 0;
 	else
 		_Z = 1;
@@ -537,35 +537,35 @@ UINT32 v60_device::opSEARCHDH(UINT8 bSearch)
 }
 
 
-UINT32 v60_device::opSCHCUB() { return opSEARCHUB(1); }
-UINT32 v60_device::opSCHCUH() { return opSEARCHUH(1); }
-UINT32 v60_device::opSCHCDB() { return opSEARCHDB(1); }
-UINT32 v60_device::opSCHCDH() { return opSEARCHDH(1); }
-UINT32 v60_device::opSKPCUB() { return opSEARCHUB(0); }
-UINT32 v60_device::opSKPCUH() { return opSEARCHUH(0); }
-UINT32 v60_device::opSKPCDB() { return opSEARCHDB(0); }
-UINT32 v60_device::opSKPCDH() { return opSEARCHDH(0); }
+uint32_t v60_device::opSCHCUB() { return opSEARCHUB(1); }
+uint32_t v60_device::opSCHCUH() { return opSEARCHUH(1); }
+uint32_t v60_device::opSCHCDB() { return opSEARCHDB(1); }
+uint32_t v60_device::opSCHCDH() { return opSEARCHDH(1); }
+uint32_t v60_device::opSKPCUB() { return opSEARCHUB(0); }
+uint32_t v60_device::opSKPCUH() { return opSEARCHUH(0); }
+uint32_t v60_device::opSKPCDB() { return opSEARCHDB(0); }
+uint32_t v60_device::opSKPCDH() { return opSEARCHDH(0); }
 
-UINT32 v60_device::opCMPCB() { return opCMPSTRB(0, 0); }
-UINT32 v60_device::opCMPCH() { return opCMPSTRH(0, 0); }
-UINT32 v60_device::opCMPCFB() { return opCMPSTRB(1, 0); }
-UINT32 v60_device::opCMPCFH() { return opCMPSTRH(1, 0); }
-UINT32 v60_device::opCMPCSB() { return opCMPSTRB(0, 1); }
-UINT32 v60_device::opCMPCSH() { return opCMPSTRH(0, 1); }
+uint32_t v60_device::opCMPCB() { return opCMPSTRB(0, 0); }
+uint32_t v60_device::opCMPCH() { return opCMPSTRH(0, 0); }
+uint32_t v60_device::opCMPCFB() { return opCMPSTRB(1, 0); }
+uint32_t v60_device::opCMPCFH() { return opCMPSTRH(1, 0); }
+uint32_t v60_device::opCMPCSB() { return opCMPSTRB(0, 1); }
+uint32_t v60_device::opCMPCSH() { return opCMPSTRH(0, 1); }
 
-UINT32 v60_device::opMOVCUB() { return opMOVSTRUB(0, 0); }
-UINT32 v60_device::opMOVCUH() { return opMOVSTRUH(0, 0); }
-UINT32 v60_device::opMOVCFUB() { return opMOVSTRUB(1, 0); }
-UINT32 v60_device::opMOVCFUH() { return opMOVSTRUH(1, 0); }
-UINT32 v60_device::opMOVCSUB() { return opMOVSTRUB(0, 1); }
-UINT32 v60_device::opMOVCSUH() { return opMOVSTRUH(0, 1); }
+uint32_t v60_device::opMOVCUB() { return opMOVSTRUB(0, 0); }
+uint32_t v60_device::opMOVCUH() { return opMOVSTRUH(0, 0); }
+uint32_t v60_device::opMOVCFUB() { return opMOVSTRUB(1, 0); }
+uint32_t v60_device::opMOVCFUH() { return opMOVSTRUH(1, 0); }
+uint32_t v60_device::opMOVCSUB() { return opMOVSTRUB(0, 1); }
+uint32_t v60_device::opMOVCSUH() { return opMOVSTRUH(0, 1); }
 
-UINT32 v60_device::opMOVCDB() { return opMOVSTRDB(0, 0); }
-UINT32 v60_device::opMOVCDH() { return opMOVSTRDH(0, 0); }
-UINT32 v60_device::opMOVCFDB() { return opMOVSTRDB(1, 0); }
-UINT32 v60_device::opMOVCFDH() { return opMOVSTRDH(1, 0); }
+uint32_t v60_device::opMOVCDB() { return opMOVSTRDB(0, 0); }
+uint32_t v60_device::opMOVCDH() { return opMOVSTRDH(0, 0); }
+uint32_t v60_device::opMOVCFDB() { return opMOVSTRDB(1, 0); }
+uint32_t v60_device::opMOVCFDH() { return opMOVSTRDH(1, 0); }
 
-UINT32 v60_device::opEXTBFZ() /* TRUSTED */
+uint32_t v60_device::opEXTBFZ() /* TRUSTED */
 {
 	F7bDecodeFirstOperand(&v60_device::BitReadAM, 11);
 
@@ -578,7 +578,7 @@ UINT32 v60_device::opEXTBFZ() /* TRUSTED */
 	F7BEND();
 }
 
-UINT32 v60_device::opEXTBFS() /* TRUSTED */
+uint32_t v60_device::opEXTBFS() /* TRUSTED */
 {
 	F7bDecodeFirstOperand(&v60_device::BitReadAM, 11);
 
@@ -593,9 +593,9 @@ UINT32 v60_device::opEXTBFS() /* TRUSTED */
 	F7BEND();
 }
 
-UINT32 v60_device::opEXTBFL()
+uint32_t v60_device::opEXTBFL()
 {
-	UINT32 appw;
+	uint32_t appw;
 
 	F7bDecodeFirstOperand(&v60_device::BitReadAM, 11);
 
@@ -610,14 +610,14 @@ UINT32 v60_device::opEXTBFL()
 	F7BEND();
 }
 
-UINT32 v60_device::opSCHBS(UINT32 bSearch1)
+uint32_t v60_device::opSCHBS(uint32_t bSearch1)
 {
-	UINT32 i, data;
-	UINT32 offset;
+	uint32_t i, data;
+	uint32_t offset;
 
 	F7bDecodeFirstOperand(&v60_device::BitReadAMAddress, 10);
 
-	// Read first UINT8
+	// Read first uint8_t
 	m_op1 += m_bamoffset / 8;
 	data = m_program->read_byte(m_op1);
 	offset = m_bamoffset & 7;
@@ -637,7 +637,7 @@ UINT32 v60_device::opSCHBS(UINT32 bSearch1)
 		offset++;
 		if (offset == 8)
 		{
-			// Next UINT8 please
+			// Next uint8_t please
 			offset = 0;
 			m_op1++;
 			data = m_program->read_byte(m_op1);
@@ -654,12 +654,12 @@ UINT32 v60_device::opSCHBS(UINT32 bSearch1)
 	F7BEND();
 }
 
-UINT32 v60_device::opSCH0BSU() { return opSCHBS(0); }
-UINT32 v60_device::opSCH1BSU() { return opSCHBS(1); }
+uint32_t v60_device::opSCH0BSU() { return opSCHBS(0); }
+uint32_t v60_device::opSCH1BSU() { return opSCHBS(1); }
 
-UINT32 v60_device::opINSBFR()
+uint32_t v60_device::opINSBFR()
 {
-	UINT32 appw;
+	uint32_t appw;
 	F7cDecodeOperands(&v60_device::ReadAM, 2,&v60_device::BitReadAMAddress, 11);
 
 	F7CCREATEBITMASK(m_lenop1);
@@ -676,9 +676,9 @@ UINT32 v60_device::opINSBFR()
 	F7CEND();
 }
 
-UINT32 v60_device::opINSBFL()
+uint32_t v60_device::opINSBFL()
 {
-	UINT32 appw;
+	uint32_t appw;
 	F7cDecodeOperands(&v60_device::ReadAM, 2,&v60_device::BitReadAMAddress, 11);
 
 	m_op1 >>= (32 - m_lenop1);
@@ -697,10 +697,10 @@ UINT32 v60_device::opINSBFL()
 	F7CEND();
 }
 
-UINT32 v60_device::opMOVBSD()
+uint32_t v60_device::opMOVBSD()
 {
-	UINT32 i;
-	UINT8 srcdata, dstdata;
+	uint32_t i;
+	uint8_t srcdata, dstdata;
 
 	F7bDecodeOperands(&v60_device::BitReadAMAddress, 10, &v60_device::BitReadAMAddress, 10);
 
@@ -753,10 +753,10 @@ UINT32 v60_device::opMOVBSD()
 	F7BEND();
 }
 
-UINT32 v60_device::opMOVBSU()
+uint32_t v60_device::opMOVBSU()
 {
-	UINT32 i;
-	UINT8 srcdata, dstdata;
+	uint32_t i;
+	uint8_t srcdata, dstdata;
 
 	F7bDecodeOperands(&v60_device::BitReadAMAddress, 10, &v60_device::BitReadAMAddress, 10);
 
@@ -804,10 +804,10 @@ UINT32 v60_device::opMOVBSU()
 
 // RADM 0x20f4b8 holds the time left
 
-UINT32 v60_device::opADDDC()
+uint32_t v60_device::opADDDC()
 {
-	UINT8 appb;
-	UINT8 src, dst;
+	uint8_t appb;
+	uint8_t src, dst;
 
 	F7cDecodeOperands(&v60_device::ReadAM, 0, &v60_device::ReadAMAddress, 0);
 
@@ -818,7 +818,7 @@ UINT32 v60_device::opADDDC()
 
 	F7CLOADOP2BYTE(appb);
 
-	src = (UINT8)(m_op1 >> 4) * 10 + (UINT8)(m_op1 & 0xF);
+	src = (uint8_t)(m_op1 >> 4) * 10 + (uint8_t)(m_op1 & 0xF);
 	dst = (appb >> 4) * 10 + (appb & 0xF);
 
 	appb = src + dst + (_CY?1:0);
@@ -843,10 +843,10 @@ UINT32 v60_device::opADDDC()
 	F7CEND();
 }
 
-UINT32 v60_device::opSUBDC()
+uint32_t v60_device::opSUBDC()
 {
-	INT8 appb;
-	UINT32 src, dst;
+	int8_t appb;
+	uint32_t src, dst;
 
 	F7cDecodeOperands(&v60_device::ReadAM, 0, &v60_device::ReadAMAddress, 0);
 
@@ -857,11 +857,11 @@ UINT32 v60_device::opSUBDC()
 
 	F7CLOADOP2BYTE(appb);
 
-	src = (UINT32)(m_op1 >> 4) * 10 + (UINT32)(m_op1 & 0xF);
+	src = (uint32_t)(m_op1 >> 4) * 10 + (uint32_t)(m_op1 & 0xF);
 	dst = ((appb & 0xF0) >> 4) * 10 + (appb & 0xF);
 
 	// Note that this APPB must be SIGNED!
-	appb = (INT32)dst - (INT32)src - (_CY?1:0);
+	appb = (int32_t)dst - (int32_t)src - (_CY?1:0);
 
 	if (appb < 0)
 	{
@@ -883,10 +883,10 @@ UINT32 v60_device::opSUBDC()
 	F7CEND();
 }
 
-UINT32 v60_device::opSUBRDC()
+uint32_t v60_device::opSUBRDC()
 {
-	INT8 appb;
-	UINT32 src, dst;
+	int8_t appb;
+	uint32_t src, dst;
 
 	F7cDecodeOperands(&v60_device::ReadAM, 0, &v60_device::ReadAMAddress, 0);
 
@@ -897,11 +897,11 @@ UINT32 v60_device::opSUBRDC()
 
 	F7CLOADOP2BYTE(appb);
 
-	src = (UINT32)(m_op1 >> 4) * 10 + (UINT32)(m_op1 & 0xF);
+	src = (uint32_t)(m_op1 >> 4) * 10 + (uint32_t)(m_op1 & 0xF);
 	dst = ((appb & 0xF0) >> 4) * 10 + (appb & 0xF);
 
 	// Note that this APPB must be SIGNED!
-	appb = (INT32)src - (INT32)dst - (_CY?1:0);
+	appb = (int32_t)src - (int32_t)dst - (_CY?1:0);
 
 	if (appb < 0)
 	{
@@ -923,13 +923,13 @@ UINT32 v60_device::opSUBRDC()
 	F7CEND();
 }
 
-UINT32 v60_device::opCVTDPZ()
+uint32_t v60_device::opCVTDPZ()
 {
-	UINT16 apph;
+	uint16_t apph;
 
 	F7cDecodeOperands(&v60_device::ReadAM, 0, &v60_device::ReadAMAddress, 1);
 
-	apph = (UINT16)(((m_op1 >> 4) & 0xF) | ((m_op1 & 0xF) << 8));
+	apph = (uint16_t)(((m_op1 >> 4) & 0xF) | ((m_op1 & 0xF) << 8));
 	apph |= (m_lenop1);
 	apph |= (m_lenop1 << 8);
 
@@ -940,9 +940,9 @@ UINT32 v60_device::opCVTDPZ()
 	F7CEND();
 }
 
-UINT32 v60_device::opCVTDZP()
+uint32_t v60_device::opCVTDZP()
 {
-	UINT8 appb;
+	uint8_t appb;
 	F7cDecodeOperands(&v60_device::ReadAM, 1, &v60_device::ReadAMAddress, 0);
 
 	if ((m_op1 & 0xF0) != (m_lenop1 & 0xF0) || ((m_op1 >> 8) & 0xF0) != (m_lenop1 & 0xF0))
@@ -957,38 +957,38 @@ UINT32 v60_device::opCVTDZP()
 		logerror("CVTD.ZP Decimal exception #2!\n");
 	}
 
-	appb = (UINT8)(((m_op1 >> 8) & 0xF) | ((m_op1 & 0xF) << 4));
+	appb = (uint8_t)(((m_op1 >> 8) & 0xF) | ((m_op1 & 0xF) << 4));
 	if (appb != 0) _Z = 0;
 
 	F7CSTOREOP2BYTE();
 	F7CEND();
 }
 
-UINT32 v60_device::op58UNHANDLED()
+uint32_t v60_device::op58UNHANDLED()
 {
 	fatalerror("Unhandled 58 opcode at PC: /%06x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::op5AUNHANDLED()
+uint32_t v60_device::op5AUNHANDLED()
 {
 	fatalerror("Unhandled 5A opcode at PC: /%06x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::op5BUNHANDLED()
+uint32_t v60_device::op5BUNHANDLED()
 {
 	fatalerror("Unhandled 5B opcode at PC: /%06x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::op5DUNHANDLED()
+uint32_t v60_device::op5DUNHANDLED()
 {
 	fatalerror("Unhandled 5D opcode at PC: /%06x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::op59UNHANDLED()
+uint32_t v60_device::op59UNHANDLED()
 {
 	fatalerror("Unhandled 59 opcode at PC: /%06x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
@@ -1176,35 +1176,35 @@ const v60_device::am_func v60_device::s_Op5ATable[32] =
 	&v60_device::op5AUNHANDLED
 };
 
-UINT32 v60_device::op58()
+uint32_t v60_device::op58()
 {
 	m_subop = OpRead8(PC + 1);
 
 	return (this->*s_Op58Table[m_subop & 0x1F])();
 }
 
-UINT32 v60_device::op5A()
+uint32_t v60_device::op5A()
 {
 	m_subop = OpRead8(PC + 1);
 
 	return (this->*s_Op5ATable[m_subop & 0x1F])();
 }
 
-UINT32 v60_device::op5B()
+uint32_t v60_device::op5B()
 {
 	m_subop = OpRead8(PC + 1);
 
 	return (this->*s_Op5BTable[m_subop & 0x1F])();
 }
 
-UINT32 v60_device::op5D()
+uint32_t v60_device::op5D()
 {
 	m_subop = OpRead8(PC + 1);
 
 	return (this->*s_Op5DTable[m_subop & 0x1F])();
 }
 
-UINT32 v60_device::op59()
+uint32_t v60_device::op59()
 {
 	m_subop = OpRead8(PC + 1);
 

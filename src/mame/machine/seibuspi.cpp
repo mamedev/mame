@@ -6,7 +6,7 @@
 
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1
-static UINT32 partial_carry_sum(UINT32 add1,UINT32 add2,UINT32 carry_mask,int bits)
+static uint32_t partial_carry_sum(uint32_t add1,uint32_t add2,uint32_t carry_mask,int bits)
 {
 	int i,res,carry;
 
@@ -32,17 +32,17 @@ static UINT32 partial_carry_sum(UINT32 add1,UINT32 add2,UINT32 carry_mask,int bi
 	return res;
 }
 
-UINT32 partial_carry_sum32(UINT32 add1,UINT32 add2,UINT32 carry_mask)
+uint32_t partial_carry_sum32(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,32);
 }
 
-UINT32 partial_carry_sum24(UINT32 add1,UINT32 add2,UINT32 carry_mask)
+uint32_t partial_carry_sum24(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,24);
 }
 
-static UINT32 partial_carry_sum16(UINT32 add1,UINT32 add2,UINT32 carry_mask)
+static uint32_t partial_carry_sum16(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,16);
 }
@@ -70,7 +70,7 @@ Bits 0-3 select the permutation on 16 bits of the source data.
 Bits 4-14 are added to the source data, with partial carry.
 Bit 15 is still unknown.
 */
-static const UINT16 key_table[256]=
+static const uint16_t key_table[256]=
 {
 	0x3ad7,0x54b1,0x2d41,0x8ca0,0xa69b,0x9018,0x9db9,0x6559,
 	0xe9a7,0xb087,0x8a5e,0x821c,0xaafc,0x2ae7,0x557b,0xcd80,
@@ -121,7 +121,7 @@ static const UINT16 key_table[256]=
 #endif
 
 
-static const UINT8 spi_bitswap[16][16] =
+static const uint8_t spi_bitswap[16][16] =
 {
 	{ 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, },
 	{  7, 6, 5,14, 0,15, 4, 3, 2, 8, 9,10,11,12,13, 1, },
@@ -149,7 +149,7 @@ static int key(int table,int addr)
 }
 
 
-void seibuspi_sprite_decrypt(UINT8 *src, int rom_size)
+void seibuspi_sprite_decrypt(uint8_t *src, int rom_size)
 {
 	int i;
 
@@ -162,7 +162,7 @@ void seibuspi_sprite_decrypt(UINT8 *src, int rom_size)
 		int s1,s2;
 		int add1,add2;
 		int plane0,plane1,plane2,plane3,plane4,plane5;
-		const UINT8 *bs;
+		const uint8_t *bs;
 
 		y1 = src[2*i+0*rom_size+0] + (src[2*i+0*rom_size+1] << 8);
 		y2 = src[2*i+1*rom_size+0] + (src[2*i+1*rom_size+1] << 8);
@@ -328,10 +328,10 @@ CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000
 
 ******************************************************************************************/
 
-static void sprite_reorder(UINT8 *buffer)
+static void sprite_reorder(uint8_t *buffer)
 {
 	int j;
-	UINT8 temp[64];
+	uint8_t temp[64];
 	for( j=0; j < 16; j++ ) {
 		temp[2*(j*2)+0] = buffer[2*j+0];
 		temp[2*(j*2)+1] = buffer[2*j+1];
@@ -341,13 +341,13 @@ static void sprite_reorder(UINT8 *buffer)
 	memcpy(buffer, temp, 64);
 }
 
-void seibuspi_rise10_sprite_decrypt(UINT8 *rom, int size)
+void seibuspi_rise10_sprite_decrypt(uint8_t *rom, int size)
 {
 	int i;
 
 	for (i = 0; i < size/2; i++)
 	{
-		UINT32 plane54,plane3210;
+		uint32_t plane54,plane3210;
 
 		plane54 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
 		plane3210 = BITSWAP32(
@@ -424,15 +424,15 @@ CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 0300
 ******************************************************************************************/
 
 
-static void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
-	UINT32 k1, UINT32 k2, UINT32 k3, UINT32 k4, UINT32 k5, int feversoc_kludge)
+static void seibuspi_rise11_sprite_decrypt(uint8_t *rom, int size,
+	uint32_t k1, uint32_t k2, uint32_t k3, uint32_t k4, uint32_t k5, int feversoc_kludge)
 {
 	int i;
 
 	for (i = 0; i < size/2; i++)
 	{
-		UINT16 b1,b2,b3;
-		UINT32 plane543,plane210;
+		uint16_t b1,b2,b3;
+		uint32_t plane543,plane210;
 
 		b1 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
 		b2 = rom[1*size+2*i] + (rom[1*size+2*i+1] << 8);
@@ -510,13 +510,13 @@ static void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
 }
 
 
-void seibuspi_rise11_sprite_decrypt_rfjet(UINT8 *rom, int size)
+void seibuspi_rise11_sprite_decrypt_rfjet(uint8_t *rom, int size)
 {
 	seibuspi_rise11_sprite_decrypt(rom, size, 0xabcb64, 0x55aadd, 0xab6a4c, 0xd6375b, 0x8bf23b, 0);
 }
 
 
-void seibuspi_rise11_sprite_decrypt_feversoc(UINT8 *rom, int size)
+void seibuspi_rise11_sprite_decrypt_feversoc(uint8_t *rom, int size)
 {
 	seibuspi_rise11_sprite_decrypt(rom, size, 0x9df5b2, 0x9ae999, 0x4a32e9, 0x968bd5, 0x1d97ac, 1);
 }

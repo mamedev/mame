@@ -46,11 +46,11 @@ public:
 	}
 
 	DECLARE_MACHINE_RESET(c8002);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(portff05_r);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -63,7 +63,7 @@ READ8_MEMBER( onyx_state::portff05_r )
 	return 4;
 }
 
-WRITE8_MEMBER( onyx_state::kbd_put )
+void onyx_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( c8002, onyx_state )
+static MACHINE_CONFIG_START( c8002 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8002, XTAL_4MHz )
 	//MCFG_Z80_DAISY_CHAIN(main_daisy_chain)
@@ -128,15 +128,15 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	/* peripheral hardware */
 	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
-	//MCFG_Z80SIO0_ADD("z80sio_0", 9600, 0, 0, 0, 0)
-	//MCFG_Z80SIO0_ADD("z80sio_1", 9600, 0, 0, 0, 0)
+	//MCFG_DEVICE_ADD("z80sio_0", Z80SIO0, 9600)
+	//MCFG_DEVICE_ADD("z80sio_1", Z80SIO0, 9600)
 	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(onyx_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(onyx_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -165,5 +165,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME       FLAGS */
-COMP( 1982, c8002, 0,      0,       c8002,     c8002, driver_device, 0,     "Onyx", "C8002", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY  FULLNAME  FLAGS
+COMP( 1982, c8002, 0,      0,       c8002,     c8002, onyx_state, 0,    "Onyx",  "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

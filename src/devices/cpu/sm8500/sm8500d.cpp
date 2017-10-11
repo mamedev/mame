@@ -54,7 +54,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] = {
+static const uint32_t s_flags[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, _OVER, _OVER, 0,
 	0, 0, 0, 0, 0, 0, _OVER, 0,
@@ -69,8 +69,8 @@ static const UINT32 s_flags[] = {
 
 struct sm8500dasm
 {
-	UINT8   mnemonic;
-	UINT8   arguments;
+	uint8_t   mnemonic;
+	uint8_t   arguments;
 };
 
 static const char *const sm8500_cond[16] = {
@@ -78,7 +78,7 @@ static const char *const sm8500_cond[16] = {
 	"T", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
 };
 
-static const UINT8 sm8500_b2w[8] = {
+static const uint8_t sm8500_b2w[8] = {
 	0, 8, 2, 10, 4, 12, 6, 14
 };
 
@@ -173,17 +173,14 @@ static const sm8500dasm mnemonic[256] = {
 
 };
 
-CPU_DISASSEMBLE( sm8500 )
+CPU_DISASSEMBLE(sm8500)
 {
 	const sm8500dasm *instr;
-	char *dst;
-	UINT8 op;
-	INT8 offset;
-	UINT16 ea;
-	UINT16 ea2;
+	uint8_t op;
+	int8_t offset;
+	uint16_t ea;
+	uint16_t ea2;
 	int pos = 0;
-
-	dst = buffer;
 
 	op = oprom[pos++];
 
@@ -192,183 +189,183 @@ CPU_DISASSEMBLE( sm8500 )
 	if ( instr->arguments )
 	{
 		if ( instr->arguments != AM_1A && instr->arguments != AM_1B && instr->arguments != AM_4F ) {
-			dst += sprintf( dst, "%-4s ", s_mnemonic[ instr->mnemonic ] );
+			util::stream_format(stream, "%-4s ", s_mnemonic[ instr->mnemonic ]);
 		}
 		switch( instr->arguments ) {
 		case AM_R:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh", ea );
+			util::stream_format(stream, "R%02Xh", ea);
 			break;
 		case AM_iR:
-			dst += sprintf( dst, "R%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
+			util::stream_format(stream, "R%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
 			pos += 2;
 			break;
 		case AM_iS:
-			dst += sprintf( dst, "RR%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
+			util::stream_format(stream, "RR%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
 			pos += 2;
 			break;
 		case AM_Sw:
 			ea2 = oprom[pos++];
 			ea = oprom[pos++] << 8;
 			ea += oprom[pos++];
-			dst+= sprintf( dst, "RR%02Xh, $%04X", ea2, ea );
+			util::stream_format(stream, "RR%02Xh, $%04X", ea2, ea);
 			break;
 		case AM_rib:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "r%02Xh, $%02X", op & 0x07, ea );
+			util::stream_format(stream, "r%02Xh, $%02X", op & 0x07, ea);
 			break;
 		case AM_riw:
 			ea = oprom[pos++] << 8;
 			ea += oprom[pos++];
-			dst += sprintf( dst, "rr%02Xh, $%04X", sm8500_b2w[op & 0x07], ea );
+			util::stream_format(stream, "rr%02Xh, $%04X", sm8500_b2w[op & 0x07], ea);
 			break;
 		case AM_rmb:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "r%02Xh,", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, "r%02Xh,", ( ea >> 3 ) & 0x07);
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@r%02Xh", ea & 0x07 ); break;
+				util::stream_format(stream, "@r%02Xh", ea & 0x07); break;
 			case 0x40:
-				dst += sprintf( dst, "(r%02Xh)+", ea & 0x07 ); break;
+				util::stream_format(stream, "(r%02Xh)+", ea & 0x07); break;
 			case 0x80:
 				ea2 = oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%02X(r%02Xh)", ea2, ea & 0x07 );
+					util::stream_format(stream, "$%02X(r%02Xh)", ea2, ea & 0x07);
 				} else {
-					dst += sprintf( dst, "@$%02X", ea2 );
+					util::stream_format(stream, "@$%02X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(r%02Xh)", ea & 0x07 ); break;
+				util::stream_format(stream, "-(r%02Xh)", ea & 0x07); break;
 			}
 			break;
 		case AM_mbr:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@r%02Xh", ea & 0x07 ); break;
+				util::stream_format(stream, "@r%02Xh", ea & 0x07); break;
 			case 0x40:
-				dst += sprintf( dst, "(r%02Xh)+", ea & 0x07 ); break;
+				util::stream_format(stream, "(r%02Xh)+", ea & 0x07); break;
 			case 0x80:
 				ea2 = oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%02X(r%02Xh)", ea2, ea & 0x07 );
+					util::stream_format(stream, "$%02X(r%02Xh)", ea2, ea & 0x07);
 				} else {
-					dst += sprintf( dst, "@$%02X", ea2 );
+					util::stream_format(stream, "@$%02X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(r%02Xh)", ea & 0x07 ); break;
+				util::stream_format(stream, "-(r%02Xh)", ea & 0x07); break;
 			}
-			dst += sprintf( dst, ",r%02Xh", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, ",r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_rmw:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "r%02Xh,", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, "r%02Xh,", ( ea >> 3 ) & 0x07);
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@rr%02Xh", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				dst += sprintf( dst, "(rr%02Xh)+", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
 				ea2 = oprom[pos++] << 8;
 				ea2 += oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07] );
+					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
-					dst += sprintf( dst, "@$%04X", ea2 );
+					util::stream_format(stream, "@$%04X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(rr%02Xh)", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "-(rr%02Xh)", sm8500_b2w[ea & 0x07]); break;
 			}
 			break;
 		case AM_mwr:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@rr%02Xh", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				dst += sprintf( dst, "(rr%02Xh)+", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
 				ea2 = oprom[pos++] << 8;
 				ea2 += oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07] );
+					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
-					dst += sprintf( dst, "@$%04X", ea2 );
+					util::stream_format(stream, "@$%04X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(rr%02Xh)", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "-(rr%02Xh)", sm8500_b2w[ea & 0x07]); break;
 			}
-			dst += sprintf( dst, ",r%02Xh", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, ",r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_smw:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "rr%02Xh,", sm8500_b2w[( ea >> 3 ) & 0x07] );
+			util::stream_format(stream, "rr%02Xh,", sm8500_b2w[( ea >> 3 ) & 0x07]);
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@rr%02Xh", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				dst += sprintf( dst, "(rr%02Xh)+", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
 				ea2 = oprom[pos++] << 8;
 				ea2 += oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07] );
+					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
-					dst += sprintf( dst, "@$%04X", ea2 );
+					util::stream_format(stream, "@$%04X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(rr%02Xh)", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "-(rr%02Xh)", sm8500_b2w[ea & 0x07]); break;
 			}
 			break;
 		case AM_mws:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@rr%02Xh", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				dst += sprintf( dst, "(rr%02Xh)+", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
 				ea2 = oprom[pos++] << 8;
 				ea2 += oprom[pos++];
 				if ( ea & 0x07 ) {
-					dst += sprintf( dst, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07] );
+					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
-					dst += sprintf( dst, "@$%04X", ea2 );
+					util::stream_format(stream, "@$%04X", ea2);
 				}
 				break;
 			case 0xC0:
-				dst += sprintf( dst, "-(rr%02Xh)", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "-(rr%02Xh)", sm8500_b2w[ea & 0x07]); break;
 			}
-			dst += sprintf( dst, ",rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07] );
+			util::stream_format(stream, ",rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07]);
 			break;
 		case AM_cbr:
-			offset = (INT8) oprom[pos++];
-			dst += sprintf( dst, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset );
+			offset = (int8_t) oprom[pos++];
+			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset);
 			break;
 		case AM_rbr:
-			offset = (INT8) oprom[pos++];
-			dst += sprintf( dst, "r%02Xh,$%04X", op & 0x07, pc + pos + offset );
+			offset = (int8_t) oprom[pos++];
+			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pc + pos + offset);
 			break;
 		case AM_cjp:
 			ea = oprom[pos++] << 8;
 			ea += oprom[pos++];
-			dst += sprintf( dst, "%s,$%04X", sm8500_cond[ op & 0x0F], ea );
+			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F], ea);
 			break;
 		case AM_rr:
 			ea = oprom[pos++];
 			switch( ea & 0xc0 ) {
 			case 0x00:
-				dst += sprintf( dst, "r%02Xh,r%02Xh", (ea >> 3 ) & 0x07, ea & 0x07 );
+				util::stream_format(stream, "r%02Xh,r%02Xh", (ea >> 3 ) & 0x07, ea & 0x07);
 				break;
 			case 0x40:
 			case 0x80:
 			case 0xC0:
-				dst += sprintf( dst, "undef" );
+				util::stream_format(stream, "undef");
 				break;
 			}
 			break;
@@ -376,208 +373,208 @@ CPU_DISASSEMBLE( sm8500 )
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "@r%02Xh", (ea >> 3 ) & 0x07 );
+				util::stream_format(stream, "@r%02Xh", (ea >> 3 ) & 0x07);
 				break;
 			case 0x40:
 			case 0x80:
 			case 0xC0:
-				dst += sprintf( dst, "undef" );
+				util::stream_format(stream, "undef");
 				break;
 			}
 			break;
 		case AM_S:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "RR%02Xh", ea );
+			util::stream_format(stream, "RR%02Xh", ea);
 			break;
 		case AM_pi:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "r%02Xh, $%02X", 0x10 + (op & 0x07), ea );
+			util::stream_format(stream, "r%02Xh, $%02X", 0x10 + (op & 0x07), ea);
 			break;
 		case AM_Ri:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,$%02X", ea, ea2 );
+			util::stream_format(stream, "R%02Xh,$%02X", ea, ea2);
 			break;
 		case AM_i:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "$%02X", ea );
+			util::stream_format(stream, "$%02X", ea);
 			break;
 		case AM_ii:
 			ea = oprom[pos++] << 8;
 			ea += oprom[pos++];
-			dst += sprintf( dst, "$%04X", ea );
+			util::stream_format(stream, "$%04X", ea);
 			break;
 		case AM_ss:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "rr%02Xh,rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07], sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "rr%02Xh,rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07], sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0x80:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0xC0:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			}
 			break;
 		case AM_RR:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,R%02Xh", ea2, ea );
+			util::stream_format(stream, "R%02Xh,R%02Xh", ea2, ea);
 			break;
 		case AM_2:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "rr%02Xh", sm8500_b2w[ea & 0x07] ); break;
+				util::stream_format(stream, "rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
 				ea2 = oprom[pos++] << 8;
 				ea2 += oprom[pos++];
 				if ( ea & 0x38 ) {
-					dst += sprintf( dst, "@$%04X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07 );
+					util::stream_format(stream, "@$%04X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07);
 				} else {
-					dst += sprintf( dst, "@$%04X", ea2 );
+					util::stream_format(stream, "@$%04X", ea2);
 				}
 				break;
 			case 0x80:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0xC0:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			}
 			break;
 		case AM_SS:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
-			dst += sprintf( dst, "RR%02Xh,RR%02Xh", ea2, ea );
+			util::stream_format(stream, "RR%02Xh,RR%02Xh", ea2, ea);
 			break;
 		case AM_bR:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "BF,R%02Xh,#%d", ea2, ea & 0x07 ); break;
+				util::stream_format(stream, "BF,R%02Xh,#%d", ea2, ea & 0x07); break;
 			case 0x40:
-				dst += sprintf( dst, "R%02Xh,#%d,BF", ea2, ea & 0x07 ); break;
+				util::stream_format(stream, "R%02Xh,#%d,BF", ea2, ea & 0x07); break;
 			case 0x80:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0xC0:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			}
 			break;
 		case AM_Rbr:
 			ea = oprom[pos++];
-			offset = (INT8) oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset );
+			offset = (int8_t) oprom[pos++];
+			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset);
 			break;
 		case AM_Rb:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,#%d", ea, op&0x07 );
+			util::stream_format(stream, "R%02Xh,#%d", ea, op&0x07);
 			break;
 		case AM_rR:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "r%02Xh,R%02Xh", op & 0x07, ea );
+			util::stream_format(stream, "r%02Xh,R%02Xh", op & 0x07, ea);
 			break;
 		case AM_Rr:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,r%02Xh", ea, op & 0x07 );
+			util::stream_format(stream, "R%02Xh,r%02Xh", ea, op & 0x07);
 			break;
 		case AM_Rii:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,", ea );
+			util::stream_format(stream, "R%02Xh,", ea);
 			ea = oprom[pos++];
-			dst += sprintf( dst, "$%02X,", ea );
+			util::stream_format(stream, "$%02X,", ea);
 			ea = oprom[pos++];
-			dst += sprintf( dst, "$%02X", ea );
+			util::stream_format(stream, "$%02X", ea);
 			break;
 		case AM_RiR:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh,", ea );
+			util::stream_format(stream, "R%02Xh,", ea);
 			ea = oprom[pos++];
-			dst += sprintf( dst, "$%02X,", ea );
+			util::stream_format(stream, "$%02X,", ea);
 			ea = oprom[pos++];
-			dst += sprintf( dst, "R%02Xh", ea );
+			util::stream_format(stream, "R%02Xh", ea);
 			break;
 		case AM_riB:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
 			switch( ea & 0xC0 ) {
 			case 0x00:
-				dst += sprintf( dst, "#%2x(r%02Xh),#%d", ea2, ea >> 3, ea & 0x07 );
+				util::stream_format(stream, "#%2x(r%02Xh),#%d", ea2, ea >> 3, ea & 0x07);
 				break;
 			case 0x40:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0x80:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			case 0xC0:
-				dst += sprintf( dst, "undef" ); break;
+				util::stream_format(stream, "undef"); break;
 			}
 			break;
 		case AM_CALS:
 			ea = oprom[pos++];
-			dst += sprintf( dst, "$%04X", 0x1000 | ( ( op & 0x0f ) << 8 ) | ea );
+			util::stream_format(stream, "$%04X", 0x1000 | ( ( op & 0x0f ) << 8 ) | ea);
 			break;
 		case AM_bid:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
 			if ( ea & 0x38 ) {
-				dst += sprintf( dst, "$%02X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07 );
+				util::stream_format(stream, "$%02X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07);
 			} else {
-				dst += sprintf( dst, "$%04X", 0xFF00 + ea2 );
+				util::stream_format(stream, "$%04X", 0xFF00 + ea2);
 			}
-			dst += sprintf( dst, ",#%d,", ea & 0x07 );
-			offset = (INT8) oprom[pos++];
-			dst += sprintf( dst, "$%04X", pc + pos + offset );
+			util::stream_format(stream, ",#%d,", ea & 0x07);
+			offset = (int8_t) oprom[pos++];
+			util::stream_format(stream, "$%04X", pc + pos + offset);
 			break;
 		case AM_1A:
 			ea = oprom[pos++];
 			switch( ea & 0x07 ) {
-			case 0x00: dst += sprintf( dst, "%-4s ", s_mnemonic[ zCLR ] ); break;
-			case 0x01: dst += sprintf( dst, "%-4s ", s_mnemonic[ zNEG ] ); break;
-			case 0x02: dst += sprintf( dst, "%-4s ", s_mnemonic[ zCOM ] ); break;
-			case 0x03: dst += sprintf( dst, "%-4s ", s_mnemonic[ zRR ] ); break;
-			case 0x04: dst += sprintf( dst, "%-4s ", s_mnemonic[ zRL ] ); break;
-			case 0x05: dst += sprintf( dst, "%-4s ", s_mnemonic[ zRRC ] ); break;
-			case 0x06: dst += sprintf( dst, "%-4s ", s_mnemonic[ zRLC ] ); break;
-			case 0x07: dst += sprintf( dst, "%-4s ", s_mnemonic[ zSRL ] ); break;
+			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zCLR ]); break;
+			case 0x01: util::stream_format(stream, "%-4s ", s_mnemonic[ zNEG ]); break;
+			case 0x02: util::stream_format(stream, "%-4s ", s_mnemonic[ zCOM ]); break;
+			case 0x03: util::stream_format(stream, "%-4s ", s_mnemonic[ zRR ]); break;
+			case 0x04: util::stream_format(stream, "%-4s ", s_mnemonic[ zRL ]); break;
+			case 0x05: util::stream_format(stream, "%-4s ", s_mnemonic[ zRRC ]); break;
+			case 0x06: util::stream_format(stream, "%-4s ", s_mnemonic[ zRLC ]); break;
+			case 0x07: util::stream_format(stream, "%-4s ", s_mnemonic[ zSRL ]); break;
 			}
-			dst += sprintf( dst, "@r%02Xh", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, "@r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_1B:
 			ea = oprom[pos++];
 			switch( ea & 0x07 ) {
-			case 0x00: dst += sprintf( dst, "%-4s ", s_mnemonic[ zINC ] ); break;
-			case 0x01: dst += sprintf( dst, "%-4s ", s_mnemonic[ zDEC ] ); break;
-			case 0x02: dst += sprintf( dst, "%-4s ", s_mnemonic[ zSRA ] ); break;
-			case 0x03: dst += sprintf( dst, "%-4s ", s_mnemonic[ zSLL ] ); break;
-			case 0x04: dst += sprintf( dst, "%-4s ", s_mnemonic[ zDA ] ); break;
-			case 0x05: dst += sprintf( dst, "%-4s ", s_mnemonic[ zSWAP ] ); break;
-			case 0x06: dst += sprintf( dst, "%-4s ", s_mnemonic[ zPUSH ] ); break;
-			case 0x07: dst += sprintf( dst, "%-4s ", s_mnemonic[ zPOP ] ); break;
+			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zINC ]); break;
+			case 0x01: util::stream_format(stream, "%-4s ", s_mnemonic[ zDEC ]); break;
+			case 0x02: util::stream_format(stream, "%-4s ", s_mnemonic[ zSRA ]); break;
+			case 0x03: util::stream_format(stream, "%-4s ", s_mnemonic[ zSLL ]); break;
+			case 0x04: util::stream_format(stream, "%-4s ", s_mnemonic[ zDA ]); break;
+			case 0x05: util::stream_format(stream, "%-4s ", s_mnemonic[ zSWAP ]); break;
+			case 0x06: util::stream_format(stream, "%-4s ", s_mnemonic[ zPUSH ]); break;
+			case 0x07: util::stream_format(stream, "%-4s ", s_mnemonic[ zPOP ]); break;
 			}
-			dst += sprintf( dst, "@r%02Xh", ( ea >> 3 ) & 0x07 );
+			util::stream_format(stream, "@r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_4F:
 			ea = oprom[pos++];
 			ea2 = oprom[pos++];
 			switch( ea & 0xc0 ) {
-			case 0x00: dst += sprintf( dst, "%-4s ", s_mnemonic[ zBCMP ] ); break;
-			case 0x40: dst += sprintf( dst, "%-4s ", s_mnemonic[ zBAND ] ); break;
-			case 0x80: dst += sprintf( dst, "%-4s ", s_mnemonic[ zBOR ] ); break;
-			case 0xC0: dst += sprintf( dst, "%-4s ", s_mnemonic[ zBXOR ] ); break;
+			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zBCMP ]); break;
+			case 0x40: util::stream_format(stream, "%-4s ", s_mnemonic[ zBAND ]); break;
+			case 0x80: util::stream_format(stream, "%-4s ", s_mnemonic[ zBOR ]); break;
+			case 0xC0: util::stream_format(stream, "%-4s ", s_mnemonic[ zBXOR ]); break;
 			}
 			if ( ! ( ea & 0x80 ) ) {
-				dst += sprintf( dst, "BF," );
+				util::stream_format(stream, "BF,");
 			}
-			dst += sprintf( dst, "R%02Xh,$%02X", ea2, ea & 0x07 );
+			util::stream_format(stream, "R%02Xh,$%02X", ea2, ea & 0x07);
 			if ( ea & 0x80 ) {
-				dst += sprintf( dst, ",BF" );
+				util::stream_format(stream, ",BF");
 			}
 			break;
 		}
 	}
 	else
 	{
-		dst += sprintf( dst, "%s", s_mnemonic[ instr->mnemonic ] );
+		util::stream_format(stream, "%s", s_mnemonic[ instr->mnemonic ]);
 	}
 
 	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;

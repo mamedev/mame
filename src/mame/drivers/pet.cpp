@@ -149,13 +149,269 @@ ROM sockets:  UA3   2K or 4K character
 
 */
 
-#include "includes/pet.h"
-#include "bus/ieee488/c2040.h"
-#include "machine/cbm_snqk.h"
+#include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/ieee488/c2040.h"
+#include "bus/ieee488/c8050.h"
+#include "bus/ieee488/ieee488.h"
+#include "bus/pet/cass.h"
+#include "bus/pet/exp.h"
+#include "bus/pet/user.h"
+#include "cpu/m6502/m6502.h"
+#include "imagedev/snapquik.h"
+#include "machine/6522via.h"
+#include "machine/6821pia.h"
+#include "machine/cbm_snqk.h"
+#include "machine/pla.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+
+#define M6502_TAG       "f3"
+#define M6522_TAG       "a5"
+#define M6520_1_TAG     "g8"
+#define M6520_2_TAG     "b8"
+#define MC6845_TAG      "ub13"
+#define SCREEN_TAG      "screen"
+#define PLA1_TAG        "ue6"
+#define PLA2_TAG        "ue5"
+#define PET_USER_PORT_TAG "user"
+
+class pet_state : public driver_device
+{
+public:
+	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M6502_TAG),
+		m_via(*this, M6522_TAG),
+		m_pia1(*this, M6520_1_TAG),
+		m_pia2(*this, M6520_2_TAG),
+		m_crtc(*this, MC6845_TAG),
+		m_ieee(*this, IEEE488_TAG),
+		m_palette(*this, "palette"),
+		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
+		m_exp(*this, PET_EXPANSION_SLOT_TAG),
+		m_user(*this, PET_USER_PORT_TAG),
+		m_speaker(*this, "speaker"),
+		m_cart_9000(*this, "cart_9000"),
+		m_cart_a000(*this, "cart_a000"),
+		m_cart_b000(*this, "cart_b000"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, M6502_TAG),
+		m_char_rom(*this, "charom"),
+		m_video_ram(*this, "video_ram"),
+		m_row(*this, "ROW%u", 0),
+		m_lock(*this, "LOCK"),
+		m_key(0),
+		m_sync(0),
+		m_graphic(0),
+		m_blanktv(0),
+		m_via_irq(CLEAR_LINE),
+		m_pia1a_irq(CLEAR_LINE),
+		m_pia1b_irq(CLEAR_LINE),
+		m_pia2a_irq(CLEAR_LINE),
+		m_pia2b_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE),
+		m_user_diag(1)
+	{ }
+
+	required_device<m6502_device> m_maincpu;
+	required_device<via6522_device> m_via;
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
+	optional_device<mc6845_device> m_crtc;
+	required_device<ieee488_device> m_ieee;
+	required_device<palette_device> m_palette;
+	required_device<pet_datassette_port_device> m_cassette;
+	required_device<pet_datassette_port_device> m_cassette2;
+	required_device<pet_expansion_slot_device> m_exp;
+	required_device<pet_user_port_device> m_user;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_device<generic_slot_device> m_cart_9000;
+	optional_device<generic_slot_device> m_cart_a000;
+	optional_device<generic_slot_device> m_cart_b000;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_char_rom;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<10> m_row;
+	required_ioport m_lock;
+
+	DECLARE_MACHINE_START( pet );
+	DECLARE_MACHINE_START( pet2001 );
+	DECLARE_MACHINE_RESET( pet );
+	DECLARE_MACHINE_START( pet40 );
+	DECLARE_MACHINE_RESET( pet40 );
+
+	MC6845_BEGIN_UPDATE( pet_begin_update );
+	MC6845_UPDATE_ROW( pet40_update_row );
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void check_interrupts();
+	void update_speaker();
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
+	DECLARE_READ8_MEMBER( pia1_pa_r );
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+
+	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+
+	enum
+	{
+		SEL0 = 0,
+		SEL1,
+		SEL2,
+		SEL3,
+		SEL4,
+		SEL5,
+		SEL6,
+		SEL7,
+		SEL8,
+		SEL9,
+		SELA,
+		SELB,
+		SELC,
+		SELD,
+		SELE,
+		SELF
+	};
+
+	// keyboard state
+	uint8_t m_key;
+
+	// video state
+	int m_sync;
+	int m_graphic;
+	int m_blanktv;
+	int m_video_ram_size;
+
+	// sound state
+	int m_via_cb2;
+	int m_pia1_pa7;
+
+	uint8_t m_via_pa;
+
+	// interrupt state
+	int m_via_irq;
+	int m_pia1a_irq;
+	int m_pia1b_irq;
+	int m_pia2a_irq;
+	int m_pia2b_irq;
+	int m_exp_irq;
+	int m_user_diag;
+};
 
 
-static void cbm_pet_quick_sethiaddress( address_space &space, UINT16 hiaddress )
+class pet2001b_state : public pet_state
+{
+public:
+	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+};
+
+
+class pet80_state : public pet2001b_state
+{
+public:
+	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet2001b_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_MACHINE_START( pet80 );
+	DECLARE_MACHINE_RESET( pet80 );
+
+	MC6845_UPDATE_ROW( pet80_update_row );
+	MC6845_UPDATE_ROW( cbm8296_update_row );
+};
+
+
+class superpet_state : public pet80_state
+{
+public:
+	superpet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pet80_state(mconfig, type, tag)
+	{ }
+};
+
+
+class cbm8096_state : public pet80_state
+{
+public:
+	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet80_state(mconfig, type, tag)
+	{ }
+};
+
+
+class cbm8296_state : public pet80_state
+{
+public:
+	cbm8296_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet80_state(mconfig, type, tag),
+		m_basic_rom(*this, "basic"),
+		m_editor_rom(*this, "editor"),
+		m_ue5_rom(*this, "ue5_eprom"),
+		m_ue6_rom(*this, "ue6_eprom"),
+		m_pla1(*this, PLA1_TAG),
+		m_pla2(*this, PLA2_TAG)
+	{ }
+
+	required_memory_region m_basic_rom;
+	required_memory_region m_editor_rom;
+	required_memory_region m_ue5_rom;
+	required_memory_region m_ue6_rom;
+	required_device<pla_device> m_pla1;
+	required_device<pla_device> m_pla2;
+
+	DECLARE_MACHINE_START( cbm8296 );
+	DECLARE_MACHINE_RESET( cbm8296 );
+
+	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
+	void read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
+
+	void read_pla1_eprom(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
+	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	uint8_t m_cr;
+};
+
+
+static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress )
 {
 	space.write_byte(0x2e, hiaddress & 0xff);
 	space.write_byte(0x2c, hiaddress & 0xff);
@@ -212,7 +468,7 @@ READ8_MEMBER( pet_state::read )
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(space, offset, sel);
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data = m_exp->read(space, offset, data, sel);
 
@@ -360,8 +616,8 @@ WRITE8_MEMBER( pet_state::write )
 void cbm8296_state::read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 	int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1)
 {
-	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
+	uint32_t data = m_pla1->read(input);
 
 	cswff = BIT(data, 0);
 	cs9 = BIT(data, 1);
@@ -378,10 +634,10 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
+	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
 	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
-	UINT8 data = m_ue6_rom->base()[input];
+	uint8_t data = m_ue6_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
 	cswff = BIT(data, 0);
@@ -401,8 +657,8 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 
 void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15)
 {
-	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
-	UINT32 data = m_pla2->read(input);
+	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t data = m_pla2->read(input);
 
 	endra = BIT(data, 4);
 	noscreen = BIT(data, 5);
@@ -414,10 +670,10 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
 	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
-	UINT8 data = m_ue5_rom->base()[input];
+	uint8_t data = m_ue5_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
 	endra = BIT(data, 4);
@@ -448,7 +704,7 @@ READ8_MEMBER( cbm8296_state::read )
 
 	//logerror("%s read  %04x : norom %u noio %u ramsela %u ramsel9 %u ramon %u / cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",machine().describe_context(),offset,norom,noio,ramsela,ramsel9,ramon,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	offs_t drma = fa15 << 15 | (offset & 0x7e00) | BIT(offset, 0) << 8 | (offset & 0x1fe) >> 1;
 
@@ -893,7 +1149,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// video sync
 	data |= (m_crtc ? m_crtc->vsync_r() : m_sync) << 5;
@@ -978,7 +1234,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= m_key;
@@ -1023,20 +1279,20 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 
 READ8_MEMBER( pet_state::pia1_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_key)
 	{
-	case 0: data &= m_row0->read(); break;
-	case 1: data &= m_row1->read(); break;
-	case 2: data &= m_row2->read(); break;
-	case 3: data &= m_row3->read(); break;
-	case 4: data &= m_row4->read(); break;
-	case 5: data &= m_row5->read(); break;
-	case 6: data &= m_row6->read(); break;
-	case 7: data &= m_row7->read(); break;
-	case 8: data &= m_row8->read() & m_lock->read(); break;
-	case 9: data &= m_row9->read(); break;
+	case 0: data &= m_row[0]->read(); break;
+	case 1: data &= m_row[1]->read(); break;
+	case 2: data &= m_row[2]->read(); break;
+	case 3: data &= m_row[3]->read(); break;
+	case 4: data &= m_row[4]->read(); break;
+	case 5: data &= m_row[5]->read(); break;
+	case 6: data &= m_row[6]->read(); break;
+	case 7: data &= m_row[7]->read(); break;
+	case 8: data &= m_row[8]->read() & m_lock->read(); break;
+	case 9: data &= m_row[9]->read(); break;
 	}
 
 	return data;
@@ -1044,20 +1300,20 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 
 READ8_MEMBER( pet2001b_state::pia1_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_key)
 	{
-	case 0: data &= m_row0->read(); break;
-	case 1: data &= m_row1->read(); break;
-	case 2: data &= m_row2->read(); break;
-	case 3: data &= m_row3->read(); break;
-	case 4: data &= m_row4->read(); break;
-	case 5: data &= m_row5->read(); break;
-	case 6: data &= m_row6->read() & m_lock->read(); break;
-	case 7: data &= m_row7->read(); break;
-	case 8: data &= m_row8->read(); break;
-	case 9: data &= m_row9->read(); break;
+	case 0: data &= m_row[0]->read(); break;
+	case 1: data &= m_row[1]->read(); break;
+	case 2: data &= m_row[2]->read(); break;
+	case 3: data &= m_row[3]->read(); break;
+	case 4: data &= m_row[4]->read(); break;
+	case 5: data &= m_row[5]->read(); break;
+	case 6: data &= m_row[6]->read() & m_lock->read(); break;
+	case 7: data &= m_row[7]->read(); break;
+	case 8: data &= m_row[8]->read(); break;
+	case 9: data &= m_row[9]->read(); break;
 	}
 
 	return data;
@@ -1112,7 +1368,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
 //  SCREEN_UPDATE( pet2001 )
 //-------------------------------------------------
 
-UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 
@@ -1122,11 +1378,11 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		{
 			int sy = y / 8;
 			offs_t video_addr = (sy * 40) + sx;
-			UINT8 lsd = m_video_ram[video_addr];
+			uint8_t lsd = m_video_ram[video_addr];
 
 			int ra = y & 0x07;
 			offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
-			UINT8 data = m_char_rom->base()[char_addr];
+			uint8_t data = m_char_rom->base()[char_addr];
 
 			for (int x = 0; x < 8; x++, data <<= 1)
 			{
@@ -1146,7 +1402,7 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 MC6845_BEGIN_UPDATE( pet_state::pet_begin_update )
 {
-	bitmap.fill(rgb_t::black);
+	bitmap.fill(rgb_t::black(), cliprect);
 }
 
 MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
@@ -1158,8 +1414,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
 		int invert = BIT(ma, 12);
 		int chr_option = BIT(ma, 13);
@@ -1206,8 +1462,8 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
 		int invert = BIT(ma, 12);
 		int chr_option = BIT(ma, 13);
@@ -1238,8 +1494,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !BIT(ra, 3);
 		int ra4 = BIT(ra, 4);
 		int chr_option = BIT(ma, 13);
@@ -1299,7 +1555,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 	m_video_ram.allocate(m_video_ram_size);
 
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{
@@ -1428,7 +1684,7 @@ MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 //  MACHINE_CONFIG( 4k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 4k )
+static MACHINE_CONFIG_START( 4k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
@@ -1439,7 +1695,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 8k )
+static MACHINE_CONFIG_START( 8k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
@@ -1450,7 +1706,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 16k )
+static MACHINE_CONFIG_START( 16k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -1461,7 +1717,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 32k )
+static MACHINE_CONFIG_START( 32k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1471,7 +1727,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet, pet_state )
+static MACHINE_CONFIG_START( pet )
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
@@ -1481,7 +1737,7 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(320, 200)
@@ -1540,11 +1796,13 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 
@@ -1659,7 +1917,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( pet2001b, pet2001n, pet2001b_state )
+static MACHINE_CONFIG_DERIVED( pet2001b, pet2001n )
 	MCFG_DEVICE_MODIFY(M6520_1_TAG)
 	MCFG_PIA_READPB_HANDLER(READ8(pet2001b_state, pia1_pb_r))
 MACHINE_CONFIG_END
@@ -1895,7 +2153,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet80, pet80_state )
+static MACHINE_CONFIG_START( pet80 )
 	MCFG_MACHINE_START_OVERRIDE(pet80_state, pet80)
 	MCFG_MACHINE_RESET_OVERRIDE(pet80_state, pet80)
 
@@ -1905,7 +2163,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 250)
@@ -1974,6 +2232,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -1986,6 +2245,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 
@@ -2002,7 +2262,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( superpet, pet8032, superpet_state )
+static MACHINE_CONFIG_DERIVED( superpet, pet8032 )
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "superpet")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2015,7 +2275,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8096 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( cbm8096, pet80, cbm8096_state )
+static MACHINE_CONFIG_DERIVED( cbm8096, pet80 )
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "64k")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2031,7 +2291,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8296 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( cbm8296, pet80, cbm8296_state )
+static MACHINE_CONFIG_DERIVED( cbm8296, pet80 )
 	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
 
@@ -2582,39 +2842,39 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY                         FULLNAME        FLAGS
-COMP( 1977, pet2001,    0,          0,      pet2001,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, pet20018,   pet2001,    0,      pet20018,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n,   0,          0,      pet2001n8,  pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n16, pet2001n,   0,      pet2001n16, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n32, pet2001n,   0,      pet2001n32, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3008,    pet2001n,   0,      cbm3008,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3016,    pet2001n,   0,      cbm3016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032,    pet2001n,   0,      cbm3032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b,   0,          0,      pet2001b8,  petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b16, pet2001b,   0,      pet2001b16, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b32, pet2001b,   0,      pet2001b32, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032b,   pet2001b,   0,      cbm3032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4016,    0,          0,      pet4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032,    pet4016,    0,      pet4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032f,   pet4016,    0,      pet4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, cbm4016,    pet4016,    0,      cbm4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032,    pet4016,    0,      cbm4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032f,   pet4016,    0,      cbm4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, pet4032b,   0,          0,      pet4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032,    pet8032,    0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_de, pet8032,    0,      pet8032,    petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_fr, pet8032,    0,      pet8032,    petb_fr,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_se, pet8032,    0,      pet8032,    petb_se,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1981, superpet,   pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000_se, pet8032,    0,      superpet,   petb_se,    driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8096,    pet8032,    0,      cbm8096,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296,    0,          0,      cbm8296,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT      COMPAT  MACHINE     INPUT       INIT                 COMPANY                         FULLNAME        FLAGS
+COMP( 1977, pet2001,      0,          0,      pet2001,    pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, pet20018,     pet2001,    0,      pet20018,   pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n,     0,          0,      pet2001n8,  pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n16,   pet2001n,   0,      pet2001n16, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n32,   pet2001n,   0,      pet2001n32, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3008,      pet2001n,   0,      cbm3008,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3016,      pet2001n,   0,      cbm3016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032,      pet2001n,   0,      cbm3032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b,     0,          0,      pet2001b8,  petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b16,   pet2001b,   0,      pet2001b16, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b32,   pet2001b,   0,      pet2001b32, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032b,     pet2001b,   0,      cbm3032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4016,      0,          0,      pet4016,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032,      pet4016,    0,      pet4032,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032f,     pet4016,    0,      pet4032f,   pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, cbm4016,      pet4016,    0,      cbm4016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032,      pet4016,    0,      cbm4032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032f,     pet4016,    0,      cbm4032f,   pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, pet4032b,     0,          0,      pet4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032b,     pet4032b,   0,      cbm4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet8032,      0,          0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032,      pet8032,    0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_de,   pet8032,    0,      pet8032,    petb_de,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr,   pet8032,    0,      pet8032,    petb_fr,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_se,   pet8032,    0,      pet8032,    petb_se,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1981, superpet,     pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000,      pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000_se,   pet8032,    0,      superpet,   petb_se,    superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8096,      pet8032,    0,      cbm8096,    petb,       cbm8096_state,   0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296,      0,          0,      cbm8296,    petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296ed,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,     cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,  cbm8296,    0,      cbm8296d,   petb_de,    cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )

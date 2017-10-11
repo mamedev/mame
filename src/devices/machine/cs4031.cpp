@@ -26,27 +26,32 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ram.h"
 #include "machine/cs4031.h"
 
+#include "machine/ram.h"
 
-//**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
+#define LOG_GENERAL     (1U << 0)
+#define LOG_REGISTER    (1U << 1)
+#define LOG_MEMORY      (1U << 2)
+#define LOG_IO          (1U << 3)
+#define LOG_KEYBOARD    (1U << 4)
 
-#define LOG_REGISTER    1
-#define LOG_MEMORY      1
-#define LOG_IO          1
-#define LOG_KEYBOARD    0
+#define VERBOSE (LOG_REGISTER | LOG_MEMORY | LOG_IO /*| LOG_KEYBOARD*/)
+#include "logmacro.h"
+
+#define LOGREGISTER(...)    LOGMASKED(LOG_REGISTER, __VA_ARGS__)
+#define LOGMEMORY(...)      LOGMASKED(LOG_MEMORY,   __VA_ARGS__)
+#define LOGIO(...)          LOGMASKED(LOG_IO,       __VA_ARGS__)
+#define LOGKEYBOARD(...)    LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CS4031 = &device_creator<cs4031_device>;
+DEFINE_DEVICE_TYPE(CS4031, cs4031_device, "cs4031", "CS4031")
 
-const char* cs4031_device::m_register_names[] =
+const char* const cs4031_device::m_register_names[] =
 {
 	/* 00 */ "RESERVED",
 	/* 01 */ "DMA WAIT STATE CONTROL",
@@ -88,11 +93,10 @@ const float cs4031_device::m_dma_clock_divider[] =
 };
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cs4031 )
+MACHINE_CONFIG_MEMBER( cs4031_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))
@@ -124,26 +128,28 @@ static MACHINE_CONFIG_FRAGMENT( cs4031 )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(cs4031_device, dma2_dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma2_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma2_dack3_w))
-	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
-	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NOOP)
+
+	MCFG_DEVICE_ADD("intc1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(cs4031_device, intc1_int_w))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(cs4031_device, intc1_slave_ack_r))
+
+	MCFG_DEVICE_ADD("intc2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("intc1", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12.0)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("intc1", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12.0)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cs4031_device, ctc_out1_w))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cs4031_device, ctc_out2_w))
 
 	MCFG_DS12885_ADD("rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(cs4031_device, rtc_irq_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
-
-machine_config_constructor cs4031_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cs4031 );
-}
 
 
 //**************************************************************************
@@ -154,8 +160,8 @@ machine_config_constructor cs4031_device::device_mconfig_additions() const
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CS4031, "CS4031", tag, owner, clock, "cs4031", __FILE__),
+cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CS4031, tag, owner, clock),
 	m_read_ior(*this),
 	m_write_iow(*this),
 	m_write_tc(*this),
@@ -250,6 +256,7 @@ void cs4031_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
+	save_item(NAME(m_emu_gatea20));
 	save_item(NAME(m_address));
 	save_item(NAME(m_address_valid));
 	save_item(NAME(m_registers));
@@ -263,7 +270,7 @@ void cs4031_device::device_start()
 	m_keybc = downcast<at_keyboard_controller_device *>(machine().device(m_keybctag));
 
 	m_ram = ram_dev->pointer();
-	UINT32 ram_size = ram_dev->size();
+	uint32_t ram_size = ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);
@@ -272,7 +279,7 @@ void cs4031_device::device_start()
 	if (ram_size > 0x100000)
 		m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
 
-	// install bios rom at cpu inital pc
+	// install bios rom at cpu initial pc
 	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
 
 	// install i/o accesses
@@ -362,7 +369,7 @@ READ8_MEMBER( cs4031_device::dma_read_word )
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	UINT16 result = m_space->read_word(page_offset() + (offset << 1));
+	uint16_t result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
@@ -373,7 +380,7 @@ WRITE8_MEMBER( cs4031_device::dma_write_word )
 	if (m_dma_channel == -1)
 		return;
 
-	m_space->write_word(page_offset() + (offset << 1), (m_dma_high_byte << 8) | data);
+	m_space->write_word((page_offset() & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
 WRITE_LINE_MEMBER( cs4031_device::dma2_dack0_w )
@@ -411,7 +418,7 @@ void cs4031_device::update_dma_clock()
 {
 	if (m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f] != 0)
 	{
-		UINT32 dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
+		uint32_t dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
 
 		if (!BIT(m_registers[DMA_WAIT_STATE], 0))
 			dma_clock /= 2;
@@ -457,8 +464,7 @@ WRITE_LINE_MEMBER( cs4031_device::rtc_irq_w )
 
 WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 {
-	if (LOG_IO)
-		logerror("cs4031_device::iochck_w: %u\n", state);
+	LOGIO("cs4031_device::iochck_w: %u\n", state);
 
 	if (BIT(m_portb, 3) == 0)
 	{
@@ -503,12 +509,11 @@ WRITE8_MEMBER( cs4031_device::config_address_w )
 
 READ8_MEMBER( cs4031_device::config_data_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (m_address_valid)
 	{
-		if (LOG_REGISTER)
-			logerror("cs4031_device: read %s = %02x\n", m_register_names[m_address], m_registers[m_address]);
+		LOGREGISTER("cs4031_device: read %s = %02x\n", m_register_names[m_address], m_registers[m_address]);
 
 		result = m_registers[m_address];
 	}
@@ -523,8 +528,7 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 {
 	if (m_address_valid)
 	{
-		if (LOG_REGISTER)
-			logerror("cs4031_device: write %s = %02x\n", m_register_names[m_address], data);
+		LOGREGISTER("cs4031_device: write %s = %02x\n", m_register_names[m_address], data);
 
 		// update register with new data
 		m_registers[m_address] = data;
@@ -588,32 +592,28 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 {
 	if (!BIT(m_registers[SHADOW_READ], index) && BIT(m_registers[ROMCS], index))
 	{
-		if (LOG_MEMORY)
-			logerror("ROM read from %x to %x\n", start, end);
+		LOGMEMORY("ROM read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
-		if (LOG_MEMORY)
-			logerror("ISA read from %x to %x\n", start, end);
+		LOGMEMORY("ISA read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
-		if (LOG_MEMORY)
-			logerror("RAM read from %x to %x\n", start, end);
+		LOGMEMORY("RAM read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_ram + start);
 	}
 	else
 	{
-		if (LOG_MEMORY)
-			logerror("NOP read from %x to %x\n", start, end);
+		LOGMEMORY("NOP read from %x to %x\n", start, end);
 
 		m_space->nop_read(start, end);
 	}
@@ -623,32 +623,28 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 {
 	if (!BIT(m_registers[SHADOW_WRITE], index) && BIT(m_registers[ROMCS], index) && BIT(m_registers[ROMCS], 7))
 	{
-		if (LOG_MEMORY)
-			logerror("ROM write from %x to %x\n", start, end);
+		LOGMEMORY("ROM write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
-		if (LOG_MEMORY)
-			logerror("ISA write from %x to %x\n", start, end);
+		LOGMEMORY("ISA write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
-		if (LOG_MEMORY)
-			logerror("RAM write from %x to %x\n", start, end);
+		LOGMEMORY("RAM write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
 		machine().root_device().membank(region)->set_base(m_ram + start);
 	}
 	else
 	{
-		if (LOG_MEMORY)
-			logerror("NOP write from %x to %x\n", start, end);
+		LOGMEMORY("NOP write from %x to %x\n", start, end);
 
 		m_space->nop_write(start, end);
 	}
@@ -723,8 +719,7 @@ void cs4031_device::keyboard_gatea20(int state)
 
 READ8_MEMBER( cs4031_device::keyb_status_r )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::keyb_status_r\n");
+	LOGKEYBOARD("cs4031_device::keyb_status_r\n");
 
 	return m_keybc->status_r(space, 0);
 }
@@ -738,8 +733,7 @@ WRITE8_MEMBER( cs4031_device::keyb_command_blocked_w )
 
 WRITE8_MEMBER( cs4031_device::keyb_command_w )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::keyb_command_w: %02x\n", data);
+	LOGKEYBOARD("cs4031_device::keyb_command_w: %02x\n", data);
 
 	m_keybc_d1_written = false;
 
@@ -810,16 +804,14 @@ WRITE8_MEMBER( cs4031_device::keyb_command_w )
 
 READ8_MEMBER( cs4031_device::keyb_data_r )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::keyb_data_r\n");
+	LOGKEYBOARD("cs4031_device::keyb_data_r\n");
 
 	return m_keybc->data_r(space, 0);
 }
 
 WRITE8_MEMBER( cs4031_device::keyb_data_w )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::keyb_data_w: %02x\n", data);
+	LOGKEYBOARD("cs4031_device::keyb_data_w: %02x\n", data);
 
 	// data is blocked only for d1 command
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 7) && m_keybc_d1_written)
@@ -837,16 +829,14 @@ WRITE8_MEMBER( cs4031_device::keyb_data_w )
 
 WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::gatea20_w: %u\n", state);
+	LOGKEYBOARD("cs4031_device::gatea20_w: %u\n", state);
 
 	keyboard_gatea20(state);
 }
 
 WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
 {
-	if (LOG_KEYBOARD)
-		logerror("cs4031_device::kbrst_w: %u\n", state);
+	LOGKEYBOARD("cs4031_device::kbrst_w: %u\n", state);
 
 	// convert to active low signal (gets inverted in at_keybc.c)
 	state = (state == ASSERT_LINE ? 0 : 1);
@@ -874,8 +864,7 @@ WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
  */
 WRITE8_MEMBER( cs4031_device::sysctrl_w )
 {
-	if (LOG_IO)
-		logerror("cs4031_device::sysctrl_w: %u\n", data);
+	LOGIO("cs4031_device::sysctrl_w: %u\n", data);
 
 	fast_gatea20(BIT(data, 1));
 
@@ -891,13 +880,12 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 
 READ8_MEMBER( cs4031_device::sysctrl_r )
 {
-	UINT8 result = 0; // reserved bits read as 0?
+	uint8_t result = 0; // reserved bits read as 0?
 
 	result |= m_cpureset << 0;
 	result |= m_fast_gatea20 << 1;
 
-	if (LOG_IO)
-		logerror("cs4031_device::sysctrl_r: %u\n", result);
+	LOGIO("cs4031_device::sysctrl_r: %u\n", result);
 
 	return result;
 }

@@ -20,7 +20,7 @@ static int k7_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-static inline int vg5k_cas_cycle(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_cas_cycle(int16_t *buffer, int sample_pos, int len)
 {
 	int i = 0;
 
@@ -45,7 +45,7 @@ static inline int vg5k_cas_cycle(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate n samples of silence
 ********************************************************************/
-static inline int vg5k_cas_silence(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_cas_silence(int16_t *buffer, int sample_pos, int len)
 {
 	int i = 0;
 
@@ -60,7 +60,7 @@ static inline int vg5k_cas_silence(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate the end-byte samples
 ********************************************************************/
-static inline int vg5k_cas_eob(INT16 *buffer, int sample_pos)
+static inline int vg5k_cas_eob(int16_t *buffer, int sample_pos)
 {
 	int i, samples = 0;
 
@@ -73,7 +73,7 @@ static inline int vg5k_cas_eob(INT16 *buffer, int sample_pos)
 }
 
 
-static inline int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int vg5k_cas_byte(int16_t *buffer, int sample_pos, uint8_t data)
 {
 /* Writing an entire byte */
 	int i, samples;
@@ -100,7 +100,7 @@ static inline int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
 /*******************************************************************
    Generate n sample of synchro
 ********************************************************************/
-static inline int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_k7_synchro(int16_t *buffer, int sample_pos, int len)
 {
 	int i, samples = 0;
 
@@ -113,7 +113,7 @@ static inline int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
 }
 
 
-static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
+static int vg5k_handle_tap(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count;
 
@@ -127,7 +127,7 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	/* on the entire file*/
 	while( data_pos < k7_size )
 	{
-		UINT16  block_size = 0;
+		uint16_t  block_size = 0;
 
 		/* Identify type of block */
 		if (casdata[data_pos] == 0xd3)
@@ -183,7 +183,7 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int vg5k_k7_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int vg5k_k7_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return vg5k_handle_tap(buffer, bytes);
 }
@@ -192,7 +192,7 @@ static int vg5k_k7_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image classical
 ********************************************************************/
-static int vg5k_k7_to_wav_size(const UINT8 *casdata, int caslen)
+static int vg5k_k7_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	k7_size = caslen ;
 

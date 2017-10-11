@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv805.h"
 
 
@@ -13,14 +14,13 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV805 = &device_creator<sv805_device>;
+DEFINE_DEVICE_TYPE(SV805, sv805_device, "sv805", "SV-805 RS-232 Interface")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv805 )
+MACHINE_CONFIG_MEMBER( sv805_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("uart", INS8250, XTAL_3_072MHz)
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(sv805_device, uart_intr_w))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -34,11 +34,6 @@ static MACHINE_CONFIG_FRAGMENT( sv805 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor sv805_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv805 );
-}
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -48,8 +43,8 @@ machine_config_constructor sv805_device::device_mconfig_additions() const
 //  sv805_device - constructor
 //-------------------------------------------------
 
-sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SV805, "SV-805 RS-232 Interface", tag, owner, clock, "sv805", __FILE__),
+sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SV805, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_uart(*this, "uart"),
 	m_rs232(*this, "rs232")

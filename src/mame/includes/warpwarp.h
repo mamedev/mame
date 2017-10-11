@@ -31,8 +31,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<warpwarp_sound_device> m_warpwarp_sound;
 	optional_device<geebee_sound_device> m_geebee_sound;
-	optional_shared_ptr<UINT8> m_geebee_videoram;
-	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_geebee_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;
@@ -62,7 +62,14 @@ public:
 	//geebee and navarone
 	DECLARE_READ8_MEMBER(geebee_in_r);
 	DECLARE_WRITE8_MEMBER(geebee_out6_w);
-	DECLARE_WRITE8_MEMBER(geebee_out7_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_1_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_2_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_3_w);
+	DECLARE_WRITE_LINE_MEMBER(counter_w);
+	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
+	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);
+	DECLARE_WRITE_LINE_MEMBER(ball_on_w);
+	DECLARE_WRITE_LINE_MEMBER(inv_w);
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
 	virtual void machine_start() override;
@@ -85,7 +92,7 @@ public:
 	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
 	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 

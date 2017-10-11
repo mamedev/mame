@@ -74,7 +74,7 @@ void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		update_signal(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in vectrex_state::device_timer");
+		assert_always(false, "Unknown id in vectrex_state::device_timer");
 	}
 }
 
@@ -103,7 +103,7 @@ void vectrex_state::vectrex_configuration()
 		switch ((cport >> 2) & 0x07)
 		{
 		case 0x00:
-			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = rgb_t::black;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = rgb_t::black();
 			break;
 		case 0x01:
 			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = VC_DARKRED;
@@ -133,7 +133,7 @@ void vectrex_state::vectrex_configuration()
 		switch ((cport >> 5) & 0x07)
 		{
 		case 0x00:
-			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::black;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::black();
 			break;
 		case 0x01:
 			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = VC_DARKRED;
@@ -162,8 +162,8 @@ void vectrex_state::vectrex_configuration()
 	else
 	{
 		vector_add_point_function = &vectrex_state::vectrex_add_point;
-		m_beam_color = rgb_t::white;
-		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::white;
+		m_beam_color = rgb_t::white();
+		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::white();
 	}
 	m_lightpen_port = m_io_lpenconf->read() & 0x03;
 }
@@ -227,7 +227,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_change_color)
 TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
 {
 	if (ptr)
-		* (UINT8 *) ptr = param;
+		* (uint8_t *) ptr = param;
 }
 
 
@@ -302,9 +302,9 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 {
 	m_imager_angles = unknown_game_angles;
-	m_beam_color = rgb_t::white;
+	m_beam_color = rgb_t::white();
 	for (auto & elem : m_imager_colors)
-		elem = rgb_t::white;
+		elem = rgb_t::white();
 
 	/*
 	 * Minestorm's PRNG doesn't work with a 0 seed (mines in the first

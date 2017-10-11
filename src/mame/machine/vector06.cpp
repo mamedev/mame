@@ -9,12 +9,14 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/vector06.h"
+#include "screen.h"
 
 
 READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
 	if (BIT(m_keyboard_mask, 1)) key &= m_line[1]->read();
 	if (BIT(m_keyboard_mask, 2)) key &= m_line[2]->read();
@@ -28,7 +30,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 
 READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
-	UINT8 ret = m_line[8]->read();
+	uint8_t ret = m_line[8]->read();
 
 	if (m_cassette->input() > 0)
 		ret |= 0x10;
@@ -59,16 +61,16 @@ WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
 
 WRITE8_MEMBER( vector06_state::vector06_color_set )
 {
-	UINT8 r = (data & 7) << 5;
-	UINT8 g = ((data >> 3) & 7) << 5;
-	UINT8 b = ((data >>6) & 3) << 6;
+	uint8_t r = (data & 7) << 5;
+	uint8_t g = ((data >> 3) & 7) << 5;
+	uint8_t b = ((data >>6) & 3) << 6;
 	m_palette->set_pen_color( m_color_index, rgb_t(r,g,b) );
 }
 
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT16 addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
+	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
@@ -92,26 +94,6 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 	m_romdisk_msb = data;
 }
 
-READ8_MEMBER( vector06_state::vector06_8255_1_r )
-{
-	return m_ppi->read(space, offset^3);
-}
-
-WRITE8_MEMBER( vector06_state::vector06_8255_1_w )
-{
-	m_ppi->write(space, offset^3, data);
-}
-
-READ8_MEMBER( vector06_state::vector06_8255_2_r )
-{
-	return m_ppi2->read(space, offset^3);
-}
-
-WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
-{
-	m_ppi2->write(space, offset^3, data);
-}
-
 INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -119,13 +101,13 @@ INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 
 IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 {
-	// Interupt is RST 7
+	// Interrupt is RST 7
 	return 0xff;
 }
 
 TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	UINT8 val = m_reset->read();
+	uint8_t val = m_reset->read();
 
 	if (BIT(val, 0))
 	{
@@ -185,7 +167,7 @@ void vector06_state::update_mem()
 
 WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 {
-	UINT8 oldbank = m_rambank;
+	const uint8_t oldbank = m_rambank;
 	m_rambank = data;
 	if (oldbank != m_rambank)
 		update_mem();
@@ -193,8 +175,8 @@ WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 
 WRITE8_MEMBER(vector06_state::vector06_status_callback)
 {
-	bool oldstate = m_stack_state;
-	m_stack_state = (data & I8085_STATUS_STACK) ? true : false;
+	const bool oldstate = m_stack_state;
+	m_stack_state = bool(data & i8080_cpu_device::STATUS_STACK);
 	if (oldstate != m_stack_state && (m_rambank & 0x10))
 		update_mem();
 }
@@ -204,19 +186,10 @@ WRITE_LINE_MEMBER(vector06_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(vector06_state::pit8253_w)
-{
-	m_pit8253->write(space, offset ^ 3, data);
-}
-
-READ8_MEMBER(vector06_state::pit8253_r)
-{
-	return m_pit8253->read(space,  offset ^ 3);
-}
-
 void vector06_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
+	m_reset_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vector06_state::reset_check_callback), this));
+	m_reset_check_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 void vector06_state::machine_reset()

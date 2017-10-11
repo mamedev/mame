@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    unicode.c
+    unicode.cpp
 
     Unicode related functions
 
@@ -10,13 +10,23 @@
 
 #include "unicode.h"
 
+#ifdef _WIN32
+#include "strconv.h"
+#define UTF8PROC_DLLEXPORT
+#endif
+
+#include <utf8proc.h>
+
+#include <codecvt>
+#include <locale>
+
 
 //-------------------------------------------------
 //  uchar_isvalid - return true if a given
 //  character is a legitimate unicode character
 //-------------------------------------------------
 
-bool uchar_isvalid(unicode_char uchar)
+bool uchar_isvalid(char32_t uchar)
 {
 	return (uchar < 0x110000) && !((uchar >= 0xd800) && (uchar <= 0xdfff));
 }
@@ -27,7 +37,7 @@ bool uchar_isvalid(unicode_char uchar)
 //  char is printable
 //-------------------------------------------------
 
-bool uchar_is_printable(unicode_char uchar)
+bool uchar_is_printable(char32_t uchar)
 {
 	return
 		!(0x0001f >= uchar) &&                            // C0 control
@@ -43,7 +53,7 @@ bool uchar_is_printable(unicode_char uchar)
 //  char is a digit
 //-------------------------------------------------
 
-bool uchar_is_digit(unicode_char uchar)
+bool uchar_is_digit(char32_t uchar)
 {
 	return uchar >= '0' && uchar <= '9';
 }
@@ -54,9 +64,9 @@ bool uchar_is_digit(unicode_char uchar)
 //  into a unicode character
 //-----------------------------------------------
 
-int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
+int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 {
-	unicode_char c, minchar;
+	char32_t c, minchar;
 	int auxlen, i;
 	char auxchar;
 
@@ -149,7 +159,7 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 //  into a unicode character
 //-------------------------------------------------
 
-int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count)
+int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count)
 {
 	int rc = -1;
 
@@ -184,9 +194,9 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 //  byte order
 //-------------------------------------------------
 
-int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count)
+int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count)
 {
-	utf16_char buf[2] = {0};
+	char16_t buf[2] = {0};
 	if (count > 0)
 		buf[0] = flipendian_int16(utf16char[0]);
 	if (count > 1)
@@ -200,7 +210,7 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 //  into a UTF-8 sequence
 //-------------------------------------------------
 
-int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
+int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar)
 {
 	int rc = 0;
 
@@ -278,7 +288,7 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 //  into a UTF-8 sequence
 //-------------------------------------------------
 
-std::string utf8_from_uchar(unicode_char uchar)
+std::string utf8_from_uchar(char32_t uchar)
 {
 	char buffer[UTF8_CHAR_MAX];
 	auto len = utf8_from_uchar(buffer, ARRAY_LENGTH(buffer), uchar);
@@ -291,7 +301,7 @@ std::string utf8_from_uchar(unicode_char uchar)
 //  into a UTF-16 sequence
 //-------------------------------------------------
 
-int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
+int utf16_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 {
 	int rc;
 
@@ -304,7 +314,7 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 		// single word case
 		if (count < 1)
 			return -1;
-		utf16string[0] = (utf16_char) uchar;
+		utf16string[0] = (char16_t) uchar;
 		rc = 1;
 	}
 	else if (uchar < 0x100000)
@@ -330,10 +340,10 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 //  into a UTF-16 sequence with flipped endianness
 //-------------------------------------------------
 
-int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
+int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 {
 	int rc;
-	utf16_char buf[2] = { 0, 0 };
+	char16_t buf[2] = { 0, 0 };
 
 	rc = utf16_from_uchar(buf, count, uchar);
 
@@ -342,6 +352,141 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	if (rc >= 2)
 		utf16string[1] = flipendian_int16(buf[1]);
 	return rc;
+}
+
+
+//-------------------------------------------------
+// wstring_from_utf8
+//-------------------------------------------------
+
+std::wstring wstring_from_utf8(const std::string &utf8string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::to_wstring(utf8string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.from_bytes(utf8string);
+#endif
+}
+
+
+//-------------------------------------------------
+// utf8_from_wstring
+//-------------------------------------------------
+
+std::string utf8_from_wstring(const std::wstring &string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::from_wstring(string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.to_bytes(string);
+#endif
+}
+
+
+//-------------------------------------------------
+//  internal_normalize_unicode - uses utf8proc to
+//  normalize unicode
+//-------------------------------------------------
+
+static std::string internal_normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool null_terminated)
+{
+	// convert the normalization form
+	int options;
+	switch (normalization_form)
+	{
+	case unicode_normalization_form::C:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE;
+		break;
+	case unicode_normalization_form::D:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE;
+		break;
+	case unicode_normalization_form::KC:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
+		break;
+	case unicode_normalization_form::KD:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
+		break;
+	default:
+		throw false;
+	}
+
+	// was this null terminated?
+	if (null_terminated)
+		options |= UTF8PROC_NULLTERM;
+
+	// invoke utf8proc
+	utf8proc_uint8_t *utf8proc_result;
+	utf8proc_ssize_t utf8proc_result_length = utf8proc_map((utf8proc_uint8_t *) s, length, &utf8proc_result, (utf8proc_option_t)options);
+
+	// conver the result
+	std::string result;
+	if (utf8proc_result)
+	{
+		if (utf8proc_result_length > 0)
+			result = std::string((const char *)utf8proc_result, utf8proc_result_length);
+		free(utf8proc_result);
+	}
+
+	return result;
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s.c_str(), s.length(), normalization_form, false);
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s, 0, normalization_form, true);
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s, length, normalization_form, false);
+}
+
+
+//-------------------------------------------------
+//  uchar_toupper - uses utf8proc to convert to
+//  upper case
+//-------------------------------------------------
+
+char32_t uchar_toupper(char32_t ch)
+{
+	return utf8proc_toupper(ch);
+}
+
+
+//-------------------------------------------------
+//  uchar_tolower - uses utf8proc to convert to
+//  lower case
+//-------------------------------------------------
+
+char32_t uchar_tolower(char32_t ch)
+{
+	return utf8proc_tolower(ch);
 }
 
 
@@ -390,7 +535,7 @@ bool utf8_is_valid_string(const char *utf8string)
 
 	while (*utf8string != 0)
 	{
-		unicode_char uchar = 0;
+		char32_t uchar = 0;
 		int charlen;
 
 		// extract the current character and verify it

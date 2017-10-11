@@ -73,6 +73,7 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+#include "speaker.h"
 
 #include "maygay1b.lh"
 
@@ -479,9 +480,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-
+	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 #ifdef USE_MCU
 	//8051
@@ -489,8 +488,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
-	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 
@@ -567,8 +565,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 #ifdef USE_MCU
 	//8051
@@ -576,8 +573,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
-	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 
@@ -737,7 +733,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
 
 READ8_MEMBER(maygay1b_state::mcu_port0_r)
 {
-	UINT8 ret = m_lamp_strobe;
+	uint8_t ret = m_lamp_strobe;
 #ifdef USE_MCU
 	// the MCU code checks to see if the input from this port is stable in
 	// the main loop
@@ -754,7 +750,7 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	// this is read in BOTH the external interrupts
 	// it seems that both the writes from the main cpu go here
 	// and the MCU knows which is is based on the interrupt level
-	UINT8 ret = m_main_to_mcu;
+	uint8_t ret = m_main_to_mcu;
 #ifdef USE_MCU
 	logerror("%s: mcu_port2_r returning %02x\n", machine().describe_context(), ret);
 #endif
@@ -771,7 +767,7 @@ ADDRESS_MAP_END
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
+MACHINE_CONFIG_START( maygay_m1 )
 
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
@@ -862,20 +858,20 @@ WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 {
 	//Initialise paging for non-extended ROM space
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &rom[0x0e000], 0x10000);
 	membank("bank1")->set_entry(0);
 
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?
 	{
-		UINT8 *cpu = memregion( "maincpu" )->base();
+		uint8_t *cpu = memregion( "maincpu" )->base();
 		int base = 0xff20;
 		for (int i=0;i<14;i++)
 		{
 			for (int j=0;j<16;j++)
 			{
-				UINT8 rom = cpu[base];
+				uint8_t rom = cpu[base];
 
 				if ((rom>=0x20) && (rom<0x7f))
 				{

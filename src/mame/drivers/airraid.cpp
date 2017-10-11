@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Air Raid (aka Cross Shooter) (c) 1987 Seibu
 
@@ -149,29 +149,34 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "video/airraid_dev.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/timer.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 class airraid_state : public driver_device
 {
 public:
 	airraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_mainram(*this, "mainram"),
-		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_airraid_video(*this,"airraid_vid")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_mainram(*this, "mainram")
+		, m_palette(*this, "palette")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_airraid_video(*this,"airraid_vid")
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
-	optional_shared_ptr<UINT8> m_mainram;
+	optional_shared_ptr<uint8_t> m_mainram;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	required_device<airraid_video_device> m_airraid_video;
 
@@ -179,8 +184,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
 	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
-	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
@@ -233,17 +236,6 @@ WRITE8_MEMBER(airraid_state::bank_w)
 }
 
 
-READ8_MEMBER(airraid_state::seibu_sound_comms_r)
-{
-	return m_seibu_sound->main_word_r(space,offset,0x00ff);
-}
-
-WRITE8_MEMBER(airraid_state::seibu_sound_comms_w)
-{
-	m_seibu_sound->main_word_w(space,offset,data,0x00ff);
-}
-
-
 
 
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
@@ -268,13 +260,35 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 //  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
 //  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
 
-	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
+	AM_RANGE(0xde00, 0xde0f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_r, main_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airraid_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
 
 
@@ -361,15 +375,16 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( airraid, airraid_state )
+static MACHINE_CONFIG_START( airraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
-	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -379,7 +394,20 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 
 	/* sound hardware */
-	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -421,9 +449,9 @@ ROM_START( airraid )
 	ROM_REGION( 0x10000, "maindata", 0 ) // cpu data
 	ROM_LOAD( "2.19j",   0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
-	ROM_LOAD( "4.7f",    0x10000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
@@ -504,9 +532,9 @@ ROM_START( cshooter )
 	ROM_REGION( 0x10000, "maindata", 0 ) // cpu data
 	ROM_LOAD( "2.k20",   0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
-	ROM_LOAD( "4.7f",    0x10000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
@@ -556,7 +584,7 @@ DRIVER_INIT_MEMBER(airraid_state, cshooter)
 
 DRIVER_INIT_MEMBER(airraid_state,cshootere)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{
@@ -588,6 +616,6 @@ DRIVER_INIT_MEMBER(airraid_state,cshootere)
 }
 
 // There's also an undumped International Games version
-GAME( 1987, cshooter,  airraid,      airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)",           "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airraid,   0,         airraid_crypt,  airraid,  airraid_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1987, cshooter,  airraid,   airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airraid,   0,         airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 

@@ -11,10 +11,11 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
 #include "includes/orion.h"
+
+#include "imagedev/cassette.h"
+#include "screen.h"
+
 
 #define SCREEN_WIDTH_384 48
 #define SCREEN_WIDTH_480 60
@@ -24,7 +25,7 @@
 
 READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 {
-	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
+	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
@@ -245,8 +246,8 @@ WRITE8_MEMBER(orion_state::orionz80_sound_fe_w)
 
 void orion_state::orionz80_switch_bank()
 {
-	UINT8 bank_select;
-	UINT8 segment_select;
+	uint8_t bank_select;
+	uint8_t segment_select;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	bank_select = (m_orionz80_dispatcher & 0x0c) >> 2;
@@ -393,7 +394,7 @@ void orion_state::orionpro_bank_switch()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int page = m_orionpro_page & 7; // we have only 8 pages
 	int is128 = (m_orionpro_dispatcher & 0x80) ? 1 : 0;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (is128==1)
 	{

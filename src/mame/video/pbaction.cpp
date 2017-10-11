@@ -80,7 +80,7 @@ void pbaction_state::video_start()
 
 void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -125,7 +125,7 @@ void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 pbaction_state::screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pbaction_state::screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

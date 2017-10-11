@@ -20,7 +20,7 @@
 //#define MAX_WORDS           111
 
 #define OKIVERBOSE 0
-#define MSM6376LOG(x) do { if (OKIVERBOSE) logerror x; } while (0)
+#define MSM6376LOG(...) do { if (OKIVERBOSE) logerror(__VA_ARGS__); } while (0)
 
 /* step size index shift table */
 static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
@@ -57,7 +57,7 @@ static int tables_computed = 0;
 
 ***********************************************************************************************/
 
-static void compute_tables(void)
+static void compute_tables()
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -98,30 +98,29 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-static void reset_adpcm(struct ADPCMVoice *voice)
+void okim6376_device::ADPCMVoice::reset()
 {
 	/* make sure we have our tables */
 	if (!tables_computed)
 		compute_tables();
 
 	/* reset the signal/step */
-	voice->signal = -2;
-	voice->step = 0;
+	signal = -2;
+	step = 0;
 }
 
 
-const device_type OKIM6376 = &device_creator<okim6376_device>;
+DEFINE_DEVICE_TYPE(OKIM6376, okim6376_device, "okim6376", "OKI MSM6376 ADPCM")
 
-okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, OKIM6376, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_region_base(*this, DEVICE_SELF),
 		//m_command[OKIM6376_VOICES],
 		m_latch(0),
 		//m_stage[OKIM6376_VOICES],
 		m_stream(nullptr),
-		m_master_clock(0),
-		m_divisor(0),
+		m_divisor(8),
 		m_channel(0),
 		m_nar(0),
 		m_nartimer(0),
@@ -131,16 +130,6 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 		m_st_pulses(0),
 		m_ch2_update(0),
 		m_st_update(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void okim6376_device::device_config_complete()
 {
 }
 
@@ -158,7 +147,6 @@ void okim6376_device::device_start()
 	m_stage[0] = 0;
 	m_stage[1] = 0;
 	m_latch = 0;
-	m_master_clock = clock();
 	m_divisor = divisor_table[0];
 	m_nar = 1;
 	m_nartimer = 0;
@@ -176,7 +164,7 @@ void okim6376_device::device_start()
 	{
 		/* initialize the rest of the structure */
 		m_voice[voice].volume = 0;
-		reset_adpcm(&m_voice[voice]);
+		m_voice[voice].reset();
 	}
 
 	okim6376_state_save_register();
@@ -202,25 +190,25 @@ void okim6376_device::device_reset()
 
 ***********************************************************************************************/
 
-static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
+int16_t okim6376_device::ADPCMVoice::clock(uint8_t nibble)
 {
-	voice->signal += diff_lookup[voice->step * 16 + (nibble & 15)];
+	signal += diff_lookup[step * 16 + (nibble & 15)];
 
 	/* clamp to the maximum 12bit */
-	if (voice->signal > 2047)
-		voice->signal = 2047;
-	else if (voice->signal < -2048)
-		voice->signal = -2048;
+	if (signal > 2047)
+		signal = 2047;
+	else if (signal < -2048)
+		signal = -2048;
 
 	/* adjust the step size and clamp */
-	voice->step += index_shift[nibble & 7];
-	if (voice->step > 48)
-		voice->step = 48;
-	else if (voice->step < 0)
-		voice->step = 0;
+	step += index_shift[nibble & 7];
+	if (step > 48)
+		step = 48;
+	else if (step < 0)
+		step = 0;
 
 	/* return the signal */
-	return voice->signal;
+	return signal;
 }
 
 
@@ -258,7 +246,7 @@ void okim6376_device::oki_process(int channel, int command)
 						voice->count = 0;
 
 						/* also reset the ADPCM parameters */
-						reset_adpcm(voice);
+						voice->reset();
 						if (channel == 0)
 						{
 							/* We set channel 2's audio separately */
@@ -300,12 +288,12 @@ void okim6376_device::oki_process(int channel, int command)
 
 ***********************************************************************************************/
 
-void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, INT16 *buffer, int samples,int channel)
+void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, int samples,int channel)
 {
 	/* if this voice is active */
 	if (voice->playing)
 	{
-		UINT8 *base = m_region_base + voice->base_offset;
+		uint8_t *base = m_region_base + voice->base_offset;
 		int sample = voice->sample;
 		int count = voice->count;
 
@@ -337,7 +325,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, INT16 *buffer, in
 
 			/* output to the buffer, scaling by the volume */
 			/* signal in range -4096..4095, volume in range 2..16 => signal * volume / 2 in range -32768..32767 */
-			*buffer++ = clock_adpcm(voice, nibble) * voice->volume / 2;
+			*buffer++ = voice->clock(nibble) * voice->volume / 2;
 
 			++sample;
 			--count;
@@ -369,7 +357,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, INT16 *buffer, in
 
 void okim6376_device::postload()
 {
-	set_frequency(m_master_clock);
+	notify_clock_changed();
 }
 
 void okim6376_device::adpcm_state_save_register(struct ADPCMVoice *voice, int index)
@@ -405,13 +393,11 @@ void okim6376_device::okim6376_state_save_register()
 		save_item(NAME(m_st_update));
 		save_item(NAME(m_ch2));
 		save_item(NAME(m_ch2_update));
-		save_item(NAME(m_master_clock));
 }
 
-void okim6376_device::set_frequency(int frequency)
+void okim6376_device::device_clock_changed()
 {
-	m_master_clock = frequency;
-	m_stream->set_sample_rate(m_master_clock / m_divisor);
+	m_stream->set_sample_rate(clock() / m_divisor);
 }
 
 
@@ -439,14 +425,14 @@ READ_LINE_MEMBER( okim6376_device::busy_r )
 
 READ_LINE_MEMBER( okim6376_device::nar_r )
 {
-	MSM6376LOG(("OKIM6376:'%s' NAR %x\n",tag(),m_nar));
+	MSM6376LOG("OKIM6376: NAR %x\n",m_nar);
 	return m_nar;
 }
 
 WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 {
 	m_ch2_update = 0;//Clear flag
-	MSM6376LOG(("OKIM6376:'%s' CH2 %x\n",tag(),state));
+	MSM6376LOG("OKIM6376: CH2 %x\n",state);
 
 	if (m_ch2 != state)
 	{
@@ -459,7 +445,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 		struct ADPCMVoice *voice0 = &m_voice[0];
 		struct ADPCMVoice *voice1 = &m_voice[1];
 		// We set to channel 2
-		MSM6376LOG(("OKIM6376:'%s' Channel 1\n",tag()));
+		MSM6376LOG("OKIM6376: Channel 1\n");
 		m_channel = 1;
 
 		if ((voice0->playing)&&(m_st))
@@ -474,7 +460,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 	{
 		m_stage[1]=0;
 		oki_process(1, m_command[1]);
-		MSM6376LOG(("OKIM6376:'%s' Channel 0\n",tag()));
+		MSM6376LOG("OKIM6376: Channel 0\n");
 		m_channel = 0;
 	}
 }
@@ -485,7 +471,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 	//As in STart, presumably, this triggers everything
 
 	m_st_update = 0;//Clear flag
-	MSM6376LOG(("OKIM6376:'%s' ST %x\n",tag(),state));
+	MSM6376LOG("OKIM6376: ST %x\n",state);
 
 	if (m_st != state)
 	{
@@ -497,7 +483,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 			struct ADPCMVoice *voice = &m_voice[m_channel];
 			{
 				m_st_pulses ++;
-				MSM6376LOG(("OKIM6376:'%s' ST pulses %x\n",tag(),m_st_pulses));
+				MSM6376LOG("OKIM6376: ST pulses %x\n",m_st_pulses);
 				if (m_st_pulses > 3)
 				{
 					m_st_pulses = 3; //undocumented behaviour beyond 3 pulses
@@ -551,7 +537,7 @@ void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	{
 		struct ADPCMVoice *voice = &m_voice[i];
 		stream_sample_t *buffer = outputs[0];
-		INT16 sample_data[MAX_SAMPLE_CHUNK];
+		int16_t sample_data[MAX_SAMPLE_CHUNK];
 		int remaining = samples;
 		if (i == 0) //channel 1 is the only channel to affect NAR
 		{

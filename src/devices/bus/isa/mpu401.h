@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Kevin Horton
+#ifndef MAME_BUS_ISA_MPU401_H
+#define MAME_BUS_ISA_MPU401_H
+
 #pragma once
 
-#ifndef __ISA_MPU401_H__
-#define __ISA_MPU401_H__
-
-#include "emu.h"
 #include "isa.h"
 #include "machine/mpu401.h"
 
@@ -20,24 +19,26 @@ class isa8_mpu401_device :
 		public device_isa8_card_interface
 {
 public:
-		// construction/destruction
-		isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		required_device<mpu401_device> m_mpu401;
-
-		// called back by the MPU401 core to set the IRQ line state
-		DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
-
-		// optional information overrides
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	// called back by the MPU401 core to set the IRQ line state
+	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
+
+	required_device<mpu401_device> m_mpu401;
 };
 
 
 // device type definition
-extern const device_type ISA8_MPU401;
+DECLARE_DEVICE_TYPE(ISA8_MPU401, isa8_mpu401_device)
 
-#endif  /* __ISA_MPU401_H__ */
+#endif // MAME_BUS_ISA_MPU401_H

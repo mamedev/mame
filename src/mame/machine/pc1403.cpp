@@ -40,7 +40,7 @@ WRITE8_MEMBER(pc1403_state::pc1403_asic_write)
 
 READ8_MEMBER(pc1403_state::pc1403_asic_read)
 {
-	UINT8 data=m_asic[offset>>9];
+	uint8_t data=m_asic[offset>>9];
 	switch( (offset>>9) ){
 		case 0: case 1: case 2:
 			logerror ("asic read %.4x %.2x\n",offset, data);
@@ -56,7 +56,7 @@ WRITE8_MEMBER(pc1403_state::pc1403_outa)
 
 READ8_MEMBER(pc1403_state::pc1403_ina)
 {
-	UINT8 data=m_outa;
+	uint8_t data=m_outa;
 
 	if (m_asic[3] & 0x01)
 		data |= ioport("KEY0")->read();
@@ -140,8 +140,8 @@ READ_LINE_MEMBER(pc1403_state::pc1403_reset)
 
 void pc1403_state::machine_start()
 {
-	UINT8 *ram = memregion("maincpu")->base() + 0x8000;
-	UINT8 *cpu = m_maincpu->internal_ram();
+	uint8_t *ram = memregion("maincpu")->base() + 0x8000;
+	uint8_t *cpu = m_maincpu->internal_ram();
 
 	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
@@ -155,14 +155,14 @@ void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_power=0;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pc1403_state::device_timer");
+		assert_always(false, "Unknown id in pc1403_state::device_timer");
 	}
 }
 
 DRIVER_INIT_MEMBER(pc1403_state,pc1403)
 {
 	int i;
-	UINT8 *gfx=memregion("gfx1")->base();
+	uint8_t *gfx=memregion("gfx1")->base();
 
 	for (i=0; i<128; i++) gfx[i]=i;
 

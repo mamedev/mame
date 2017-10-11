@@ -103,8 +103,8 @@
 /*
     Constructor.
 */
-tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMC0430, "TMC0430 device (GROM)", tag, owner, clock, "grom", __FILE__),
+tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TMC0430, tag, owner, clock),
 	m_gromready(*this),
 	m_current_clock_level(CLEAR_LINE),
 	m_current_ident(0),
@@ -202,7 +202,7 @@ WRITE8_MEMBER( tmc0430_device::set_lines )
 WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 {
 	int bank = 0;
-	UINT16 baddr = 0;
+	uint16_t baddr = 0;
 
 	// Wait for rising edge
 	line_state oldlevel = (line_state)m_current_clock_level;
@@ -277,7 +277,7 @@ READ8Z_MEMBER( tmc0430_device::readz )
 	{
 		// Address reading is destructive
 		*value = (m_address & 0xff00)>>8;
-		UINT8 lsb = (m_address & 0x00ff);
+		uint8_t lsb = (m_address & 0x00ff);
 		m_address = (lsb << 8) | lsb;       // see [1], section 2.5.3
 		if (TRACE_DETAIL) logerror("GROM %d return address %02x\n", m_ident>>13, *value);
 	}
@@ -334,7 +334,7 @@ WRITE8_MEMBER( tmc0430_device::write )
     DEVICE FUNCTIONS
 ***************************************************************************/
 
-void tmc0430_device::device_start(void)
+void tmc0430_device::device_start()
 {
 	m_gromready.resolve_safe();
 	save_item(NAME(m_current_clock_level));
@@ -348,7 +348,7 @@ void tmc0430_device::device_start(void)
 	save_item(NAME(m_buffer));
 }
 
-void tmc0430_device::device_reset(void)
+void tmc0430_device::device_reset()
 {
 	// The memory region must be defined in the owning component
 	m_memptr = owner()->memregion(m_regionname)->base() + m_offset;
@@ -363,4 +363,4 @@ int tmc0430_device::debug_get_address()
 	return m_address;
 }
 
-const device_type TMC0430 = &device_creator<tmc0430_device>;
+DEFINE_DEVICE_TYPE(TMC0430, tmc0430_device, "grom", "TMC0430 GROM")

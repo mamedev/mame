@@ -8,10 +8,17 @@
 ***************************************************************************/
 
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
+#include "cpu/m6805/m68705.h"
+
 #include "machine/6821pia.h"
-#include "sound/sn76496.h"
+
 #include "sound/discrete.h"
+#include "sound/sn76496.h"
+
+#include "video/mc6845.h"
+
+#include "screen.h"
+
 
 #define MAIN_CLOCK_OSC          20000000    /* 20 MHz */
 #define SLITHER_CLOCK_OSC       21300000    /* 21.3 MHz */
@@ -39,8 +46,6 @@ public:
 		m_sn1 (*this, "sn1"),
 		m_sn2 (*this, "sn2"),
 		m_discrete(*this, "discrete"),
-		m_68705_port_out(*this, "68705_port_out"),
-		m_68705_ddr(*this, "68705_ddr"),
 		m_paletteram(*this, "paletteram"),
 		m_videoram(*this, "videoram"),
 		m_videoram_address(*this, "videoram_addr"),
@@ -54,7 +59,7 @@ public:
 	required_device<m6809_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<m6809_base_device> m_videocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<m68705p_device> m_mcu;
 	required_device<mc6845_device> m_crtc;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -67,20 +72,18 @@ public:
 	optional_device<discrete_device> m_discrete;
 
 	/* machine state */
-	optional_shared_ptr<UINT8> m_68705_port_out;
-	optional_shared_ptr<UINT8> m_68705_ddr;
-	UINT8  m_68705_port_in[3];
-	UINT8  m_coinctrl;
+	uint8_t  m_68705_portA_out;
+	uint8_t  m_coinctrl;
 
 	/* video state */
-	required_shared_ptr<UINT8> m_paletteram;
-	optional_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram_address;
-	optional_shared_ptr<UINT8> m_videoram_mask;
-	required_shared_ptr<UINT8> m_scanline_latch;
-	UINT8  m_flip;
-	UINT8  m_palette_bank;
-	UINT8  m_leds;
+	required_shared_ptr<uint8_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram_address;
+	optional_shared_ptr<uint8_t> m_videoram_mask;
+	required_shared_ptr<uint8_t> m_scanline_latch;
+	uint8_t  m_flip;
+	uint8_t  m_palette_bank;
+	uint8_t  m_leds;
 
 	optional_memory_bank m_bank0;
 	optional_memory_bank m_bank1;
@@ -96,12 +99,10 @@ public:
 	DECLARE_WRITE8_MEMBER(qix_video_firq_ack_w);
 	DECLARE_READ8_MEMBER(qix_video_firq_r);
 	DECLARE_READ8_MEMBER(qix_video_firq_ack_r);
-	DECLARE_READ8_MEMBER(qix_68705_portA_r);
 	DECLARE_READ8_MEMBER(qix_68705_portB_r);
 	DECLARE_READ8_MEMBER(qix_68705_portC_r);
 	DECLARE_WRITE8_MEMBER(qix_68705_portA_w);
 	DECLARE_WRITE8_MEMBER(qix_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(qix_68705_portC_w);
 	DECLARE_READ8_MEMBER(qix_videoram_r);
 	DECLARE_WRITE8_MEMBER(qix_videoram_w);
 	DECLARE_WRITE8_MEMBER(slither_videoram_w);
@@ -141,7 +142,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void set_pen(int offs);
 	int kram3_permut1(int idx, int value);
-	int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table);
+	int kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table);
 	int kram3_decrypt(int address, int value);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);

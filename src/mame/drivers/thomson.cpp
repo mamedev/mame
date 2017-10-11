@@ -76,17 +76,23 @@
 
 */
 
+#include "emu.h"
 #include "includes/thomson.h"
-#include "bus/rs232/rs232.h"
-#include "machine/6821pia.h"
-#include "machine/wd_fdc.h"
-#include "machine/clock.h"
+
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "imagedev/flopdrv.h"
-#include "formats/cd90_640_dsk.h"
-#include "formats/basicdsk.h"
+#include "machine/6821pia.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/volt_reg.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/basicdsk.h"
+#include "formats/cd90_640_dsk.h"
 
 
 /**************************** common *******************************/
@@ -611,7 +617,7 @@ SLOT_INTERFACE_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_START( to7, thomson_state )
+static MACHINE_CONFIG_START( to7 )
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
@@ -627,7 +633,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
-	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thomson_state, thom_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
@@ -635,13 +641,16 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD ( "buzzer", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
-	MCFG_SOUND_ADD ( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
-	MCFG_SOUND_ADD ( "speech", DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
+/* speech synthesis */
+	MCFG_SOUND_ADD("mea8000", MEA8000, 3840000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 /* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -652,22 +661,13 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to7_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to7_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(DEVWRITELINE("buzzer", dac_bit_interface, write))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
-	MCFG_MC6846_OUT_CTO_CB(WRITE8(thomson_state, to7_timer_tco_out))
+	MCFG_MC6846_OUT_CTO_CB(WRITELINE(thomson_state, to7_set_cassette))
 	MCFG_MC6846_IRQ_CB(WRITELINE(thomson_state, thom_dev_irq_0))
-
-/* speech synthesis */
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
-	MCFG_MEA8000_DAC("speech")
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
-
-	MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
-
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
@@ -681,6 +681,11 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
+
+		MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
+		MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+		MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+
 
 /* network */
 	MCFG_DEVICE_ADD( "mc6854", MC6854, 0 )
@@ -754,9 +759,9 @@ static MACHINE_CONFIG_DERIVED( t9000, to7 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, driver_device, 0,  "Thomson", "TO7", 0 )
+COMP ( 1982, to7, 0, 0, to7, to7, thomson_state, 0,  "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, driver_device,  0, "Thomson", "T9000", 0 )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, thomson_state,  0, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -943,9 +948,9 @@ static MACHINE_CONFIG_DERIVED( to770a, to770 )
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, driver_device, 0, "Thomson", "TO7/70", 0 )
+COMP ( 1984, to770, 0, 0, to770, to770, thomson_state, 0, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, driver_device, 0, "Thomson", "TO7/70 (Arabic)", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, thomson_state, 0, "Thomson", "TO7/70 (Arabic)", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1122,7 +1127,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo5_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo5_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
@@ -1151,9 +1156,9 @@ static MACHINE_CONFIG_DERIVED( mo5e, mo5 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, driver_device, 0, "Thomson", "MO5", 0 )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, thomson_state, 0, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, driver_device, 0, "Thomson", "MO5E", 0 )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, thomson_state, 0, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1490,7 +1495,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, driver_device, 0, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, thomson_state, 0, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1704,7 +1709,7 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to8_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to8_timer_port_in))
 
 	/* internal ram */
@@ -1725,9 +1730,9 @@ static MACHINE_CONFIG_DERIVED( to8d, to8 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, driver_device, 0, "Thomson", "TO8", 0 )
+COMP ( 1986, to8, 0, 0, to8, to8, thomson_state, 0, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, driver_device, 0, "Thomson", "TO8D", 0 )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, thomson_state, 0, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1868,7 +1873,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9p_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to9p_timer_port_in))
 
 	/* internal ram */
@@ -1884,7 +1889,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, driver_device, 0, "Thomson", "TO9+", 0 )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, thomson_state, 0, "Thomson", "TO9+", 0 )
 
 
 
@@ -2213,7 +2218,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo6_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
@@ -2264,9 +2269,9 @@ static MACHINE_CONFIG_DERIVED( pro128, mo6 )
 	MCFG_SOFTWARE_LIST_ADD("p128_flop_list","pro128_flop")
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, driver_device, 0, "Thomson", "MO6", 0 )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, thomson_state, 0, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, driver_device, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, thomson_state, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2482,7 +2487,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5nr_sys_portb_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5nr_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
@@ -2520,4 +2525,4 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, driver_device, 0, "Thomson", "MO5 NR", 0 )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, 0, "Thomson", "MO5 NR", 0 )

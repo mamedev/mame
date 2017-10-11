@@ -21,7 +21,7 @@
 // image size
 static int x07_image_size;
 
-static int x07_put_samples(INT16 *buffer, int sample_pos, int count, int level)
+static int x07_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
@@ -32,7 +32,7 @@ static int x07_put_samples(INT16 *buffer, int sample_pos, int count, int level)
 	return count;
 }
 
-static int x07_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
+static int x07_output_bit(int16_t *buffer, int sample_pos, uint8_t bit)
 {
 	int samples = 0;
 
@@ -52,7 +52,7 @@ static int x07_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
 	return samples;
 }
 
-static int x07_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int x07_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
 
@@ -71,7 +71,7 @@ static int x07_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static int x07_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int x07_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
 	int sample_count = 0;
 	int img_start = 0;
@@ -124,7 +124,7 @@ static int x07_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int x07_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int x07_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return x07_handle_cassette(buffer, bytes);
 }
@@ -133,7 +133,7 @@ static int x07_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int x07_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int x07_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	x07_image_size = length;
 

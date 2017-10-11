@@ -26,6 +26,7 @@
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_windowevents_c.h"
 #include "../SDL_egl_c.h"
+#include "SDL_waylandevents_c.h"
 #include "SDL_waylandwindow.h"
 #include "SDL_waylandvideo.h"
 #include "SDL_waylandtouch.h"
@@ -45,6 +46,33 @@ handle_configure(void *data, struct wl_shell_surface *shell_surface,
     SDL_WindowData *wind = (SDL_WindowData *)data;
     SDL_Window *window = wind->sdlwindow;
     struct wl_region *region;
+
+    /* wl_shell_surface spec states that this is a suggestion.
+       Ignore if less than or greater than max/min size. */
+
+    if (width == 0 || height == 0) {
+        return;
+    }
+
+    if (!(window->flags & SDL_WINDOW_FULLSCREEN)) {
+        if ((window->flags & SDL_WINDOW_RESIZABLE)) {
+            if (window->max_w > 0) {
+                width = SDL_min(width, window->max_w);
+            } 
+            width = SDL_max(width, window->min_w);
+
+            if (window->max_h > 0) {
+                height = SDL_min(height, window->max_h);
+            }
+            height = SDL_max(height, window->min_h);
+        } else {
+            return;
+        }
+    }
+
+    if (width == window->w && height == window->h) {
+        return;
+    }
 
     window->w = width;
     window->h = height;
@@ -145,6 +173,26 @@ Wayland_SetWindowFullscreen(_THIS, SDL_Window * window,
     WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
 }
 
+void
+Wayland_RestoreWindow(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *wind = window->driverdata;
+
+    wl_shell_surface_set_toplevel(wind->shell_surface);
+
+    WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
+}
+
+void
+Wayland_MaximizeWindow(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *wind = window->driverdata;
+
+    wl_shell_surface_set_maximized(wind->shell_surface, NULL);
+
+    WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
+}
+
 int Wayland_CreateWindow(_THIS, SDL_Window *window)
 {
     SDL_WindowData *data;
@@ -178,6 +226,7 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     wl_surface_set_user_data(data->surface, data);
     data->shell_surface = wl_shell_get_shell_surface(c->shell,
                                                      data->surface);
+    wl_shell_surface_set_class (data->shell_surface, c->classname);
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH    
     if (c->surface_extension) {
         data->extended_surface = qt_surface_extension_get_extended_surface(
@@ -214,6 +263,10 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     wl_surface_set_opaque_region(data->surface, region);
     wl_region_destroy(region);
 
+    if (c->relative_mouse_mode) {
+        Wayland_input_lock_pointer(c->input);
+    }
+
     WAYLAND_wl_display_flush(c->display);
 
     return 0;
@@ -231,6 +284,17 @@ void Wayland_SetWindowSize(_THIS, SDL_Window * window)
     wl_region_add(region, 0, 0, window->w, window->h);
     wl_surface_set_opaque_region(wind->surface, region);
     wl_region_destroy(region);
+}
+
+void Wayland_SetWindowTitle(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *wind = window->driverdata;
+    
+    if (window->title != NULL) {
+        wl_shell_surface_set_title(wind->shell_surface, window->title);
+    }
+
+    WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
 }
 
 void Wayland_DestroyWindow(_THIS, SDL_Window *window)

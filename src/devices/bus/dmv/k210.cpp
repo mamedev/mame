@@ -14,34 +14,11 @@
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k210 )
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(dmv_k210_device, porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(dmv_k210_device, portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(dmv_k210_device, portc_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k210_device, porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(dmv_k210_device, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k210_device, portc_w))
-
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(dmv_k210_device, cent_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(dmv_k210_device, cent_busy_w))
-	MCFG_CENTRONICS_SELECT_IN_HANDLER(WRITELINE(dmv_k210_device, cent_slct_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(dmv_k210_device, cent_pe_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(dmv_k210_device, cent_fault_w))
-	MCFG_CENTRONICS_AUTOFD_HANDLER(WRITELINE(dmv_k210_device, cent_autofd_w))
-	MCFG_CENTRONICS_INIT_HANDLER(WRITELINE(dmv_k210_device, cent_init_w))
-
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K210 = &device_creator<dmv_k210_device>;
+DEFINE_DEVICE_TYPE(DMV_K210, dmv_k210_device, "dmv_k210", "K210 Centronics")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -51,14 +28,15 @@ const device_type DMV_K210 = &device_creator<dmv_k210_device>;
 //  dmv_k210_device - constructor
 //-------------------------------------------------
 
-dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, DMV_K210, "K210 Centronics", tag, owner, clock, "dmv_k210", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_ppi(*this, "ppi8255"),
-		m_centronics(*this, "centronics"),
-		m_cent_data_in(*this, "cent_data_in"),
-		m_cent_data_out(*this, "cent_data_out"), m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
-	{
+dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMV_K210, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_ppi(*this, "ppi8255")
+	, m_centronics(*this, "centronics")
+	, m_cent_data_in(*this, "cent_data_in")
+	, m_cent_data_out(*this, "cent_data_out")
+	, m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
+{
 }
 
 //-------------------------------------------------
@@ -92,22 +70,39 @@ void dmv_k210_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k210_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k210 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k210_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(dmv_k210_device, porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(dmv_k210_device, portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(dmv_k210_device, portc_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k210_device, porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(dmv_k210_device, portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k210_device, portc_w))
 
-void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(dmv_k210_device, cent_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(dmv_k210_device, cent_busy_w))
+	MCFG_CENTRONICS_SELECT_IN_HANDLER(WRITELINE(dmv_k210_device, cent_slct_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(dmv_k210_device, cent_pe_w))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(dmv_k210_device, cent_fault_w))
+	MCFG_CENTRONICS_AUTOFD_HANDLER(WRITELINE(dmv_k210_device, cent_autofd_w))
+	MCFG_CENTRONICS_INIT_HANDLER(WRITELINE(dmv_k210_device, cent_init_w))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+MACHINE_CONFIG_END
+
+void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
 	if (ifsel == 0)
 		data = m_ppi->read(space, offset & 0x03);
 }
 
-void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
 	if (ifsel == 0)
 		m_ppi->write(space, offset & 0x03, data);

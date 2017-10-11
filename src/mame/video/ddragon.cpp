@@ -60,7 +60,7 @@ TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
-	UINT8 attr = m_bgvideoram[2 * tile_index];
+	uint8_t attr = m_bgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			m_bgvideoram[2 * tile_index+1] + ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fgvideoram[2 * tile_index];
+	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[2 * tile_index + 1] + ((attr & 0x07) << 8),
 			attr >> 5,
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
-	UINT8 attr = m_fgvideoram[2 * tile_index];
+	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[2 * tile_index+1] + ((attr & 0x0f) << 8),
 			attr >> 4,
@@ -137,10 +137,10 @@ WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	const UINT8 *src = m_spriteram;
-	const UINT32 bytes = m_spriteram.bytes();
+	const uint8_t *src = m_spriteram;
+	const uint32_t bytes = m_spriteram.bytes();
 
-	for (UINT32 i = 0; i < bytes; i += 5)
+	for (uint32_t i = 0; i < bytes; i += 5)
 	{
 		int attr = src[i + 1];
 		if (attr & 0x80)  /* visible */
@@ -213,7 +213,7 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 #undef DRAW_SPRITE
 
 
-UINT32 ddragon_state::screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddragon_state::screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = (m_scrollx_hi << 8) | *m_scrollx_lo;
 	int scrolly = (m_scrolly_hi << 8) | *m_scrolly_lo;

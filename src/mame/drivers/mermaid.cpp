@@ -117,28 +117,42 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/msm5205.h"
 #include "includes/mermaid.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "sound/msm5205.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	if (m_ay8910_enable[0]) m_ay1->data_w(space, offset, data);
-	if (m_ay8910_enable[1]) m_ay2->data_w(space, offset, data);
+	if (m_ay8910_enable[0]) m_ay8910[0]->data_w(space, offset, data);
+	if (m_ay8910_enable[1]) m_ay8910[1]->data_w(space, offset, data);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	if (m_ay8910_enable[0]) m_ay1->address_w(space, offset, data);
-	if (m_ay8910_enable[1]) m_ay2->address_w(space, offset, data);
+	if (m_ay8910_enable[0]) m_ay8910[0]->address_w(space, offset, data);
+	if (m_ay8910_enable[1]) m_ay8910[1]->address_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(mermaid_state::nmi_mask_w)
+WRITE_LINE_MEMBER(mermaid_state::ay1_enable_w)
 {
-	m_nmi_mask = data & 1;
+	m_ay8910_enable[0] = state;
+}
+
+WRITE_LINE_MEMBER(mermaid_state::ay2_enable_w)
+{
+	m_ay8910_enable[1] = state;
+}
+
+WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
+{
+	m_nmi_mask = state;
 }
 
 /* Memory Map */
@@ -153,18 +167,9 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe000, 0xe001) AM_RAM AM_SHARE("ay8910_enable")
-	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1") AM_WRITENOP // ???
-	AM_RANGE(0xe801, 0xe801) AM_WRITENOP    // ???
-	AM_RANGE(0xe802, 0xe802) AM_WRITENOP    // ???
-	AM_RANGE(0xe803, 0xe803) AM_WRITENOP    // ???
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(rougien_gfxbankswitch1_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(rougien_gfxbankswitch2_w)
-	AM_RANGE(0xe807, 0xe807) AM_WRITENOP    // ???
+	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("latch1", ls259_device, write_d0)
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1")
+	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("latch2", ls259_device, write_d0)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P2")
 	AM_RANGE(0xf800, 0xf800) AM_READ(mermaid_collision_r)
 	AM_RANGE(0xf802, 0xf802) AM_WRITENOP    // ???
@@ -172,35 +177,26 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
+WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {
-	m_adpcm_rom_sel = (data & 1) | (m_adpcm_rom_sel & 2);
+	m_adpcm_rom_sel = state | (m_adpcm_rom_sel & 2);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
+WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
 {
-	m_adpcm_rom_sel = ((data & 1)<<1) | (m_adpcm_rom_sel & 1);
+	m_adpcm_rom_sel = (state <<1) | (m_adpcm_rom_sel & 1);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
+WRITE_LINE_MEMBER(mermaid_state::rougien_sample_playback_w)
 {
-	if((m_adpcm_play_reg & 1) && ((data & 1) == 0))
+	if (state)
 	{
 		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
 		m_adpcm_end = m_adpcm_pos+0x1000;
 		m_adpcm_idle = 0;
 		m_adpcm->reset_w(0);
 	}
-
-	m_adpcm_play_reg = data & 1;
 }
-
-static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8, mermaid_state )
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)
-	AM_IMPORT_FROM( mermaid_map )
-ADDRESS_MAP_END
 
 /* Input Ports */
 
@@ -368,6 +364,7 @@ void mermaid_state::machine_start()
 	save_item(NAME(m_coll_bit6));
 	save_item(NAME(m_rougien_gfxbank1));
 	save_item(NAME(m_rougien_gfxbank2));
+	save_item(NAME(m_ay8910_enable));
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
@@ -406,7 +403,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);
@@ -426,13 +423,26 @@ INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( mermaid, mermaid_state )
+static MACHINE_CONFIG_START( mermaid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // ???
 	MCFG_CPU_PROGRAM_MAP(mermaid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mermaid_state,  vblank_irq)
 
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mermaid_state, ay1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mermaid_state, ay2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ???
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mermaid_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mermaid_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mermaid_state, nmi_mask_w))
+
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ???
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mermaid_state, rougien_gfxbankswitch1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mermaid_state, rougien_gfxbankswitch2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // very frequent
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -441,7 +451,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
-	MCFG_SCREEN_VBLANK_DRIVER(mermaid_state, screen_eof_mermaid)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mermaid_state, screen_vblank_mermaid))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mermaid)
@@ -462,15 +472,19 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rougien_map)
+	MCFG_DEVICE_MODIFY("latch1")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_playback_w))
+
+	MCFG_DEVICE_MODIFY("latch2")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_rom_hi_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mermaid_state, rougien_sample_rom_lo_w))
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mermaid_state, rougien_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -579,6 +593,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, driver_device,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, driver_device,  0, ROT0, "Sanritsu / Esco", "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, rougien,  0,        rougien,  rougien, driver_device,  0, ROT0, "Sanritsu", "Rougien", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state,  0, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state,  0, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

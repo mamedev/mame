@@ -17,14 +17,14 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 // device type definition
-const device_type CASSETTE = &device_creator<cassette_image_device>;
+DEFINE_DEVICE_TYPE(CASSETTE, cassette_image_device, "cassette_image", "Cassette")
 
 //-------------------------------------------------
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CASSETTE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_cassette(nullptr),
 	m_state(CASSETTE_STOPPED),
@@ -60,9 +60,6 @@ void cassette_image_device::device_config_complete()
 	m_extension_list[0] = '\0';
 	for (int i = 0; m_formats[i]; i++ )
 		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -138,7 +135,7 @@ void cassette_image_device::change_state(cassette_state state, cassette_state ma
 
 double cassette_image_device::input()
 {
-	INT32 sample;
+	int32_t sample;
 	double double_value;
 
 	update();
@@ -161,7 +158,7 @@ void cassette_image_device::output(double value)
 		value = std::min(value, 1.0);
 		value = std::max(value, -1.0);
 
-		m_value = (INT32) (value * 0x7FFFFFFF);
+		m_value = (int32_t) (value * 0x7FFFFFFF);
 	}
 }
 

@@ -31,7 +31,7 @@ public:
 
 	DECLARE_VIDEO_START(klax);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	UINT32 screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
 

@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 private:
-	UINT8 m_keyrow;
+	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -67,14 +67,14 @@ READ8_MEMBER( pmi80_state::keyboard_r)
 WRITE8_MEMBER( pmi80_state::keyboard_w )
 {
 	m_keyrow = data;
-	m_ledready = TRUE;
+	m_ledready = true;
 }
 
 WRITE8_MEMBER( pmi80_state::leds_w )
 {
 	if (m_ledready)
 	{
-		m_ledready = FALSE;
+		m_ledready = false;
 		output().set_digit_value(m_keyrow^0xff, data^0xff);
 	}
 }
@@ -152,7 +152,7 @@ void pmi80_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pmi80, pmi80_state )
+static MACHINE_CONFIG_START( pmi80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
@@ -171,5 +171,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, pmi80,  0,       0,      pmi80,     pmi80, driver_device,   0,      "Tesla",  "PMI-80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
+COMP( 1982, pmi80,  0,       0,      pmi80,     pmi80, pmi80_state, 0,    "Tesla",  "PMI-80", MACHINE_NO_SOUND_HW)

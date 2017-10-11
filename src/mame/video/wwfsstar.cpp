@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 
 	**- End of Comments -*/
 
-	UINT16 *tilebase;
+	uint16_t *tilebase;
 	int tileno;
 	int colbank;
 
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 
 	**- End of Comments -*/
 
-	UINT16 *tilebase;
+	uint16_t *tilebase;
 	int tileno, colbank, flipx;
 
 	tilebase =  &m_bg0_videoram[tile_index*2];
@@ -129,8 +129,8 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	**- End of Comments -*/
 
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT16 *source = m_spriteram;
-	UINT16 *finish = source + 0x3ff/2;
+	uint16_t *source = m_spriteram;
+	uint16_t *finish = source + 0x3ff/2;
 
 	while (source < finish)
 	{
@@ -215,7 +215,7 @@ void wwfsstar_state::video_start()
 	save_item(NAME(m_scrolly));
 }
 
-UINT32 wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg0_tilemap->set_scrolly(0, m_scrolly  );
 	m_bg0_tilemap->set_scrollx(0, m_scrollx  );

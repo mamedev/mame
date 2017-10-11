@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 		bit1 = (i >> 7) & 0x01;
 		b = combine_2_weights(weights_tiles_b, bit0, bit1);
 
-		palette.set_pen_color((i * 2) + 0, rgb_t::black);
+		palette.set_pen_color((i * 2) + 0, rgb_t::black());
 		palette.set_pen_color((i * 2) + 1, rgb_t(r, g, b));
 	}
 
@@ -232,7 +232,7 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 	}
 }
 
-UINT32 warpwarp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t warpwarp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

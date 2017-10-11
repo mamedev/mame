@@ -130,7 +130,10 @@ WinXP-64 FindFirstFile():
   \\Server\        - ERROR_INVALID_NAME
       
   \\Server\Share            - ERROR_BAD_NETPATH
-  \\Server\Share            - ERROR_BAD_NET_NAME (Win7)
+  \\Server\Share            - ERROR_BAD_NET_NAME (Win7).
+             !!! There is problem : Win7 makes some requests for "\\Server\Shar" (look in Procmon),
+                 when we call it for "\\Server\Share"
+                      
   \\Server\Share\           - ERROR_FILE_NOT_FOUND
   
   \\?\UNC\Server\Share      - ERROR_INVALID_NAME
@@ -508,11 +511,10 @@ bool CFileInfo::Find(CFSTR path)
   #endif
 
   CFindFile finder;
-  if (finder.FindFirst(path, *this))
-    return true;
-  
+
   #if defined(_WIN32) && !defined(UNDER_CE)
   {
+    /*
     DWORD lastError = GetLastError();
     if (lastError == ERROR_FILE_NOT_FOUND
         || lastError == ERROR_BAD_NETPATH  // XP64: "\\Server\Share"
@@ -520,11 +522,26 @@ bool CFileInfo::Find(CFSTR path)
         || lastError == ERROR_INVALID_NAME // XP64: "\\?\UNC\Server\Share"
         || lastError == ERROR_BAD_PATHNAME // Win7: "\\?\UNC\Server\Share"
         )
+    */
+    
+    unsigned rootSize = 0;
+    if (IsSuperPath(path))
+      rootSize = kSuperPathPrefixSize;
+    
+    if (NName::IsDrivePath(path + rootSize) && path[rootSize + 3] == 0)
     {
-      unsigned rootSize = 0;
-      if (IsSuperPath(path))
-        rootSize = kSuperPathPrefixSize;
-      if (IS_PATH_SEPAR(path[0]) && path[1] == 0)
+      DWORD attrib = GetFileAttrib(path);
+      if (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY) != 0)
+      {
+        ClearBase();
+        Attrib = attrib;
+        Name = path + rootSize;
+        Name.DeleteFrom(2); // we don't need backslash (C:)
+        return true;
+      }
+    }
+    else if (IS_PATH_SEPAR(path[0]))
+      if (path[1] == 0)
       {
         DWORD attrib = GetFileAttrib(path);
         if (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY) != 0)
@@ -535,21 +552,9 @@ bool CFileInfo::Find(CFSTR path)
           return true;
         }
       }
-      else if (NName::IsDrivePath(path + rootSize) && path[rootSize + 3] == 0)
-      {
-        DWORD attrib = GetFileAttrib(path);
-        if (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY) != 0)
-        {
-          ClearBase();
-          Attrib = attrib;
-          Name = path + rootSize;
-          Name.DeleteFrom(2); // we don't need backslash (C:)
-          return true;
-        }
-      }
       else
       {
-        unsigned prefixSize = GetNetworkServerPrefixSize(path);
+        const unsigned prefixSize = GetNetworkServerPrefixSize(path);
         if (prefixSize > 0 && path[prefixSize] != 0)
         {
           if (NName::FindSepar(path + prefixSize) < 0)
@@ -563,7 +568,7 @@ bool CFileInfo::Find(CFSTR path)
             {
               if (Name == FTEXT("."))
               {
-                Name = path + prefixSize;;
+                Name = path + prefixSize;
                 return true;
               }
               isOK = true;
@@ -583,16 +588,16 @@ bool CFileInfo::Find(CFSTR path)
                 return true;
               }
             }
-            ::SetLastError(lastError);
+            // ::SetLastError(lastError);
           }
         }
       }
-    }
   }
   #endif
-  
-  return false;
+
+  return finder.FindFirst(path, *this);
 }
+
 
 bool DoesFileExist(CFSTR name)
 {
@@ -706,7 +711,7 @@ bool MyGetLogicalDriveStrings(CObjectVector<FString> &driveStrings)
         driveStrings.Add(fas2fs(s));
       }
     }
-    return prev == newSize;;
+    return prev == newSize;
   }
   else
   #endif

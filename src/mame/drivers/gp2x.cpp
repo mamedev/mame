@@ -21,6 +21,8 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class gp2x_state : public driver_device
@@ -33,7 +35,7 @@ public:
 			m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<UINT32> m_maincpu_region;
+	required_region_ptr<uint32_t> m_maincpu_region;
 	DECLARE_READ32_MEMBER(gp2x_lcdc_r);
 	DECLARE_WRITE32_MEMBER(gp2x_lcdc_w);
 	DECLARE_READ32_MEMBER(nand_r);
@@ -44,15 +46,15 @@ public:
 	DECLARE_READ32_MEMBER(nand_ctrl_r);
 	DECLARE_WRITE32_MEMBER(nand_ctrl_w);
 	DECLARE_READ32_MEMBER(sdcard_r);
-	required_shared_ptr<UINT32> m_ram;
-	UINT16 m_vidregs[0x200/2];
-	UINT32 m_nand_ptr;
-	UINT32 m_nand_cmd;
-	UINT32 m_nand_subword_stage;
-	UINT32 m_nand_stage;
-	UINT32 m_nand_ptr_temp;
-	UINT32 m_timer;
-	UINT32 screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint32_t> m_ram;
+	uint16_t m_vidregs[0x200/2];
+	uint32_t m_nand_ptr;
+	uint32_t m_nand_cmd;
+	uint32_t m_nand_subword_stage;
+	uint32_t m_nand_stage;
+	uint32_t m_nand_ptr_temp;
+	uint32_t m_timer;
+	uint32_t screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -144,7 +146,7 @@ static const char *const gp2x_regnames[0x200] =
 	"YUV Source region A H",
 };
 #endif
-UINT32 gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// display enabled?
 	if (m_vidregs[0] & 1)
@@ -153,7 +155,7 @@ UINT32 gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitma
 		if (m_vidregs[0x80/2] & 4)
 		{
 			int x, y;
-			UINT16 *vram = (UINT16 *)&m_ram[0x2100000/4];
+			uint16_t *vram = (uint16_t *)&m_ram[0x2100000/4];
 
 /*          printf("RGB still image 1 enabled, bpp %d, size is %d %d %d %d\n",
                 (m_vidregs[(0xda/2)]>>9)&3,
@@ -165,11 +167,11 @@ UINT32 gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitma
 
 			for (y = 0; y < 240; y++)
 			{
-				UINT32 *scanline = &bitmap.pix32(y);
+				uint32_t *scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 320; x++)
 				{
-					UINT16 pixel = vram[(320*y)+x];
+					uint16_t pixel = vram[(320*y)+x];
 
 					*scanline++ = rgb_t(0xff, (pixel>>11)<<3, ((pixel>>5)&0x3f)<<2, (pixel&0x1f)<<3);
 				}
@@ -205,8 +207,8 @@ WRITE32_MEMBER( gp2x_state::gp2x_lcdc_w )
 
 READ32_MEMBER( gp2x_state::nand_r )
 {
-	UINT32 *ROM = m_maincpu_region;
-	UINT32 ret;
+	uint32_t *ROM = m_maincpu_region;
+	uint32_t ret;
 
 	if (offset == 0)
 	{
@@ -354,7 +356,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gp2x, gp2x_state )
+static MACHINE_CONFIG_START( gp2x )
 	MCFG_CPU_ADD("maincpu", ARM9, 80000000)
 	MCFG_CPU_PROGRAM_MAP(gp2x_map)
 
@@ -390,4 +392,4 @@ ROM_START(gp2x)
 	ROMX_LOAD( "gp2xyaffs.v4",   0x300000, 0x2dfed0, CRC(e77efc53) SHA1(21477ff77aacb84005bc465a03066d71031a6098), ROM_BIOS(3))
 ROM_END
 
-CONS(2005, gp2x, 0, 0, gp2x, gp2x, driver_device, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2005, gp2x, 0, 0, gp2x, gp2x, gp2x_state, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

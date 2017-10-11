@@ -34,7 +34,7 @@
 
 PALETTE_INIT_MEMBER(m57_state, m57)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* character palette */
@@ -112,8 +112,8 @@ PALETTE_INIT_MEMBER(m57_state, m57)
 
 TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index * 2 + 0];
-	UINT16 code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
+	uint8_t attr = m_videoram[tile_index * 2 + 0];
+	uint16_t code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
 	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
@@ -173,7 +173,7 @@ WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
-	INT16 scrolly;
+	int16_t scrolly;
 
 	// from 64 to 127: not wrapped
 	for (y = 64; y < 128; y++)
@@ -219,7 +219,7 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		UINT8 attributes = m_spriteram[offs + 1];
+		uint8_t attributes = m_spriteram[offs + 1];
 		int sx = m_spriteram[offs + 3];
 		int sy = ((224 - m_spriteram[offs + 0] - 32) & 0xff) + 32;
 		int code = m_spriteram[offs + 2];
@@ -258,7 +258,7 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
  *
  *************************************/
 
-UINT32 m57_state::screen_update_m57(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m57_state::screen_update_m57(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);

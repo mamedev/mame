@@ -7,7 +7,6 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shellapi.h>
 #include <stdlib.h>
@@ -23,11 +22,12 @@
 
 void win_output_debug_string_utf8(const char *string)
 {
-	auto t_string = tstring_from_utf8(string);
+	auto t_string = osd::text::to_tstring(string);
 	OutputDebugString(t_string.c_str());
 }
 
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  win_message_box_utf8
@@ -42,18 +42,20 @@ int win_message_box_utf8(HWND window, const char *text, const char *caption, UIN
 
 	if (text)
 	{
-		ts_text = tstring_from_utf8(text);
+		ts_text = osd::text::to_tstring(text);
 		t_text = ts_text.c_str();
 	}
 
 	if (caption)
 	{
-		ts_caption = tstring_from_utf8(caption);
+		ts_caption = osd::text::to_tstring(caption);
 		t_caption = ts_caption.c_str();
 	}
 
 	return MessageBox(window, t_text, t_caption, type);
 }
+
+#endif
 
 
 
@@ -69,7 +71,7 @@ BOOL win_set_window_text_utf8(HWND window, const char *text)
 
 	if (text)
 	{
-		ts_text = tstring_from_utf8(text);
+		ts_text = osd::text::to_tstring(text);
 		t_text = ts_text.c_str();
 	}
 
@@ -100,19 +102,20 @@ std::string win_get_window_text_utf8(HWND window)
 
 		TCHAR *buffer = (TCHAR *) alloca((length + 1) * sizeof(TCHAR));
 		GetWindowText(window, buffer, length + 1);
-		return utf8_from_tstring(buffer);
+		return osd::text::from_tstring(buffer);
 	}
 #else
 	{
 		TCHAR t_buffer[256];
 		auto title = Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title;
 		wcsncpy(t_buffer, title->Data(), ARRAY_LENGTH(t_buffer));
-		return utf8_from_tstring(t_buffer);
+		return osd::text::from_tstring(t_buffer);
 	}
 #endif
 }
 
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  win_create_window_ex_utf8
@@ -122,16 +125,18 @@ HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char*
 								int x, int y, int width, int height, HWND parent, HMENU menu,
 								HINSTANCE instance, void* param)
 {
-	std::basic_string<TCHAR> ts_classname = tstring_from_utf8(classname);
+	std::basic_string<TCHAR> ts_classname = osd::text::to_tstring(classname);
 
 	LPCTSTR t_windowname = nullptr;
 	std::basic_string<TCHAR> ts_windowname;
 	if (windowname != nullptr)
 	{
-		ts_windowname = tstring_from_utf8(windowname);
+		ts_windowname = osd::text::to_tstring(windowname);
 		t_windowname = ts_windowname.c_str();
 	}
 
 	return CreateWindowEx(exstyle, ts_classname.c_str(), t_windowname, style, x, y, width, height, parent,
 		menu, instance, param);
 }
+
+#endif

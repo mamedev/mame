@@ -7,7 +7,6 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <direct.h>
 
@@ -106,9 +105,13 @@ void osd_subst_env(std::string &dst, const std::string &src)
 {
 	TCHAR buffer[MAX_PATH];
 
-	auto t_src = tstring_from_utf8(src.c_str());
+	osd::text::tstring t_src = osd::text::to_tstring(src);
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 	ExpandEnvironmentStrings(t_src.c_str(), buffer, ARRAY_LENGTH(buffer));
-	utf8_from_tstring(dst, buffer);
+#else
+	wcsncpy(buffer, t_src.c_str(), ARRAY_LENGTH(buffer));
+#endif
+	osd::text::from_tstring(dst, buffer);
 }
 
 //-------------------------------------------------

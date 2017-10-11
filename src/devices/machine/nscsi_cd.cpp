@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "machine/nscsi_cd.h"
 #include "imagedev/chd_cd.h"
 
-const device_type NSCSI_CDROM = &device_creator<nscsi_cdrom_device>;
+DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
 
-nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	nscsi_full_device(mconfig, NSCSI_CDROM, "SCSI CDROM", tag, owner, clock, "scsi_cdrom", __FILE__), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
+nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_full_device(mconfig, NSCSI_CDROM, tag, owner, clock), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
 {
 }
 
@@ -30,17 +31,13 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
+MACHINE_CONFIG_MEMBER(nscsi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END
 
-machine_config_constructor nscsi_cdrom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_cdrom);
-}
 
-UINT8 nscsi_cdrom_device::scsi_get_data(int id, int pos)
+uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 {
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
@@ -136,7 +133,7 @@ void nscsi_cdrom_device::scsi_command()
 
 		logerror("%s: command READ CAPACITY\n", tag());
 
-		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
+		uint32_t temp = cdrom_get_track_start(cdrom, 0xaa);
 		temp--; // return the last used block on the disc
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
@@ -185,7 +182,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x00; // medium type
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
-		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
+		uint32_t temp = cdrom_get_track_start(cdrom, 0xaa);
 		temp--; // return the last used block on the disc
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 

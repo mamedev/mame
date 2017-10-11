@@ -267,9 +267,13 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 */
 
 #include "emu.h"
-#include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/ns10crypt.h"
+
+#include "cpu/psx/psx.h"
+#include "machine/ram.h"
+#include "video/psx.h"
+#include "speaker.h"
+
 
 class namcos10_state : public driver_device
 {
@@ -304,8 +308,8 @@ public:
 	DECLARE_READ16_MEMBER (sprot_r);
 	DECLARE_WRITE16_MEMBER(sprot_w);
 
-	UINT8 *nand_base;
-	void nand_copy( UINT32 *dst, UINT32 address, int len );
+	uint8_t *nand_base;
+	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
 private:
 	enum {
@@ -315,19 +319,19 @@ private:
 		I2CP_RECIEVE_ACK_0
 	};
 
-	UINT32 bank_base;
-	UINT32 nand_address;
-	UINT16 block[0x1ff];
+	uint32_t bank_base;
+	uint32_t nand_address;
+	uint16_t block[0x1ff];
 	ns10_decrypter_device* decrypter;
 
-	UINT16 i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
+	uint16_t i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
 	int i2cp_mode;
-	UINT8 i2c_byte;
+	uint8_t i2c_byte;
 	int i2c_bit;
 
 	int sprot_bit, sprot_byte;
-	UINT16 nand_read( UINT32 address );
-	UINT16 nand_read2( UINT32 address );
+	uint16_t nand_read( uint32_t address );
+	uint16_t nand_read2( uint32_t address );
 
 	void i2c_update();
 public:
@@ -388,7 +392,7 @@ WRITE16_MEMBER(namcos10_state::bank_w)
 
 READ16_MEMBER(namcos10_state::range_r)
 {
-	UINT16 data = ((const UINT16 *)(memregion("maincpu:rom")->base()))[bank_base+offset];
+	uint16_t data = ((const uint16_t *)(memregion("maincpu:rom")->base()))[bank_base+offset];
 
 	if (decrypter == nullptr)
 		return data;
@@ -432,13 +436,13 @@ READ16_MEMBER(namcos10_state::sprot_r)
 	// If line 3 has 0x30/0x31 in it, something happens.  That
 	// something currently kills the system though.
 
-	const static UINT8 prot[0x40] = {
+	const static uint8_t prot[0x40] = {
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
 		0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51,
 		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
 	};
-	UINT16 res = sprot_byte >= 0x20 ? 0x3 :
+	uint16_t res = sprot_byte >= 0x20 ? 0x3 :
 		(((prot[sprot_byte     ] >> sprot_bit) & 1) ? 1 : 0) |
 		(((prot[sprot_byte+0x20] >> sprot_bit) & 1) ? 2 : 0);
 
@@ -452,7 +456,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 
 READ16_MEMBER(namcos10_state::i2c_clock_r)
 {
-	UINT16 res = i2c_dev_clock & i2c_host_clock & 1;
+	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
 	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
@@ -467,7 +471,7 @@ WRITE16_MEMBER(namcos10_state::i2c_clock_w)
 
 READ16_MEMBER(namcos10_state::i2c_data_r)
 {
-	UINT16 res = i2c_dev_data & i2c_host_data & 1;
+	uint16_t res = i2c_dev_data & i2c_host_data & 1;
 	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
@@ -482,8 +486,8 @@ WRITE16_MEMBER(namcos10_state::i2c_data_w)
 
 void namcos10_state::i2c_update()
 {
-	UINT16 clock = i2c_dev_clock & i2c_host_clock & 1;
-	UINT16 data = i2c_dev_data & i2c_host_data & 1;
+	uint16_t clock = i2c_dev_clock & i2c_host_clock & 1;
+	uint16_t data = i2c_dev_data & i2c_host_data & 1;
 
 	if(i2c_prev_data == data && i2c_prev_clock == clock)
 		return;
@@ -577,13 +581,13 @@ WRITE8_MEMBER( namcos10_state::nand_address4_w )
 	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, space.device().safe_pc(), nand_address*2);
 }
 
-UINT16 namcos10_state::nand_read( UINT32 address )
+uint16_t namcos10_state::nand_read( uint32_t address )
 {
 	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
 	return nand_base[ index ] | ( nand_base[ index + 1 ] << 8 );
 }
 
-UINT16 namcos10_state::nand_read2( UINT32 address )
+uint16_t namcos10_state::nand_read2( uint32_t address )
 {
 	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
@@ -591,7 +595,7 @@ UINT16 namcos10_state::nand_read2( UINT32 address )
 
 READ16_MEMBER( namcos10_state::nand_data_r )
 {
-	UINT16 data = nand_read2( nand_address * 2 );
+	uint16_t data = nand_read2( nand_address * 2 );
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
 	// printf("read %08x = %04x\n", nand_address*2, data);
@@ -609,7 +613,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 		return data;
 }
 
-void namcos10_state::nand_copy( UINT32 *dst, UINT32 address, int len )
+void namcos10_state::nand_copy( uint32_t *dst, uint32_t address, int len )
 {
 	while( len > 0 )
 	{
@@ -645,19 +649,19 @@ ADDRESS_MAP_END
 
 void namcos10_state::memn_driver_init(  )
 {
-	UINT8 *BIOS = (UINT8 *)memregion( "maincpu:rom" )->base();
-	nand_base = (UINT8 *)memregion( "user2" )->base();
+	uint8_t *BIOS = (uint8_t *)memregion( "maincpu:rom" )->base();
+	nand_base = (uint8_t *)memregion( "user2" )->base();
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 
-	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
-	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
+	nand_copy( (uint32_t *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
+	nand_copy( (uint32_t *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
 }
 
 static void decrypt_bios( running_machine &machine, const char *regionName, int start, int end, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
 	memory_region *region = machine.root_device().memregion( regionName );
-	UINT16 *BIOS = (UINT16 *)( region->base() + start );
+	uint16_t *BIOS = (uint16_t *)( region->base() + start );
 	int len = (end - start) / 2;
 
 	for( int i = 0; i < len; i++ )
@@ -771,7 +775,7 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 	i2c_bit = 0;
 }
 
-static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
+static MACHINE_CONFIG_START( namcos10_memm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
@@ -795,7 +799,7 @@ static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
+static MACHINE_CONFIG_START( namcos10_memn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )
@@ -985,6 +989,15 @@ ROM_START( gamshara )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "10021a_e.8e",  0x0000000, 0x1080000, CRC(684ab324) SHA1(95c2e0a04c4f33039535fc451c5559d239b8fbc6) )
+	ROM_LOAD( "10021a.8d",    0x1080000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
+ROM_END
+
+ROM_START( gamsharaj )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
 	ROM_LOAD( "10021a.8e",    0x0000000, 0x1080000, CRC(6c0361fc) SHA1(7debf1f2e6bed31d59fb224a78a17a94fc573785) )
 	ROM_LOAD( "10021a.8d",    0x1080000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
@@ -1063,6 +1076,7 @@ GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, knpuzz
 GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

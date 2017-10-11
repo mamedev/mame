@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SAT_CTRL_SEGATAP_H
+#define MAME_BUS_SAT_CTRL_SEGATAP_H
+
 #pragma once
 
-#ifndef __SATURN_SEGATAP__
-#define __SATURN_SEGATAP__
 
-
-#include "emu.h"
 #include "ctrl.h"
 
 
@@ -28,20 +27,20 @@ class saturn_segatap_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_saturn_control_port_interface overrides
-	virtual UINT8 read_ctrl(UINT8 offset) override;
-	virtual UINT8 read_status() override { return 0x04; }
-	virtual UINT8 read_id(int idx) override;
+	virtual uint8_t read_ctrl(uint8_t offset) override;
+	virtual uint8_t read_status() override { return 0x04; }
+	virtual uint8_t read_id(int idx) override;
 
 private:
 	required_device<saturn_control_port_device> m_subctrl1_port;
@@ -52,7 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type SATURN_SEGATAP;
+DECLARE_DEVICE_TYPE(SATURN_SEGATAP, saturn_segatap_device)
 
-
-#endif
+#endif // MAME_BUS_SAT_CTRL_SEGATAP_H

@@ -6,17 +6,19 @@
 #define __PC8401A__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
 #include "video/sed1330.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
 
 #define SCREEN_TAG      "screen"
 #define CRT_SCREEN_TAG  "screen2"
@@ -59,7 +61,7 @@ public:
 	required_device<generic_slot_device> m_io_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_crt_ram;
+	optional_shared_ptr<uint8_t> m_crt_ram;
 	required_ioport_array<10> m_io_y;
 
 	memory_region *m_cart_rom;
@@ -83,16 +85,16 @@ public:
 	DECLARE_PALETTE_INIT(pc8401a);
 
 	void scan_keyboard();
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 
 	// keyboard state
 	int m_key_strobe;           // key pressed
 
 	// memory state
-	UINT8 m_mmr;                // memory mapping register
-	UINT32 m_io_addr;           // I/O ROM address counter
+	uint8_t m_mmr;                // memory mapping register
+	uint32_t m_io_addr;           // I/O ROM address counter
 
-	UINT8 m_key_latch;
+	uint8_t m_key_latch;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
 };
 
@@ -104,7 +106,7 @@ public:
 	{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 // ---------- defined in video/pc8401a.c ----------

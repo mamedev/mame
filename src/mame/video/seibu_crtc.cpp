@@ -213,9 +213,9 @@ List of default vregs (title screen):
 //**************************************************************************
 
 // device type definition
-const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
+DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Controller")
 
-static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
+static ADDRESS_MAP_START( seibu_crtc_vregs, 0, 16, seibu_crtc_device )
 	AM_RANGE(0x0014, 0x0015) AM_WRITE(decrypt_key_w)
 	AM_RANGE(0x001a, 0x001b) AM_READWRITE(reg_1a_r, reg_1a_w)
 	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
@@ -269,8 +269,8 @@ WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
 //  seibu_crtc_device - constructor
 //-------------------------------------------------
 
-seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
+seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEIBU_CRTC, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_decrypt_key_cb(*this),
@@ -322,9 +322,11 @@ void seibu_crtc_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *seibu_crtc_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector seibu_crtc_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -337,7 +339,7 @@ const address_space_config *seibu_crtc_device::memory_space_config(address_space
 //  read_word - read a word at the given address
 //-------------------------------------------------
 
-inline UINT16 seibu_crtc_device::read_word(offs_t address)
+inline uint16_t seibu_crtc_device::read_word(offs_t address)
 {
 	return space().read_word(address << 1);
 }
@@ -346,7 +348,7 @@ inline UINT16 seibu_crtc_device::read_word(offs_t address)
 //  write_word - write a word at the given address
 //-------------------------------------------------
 
-inline void seibu_crtc_device::write_word(offs_t address, UINT16 data)
+inline void seibu_crtc_device::write_word(offs_t address, uint16_t data)
 {
 	space().write_word(address << 1, data);
 }
@@ -374,15 +376,4 @@ READ16_MEMBER( seibu_crtc_device::read_alt )
 WRITE16_MEMBER( seibu_crtc_device::write_alt )
 {
 	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
-}
-
-/* Good E Jang / Seibu Cup Soccer Selection XOR bit 6 of the address bus */
-READ16_MEMBER( seibu_crtc_device::read_xor )
-{
-	return read_word(offset ^ 0x20);
-}
-
-WRITE16_MEMBER( seibu_crtc_device::write_xor )
-{
-	write_word(offset ^ 0x20,data);
 }

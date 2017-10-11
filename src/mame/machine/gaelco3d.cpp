@@ -54,6 +54,18 @@
 #define LOGMSG(x)   do {} while (0);
 #endif
 
+/* external status bits */
+#define GAELCOSER_STATUS_READY          0x01
+#define GAELCOSER_STATUS_RTS            0x02
+
+/* only RTS currently understood ! */
+//#define GAELCOSER_STATUS_DTR          0x04
+
+/* internal bits follow ... */
+#define GAELCOSER_STATUS_IRQ_ENABLE     0x10
+#define GAELCOSER_STATUS_RESET          0x20
+#define GAELCOSER_STATUS_SEND           0x40
+
 /*
  * 115200 seems plausible, radikalb won't work below this speed
  * surfplnt will not work below 460800 ....
@@ -68,7 +80,7 @@
 
 #define LINK_FREQ (LINK_BAUD / LINK_BITS)
 
-/* Sync up the instances 8 times for each byte transfered */
+/* Sync up the instances 8 times for each byte transferred */
 #define SYNC_MULT (4)
 
 #define SYNC_FREQ (15000000 / 20) //(LINK_FREQ * SYNC_MULT)
@@ -82,14 +94,14 @@
 
 /* code below currently works on unix only */
 #ifdef SHARED_MEM_DRIVER
-static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
+gaelco_serial_device::osd_shared_mem *gaelco_serial_device::osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
 	int fd;
-	osd_shared_mem *os_shmem = (osd_shared_mem *) osd_malloc(sizeof(osd_shared_mem));
+	osd_shared_mem *os_shmem = (osd_shared_mem *)malloc(sizeof(osd_shared_mem));
 
 	if (create)
 	{
-		char *buf = (char *) osd_malloc_array(size);
+		char *buf = (char *) malloc(size);
 		memset(buf,0, size);
 
 		fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
@@ -101,12 +113,12 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 		fd = open(path, O_RDWR);
 		if (fd == -1)
 		{
-			osd_free(os_shmem);
+			free(os_shmem);
 			return nullptr;
 		}
 		os_shmem->creator = 0;
 	}
-	os_shmem->fn = (char *) osd_malloc_array(strlen(path)+1);
+	os_shmem->fn = (char *) malloc(strlen(path)+1);
 	strcpy(os_shmem->fn, path);
 
 	assert(fd != -1);
@@ -117,38 +129,38 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 	return os_shmem;
 }
 
-static void osd_sharedmem_free(osd_shared_mem *os_shmem)
+void gaelco_serial_device::osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
 	munmap(os_shmem->ptr, os_shmem->size);
 	if (os_shmem->creator)
 		unlink(os_shmem->fn);
-	osd_free(os_shmem->fn);
-	osd_free(os_shmem);
+	free(os_shmem->fn);
+	free(os_shmem);
 }
 
-static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
+void *gaelco_serial_device::osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 {
 	return os_shmem->ptr;
 }
 #else
-static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
+gaelco_serial_device::osd_shared_mem *gaelco_serial_device::osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
-	osd_shared_mem *os_shmem = (osd_shared_mem *) osd_malloc(sizeof(osd_shared_mem));
+	osd_shared_mem *os_shmem = (osd_shared_mem *) malloc(sizeof(osd_shared_mem));
 
 	os_shmem->creator = 0;
 
-	os_shmem->ptr = (void *) osd_malloc_array(size);
+	os_shmem->ptr = (void *) malloc(size);
 	os_shmem->size = size;
 	return os_shmem;
 }
 
-static void osd_sharedmem_free(osd_shared_mem *os_shmem)
+void gaelco_serial_device::osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
-	osd_free(os_shmem->ptr);
-	osd_free(os_shmem);
+	free(os_shmem->ptr);
+	free(os_shmem);
 }
 
-static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
+void *gaelco_serial_device::osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 {
 	return os_shmem->ptr;
 }
@@ -160,18 +172,18 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 
 #define PATH_NAME "/tmp/gaelco_serial"
 
-static void buf_reset(buf_t *buf)
+void gaelco_serial_device::buf_reset(buf_t *buf)
 {
-	buf->stat = GAELCOSER_STATUS_RTS| GAELCOSER_STATUS_RESET;
+	buf->stat = GAELCOSER_STATUS_RTS | GAELCOSER_STATUS_RESET;
 	buf->data = 0;
 	buf->data_cnt = -1;
 	buf->cnt = 0;
 }
 
-const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
+DEFINE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device, "gaelco_serial", "Gaelco 3D Serial Hardware")
 
-gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GAELCO_SERIAL, "Gaelco 3D Serial Hardware", tag, owner, clock, "gaelco_serial", __FILE__),
+gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GAELCO_SERIAL, tag, owner, clock),
 	m_irq_handler(*this),
 	m_status(0),
 	m_last_in_msg_cnt(0),
@@ -253,14 +265,14 @@ void gaelco_serial_device::device_stop()
 
 TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
 {
-	UINT8 mask = param >> 8;
-	UINT8 set = param & 0xff;
+	uint8_t mask = param >> 8;
+	uint8_t set = param & 0xff;
 
 	m_status &= mask;
 	m_status |= set;
 }
 
-void gaelco_serial_device::set_status(UINT8 mask, UINT8 set, int wait)
+void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 {
 	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
 }
@@ -331,14 +343,14 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
 
 
 
-WRITE8_MEMBER( gaelco_serial_device::irq_enable )
+WRITE_LINE_MEMBER(gaelco_serial_device::irq_enable)
 {
-	LOGMSG(("???? irq enable %d\n", data));
+	LOGMSG(("???? irq enable %d\n", state));
 }
 
-READ8_MEMBER( gaelco_serial_device::status_r)
+READ8_MEMBER(gaelco_serial_device::status_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -351,7 +363,7 @@ READ8_MEMBER( gaelco_serial_device::status_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::data_w)
+WRITE8_MEMBER(gaelco_serial_device::data_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -366,7 +378,7 @@ WRITE8_MEMBER( gaelco_serial_device::data_w)
 
 READ8_MEMBER( gaelco_serial_device::data_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 	process_in();
@@ -382,18 +394,18 @@ READ8_MEMBER( gaelco_serial_device::data_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::unknown_w)
+WRITE_LINE_MEMBER(gaelco_serial_device::unknown_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
-	LOGMSG(("???? unknown serial access %d\n", data));
+	LOGMSG(("???? unknown serial access %d\n", state));
 
 }
 
-WRITE8_MEMBER( gaelco_serial_device::rts_w )
+WRITE_LINE_MEMBER(gaelco_serial_device::rts_w)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
-	if (data == 0)
+	if (state == 0)
 		m_out_ptr->stat |= GAELCOSER_STATUS_RTS;
 	else
 	{
@@ -403,11 +415,11 @@ WRITE8_MEMBER( gaelco_serial_device::rts_w )
 	}
 }
 
-WRITE8_MEMBER( gaelco_serial_device::tr_w)
+WRITE_LINE_MEMBER(gaelco_serial_device::tr_w)
 {
 	LOGMSG(("set transmit %d\n", data));
 	std::lock_guard<std::mutex> guard(m_mutex);
-	if ((data & 0x01) != 0)
+	if (state != 0)
 		m_status |= GAELCOSER_STATUS_SEND;
 	else
 		m_status &= ~GAELCOSER_STATUS_SEND;

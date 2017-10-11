@@ -8,7 +8,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "i82730.h"
+
+#include "screen.h"
 
 
 //**************************************************************************
@@ -24,9 +27,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I82730 = &device_creator<i82730_device>;
+DEFINE_DEVICE_TYPE(I82730, i82730_device, "i82730", "Intel 82730")
 
-const char *i82730_device::m_command_names[] =
+const char *const i82730_device::s_command_names[] =
 {
 	/* 00 */ "NOP",
 	/* 01 */ "START DISPLAY",
@@ -51,8 +54,8 @@ const char *i82730_device::m_command_names[] =
 //  i82730_device - constructor
 //-------------------------------------------------
 
-i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, I82730, "I82730", tag, owner, clock, "i82730", __FILE__),
+i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, I82730, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),
 	m_cpu_tag(nullptr), m_program(nullptr),
@@ -104,7 +107,7 @@ void i82730_device::device_start()
 
 void i82730_device::device_reset()
 {
-	cpu_device *cpu = m_owner->subdevice<cpu_device>(m_cpu_tag);
+	cpu_device *cpu = owner()->subdevice<cpu_device>(m_cpu_tag);
 	m_program = &cpu->space(AS_PROGRAM);
 
 	m_initialized = false;
@@ -119,14 +122,14 @@ void i82730_device::device_reset()
 //  MEMORY ACCESS
 //**************************************************************************
 
-UINT8 i82730_device::read_byte(offs_t address)
+uint8_t i82730_device::read_byte(offs_t address)
 {
 	return m_program->read_byte(address);
 }
 
-UINT16 i82730_device::read_word(offs_t address)
+uint16_t i82730_device::read_word(offs_t address)
 {
-	UINT16 data;
+	uint16_t data;
 
 	if (sysbus_16bit() && WORD_ALIGNED(address))
 	{
@@ -141,12 +144,12 @@ UINT16 i82730_device::read_word(offs_t address)
 	return data;
 }
 
-void i82730_device::write_byte(offs_t address, UINT8 data)
+void i82730_device::write_byte(offs_t address, uint8_t data)
 {
 	m_program->write_byte(address, data);
 }
 
-void i82730_device::write_word(offs_t address, UINT16 data)
+void i82730_device::write_word(offs_t address, uint16_t data)
 {
 	if (sysbus_16bit() && WORD_ALIGNED(address))
 	{
@@ -166,7 +169,7 @@ void i82730_device::write_word(offs_t address, UINT16 data)
 
 void i82730_device::update_interrupts()
 {
-	UINT16 code = m_status & ~m_intmask & ~(VDIP | DIP);
+	uint16_t code = m_status & ~m_intmask & ~(VDIP | DIP);
 	write_word(m_cbp + 20, code);
 
 	if (code)
@@ -175,24 +178,24 @@ void i82730_device::update_interrupts()
 
 void i82730_device::mode_set()
 {
-	UINT32 mptr = (read_word(m_cbp + 32) << 16) | read_word(m_cbp + 30);
-	UINT16 tmp;
+	uint32_t mptr = (read_word(m_cbp + 32) << 16) | read_word(m_cbp + 30);
+	uint16_t tmp;
 
 	tmp = read_word(mptr);
 	m_dma_burst_space = tmp & 0x7f;
 	m_dma_burst_length = (tmp >> 8) & 0x7f;
 
 	tmp = read_word(mptr + 2);
-	UINT8 hsyncstp = tmp & 0xff;
-	UINT8 line_length = (tmp >> 8) & 0xff;
+	uint8_t hsyncstp = tmp & 0xff;
+	uint8_t line_length = (tmp >> 8) & 0xff;
 
 	tmp = read_word(mptr + 4);
-	UINT8 hfldstp = tmp & 0xff;
+	uint8_t hfldstp = tmp & 0xff;
 	m_hfldstrt = (tmp >> 8) & 0xff;
 
 	tmp = read_word(mptr + 6);
-	UINT8 hbrdstp = tmp & 0xff;
-	UINT8 hbrdstrt = (tmp >> 8) & 0xff;
+	uint8_t hbrdstp = tmp & 0xff;
+	uint8_t hbrdstrt = (tmp >> 8) & 0xff;
 
 	tmp = read_word(mptr + 8);
 	m_margin = tmp & 0x1f;
@@ -204,7 +207,7 @@ void i82730_device::mode_set()
 	m_field_attribute_mask = tmp & 0x7fff;
 
 	tmp = read_word(mptr + 26);
-	UINT16 frame_length = tmp & 0x7ff;
+	uint16_t frame_length = tmp & 0x7ff;
 
 	tmp = read_word(mptr + 28);
 	m_vsyncstp = tmp & 0x7ff;
@@ -244,11 +247,11 @@ void i82730_device::mode_set()
 
 void i82730_device::execute_command()
 {
-	UINT8 command = read_byte(m_cbp + 1);
-	UINT16 tmp;
+	uint8_t command = read_byte(m_cbp + 1);
+	uint16_t tmp;
 
-	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(m_command_names))
-		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), m_command_names[command], m_cbp);
+	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(s_command_names))
+		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), s_command_names[command], m_cbp);
 
 	tmp = read_word(m_cbp + 2);
 	m_list_switch = BIT(tmp, 6);
@@ -300,7 +303,7 @@ void i82730_device::execute_command()
 
 	// LPEN ENABLE
 	case 0x07:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// READ STATUS
@@ -311,17 +314,17 @@ void i82730_device::execute_command()
 
 	// LD CUR POS
 	case 0x09:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// SELF TEST
 	case 0x0a:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// TEST ROW BUFFER
 	case 0x0b:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	default:
@@ -344,7 +347,7 @@ void i82730_device::load_row()
 
 	while (!finished)
 	{
-		UINT16 data = read_word(m_sptr);
+		uint16_t data = read_word(m_sptr);
 		m_sptr += 2;
 
 		if (BIT(data, 15))
@@ -420,7 +423,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	}
 	else if (y >= m_vfldstrt && y < m_vfldstp)
 	{
-		UINT8 lc = (y - m_vfldstrt) % (m_lpr + 1);
+		uint8_t lc = (y - m_vfldstrt) % (m_lpr + 1);
 
 		// call driver
 		m_update_row_cb(m_bitmap, m_row[m_row_index].data, lc, y - m_vsyncstp, m_row[m_row_index].count);
@@ -438,7 +441,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	}
 	else if (y >= m_vfldstp + m_margin + 1 && y < m_vfldstp + m_margin + 1 + m_lpr + 1)
 	{
-		UINT8 lc = (y - (m_vfldstp + m_margin + 1)) % (m_lpr + 1);
+		uint8_t lc = (y - (m_vfldstp + m_margin + 1)) % (m_lpr + 1);
 
 		m_sptr = (read_word(m_cbp + 36) << 16) | read_word(m_cbp + 34);
 		load_row();
@@ -482,7 +485,7 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 			m_ibp = (read_word(0xfffffffe) << 16) | read_word(0xfffffffc);
 
 			// get system configuration byte
-			UINT8 scb = read_byte(m_ibp + 6);
+			uint8_t scb = read_byte(m_ibp + 6);
 
 			// clear busy
 			write_word(m_ibp, read_word(m_ibp) & 0xff00);
@@ -520,7 +523,7 @@ WRITE_LINE_MEMBER( i82730_device::irst_w )
 	m_sint_handler(0);
 }
 
-UINT32 i82730_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t i82730_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, m_hfldstrt * 16, 0, cliprect);
 	return 0;

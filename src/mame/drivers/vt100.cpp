@@ -19,14 +19,21 @@
         http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
 ****************************************************************************/
 
+#include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "vt100.lh"
+
 
 #define RS232_TAG       "rs232"
 #define COM5016T_TAG    "com5016t"
@@ -57,19 +64,19 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
 	bool m_vertical_int;
 	bool m_key_scan;
-	UINT8 m_key_code;
+	uint8_t m_key_code;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
-	UINT8 bit_sel(UINT8 data);
+	uint8_t bit_sel(uint8_t data);
 };
 
 
@@ -108,13 +115,13 @@ ADDRESS_MAP_END
 // 7 - Keyboard TBMT H
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_crtc->lba7_r(space, 0) << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
 }
 
-UINT8 vt100_state::bit_sel(UINT8 data)
+uint8_t vt100_state::bit_sel(uint8_t data)
 {
 	if (!BIT(data,7)) return 0x70;
 	if (!BIT(data,6)) return 0x60;
@@ -129,7 +136,7 @@ UINT8 vt100_state::bit_sel(UINT8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 {
-	UINT8 i, code;
+	uint8_t i, code;
 	char kbdrow[8];
 	if (m_key_scan)
 	{
@@ -323,7 +330,7 @@ static INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
-UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_crtc->video_update(bitmap, cliprect);
 	return 0;
@@ -337,7 +344,7 @@ UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bit
 //          all other set to 1
 IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
 {
-	UINT8 ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
+	uint8_t ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
 	m_receiver_int = 0;
 	return ret;
 }
@@ -396,7 +403,7 @@ static GFXDECODE_START( vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( vt100, vt100_state )
+static MACHINE_CONFIG_START( vt100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
@@ -405,7 +412,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*10, 25*10)
@@ -665,10 +672,10 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 // on page 433: VT100 WC or WK uses these as well.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6C8ACF44) SHA1(B3EF5AF920995A40A316C6DC008960C461853BFC)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
-	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77F21473) SHA1(6F10B250777C12CCA63EE611735F9F36CC05A7EF)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
-	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(EAEDE07A) SHA1(410CEF41C4F3A6A37570A82F359DD2B2D536D3DD)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
-	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4BF1CE4E) SHA1(279F47EC9A68C801C3C05005DD782202AC9E51A4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
+	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6c8acf44) SHA1(b3ef5af920995a40a316c6dc008960c461853bfc)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
+	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77f21473) SHA1(6f10b250777c12cca63ee611735f9f36cc05a7ef)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
+	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(eaede07a) SHA1(410cef41c4f3a6a37570a82f359dd2b2d536d3dd)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
+	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
 	/* bad rom tracing
 	bpset 1be then set pc=1d5 to bypass rom test
@@ -679,11 +686,11 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
 	// are 184 and 185 an older version of the stp avo firmware?
 	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
-	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592DEC1) SHA1(C4B8FC9FC0514E0CD46AD2DE03ABE72271CE460B)) // Label: "S 8218 // C69063 // 23186E2" @E21
-	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(C6D72A41) SHA1(956F9EB945A250FD05C76100B38C0BA381AB8FDE)) // Label: "S 8228 // C69062 // 23187E2" @E17
+	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
+	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
-	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(DA55C62B) SHA1(261B02B774D57253D1DEDECAB8CA0E368C2A96CD)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
+	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
 	// the rom dump above MIGHT be in the wrong order: it was dumped with A11 to pin 18, A12 to pin 21, A13 to pin 20, but I'm not sure those assignments to pins are correct.
 	// At worst the 8 parts of it are in the wrong order.
 
@@ -874,15 +881,15 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1978, vt100,    0,      0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
-//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac, vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
-COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
-COMP( 1981, vt102,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
-//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
-COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
-//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING)
-//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING)
-COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING)
-//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING)
-COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING)
+COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
+//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
+COMP( 1979, vt100ac, vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
+COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
+COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
+//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
+COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
+//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING)
+//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING)
+COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING)
+//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING)
+COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING)

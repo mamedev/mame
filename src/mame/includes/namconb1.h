@@ -8,7 +8,8 @@
 
 #include "namcos2.h"
 #include "machine/eeprompar.h"
-#include "video/c116.h"
+#include "machine/timer.h"
+#include "video/namco_c116.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)
@@ -60,16 +61,16 @@ public:
 	optional_ioport m_light0_y;
 	optional_ioport m_light1_x;
 	optional_ioport m_light1_y;
-	required_shared_ptr<UINT32> m_spritebank32;
-	optional_shared_ptr<UINT32> m_tilebank32;
-	required_shared_ptr<UINT16> m_namconb_shareram;
+	required_shared_ptr<uint32_t> m_spritebank32;
+	optional_shared_ptr<uint32_t> m_tilebank32;
+	required_shared_ptr<uint16_t> m_namconb_shareram;
 
-	UINT8 m_vbl_irq_level;
-	UINT8 m_pos_irq_level;
-	UINT8 m_unk_irq_level;
-	UINT16 m_count;
-	UINT8 m_port6;
-	UINT32 m_tilemap_tile_bank[4];
+	uint8_t m_vbl_irq_level;
+	uint8_t m_pos_irq_level;
+	uint8_t m_unk_irq_level;
+	uint16_t m_count;
+	uint8_t m_port6;
+	uint32_t m_tilemap_tile_bank[4];
 
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);
@@ -109,8 +110,8 @@ public:
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(namconb2);
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ);
-	UINT32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
@@ -119,4 +120,6 @@ public:
 
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);
+	void NB1TilemapCB(uint16_t code, int *tile, int *mask);
+	void NB2TilemapCB(uint16_t code, int *tile, int *mask);
 };

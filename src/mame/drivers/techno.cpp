@@ -14,6 +14,7 @@ ToDo:
 ***********************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m68000/m68000.h"
 #include "techno.lh"
@@ -42,9 +43,9 @@ public:
 	INTERRUPT_GEN_MEMBER(techno_intgen);
 private:
 	bool m_digwait;
-	UINT8 m_keyrow;
-	UINT16 m_digit;
-	UINT8 m_vector;
+	uint8_t m_keyrow;
+	uint16_t m_digit;
+	uint8_t m_vector;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_switch;
@@ -243,7 +244,7 @@ void techno_state::machine_reset()
 	m_digit = 0;
 }
 
-static MACHINE_CONFIG_START( techno, techno_state )
+static MACHINE_CONFIG_START( techno )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
@@ -275,5 +276,5 @@ ROM_START(spcteam)
 	ROM_RELOAD(0, 0x8000)
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  spcteam, 0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout
+GAME(1987,  xforce,  0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout

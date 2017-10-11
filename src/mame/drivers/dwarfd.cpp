@@ -301,6 +301,8 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "video/i8275.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dwarfd_state : public driver_device
 {
@@ -312,19 +314,19 @@ public:
 		m_crtc(*this, "i8275"),
 		m_charmap(*this, "gfx1"),
 		m_dsw2(*this, "DSW2")
-		{ }
+	{ }
 
 	/* video-related */
 	int m_crt_access;
 	bool m_back_color;
 
 	/* memory */
-	UINT8    m_dw_ram[0x1000];
+	uint8_t    m_dw_ram[0x1000];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_region_ptr<UINT16> m_charmap;
+	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
 	DECLARE_READ8_MEMBER(dwarfd_ram_r);
@@ -580,7 +582,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 	int i;
 	int bank = ((gpa & 2) ? 0 : 2) + (gpa & 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -589,8 +591,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -604,7 +606,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	int i;
 	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -613,8 +615,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -628,7 +630,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	int i;
 	int bank = gpa;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -637,8 +639,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -760,9 +762,9 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
-	UINT8 rgb[3];
+	uint8_t rgb[3];
 	int i,j;
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 
 	for (i = 0; i < 32; i++)
 	{
@@ -788,7 +790,7 @@ void dwarfd_state::machine_reset()
 	m_back_color = false;
 }
 
-static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
+static MACHINE_CONFIG_START( dwarfd )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -1054,7 +1056,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 {
 	/* expand gfx roms */
-	UINT8 *dst = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx2")->base();
 
 	for (int i = 0; i < 0x4000/2; i++)
 	{
@@ -1105,11 +1107,11 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 
 }
 
-/*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
-GAME( 1979, pokeresp, 0,         pokeresp, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Poker (Electro-Sport)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995, qc,       0,         qc,     quarterh, dwarfd_state, qc,     0, "ArJay Exports/Prestige Games", "Quarter Horse Classic", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT     MACHINE   INPUT     STATE         INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS
+GAME( 1979, pokeresp, 0,         pokeresp, dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Poker (Electro-Sport)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfd,   0,         dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1983, quarterha, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1983, quarterhb, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, qc,       0,         qc,       quarterh, dwarfd_state, qc,     ROT0, "ArJay Exports/Prestige Games", "Quarter Horse Classic",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

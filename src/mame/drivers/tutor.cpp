@@ -169,15 +169,20 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 *********************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9995.h"
-#include "sound/wave.h"
-#include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
+#include "sound/wave.h"
+#include "video/tms9928a.h"
+
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class tutor_state : public driver_device
 {
@@ -281,7 +286,7 @@ void tutor_state::machine_reset()
 READ8_MEMBER( tutor_state::key_r )
 {
 	char port[12];
-	UINT8 value;
+	uint8_t value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
 	value = ioport(port)->read();
@@ -727,7 +732,7 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tutor, tutor_state )
+static MACHINE_CONFIG_START( tutor )
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
@@ -790,7 +795,7 @@ ROM_START(pyuutajr)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
 
-/*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT                      INIT    COMPANY     FULLNAME */
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    driver_device,   0,      "Tomy",   "Tomy Tutor" , 0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    driver_device,   0,      "Tomy",   "Tomy Pyuuta" , 0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, driver_device,   0,      "Tomy",   "Tomy Pyuuta Jr." , 0)
+//   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT     STATE          INIT    COMPANY   FULLNAME           FLAGS
+COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Tutor" ,     0)
+COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Pyuuta" ,    0)
+COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,   0,      "Tomy",   "Tomy Pyuuta Jr.", 0)

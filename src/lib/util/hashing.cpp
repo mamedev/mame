@@ -184,7 +184,7 @@ std::string crc32_t::as_string() const
 //  the currently-accumulated value
 //-------------------------------------------------
 
-void crc32_creator::append(const void *data, UINT32 length)
+void crc32_creator::append(const void *data, uint32_t length)
 {
 	m_accum.m_raw = crc32(m_accum, reinterpret_cast<const Bytef *>(data), length);
 }
@@ -236,7 +236,7 @@ std::string crc16_t::as_string() const
 }
 
 /**
- * @fn  void crc16_creator::append(const void *data, UINT32 length)
+ * @fn  void crc16_creator::append(const void *data, uint32_t length)
  *
  * @brief   -------------------------------------------------
  *            append - hash a block of data, appending to the currently-accumulated value
@@ -246,9 +246,9 @@ std::string crc16_t::as_string() const
  * @param   length  The length.
  */
 
-void crc16_creator::append(const void *data, UINT32 length)
+void crc16_creator::append(const void *data, uint32_t length)
 {
-	static const UINT16 s_table[256] =
+	static const uint16_t s_table[256] =
 	{
 		0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 		0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
@@ -284,10 +284,10 @@ void crc16_creator::append(const void *data, UINT32 length)
 		0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 	};
 
-	const UINT8 *src = reinterpret_cast<const UINT8 *>(data);
+	const uint8_t *src = reinterpret_cast<const uint8_t *>(data);
 
 	// fetch the current value into a local and rip through the source data
-	UINT16 crc = m_accum.m_raw;
+	uint16_t crc = m_accum.m_raw;
 	while (length-- != 0)
 		crc = (crc << 8) ^ s_table[(crc >> 8) ^ *src++];
 	m_accum.m_raw = crc;

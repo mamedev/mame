@@ -110,6 +110,29 @@
 		</part>
 	</software>
 
+	<software name="iob">
+		<description>I/O (Rev B)</description>
+		<year>198?</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="ppu_rom" interface="hp9845b_rom">
+			<feature name="base" value="0x094000"  />
+			<dataarea name="rom" size="0x4000" width="16" endianness="big">
+				<rom name="09845-65519-09_40-revb-io_ppu.bin" size="0x2000" crc="fb49c7d8" sha1="f2e4f196a4fb3859081495e1be7062afc7769544" offset="0x0000" />
+				<rom name="09845-65519-09_50-revb-io_ppu.bin" size="0x2000" crc="861a77c6" sha1="6f419275d2cf13daa9345ea55e03d5ad15e438a7" offset="0x2000" />
+			</dataarea>
+		</part>
+
+		<part name="lpu_rom" interface="hp9845b_rom">
+			<feature name="base" value="0x0b5000"  />
+			<dataarea name="rom" size="0x4000" width="16" endianness="big">
+				<rom name="09845-65518-13_50-revb-io_lpu.bin" size="0x2000" crc="3d642769" sha1="18e41b9d6c39c26f42d197ef455b4085b936b3da" offset="0x0000" />
+				<rom name="09845-65518-13_60-revb-io_lpu.bin" size="0x2000" crc="4fc249f8" sha1="cb80e382eb456d6bead110077536564c1a170071" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="ioppuc" cloneof="ioppu">
 		<description>I/O PPU (Rev C)</description>
 		<year>198?</year>
@@ -346,4 +369,16 @@
 		</part>
 	</software>
 
+	<software name="sssmass">
+		<description>Mass storage (rev A)</description>
+		<year>1983</year>
+		<publisher>Structured Software Systems</publisher>
+
+		<part name="rom" interface="hp9845b_rom">
+			<feature name="base" value="0x0d1000"  />
+			<dataarea name="rom" size="0x2000" width="16" endianness="big">
+				<rom name="831010-15_10-RevA-Structured_Software_Systems_Mass_Storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000"  />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

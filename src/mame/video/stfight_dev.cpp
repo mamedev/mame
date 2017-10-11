@@ -6,14 +6,14 @@
 
 #include "emu.h"
 #include "stfight_dev.h"
+#include "screen.h"
 
 
+DEFINE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device, "stfight_vid", "Seibu Street Fight Video")
 
-extern const device_type STFIGHT_VIDEO = &device_creator<stfight_video_device>;
 
-
-stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, STFIGHT_VIDEO, "Seibu Street Fight Video", tag, owner, clock, "stfight_vid", __FILE__),
+stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, STFIGHT_VIDEO, tag, owner, clock),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_palette(*this,"^palette"),
 	m_screen(*this, "screen"),
@@ -109,7 +109,7 @@ static GFXDECODE_START( stfight )
 	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( stfight_vid )
+MACHINE_CONFIG_MEMBER(stfight_video_device::device_add_mconfig)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -121,11 +121,6 @@ static MACHINE_CONFIG_FRAGMENT( stfight_vid )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", stfight)
 MACHINE_CONFIG_END
-
-machine_config_constructor stfight_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( stfight_vid );
-}
 
 /*
         Graphics ROM Format
@@ -190,7 +185,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(stfight_video_device::get_tx_tile_info)
 {
-	UINT8 attr = m_txram[tile_index+0x400];
+	uint8_t attr = m_txram[tile_index+0x400];
 	int color = attr & 0x0f;
 
 	tileinfo.group = color;
@@ -249,7 +244,7 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 stfight_video_device::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */
 
@@ -276,12 +271,12 @@ UINT32 stfight_video_device::screen_update_stfight(screen_device &screen, bitmap
 }
 
 
-void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind16 &bitmap2, const rectangle &cliprect, UINT8* clut, int base, int mask, int condition, bool realcheck)
+void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind16 &bitmap2, const rectangle &cliprect, uint8_t* clut, int base, int mask, int condition, bool realcheck)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &bitmap2.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *src = &bitmap2.pix16(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (src[x] == -1)
@@ -289,8 +284,8 @@ void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitm
 
 			if ((src[x] & mask) == condition)
 			{
-				UINT8 pix = src[x] & 0xff;
-				UINT8 real = clut[pix];
+				uint8_t pix = src[x] & 0xff;
+				uint8_t real = clut[pix];
 
 				if (realcheck) // the text layer transparency appears to be 0xf *after* lookup
 				{

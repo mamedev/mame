@@ -31,6 +31,7 @@
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
 # SDL2_MULTIAPI = 1
 # NO_USE_MIDI = 1
+# NO_USE_PORTAUDIO = 1
 # DONT_USE_NETWORK = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
@@ -59,10 +60,11 @@
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
+# USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
-# USE_SYSTEM_LIB_UV = 1
 # USE_BUNDLED_LIB_SDL2 = 1
+# USE_SYSTEM_LIB_UTF8PROC = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -96,7 +98,6 @@
 # FORCE_VERSION_COMPILE = 1
 
 # MSBUILD = 1
-# USE_LIBUV = 1
 # IGNORE_BAD_LOCALISATION=1
 # PRECOMPILE = 0
 
@@ -218,6 +219,10 @@ endif
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
+ifdef PROJECT
+PARAMS += --PROJECT='$(PROJECT)'
+TARGET := $(PROJECT)
+endif
 
 ifndef TARGET
 TARGET := mame
@@ -232,7 +237,9 @@ SUBTARGET_FULL := $(subst -,_,$(SUBTARGET))
 
 CONFIG = release
 ifdef DEBUG
+ifneq '$(DEBUG)' '0'
 CONFIG := debug
+endif
 endif
 
 ifdef VERBOSE
@@ -281,6 +288,12 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
 endif
+ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
+ARCHITECTURE := _x64
+endif
+ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
+ARCHITECTURE := _x64
+endif
 endif
 
 else
@@ -326,6 +339,12 @@ ifndef NOASM
 endif
 endif
 
+ifeq ($(findstring s390x,$(UNAME)),s390x)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
 TARGETOS := asmjs
@@ -343,6 +362,13 @@ BIGENDIAN := 1
 endif
 # Linux
 ifneq (,$(findstring ppc,$(UNAME)))
+ifneq (,$(findstring ppc64le,$(UNAME)))
+BIGENDIAN := 0
+else
+BIGENDIAN := 1
+endif
+endif
+ifneq (,$(findstring s390x,$(UNAME)))
 BIGENDIAN := 1
 endif
 endif # BIGENDIAN
@@ -423,6 +449,10 @@ ifdef USE_SYSTEM_LIB_LUA
 PARAMS += --with-system-lua='$(USE_SYSTEM_LIB_LUA)'
 endif
 
+ifdef USE_SYSTEM_LIB_SQLITE3
+PARAMS += --with-system-sqlite3='$(USE_SYSTEM_LIB_SQLITE3)'
+endif
+
 ifdef USE_SYSTEM_LIB_PORTMIDI
 PARAMS += --with-system-portmidi='$(USE_SYSTEM_LIB_PORTMIDI)'
 endif
@@ -431,14 +461,14 @@ ifdef USE_SYSTEM_LIB_PORTAUDIO
 PARAMS += --with-system-portaudio='$(USE_SYSTEM_LIB_PORTAUDIO)'
 endif
 
+ifdef USE_SYSTEM_LIB_UTF8PROC
+PARAMS += --with-system-utf8proc='$(USE_SYSTEM_LIB_UTF8PROC)'
+endif
+
 # reverse logic for this one
 
 ifdef USE_BUNDLED_LIB_SDL2
 PARAMS += --with-bundled-sdl2
-endif
-
-ifdef USE_SYSTEM_LIB_UV
-PARAMS += --with-system-uv='$(USE_SYSTEM_LIB_UV)'
 endif
 
 #-------------------------------------------------
@@ -489,8 +519,10 @@ endif
 
 # profiler defaults to on for DEBUG builds
 ifdef DEBUG
+ifneq '$(DEBUG)' '0'
 ifndef PROFILER
 PROFILER = 1
+endif
 endif
 endif
 
@@ -499,9 +531,6 @@ endif
 ifdef PROFILE
 PROFILER =
 SYMBOLS = 1
-ifndef SYMLEVEL
-SYMLEVEL = 1
-endif
 endif
 
 # specify a default optimization level if none explicitly stated
@@ -511,10 +540,14 @@ endif
 
 # set the symbols level
 ifdef SYMBOLS
+PARAMS += --SYMBOLS='$(SYMBOLS)'
+ifneq '$(SYMBOLS)' '0'
 ifndef SYMLEVEL
-SYMLEVEL = 1
 ifdef SOURCES
 SYMLEVEL = 2
+else
+SYMLEVEL = 1
+endif
 endif
 endif
 endif
@@ -535,10 +568,6 @@ ifdef BENCHMARKS
 ifneq '$(BENCHMARKS)' '0'
 PARAMS += --with-benchmarks
 endif
-endif
-
-ifdef SYMBOLS
-PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
 
 ifdef SYMLEVEL
@@ -571,10 +600,6 @@ endif
 
 ifdef MAP
 PARAMS += --MAP='$(MAP)'
-endif
-
-ifdef USE_BGFX
-PARAMS += --USE_BGFX='$(USE_BGFX)'
 endif
 
 ifdef NOASM
@@ -623,6 +648,10 @@ endif
 
 ifdef NO_USE_MIDI
 PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+endif
+
+ifdef NO_USE_PORTAUDIO
+PARAMS += --NO_USE_PORTAUDIO='$(NO_USE_PORTAUDIO)'
 endif
 
 ifdef USE_QTDEBUG
@@ -737,10 +766,6 @@ ifdef PLATFORM
 TARGET_PARAMS += --PLATFORM='$(PLATFORM)'
 endif
 
-ifdef USE_LIBUV
-PARAMS += --USE_LIBUV='$(USE_LIBUV)'
-endif
-
 ifdef PRECOMPILE
 PARAMS += --precompile='$(PRECOMPILE)'
 endif
@@ -751,6 +776,10 @@ endif
 
 ifdef DEBUG_ARGS
 PARAMS += --DEBUG_ARGS='$(DEBUG_ARGS)'
+endif
+
+ifdef WEBASSEMBLY
+PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
 endif
 #-------------------------------------------------
 # All scripts
@@ -786,7 +815,11 @@ SCRIPTS += scripts/target/$(TARGET)/mess.lua
 endif
 
 ifndef SOURCES
+ifdef PROJECT
+SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+else
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+endif
 endif
 
 ifdef REGENIE
@@ -938,9 +971,10 @@ PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
-.PHONY: all clean regenie generate
+.PHONY: all clean regenie generate FORCE
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
 regenie:
+FORCE:
 
 #-------------------------------------------------
 # gmake-mingw64-gcc
@@ -1025,7 +1059,7 @@ endif
 
 .PHONY: vs2015_uwp
 vs2015_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=windows --NO_USE_MIDI=1 --USE_LIBUV=0 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
@@ -1035,6 +1069,45 @@ vs2015_fastbuild: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015-fastbuild
 ifdef FASTBUILD
 	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2015-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
+# Visual Studio 2017
+#-------------------------------------------------
+
+.PHONY: vs2017
+vs2017: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_intel
+vs2017_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_xp
+vs2017_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2017-xp vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_uwp
+vs2017_uwp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_fastbuild
+vs2017_fastbuild: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017-fastbuild
+ifdef FASTBUILD
+	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2017-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1461,7 +1534,7 @@ generate: \
 
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
-	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
+	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:
@@ -1474,14 +1547,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.178"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.190"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.178" > $@
+	@echo #define BARE_BUILD_VERSION "0.190" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1495,7 +1568,7 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 
 $(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg UINT8
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg uint8_t
 
 $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
 ifeq ($(TARGETOS),asmjs)
@@ -1625,9 +1698,11 @@ bgfx-tools:
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
 	-$(call MKDIR,build/shaders/dx9)
-	-$(call MKDIR,build/shaders/gles)
-	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/pssl)
 	-$(call MKDIR,build/shaders/metal)
+	-$(call MKDIR,build/shaders/essl)
+	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/spirv)
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
 
 #-------------------------------------------------
@@ -1636,9 +1711,11 @@ shaders: bgfx-tools
 
 .PHONY: translation
 
-translation:
+$(GENDIR)/mame.pot: FORCE
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U -N %% mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
+	$(SILENT) find src -iname "*.cpp" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -o $@
+	$(SILENT) find plugins -iname "*.lua" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -j -o $@
 
+translation: $(GENDIR)/mame.pot
+	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% $<
+	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%

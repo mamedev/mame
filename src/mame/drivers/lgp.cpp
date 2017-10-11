@@ -67,8 +67,9 @@ Dumping Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "machine/ldv1000.h"
+#include "render.h"
+#include "speaker.h"
 
 
 class lgp_state : public driver_device
@@ -84,13 +85,13 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<UINT8> m_tile_ram;
-	required_shared_ptr<UINT8> m_tile_control_ram;
+	required_shared_ptr<uint8_t> m_tile_ram;
+	required_shared_ptr<uint8_t> m_tile_control_ram;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
 	DECLARE_DRIVER_INIT(lgp);
 	virtual void machine_start() override;
-	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 	DECLARE_PALETTE_INIT(lgp);
@@ -106,7 +107,7 @@ public:
 
 
 /* VIDEO GOODS */
-UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int charx, chary;
 
@@ -362,7 +363,7 @@ WRITE_LINE_MEMBER(lgp_state::ld_command_strobe_cb)
 
 PALETTE_INIT_MEMBER(lgp_state, lgp)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 //  for (i = 0; i < palette.entries(); i++)
@@ -396,7 +397,7 @@ PALETTE_INIT_MEMBER(lgp_state, lgp)
 }
 
 /* DRIVER */
-static MACHINE_CONFIG_START( lgp, lgp_state )
+static MACHINE_CONFIG_START( lgp )
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
@@ -608,6 +609,6 @@ DRIVER_INIT_MEMBER(lgp_state,lgp)
 {
 }
 
-/*    YEAR  NAME PARENT   MACHINE INPUT INIT MONITOR  COMPANY   FULLNAME             FLAGS) */
-GAME( 1983, lgp, 0,       lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, lgpalt, lgp,  lgp,    lgp, lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME PARENT   MACHINE INPUT STATE       INIT MONITOR  COMPANY   FULLNAME                         FLAGS) */
+GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

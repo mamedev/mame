@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv802.h"
 
 
@@ -13,24 +14,18 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV802 = &device_creator<sv802_device>;
+DEFINE_DEVICE_TYPE(SV802, sv802_device, "sv802", "SV-802 Centronics Printer Interface")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv802 )
+MACHINE_CONFIG_MEMBER( sv802_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sv802_device, busy_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
-
-machine_config_constructor sv802_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv802 );
-}
 
 
 //**************************************************************************
@@ -41,8 +36,8 @@ machine_config_constructor sv802_device::device_mconfig_additions() const
 //  sv802_device - constructor
 //-------------------------------------------------
 
-sv802_device::sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SV805, "SV-802 Centronics Printer Interface", tag, owner, clock, "sv802", __FILE__),
+sv802_device::sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SV802, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),
 	m_cent_data_out(*this, "cent_data_out"),

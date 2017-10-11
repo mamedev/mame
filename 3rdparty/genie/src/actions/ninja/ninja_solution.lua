@@ -1,3 +1,8 @@
+--
+-- GENie - Project generator tool
+-- https://github.com/bkaradzic/GENie#license
+--
+
 local ninja = premake.ninja
 local p = premake
 local solution = p.solution
@@ -78,7 +83,7 @@ end
 
 -- generate solution that will call ninja for projects
 	local generate
-	
+
 	local function getconfigs(sln, name, plat)
 		local cfgs = {}
 		for prj in solution.eachproject(sln) do
@@ -95,14 +100,14 @@ end
 	function ninja.generate_ninja_builds(sln)
 		-- create a shortcut to the compiler interface
 		local cc = premake[_OPTIONS.cc]
-		
+
 		sln.getlocation = function(cfg, plat)
 			return path.join(sln.location, premake.getconfigname(cfg, plat, true))
 		end
-		
+
 		-- build a list of supported target platforms that also includes a generic build
 		local platforms = premake.filterplatforms(sln, cc.platforms, "Native")
-		
+
 		for _,plat in ipairs(platforms) do
 			for _,name in ipairs(sln.configurations) do
 				p.generate(sln, ninja.get_solution_name(sln, name, plat), function(sln)
@@ -111,16 +116,16 @@ end
 			end
 		end
 	end
-	
+
 	function ninja.get_solution_name(sln, cfg, plat)
 		return path.join(sln.getlocation(cfg, plat), "build.ninja")
 	end
-	
+
 	function generate(prjcfgs)
 		local cfgs          = {}
 		local cfg_first     = nil
 		local cfg_first_lib = nil
-		
+
 		_p("# solution build file")
 		_p("# generated with GENie ninja")
 		_p("")
@@ -147,7 +152,7 @@ end
 			-- include other ninja file
 			_p("subninja " .. cfg:getprojectfilename())
 		end
-		
+
 		_p("")
 
 		_p("# targets")

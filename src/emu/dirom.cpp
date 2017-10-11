@@ -1,8 +1,9 @@
 #include "emu.h"
 
 
-device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, UINT8 addrwidth, endianness_t endian, UINT8 datawidth) :
+device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian, u8 datawidth) :
 	device_memory_interface(mconfig, device),
+	m_rom_tag(device.basetag()),
 	m_rom_config("rom", endian, datawidth, addrwidth)
 {
 }
@@ -11,9 +12,20 @@ device_rom_interface::~device_rom_interface()
 {
 }
 
-const address_space_config *device_rom_interface::memory_space_config(address_spacenum spacenum) const
+void device_rom_interface::static_set_device_rom_tag(device_t &device, const char *tag)
 {
-	return spacenum ? nullptr : &m_rom_config;
+	device_rom_interface *romintf;
+	if (!device.interface(romintf))
+		throw emu_fatalerror("MCFG_DEVICE_ROM called on device '%s' with no ROM interface\n", device.tag());
+
+	romintf->m_rom_tag = tag;
+}
+
+device_memory_interface::space_config_vector device_rom_interface::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_rom_config)
+	};
 }
 
 void device_rom_interface::rom_bank_updated()
@@ -41,10 +53,10 @@ void device_rom_interface::reset_bank()
 		m_bank->set_entry(m_cur_bank);
 }
 
-void device_rom_interface::set_rom(const void *base, UINT32 size)
+void device_rom_interface::set_rom(const void *base, u32 size)
 {
-	UINT32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
-	UINT32 rend = size-1;
+	u32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
+	u32 rend = size-1;
 	m_bank_count = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
 	if(m_bank_count < 1)
 		m_bank_count = 1;
@@ -57,7 +69,7 @@ void device_rom_interface::set_rom(const void *base, UINT32 size)
 
 	} else {
 		// Round up to the nearest power-of-two-minus-one
-		UINT32 rmask = rend;
+		u32 rmask = rend;
 		rmask |= rmask >> 1;
 		rmask |= rmask >> 2;
 		rmask |= rmask >> 4;
@@ -81,11 +93,12 @@ void device_rom_interface::interface_pre_start()
 	device().machine().save().register_postload(save_prepost_delegate(FUNC(device_rom_interface::reset_bank), this));
 
 	if(!has_configured_map(0)) {
-		memory_region *reg = device().memregion(DEVICE_SELF);
+		memory_region *reg = device().owner()->memregion(m_rom_tag);
 		if(reg)
 			set_rom(reg->base(), reg->bytes());
 		else {
-			UINT32 end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
+			device().logerror("ROM region '%s' not found\n", m_rom_tag);
+			u32 end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
 			space().unmap_read(0, end);
 		}
 	}

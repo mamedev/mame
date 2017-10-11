@@ -189,6 +189,7 @@ C64 SERIAL BUS
     5)  Tei minimum must be 80us for external device to be a listener.
 */
 
+#include "emu.h"
 #include "cbmiec.h"
 
 
@@ -208,8 +209,8 @@ static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM_IEC = &device_creator<cbm_iec_device>;
-const device_type CBM_IEC_SLOT = &device_creator<cbm_iec_slot_device>;
+DEFINE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device,      "cbm_iec",      "CBM IEC bus")
+DEFINE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device, "cbm_iec_slot", "CBM IEC slot")
 
 
 
@@ -245,8 +246,8 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //  cbm_iec_slot_device - constructor
 //-------------------------------------------------
 
-cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock, "cbm_iec_slot", __FILE__),
+cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
 		device_slot_interface(mconfig, *this), m_address(0)
 {
 }
@@ -282,8 +283,8 @@ void cbm_iec_slot_device::device_start()
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock, "cbm_iec", __FILE__),
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CBM_IEC, tag, owner, clock),
 		m_write_srq(*this),
 		m_write_atn(*this),
 		m_write_clk(*this),
@@ -522,5 +523,4 @@ SLOT_INTERFACE_START( cbm_iec_devices )
 	SLOT_INTERFACE("vic1515", VIC1515)
 	SLOT_INTERFACE("vic1520", VIC1520)
 	SLOT_INTERFACE("c1526", C1526)
-	SLOT_INTERFACE("mps802", MPS802)
 SLOT_INTERFACE_END

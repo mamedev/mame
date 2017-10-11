@@ -363,7 +363,7 @@ done:
 // -------------------------------------------------
 
 /**
- * @fn  osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+ * @fn  osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path)
  *
  * @brief   Zippath fopen.
  *
@@ -375,7 +375,7 @@ done:
  * @return  A osd_file::error.
  */
 
-osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path)
 {
 	osd_file::error filerr = osd_file::error::NOT_FOUND;
 	archive_file::error ziperr;
@@ -1048,8 +1048,8 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
 
 
 // -------------------------------------------------
-//  zippath_is_zip - returns TRUE if this path is
-//  a ZIP path or FALSE if not
+//  zippath_is_zip - returns true if this path is
+//  a ZIP path or false if not
 // -------------------------------------------------
 
 /**
@@ -1062,7 +1062,7 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
  * @return  An int.
  */
 
-int zippath_is_zip(zippath_directory *directory)
+bool zippath_is_zip(zippath_directory *directory)
 {
 	return directory->zipfile != nullptr;
 }

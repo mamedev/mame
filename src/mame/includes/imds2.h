@@ -5,7 +5,6 @@
 #ifndef _IMDS2_H_
 #define _IMDS2_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8257.h"
@@ -42,8 +41,8 @@ class imds2_state : public driver_device
 	DECLARE_READ8_MEMBER(imds2_kb_read);
 	DECLARE_READ8_MEMBER(imds2_kb_port_p2_r);
 	DECLARE_WRITE8_MEMBER(imds2_kb_port_p1_w);
-	DECLARE_READ8_MEMBER(imds2_kb_port_t0_r);
-	DECLARE_READ8_MEMBER(imds2_kb_port_t1_r);
+	DECLARE_READ_LINE_MEMBER(imds2_kb_port_t0_r);
+	DECLARE_READ_LINE_MEMBER(imds2_kb_port_t1_r);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_dbbout_w);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_f0_w);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_set_f1_w);
@@ -104,7 +103,7 @@ class imds2_state : public driver_device
 	required_ioport m_io_key7;
 	required_ioport m_ioc_options;
 
-	std::vector<UINT8> m_ipc_ram;
+	std::vector<uint8_t> m_ipc_ram;
 
 	bool imds2_in_ipc_rom(offs_t offset) const;
 
@@ -112,40 +111,40 @@ class imds2_state : public driver_device
 	void imds2_update_printer(void);
 
 	// IPC control port
-	UINT8 m_ipc_control;
+	uint8_t m_ipc_control;
 
 	// IPC ROM content
-	const UINT8 *m_ipc_rom;
+	const uint8_t *m_ipc_rom;
 
 	// Character generator
-	const UINT8 *m_chargen;
+	const uint8_t *m_chargen;
 
 	// MISCOUT state
-	UINT8 m_miscout;
+	uint8_t m_miscout;
 
 	// Beeper timer line
 	int m_beeper_timer;
 
 	// Keyboard state
-	UINT8 m_kb_p1;
+	uint8_t m_kb_p1;
 
 	// IPC to IOC buffer
-	UINT8 m_ioc_ibf;
+	uint8_t m_ioc_ibf;
 
 	// IOC to IPC buffer
-	UINT8 m_ioc_obf;
+	uint8_t m_ioc_obf;
 
 	// IPC/IOC status
-	UINT8 m_ipc_ioc_status;
+	uint8_t m_ipc_ioc_status;
 
 	// PIO port 1
-	UINT8 m_pio_port1;
+	uint8_t m_pio_port1;
 
 	// PIO port 2
-	UINT8 m_pio_port2;
+	uint8_t m_pio_port2;
 
 	// PIO device status byte
-	UINT8 m_device_status_byte;
+	uint8_t m_device_status_byte;
 };
 
 #endif /* _IMDS2_H_ */

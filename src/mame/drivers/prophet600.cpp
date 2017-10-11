@@ -106,9 +106,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gate_w);
 
 private:
-	UINT16 m_dac;
-	UINT8 m_scanrow;
-	UINT8 m_comparitor;
+	uint16_t m_dac;
+	uint8_t m_scanrow;
+	uint8_t m_comparitor;
 
 	bool m_nmi_gate;
 
@@ -116,7 +116,7 @@ private:
 	bool m_ASaw, m_ATri, m_Sync, m_BSaw, m_BTri, m_PModFA, m_PModFil;
 
 	// control voltages
-	UINT16 m_CVs[CV_MAX];
+	uint16_t m_CVs[CV_MAX];
 };
 
 WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )
@@ -262,7 +262,7 @@ DRIVER_INIT_MEMBER(prophet600_state, prophet600)
 }
 
 // master crystal is 8 MHz, all clocks derived from there
-static MACHINE_CONFIG_START( prophet600, prophet600_state )
+static MACHINE_CONFIG_START( prophet600 )
 	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

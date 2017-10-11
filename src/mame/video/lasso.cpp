@@ -68,7 +68,7 @@ rgb_t lasso_state::get_color( int data )
 
 PALETTE_INIT_MEMBER(lasso_state, lasso)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -78,7 +78,7 @@ PALETTE_INIT_MEMBER(lasso_state, lasso)
 
 PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 	/* track */
 	for (i = 0x40; i < 0x140; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if ((i - 0x40) & 0x03)
 			ctabentry = ((((i - 0x40) & 0xf0) >> 2) + ((i - 0x40) & 0x0f)) & 0x3f;
@@ -126,14 +126,14 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 	int color = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,
-					code + ((UINT16)m_gfxbank << 8),
+					code + ((uint16_t)m_gfxbank << 8),
 					color & 0x0f,
 					0);
 }
 
 TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 {
-	UINT8 *ROM = memregion("user1")->base();
+	uint8_t *ROM = memregion("user1")->base();
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 
@@ -260,7 +260,7 @@ WRITE8_MEMBER(lasso_state::pinbo_video_control_w)
 
 void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse )
 {
-	const UINT8 *finish, *source;
+	const uint8_t *finish, *source;
 	int inc;
 
 	if (reverse)
@@ -301,7 +301,7 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		color = source[2] & 0x0f;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code | ((UINT16)m_gfxbank << 6),
+				code | ((uint16_t)m_gfxbank << 6),
 				color,
 				flipx, flipy,
 				sx,sy,0);
@@ -319,9 +319,9 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int bit;
-		UINT8 data;
-		UINT8 x;
-		UINT8 y = offs >> 5;
+		uint8_t data;
+		uint8_t x;
+		uint8_t y = offs >> 5;
 
 		if (flip_screen_y())
 			y = ~y;
@@ -351,7 +351,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_pen_color(0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
@@ -363,7 +363,7 @@ UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_pen_color(0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
@@ -375,7 +375,7 @@ UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_indirect_color(0, get_color(*m_back_color));
 	wwjgtin_set_last_four_colors();

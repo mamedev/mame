@@ -221,7 +221,7 @@ void starfire_state::get_pens(pen_t *pens)
 
 	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
-		UINT16 color = m_starfire_colors[offs];
+		uint16_t color = m_starfire_colors[offs];
 
 		pens[offs] = rgb_t(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
 	}
@@ -234,8 +234,8 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 
 	get_pens(pens);
 
-	UINT8 *pix = &m_starfire_videoram[y];
-	UINT8 *col = &m_starfire_colorram[y];
+	uint8_t *pix = &m_starfire_videoram[y];
+	uint8_t *col = &m_starfire_colorram[y];
 
 	for (int x = 0; x < 256; x += 8)
 	{
@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 	m_scanline_timer->adjust(m_screen->time_until_pos(y), y);
 }
 
-UINT32 starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_starfire_screen, 0, 0, 0, 0, cliprect);
 

@@ -63,7 +63,7 @@ WRITE8_MEMBER(rollrace_state::cram_w)
 ***************************************************************************/
 PALETTE_INIT_MEMBER(rollrace_state, rollrace)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -92,10 +92,15 @@ PALETTE_INIT_MEMBER(rollrace_state, rollrace)
 	}
 }
 
-WRITE8_MEMBER(rollrace_state::charbank_w)
+WRITE_LINE_MEMBER(rollrace_state::charbank_0_w)
 {
-	m_charbank[offset&1] = data;
-	m_chrbank = m_charbank[0] | (m_charbank[1] << 1) ;
+	m_chrbank = state | (m_chrbank & 2);
+	m_fg_tilemap->mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(rollrace_state::charbank_1_w)
+{
+	m_chrbank = (m_chrbank & 1) | (state << 1);
 	m_fg_tilemap->mark_all_dirty();
 }
 
@@ -104,9 +109,9 @@ WRITE8_MEMBER(rollrace_state::bkgpen_w)
 	m_bkgpen = data;
 }
 
-WRITE8_MEMBER(rollrace_state::spritebank_w)
+WRITE_LINE_MEMBER(rollrace_state::spritebank_w)
 {
-	m_spritebank = data;
+	m_spritebank = state;
 }
 
 WRITE8_MEMBER(rollrace_state::backgroundpage_w)
@@ -128,18 +133,18 @@ WRITE8_MEMBER(rollrace_state::flipy_w)
 	// bit 2: cleared at night stage in attract, unknown purpose
 }
 
-WRITE8_MEMBER(rollrace_state::flipx_w)
+WRITE_LINE_MEMBER(rollrace_state::flipx_w)
 {
-	m_flipx = data & 0x01;
+	m_flipx = state;
 	m_fg_tilemap->set_flip(m_flipx ? TILEMAP_FLIPX|TILEMAP_FLIPY : 0);
 }
 
-UINT32 rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 	int sx, sy;
-	const UINT8 *mem = memregion("user1")->base();
+	const uint8_t *mem = memregion("user1")->base();
 
 	/* fill in background colour*/
 	bitmap.fill(m_bkgpen, cliprect);

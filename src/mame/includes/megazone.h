@@ -25,13 +25,13 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_scrolly;
-	required_shared_ptr<UINT8> m_scrollx;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_colorram2;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrolly;
+	required_shared_ptr<uint8_t> m_scrollx;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16>   m_tmpbitmap;
@@ -47,18 +47,19 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8         m_irq_mask;
+	uint8_t         m_irq_mask;
 	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_WRITE8_MEMBER(megazone_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(megazone_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(megazone_port_a_r);
 	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(megazone);
-	UINT32 screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

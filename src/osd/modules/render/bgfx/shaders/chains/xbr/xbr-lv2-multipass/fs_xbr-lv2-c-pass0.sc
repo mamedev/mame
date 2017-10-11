@@ -36,26 +36,6 @@ SAMPLER2D(decal, 0);
 
 #define round(X) floor((X)+0.5)
 
-const float coef        = 2.0;
-const vec4 eq_threshold = vec4(15.0, 15.0, 15.0, 15.0);
-const float y_weight    = 48.0;
-const float u_weight    = 7.0;
-const float v_weight    = 6.0;
-const mat4 yuv          = mat4(
-	 0.299,  0.587,  0.114,  0.0,
-	-0.169, -0.331,  0.499,  0.0,
-	 0.499, -0.418, -0.0813, 0.0,
-	 0.0, 0.0, 0.0, 0.0
-);
-
-const mat4 yuv_weighted = mat4(
-	48.0 * vec4( 0.299,  0.587,  0.114,  0.0),
-	 7.0 * vec4(-0.169, -0.331,  0.499,  0.0),
-	 6.0 * vec4( 0.499, -0.418, -0.0813, 0.0),
-	 0.0 * vec4( 0.0,    0.0,    0.0,    0.0)
-);
-const vec4 delta        = vec4(0.4, 0.4, 0.4, 0.4);
-
 vec3 remapTo01(vec3 v, vec3 low, vec3 high)
 {
 	return saturate((v - low) / (high-low));
@@ -72,24 +52,14 @@ float c_df(vec3 c1, vec3 c2)
 	return df.r + df.g + df.b;
 }
 
-vec4 le(vec4 A, vec4 B)
+vec4 eq(vec4 A, vec4 B)
 {
-	return vec4(lessThanEqual(A, B));
+	return vec4(lessThan(df(A, B), vec4(15.0, 15.0, 15.0, 15.0)));
 }
 
-vec4 ge(vec4 A, vec4 B)
+vec4 neq(vec4 A, vec4 B)
 {
-	return vec4(greaterThanEqual(A, B));
-}
-
-vec4 lt(vec4 A, vec4 B)
-{
-	return vec4(lessThan(A, B));
-}
-
-vec4 ne(vec4 A, vec4 B)
-{
-	return vec4(notEqual(A, B));
+	return vec4(greaterThanEqual(df(A, B), vec4(15.0, 15.0, 15.0, 15.0)));
 }
 
 vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, vec4 h)
@@ -99,6 +69,11 @@ vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, v
 
 void main()
 {
+	float coef        = 2.0;
+
+	vec4 yuv_weighted = 48.0 * vec4( 0.299,  0.587,  0.114,  0.0);
+	vec4 delta        = vec4(0.4, 0.4, 0.4, 0.4);
+
 	vec4 A1 = texture2D(decal, v_texcoord1.xw);
 	vec4 B1 = texture2D(decal, v_texcoord1.yw);
 	vec4 C1 = texture2D(decal, v_texcoord1.zw);
@@ -127,28 +102,28 @@ void main()
 	vec4 F4 = texture2D(decal, v_texcoord7.xz);
 	vec4 I4 = texture2D(decal, v_texcoord7.xw);
 
-	vec4 b = mul(mat4(B, D, H, F), yuv_weighted[0]);
-	vec4 c = mul(mat4(C, A, G, I), yuv_weighted[0]);
-	vec4 e = mul(mat4(E, E, E, E), yuv_weighted[0]);
+	vec4 b = instMul(yuv_weighted, mat4(B, D, H, F));
+	vec4 c = instMul(yuv_weighted, mat4(C, A, G, I));
+	vec4 e = instMul(yuv_weighted, mat4(E, E, E, E));
 	vec4 d = b.yzwx;
 	vec4 f = b.wxyz;
 	vec4 g = c.zwxy;
 	vec4 h = b.zwxy;
 	vec4 i = c.wxyz;
 
-	vec4 i4 = mul(mat4(I4, C1, A0, G5), yuv_weighted[0]);
-	vec4 i5 = mul(mat4(I5, C4, A1, G0), yuv_weighted[0]);
-	vec4 h5 = mul(mat4(H5, F4, B1, D0), yuv_weighted[0]);
+	vec4 i4 = instMul(yuv_weighted, mat4(I4, C1, A0, G5));
+	vec4 i5 = instMul(yuv_weighted, mat4(I5, C4, A1, G0));
+	vec4 h5 = instMul(yuv_weighted, mat4(H5, F4, B1, D0));
 	vec4 f4 = h5.yzwx;
 
-	vec4 interp_restriction_lv1      = clamp(ne(e,f) * ne(e,h) * (ge(f,b) * ge(f,c) + ge(h,d) * ge(h,g) + lt(e,i) * (ge(f,f4) * ge(f,i4) + ge(h,h5) * ge(h,i5)) + lt(e,g) + lt(e,c)), 0.0, 1.0);
-	vec4 interp_restriction_lv2_left = ne(e,g) * ne(d,g);
-	vec4 interp_restriction_lv2_up   = ne(e,c) * ne(b,c);
-
-	vec4 edr      = lt(weighted_distance(e, c, g, i, h5, f4, h, f), weighted_distance(h, d, i5, f, i4, b, e, i)) * interp_restriction_lv1;
-	vec4 edr_left = le(coef * df(f,g), df(h,c)) * interp_restriction_lv2_left * edr;
-	vec4 edr_up   = ge(df(f,g), coef * df(h,c)) * interp_restriction_lv2_up   * edr;
-
+	vec4 interp_restriction_lv1      = clamp(vec4(notEqual(e,f)) * vec4(notEqual(e,h))  * ( neq(f,b) * neq(f,c) + neq(h,d) * neq(h,g) + eq(e,i) * (neq(f,f4) * neq(f,i4) + neq(h,h5) * neq(h,i5)) + eq(e,g) + eq(e,c)), vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
+	vec4 interp_restriction_lv2_left = vec4(notEqual(e,g)) * vec4(notEqual(d,g));
+	vec4 interp_restriction_lv2_up   = vec4(notEqual(e,c)) * vec4(notEqual(b,c));
+	
+	vec4 edr      = vec4(lessThan(weighted_distance(e, c, g, i, h5, f4, h, f), weighted_distance(h, d, i5, f, i4, b, e, i))) * interp_restriction_lv1;
+	vec4 edr_left = vec4(lessThanEqual(coef * df(f,g), df(h,c))) * interp_restriction_lv2_left * edr;
+	vec4 edr_up   = vec4(greaterThanEqual(df(f,g), coef * df(h,c))) * interp_restriction_lv2_up * edr;
+	
 	vec3 info;
 	info.x = dot(edr,      vec4(8.0, 4.0, 2.0, 1.0));
 	info.y = dot(edr_left, vec4(8.0, 4.0, 2.0, 1.0));

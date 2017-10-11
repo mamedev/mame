@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class tubep_state : public driver_device
 {
@@ -25,53 +26,53 @@ public:
 		m_msm(*this, "msm"),
 		m_screen(*this, "screen") { }
 
-	UINT8 m_sound_latch;
-	UINT8 m_ls74;
-	UINT8 m_ls377;
+	uint8_t m_sound_latch;
+	uint8_t m_ls74;
+	uint8_t m_ls377;
 	emu_timer *m_interrupt_timer;
+	emu_timer *m_sprite_timer;
 	int m_curr_scanline;
-	required_shared_ptr<UINT8> m_textram;
-	optional_shared_ptr<UINT8> m_backgroundram;
-	required_shared_ptr<UINT8> m_sprite_colorsharedram;
-	optional_shared_ptr<UINT8> m_rjammer_backgroundram;
-	std::unique_ptr<UINT8[]> m_spritemap;
-	UINT8 m_prom2[32];
-	UINT32 m_romD_addr;
-	UINT32 m_romEF_addr;
-	UINT32 m_E16_add_b;
-	UINT32 m_HINV;
-	UINT32 m_VINV;
-	UINT32 m_XSize;
-	UINT32 m_YSize;
-	UINT32 m_mark_1;
-	UINT32 m_mark_2;
-	UINT32 m_colorram_addr_hi;
-	UINT32 m_ls273_g6;
-	UINT32 m_ls273_j6;
-	UINT32 m_romHI_addr_mid;
-	UINT32 m_romHI_addr_msb;
-	UINT8 m_DISP;
-	UINT8 m_background_romsel;
-	UINT8 m_color_A4;
-	UINT8 m_ls175_b7;
-	UINT8 m_ls175_e8;
-	UINT8 m_ls377_data;
-	UINT32 m_page;
-	DECLARE_WRITE8_MEMBER(tubep_LS259_w);
+	required_shared_ptr<uint8_t> m_textram;
+	optional_shared_ptr<uint8_t> m_backgroundram;
+	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
+	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
+	std::unique_ptr<uint8_t[]> m_spritemap;
+	uint8_t m_prom2[32];
+	uint32_t m_romD_addr;
+	uint32_t m_romEF_addr;
+	uint32_t m_E16_add_b;
+	uint32_t m_HINV;
+	uint32_t m_VINV;
+	uint32_t m_XSize;
+	uint32_t m_YSize;
+	uint32_t m_mark_1;
+	uint32_t m_mark_2;
+	uint32_t m_colorram_addr_hi;
+	uint32_t m_ls273_g6;
+	uint32_t m_ls273_j6;
+	uint32_t m_romHI_addr_mid;
+	uint32_t m_romHI_addr_msb;
+	uint8_t m_DISP;
+	uint8_t m_background_romsel;
+	uint8_t m_color_A4;
+	uint8_t m_ls175_b7;
+	uint8_t m_ls175_e8;
+	uint8_t m_ls377_data;
+	uint32_t m_page;
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_WRITE8_MEMBER(main_cpu_irq_line_clear_w);
-	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(second_cpu_irq_line_clear_w);
+	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
 	DECLARE_READ8_MEMBER(tubep_soundlatch_r);
 	DECLARE_READ8_MEMBER(tubep_sound_irq_ack);
 	DECLARE_WRITE8_MEMBER(tubep_sound_unknown);
-	DECLARE_WRITE8_MEMBER(rjammer_LS259_w);
-	DECLARE_WRITE8_MEMBER(rjammer_soundlatch_w);
-	DECLARE_READ8_MEMBER(rjammer_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_input_w);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_intensity_control_w);
 	DECLARE_WRITE8_MEMBER(tubep_textram_w);
-	DECLARE_WRITE8_MEMBER(tubep_background_romselect_w);
-	DECLARE_WRITE8_MEMBER(tubep_colorproms_A4_line_w);
+	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
+	DECLARE_WRITE_LINE_MEMBER(background_romselect_w);
+	DECLARE_WRITE_LINE_MEMBER(colorproms_A4_line_w);
 	DECLARE_WRITE8_MEMBER(tubep_background_a000_w);
 	DECLARE_WRITE8_MEMBER(tubep_background_c000_w);
 	DECLARE_WRITE8_MEMBER(tubep_sprite_control_w);
@@ -87,14 +88,14 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
 	DECLARE_MACHINE_START(tubep);
 	DECLARE_MACHINE_RESET(tubep);
-	DECLARE_VIDEO_START(tubep);
-	DECLARE_VIDEO_RESET(tubep);
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(tubep);
 	DECLARE_MACHINE_START(rjammer);
 	DECLARE_MACHINE_RESET(rjammer);
 	DECLARE_PALETTE_INIT(rjammer);
-	UINT32 screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
 	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback);
 	void draw_sprite();

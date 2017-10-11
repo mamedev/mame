@@ -127,7 +127,7 @@ bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
 // Utility function to draw a screen space quad for deferred rendering
 void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
+	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
@@ -454,7 +454,7 @@ public:
 			cameraGetViewMtx(view);
 
 			float proj[16];
-			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			bgfx::setViewRect(RENDER_PASS_GBUFFER, 0, 0, uint16_t(m_width), uint16_t(m_height));
 			bgfx::setViewTransform(RENDER_PASS_GBUFFER, view, proj);
@@ -515,12 +515,12 @@ public:
 				for (uint32_t j = 0; j < MAX_SPHERE; j++)
 				{
 					// These are used in the fragment shader
-					bgfx::setTexture(0, s_normal, m_gbuffer, GBUFFER_RT_NORMAL);  // Normal for lighting calculations
-					bgfx::setTexture(1, s_depth,  m_gbuffer, GBUFFER_RT_DEPTH);   // Depth to reconstruct world position
+					bgfx::setTexture(0, s_normal, bgfx::getTexture(m_gbuffer, GBUFFER_RT_NORMAL) );  // Normal for lighting calculations
+					bgfx::setTexture(1, s_depth,  bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );   // Depth to reconstruct world position
 
 					// Thse are used in the vert shader
-					bgfx::setTexture(2, s_shadowMap, m_shadowBuffer, SHADOW_RT_DEPTH);  // Used to place sphere
-					bgfx::setTexture(3, s_rsm,       m_shadowBuffer, SHADOW_RT_RSM);    // Used to scale/color sphere
+					bgfx::setTexture(2, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH) );  // Used to place sphere
+					bgfx::setTexture(3, s_rsm,       bgfx::getTexture(m_shadowBuffer, SHADOW_RT_RSM) );    // Used to scale/color sphere
 
 					bgfx::setUniform(u_invMvp, invMvp);
 					bgfx::setUniform(u_invMvpShadow, invMvpShadow);
@@ -551,11 +551,13 @@ public:
 			// Draw combine pass
 
 			// Texture inputs for combine pass
-			bgfx::setTexture(0, s_normal, m_gbuffer, GBUFFER_RT_NORMAL);
-			bgfx::setTexture(1, s_color, m_gbuffer, GBUFFER_RT_COLOR);
-			bgfx::setTexture(2, s_light, m_lightBuffer, 0);
-			bgfx::setTexture(3, s_depth, m_gbuffer, GBUFFER_RT_DEPTH);
-			bgfx::setTexture(4, s_shadowMap, m_shadowBuffer, SHADOW_RT_DEPTH, BGFX_TEXTURE_COMPARE_LEQUAL);
+			bgfx::setTexture(0, s_normal,    bgfx::getTexture(m_gbuffer, GBUFFER_RT_NORMAL) );
+			bgfx::setTexture(1, s_color,     bgfx::getTexture(m_gbuffer, GBUFFER_RT_COLOR) );
+			bgfx::setTexture(2, s_light,     bgfx::getTexture(m_lightBuffer, 0) );
+			bgfx::setTexture(3, s_depth,     bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );
+			bgfx::setTexture(4, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH)
+				, BGFX_TEXTURE_COMPARE_LEQUAL
+				);
 
 			// Uniforms for combine pass
 
@@ -577,8 +579,8 @@ public:
 			// Set up transform matrix for fullscreen quad
 			float orthoProj[16];
 			bx::mtxOrtho(orthoProj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-			bgfx::setViewTransform(RENDER_PASS_COMBINE,   NULL, orthoProj);
-			bgfx::setViewRect(RENDER_PASS_COMBINE, 0, 0, m_width, m_height);
+			bgfx::setViewTransform(RENDER_PASS_COMBINE, NULL, orthoProj);
+			bgfx::setViewRect(RENDER_PASS_COMBINE, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 			// Bind vertex buffer and draw quad
 			screenSpaceQuad( (float)m_width, (float)m_height, m_texelHalf, m_caps->originBottomLeft);
 			bgfx::submit(RENDER_PASS_COMBINE, m_combineProgram);
@@ -590,8 +592,8 @@ public:
 					| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
 					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 					, m_mouseState.m_mz
-					, m_width
-					, m_height
+					, uint16_t(m_width)
+					, uint16_t(m_height)
 					);
 
 			imguiBeginArea("RSM:", 10, 100, 300, 400);
@@ -666,10 +668,10 @@ public:
 	void updateLightDir()
 	{
 		float el = m_lightElevation * (bx::pi/180.0f);
-		float az = m_lightAzimuth * (bx::pi/180.0f);
-		m_lightDir[0] = cos(el)*cos(az);
-		m_lightDir[2] = cos(el)*sin(az);
-		m_lightDir[1] = sin(el);
+		float az = m_lightAzimuth   * (bx::pi/180.0f);
+		m_lightDir[0] = bx::fcos(el)*bx::fcos(az);
+		m_lightDir[2] = bx::fcos(el)*bx::fsin(az);
+		m_lightDir[1] = bx::fsin(el);
 		m_lightDir[3] = 0.0f;
 	}
 

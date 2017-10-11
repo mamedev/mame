@@ -19,7 +19,7 @@
 #include "window.h"
 #else
 #include "../windows/window.h"
-typedef UINT64 HashT;
+typedef uint64_t HashT;
 #endif
 
 // standard SDL headers
@@ -41,9 +41,9 @@ struct quad_setup_data
 
 	void compute(const render_primitive &prim, const int prescale);
 
-	INT32   dudx, dvdx, dudy, dvdy;
-	INT32   startu, startv;
-	INT32   rotwidth, rotheight;
+	int32_t   dudx, dvdx, dudy, dvdy;
+	int32_t   startu, startv;
+	int32_t   rotwidth, rotheight;
 };
 
 //============================================================
@@ -58,10 +58,10 @@ class texture_info
 {
 	friend class simple_list<texture_info>;
 public:
-	texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
+	texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const uint32_t flags);
 	~texture_info();
 
-	void set_data(const render_texinfo &texsource, const UINT32 flags);
+	void set_data(const render_texinfo &texsource, const uint32_t flags);
 	void render_quad(const render_primitive &prim, const int x, const int y);
 	bool matches(const render_primitive &prim, const quad_setup_data &setup);
 
@@ -83,7 +83,7 @@ public:
 	render_texinfo &texinfo() { return m_texinfo; }
 
 	HashT hash() const { return m_hash; }
-	UINT32 flags() const { return m_flags; }
+	uint32_t flags() const { return m_flags; }
 	// FIXME:
 	bool is_pixels_owned() const;
 
@@ -94,7 +94,7 @@ private:
 	renderer_sdl2 *     m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
-	UINT32              m_flags;              // rendering flags
+	uint32_t              m_flags;              // rendering flags
 
 	SDL_Texture *       m_texture_id;
 	bool                m_is_rotated;
@@ -137,8 +137,8 @@ struct copy_info_t
 	const char          *srcname;
 	const char          *dstname;
 	/* Statistics */
-	UINT64              pixel_count;
-	INT64               time;
+	uint64_t              pixel_count;
+	int64_t               time;
 	int                 samples;
 	int                 perf;
 	/* list */
@@ -183,7 +183,7 @@ private:
 
 	void destroy_all_textures();
 
-	INT32           m_blittimer;
+	int32_t           m_blittimer;
 
 
 	simple_list<texture_info>  m_texlist;                // list of active textures
@@ -203,8 +203,8 @@ private:
 	} fmt_support[30];
 
 	// Stats
-	INT64           m_last_blit_time;
-	INT64           m_last_blit_pixels;
+	int64_t           m_last_blit_time;
+	int64_t           m_last_blit_pixels;
 
 	static bool s_blit_info_initialized;
 	static const copy_info_t s_blit_info_default[];

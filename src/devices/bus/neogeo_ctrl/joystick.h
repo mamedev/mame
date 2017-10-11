@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NEOGEO_CTRL_JOYSTICK_H
+#define MAME_BUS_NEOGEO_CTRL_JOYSTICK_H
+
 #pragma once
 
-#ifndef __NEOGEO_JOYSTICK__
-#define __NEOGEO_JOYSTICK__
 
-
-#include "emu.h"
 #include "ctrl.h"
 
 //**************************************************************************
@@ -21,12 +20,11 @@
 
 // ======================> neogeo_joystick_device
 
-class neogeo_joystick_device : public device_t,
-							public device_neogeo_control_port_interface
+class neogeo_joystick_device : public device_t, public device_neogeo_control_port_interface
 {
 public:
 	// construction/destruction
-	neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,8 +35,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_neogeo_control_port_interface overrides
-	virtual UINT8 read_ctrl() override;
-	virtual UINT8 read_start_sel() override;
+	virtual uint8_t read_ctrl() override;
+	virtual uint8_t read_start_sel() override;
 
 private:
 	required_ioport m_joy;
@@ -48,12 +46,11 @@ private:
 
 // ======================> neogeo_joy_ac_device
 
-class neogeo_joy_ac_device : public device_t,
-							public device_neogeo_ctrl_edge_interface
+class neogeo_joy_ac_device : public device_t, public device_neogeo_ctrl_edge_interface
 {
 public:
 	// construction/destruction
-	neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -74,8 +71,8 @@ private:
 
 
 // device type definition
-extern const device_type NEOGEO_JOY;
-extern const device_type NEOGEO_JOY_AC;
+DECLARE_DEVICE_TYPE(NEOGEO_JOY,    neogeo_joystick_device)
+DECLARE_DEVICE_TYPE(NEOGEO_JOY_AC, neogeo_joy_ac_device)
 
 
-#endif
+#endif // MAME_BUS_NEOGEO_CTRL_JOYSTICK_H

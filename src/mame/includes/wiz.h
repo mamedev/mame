@@ -35,24 +35,24 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_colorram2;
-	required_shared_ptr<UINT8> m_attrram;
-	required_shared_ptr<UINT8> m_attrram2;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr<uint8_t> m_attrram;
+	required_shared_ptr<uint8_t> m_attrram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	INT32 m_flipx;
-	INT32 m_flipy;
-	INT32 m_bgcolor;
-	UINT8 m_charbank[2];
-	UINT8 m_palbank[2];
-	UINT8 m_main_nmi_mask;
-	UINT8 m_sound_nmi_mask;
-	UINT8 m_sprite_bank;
+	int32_t m_flipx;
+	int32_t m_flipy;
+	int32_t m_bgcolor;
+	uint8_t m_charbank[2];
+	uint8_t m_palbank[2];
+	uint8_t m_main_nmi_mask;
+	uint8_t m_sound_nmi_mask;
+	uint8_t m_sprite_bank;
 
 	int m_dsc0;
 	int m_dsc1;
@@ -75,9 +75,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(wiz);
-	UINT32 screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wiz_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);

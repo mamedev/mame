@@ -40,14 +40,14 @@ public:
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
 	required_device<atari_motion_objects_device> m_mob;
-	required_shared_ptr<UINT16> m_slapstic_base;
+	required_shared_ptr<uint16_t> m_slapstic_base;
 
-	UINT8           m_interrupt_enable;
+	uint8_t           m_interrupt_enable;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 
-	INT8            m_pedal_count;
+	int8_t            m_pedal_count;
 
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<ym2151_device> m_ym2151;
@@ -55,31 +55,31 @@ public:
 	required_device<pokey_device> m_pokey2;
 	optional_device<tms5220_device> m_tms5220;
 
-	UINT8           m_which_adc;
+	uint8_t           m_which_adc;
 
-	UINT8           m_p2portwr_state;
-	UINT8           m_p2portrd_state;
+	uint8_t           m_p2portwr_state;
+	uint8_t           m_p2portrd_state;
 
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
 	required_device<atari_slapstic_device> m_slapstic;
 
-	UINT8           m_sound_reset_state;
+	uint8_t           m_sound_reset_state;
 
 	emu_timer *     m_yscroll_reset_timer;
-	UINT32          m_playfield_tile_bank[2];
-	UINT32          m_videobank;
+	uint32_t          m_playfield_tile_bank[2];
+	uint32_t          m_videobank;
 
 	// 720 fake joystick
 	double          m_joy_last_angle;
 	int             m_joy_rotations;
 
 	// 720 fake spinner
-	UINT32          m_spin_last_rotate_count;
-	INT32           m_spin_pos;                 /* track fake position of spinner */
-	UINT32          m_spin_center_count;
+	uint32_t          m_spin_last_rotate_count;
+	int32_t           m_spin_pos;                 /* track fake position of spinner */
+	uint32_t          m_spin_center_count;
 
-	UINT16          m_vram[0x8000/2];
+	uint16_t          m_vram[0x8000/2];
 
 	virtual void device_post_load() override;
 
@@ -113,7 +113,7 @@ public:
 	DECLARE_MACHINE_START(atarisy2);
 	DECLARE_MACHINE_RESET(atarisy2);
 	DECLARE_VIDEO_START(atarisy2);
-	UINT32 screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);

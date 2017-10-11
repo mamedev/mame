@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class bombjack_state : public driver_device
 {
 public:
@@ -16,24 +18,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
-	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-
-	/* video-related */
-	tilemap_t   *m_fg_tilemap;
-	tilemap_t   *m_bg_tilemap;
-	UINT8       m_background_image;
-
-	/* sound-related */
-	UINT8       m_latch;
-
-	UINT8       m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(bombjack_soundlatch_w);
-	DECLARE_READ8_MEMBER(bombjack_soundlatch_r);
+	DECLARE_READ8_MEMBER(soundlatch_read_and_clear);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(bombjack_videoram_w);
 	DECLARE_WRITE8_MEMBER(bombjack_colorram_w);
@@ -44,11 +32,26 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bombjack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	/* video-related */
+	tilemap_t   *m_fg_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	uint8_t       m_background_image;
+
+	uint8_t       m_nmi_mask;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

@@ -54,7 +54,7 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
@@ -66,8 +66,8 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_usart_baud_rate;
 
-	UINT8 m_usart_divide_counter;
-	UINT8 m_usart_clock_state;
+	uint8_t m_usart_divide_counter;
+	uint8_t m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(isbc8010_mem, AS_PROGRAM, 8, isbc8010_state)
@@ -131,17 +131,17 @@ static GFXDECODE_START( isbc8010 )
 GFXDECODE_END
 #endif
 
-UINT32 isbc8010_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t isbc8010_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 WRITE_LINE_MEMBER( isbc8010_state::usart_clock_tick )
 {
-	UINT8 old_counter = m_usart_divide_counter;
+	uint8_t old_counter = m_usart_divide_counter;
 	m_usart_divide_counter++;
 
-	UINT8 transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
+	uint8_t transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
 	if (transition)
 	{
 		m_usart->write_txc(m_usart_clock_state);
@@ -159,7 +159,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( isbc8010, isbc8010_state )
+static MACHINE_CONFIG_START( isbc8010 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
 	MCFG_CPU_PROGRAM_MAP(isbc8010_mem)
@@ -260,7 +260,7 @@ ROM_END
 #define rom_isbc8010a rom_isbc8010
 #define rom_isbc8010b rom_isbc8010
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
-COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
-COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
+COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
+COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )

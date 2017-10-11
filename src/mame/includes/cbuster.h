@@ -21,6 +21,8 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_spriteram16(*this, "spriteram16"),
+		m_paletteram(*this, "palette"),
+		m_paletteram_ext(*this, "palette_ext"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -31,18 +33,20 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf3_rowscroll;
-	required_shared_ptr<UINT16> m_pf4_rowscroll;
-	required_shared_ptr<UINT16> m_spriteram16;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf3_rowscroll;
+	required_shared_ptr<uint16_t> m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_spriteram16;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram_ext;
 	optional_device<decospr_device> m_sprgen;
 
-	UINT16    m_spriteram16_buffer[0x400];
+	uint16_t    m_spriteram16_buffer[0x400];
 
 	/* misc */
-	UINT16    m_prot;
+	uint16_t    m_prot;
 	int       m_pri;
 
 	/* devices */
@@ -59,6 +63,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECLARE_WRITE16_MEMBER(cbuster_palette_w);
+	DECLARE_WRITE16_MEMBER(cbuster_palette_ext_w);
+	void update_palette(int offset);
 };

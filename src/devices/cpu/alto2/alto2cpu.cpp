@@ -5,6 +5,7 @@
  *   Xerox AltoII CPU core
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 #include "a2roms.h"
 
@@ -15,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ALTO2 = &device_creator<alto2_cpu_device>;
+DEFINE_DEVICE_TYPE(ALTO2, alto2_cpu_device, "alto2_cpu", "Xerox Alto-II")
 
 //**************************************************************************
 //  LOGGING AND DEBUGGING
@@ -120,8 +121,8 @@ ADDRESS_MAP_END
 //  alto2_cpu_device - constructor
 //-------------------------------------------------
 
-alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
-	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2_cpu", __FILE__),
+alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	cpu_device(mconfig, ALTO2, tag, owner, clock),
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
@@ -271,7 +272,7 @@ ROM_START( alto2_cpu )
 	ROM_LOAD( "xm51.u72", 15*02000, 02000, CRC(a28e5251) SHA1(44dd8ad4ad56541b5394d30ce3521b4d1d561394) )   //!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 
 	// constant PROMs, 4 x 4bit
-	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
+	// uint16_t src = BITS(addr, 3,2,1,4,5,6,7,0);
 	ROM_REGION( 4 * 0400, "const_proms", 0 )
 	ROM_LOAD( "madr.a6",   0*00400, 00400, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca) )   //!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
 	ROM_LOAD( "madr.a5",   1*00400, 00400, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b) )   //!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
@@ -370,7 +371,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 28,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  ZERO,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
 		"64x.3",
@@ -385,7 +386,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 24,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
 		"65x.3",
@@ -400,7 +401,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 20,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 F1(0),F1(1)',F1(2)',F1(3)'
 		"63x.3",
@@ -415,7 +416,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 16,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 F2(0),F2(1)',F2(2)',F2(3)'
 		"53x.3",
@@ -430,7 +431,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 12,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
 		"60x.3",
@@ -445,7 +446,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 8,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
 		"61x.3",
@@ -460,7 +461,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 4,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 0000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 		"62x.3",
@@ -475,7 +476,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 0,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	// NOTE: the Mesa 5.1 ucode PROM may be used as RAM, if m_cram_config == 3
 	{   // 02000-03777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
@@ -491,7 +492,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 28,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  ZERO,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
 		"xm51.u74",
@@ -506,7 +507,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 24,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 ALUF(3)',BS(0)',BS(1)',BS(2)'
 		"xm51.u75",
@@ -521,7 +522,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 20,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 F1(0),F1(1)',F1(2)',F1(3)'
 		"xm51.u73",
@@ -536,7 +537,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 16,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 F2(0),F2(1)',F2(2)',F2(3)'
 		"xm51.u52",
@@ -551,7 +552,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 12,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 LOADT',LOADL,NEXT(0)',NEXT(1)'
 		"xm51.u70",
@@ -566,7 +567,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 8,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
 		"xm51.u71",
@@ -581,7 +582,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 4,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	},
 	{   // 02000-03777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 		"xm51.u72",
@@ -596,7 +597,7 @@ static const prom_load_t pl_ucode[] = {
 		/* shift */ 0,
 		/* dmap */  DMAP_DEFAULT,
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT32)
+		/* type */  sizeof(uint32_t)
 	}
 };
 
@@ -617,7 +618,7 @@ static const prom_load_t pl_const[] = {
 		/* shift */ 0,
 		/* dmap */  DMAP_REVERSE_0_3,           // reverse D0-D3 to D3-D0
 		/* dand */  ZERO,
-		/* type */  sizeof(UINT16)
+		/* type */  sizeof(uint16_t)
 	},
 	{   // constant prom D4-D7
 		"madr.a5",
@@ -632,7 +633,7 @@ static const prom_load_t pl_const[] = {
 		/* shift */ 4,
 		/* dmap */  DMAP_REVERSE_0_3,           // reverse D0-D3 to D3-D0
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT16)
+		/* type */  sizeof(uint16_t)
 	},
 	{   // constant prom D8-D11
 		"madr.a4",
@@ -647,7 +648,7 @@ static const prom_load_t pl_const[] = {
 		/* shift */ 8,
 		/* dmap */  DMAP_REVERSE_0_3,           // reverse D0-D3 to D3-D0
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT16)
+		/* type */  sizeof(uint16_t)
 	},
 	{   // constant PROM D12-D15
 		"madr.a3",
@@ -662,7 +663,7 @@ static const prom_load_t pl_const[] = {
 		/* shift */ 12,
 		/* dmap */  DMAP_REVERSE_0_3,           // reverse D0-D3 to D3-D0
 		/* dand */  KEEP,
-		/* type */  sizeof(UINT16)
+		/* type */  sizeof(uint16_t)
 	}
 };
 
@@ -681,7 +682,7 @@ static const prom_load_t pl_2kctl_u3 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 //! 82S23 32x8 BPROM; task priority and initial address
@@ -699,7 +700,7 @@ static const prom_load_t pl_2kctl_u38 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 //! 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
@@ -717,7 +718,7 @@ static const prom_load_t pl_2kctl_u76 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 //! ALUF to ALU 741818 functions and carry in mapper
@@ -735,7 +736,7 @@ static const prom_load_t pl_alu_a10 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 static const prom_load_t pl_3kcram_a37 =
@@ -752,7 +753,7 @@ static const prom_load_t pl_3kcram_a37 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 static const prom_load_t pl_madr_a90 =
@@ -769,7 +770,7 @@ static const prom_load_t pl_madr_a90 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 static const prom_load_t pl_madr_a91 =
@@ -786,22 +787,20 @@ static const prom_load_t pl_madr_a91 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 //-------------------------------------------------
 // device_memory_interface overrides
 //-------------------------------------------------
 
-const address_space_config*alto2_cpu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector alto2_cpu_device::memory_space_config() const
 {
-	if (AS_0 == spacenum)
-		return &m_ucode_config;
-	if (AS_1 == spacenum)
-		return &m_const_config;
-	if (AS_2 == spacenum)
-		return &m_iomem_config;
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_ucode_config),
+		std::make_pair(1, &m_const_config),
+		std::make_pair(2, &m_iomem_config)
+	};
 }
 
 //-------------------------------------------------
@@ -811,17 +810,17 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 void alto2_cpu_device::device_start()
 {
 	// get a pointer to the IO address space
-	m_iomem = &space(AS_2);
+	m_iomem = &space(2);
 
 	// Decode 2 pages of micro code PROMs to CROM
 	// If m_cram_config == 1 or 3, only the first page will be used
 	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), 2, 8);
 
 	// allocate micro code CRAM for max 3 pages
-	m_ucode_cram = std::make_unique<UINT8[]>(sizeof(UINT32) * 3 * ALTO2_UCODE_PAGE_SIZE);
+	m_ucode_cram = std::make_unique<uint8_t[]>(sizeof(uint32_t) * 3 * ALTO2_UCODE_PAGE_SIZE);
 	// fill with the micro code inverted bits value
 	for (offs_t offset = 0; offset < 3 * ALTO2_UCODE_PAGE_SIZE; offset++)
-		*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
+		*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
 
 	// decode constant PROMs to m_const_data
 	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
@@ -836,8 +835,8 @@ void alto2_cpu_device::device_start()
 
 #if DEBUG_ALU_A10_PROM
 	// dump ALU a10 PROM after loading
-	for (UINT8 i = 0; i < 32; i++) {
-		UINT8 a = m_alu_a10[i];
+	for (uint8_t i = 0; i < 32; i++) {
+		uint8_t a = m_alu_a10[i];
 		printf("%03o: S3-S0:%u%u%u%u M:%u CI:%u T:%u ?:%u\n",
 				i, (a >> 7) & 1, (a >> 6) & 1, (a >> 5) & 1, (a >> 4) & 1,
 				(a >> 3) & 1, (a >> 2) & 1, (a >> 1) & 1, (a >> 0) & 1);
@@ -885,7 +884,7 @@ void alto2_cpu_device::device_start()
 
 	hard_reset();
 
-	state_add( A2_TASK,    "TASK",    m_task).callimport().formatstr("%6s");
+	state_add( A2_TASK,    "TASK",    m_task).formatstr("%6s");
 	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
 	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
 	state_add( A2_NEXT2,   "NEXT2",   m_next2).formatstr("%06O");
@@ -989,9 +988,8 @@ void alto2_cpu_device::device_start()
 	state_add( A2_OKTORUN, "OKTORUN", m_dsk.ok_to_run).formatstr("%1u");
 	state_add( A2_READY,   "READY",   m_dsk.kstat).formatstr("%1u");
 
-	state_add(STATE_GENPC, "GENPC", m_mpc).formatstr("%03X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_mpc).formatstr("%03X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_mpc).noshow();
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_aluc0).formatstr("%5s").noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -1014,7 +1012,7 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 				m_aluc0                 ? 'C' : '-',
 				m_laluc0                ? 'c' : '-',
 				(m_shifter == 0)        ? '0' : '-',
-				(INT16(m_shifter) < 0)  ? '<' : '-');
+				(int16_t(m_shifter) < 0)  ? '<' : '-');
 		break;
 	}
 }
@@ -1023,8 +1021,8 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 READ32_MEMBER ( alto2_cpu_device::crom_cram_r )
 {
 	if (offset < m_ucode_ram_base)
-		return *reinterpret_cast<UINT32 *>(m_ucode_crom + offset * 4);
-	return *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4);
+		return *reinterpret_cast<uint32_t *>(m_ucode_crom + offset * 4);
+	return *reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4);
 }
 
 //! write microcode CROM or CRAM (CROM of course can't be written)
@@ -1032,19 +1030,19 @@ WRITE32_MEMBER( alto2_cpu_device::crom_cram_w )
 {
 	if (offset < m_ucode_ram_base)
 		return;
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4) = data;
+	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4) = data;
 }
 
 //! read constants PROM
 READ16_MEMBER ( alto2_cpu_device::const_r )
 {
-	return *reinterpret_cast<UINT16 *>(m_const_data + offset * 2);
+	return *reinterpret_cast<uint16_t *>(m_const_data + offset * 2);
 }
 
 //! direct read access to the microcode CROM or CRAM
 #define RD_UCODE(addr) (addr < m_ucode_ram_base ? \
-	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (addr - m_ucode_ram_base) * 4))
+	*reinterpret_cast<uint32_t *>(m_ucode_crom + addr * 4) : \
+	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (addr - m_ucode_ram_base) * 4))
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1140,7 +1138,7 @@ const char* alto2_cpu_device::task_name(int task)
 }
 
 /** @brief register names (as used by the microcode) */
-const char* alto2_cpu_device::r_name(UINT8 reg)
+const char* alto2_cpu_device::r_name(uint8_t reg)
 {
 	switch (reg) {
 	case 000: return "ac(3)";
@@ -1180,7 +1178,7 @@ const char* alto2_cpu_device::r_name(UINT8 reg)
 }
 
 /** @brief ALU function names */
-const char* alto2_cpu_device::aluf_name(UINT8 aluf)
+const char* alto2_cpu_device::aluf_name(uint8_t aluf)
 {
 	switch (aluf) {
 	case 000: return "bus";
@@ -1204,7 +1202,7 @@ const char* alto2_cpu_device::aluf_name(UINT8 aluf)
 }
 
 /** @brief BUS source names */
-const char* alto2_cpu_device::bs_name(UINT8 bs)
+const char* alto2_cpu_device::bs_name(uint8_t bs)
 {
 	switch (bs) {
 	case 000: return "read_r";
@@ -1220,7 +1218,7 @@ const char* alto2_cpu_device::bs_name(UINT8 bs)
 }
 
 /** @brief F1 function names */
-const char* alto2_cpu_device::f1_name(UINT8 f1)
+const char* alto2_cpu_device::f1_name(uint8_t f1)
 {
 	switch (f1) {
 	case 000: return "nop";
@@ -1244,7 +1242,7 @@ const char* alto2_cpu_device::f1_name(UINT8 f1)
 }
 
 /** @brief F2 function names */
-const char* alto2_cpu_device::f2_name(UINT8 f2)
+const char* alto2_cpu_device::f2_name(uint8_t f2)
 {
 	switch (f2) {
 	case 000: return "nop";
@@ -1268,12 +1266,12 @@ const char* alto2_cpu_device::f2_name(UINT8 f2)
 }
 
 #if ALTO2_DEBUG
-void alto2_cpu_device::watch_read(UINT32 addr, UINT32 data)
+void alto2_cpu_device::watch_read(uint32_t addr, uint32_t data)
 {
 	LOG((this,LOG_MEM,0,"mem: rd[%06o] = %06o\n", addr, data));
 }
 
-void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
+void alto2_cpu_device::watch_write(uint32_t addr, uint32_t data)
 {
 	LOG((this,LOG_MEM,0,"mem: wr[%06o] = %06o\n", addr, data));
 }
@@ -1323,7 +1321,7 @@ void alto2_cpu_device::f2_late_bad()
 
 #if ALTO2_DEBUG
 typedef struct {
-	UINT16 first, last;
+	uint16_t first, last;
 	const char* name;
 }   memory_range_name_t;
 
@@ -1433,7 +1431,7 @@ WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
  */
 void alto2_cpu_device::bs_early_read_r()
 {
-	UINT16 r = m_r[m_rsel];
+	uint16_t r = m_r[m_rsel];
 	LOG((this,LOG_CPU,2,"    <-R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
 	m_bus &= r;
 }
@@ -1443,7 +1441,7 @@ void alto2_cpu_device::bs_early_read_r()
  */
 void alto2_cpu_device::bs_early_load_r()
 {
-	UINT16 r = 0;
+	uint16_t r = 0;
 	LOG((this,LOG_CPU,2,"    R%02o<-; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
 	m_bus &= r;
 }
@@ -1467,9 +1465,9 @@ void alto2_cpu_device::bs_late_load_r()
 void alto2_cpu_device::bs_early_read_md()
 {
 #if ALTO2_DEBUG
-	UINT32 mar = m_mem.mar;
+	uint32_t mar = m_mem.mar;
 #endif
-	UINT16 md = read_mem();
+	uint16_t md = read_mem();
 	LOG((this,LOG_CPU,2,"    <-MD; BUS&=MD (%#o=[%#o])\n", md, mar));
 	m_bus &= md;
 }
@@ -1479,7 +1477,7 @@ void alto2_cpu_device::bs_early_read_md()
  */
 void alto2_cpu_device::bs_early_mouse()
 {
-	UINT16 r = mouse_read();
+	uint16_t r = mouse_read();
 	LOG((this,LOG_CPU,2,"    <-MOUSE; BUS&=MOUSE (%#o)\n", r));
 	m_bus &= r;
 }
@@ -1489,7 +1487,7 @@ void alto2_cpu_device::bs_early_mouse()
  */
 void alto2_cpu_device::bs_early_disp()
 {
-	UINT16 r = 0177777;
+	uint16_t r = 0177777;
 	LOG((this,LOG_CPU,0,"BS <-DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
 	LOG((this,LOG_CPU,2,"    <-DISP; BUS&=DISP ?? (%#o)\n", r));
 	m_bus &= r;
@@ -1503,8 +1501,8 @@ void alto2_cpu_device::bs_early_disp()
  */
 void alto2_cpu_device::f1_late_load_mar()
 {
-	UINT8 bank = m_bank_reg[m_task];
-	UINT32 msb;
+	uint8_t bank = m_bank_reg[m_task];
+	uint32_t msb;
 	if (f2() == f2_load_md) {
 		msb = GET_BANK_EXTENDED(bank) << 16;
 		LOG((this,LOG_CPU,7, "   XMAR %#o\n", msb | m_alu));
@@ -1829,7 +1827,7 @@ void alto2_cpu_device::f1_late_l_lcy_8()
  */
 void alto2_cpu_device::f2_late_bus_eq_zero()
 {
-	UINT16 r = m_bus == 0 ? 1 : 0;
+	uint16_t r = m_bus == 0 ? 1 : 0;
 	LOG((this,LOG_CPU,2, "   BUS=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -1839,7 +1837,7 @@ void alto2_cpu_device::f2_late_bus_eq_zero()
  */
 void alto2_cpu_device::f2_late_shifter_lt_zero()
 {
-	UINT16 r = (m_shifter & 0100000) ? 1 : 0;
+	uint16_t r = (m_shifter & 0100000) ? 1 : 0;
 	LOG((this,LOG_CPU,2, "   SH<0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -1849,7 +1847,7 @@ void alto2_cpu_device::f2_late_shifter_lt_zero()
  */
 void alto2_cpu_device::f2_late_shifter_eq_zero()
 {
-	UINT16 r = m_shifter == 0 ? 1 : 0;
+	uint16_t r = m_shifter == 0 ? 1 : 0;
 	LOG((this,LOG_CPU,2, "   SH=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -1859,7 +1857,7 @@ void alto2_cpu_device::f2_late_shifter_eq_zero()
  */
 void alto2_cpu_device::f2_late_bus()
 {
-	UINT16 r = X_RDBITS(m_bus,16,6,15);
+	uint16_t r = X_RDBITS(m_bus,16,6,15);
 	LOG((this,LOG_CPU,2, "   BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -1869,7 +1867,7 @@ void alto2_cpu_device::f2_late_bus()
  */
 void alto2_cpu_device::f2_late_alucy()
 {
-	UINT16 r = m_laluc0;
+	uint16_t r = m_laluc0;
 	LOG((this,LOG_CPU,2, "   ALUCY; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -1882,7 +1880,7 @@ void alto2_cpu_device::f2_late_alucy()
 void alto2_cpu_device::f2_late_load_md()
 {
 #if ALTO2_DEBUG
-	UINT16 mar = m_mem.mar;
+	uint16_t mar = m_mem.mar;
 #endif
 	if (f1() == f1_load_mar) {
 		/* part of an XMAR */
@@ -2000,10 +1998,10 @@ void alto2_cpu_device::f2_late_load_md()
  * @return resulting ALU output
  */
 #if 1
-UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
+uint32_t alto2_cpu_device::alu_74181(uint32_t a, uint32_t b, uint8_t smc)
 {
-	UINT32 f;
-	const UINT32 cout = 1 << 16;
+	uint32_t f;
+	const uint32_t cout = 1 << 16;
 
 	switch (smc & A10_ALUIN) {
 	case SMC(0,0,0,0, 0, 0): // 0000: A + 1
@@ -2243,7 +2241,7 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 } while (0)
 
 
-UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
+uint32_t alto2_cpu_device::alu_74181(uint32_t a, uint32_t b, uint8_t smc)
 {
 	// inputs
 	int ci = !BIT(smc, 2);
@@ -2251,7 +2249,7 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 	int s0 = !BIT(smc, 4), s1 = !BIT(smc, 5), s2 = !BIT(smc, 6), s3 = !BIT(smc, 7);
 
 	// outputs
-	UINT32 f = 0;
+	uint32_t f = 0;
 	int cn_x;
 	DO_74181(ci,  mp,s0,s1,s2,s3,a,b, 0, 1, 2, 3,f,cn_x);   // 74181 #1
 	int cn_y;
@@ -2359,8 +2357,8 @@ void alto2_cpu_device::execute_run()
 
 		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		if (!do_bs || bs() >= bs_task_4) {
-			const UINT32 addr = 8 * m_rsel + bs();
-			const UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
+			const uint32_t addr = 8 * m_rsel + bs();
+			const uint16_t data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((this,LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
@@ -2544,11 +2542,11 @@ void alto2_cpu_device::execute_run()
 		 *
 		 * B1 and B3-B7 are inverted on loading the PROM
 		 */
-		const UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf()];
-		const UINT32 alu = alu_74181(m_bus, m_t, a10);
+		const uint8_t a10 = m_alu_a10[(m_emu.skip << 4) | aluf()];
+		const uint32_t alu = alu_74181(m_bus, m_t, a10);
 		const int flags = a10 & (TSELECT | ALUM);
 		m_aluc0 = (alu >> 16) & 1;
-		m_alu = static_cast<UINT16>(alu);
+		m_alu = static_cast<uint16_t>(alu);
 
 		// WRTRAM must happen now before L is changed
 		if (m_wrtram_flag)

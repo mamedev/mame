@@ -57,7 +57,7 @@ WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
 int nbmj9195_state::blitter_r(int offset, int vram)
 {
 	int ret;
-	UINT8 *GFXROM = memregion("gfx1")->base();
+	uint8_t *GFXROM = memregion("gfx1")->base();
 
 	switch (offset)
 	{
@@ -138,7 +138,7 @@ WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
 void nbmj9195_state::vramflip(int vram)
 {
 	int x, y;
-	UINT16 color1, color2;
+	uint16_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -175,7 +175,7 @@ void nbmj9195_state::vramflip(int vram)
 
 void nbmj9195_state::update_pixel(int vram, int x, int y)
 {
-	UINT16 color = m_videoram[vram][(y * m_screen->width()) + x];
+	uint16_t color = m_videoram[vram][(y * m_screen->width()) + x];
 	m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
@@ -187,13 +187,13 @@ void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb19010_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in nbmj9195_state::device_timer");
+		assert_always(false, "Unknown id in nbmj9195_state::device_timer");
 	}
 }
 
 void nbmj9195_state::gfxdraw(int vram)
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
 
 	int x, y;
@@ -202,7 +202,7 @@ void nbmj9195_state::gfxdraw(int vram)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	UINT16 color, color1, color2;
+	uint16_t color, color1, color2;
 	int gfxaddr, gfxlen;
 
 	m_nb19010_busyctr = 0;
@@ -376,8 +376,8 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
-	m_videoram[0] = make_unique_clear<UINT16[]>(width * height);
-	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
+	m_videoram[0] = make_unique_clear<uint16_t[]>(width * height);
+	m_clut[0] = std::make_unique<uint8_t[]>(0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 0;
@@ -416,10 +416,10 @@ void nbmj9195_state::video_start()
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
-	m_videoram[0] = make_unique_clear<UINT16[]>(width * height);
-	m_videoram[1] = make_unique_clear<UINT16[]>(width * height);
-	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
-	m_clut[1] = std::make_unique<UINT8[]>(0x1000);
+	m_videoram[0] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoram[1] = make_unique_clear<uint16_t[]>(width * height);
+	m_clut[0] = std::make_unique<uint8_t[]>(0x1000);
+	m_clut[1] = std::make_unique<uint8_t[]>(0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 1;
@@ -464,8 +464,8 @@ VIDEO_START_MEMBER(nbmj9195_state,nb22090)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_videoworkram[0] = make_unique_clear<UINT16[]>(width * height);
-	m_videoworkram[1] = make_unique_clear<UINT16[]>(width * height);
+	m_videoworkram[0] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoworkram[1] = make_unique_clear<uint16_t[]>(width * height);
 
 	save_pointer(NAME(m_videoworkram[0].get()), width * height);
 	save_pointer(NAME(m_videoworkram[1].get()), width * height);
@@ -477,7 +477,7 @@ VIDEO_START_MEMBER(nbmj9195_state,nb22090)
 
 
 ******************************************************************************/
-UINT32 nbmj9195_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nbmj9195_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int x, y;

@@ -52,10 +52,11 @@ Usage of terminal:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
-#include "machine/terminal.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
-#define TERMINAL_TAG "terminal"
 
 class okean240_state : public driver_device
 {
@@ -66,15 +67,15 @@ public:
 	};
 
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_term_data(0),
-		m_j(0),
-		m_scroll(0),
-		m_p_videoram(*this, "p_videoram"),
-		m_io_modifiers(*this, "MODIFIERS"),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_term_data(0)
+		, m_j(0)
+		, m_scroll(0)
+		, m_tog(0)
+		, m_p_videoram(*this, "videoram")
+		, m_io_modifiers(*this, "MODIFIERS")
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
@@ -83,48 +84,50 @@ public:
 	DECLARE_READ8_MEMBER(okean240_keyboard_r);
 	DECLARE_WRITE8_MEMBER(okean240_keyboard_w);
 	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	UINT8 m_term_data;
-	UINT8 m_j;
-	UINT8 m_scroll;
-	required_shared_ptr<UINT8> m_p_videoram;
+	DECLARE_DRIVER_INIT(okean240);
+	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(okean240);
-	UINT32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	uint8_t m_term_data;
+	uint8_t m_j;
+	uint8_t m_scroll;
+	uint8_t m_tog;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
 	required_device<cpu_device> m_maincpu;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // okean240 requires bit 4 to change
 READ8_MEMBER( okean240_state::okean240_kbd_status_r )
 {
+	m_tog ^= 0x18;
 	if (m_term_data)
-		return (machine().rand() & 0x10) | 2;
+		return m_tog | 2;
 	else
-		return machine().rand() & 0x10;
+		return m_tog & 0x18;
 }
 
 // see if a key is pressed and indicate status
 READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
 {
-	UINT8 i,j;
+	uint8_t i,j;
+	m_tog ^= 0x18;
 
 	for (i = 0; i < 11; i++)
 	{
 		j = m_io_port[i]->read();
 		if (j)
-			return (machine().rand() & 0x10) | 2;
+			return m_tog | 2;
 	}
 	m_j = 0;
-	return machine().rand() & 0x10;
+	return m_tog & 0x18;
 }
 
 // for test rom
@@ -140,7 +143,8 @@ READ8_MEMBER( okean240_state::okean240_keyboard_r )
 	else
 	if (offset == 1) // port 41 bit 1 (test rom status bit)
 	{
-		return (machine().rand() & 2);
+		m_tog ^= 6;
+		return m_tog;
 	}
 	else // port 42 (not used)
 		return 0;
@@ -148,7 +152,7 @@ READ8_MEMBER( okean240_state::okean240_keyboard_r )
 
 READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 {
-	UINT8 i,j;
+	uint8_t i,j;
 
 	if (offset == 0) // port 40 (get a column)
 	{
@@ -168,7 +172,8 @@ READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 	else
 	if (offset == 1) // port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
 	{
-		return (machine().rand() & 2) | m_io_modifiers->read();
+		m_tog ^= 2;
+		return m_tog | m_io_modifiers->read();
 	}
 	else // port 42 (get a row)
 	{
@@ -192,7 +197,7 @@ WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
 // for test rom
 READ8_MEMBER( okean240_state::term_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -206,7 +211,7 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -224,8 +229,8 @@ static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240a_keyboard_r,okean240_keyboard_w)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
-	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
 	// AM_RANGE(0x20, 0x23)=dsk.data
@@ -241,12 +246,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
+	AM_RANGE(0x20, 0x23) AM_WRITENOP
+	AM_RANGE(0x40, 0x42) AM_READ(okean240_keyboard_r)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
-	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
+	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
+	AM_RANGE(0xe0, 0xe3) AM_WRITENOP
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -380,7 +387,7 @@ void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in okean240_state::device_timer");
+		assert_always(false, "Unknown id in okean240_state::device_timer");
 	}
 }
 
@@ -406,14 +413,14 @@ void okean240_state::machine_reset()
 	m_scroll = 0;
 }
 
-WRITE8_MEMBER( okean240_state::kbd_put )
+void okean240_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
 DRIVER_INIT_MEMBER(okean240_state,okean240)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -421,15 +428,15 @@ void okean240_state::video_start()
 {
 }
 
-UINT32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 gfx,ma; // ma must be 8bit
-	UINT16 x,y;
+	uint8_t gfx,ma; // ma must be 8bit
+	uint16_t x,y;
 
 	for (y = 0; y < 256; y++)
 	{
 		ma = y + m_scroll;
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{
@@ -473,14 +480,28 @@ static GFXDECODE_START( okean240a )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( okean240t, okean240_state )
+static MACHINE_CONFIG_START( okean240t )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
 	MCFG_CPU_IO_MAP(okean240t_io)
 
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen1", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
@@ -489,27 +510,28 @@ static MACHINE_CONFIG_START( okean240t, okean240_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
-	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
+	MCFG_DEVICE_REMOVE("rs232")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
-	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
+	MCFG_DEVICE_REMOVE("uart")
+	MCFG_DEVICE_REMOVE("uart_clock")
+	MCFG_DEVICE_REMOVE("rs232")
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -532,7 +554,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT      INIT         COMPANY     FULLNAME       FLAGS */
-COMP( 1986, okean240,  0,       0,   okean240,  okean240, okean240_state,  okean240,  "<unknown>", "Okeah-240", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240a, okean240,0,   okean240a, okean240a, okean240_state, okean240,  "<unknown>", "Ocean-240 with fdd", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240t, okean240,0,   okean240t, okean240, okean240_state,  okean240,  "<unknown>", "Ocean-240 Test Rom", MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      INIT            COMPANY    FULLNAME     FLAGS
+COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, okean240,  "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, okean240,  "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, okean240,  "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

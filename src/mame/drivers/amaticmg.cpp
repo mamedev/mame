@@ -410,20 +410,22 @@
 ***********************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/3812intf.h"
+#include "video/mc6845.h"
+//#include "sound/dac.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "suprstar.lh"
+
+
 #define MASTER_CLOCK    XTAL_16MHz
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/4  /* guess */
 #define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */
-
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/3812intf.h"
-#include "sound/dac.h"
-
-#include "suprstar.lh"
 
 
 class amaticmg_state : public driver_device
@@ -437,14 +439,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_attr;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
+	required_shared_ptr<uint8_t> m_vram;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
 	DECLARE_DRIVER_INIT(ama8000_3_o);
@@ -456,10 +458,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(amaticmg);
 	DECLARE_PALETTE_INIT(amaticmg2);
-	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
-	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
+	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -475,7 +477,7 @@ void amaticmg_state::video_start()
 {
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -485,8 +487,8 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0x0f)<<8);
 			/* TODO: this looks so out of place ... */
@@ -500,7 +502,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -510,8 +512,8 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
@@ -526,7 +528,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 
 PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -553,7 +555,7 @@ PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 
 PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int r, g, b;
 	int i;
 
@@ -627,7 +629,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 
 WRITE8_MEMBER( amaticmg_state::unk80_w )
 {
-//  m_dac->write_unsigned8(data & 0x01);       /* Sound DAC */
+//  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }
 
 
@@ -656,8 +658,8 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_signed8)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_device, write_signed8)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
 
 ADDRESS_MAP_END
 
@@ -699,11 +701,11 @@ static INPUT_PORTS_START( amaticmg )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_CODE(KEYCODE_8) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)")   PORT_IMPULSE(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Payout pulse") PORT_IMPULSE(3)      PORT_CODE(KEYCODE_Q)  // Hopper paying pulse
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CODE(KEYCODE_W)           // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 (Halten 3)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 (Halten 2)")
 
@@ -711,10 +713,10 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take (Loeschen)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 (Halten 1)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_CODE(KEYCODE_7) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet (Setzen) / Half Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_CODE(KEYCODE_9) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")    PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 (Halten 4)")
 
 	PORT_START("IN3")
@@ -801,7 +803,7 @@ GFXDECODE_END
 
 void amaticmg_state::machine_start()
 {
-	UINT8 *rombank = memregion("maincpu")->base();
+	uint8_t *rombank = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 }
@@ -817,7 +819,7 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
+static MACHINE_CONFIG_START( amaticmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
@@ -858,14 +860,10 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-//  MCFG_DAC_ADD("dac")   /* Y3014B */
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -1052,12 +1050,12 @@ ROM_END
 *       Driver Initialization       *
 ************************************/
 
-void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
+void amaticmg_state::encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
 	aux = ((aux<<6) | (aux>>6)) & 0xfff;
-	UINT8 aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
+	uint8_t aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
 	aux2 ^= aux2>>4;
 	aux2 = (aux2<<4) | (aux2>>4);
 	ciphertext ^= ciphertext<<4;
@@ -1068,11 +1066,11 @@ void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &
 
 void amaticmg_state::decrypt(int key1, int key2)
 {
-	UINT8 plaintext;
+	uint8_t plaintext;
 	int newaddress;
 
-	UINT8 *src = memregion("mainprg")->base();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *src = memregion("mainprg")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 	int len = memregion("mainprg")->bytes();
 
 	for (int i = 0; i < len; i++)

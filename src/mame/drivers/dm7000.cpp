@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "includes/dm7000.h"
+#include "screen.h"
 
 #define VERBOSE_LEVEL ( 9 )
 
@@ -58,7 +59,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 READ8_MEMBER( dm7000_state::dm7000_iic0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
 	return data;
 }
@@ -70,7 +71,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_iic0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_iic1_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
 	return data;
 }
@@ -82,7 +83,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
 
 READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch(offset) {
 		case UART_THR:
 			data = m_term_data;
@@ -119,7 +120,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_gpio0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
 	return data;
 }
@@ -131,7 +132,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	switch(offset) {
 		case SCP_STATUS:
 			data = SCP_STATUS_RXRDY;
@@ -153,7 +154,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
 
 READ16_MEMBER( dm7000_state::dm7000_enet_r )
 {
-	UINT16 data;
+	uint16_t data;
 	switch (offset) {
 		case 0x01:
 			data = 0x1801;
@@ -267,7 +268,7 @@ void dm7000_state::video_start()
 {
 }
 
-UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -292,14 +293,14 @@ WRITE32_MEMBER( dm7000_state::dcr_w )
 	dcr[offset] = data;
 }
 
-WRITE8_MEMBER( dm7000_state::kbd_put )
+void dm7000_state::kbd_put(u8 data)
 {
 	//printf("%02X\n", data);
 	m_term_data = data;
 	m_scc0_lsr = 1;
 }
 
-static MACHINE_CONFIG_START( dm7000, dm7000_state )
+static MACHINE_CONFIG_START( dm7000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
@@ -316,7 +317,7 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dm7000_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dm7000_state, kbd_put))
 
 MACHINE_CONFIG_END
 
@@ -346,7 +347,7 @@ ROM_START( dm500 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    INIT     COMPANY                FULLNAME       FLAGS */
-SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY             FULLNAME         FLAGS
+SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

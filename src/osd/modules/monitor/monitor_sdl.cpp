@@ -5,6 +5,7 @@
  *
  */
 
+#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
@@ -15,6 +16,7 @@
 
 #include "modules/osdwindow.h"
 #include "monitor_common.h"
+#include "window.h"
 
 inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
 {
@@ -95,7 +97,7 @@ public:
 		if (!m_initialized)
 			return nullptr;
 
-		std::uint64_t display = SDL_GetWindowDisplayIndex(window.platform_window<SDL_Window*>());
+		std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const sdl_window_info &>(window).platform_window());
 		return monitor_from_handle(display);
 	}
 

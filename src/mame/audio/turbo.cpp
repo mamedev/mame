@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "includes/turbo.h"
 #include "sound/samples.h"
+#include "speaker.h"
 
 
 #define DISCRETE_TEST (0)
@@ -76,7 +77,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 #if (!DISCRETE_TEST)
 #endif
 #if (!DISCRETE_TEST)
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 #endif
 	m_sound_state[0] = data;
 
@@ -124,7 +125,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 
 WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* ACC0-ACC5 */
@@ -182,7 +183,7 @@ static const char *const turbo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( turbo_samples )
+MACHINE_CONFIG_START( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
 	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
@@ -294,7 +295,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_a_w)
 }
 
 
-inline void turbo_state::subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 dir)
+inline void turbo_state::subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir)
 {
 	float volume = (float)(15 - dis) / 16.0f;
 	float lvol, rvol;
@@ -316,7 +317,7 @@ inline void turbo_state::subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 d
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* bit 0 latches direction/volume for missile */
@@ -370,7 +371,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_c_w)
 {
-	UINT8 diff = data ^ m_sound_state[2];
+	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
 	/* /FIRE TRIG */
@@ -428,7 +429,7 @@ static const char *const subroc3d_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
+MACHINE_CONFIG_START( subroc3d_samples )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -486,7 +487,7 @@ void turbo_state::buckrog_update_samples()
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 {
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* clock HIT DIS from bits 0-2 */
@@ -510,7 +511,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* /ALARM3: channel 0 */
@@ -573,7 +574,7 @@ static const char *const buckrog_sample_names[]=
 };
 
 
-MACHINE_CONFIG_FRAGMENT( buckrog_samples )
+MACHINE_CONFIG_START( buckrog_samples )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)

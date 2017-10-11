@@ -3,7 +3,7 @@
 
 void minx_cpu_device::execute_one()
 {
-	const UINT8 opcode = rdop();
+	const uint8_t opcode = rdop();
 
 	switch (opcode)
 	{
@@ -370,21 +370,21 @@ void minx_cpu_device::execute_one()
 		case 0xAF: { m_F = POP8(); }
 			break;
 
-		case 0xB0: { UINT8 op = rdop(); m_BA = ( m_BA & 0xFF00 ) | op; }
+		case 0xB0: { uint8_t op = rdop(); m_BA = ( m_BA & 0xFF00 ) | op; }
 			break;
-		case 0xB1: { UINT8 op = rdop(); m_BA = ( m_BA & 0x00FF ) | ( op << 8 ); }
+		case 0xB1: { uint8_t op = rdop(); m_BA = ( m_BA & 0x00FF ) | ( op << 8 ); }
 			break;
-		case 0xB2: { UINT8 op = rdop(); m_HL = ( m_HL & 0xFF00 ) | op; }
+		case 0xB2: { uint8_t op = rdop(); m_HL = ( m_HL & 0xFF00 ) | op; }
 			break;
-		case 0xB3: { UINT8 op = rdop(); m_HL = ( m_HL & 0x00FF ) | ( op << 8 ); }
+		case 0xB3: { uint8_t op = rdop(); m_HL = ( m_HL & 0x00FF ) | ( op << 8 ); }
 			break;
-		case 0xB4: { UINT8 op = rdop(); m_N = op; }
+		case 0xB4: { uint8_t op = rdop(); m_N = op; }
 			break;
-		case 0xB5: { AD1_IHL; UINT8 op = rdop(); WR( addr1, op); }
+		case 0xB5: { AD1_IHL; uint8_t op = rdop(); WR( addr1, op); }
 			break;
-		case 0xB6: { AD1_XIX; UINT8 op = rdop(); WR( addr1, op ); }
+		case 0xB6: { AD1_XIX; uint8_t op = rdop(); WR( addr1, op ); }
 			break;
-		case 0xB7: { AD1_YIY; UINT8 op = rdop(); WR( addr1, op ); }
+		case 0xB7: { AD1_YIY; uint8_t op = rdop(); WR( addr1, op ); }
 			break;
 		case 0xB8: { AD2_I16; m_BA = rd16( addr2 ); }
 			break;
@@ -419,17 +419,17 @@ void minx_cpu_device::execute_one()
 			break;
 		case 0xC7: { m_Y = rdop16(); }
 			break;
-		case 0xC8: { UINT16 t = m_BA; m_BA = m_HL; m_HL = t; }
+		case 0xC8: { uint16_t t = m_BA; m_BA = m_HL; m_HL = t; }
 			break;
-		case 0xC9: { UINT16 t = m_BA; m_BA = m_X; m_X = t; }
+		case 0xC9: { uint16_t t = m_BA; m_BA = m_X; m_X = t; }
 			break;
-		case 0xCA: { UINT16 t = m_BA; m_BA = m_Y; m_Y = t; }
+		case 0xCA: { uint16_t t = m_BA; m_BA = m_Y; m_Y = t; }
 			break;
-		case 0xCB: { UINT16 t = m_BA; m_BA = m_SP; m_SP = t; }
+		case 0xCB: { uint16_t t = m_BA; m_BA = m_SP; m_SP = t; }
 			break;
 		case 0xCC: { m_BA = ( m_BA >> 8 ) | ( ( m_BA & 0x00FF ) << 8 ); }
 			break;
-		case 0xCD: { UINT8 t; AD2_IHL; t = RD( addr2 ); WR( addr2, ( m_BA & 0x00FF ) ); m_BA = ( m_BA & 0xFF00 ) | t; }
+		case 0xCD: { uint8_t t; AD2_IHL; t = RD( addr2 ); WR( addr2, ( m_BA & 0x00FF ) ); m_BA = ( m_BA & 0xFF00 ) | t; }
 			break;
 		case 0xCE: { execute_one_ce(); }
 			break;
@@ -469,54 +469,54 @@ void minx_cpu_device::execute_one()
 		case 0xDF: { m_BA = ( ( m_BA & 0x0080 ) ? 0xFF00 : 0x0000 ) | ( m_BA & 0x000F ); }
 			break;
 
-		case 0xE0: { INT8 d8 = rdop(); if ( m_F & FLAG_C ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xE0: { int8_t d8 = rdop(); if ( m_F & FLAG_C ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xE1: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_C ) ) { CALL( m_PC + d8- 1  ); m_icount -= 12; } }
+		case 0xE1: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_C ) ) { CALL( m_PC + d8- 1  ); m_icount -= 12; } }
 			break;
-		case 0xE2: { INT8 d8 = rdop(); if ( m_F & FLAG_Z ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xE2: { int8_t d8 = rdop(); if ( m_F & FLAG_Z ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xE3: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_Z ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
+		case 0xE3: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_Z ) ) { CALL( m_PC + d8 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xE4: { INT8 d8 = rdop(); if ( m_F & FLAG_C ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE4: { int8_t d8 = rdop(); if ( m_F & FLAG_C ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE5: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_C ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE5: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_C ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE6: { INT8 d8 = rdop(); if ( m_F & FLAG_Z ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE6: { int8_t d8 = rdop(); if ( m_F & FLAG_Z ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE7: { INT8 d8 = rdop(); if ( ! ( m_F & FLAG_Z ) ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xE7: { int8_t d8 = rdop(); if ( ! ( m_F & FLAG_Z ) ) { JMP( m_PC + d8 - 1 ); } }
 			break;
-		case 0xE8: { UINT16 d16 = rdop16(); if ( m_F & FLAG_C ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
+		case 0xE8: { uint16_t d16 = rdop16(); if ( m_F & FLAG_C ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xE9: { UINT16 d16 = rdop16(); if ( ! ( m_F & FLAG_C ) ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
+		case 0xE9: { uint16_t d16 = rdop16(); if ( ! ( m_F & FLAG_C ) ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xEA: { UINT16 d16 = rdop16(); if ( m_F & FLAG_Z ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
+		case 0xEA: { uint16_t d16 = rdop16(); if ( m_F & FLAG_Z ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xEB: { UINT16 d16 = rdop16(); if ( ! ( m_F & FLAG_Z ) ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
+		case 0xEB: { uint16_t d16 = rdop16(); if ( ! ( m_F & FLAG_Z ) ) { CALL( m_PC + d16 - 1 ); m_icount -= 12; } }
 			break;
-		case 0xEC: { UINT16 d16 = rdop16(); if ( m_F & FLAG_C ) { JMP( m_PC + d16 - 1 ); } }
+		case 0xEC: { uint16_t d16 = rdop16(); if ( m_F & FLAG_C ) { JMP( m_PC + d16 - 1 ); } }
 			break;
-		case 0xED: { UINT16 d16 = rdop16(); if ( ! ( m_F & FLAG_C ) ) { JMP( m_PC + d16 - 1 ); } }
+		case 0xED: { uint16_t d16 = rdop16(); if ( ! ( m_F & FLAG_C ) ) { JMP( m_PC + d16 - 1 ); } }
 			break;
-		case 0xEE: { UINT16 d16 = rdop16(); if ( m_F & FLAG_Z ) { JMP( m_PC + d16 - 1 ); } }
+		case 0xEE: { uint16_t d16 = rdop16(); if ( m_F & FLAG_Z ) { JMP( m_PC + d16 - 1 ); } }
 			break;
-		case 0xEF: { UINT16 d16 = rdop16(); if ( ! ( m_F & FLAG_Z ) ) { JMP( m_PC + d16 - 1 ); } }
+		case 0xEF: { uint16_t d16 = rdop16(); if ( ! ( m_F & FLAG_Z ) ) { JMP( m_PC + d16 - 1 ); } }
 			break;
 
-		case 0xF0: { INT8 d8 = rdop(); CALL( m_PC + d8 - 1 ); }
+		case 0xF0: { int8_t d8 = rdop(); CALL( m_PC + d8 - 1 ); }
 			break;
-		case 0xF1: { INT8 d8 = rdop(); JMP( m_PC + d8 - 1 ); }
+		case 0xF1: { int8_t d8 = rdop(); JMP( m_PC + d8 - 1 ); }
 			break;
-		case 0xF2: { UINT16 d16 = rdop16(); CALL( m_PC + d16 - 1 ); }
+		case 0xF2: { uint16_t d16 = rdop16(); CALL( m_PC + d16 - 1 ); }
 			break;
-		case 0xF3: { UINT16 d16 = rdop16(); JMP( m_PC + d16 - 1 ); }
+		case 0xF3: { uint16_t d16 = rdop16(); JMP( m_PC + d16 - 1 ); }
 			break;
 		case 0xF4: { JMP( m_HL ); }
 			break;
-		case 0xF5: { INT8 d8 = rdop(); m_BA = m_BA - 0x0100; if ( m_BA & 0xFF00 ) { JMP( m_PC + d8 - 1 ); } }
+		case 0xF5: { int8_t d8 = rdop(); m_BA = m_BA - 0x0100; if ( m_BA & 0xFF00 ) { JMP( m_PC + d8 - 1 ); } }
 			break;
 		case 0xF6: { m_BA = ( m_BA & 0xFF00 ) | ( ( m_BA & 0x00F0 ) >> 4 ) | ( ( m_BA & 0x000F ) << 4 ); }
 			break;
-		case 0xF7: { UINT8 d; AD1_IHL; d = RD( addr1 ); WR( addr1, ( ( d & 0xF0 ) >> 4 ) | ( ( d & 0x0F ) << 4 ) ); }
+		case 0xF7: { uint8_t d; AD1_IHL; d = RD( addr1 ); WR( addr1, ( ( d & 0xF0 ) >> 4 ) | ( ( d & 0x0F ) << 4 ) ); }
 			break;
 		case 0xF8: { m_PC = POP16(); m_V = POP8(); m_U = m_V; }
 			break;
@@ -526,9 +526,9 @@ void minx_cpu_device::execute_one()
 			break;
 		case 0xFB: { AD1_I16; CALL( rd16( addr1 ) ); }
 			break;
-		case 0xFC: { UINT8 i = rdop() & 0xFE; CALL( rd16( i ) ); PUSH8( m_F ); }
+		case 0xFC: { uint8_t i = rdop() & 0xFE; CALL( rd16( i ) ); PUSH8( m_F ); }
 			break;
-		case 0xFD: { UINT8 i = rdop() & 0xFE; JMP( rd16( i ) ); /* PUSH8( m_F );?? */ }
+		case 0xFD: { uint8_t i = rdop() & 0xFE; JMP( rd16( i ) ); /* PUSH8( m_F );?? */ }
 			break;
 		case 0xFE: { /* illegal operation? */ }
 			break;

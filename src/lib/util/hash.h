@@ -75,8 +75,8 @@ public:
 	bool remove(char type);
 
 	// CRC-specific helpers
-	bool crc(UINT32 &result) const { result = m_crc32; return m_has_crc32; }
-	void add_crc(UINT32 crc) { m_crc32 = crc; m_has_crc32 = true; }
+	bool crc(uint32_t &result) const { result = m_crc32; return m_has_crc32; }
+	void add_crc(uint32_t crc) { m_crc32 = crc; m_has_crc32 = true; }
 
 	// SHA1-specific helpers
 	bool sha1(sha1_t &result) const { result = m_sha1; return m_has_sha1; }
@@ -90,9 +90,9 @@ public:
 
 	// creation
 	void begin(const char *types = nullptr);
-	void buffer(const UINT8 *data, UINT32 length);
+	void buffer(const uint8_t *data, uint32_t length);
 	void end();
-	void compute(const UINT8 *data, UINT32 length, const char *types = nullptr) { begin(types); buffer(data, length); end(); }
+	void compute(const uint8_t *data, uint32_t length, const char *types = nullptr) { begin(types); buffer(data, length); end(); }
 
 private:
 	// internal helpers

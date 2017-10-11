@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 
@@ -111,7 +111,6 @@ Sound
     Mapped @0x8010-0x8016
     Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
     There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
-    For now reading at 8010 always reports ready.
 
 
 Ports
@@ -220,20 +219,25 @@ TODO :
     - Hook up the OKI M5202
 */
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "sound/2203intf.h"
+#include "sound/es8712.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK        XTAL_12MHz
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/es8712.h"
-#include "sound/2203intf.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "machine/ticket.h"
 
 
 class witch_state : public driver_device
@@ -262,18 +266,19 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_gfx0_vram;
-	required_shared_ptr<UINT8> m_gfx0_cram;
-	required_shared_ptr<UINT8> m_gfx1_vram;
-	required_shared_ptr<UINT8> m_gfx1_cram;
-	required_shared_ptr<UINT8> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_gfx0_vram;
+	required_shared_ptr<uint8_t> m_gfx0_cram;
+	required_shared_ptr<uint8_t> m_gfx1_vram;
+	required_shared_ptr<uint8_t> m_gfx1_cram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_device<palette_device> m_palette;
 
 	required_device<ticket_dispenser_device> m_hopper;
 
 	int m_scrollx;
 	int m_scrolly;
-	UINT8 m_reg_a002;
+	uint8_t m_reg_a002;
+	uint8_t m_motor_active;
 	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
 	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
 	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
@@ -285,7 +290,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_a006);
 	DECLARE_WRITE8_MEMBER(write_a008);
 	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
 	DECLARE_DRIVER_INIT(witch);
@@ -293,8 +297,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
 };
 
 
@@ -420,8 +425,7 @@ WRITE8_MEMBER(witch_state::write_a006)
 	if (data == 0)
 		return;
 
-	// TODO: this assumes the "Hopper Active" DSW is "Low"
-	m_hopper->write(space, 0, !BIT(data, 1) ? 0x80 : 0);
+	m_hopper->motor_w(!BIT(data, 1) ^ m_motor_active);
 
 	// TODO: Bit 3 = Attendant Pay
 
@@ -459,12 +463,6 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	return memregion("sub")->base()[0x7000+offset];
 }
 
-/*
- * Status from ES8712?
- * BIT1 is zero when no sample is playing?
- */
-READ8_MEMBER(witch_state::read_8010){   return 0x00; }
-
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
 	m_scrollx=data;
@@ -501,7 +499,7 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE("essnd", es8712_device, es8712_w)
+	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
@@ -695,6 +693,7 @@ void witch_state::video_start()
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_reg_a002));
+	save_item(NAME(m_motor_active));
 }
 
 void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -742,7 +741,7 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 }
 
-UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gfx1_tilemap->set_scrollx(0, m_scrollx-7 ); //offset to have it aligned with the sprites
 	m_gfx1_tilemap->set_scrolly(0, m_scrolly+8 );
@@ -756,7 +755,13 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( witch, witch_state )
+void witch_state::machine_reset()
+{
+	// Keep track of the "Hopper Active" DSW value because the program will use it
+	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
+}
+
+static MACHINE_CONFIG_START( witch )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)

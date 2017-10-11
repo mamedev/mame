@@ -18,13 +18,13 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_control;
+	required_shared_ptr<uint8_t> m_video_control;
 
 	/* video-related */
-	std::unique_ptr<UINT32[]>      m_videoram;
+	std::unique_ptr<uint32_t[]>      m_videoram;
 
 	/* misc */
-	UINT8        m_mcu_clock;
+	uint8_t        m_mcu_clock;
 	DECLARE_READ8_MEMBER(mcu_sim_r);
 	DECLARE_WRITE8_MEMBER(mcu_sim_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_coin_counter_w);
@@ -34,8 +34,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(kangaroo_mcu);
-	UINT32 screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void videoram_write( UINT16 offset, UINT8 data, UINT8 mask );
+	uint32_t screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void videoram_write( uint16_t offset, uint8_t data, uint8_t mask );
 	void blitter_execute(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

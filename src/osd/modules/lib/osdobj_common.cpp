@@ -127,6 +127,13 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
+#ifndef NO_USE_PORTAUDIO
+	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
+	{ OSDOPTION_PA_API,                       OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio API" },
+	{ OSDOPTION_PA_DEVICE,                    OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio device" },
+	{ OSDOPTION_PA_LATENCY "(0-0.25)",        "0",              OPTION_FLOAT,     "suggested latency in seconds, 0 for default" },
+#endif
+
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
 	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "Audio output device" },
@@ -193,7 +200,7 @@ osd_common_t::osd_common_t(osd_options &options)
 osd_common_t::~osd_common_t()
 {
 	for(unsigned int i= 0; i < m_video_names.size(); ++i)
-		osd_free(const_cast<char*>(m_video_names[i]));
+		free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
 }
@@ -213,6 +220,9 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#ifndef NO_USE_PORTAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
@@ -242,6 +252,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
@@ -259,6 +270,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -342,7 +354,7 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values) const
 {
 	std::string current_value(m_options.description(key));
 	std::string new_option_value("");
@@ -435,7 +447,7 @@ void osd_common_t::init(running_machine &machine)
 		set_verbose(true);
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&osd_common_t::osd_exit, this));
 
 
 	/* now setup watchdog */
@@ -514,7 +526,7 @@ void osd_common_t::debugger_update()
 //  stream
 //-------------------------------------------------
 
-void osd_common_t::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
 {
 	//
 	// This method is called whenever the system has new audio data to stream.
@@ -579,7 +591,7 @@ std::vector<ui::menu_item> osd_common_t::get_slider_list()
 //  to an AVI recording if one is active
 //-------------------------------------------------
 
-void osd_common_t::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
 	// Do nothing
 }
@@ -623,10 +635,9 @@ bool osd_common_t::execute_command(const char *command)
 
 }
 
-static void output_notifier_callback(const char *outname, INT32 value, void *param)
+static void output_notifier_callback(const char *outname, int32_t value, void *param)
 {
-	osd_common_t *osd = (osd_common_t*)param;
-	osd->notify(outname, value);
+	static_cast<osd_common_t*>(param)->notify(outname, value);
 }
 
 void osd_common_t::init_subsystems()
@@ -669,8 +680,8 @@ void osd_common_t::init_subsystems()
 
 	input_init();
 	// we need pause callbacks
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_common_t::input_pause), this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&osd_common_t::input_pause, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&osd_common_t::input_resume, this));
 }
 
 bool osd_common_t::video_init()

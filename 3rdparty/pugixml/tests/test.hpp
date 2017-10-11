@@ -78,7 +78,7 @@ struct dummy_fixture {};
 	{ \
 		test_runner_##name(): test_runner(#name) {} \
 		\
-		virtual void run() \
+		virtual void run() PUGIXML_OVERRIDE \
 		{ \
 			test_runner_helper_##name helper; \
 			helper.run(); \

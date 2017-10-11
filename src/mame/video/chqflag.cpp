@@ -55,7 +55,7 @@ K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
 
 ***************************************************************************/
 
-UINT32 chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

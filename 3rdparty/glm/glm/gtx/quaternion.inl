@@ -71,9 +71,9 @@ namespace glm
 		}
 		else
 		{
-			T QuatLen = sqrt(Vec3Len * Vec3Len + q.w * q.w);
 			T t = atan(Vec3Len, T(q.w)) / Vec3Len;
-			return tquat<T, P>(log(QuatLen), t * q.x, t * q.y, t * q.z);
+			T QuatLen2 = Vec3Len * Vec3Len + q.w * q.w;
+			return tquat<T, P>(static_cast<T>(0.5) * log(QuatLen2), t * q.x, t * q.y, t * q.z);
 		}
 	}
 

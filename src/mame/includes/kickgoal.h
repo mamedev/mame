@@ -27,11 +27,11 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_fgram;
-	required_shared_ptr<UINT16> m_bgram;
-	required_shared_ptr<UINT16> m_bg2ram;
-	required_shared_ptr<UINT16> m_scrram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_fgram;
+	required_shared_ptr<uint16_t> m_bgram;
+	required_shared_ptr<uint16_t> m_bg2ram;
+	required_shared_ptr<uint16_t> m_scrram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_fgtm;
@@ -44,7 +44,7 @@ public:
 	int         m_snd_sam[4];
 	int         m_m6295_comm;
 	int         m_m6295_bank;
-	UINT16      m_m6295_key_delay;
+	uint16_t      m_m6295_key_delay;
 
 	int m_fg_base;
 
@@ -78,7 +78,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(kickgoal);
 	DECLARE_VIDEO_START(actionhw);
-	UINT32 screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
 	void kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

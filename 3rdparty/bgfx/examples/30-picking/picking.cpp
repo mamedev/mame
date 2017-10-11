@@ -207,37 +207,39 @@ class ExamplePicking : public entry::AppI
 			bx::mtxLookAt(view, eye, at);
 
 			float proj[16];
-			bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 100.0f);
+			bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			// Set up view rect and transform for the shaded pass
 			bgfx::setViewRect(RENDER_PASS_SHADING, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 			bgfx::setViewTransform(RENDER_PASS_SHADING, view, proj);
 
 			// Set up picking pass
-			float pickView[16];
-			float pickAt[4]; // Need to inversly project the mouse pointer to determin what we're looking at
-			float pickEye[3] = { eye[0], eye[1], eye[2] };  // Eye is same location as before
 			float viewProj[16];
 			bx::mtxMul(viewProj, view, proj);
+
 			float invViewProj[16];
 			bx::mtxInverse(invViewProj, viewProj);
+
 			// Mouse coord in NDC
-			float mouseXNDC = (m_mouseState.m_mx / (float)m_width) * 2.0f - 1.0f;
+			float mouseXNDC = ( m_mouseState.m_mx             / (float)m_width ) * 2.0f - 1.0f;
 			float mouseYNDC = ((m_height - m_mouseState.m_my) / (float)m_height) * 2.0f - 1.0f;
-			float mousePosNDC[4] = { mouseXNDC, mouseYNDC, 0, 1.0f };
-			// Unproject and perspective divide
-			bx::vec4MulMtx(pickAt, mousePosNDC, invViewProj);
-			pickAt[3] = 1.0f / pickAt[3];
-			pickAt[0] *= pickAt[3];
-			pickAt[1] *= pickAt[3];
-			pickAt[2] *= pickAt[3];
+
+			float pickEye[3];
+			float mousePosNDC[3] = { mouseXNDC, mouseYNDC, 0.0f };
+			bx::vec3MulMtxH(pickEye, mousePosNDC, invViewProj);
+
+			float pickAt[3];
+			float mousePosNDCEnd[3] = { mouseXNDC, mouseYNDC, 1.0f };
+			bx::vec3MulMtxH(pickAt, mousePosNDCEnd, invViewProj);
 
 			// Look at our unprojected point
+			float pickView[16];
 			bx::mtxLookAt(pickView, pickEye, pickAt);
-			float pickProj[16];
 
 			// Tight FOV is best for picking
-			bx::mtxProj(pickProj, m_fov, 1, 0.1f, 100.0f);
+			float pickProj[16];
+			bx::mtxProj(pickProj, m_fov, 1, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+
 			// View rect and transforms for picking pass
 			bgfx::setViewRect(RENDER_PASS_ID, 0, 0, ID_DIM, ID_DIM);
 			bgfx::setViewTransform(RENDER_PASS_ID, pickView, pickProj);
@@ -361,8 +363,8 @@ class ExamplePicking : public entry::AppI
 				| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
 				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				, m_mouseState.m_mz
-				, m_width
-				, m_height
+				, uint16_t(m_width)
+				, uint16_t(m_height)
 				);
 
 			imguiBeginArea("Picking Render Target:", 10, 100, 300, 400);

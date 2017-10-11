@@ -15,7 +15,7 @@ TODO:
 void namcona1_state::tilemap_get_info(
 	tile_data &tileinfo,
 	int tile_index,
-	const UINT16 *tilemap_videoram,
+	const uint16_t *tilemap_videoram,
 	bool use_4bpp_gfx )
 {
 	int data = tilemap_videoram[tile_index];
@@ -95,7 +95,7 @@ WRITE16_MEMBER(namcona1_state::videoram_w)
 
 void namcona1_state::UpdatePalette( int offset )
 {
-	UINT16 data = m_paletteram[offset]; /* -RRRRRGG GGGBBBBB */
+	uint16_t data = m_paletteram[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
 	 * sprites can be configured to use an alternate interpretation of palette ram
 	 * (used in-game in Emeraldia)
@@ -126,7 +126,7 @@ WRITE16_MEMBER(namcona1_state::paletteram_w)
 
 READ16_MEMBER(namcona1_state::gfxram_r)
 {
-	UINT16 type = m_vreg[0x0c/2];
+	uint16_t type = m_vreg[0x0c/2];
 	if( type == 0x03 )
 	{
 		if( offset<0x4000 )
@@ -144,8 +144,8 @@ READ16_MEMBER(namcona1_state::gfxram_r)
 
 WRITE16_MEMBER(namcona1_state::gfxram_w)
 {
-	UINT16 type = m_vreg[0x0c/2];
-	UINT16 old_word;
+	uint16_t type = m_vreg[0x0c/2];
+	uint16_t old_word;
 
 	if( type == 0x03 )
 	{
@@ -205,7 +205,7 @@ void namcona1_state::pdraw_tile(
 		screen_device &screen,
 		bitmap_ind16 &dest_bmp,
 		const rectangle &clip,
-		UINT32 code,
+		uint32_t code,
 		int color,
 		int sx, int sy,
 		int flipx, int flipy,
@@ -218,8 +218,8 @@ void namcona1_state::pdraw_tile(
 	gfx_element *mask = m_gfxdecode->gfx(2);
 
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const UINT8 *source_base = gfx->get_data((code % gfx->elements()));
-	const UINT8 *mask_base = mask->get_data((code % mask->elements()));
+	const uint8_t *source_base = gfx->get_data((code % gfx->elements()));
+	const uint8_t *mask_base = mask->get_data((code % mask->elements()));
 
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width  = ((1<<16)*gfx->width()+0x8000)>>16;
@@ -286,10 +286,10 @@ void namcona1_state::pdraw_tile(
 
 			for( y=sy; y<ey; y++ )
 			{
-				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->rowbytes();
-				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &screen.priority().pix8(y);
+				const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+				const uint8_t *mask_addr = mask_base + (y_index>>16) * mask->rowbytes();
+				uint16_t *dest = &dest_bmp.pix16(y);
+				uint8_t *pri = &screen.priority().pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -348,9 +348,9 @@ void namcona1_state::pdraw_tile(
 void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int which;
-	const UINT16 *source = m_spriteram;
-	UINT16 sprite_control;
-	UINT16 ypos,tile,color,xpos;
+	const uint16_t *source = m_spriteram;
+	uint16_t sprite_control;
+	uint16_t ypos,tile,color,xpos;
 	int priority;
 	int width,height;
 	int flipy,flipx;
@@ -428,12 +428,12 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 } /* draw_sprites */
 
-static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const pen_t *paldata )
+static void draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
 {
 	int x;
 	for( x=0; x<38*8; x+=2 )
 	{
-		UINT16 data = *pSource++;
+		uint16_t data = *pSource++;
 		pPri[x+0] = 0xff;
 		pPri[x+1] = 0xff;
 		pDest[x+0] = paldata[data>>8];
@@ -446,16 +446,16 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 	if(which == 4)
 	{
 		/* draw the roz tilemap all at once */
-		int incxx = ((INT16)m_vreg[0xc0/2])<<8;
-		int incxy = ((INT16)m_vreg[0xc2/2])<<8;
-		int incyx = ((INT16)m_vreg[0xc4/2])<<8;
-		int incyy = ((INT16)m_vreg[0xc6/2])<<8;
-		INT16 xoffset = m_vreg[0xc8/2];
-		INT16 yoffset = m_vreg[0xca/2];
+		int incxx = ((int16_t)m_vreg[0xc0/2])<<8;
+		int incxy = ((int16_t)m_vreg[0xc2/2])<<8;
+		int incyx = ((int16_t)m_vreg[0xc4/2])<<8;
+		int incyy = ((int16_t)m_vreg[0xc6/2])<<8;
+		int16_t xoffset = m_vreg[0xc8/2];
+		int16_t yoffset = m_vreg[0xca/2];
 		int dx = 46; /* horizontal adjust */
 		int dy = -8; /* vertical adjust */
-		UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
-		UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
+		uint32_t startx = (xoffset<<12)+incxx*dx+incyx*dy;
+		uint32_t starty = (yoffset<<12)+incxy*dx+incyy*dy;
 		m_bg_tilemap[4]->draw_roz(screen, bitmap, cliprect,
 			startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 	}
@@ -468,7 +468,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		*  tmap2   ffe800  ffea00
 		*  tmap3   ffec00  ffee00
 		*/
-		const UINT16 *scroll = &m_scroll[which * 0x400/2];
+		const uint16_t *scroll = &m_scroll[which * 0x400/2];
 		const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
@@ -517,7 +517,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 	}
 } /* draw_background */
 
-UINT32 namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int which;
 	int priority;

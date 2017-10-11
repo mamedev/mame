@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 Sliver - Hollow Corp.1996
@@ -65,11 +65,17 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "sound/okim6295.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "jpeglib.h"
 
 
@@ -90,13 +96,13 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram") { }
 
-	UINT16 m_io_offset;
-	UINT16 m_io_reg[IO_SIZE];
-	UINT16 m_fifo[FIFO_SIZE];
-	UINT16 m_fptr;
+	uint16_t m_io_offset;
+	uint16_t m_io_reg[IO_SIZE];
+	uint16_t m_fifo[FIFO_SIZE];
+	uint16_t m_fptr;
 
-	UINT16 m_jpeg1;
-	UINT16 m_jpeg2;
+	uint16_t m_jpeg1;
+	uint16_t m_jpeg2;
 	int m_jpeg_x;
 	int m_jpeg_y;
 	int m_tmp_counter;
@@ -105,11 +111,11 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
 
-	UINT16 m_tempbuf[8];
+	uint16_t m_tempbuf[8];
 
 	DECLARE_WRITE16_MEMBER(fifo_data_w);
 	DECLARE_WRITE16_MEMBER(fifo_clear_w);
@@ -126,8 +132,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
@@ -147,7 +153,7 @@ void sliver_state::machine_start()
 	save_item(NAME(m_tmp_counter));
 }
 
-void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
+void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b)
 {
 //  printf("plot %d %d %d\n", r,g,b);
 
@@ -159,7 +165,7 @@ void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
 
 void sliver_state::plot_pixel_pal(int x, int y, int addr)
 {
-	UINT32 r,g,b;
+	uint32_t r,g,b;
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
@@ -195,7 +201,7 @@ WRITE16_MEMBER(sliver_state::fifo_data_w)
 void sliver_state::blit_gfx()
 {
 	int tmpptr=0;
-	const UINT8 *rom = memregion("user1")->base();
+	const uint8_t *rom = memregion("user1")->base();
 
 	while (tmpptr < m_fptr)
 	{
@@ -267,7 +273,7 @@ void sliver_state::render_jpeg()
 
 		jpeg_mem_src(&cinfo, memregion("user2")->base()+addr, memregion("user2")->bytes()-addr);
 
-		jpeg_read_header(&cinfo, TRUE);
+		jpeg_read_header(&cinfo, true);
 		jpeg_start_decompress(&cinfo);
 
 		int row_stride = cinfo.output_width * cinfo.output_components;
@@ -281,9 +287,9 @@ void sliver_state::render_jpeg()
 
 			for (x = 0; x < row_stride/3; x++)
 			{
-				UINT8 b = buffer[0][(x*3)];
-				UINT8 g = buffer[0][(x*3)+1];
-				UINT8 r = buffer[0][(x*3)+2];
+				uint8_t b = buffer[0][(x*3)];
+				uint8_t g = buffer[0][(x*3)+1];
+				uint8_t r = buffer[0][(x*3)+2];
 				plot_pixel_rgb(x - x_offset + m_jpeg_x, y - y_offset - m_jpeg_y, r, g, b);
 
 			}
@@ -387,7 +393,7 @@ static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, sliver_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, sliver_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -410,7 +416,7 @@ void sliver_state::postload()
 	render_jpeg();
 }
 
-UINT32 sliver_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sliver_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap      (bitmap, m_bitmap_bg, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
@@ -489,7 +495,7 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "SW2:8" )    /* Listed as "UNUSED (MUST ON)" */
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, sliver_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
@@ -498,7 +504,7 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sliver, sliver_state )
+static MACHINE_CONFIG_START( sliver )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
@@ -524,8 +530,8 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 MACHINE_CONFIG_END
@@ -556,8 +562,8 @@ ROM_END
 
 ROM_START( slivera )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ka-4.bin", 0x00001, 0x20000, CRC(044d1046) SHA1(dd6da44e65dccae7e2ea0c72c3f8d1452ae8c9e2) )
-	ROM_LOAD16_BYTE( "ka-5.bin", 0x00000, 0x20000, CRC(c2e8b785) SHA1(84444495c4ecb8da50fef0998dbd9b4352f46582) )
+	ROM_LOAD16_BYTE( "ka-4.bin", 0x00001, 0x20000, CRC(044d1046) SHA1(dd6da44e65dccae7e2ea0c72c3f8d1452ae8c9e2) ) // sldh
+	ROM_LOAD16_BYTE( "ka-5.bin", 0x00000, 0x20000, CRC(c2e8b785) SHA1(84444495c4ecb8da50fef0998dbd9b4352f46582) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8031 */
 	ROM_LOAD( "ka-1.bin", 0x000000, 0x10000, CRC(56e616a2) SHA1(f8952aba62ae0410e300d99e95dc8b752543af1e) )
@@ -573,11 +579,11 @@ ROM_START( slivera )
 	ROM_LOAD16_BYTE( "ka-7.bin", 0x100001, 0x40000, CRC(1c5d6fb9) SHA1(372533264eb41a5f57b2a59eb039adb6334f36c5) )
 
 	ROM_REGION( 0x180000, "user2", 0 ) /* JPEG(!) compressed GFX */
-	ROM_LOAD( "ka-10.bin", 0x000000, 0x80000, CRC(639ad3ca) SHA1(d3c6a071aac62a3048e9f5bf2eb835619aa1a83b) )
-	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) )
+	ROM_LOAD( "ka-10.bin", 0x000000, 0x80000, CRC(639ad3ca) SHA1(d3c6a071aac62a3048e9f5bf2eb835619aa1a83b) ) // sldh
+	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) ) // sldh
 	// no rom 12 on PCB, played through the game and doesn't seem to be required for this gfx set, all girls present.
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

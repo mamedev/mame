@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_FILESEL_H
 #define MAME_FRONTEND_UI_FILESEL_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -50,6 +50,9 @@ private:
 
 	struct file_selector_entry
 	{
+		file_selector_entry() {}
+		file_selector_entry(file_selector_entry &&) = default;
+		file_selector_entry &operator=(file_selector_entry &&) = default;
 		file_selector_entry_type type;
 		std::string basename;
 		std::string fullpath;
@@ -67,7 +70,7 @@ private:
 	std::string                 m_hover_directory;
 	std::string                 m_filename;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// methods
@@ -95,7 +98,7 @@ public:
 	menu_select_rw(mame_ui_manager &mui, render_container &container,
 						bool can_in_place, result &result);
 	virtual ~menu_select_rw() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	static void *itemref_from_result(result result);

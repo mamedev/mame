@@ -16,7 +16,10 @@
 
 */
 
+#include "emu.h"
 #include "lvc.h"
+
+#include "screen.h"
 
 
 
@@ -44,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_LVC, wangpc_lvc_device, "wangpc_lvc", "Wang PC Low Resolution Video Card")
 
 
 //-------------------------------------------------
@@ -60,7 +63,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 		for (int column = 0; column < x_count; column++)
 		{
 			offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
-			UINT16 data = m_video_ram[addr & 0x7fff];
+			uint16_t data = m_video_ram[addr & 0x7fff];
 
 			for (int bit = 0; bit < 8; bit++)
 			{
@@ -69,7 +72,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -82,7 +85,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 		for (int column = 0; column < x_count; column++)
 		{
-			UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
+			uint32_t data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
 
 			for (int bit = 0; bit < 8; bit++)
 			{
@@ -91,7 +94,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -110,10 +113,10 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
+//  MACHINE_CONFIG_START( wangpc_lvc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
+MACHINE_CONFIG_MEMBER( wangpc_lvc_device::device_add_mconfig )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 25*9)
@@ -127,17 +130,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_lvc_device, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_lvc_device, vsync_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_lvc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_lvc );
-}
 
 
 
@@ -166,8 +158,8 @@ inline void wangpc_lvc_device::set_irq(int state)
 //  wangpc_lvc_device - constructor
 //-------------------------------------------------
 
-wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WANGPC_LVC, "Wang PC Low Resolution Video Card", tag, owner, clock, "wangpc_lvc", __FILE__),
+wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WANGPC_LVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram"),
@@ -209,9 +201,9 @@ void wangpc_lvc_device::device_reset()
 //  wangpcbus_mrdc_r - memory read
 //-------------------------------------------------
 
-UINT16 wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (OPTION_VRAM && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
@@ -228,7 +220,7 @@ UINT16 wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, 
 //  wangpcbus_amwc_w - memory write
 //-------------------------------------------------
 
-void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (OPTION_VRAM && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
@@ -243,9 +235,9 @@ void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UI
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-UINT16 wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (sad(offset))
 	{
@@ -276,7 +268,7 @@ UINT16 wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset))
 	{

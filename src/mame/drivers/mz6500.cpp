@@ -12,6 +12,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+#include "screen.h"
 
 class mz6500_state : public driver_device
 {
@@ -30,7 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -42,7 +43,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int gfx[3];
-	UINT8 i,pen;
+	uint8_t i,pen;
 
 	gfx[0] = m_video_ram[(address + 0x00000) >> 1];
 	gfx[1] = m_video_ram[(address + 0x10000) >> 1];
@@ -131,12 +132,12 @@ static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, mz6500_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, mz6500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( mz6500, mz6500_state )
+static MACHINE_CONFIG_START( mz6500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
 	MCFG_CPU_PROGRAM_MAP(mz6500_map)
@@ -154,7 +155,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
@@ -176,5 +177,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, mz6500,  0,      0,       mz6500,     mz6500, driver_device,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE            INIT   COMPANY    FULLNAME   FLAGS
+COMP( 198?, mz6500,  0,      0,       mz6500,    mz6500, mz6500_state,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

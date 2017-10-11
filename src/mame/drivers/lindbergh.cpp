@@ -99,16 +99,16 @@ Ghost Squad Evolution                         ?                 ?              ^
 Harley Davidson: King of the Road             ?                 ?               ?
 Hummer                                        ?                 ?               DVP-0057B
 Hummer Extreme                                253-5508-????    ^317-????-COM    DVP-0079 ???
-Initial D Arcade Stage 4                      253-5508-0620     317-0620-COM    DVP-0019
-Initial D Arcade Stage 4 (rev A)              253-5508-0620     317-0620-COM    DVP-0019A
-Initial D Arcade Stage 4 (rev B)              253-5508-0620     317-0620-COM    DVP-0019B
-Initial D Arcade Stage 4 (rev C)              253-5508-0620     317-0620-COM   ^DVP-0019C
-Initial D Arcade Stage 4 (rev D)              253-5508-0620     317-0620-COM    DVP-0019D
-Initial D Arcade Stage 4 (rev G)              253-5508-0620     317-0620-COM    DVP-0019G
-Initial D4                                    253-5508-0486E    317-0486-COM    DVP-0030
-Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
-Initial D4 (rev C)                            253-5508-0486E    317-0486-COM   ^DVP-0030C
-Initial D4 (rev D)                            253-5508-0486E    317-0486-COM   ^DVP-0030D
+Initial D Arcade Stage 4                      253-5508-0486J    317-0486-JPN    DVP-0019
+Initial D Arcade Stage 4 (rev A)              253-5508-0486J    317-0486-JPN    DVP-0019A
+Initial D Arcade Stage 4 (rev B)              253-5508-0486J    317-0486-JPN    DVP-0019B
+Initial D Arcade Stage 4 (rev C)              253-5508-0486J    317-0486-JPN   ^DVP-0019C
+Initial D Arcade Stage 4 (rev D)              253-5508-0486J    317-0486-JPN    DVP-0019D
+Initial D Arcade Stage 4 (rev G)              253-5508-0486J    317-0486-JPN    DVP-0019G
+Initial D4                                    253-5508-0486E    317-0486-EXP    DVP-0030
+Initial D4 (rev B)                            253-5508-0486E    317-0486-EXP    DVP-0030B
+Initial D4 (rev C)                            253-5508-0486E    317-0486-EXP   ^DVP-0030C
+Initial D4 (rev D)                            253-5508-0486E    317-0486-EXP   ^DVP-0030D
 Initial D Arcade Stage 5 (rev A)              ?                 ?               DVP-0070A
 Initial D Arcade Stage 5 EXP 2.0              ?                 ?               DVP-0075
 INFO STATION 2 (rev C)                        ?                 ?               DVP-0050C
@@ -389,7 +389,7 @@ void lindbergh_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
+static MACHINE_CONFIG_START(lindbergh)
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
@@ -609,22 +609,22 @@ ROM_START(lbvbiosu)
 	DISK_IMAGE_READONLY("dvp-0021b", 0, SHA1(362ac028ba19ba4762678953a033034a5ee8ad53))
 ROM_END
 
-GAME(1999, lindbios,         0, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
-GAME(2005, hotd4,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev B)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2005, hotd4a,    hotd4,    lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev A)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2005, vf5,       lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, abclimax,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, letsgoju,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, outr2sdx,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "OutRun 2 SP SDX",                          MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, psmash3,   lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, vtennis3,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, 2spicy,    lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "2 Spicy",                                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, ghostsev,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Ghost Squad Evolution",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, initiad4,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Initial D4 (Rev D)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, initiad4c, initiad4, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Initial D4 (Rev C)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, segartv,   lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Sega Race-TV (Export)",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, hotdex,    lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead EX (Japan)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, primevah,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, rambo,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2009, hummerxt,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "VBios updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(1999, lindbios,         0, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
+GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, abclimax,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, letsgoju,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, outr2sdx,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "OutRun 2 SP SDX",                          MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, psmash3,   lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, vtennis3,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, 2spicy,    lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "2 Spicy",                                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, ghostsev,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Ghost Squad Evolution",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, initiad4,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Initial D4 (Rev D)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, initiad4c, initiad4, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Initial D4 (Rev C)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, segartv,   lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Sega Race-TV (Export)",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, hotdex,    lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead EX (Japan)",         MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, primevah,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, rambo,     lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2009, hummerxt,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "VBios updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

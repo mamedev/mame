@@ -63,12 +63,18 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 */
 
 #include "emu.h"
+#include "includes/raiden2.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "sound/3812intf.h"
+//#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/raiden2.h"
 #include "machine/r2crypt.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class r2dx_v33_state : public raiden2_state
@@ -83,7 +89,7 @@ public:
 	{ }
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_region_ptr<UINT8> m_math;
+	required_region_ptr<uint8_t> m_math;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -122,10 +128,10 @@ public:
 
 	int m_r2dxbank;
 	int m_r2dxgameselect;
-	INT16 m_r2dx_angle;
+	int16_t m_r2dx_angle;
 
-	UINT16 r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
-	UINT32 r2dx_i_sdist;
+	uint16_t r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
+	uint32_t r2dx_i_sdist;
 
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 
@@ -208,7 +214,7 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
 
-static UINT16 mcu_prog[0x800];
+static uint16_t mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
@@ -248,7 +254,7 @@ READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
 }
 
 
-static UINT16 mcu_xval,mcu_yval;
+static uint16_t mcu_xval,mcu_yval;
 
 /* something sent to the MCU for X/Y global screen calculating ... */
 WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
@@ -263,7 +269,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
 }
 
-static UINT16 mcu_data[9];
+static uint16_t mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
 WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
@@ -329,12 +335,12 @@ READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | UINT16(~mem_mask))) | (data & mem_mask);
+	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (UINT16(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
+	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 // these DMA operations seem to use hardcoded addresses on this hardware
@@ -344,7 +350,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_tilemapdma_w)
 
 	for (int i = 0; i < 0x2800 / 2; i++)
 	{
-		UINT16 tileval = space.read_word(src);
+		uint16_t tileval = space.read_word(src);
 		src += 2;
 		m_videoram_private_w(space, i, tileval, 0xffff);
 	}
@@ -356,7 +362,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 
 	for (int i = 0; i < 0x1000 / 2; i++)
 	{
-		UINT16 palval = space.read_word(src);
+		uint16_t palval = space.read_word(src);
 		src += 2;
 		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
@@ -472,7 +478,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
+	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
@@ -754,11 +760,11 @@ MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 	mid_bank = 1;
 }
 
-static ADDRESS_MAP_START( r2dx_oki_map, AS_0, 8, r2dx_v33_state )
+static ADDRESS_MAP_START( r2dx_oki_map, 0, 8, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
+static MACHINE_CONFIG_START( rdx_v33 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -790,12 +796,12 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, r2dx_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
+static MACHINE_CONFIG_START( nzerotea )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */
@@ -804,9 +810,8 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-
-	//  SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
-	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -827,9 +832,20 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-//  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zerotm2k, nzerotea )
@@ -881,10 +897,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	// no sprite encryption(!)
 
 	// BG tile rom has 2 lines swapped
-	UINT8 *src = memregion("gfx2")->base()+0x100000;
+	uint8_t *src = memregion("gfx2")->base()+0x100000;
 	int len = 0x080000;
 
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	int i;
 	for (i = 0; i < len; i ++)
 		buffer[i] = src[BITSWAP32(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];

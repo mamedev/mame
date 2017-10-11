@@ -677,6 +677,20 @@ void ir_print_metal_visitor::visit(ir_variable *ir)
 		buffer.asprintf_append (" = ");
 		visit (ir->constant_value);
 	}
+
+	if ((ir->data.mode == ir_var_auto || ir->data.mode == ir_var_temporary) && (ir->type->matrix_columns == 1)) {
+		switch (ir->type->base_type) {
+			case GLSL_TYPE_INT:
+			case GLSL_TYPE_FLOAT:
+				buffer.asprintf_append (" = 0");
+				break;
+			case GLSL_TYPE_BOOL:
+				buffer.asprintf_append (" = false");
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 
@@ -1110,9 +1124,10 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 			else if (op0cast)
 			{
 				print_cast (buffer, arg_prec, ir->operands[0]);
+				buffer.asprintf_append ("(");
 			}
 			ir->operands[0]->accept(this);
-			if (op0castTo1)
+			if (op0castTo1 || op0cast)
 			{
 				buffer.asprintf_append (")");
 			}
@@ -1131,9 +1146,10 @@ void ir_print_metal_visitor::visit(ir_expression *ir)
 			else if (op1cast)
 			{
 				print_cast (buffer, arg_prec, ir->operands[1]);
+				buffer.asprintf_append ("(");
 			}
 			ir->operands[1]->accept(this);
-			if (op1castTo0)
+			if (op1castTo0 || op1cast)
 			{
 				buffer.asprintf_append (")");
 			}
@@ -1214,14 +1230,17 @@ static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool 
 	}
 	else if (is_shadow)
 	{
+		// Note that on metal sample_compare works differently than shadow2DEXT on GLES:
+		// it does not clamp neither the pixel value nor compare value to the [0.0, 1.0] range. To
+		// preserve same behavior we're clamping the argument explicitly.
 		if (!is_proj)
 		{
 			// regular shadow
 			vis->buffer.asprintf_append (uv_dim == 4 ? "(float3)(" : "(float2)(");
 			ir->coordinate->accept(vis);
-			vis->buffer.asprintf_append (uv_dim == 4 ? ").xyz, (" : ").xy, (float)(");
+			vis->buffer.asprintf_append (uv_dim == 4 ? ").xyz, (" : ").xy, saturate((float)(");
 			ir->coordinate->accept(vis);
-			vis->buffer.asprintf_append (uv_dim == 4 ? ").w" : ").z");
+			vis->buffer.asprintf_append (uv_dim == 4 ? ").w" : ").z)");
 		}
 		else
 		{
@@ -1230,17 +1249,29 @@ static void print_texture_uv (ir_print_metal_visitor* vis, ir_texture* ir, bool 
 			ir->coordinate->accept(vis);
 			vis->buffer.asprintf_append (").xy / (float)(");
 			ir->coordinate->accept(vis);
-			vis->buffer.asprintf_append (").w, (float)(");
+			vis->buffer.asprintf_append (").w, saturate((float)(");
 			ir->coordinate->accept(vis);
 			vis->buffer.asprintf_append (").z / (float)(");
 			ir->coordinate->accept(vis);
-			vis->buffer.asprintf_append (").w");
+			vis->buffer.asprintf_append (").w)");
 		}
 	}
 }
 
 void ir_print_metal_visitor::visit(ir_texture *ir)
 {
+	if (ir->op == ir_txs)
+	{
+		ir->sampler->accept(this);
+		buffer.asprintf_append (".get_width(");
+		ir->lod_info.lod->accept(this);
+		buffer.asprintf_append ("), ");
+		ir->sampler->accept(this);
+		buffer.asprintf_append (".get_height(");
+		ir->lod_info.lod->accept(this);
+		buffer.asprintf_append (")");
+		return;
+	}
 	glsl_sampler_dim sampler_dim = (glsl_sampler_dim)ir->sampler->type->sampler_dimensionality;
 	const bool is_shadow = ir->sampler->type->sampler_shadow;
 	const bool is_array = ir->sampler->type->sampler_array;
@@ -1251,6 +1282,12 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 		sampler_uv_dim += 1;
 	const bool is_proj = (uv_dim > sampler_uv_dim) && !is_array;
 
+    // Construct as the expected return type of shadow2D as sample_compare returns a scalar
+    if (is_shadow)
+    {
+        buffer.asprintf_append("float4(");
+    }
+
 	// texture name & call to sample
 	ir->sampler->accept(this);
 	if (is_shadow)
@@ -1258,7 +1295,7 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 		// For shadow sampling, Metal right now needs a hardcoded sampler state :|
 		if (!ctx.shadowSamplerDone)
 		{
-			ctx.prefixStr.asprintf_append("constexpr sampler _mtl_xl_shadow_sampler(address::clamp_to_edge, filter::linear, compare_func::less);\n");
+			ctx.prefixStr.asprintf_append("constexpr sampler _mtl_xl_shadow_sampler(address::clamp_to_edge, filter::linear, compare_func::less_equal);\n");
 			ctx.shadowSamplerDone = true;
 		}
 		buffer.asprintf_append (".sample_compare(_mtl_xl_shadow_sampler");
@@ -1314,6 +1351,12 @@ void ir_print_metal_visitor::visit(ir_texture *ir)
 	//@TODO: pixel offsets
 
 	buffer.asprintf_append (")");
+	
+    // Close float4 cast
+    if (is_shadow)
+    {
+        buffer.asprintf_append(")");
+    }
 }
 
 

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#pragma once
+#ifndef MAME_CPU_E132XS_E132XS_H
+#define MAME_CPU_E132XS_E132XS_H
 
-#ifndef __E132XS_H__
-#define __E132XS_H__
+#pragma once
 
 
 /*
@@ -25,181 +25,10 @@
 /* Functions */
 
 /***************************************************************************
-    COMPILE-TIME DEFINITIONS
-***************************************************************************/
-
-#define PC_REGISTER          0
-#define SR_REGISTER          1
-#define BCR_REGISTER        20
-#define TPR_REGISTER        21
-#define TCR_REGISTER        22
-#define TR_REGISTER         23
-#define ISR_REGISTER        25
-#define FCR_REGISTER        26
-#define MCR_REGISTER        27
-
-#define X_CODE(val)      ((val & 0x7000) >> 12)
-#define E_BIT(val)       ((val & 0x8000) >> 15)
-#define S_BIT_CONST(val) ((val & 0x4000) >> 14)
-#define DD(val)          ((val & 0x3000) >> 12)
-
-
-/* Extended DSP instructions */
-#define EMUL            0x102
-#define EMULU           0x104
-#define EMULS           0x106
-#define EMAC            0x10a
-#define EMACD           0x10e
-#define EMSUB           0x11a
-#define EMSUBD          0x11e
-#define EHMAC           0x02a
-#define EHMACD          0x02e
-#define EHCMULD         0x046
-#define EHCMACD         0x04e
-#define EHCSUMD         0x086
-#define EHCFFTD         0x096
-#define EHCFFTSD        0x296
-
-/* Delay values */
-#define NO_DELAY        0
-#define DELAY_EXECUTE   1
-
-/* IRQ numbers */
-#define IRQ_INT1        0
-#define IRQ_INT2        1
-#define IRQ_INT3        2
-#define IRQ_INT4        3
-#define IRQ_IO1         4
-#define IRQ_IO2         5
-#define IRQ_IO3         6
-
-/* Trap numbers */
-#define TRAPNO_IO2                  48
-#define TRAPNO_IO1                  49
-#define TRAPNO_INT4             50
-#define TRAPNO_INT3             51
-#define TRAPNO_INT2             52
-#define TRAPNO_INT1             53
-#define TRAPNO_IO3                  54
-#define TRAPNO_TIMER                55
-#define TRAPNO_RESERVED1            56
-#define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR     58
-#define TRAPNO_EXTENDED_OVERFLOW    59
-#define TRAPNO_RANGE_ERROR          60
-#define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
-#define TRAPNO_FRAME_ERROR          TRAPNO_RANGE_ERROR
-#define TRAPNO_RESERVED2            61
-#define TRAPNO_RESET                62  // reserved if not mapped @ MEM3
-#define TRAPNO_ERROR_ENTRY          63  // for instruction code of all ones
-
-/* Trap codes */
-#define TRAPLE      4
-#define TRAPGT      5
-#define TRAPLT      6
-#define TRAPGE      7
-#define TRAPSE      8
-#define TRAPHT      9
-#define TRAPST      10
-#define TRAPHE      11
-#define TRAPE       12
-#define TRAPNE      13
-#define TRAPV       14
-#define TRAP        15
-
-/* Entry point to get trap locations or emulated code associated */
-#define E132XS_ENTRY_MEM0   0
-#define E132XS_ENTRY_MEM1   1
-#define E132XS_ENTRY_MEM2   2
-#define E132XS_ENTRY_IRAM   3
-#define E132XS_ENTRY_MEM3   7
-
-/***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
 
-enum
-{
-	E132XS_PC = 1,
-	E132XS_SR,
-	E132XS_FER,
-	E132XS_G3,
-	E132XS_G4,
-	E132XS_G5,
-	E132XS_G6,
-	E132XS_G7,
-	E132XS_G8,
-	E132XS_G9,
-	E132XS_G10,
-	E132XS_G11,
-	E132XS_G12,
-	E132XS_G13,
-	E132XS_G14,
-	E132XS_G15,
-	E132XS_G16,
-	E132XS_G17,
-	E132XS_SP,
-	E132XS_UB,
-	E132XS_BCR,
-	E132XS_TPR,
-	E132XS_TCR,
-	E132XS_TR,
-	E132XS_WCR,
-	E132XS_ISR,
-	E132XS_FCR,
-	E132XS_MCR,
-	E132XS_G28,
-	E132XS_G29,
-	E132XS_G30,
-	E132XS_G31,
-	E132XS_CL0, E132XS_CL1, E132XS_CL2, E132XS_CL3,
-	E132XS_CL4, E132XS_CL5, E132XS_CL6, E132XS_CL7,
-	E132XS_CL8, E132XS_CL9, E132XS_CL10,E132XS_CL11,
-	E132XS_CL12,E132XS_CL13,E132XS_CL14,E132XS_CL15,
-	E132XS_L0,  E132XS_L1,  E132XS_L2,  E132XS_L3,
-	E132XS_L4,  E132XS_L5,  E132XS_L6,  E132XS_L7,
-	E132XS_L8,  E132XS_L9,  E132XS_L10, E132XS_L11,
-	E132XS_L12, E132XS_L13, E132XS_L14, E132XS_L15,
-	E132XS_L16, E132XS_L17, E132XS_L18, E132XS_L19,
-	E132XS_L20, E132XS_L21, E132XS_L22, E132XS_L23,
-	E132XS_L24, E132XS_L25, E132XS_L26, E132XS_L27,
-	E132XS_L28, E132XS_L29, E132XS_L30, E132XS_L31,
-	E132XS_L32, E132XS_L33, E132XS_L34, E132XS_L35,
-	E132XS_L36, E132XS_L37, E132XS_L38, E132XS_L39,
-	E132XS_L40, E132XS_L41, E132XS_L42, E132XS_L43,
-	E132XS_L44, E132XS_L45, E132XS_L46, E132XS_L47,
-	E132XS_L48, E132XS_L49, E132XS_L50, E132XS_L51,
-	E132XS_L52, E132XS_L53, E132XS_L54, E132XS_L55,
-	E132XS_L56, E132XS_L57, E132XS_L58, E132XS_L59,
-	E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
-};
-
-extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp);
-
-/* Memory access */
-/* read byte */
-#define READ_B(addr)            m_program->read_byte((addr))
-/* read half-word */
-#define READ_HW(addr)           m_program->read_word((addr) & ~1)
-/* read word */
-#define READ_W(addr)            m_program->read_dword((addr) & ~3)
-
-/* write byte */
-#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
-/* write half-word */
-#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
-/* write word */
-#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
-
-
-/* I/O access */
-/* read word */
-#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
-/* write word */
-#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
-
-
-#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
+extern unsigned dasm_hyperstone(std::ostream &stream, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -210,14 +39,67 @@ extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, u
 // Used by core CPU interface
 class hyperstone_device : public cpu_device
 {
-public:
-	// construction/destruction
-	hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, const char *shortname, const char *source);
-
-	// public interfaces
-
 protected:
+	enum
+	{
+		E132XS_PC = 1,
+		E132XS_SR,
+		E132XS_FER,
+		E132XS_G3,
+		E132XS_G4,
+		E132XS_G5,
+		E132XS_G6,
+		E132XS_G7,
+		E132XS_G8,
+		E132XS_G9,
+		E132XS_G10,
+		E132XS_G11,
+		E132XS_G12,
+		E132XS_G13,
+		E132XS_G14,
+		E132XS_G15,
+		E132XS_G16,
+		E132XS_G17,
+		E132XS_SP,
+		E132XS_UB,
+		E132XS_BCR,
+		E132XS_TPR,
+		E132XS_TCR,
+		E132XS_TR,
+		E132XS_WCR,
+		E132XS_ISR,
+		E132XS_FCR,
+		E132XS_MCR,
+		E132XS_G28,
+		E132XS_G29,
+		E132XS_G30,
+		E132XS_G31,
+		E132XS_CL0, E132XS_CL1, E132XS_CL2, E132XS_CL3,
+		E132XS_CL4, E132XS_CL5, E132XS_CL6, E132XS_CL7,
+		E132XS_CL8, E132XS_CL9, E132XS_CL10,E132XS_CL11,
+		E132XS_CL12,E132XS_CL13,E132XS_CL14,E132XS_CL15,
+		E132XS_L0,  E132XS_L1,  E132XS_L2,  E132XS_L3,
+		E132XS_L4,  E132XS_L5,  E132XS_L6,  E132XS_L7,
+		E132XS_L8,  E132XS_L9,  E132XS_L10, E132XS_L11,
+		E132XS_L12, E132XS_L13, E132XS_L14, E132XS_L15,
+		E132XS_L16, E132XS_L17, E132XS_L18, E132XS_L19,
+		E132XS_L20, E132XS_L21, E132XS_L22, E132XS_L23,
+		E132XS_L24, E132XS_L25, E132XS_L26, E132XS_L27,
+		E132XS_L28, E132XS_L29, E132XS_L30, E132XS_L31,
+		E132XS_L32, E132XS_L33, E132XS_L34, E132XS_L35,
+		E132XS_L36, E132XS_L37, E132XS_L38, E132XS_L39,
+		E132XS_L40, E132XS_L41, E132XS_L42, E132XS_L43,
+		E132XS_L44, E132XS_L45, E132XS_L46, E132XS_L47,
+		E132XS_L48, E132XS_L49, E132XS_L50, E132XS_L51,
+		E132XS_L52, E132XS_L53, E132XS_L54, E132XS_L55,
+		E132XS_L56, E132XS_L57, E132XS_L58, E132XS_L59,
+		E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
+	};
+
+	// construction/destruction
+	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
+
 	void init(int scale_mask);
 
 	// device-level overrides
@@ -226,19 +108,19 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -253,38 +135,38 @@ protected:
 	/* Delay information */
 	struct delay_info
 	{
-		INT32   delay_cmd;
-		UINT32  delay_pc;
+		int32_t   delay_cmd;
+		uint32_t  delay_pc;
 	};
 
 	// CPU registers
-	UINT32  m_global_regs[32];
-	UINT32  m_local_regs[64];
+	uint32_t  m_global_regs[32];
+	uint32_t  m_local_regs[64];
 
 	/* internal stuff */
-	UINT32  m_ppc;          // previous pc
-	UINT16  m_op;           // opcode
-	UINT32  m_trap_entry;   // entry point to get trap address
+	uint32_t  m_ppc;          // previous pc
+	uint16_t  m_op;           // opcode
+	uint32_t  m_trap_entry;   // entry point to get trap address
 
-	UINT8   m_clock_scale_mask;
-	UINT8   m_clck_scale;
-	UINT8   m_clock_cycles_1;
-	UINT8   m_clock_cycles_2;
-	UINT8   m_clock_cycles_4;
-	UINT8   m_clock_cycles_6;
+	uint8_t   m_clock_scale_mask;
+	uint8_t   m_clck_scale;
+	uint8_t   m_clock_cycles_1;
+	uint8_t   m_clock_cycles_2;
+	uint8_t   m_clock_cycles_4;
+	uint8_t   m_clock_cycles_6;
 
-	UINT64  m_tr_base_cycles;
-	UINT32  m_tr_base_value;
-	UINT32  m_tr_clocks_per_tick;
-	UINT8   m_timer_int_pending;
+	uint64_t  m_tr_base_cycles;
+	uint32_t  m_tr_base_value;
+	uint32_t  m_tr_clocks_per_tick;
+	uint8_t   m_timer_int_pending;
 	emu_timer *m_timer;
 
 	delay_info m_delay;
 
-	UINT32 m_opcodexor;
+	uint32_t m_opcodexor;
 
-	INT32 m_instruction_length;
-	INT32 m_intblock;
+	int32_t m_instruction_length;
+	int32_t m_intblock;
 
 	// other internal state
 	int     m_icount;
@@ -298,36 +180,36 @@ protected:
 private:
 	struct regs_decode
 	{
-		UINT8   src, dst;       // destination and source register code
-		UINT32  src_value;      // current source register value
-		UINT32  next_src_value; // current next source register value
-		UINT32  dst_value;      // current destination register value
-		UINT32  next_dst_value; // current next destination register value
-		UINT8   sub_type;       // sub type opcode (for DD and X_CODE bits)
+		uint8_t   src, dst;       // destination and source register code
+		uint32_t  src_value;      // current source register value
+		uint32_t  next_src_value; // current next source register value
+		uint32_t  dst_value;      // current destination register value
+		uint32_t  next_dst_value; // current next destination register value
+		uint8_t   sub_type;       // sub type opcode (for DD and X_CODE bits)
 		union
 		{
-			UINT32 u;
-			INT32  s;
+			uint32_t u;
+			int32_t  s;
 		} extra;                // extra value such as immediate value, const, pcrel, ...
-		UINT8   src_is_local;
-		UINT8   dst_is_local;
-		UINT8   same_src_dst;
-		UINT8   same_src_dstf;
-		UINT8   same_srcf_dst;
+		uint8_t   src_is_local;
+		uint8_t   dst_is_local;
+		uint8_t   same_src_dst;
+		uint8_t   same_src_dstf;
+		uint8_t   same_srcf_dst;
 	};
 
 	// internal functions
 	void check_interrupts();
 
-	void set_global_register(UINT8 code, UINT32 val);
-	void set_local_register(UINT8 code, UINT32 val);
+	void set_global_register(uint8_t code, uint32_t val);
+	void set_local_register(uint8_t code, uint32_t val);
 
-	UINT32 get_global_register(UINT8 code);
+	uint32_t get_global_register(uint8_t code);
 
-	UINT32 get_trap_addr(UINT8 trapno);
-	UINT32 get_emu_code_addr(UINT8 num);
+	uint32_t get_trap_addr(uint8_t trapno);
+	uint32_t get_emu_code_addr(uint8_t num);
 	void hyperstone_set_trap_entry(int which);
-	UINT32 compute_tr();
+	uint32_t compute_tr();
 	void update_timer_prescale();
 	void adjust_timer_interrupt();
 
@@ -335,9 +217,9 @@ private:
 
 	void execute_br(struct regs_decode *decode);
 	void execute_dbr(struct regs_decode *decode);
-	void execute_trap(UINT32 addr);
-	void execute_int(UINT32 addr);
-	void execute_exception(UINT32 addr);
+	void execute_trap(uint32_t addr);
+	void execute_int(uint32_t addr);
+	void execute_exception(uint32_t addr);
 	void execute_software(struct regs_decode *decode);
 
 	void hyperstone_chk(struct regs_decode *decode);
@@ -495,20 +377,20 @@ private:
 };
 
 // device type definition
-extern const device_type E116T;
-extern const device_type E116XT;
-extern const device_type E116XS;
-extern const device_type E116XSR;
-extern const device_type E132N;
-extern const device_type E132T;
-extern const device_type E132XN;
-extern const device_type E132XT;
-extern const device_type E132XS;
-extern const device_type E132XSR;
-extern const device_type GMS30C2116;
-extern const device_type GMS30C2132;
-extern const device_type GMS30C2216;
-extern const device_type GMS30C2232;
+DECLARE_DEVICE_TYPE(E116T,      e116t_device)
+DECLARE_DEVICE_TYPE(E116XT,     e116xt_device)
+DECLARE_DEVICE_TYPE(E116XS,     e116xs_device)
+DECLARE_DEVICE_TYPE(E116XSR,    e116xsr_device)
+DECLARE_DEVICE_TYPE(E132N,      e132n_device)
+DECLARE_DEVICE_TYPE(E132T,      e132t_device)
+DECLARE_DEVICE_TYPE(E132XN,     e132xn_device)
+DECLARE_DEVICE_TYPE(E132XT,     e132xt_device)
+DECLARE_DEVICE_TYPE(E132XS,     e132xs_device)
+DECLARE_DEVICE_TYPE(E132XSR,    e132xsr_device)
+DECLARE_DEVICE_TYPE(GMS30C2116, gms30c2116_device)
+DECLARE_DEVICE_TYPE(GMS30C2132, gms30c2132_device)
+DECLARE_DEVICE_TYPE(GMS30C2216, gms30c2216_device)
+DECLARE_DEVICE_TYPE(GMS30C2232, gms30c2232_device)
 
 
 // ======================> e116t_device
@@ -517,7 +399,7 @@ class e116t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -530,7 +412,7 @@ class e116xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -543,7 +425,7 @@ class e116xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -556,7 +438,7 @@ class e116xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -569,7 +451,7 @@ class e132n_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -582,7 +464,7 @@ class e132t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -595,7 +477,7 @@ class e132xn_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -608,7 +490,7 @@ class e132xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -621,7 +503,7 @@ class e132xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -634,7 +516,7 @@ class e132xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -647,7 +529,7 @@ class gms30c2116_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -660,7 +542,7 @@ class gms30c2132_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -673,7 +555,7 @@ class gms30c2216_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -686,10 +568,10 @@ class gms30c2232_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 };
 
-#endif /* __E132XS_H__ */
+#endif // MAME_CPU_E132XS_E132XS_H

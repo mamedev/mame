@@ -16,19 +16,13 @@
 
 ***************************************************************************/
 
-#ifndef __RP5H01_H__
-#define __RP5H01_H__
+#ifndef MAME_MACHINE_RP5H01_H
+#define MAME_MACHINE_RP5H01_H
 
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-/* these also work as the address masks */
-enum {
-	COUNTER_MODE_6_BITS = 0x3f,
-	COUNTER_MODE_7_BITS = 0x7f
-};
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -37,7 +31,7 @@ enum {
 class rp5h01_device : public device_t
 {
 public:
-	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( enable_w );   /* /CE */
 	DECLARE_WRITE_LINE_MEMBER( reset_w );    /* RESET */
@@ -49,12 +43,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	static UINT8 const s_initial_data[0x10];
+	/* these also work as the address masks */
+	enum {
+		COUNTER_MODE_6_BITS = 0x3f,
+		COUNTER_MODE_7_BITS = 0x7f
+	};
+
+	static uint8_t const s_initial_data[0x10];
 
 	// internal state
 	int m_counter;
@@ -62,11 +61,11 @@ private:
 	int m_enabled;        /* chip enable */
 	int m_old_reset;      /* reset pin state (level-triggered) */
 	int m_old_clock;      /* clock pin state (level-triggered) */
-	UINT8 const *m_data;
-	optional_region_ptr<UINT8> m_rom;
+	uint8_t const *m_data;
+	optional_region_ptr<uint8_t> m_rom;
 };
 
-extern const device_type RP5H01;
+DECLARE_DEVICE_TYPE(RP5H01, rp5h01_device)
 
 
 #define MCFG_RP5H01_ADD(_tag) \
@@ -78,4 +77,4 @@ extern const device_type RP5H01;
  * assigned to device.
  */
 
-#endif /* __RP5H01_H__ */
+#endif // MAME_MACHINE_RP5H01_H

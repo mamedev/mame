@@ -6,7 +6,6 @@
 #define __TMC1800__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -92,7 +91,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ_LINE_MEMBER( clear_r );
@@ -115,7 +114,7 @@ public:
 	{ }
 
 	required_device<cdp1864_device> m_cti;
-	optional_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
 
 	virtual void machine_start() override;
@@ -140,7 +139,7 @@ public:
 	int m_roc;
 
 	/* video state */
-	UINT8 m_color;
+	uint8_t m_color;
 
 	/* keyboard state */
 	int m_keylatch;

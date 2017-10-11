@@ -52,6 +52,7 @@
 #include "eacc.lh"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 
 class eacc_state : public driver_device
@@ -76,12 +77,12 @@ public:
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
-	required_shared_ptr<UINT8> m_p_nvram;
+	required_shared_ptr<uint8_t> m_p_nvram;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 private:
-	UINT8 m_digit;
+	uint8_t m_digit;
 };
 
 
@@ -174,7 +175,7 @@ WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 
 READ8_MEMBER( eacc_state::eacc_keyboard_r )
 {
-	UINT8 data = m_digit;
+	uint8_t data = m_digit;
 
 	if (BIT(m_digit, 3))
 		data |= ioport("X0")->read();
@@ -201,7 +202,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 
 	if (!m_nmi)
 	{
-		UINT8 i;
+		uint8_t i;
 		if (BIT(m_digit, 7))
 		{
 			char lednum[6];
@@ -237,7 +238,7 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( eacc, eacc_state )
+static MACHINE_CONFIG_START( eacc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)  /* Divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(eacc_mem)
@@ -276,5 +277,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1982, eacc,       0,          0,      eacc,       eacc, driver_device,   0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

@@ -1,14 +1,24 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
 #include "bgfx_utils.h"
 
+#include <bgfx/embedded_shader.h>
+
 // embedded shaders
 #include "vs_metaballs.bin.h"
 #include "fs_metaballs.bin.h"
+
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_metaballs),
+	BGFX_EMBEDDED_SHADER(fs_metaballs),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
 
 struct PosNormalColorVertex
 {
@@ -361,7 +371,7 @@ float vertLerp(float* __restrict _result, float _iso, uint32_t _idx0, float _v0,
 	const float* __restrict edge0 = s_cube[_idx0];
 	const float* __restrict edge1 = s_cube[_idx1];
 
-	if (fabsf(_iso-_v1) < 0.00001f)
+	if (bx::fabsolute(_iso-_v1) < 0.00001f)
 	{
 		_result[0] = edge1[0];
 		_result[1] = edge1[1];
@@ -369,8 +379,8 @@ float vertLerp(float* __restrict _result, float _iso, uint32_t _idx0, float _v0,
 		return 1.0f;
 	}
 
-	if (fabsf(_iso-_v0) < 0.00001f
-	||  fabsf(_v0-_v1) < 0.00001f)
+	if (bx::fabsolute(_iso-_v0) < 0.00001f
+	||  bx::fabsolute(_v0-_v1) < 0.00001f)
 	{
 		_result[0] = edge0[0];
 		_result[1] = edge0[1];
@@ -490,35 +500,10 @@ class ExampleMetaballs : public entry::AppI
 		// Create vertex stream declaration.
 		PosNormalColorVertex::init();
 
-		const bgfx::Memory* vs_metaballs;
-		const bgfx::Memory* fs_metaballs;
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
 
-		switch (bgfx::getRendererType() )
-		{
-			case bgfx::RendererType::Direct3D9:
-				vs_metaballs = bgfx::makeRef(vs_metaballs_dx9, sizeof(vs_metaballs_dx9) );
-				fs_metaballs = bgfx::makeRef(fs_metaballs_dx9, sizeof(fs_metaballs_dx9) );
-				break;
-
-			case bgfx::RendererType::Direct3D11:
-			case bgfx::RendererType::Direct3D12:
-				vs_metaballs = bgfx::makeRef(vs_metaballs_dx11, sizeof(vs_metaballs_dx11) );
-				fs_metaballs = bgfx::makeRef(fs_metaballs_dx11, sizeof(fs_metaballs_dx11) );
-				break;
-
-			case bgfx::RendererType::Metal:
-				vs_metaballs = bgfx::makeRef(vs_metaballs_mtl, sizeof(vs_metaballs_mtl) );
-				fs_metaballs = bgfx::makeRef(fs_metaballs_mtl, sizeof(fs_metaballs_mtl) );
-				break;
-
-			default:
-				vs_metaballs = bgfx::makeRef(vs_metaballs_glsl, sizeof(vs_metaballs_glsl) );
-				fs_metaballs = bgfx::makeRef(fs_metaballs_glsl, sizeof(fs_metaballs_glsl) );
-				break;
-		}
-
-		bgfx::ShaderHandle vsh = bgfx::createShader(vs_metaballs);
-		bgfx::ShaderHandle fsh = bgfx::createShader(fs_metaballs);
+		bgfx::ShaderHandle vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_metaballs");
+		bgfx::ShaderHandle fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_metaballs");
 
 		// Create program from shaders.
 		m_program = bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
@@ -591,7 +576,7 @@ class ExampleMetaballs : public entry::AppI
 				bx::mtxLookAt(view, eye, at);
 
 				float proj[16];
-				bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+				bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 				bgfx::setViewTransform(0, view, proj);
 
 				// Set view 0 default viewport.
@@ -613,10 +598,10 @@ class ExampleMetaballs : public entry::AppI
 			float sphere[numSpheres][4];
 			for (uint32_t ii = 0; ii < numSpheres; ++ii)
 			{
-				sphere[ii][0] = sinf(time*(ii*0.21f)+ii*0.37f) * (DIMS * 0.5f - 8.0f);
-				sphere[ii][1] = sinf(time*(ii*0.37f)+ii*0.67f) * (DIMS * 0.5f - 8.0f);
-				sphere[ii][2] = cosf(time*(ii*0.11f)+ii*0.13f) * (DIMS * 0.5f - 8.0f);
-				sphere[ii][3] = 1.0f/(2.0f + (sinf(time*(ii*0.13f) )*0.5f+0.5f)*2.0f);
+				sphere[ii][0] = bx::fsin(time*(ii*0.21f)+ii*0.37f) * (DIMS * 0.5f - 8.0f);
+				sphere[ii][1] = bx::fsin(time*(ii*0.37f)+ii*0.67f) * (DIMS * 0.5f - 8.0f);
+				sphere[ii][2] = bx::fcos(time*(ii*0.11f)+ii*0.13f) * (DIMS * 0.5f - 8.0f);
+				sphere[ii][3] = 1.0f/(2.0f + (bx::fsin(time*(ii*0.13f) )*0.5f+0.5f)*2.0f);
 			}
 
 			profUpdate = bx::getHPCounter();

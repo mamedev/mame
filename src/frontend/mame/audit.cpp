@@ -48,7 +48,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 // temporary hack until romload is update: get the driver path and support it for
 // all searches
-const char *driverpath = m_enumerator.config().root_device().searchpath();
+const char *driverpath = m_enumerator.config()->root_device().searchpath();
 
 	std::size_t found = 0;
 	std::size_t required = 0;
@@ -56,7 +56,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 	std::size_t shared_required = 0;
 
 	// iterate over devices and regions
-	for (device_t &device : device_iterator(m_enumerator.config().root_device()))
+	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
 	{
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = device.searchpath();
@@ -199,7 +199,7 @@ media_auditor::summary media_auditor::audit_samples()
 	std::size_t found = 0;
 
 	// iterate over sample entries
-	for (samples_device &device : samples_device_iterator(m_enumerator.config().root_device()))
+	for (samples_device &device : samples_device_iterator(m_enumerator.config()->root_device()))
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);
@@ -273,7 +273,10 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 		// output the game name, file name, and length (if applicable)
 		if (output)
 		{
-			util::stream_format(*output, "%-12s: %s", name, record.name());
+			if (name)
+				util::stream_format(*output, "%-12s: %s", name, record.name());
+			else
+				util::stream_format(*output, "%s", record.name());
 			if (record.expected_length() > 0)
 				util::stream_format(*output, " (%d bytes)", record.expected_length());
 			*output << " - ";
@@ -380,7 +383,7 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 	audit_record &record = *m_record_list.emplace(m_record_list.end(), *rom, media_type::ROM);
 
 	// see if we have a CRC and extract it if so
-	UINT32 crc = 0;
+	uint32_t crc = 0;
 	bool const has_crc = record.expected_hashes().crc(crc);
 
 	// find the file and checksum it, getting the file length along the way
@@ -481,7 +484,7 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 //  shares a media entry with the same hashes
 //-------------------------------------------------
 
-device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, UINT64 romlength)
+device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
 {
 	bool const dumped = !romhashes.flag(util::hash_collection::FLAG_NO_DUMP);
 
@@ -507,7 +510,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 		// iterate up the parent chain
 		for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex >= 0; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
 		{
-			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex).root_device()))
+			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex)->root_device()))
 			{
 				for (const rom_entry *region = rom_first_region(scandevice); region; region = rom_next_region(region))
 				{

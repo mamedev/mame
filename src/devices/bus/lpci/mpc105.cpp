@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MPC105 = &device_creator<mpc105_device>;
+DEFINE_DEVICE_TYPE(MPC105, mpc105_device, "mpc105", "Motorola MPC105")
 
 
 //**************************************************************************
@@ -29,8 +29,8 @@ const device_type MPC105 = &device_creator<mpc105_device>;
 //  mpc105_device - constructor
 //-------------------------------------------------
 
-mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock, "mpc105", __FILE__),
+mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MPC105, tag, owner, clock),
 	pci_device_interface( mconfig, *this ),
 	m_cpu_tag(nullptr),
 	m_bank_base_default(0),
@@ -102,7 +102,7 @@ void mpc105_device::update_memory()
 
 				if (m_bank_base > 0)
 				{
-					sprintf(bank_str,"bank%d",bank + m_bank_base);
+					sprintf(bank_str,"bank%d",uint8_t(bank + m_bank_base));
 					membank(bank_str)->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 				}
 			}
@@ -114,9 +114,9 @@ void mpc105_device::update_memory()
 //  pci_read - implementation of PCI read
 //-------------------------------------------------
 
-UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
+uint32_t mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask)
 {
-	UINT32 result;
+	uint32_t result;
 
 	if (function != 0)
 		return 0;
@@ -191,7 +191,7 @@ UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 //  pci_write - implementation of PCI write
 //-------------------------------------------------
 
-void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 	if (function != 0)
@@ -216,9 +216,9 @@ void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 			break;
 
 		case 0xA0:  /* memory enable */
-			if (m_bank_enable != (UINT8) data)
+			if (m_bank_enable != (uint8_t) data)
 			{
-				m_bank_enable = (UINT8) data;
+				m_bank_enable = (uint8_t) data;
 				update_memory();
 			}
 			break;

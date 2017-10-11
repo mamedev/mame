@@ -1,20 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
+#ifndef MAME_SOUND_C352_H
+#define MAME_SOUND_C352_H
+
 #pragma once
 
-#ifndef __C352_H__
-#define __C352_H__
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C352_ADD(_tag, _clock, _setting) \
-	MCFG_DEVICE_ADD(_tag, C352, _clock) \
-	MCFG_C352_DIVIDER(_setting)
+#define MCFG_C352_ADD(tag, clock, setting) \
+		MCFG_DEVICE_ADD((tag), C352, (clock)) \
+		MCFG_C352_DIVIDER(setting)
 
-#define MCFG_C352_DIVIDER(_setting) \
-	c352_device::static_set_divider(*device, _setting);
+#define MCFG_C352_DIVIDER(setting) \
+		c352_device::static_set_divider(*device, (setting));
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,15 +30,13 @@ class c352_device : public device_t,
 {
 public:
 	// construction/destruction
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_divider(device_t &device, int setting);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
-
-	sound_stream *m_stream;
 
 protected:
 	// device-level overrides
@@ -73,41 +73,45 @@ private:
 
 	struct c352_voice_t {
 
-		UINT32 pos;
-		UINT32 counter;
+		uint32_t pos;
+		uint32_t counter;
 
-		INT16 sample;
-		INT16 last_sample;
+		int16_t sample;
+		int16_t last_sample;
 
-		UINT16 vol_f;
-		UINT16 vol_r;
-		UINT16 freq;
-		UINT16 flags;
+		uint16_t vol_f;
+		uint16_t vol_r;
+		uint8_t curr_vol[4];
 
-		UINT16  wave_bank;
-		UINT16 wave_start;
-		UINT16 wave_end;
-		UINT16 wave_loop;
+		uint16_t freq;
+		uint16_t flags;
+
+		uint16_t  wave_bank;
+		uint16_t wave_start;
+		uint16_t wave_end;
+		uint16_t wave_loop;
 
 	};
+
+	void fetch_sample(c352_voice_t* v);
+	void ramp_volume(c352_voice_t* v,int ch,uint8_t val);
+
+	unsigned short read_reg16(unsigned long address);
+	void write_reg16(unsigned long address, unsigned short val);
+
+	sound_stream *m_stream;
 
 	int m_sample_rate_base;
 	int m_divider;
 
 	c352_voice_t m_c352_v[32];
-	INT16 m_mulaw_table[256];
 
-	UINT16 m_random;
-	UINT16 m_control; // control flags, purpose unknown.
-
-	void fetch_sample(c352_voice_t* v);
-
-	unsigned short read_reg16(unsigned long address);
-	void write_reg16(unsigned long address, unsigned short val);
+	uint16_t m_random;
+	uint16_t m_control; // control flags, purpose unknown.
 };
 
 
 // device type definition
-extern const device_type C352;
+DECLARE_DEVICE_TYPE(C352, c352_device)
 
-#endif /* __C352_H__ */
+#endif // MAME_SOUND_C352_H

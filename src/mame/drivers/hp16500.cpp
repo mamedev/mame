@@ -49,30 +49,37 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
 #include "machine/mc68681.h"
+#include "bus/hp_hil/hp_hil.h"
+#include "bus/hp_hil/hil_devices.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAINCPU_TAG "maincpu"
 #define CRTC_TAG    "crtc"
 #define SCREEN_TAG  "screen"
 #define DUART_TAG   "duart"
+#define MLC_TAG     "mlc"
 
 class hp16500_state : public driver_device
 {
 public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, MAINCPU_TAG)
+		m_maincpu(*this, MAINCPU_TAG),
+		m_mlc(*this, MLC_TAG)
 		{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	std::vector<UINT8> m_vram;
+	optional_device<hp_hil_mlc_device> m_mlc;
+	std::vector<uint8_t> m_vram;
 
-	UINT8 m_mask, m_val;
+	uint8_t m_mask, m_val;
 
 	DECLARE_WRITE32_MEMBER(palette_w);
 
@@ -91,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pal_b_w);
 
 	DECLARE_WRITE16_MEMBER(maskval_w);
-
+	DECLARE_WRITE_LINE_MEMBER(irq_2);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
@@ -99,7 +106,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 
 private:
-	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
 READ32_MEMBER(hp16500_state::vbl_state_r)
@@ -133,7 +140,7 @@ WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 {
-	UINT32 *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y);
 	int i, pos;
 
 	pos =  y * 144;
@@ -155,7 +162,7 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 {
-	UINT32 *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y);
 	int i, pos;
 
 	pos =  y * 148;
@@ -205,6 +212,11 @@ WRITE16_MEMBER(hp16500_state::maskval_w)
 	// appears to be a direct port...
 	m_val =  ((data>>8) & 0xff) ^ 0xff;
 	m_mask = (data & 0xff) ^ 0xff;
+}
+
+WRITE_LINE_MEMBER(hp16500_state::irq_2)
+{
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static ADDRESS_MAP_START(hp1650_map, AS_PROGRAM, 16, hp16500_state)
@@ -279,7 +291,7 @@ static ADDRESS_MAP_START(hp16500a_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
 ADDRESS_MAP_END
 
-UINT32 hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -294,6 +306,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 
 	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
 
+	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8(MLC_TAG, hp_hil_mlc_device, read, write, 0xffffffff);
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
@@ -375,12 +388,12 @@ WRITE32_MEMBER(hp16500_state::palette_w)
 
 // 4 bpp
 // addr = ((Y * 0xfc0) + 0x360) + (X * 4)
-UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos = 0;
 	for (int y = 0; y < 384; y++)
 	{
-		UINT32 *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix32(y);
 
 		for (int x = 0; x < 576; x+=4)
 		{
@@ -395,7 +408,7 @@ UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hp1650, hp16500_state )
+static MACHINE_CONFIG_START( hp1650 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1650_map)
@@ -415,7 +428,7 @@ static MACHINE_CONFIG_START( hp1650, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp1651, hp16500_state )
+static MACHINE_CONFIG_START( hp1651 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1651_map)
@@ -435,7 +448,7 @@ static MACHINE_CONFIG_START( hp1651, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500a, hp16500_state )
+static MACHINE_CONFIG_START( hp16500a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
@@ -455,7 +468,7 @@ static MACHINE_CONFIG_START( hp16500a, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500, hp16500_state )
+static MACHINE_CONFIG_START( hp16500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
@@ -466,6 +479,18 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 	MCFG_SCREEN_SIZE(576,384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+
+	// FIXME: Where is the AP line connected to? The MLC documentation recommends
+	// connecting it to VBLANK
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE(MLC_TAG, hp_hil_mlc_device, ap_w))
+
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
+
+	// TODO: for now hook up the ipc hil keyboard - this might be replaced
+	// later with a 16500b specific keyboard implementation
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil2", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
 
@@ -501,7 +526,7 @@ ROM_START( hp16500b )
 	ROM_LOAD32_BYTE( "16500-80017.bin", 0x000003, 0x008000, CRC(e0b1096b) SHA1(426bb9a4756d8087bded4f6b61365d733ffbb09a) )
 ROM_END
 
-COMP( 1989, hp1650b,  0, 0, hp1650,  hp16500, driver_device, 0,  "Hewlett Packard", "HP 1650b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1989, hp1651b,  0, 0, hp1651,  hp16500, driver_device, 0,  "Hewlett Packard", "HP 1651b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, driver_device, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500, hp16500, driver_device, 0,  "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

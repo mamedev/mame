@@ -17,17 +17,19 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/ti89.h"
-#include "machine/nvram.h"
-#include "machine/intelfsh.h"
-#include "rendlay.h"
 
-UINT8 ti68k_state::keypad_r()
+#include "cpu/m68000/m68000.h"
+#include "machine/intelfsh.h"
+#include "machine/nvram.h"
+#include "rendlay.h"
+#include "screen.h"
+
+
+uint8_t ti68k_state::keypad_r()
 {
-	UINT8 bit, data = 0xff;
+	uint8_t bit, data = 0xff;
 
 	for (bit = 0; bit < 10; bit++)
 	{
@@ -93,7 +95,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
 
 READ16_MEMBER ( ti68k_state::ti68k_io_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	switch (offset & 0x0f)
 	{
@@ -131,7 +133,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
 
 READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	switch (offset & 0x7f)
 	{
@@ -432,7 +434,7 @@ void ti68k_state::machine_start()
 
 	if (m_flash_mem)
 	{
-		UINT32 base = ((((m_rom_base[0x82]) << 16) | m_rom_base[0x83]) & 0xffff)>>1;
+		uint32_t base = ((((m_rom_base[0x82]) << 16) | m_rom_base[0x83]) & 0xffff)>>1;
 
 		if (m_rom_base[base] >= 8)
 			m_hw_version = ((m_rom_base[base + 0x0b]) << 16) | m_rom_base[base + 0x0c];
@@ -478,20 +480,20 @@ void ti68k_state::machine_reset()
 	m_lcd_height = 0;
 	m_lcd_on = 0;
 	m_lcd_contrast = 0;
-	memset(m_io_hw1, 0, ARRAY_LENGTH(m_io_hw1) * sizeof(UINT16));
-	memset(m_io_hw2, 0, ARRAY_LENGTH(m_io_hw2) * sizeof(UINT16));
+	memset(m_io_hw1, 0, ARRAY_LENGTH(m_io_hw1) * sizeof(uint16_t));
+	memset(m_io_hw2, 0, ARRAY_LENGTH(m_io_hw2) * sizeof(uint16_t));
 	m_timer_on = 0;
 	m_timer_mask = 0xf;
 	m_timer_val = 0;
 }
 
 /* video */
-UINT32 ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* preliminary implementation, doesn't use the contrast value */
-	UINT8 width = screen.width();
-	UINT8 height = screen.height();
-	UINT8 x, y, b;
+	uint8_t width = screen.width();
+	uint8_t height = screen.height();
+	uint8_t x, y, b;
 
 	if (!m_lcd_on || !m_lcd_base)
 		bitmap.fill(0);
@@ -499,7 +501,7 @@ UINT32 ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width / 8; x++)
 			{
-				UINT8 s_byte= m_maincpu->space(AS_PROGRAM).read_byte(m_lcd_base + y * (width/8) + x);
+				uint8_t s_byte= m_maincpu->space(AS_PROGRAM).read_byte(m_lcd_base + y * (width/8) + x);
 				for (b = 0; b<8; b++)
 					bitmap.pix16(y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}
@@ -513,7 +515,7 @@ PALETTE_INIT_MEMBER(ti68k_state, ti68k)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static MACHINE_CONFIG_START( ti89, ti68k_state )
+static MACHINE_CONFIG_START( ti89 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ti89_mem)
@@ -667,9 +669,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1998, ti89,  0,       0,      ti89,   ti8x, driver_device,     0,         "Texas Instruments",    "TI-89",         MACHINE_NO_SOUND)
-COMP( 1995, ti92,  0,       0,      ti92,   ti9x, driver_device,     0,         "Texas Instruments",    "TI-92",         MACHINE_NO_SOUND)
-COMP( 1999, ti92p, 0,       0,      ti92p,  ti9x, driver_device,     0,         "Texas Instruments",    "TI-92 Plus",    MACHINE_NO_SOUND)
-COMP( 2002, v200,  0,       0,      v200,   ti9x, driver_device,     0,         "Texas Instruments",    "Voyage 200 PLT",MACHINE_NO_SOUND)
-COMP( 2004, ti89t, 0,       0,      ti89t,  ti8x, driver_device,     0,         "Texas Instruments",    "TI-89 Titanium",MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY              FULLNAME          FLAGS
+COMP( 1998, ti89,  0,       0,      ti89,    ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
+COMP( 1995, ti92,  0,       0,      ti92,    ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
+COMP( 1999, ti92p, 0,       0,      ti92p,   ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
+COMP( 2002, v200,  0,       0,      v200,    ti9x,  ti68k_state, 0,    "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
+COMP( 2004, ti89t, 0,       0,      ti89t,   ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )

@@ -7,10 +7,13 @@ Taito Super Speed Race driver
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sspeedr.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+
 #include "sspeedr.lh"
-#include "includes/sspeedr.h"
 
 
 
@@ -51,7 +54,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const UINT8 ls48_map[16] =
+static const uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
@@ -187,7 +190,7 @@ static GFXDECODE_START( sspeedr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
+static MACHINE_CONFIG_START( sspeedr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
@@ -204,7 +207,7 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 	MCFG_SCREEN_SIZE(376, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
-	MCFG_SCREEN_VBLANK_DRIVER(sspeedr_state, screen_eof_sspeedr)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sspeedr_state, screen_vblank_sspeedr))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)
@@ -231,4 +234,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, driver_device, 0, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, 0, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )

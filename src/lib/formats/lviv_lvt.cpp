@@ -17,7 +17,7 @@
 #define LVIV_LVT_HEADER_PILOT_LENGTH        5190
 #define LVIV_LVT_BLOCK_PILOT_LENGTH         1298
 
-static INT16 *lviv_emit_level(INT16 *p, int count, int level)
+static int16_t *lviv_emit_level(int16_t *p, int count, int level)
 {
 	int i;
 
@@ -28,7 +28,7 @@ static INT16 *lviv_emit_level(INT16 *p, int count, int level)
 	return p;
 }
 
-static INT16* lviv_output_bit(INT16 *p, UINT8 b)
+static int16_t* lviv_output_bit(int16_t *p, uint8_t b)
 {
 	if (b)
 	{
@@ -45,7 +45,7 @@ static INT16* lviv_output_bit(INT16 *p, UINT8 b)
 		return p;
 }
 
-static INT16* lviv_output_byte(INT16 *p, UINT8 byte)
+static int16_t* lviv_output_byte(int16_t *p, uint8_t byte)
 {
 	int i;
 
@@ -61,7 +61,7 @@ static INT16* lviv_output_byte(INT16 *p, UINT8 byte)
 
 /*************************************************************************************/
 
-static int lviv_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int lviv_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	int size;
 
@@ -76,10 +76,10 @@ static int lviv_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 /*************************************************************************************/
 
-static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int lviv_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	int i;
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 
 	int data_size;
 

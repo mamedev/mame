@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_INUFUKU_H
+#define MAME_INCLUDES_INUFUKU_H
 
+#include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 
 class inufuku_state : public driver_device
@@ -21,11 +24,11 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_bg_rasterram;
-	required_shared_ptr<UINT16> m_tx_videoram;
-	required_shared_ptr<UINT16> m_spriteram1;
-	required_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_bg_rasterram;
+	required_shared_ptr<uint16_t> m_tx_videoram;
+	required_shared_ptr<uint16_t> m_spriteram1;
+	required_shared_ptr<uint16_t> m_spriteram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -37,11 +40,8 @@ public:
 	int       m_bg_raster;
 	int       m_bg_palettebank;
 	int       m_tx_palettebank;
-	std::unique_ptr<UINT16[]>     m_spriteram1_old;
-	UINT32  inufuku_tile_callback( UINT32 code );
-
-	/* misc */
-	UINT16    m_pending_command;
+	std::unique_ptr<uint16_t[]>     m_spriteram1_old;
+	uint32_t  inufuku_tile_callback( uint32_t code );
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -51,8 +51,6 @@ public:
 	required_device<vsystem_spr_device> m_spr;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);
 	DECLARE_WRITE16_MEMBER(inufuku_palettereg_w);
 	DECLARE_WRITE16_MEMBER(inufuku_scrollreg_w);
@@ -66,6 +64,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_inufuku(screen_device &screen, bool state);
+	uint32_t screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_inufuku);
 };
+
+#endif // MAME_INCLUDES_INUFUKU_H

@@ -50,20 +50,20 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_fg_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_fg_ram;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
 
 	/* misc */
-	UINT16     m_cpua_ctrl;
-	UINT16     m_coin_word;
-	UINT8      m_adpcm_command;
-	UINT8      m_nmi_enable;
-	UINT32     m_def_vol[0x10];
-	UINT8      m_vol[DARIUS_VOL_MAX];
-	UINT8      m_pan[DARIUS_PAN_MAX];
+	uint16_t     m_cpua_ctrl;
+	uint16_t     m_coin_word;
+	uint8_t      m_adpcm_command;
+	uint8_t      m_nmi_enable;
+	uint32_t     m_def_vol[0x10];
+	uint8_t      m_vol[DARIUS_VOL_MAX];
+	uint8_t      m_pan[DARIUS_PAN_MAX];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -120,12 +120,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void darius_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
 	void update_fm0(  );
 	void update_fm1(  );

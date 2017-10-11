@@ -2,12 +2,13 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco12.c
+    coco12.cpp
 
     TRS-80 Radio Shack Color Computer 1/2 Family
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco12.h"
 
 //-------------------------------------------------
@@ -28,16 +29,13 @@ void coco12_state::device_start()
 
 void coco12_state::configure_sam()
 {
-	cococart_slot_device *cart = m_cococart;
-	UINT8 *ram = m_ram->pointer();
-	UINT32 ram_size = m_ram->size();
-	UINT8 *rom = memregion(MAINCPU_TAG)->base();
-	UINT8 *cart_rom = cart->get_cart_base();
+	uint8_t *rom = memregion(MAINCPU_TAG)->base();
+	uint8_t *cart_rom = cococart().get_cart_base();
 
-	m_sam->configure_bank(0, ram, ram_size, false);         // $0000-$7FFF
-	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);   // $8000-$9FFF
-	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);   // $A000-$BFFF
-	m_sam->configure_bank(3, cart_rom, 0x4000, true);       // $C000-$FEFF
+	m_sam->configure_bank(0, ram().pointer(), ram().size(), false); // $0000-$7FFF
+	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);           // $8000-$9FFF
+	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);           // $A000-$BFFF
+	m_sam->configure_bank(3, cart_rom, 0x4000, true);               // $C000-$FEFF
 
 	// $FF00-$FF1F
 	m_sam->configure_bank(4, read8_delegate(FUNC(coco12_state::ff00_read), this), write8_delegate(FUNC(coco12_state::ff00_write), this));
@@ -59,7 +57,7 @@ void coco12_state::configure_sam()
 
 WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
 {
-	m_pia_0->ca1_w(state);
+	pia_0().ca1_w(state);
 	m_sam->hs_w(state);
 }
 
@@ -71,7 +69,7 @@ WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
 
 WRITE_LINE_MEMBER( coco12_state::field_sync )
 {
-	m_pia_0->cb1_w(state);
+	pia_0().cb1_w(state);
 }
 
 
@@ -82,7 +80,7 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 
 READ8_MEMBER( coco12_state::sam_read )
 {
-	UINT8 data = m_ram->read(offset);
+	uint8_t data = ram().read(offset);
 	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 	return data;
@@ -94,7 +92,7 @@ READ8_MEMBER( coco12_state::sam_read )
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void coco12_state::pia1_pb_changed(UINT8 data)
+void coco12_state::pia1_pb_changed(uint8_t data)
 {
 	/* call inherited function */
 	coco_state::pia1_pb_changed(data);
@@ -113,7 +111,7 @@ void coco12_state::pia1_pb_changed(UINT8 data)
 //  update_cart_base
 //-------------------------------------------------
 
-void coco12_state::update_cart_base(UINT8 *cart_base)
+void coco12_state::update_cart_base(uint8_t *cart_base)
 {
 	m_sam->configure_bank(3, cart_base, 0x4000, true);      // $C000-$FEFF
 }

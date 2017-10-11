@@ -19,7 +19,7 @@
 		description     = "Generate Microsoft Visual Studio 2015 project files",
 		os              = "windows",
 
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib" },
+		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
 		valid_languages = { "C", "C++", "C#" },
 
@@ -58,6 +58,7 @@
 			targetFramework = "4.5",
 			toolsVersion    = "14.0",
 			windowsTargetPlatformVersion = "8.1",
-			supports64bitEditContinue = true,
+			supports64bitEditContinue    = true,
+			intDirAbsolute  = false,
 		}
 	}

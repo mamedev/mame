@@ -58,8 +58,9 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/msm5205.h"
 #include "machine/i8255.h"
+#include "sound/msm5205.h"
+#include "speaker.h"
 
 #include "kungfur.lh"
 
@@ -74,12 +75,12 @@ public:
 		m_adpcm2(*this, "adpcm2")
 	{ }
 
-	UINT8 m_latch[3];
-	UINT8 m_control;
+	uint8_t m_latch[3];
+	uint8_t m_control;
 
-	UINT32 m_adpcm_pos[2];
-	UINT8 m_adpcm_data[2];
-	UINT8 m_adpcm_sel[2];
+	uint32_t m_adpcm_pos[2];
+	uint8_t m_adpcm_data[2];
+	uint8_t m_adpcm_sel[2];
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -201,8 +202,8 @@ WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
 // adpcm callbacks
 WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 {
-	UINT8 *ROM = memregion("adpcm1")->base();
-	UINT8 data = ROM[m_adpcm_pos[0] & 0x1ffff];
+	uint8_t *ROM = memregion("adpcm1")->base();
+	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
 	m_adpcm1->data_w(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[0] += m_adpcm_sel[0];
@@ -211,8 +212,8 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 
 WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 {
-	UINT8 *ROM = memregion("adpcm2")->base();
-	UINT8 data = ROM[m_adpcm_pos[1] & 0x3ffff];
+	uint8_t *ROM = memregion("adpcm2")->base();
+	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
 	m_adpcm2->data_w(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[1] += m_adpcm_sel[1];
@@ -283,7 +284,7 @@ void kungfur_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kungfur, kungfur_state )
+static MACHINE_CONFIG_START( kungfur )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 8000000/2)   // 4MHz?
@@ -309,12 +310,12 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL_384kHz)  // clock verified with recording
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm1_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL_384kHz)  // "
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm2_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -339,4 +340,4 @@ ROM_START( kungfur )
 	ROM_LOAD( "kr6.bin",   0x20000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
-GAMEL(1987, kungfur,  0,       kungfur,  kungfur, driver_device,  0, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )
+GAMEL(1987, kungfur,  0,       kungfur,  kungfur, kungfur_state,  0, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )

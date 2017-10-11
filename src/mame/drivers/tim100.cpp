@@ -17,11 +17,12 @@ Notes:
 *******************************************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
-#include "bus/rs232/rs232.h"
-#include "machine/clock.h"
+#include "screen.h"
 
 class tim100_state : public driver_device
 {
@@ -32,25 +33,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
-		, m_uart17(*this, "uart_u17")
-		, m_uart18(*this, "uart_u18")
 		{ }
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 private:
 	virtual void machine_start() override;
-	UINT8 *m_charmap;
-	UINT16 m_dma_adr;
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint8_t *m_charmap;
+	uint16_t m_dma_adr;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_device<i8251_device> m_uart17;
-	required_device<i8251_device> m_uart18;
 };
 
 static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
@@ -116,8 +112,8 @@ GFXDECODE_END
 I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 pixels;
-	for (UINT8 i = 0; i < 2; i++)
+	uint8_t pixels;
+	for (uint8_t i = 0; i < 2; i++)
 	{
 		pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
 		if (vsp)
@@ -158,16 +154,8 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( tim100_state::clock_w )
-{
-	m_uart17->write_txc(state);
-	m_uart17->write_rxc(state);
-	m_uart18->write_txc(state);
-	m_uart18->write_rxc(state);
-}
 
-
-static MACHINE_CONFIG_START( tim100, tim100_state )
+static MACHINE_CONFIG_START( tim100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)
@@ -215,7 +203,10 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tim100_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u17", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -238,4 +229,4 @@ ROM_START( tim100 )
 ROM_END
 
 /* Driver */
-COMP( 1985, tim100, 0, 0, tim100, tim100, driver_device, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)

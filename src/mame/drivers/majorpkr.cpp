@@ -449,18 +449,24 @@
 
 **********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "majorpkr.lh"
+
+
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK / 2)   // 6 MHz, measured.
 #define OKI_CLOCK       (MASTER_CLOCK / 8)   // 1.5 MHz, measured.
 #define CRTC_CLOCK      (MASTER_CLOCK / 16)  // 750 kHz, measured.
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/okim6295.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
-#include "majorpkr.lh"
 
 
 class majorpkr_state : public driver_device
@@ -480,8 +486,8 @@ public:
 	required_device<address_map_bank_device> m_vram_bank;
 
 	required_memory_bank m_rom_bank;
-	required_shared_ptr<UINT8> m_fg_vram;
-	required_shared_ptr<UINT8> m_bg_vram;
+	required_shared_ptr<uint8_t> m_fg_vram;
+	required_shared_ptr<uint8_t> m_bg_vram;
 
 	tilemap_t    *m_bg_tilemap, *m_fg_tilemap;
 
@@ -504,7 +510,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -541,7 +547,7 @@ void majorpkr_state::video_start()
 }
 
 
-UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -979,7 +985,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
+static MACHINE_CONFIG_START( majorpkr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
 	MCFG_CPU_PROGRAM_MAP(map)
@@ -1020,7 +1026,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)  // clock frequency & pin 7 verified.
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1168,7 +1174,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 {
-	UINT8 * ROM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t * ROM = (uint8_t *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
 }
 

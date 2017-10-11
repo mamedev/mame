@@ -27,6 +27,8 @@
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "machine/clock.h"
+#include "screen.h"
 
 
 class univac_state : public driver_device
@@ -39,23 +41,25 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_ctc(*this, "ctc")
 		, m_dart(*this, "dart")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port43_w);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
-	const UINT8 *m_p_chargen;
 	bool m_screen_num;
-	UINT8 m_framecnt;
+	uint8_t m_framecnt;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<nvram_device> m_nvram;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -88,8 +92,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uts20_io, AS_IO, 8, univac_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w) // ?? no idea
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
 	AM_RANGE(0x80, 0xbf) AM_RAM AM_SHARE("nvram")
@@ -108,10 +111,9 @@ void univac_state::machine_start()
 void univac_state::machine_reset()
 {
 	m_screen_num = 0;
-	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// this is used to get the ctc to pass the test
 	bool state = BIT(m_framecnt,0);
@@ -120,9 +122,9 @@ UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_ctc->trg2(state);
 	m_ctc->trg3(state);
 
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = m_p_videoram;//+(m_screen_num ? 0x2000 : 0);
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t *videoram = m_p_videoram;//+(m_screen_num ? 0x2000 : 0);
 
 	m_framecnt++;
 
@@ -130,7 +132,7 @@ UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -165,7 +167,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( uts20, univac_state )
+static MACHINE_CONFIG_START( uts20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(uts20_mem)
@@ -173,7 +175,7 @@ static MACHINE_CONFIG_START( uts20, univac_state )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
@@ -183,9 +185,16 @@ static MACHINE_CONFIG_START( uts20, univac_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxcb_w))
+
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_ADD("dart", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_4MHz)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
@@ -209,5 +218,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY            FULLNAME       FLAGS */
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, driver_device,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
+COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -12,13 +12,13 @@
 #include "includes/bublbobl.h"
 
 
-UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
-	const UINT8 *prom;
-	const UINT8 *prom_line;
+	const uint8_t *prom;
+	const uint8_t *prom_line;
 
 
 	/* Bubble Bobble doesn't have a real video RAM. All graphics (characters */
@@ -37,9 +37,9 @@ UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind1
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
-		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
+		/* this is dword aligned so the uint32_t * cast shouldn't give problems */
 		/* on any architecture */
-		if (*(UINT32 *)(&m_objectram[offs]) == 0)
+		if (*(uint32_t *)(&m_objectram[offs]) == 0)
 			continue;
 
 		gfx_num = m_objectram[offs + 1];

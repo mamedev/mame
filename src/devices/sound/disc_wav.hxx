@@ -61,9 +61,9 @@ DISCRETE_STEP(dss_counter)
 	double  cycles;
 	double  ds_clock;
 	int     clock = 0, inc = 0;
-	UINT32  last_count = m_last_count;  /* it is different then output in 7492 */
+	uint32_t  last_count = m_last_count;  /* it is different then output in 7492 */
 	double  x_time = 0;
-	UINT32  count = last_count;
+	uint32_t  count = last_count;
 
 	ds_clock = DSS_COUNTER__CLOCK;
 	if (UNEXPECTED(m_clock_type == DISC_CLK_IS_FREQ))
@@ -647,10 +647,10 @@ DISCRETE_STEP(dss_op_amp_osc)
 	double charge[2]  = {0};
 	double x_time  = 0;     /* time since change happened */
 	double exponent;
-	UINT8 force_charge = 0;
-	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
-	UINT8 update_exponent = 0;
-	UINT8 flip_flop = m_flip_flop;
+	uint8_t force_charge = 0;
+	uint8_t enable = DSS_OP_AMP_OSC__ENABLE;
+	uint8_t update_exponent = 0;
+	uint8_t flip_flop = m_flip_flop;
 	int count_f = 0;
 	int count_r = 0;
 

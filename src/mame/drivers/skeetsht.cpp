@@ -17,6 +17,8 @@
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"
 #include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -39,11 +41,11 @@ public:
 	}
 
 	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<UINT16> m_tms_vram;
-	UINT8 m_porta_latch;
-	UINT8 m_ay_sel;
-	UINT8 m_lastdataw;
-	UINT16 m_lastdatar;
+	required_shared_ptr<uint16_t> m_tms_vram;
+	uint8_t m_porta_latch;
+	uint8_t m_ay_sel;
+	uint8_t m_lastdataw;
+	uint16_t m_lastdatar;
 	DECLARE_READ16_MEMBER(ramdac_r);
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
@@ -85,14 +87,14 @@ void skeetsht_state::video_start()
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 {
 	const rgb_t *const pens = m_tlc34076->get_pens();
-	UINT16 *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
 	int x;
 
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 pixels = vram[coladdr++ & 0xff];
+		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[pixels & 0xff];
 		dest[x + 1] = pens[pixels >> 8];
 	}
@@ -225,7 +227,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
+static MACHINE_CONFIG_START( skeetsht )
 
 	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -234,7 +236,7 @@ static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 
 	MCFG_CPU_ADD("tms", TMS34010, 48000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(48000000 / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(skeetsht_state, scanline_update)   /* scanline updater (rgb32) */
@@ -293,5 +295,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Skeet Shot", MACHINE_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

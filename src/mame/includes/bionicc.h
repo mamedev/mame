@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
 
@@ -29,29 +30,29 @@ public:
 
 	/* memory pointers */
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_txvideoram;
-	required_shared_ptr<UINT16> m_fgvideoram;
-	required_shared_ptr<UINT16> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
 
 	/* video-related */
 	tilemap_t   *m_tx_tilemap;
 	tilemap_t   *m_bg_tilemap;
 	tilemap_t   *m_fg_tilemap;
-	UINT16    m_scroll[4];
+	uint16_t    m_scroll[4];
 
-	UINT16    m_inp[3];
-	UINT16    m_soundcommand;
+	uint16_t    m_inp[3];
+	uint16_t    m_soundcommand;
 
 	DECLARE_WRITE16_MEMBER(hacked_controls_w);
 	DECLARE_READ16_MEMBER(hacked_controls_r);
-	DECLARE_WRITE16_MEMBER(bionicc_mpu_trigger_w);
+	DECLARE_WRITE16_MEMBER(mpu_trigger_w);
 	DECLARE_WRITE16_MEMBER(hacked_soundcommand_w);
 	DECLARE_READ16_MEMBER(hacked_soundcommand_r);
-	DECLARE_WRITE16_MEMBER(bionicc_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_txvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_scroll_w);
-	DECLARE_WRITE16_MEMBER(bionicc_gfxctrl_w);
+	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(txvideoram_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
+	DECLARE_WRITE16_MEMBER(gfxctrl_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -59,8 +60,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
-	UINT32 screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bionicc_scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

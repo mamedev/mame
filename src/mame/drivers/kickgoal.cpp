@@ -37,11 +37,15 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #include "emu.h"
+#include "includes/kickgoal.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/kickgoal.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /**************************************************************************
    This table converts commands sent from the main CPU, into sample numbers
@@ -55,7 +59,7 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #ifdef UNUSED_DEFINITION
-static const UINT8 kickgoal_cmd_snd[128] =
+static const uint8_t kickgoal_cmd_snd[128] =
 {
 /*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 /*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
@@ -430,7 +434,7 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 }
 
 
-static const UINT16 kickgoal_default_eeprom_type1[64] = {
+static const uint16_t kickgoal_default_eeprom_type1[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -624,7 +628,7 @@ void kickgoal_state::machine_reset()
 	m_m6295_key_delay = 0;
 }
 
-static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
+static MACHINE_CONFIG_START( kickgoal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -659,11 +663,11 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( actionhw, kickgoal_state )
+static MACHINE_CONFIG_START( actionhw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -697,7 +701,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -766,7 +770,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;
@@ -774,5 +778,5 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal, 0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

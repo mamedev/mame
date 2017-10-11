@@ -387,7 +387,7 @@ static void AddRenamePair(CObjectVector<CRenamePair> *renamePairs,
     val.Add_LF();
     if (type == NRecursedType::kRecursed)
       val.AddAscii("-r");
-    else if (type == NRecursedType::kRecursed)
+    else if (type == NRecursedType::kWildcardOnlyRecursed)
       val.AddAscii("-r0");
     throw CArcCmdLineException("Unsupported rename command:", val);
   }

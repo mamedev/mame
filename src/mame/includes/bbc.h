@@ -9,9 +9,10 @@
  * Driver by Gordon Jefferyes <mess_bbc@romvault.com>
  *
  ****************************************************************************/
+#ifndef MAME_INCLUDES_BBC_H
+#define MAME_INCLUDES_BBC_H
 
-#ifndef BBC_H_
-#define BBC_H_
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
@@ -81,6 +82,10 @@ public:
 		m_upd7002(*this, "upd7002"),
 		m_analog(*this, "analogue"),
 		m_joyport(*this, "joyport"),
+		m_tube(*this, "tube"),
+		m_intube(*this, "intube"),
+		m_extube(*this, "extube"),
+		m_1mhzbus(*this, "1mhzbus"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -139,8 +144,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcm_wd1772l_write);
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
 	DECLARE_DRIVER_INIT(bbc);
 	DECLARE_VIDEO_START(bbc);
@@ -195,8 +198,8 @@ public:
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
 
-	void bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
-	void bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
+	void bbc_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
+	void bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
 
 	image_init_result bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
@@ -229,11 +232,15 @@ public: // HACK FOR MC6845
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<bbc_analogue_slot_device> m_analog;
 	optional_device<bbc_joyport_slot_device> m_joyport;
+	optional_device<bbc_tube_slot_device> m_tube;
+	optional_device<bbc_tube_slot_device> m_intube;
+	optional_device<bbc_tube_slot_device> m_extube;
+	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
-	optional_device<wd1770_t> m_wd1770;
-	optional_device<wd1772_t> m_wd1772;
+	optional_device<wd1770_device> m_wd1770;
+	optional_device<wd1772_device> m_wd1772;
 	optional_device<generic_slot_device> m_exp1;
 	optional_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;
@@ -251,7 +258,7 @@ public: // HACK FOR MC6845
 	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank8; //                          bbcm
 
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<input_merger_device> m_irqs;
 
 	machine_type_t m_machinetype;
 
@@ -360,7 +367,7 @@ public: // HACK FOR MC6845
 	int m_len2;
 	int m_len3;
 	int m_mc6850_clock;
-	UINT8 m_serproc_data;
+	uint8_t m_serproc_data;
 	int m_rxd_serial;
 	int m_dcd_serial;
 	int m_cts_serial;
@@ -368,7 +375,7 @@ public: // HACK FOR MC6845
 	int m_rxd_cass;
 	int m_cass_out_enabled;
 	int m_txd;
-	UINT32 m_nr_high_tones;
+	uint32_t m_nr_high_tones;
 	int m_cass_out_samples_to_go;
 	int m_cass_out_bit;
 	int m_cass_out_phase;
@@ -392,42 +399,27 @@ public: // HACK FOR MC6845
 
 // this is the real location of the start of the BBC's ram in the emulation
 // it can be changed if shadow ram is being used to point at the upper 32K of RAM
-
-// this is the screen memory location of the next pixels to be drawn
-
-// this is a more global variable to store the bitmap variable passed in in the bbc_vh_screenrefresh function
-
-// this is the X and Y screen location in emulation pixels of the next pixels to be drawn
-
-
-	unsigned char *m_BBC_Video_RAM;
-	UINT16 *m_BBC_display;
-	UINT16 *m_BBC_display_left;
-	UINT16 *m_BBC_display_right;
-	bitmap_ind16 *m_BBC_bitmap;
-	int m_y_screen_pos;
-	unsigned char m_pixel_bits[256];
+	uint8_t *m_video_ram;
+	uint8_t m_pixel_bits[256];
 	int m_hsync;
 	int m_vsync;
-	int m_display_enable;
 
-	int m_Teletext_Latch;
-	int m_VideoULA_CR;
-	int m_VideoULA_CR_counter;
-	int m_videoULA_Reg;
-	int m_videoULA_master_cursor_size;
-	int m_videoULA_width_of_cursor;
-	int m_videoULA_6845_clock_rate;
-	int m_videoULA_characters_per_line;
-	int m_videoULA_teletext_normal_select;
-	int m_videoULA_flash_colour_select;
+	uint8_t m_teletext_latch;
+
+	struct {
+		// control register
+		int master_cursor_size;
+		int width_of_cursor;
+		int clock_rate_6845;
+		int characters_per_line;
+		int teletext_normal_select;
+		int flash_colour_select;
+		// inputs
+		int de;
+	} m_video_ula;
 
 	int m_pixels_per_byte;
-	int m_emulation_pixels_per_real_pixel;
-	int m_emulation_pixels_per_byte;
-
-	int m_emulation_cursor_size;
-	int m_cursor_state;
+	int m_cursor_size;
 
 	int m_videoULA_palette0[16];
 	int m_videoULA_palette1[16];
@@ -445,9 +437,17 @@ public: // HACK FOR MC6845
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_nmi();
-	unsigned int calculate_video_address(int ma,int ra);
+	uint16_t calculate_video_address(uint16_t ma, uint8_t ra);
 	required_device<palette_device> m_palette;
 	optional_ioport m_bbcconfig;
 };
 
-#endif /* BBC_H_ */
+
+class torch240_state : public bbc_state
+{
+public:
+	using bbc_state::bbc_state;
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+};
+
+#endif // MAME_INCLUDES_BBC_H

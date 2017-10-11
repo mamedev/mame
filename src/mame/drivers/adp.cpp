@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 
@@ -156,13 +156,15 @@ Quick Jack administration/service mode:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ay8910.h"
-#include "video/hd63484.h"
-#include "machine/microtch.h"
 #include "machine/mc68681.h"
+#include "machine/microtch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class adp_state : public driver_device
@@ -175,7 +177,7 @@ public:
 		m_duart(*this, "duart68681"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0")
-		{ }
+	{ }
 
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
@@ -184,7 +186,7 @@ public:
 	required_ioport m_in0;
 
 	/* misc */
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(input_r);
@@ -207,7 +209,7 @@ void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
     00F70A: 4EB9 0001 D7F4             jsr     $1d7f4.l                 ; initializes the HD63484
     00F710: 11FC 0010 E8AD             move.b  #$10, $e8ad.w
 */
-	UINT16 *ram = (UINT16 *)base;
+	uint16_t *ram = (uint16_t *)base;
 	ram[0x2450 >> 1] = 0x2400;
 	ram[0x2452 >> 1] = 0x0018;
 	ram[0x0000 >> 1] = 0x3141;
@@ -273,7 +275,7 @@ PALETTE_INIT_MEMBER(adp_state,fstation)
 
 READ16_MEMBER(adp_state::input_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
 
@@ -516,22 +518,22 @@ INTERRUPT_GEN_MEMBER(adp_state::adp_int)
 }
 */
 
-static ADDRESS_MAP_START( adp_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( adp_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0x9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fashiong_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fashiong_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fstation_hd63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fstation_hd63484_map, 0, 16, adp_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( quickjac, adp_state )
+static MACHINE_CONFIG_START( quickjac )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
@@ -599,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( fashiong, skattv )
 	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, adp_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, adp_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -719,11 +721,11 @@ ROM_START( fstation )
 ROM_END
 
 
-GAME( 1990, backgamn,  0,        backgamn,    skattv, driver_device,    0, ROT0,  "ADP",     "Backgammon", MACHINE_NOT_WORKING )
-GAME( 1993, quickjac,  0,        quickjac,    quickjac, driver_device,  0, ROT0,  "ADP",     "Quick Jack", MACHINE_NOT_WORKING )
-GAME( 1994, skattv,    0,        skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV", MACHINE_NOT_WORKING )
-GAME( 1995, skattva,   skattv,   skattva,     skattva, driver_device,   0, ROT0,  "ADP",     "Skat TV (version TS3)", MACHINE_NOT_WORKING )
-GAME( 1997, fashiong,  0,        fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 1)", MACHINE_NOT_WORKING )
-GAME( 1997, fashiong2, fashiong, fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 2)", MACHINE_NOT_WORKING )
-GAME( 1999, funlddlx,  0,        funland,     skattv, driver_device,    0, ROT0,  "Stella",  "Funny Land de Luxe", MACHINE_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation,    fstation, driver_device,  0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )
+GAME( 1990, backgamn,  0,        backgamn,    skattv,   adp_state, 0, ROT0,  "ADP",     "Backgammon",                        MACHINE_NOT_WORKING )
+GAME( 1993, quickjac,  0,        quickjac,    quickjac, adp_state, 0, ROT0,  "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
+GAME( 1994, skattv,    0,        skattv,      skattv,   adp_state, 0, ROT0,  "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
+GAME( 1995, skattva,   skattv,   skattva,     skattva,  adp_state, 0, ROT0,  "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
+GAME( 1997, fashiong,  0,        fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
+GAME( 1997, fashiong2, fashiong, fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
+GAME( 1999, funlddlx,  0,        funland,     skattv,   adp_state, 0, ROT0,  "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
+GAME( 2000, fstation,  0,        fstation,    fstation, adp_state, 0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )

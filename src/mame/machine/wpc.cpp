@@ -6,14 +6,15 @@
  *  Created on: 7/10/2013
  */
 
+#include "emu.h"
 #include "wpc.h"
 
 #define LOG_WPC (0)
 
-const device_type WPCASIC = &device_creator<wpc_device>;
+DEFINE_DEVICE_TYPE(WPCASIC, wpc_device, "wpc", "Williams WPC ASIC")
 
-wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig,WPCASIC,"Williams WPC ASIC",tag,owner,clock, "wpc", __FILE__),
+wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WPCASIC, tag, owner, clock),
 		m_dmd_visiblepage(0),
 		m_irq_cb(*this),
 		m_firq_cb(*this),
@@ -65,7 +66,7 @@ void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ8_MEMBER(wpc_device::read)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 	char kbdrow[8];
 
 	switch(offset)

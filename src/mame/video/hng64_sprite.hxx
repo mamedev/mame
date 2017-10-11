@@ -7,7 +7,7 @@
  * Sprite Format
  * ------------------
  *
- * UINT32 | Bits                                    | Use
+ * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
@@ -26,7 +26,7 @@
  * Sprite Global Registers
  * -----------------------
  *
- * UINT32 | Bits                                    | Use
+ * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- z--- b--- ---- ---- ---- ---- ---- | zooming mode, bpp select
@@ -47,8 +47,8 @@
 void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx;
-	UINT32 *source = m_spriteram;
-	UINT32 *finish = m_spriteram + 0xc000/4;
+	uint32_t *source = m_spriteram;
+	uint32_t *finish = m_spriteram + 0xc000/4;
 
 	// global offsets in sprite regs
 	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
@@ -64,11 +64,11 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	{
 		int tileno,chainx,chainy,xflip;
 		int pal,xinc,yinc,yflip;
-		UINT16 xpos, ypos;
+		uint16_t xpos, ypos;
 		int xdrw,ydrw;
 		int chaini;
 		int zbuf;
-		UINT32 zoomx,zoomy;
+		uint32_t zoomx,zoomy;
 		float foomX, foomY;
 		int blend;
 		int disable;
@@ -179,8 +179,8 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		{
 			for(xdrw=0;xdrw<=chainx;xdrw++)
 			{
-				INT16 drawx = xpos+(xinc*xdrw);
-				INT16 drawy = ypos+(yinc*ydrw);
+				int16_t drawx = xpos+(xinc*xdrw);
+				int16_t drawy = ypos+(yinc*ydrw);
 
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;

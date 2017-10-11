@@ -42,7 +42,7 @@ const d80_format::format d80_format::file_formats[] = {
 	{}
 };
 
-const UINT32 d80_format::d80_cell_size[] =
+const uint32_t d80_format::d80_cell_size[] =
 {
 	2667, // 12MHz/2/16
 	2500, // 12MHz/2/15
@@ -75,7 +75,7 @@ int d80_format::get_physical_track(const format &f, int head, int track)
 	return track;
 }
 
-UINT32 d80_format::get_cell_size(const format &f, int track)
+uint32_t d80_format::get_cell_size(const format &f, int track)
 {
 	return d80_cell_size[d80_speed_zone[track]];
 }
@@ -91,7 +91,7 @@ int d80_format::get_disk_id_offset(const format &f)
 	return 0x44e18;
 }
 
-floppy_image_format_t::desc_e* d80_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)
+floppy_image_format_t::desc_e* d80_format::get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2)
 {
 	static floppy_image_format_t::desc_e desc[] = {
 		/* 00 */ { SECTOR_LOOP_START, 0, -1 },

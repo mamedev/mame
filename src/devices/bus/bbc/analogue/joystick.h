@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_ANALOGUE_JOYSTICK_H
+#define MAME_BUS_BBC_ANALOGUE_JOYSTICK_H
+
 #pragma once
 
-#ifndef __BBC_JOYSTICK__
-#define __BBC_JOYSTICK__
 
-
-#include "emu.h"
 #include "analogue.h"
 
 //**************************************************************************
@@ -25,17 +24,16 @@ class bbc_joystick_device :
 	public device_t,
 	public device_bbc_analogue_interface
 {
-public:
-	// construction/destruction
-	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 ch_r(int channel) override;
-	virtual UINT8 pb_r() override;
+	virtual uint8_t ch_r(int channel) override;
+	virtual uint8_t pb_r() override;
 
 private:
 	required_ioport_array<4> m_joy;
@@ -45,7 +43,7 @@ private:
 class bbc_acornjoy_device : public bbc_joystick_device
 {
 public:
-	bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -53,15 +51,14 @@ public:
 class bbc_voltmace3b_device : public bbc_joystick_device
 {
 public:
-	bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
 
 
 // device type definition
-extern const device_type BBC_ACORNJOY;
-extern const device_type BBC_VOLTMACE3B;
+DECLARE_DEVICE_TYPE(BBC_ACORNJOY,   bbc_acornjoy_device)
+DECLARE_DEVICE_TYPE(BBC_VOLTMACE3B, bbc_voltmace3b_device)
 
-
-#endif
+#endif // MAME_BUS_BBC_ANALOGUE_JOYSTICK_H

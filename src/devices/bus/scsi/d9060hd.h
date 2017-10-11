@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_BUS_SCSI_D9060HD_H
+#define MAME_BUS_SCSI_D9060HD_H
 
-#ifndef __D9060HD__
-#define __D9060HD__
+#pragma once
 
 #include "scsihd.h"
 
@@ -11,12 +11,12 @@ class d9060hd_device : public scsihd_device
 {
 public:
 	// construction/destruction
-	d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void ExecCommand() override;
 };
 
 // device type definition
-extern const device_type D9060HD;
+DECLARE_DEVICE_TYPE(D9060HD, d9060hd_device)
 
-#endif
+#endif // MAME_BUS_SCSI_D9060HD_H

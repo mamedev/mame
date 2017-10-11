@@ -142,6 +142,7 @@ Adder hardware:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 
 #include "machine/nvram.h"
@@ -154,10 +155,13 @@ Adder hardware:
 
 /* fruit machines only */
 #include "video/awpvid.h"
-#include "machine/steppers.h" // stepper motor
+#include "video/bfm_dm01.h"
+#include "machine/steppers.h"
 
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
+
+#include "speaker.h"
 
 #include "sc2_vid.lh"
 #include "gldncrwn.lh"
@@ -169,8 +173,6 @@ Adder hardware:
 #include "sltblgtk.lh"
 #include "slots.lh"
 
-/* fruit machines only */
-#include "video/bfm_dm01.h"
 #include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
 #include "drwho.lh"
@@ -228,15 +230,15 @@ public:
 
 
 	required_device<upd7759_device> m_upd7759;
-	optional_device<bfm_bd1_t> m_vfd0;
-	optional_device<bfm_bd1_t> m_vfd1;
-	optional_device<bfmdm01_device> m_dm01;
+	optional_device<bfm_bd1_device> m_vfd0;
+	optional_device<bfm_bd1_device> m_vfd1;
+	optional_device<bfm_dm01_device> m_dm01;
 	optional_device<meters_device> m_meters; // scorpion2_vid doesn't use this (scorpion2_vidm does)
 
 	int m_sc2gui_update_mmtr; //not used?
-	UINT8 *m_nvram;
-	UINT8 m_key[8];
-	UINT8 m_e2ram[1024];
+	uint8_t *m_nvram;
+	uint8_t m_key[8];
+	uint8_t m_e2ram[1024];
 	int m_mmtr_latch;
 	int m_irq_status;
 	int m_optic_pattern;
@@ -270,8 +272,8 @@ public:
 	int m_hopper_running;
 	int m_hopper_coin_sense;
 	int m_timercnt;
-	UINT8 m_sc2_Inputs[64];
-	UINT8 m_input_override[64];
+	uint8_t m_sc2_Inputs[64];
+	uint8_t m_input_override[64];
 	int m_e2reg;
 	int m_e2state;
 	int m_e2cnt;
@@ -281,8 +283,8 @@ public:
 	int m_e2data_pin;
 	int m_e2dummywrite;
 	int m_e2data_to_read;
-	UINT8 m_codec_data[256];
-	UINT8 m_lamps_old[0x20];
+	uint8_t m_codec_data[256];
+	uint8_t m_lamps_old[0x20];
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -439,7 +441,7 @@ void bfm_sc2_state::on_scorpion2_reset()
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 
 		m_rombank1->configure_entries(0, 4, &rom[0x00000], 0x02000);
 
@@ -511,7 +513,7 @@ int bfm_sc2_state::Scorpion2_GetSwitchState(int strobe, int data)
 
 void bfm_sc2_state::e2ram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init_e2ram[] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
+	static const uint8_t init_e2ram[] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	memset(data,0x00,size);
 	memcpy(data,init_e2ram,sizeof(init_e2ram));
 }
@@ -2184,17 +2186,17 @@ INPUT_PORTS_END
 // machine config fragments for different meters numbers //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_FRAGMENT( _3meters )
+MACHINE_CONFIG_START( _3meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( _5meters )
+MACHINE_CONFIG_START( _5meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( _8meters )
+MACHINE_CONFIG_START( _8meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
@@ -2212,7 +2214,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 	save_state();
 }
 
-static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2_vid )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)               // generate 1000 IRQ's per second
@@ -2253,7 +2255,7 @@ int bfm_sc2_state::sc2_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[4][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2" };
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
 	for (auto & elem : title_string)
@@ -2266,8 +2268,8 @@ int bfm_sc2_state::sc2_find_project_string( )
 			int found = 1;
 			for (j=0;j<strlength;j+=1)
 			{
-				UINT8 rom = src[(i+j)];
-				UINT8 chr = elem[j];
+				uint8_t rom = src[(i+j)];
+				uint8_t chr = elem[j];
 
 				if (rom != chr)
 				{
@@ -2285,7 +2287,7 @@ int bfm_sc2_state::sc2_find_project_string( )
 
 				while (!end)
 				{
-					UINT8 rom;
+					uint8_t rom;
 					int addr;
 
 					addr = (i+count);
@@ -2335,7 +2337,7 @@ void bfm_sc2_state::adder2_common_init()
 {
 	if (memregion("proms") != nullptr)
 	{
-		UINT8 *pal;
+		uint8_t *pal;
 		pal = memregion("proms")->base();
 		memcpy(m_key, pal, 8);
 	}
@@ -2522,6 +2524,24 @@ ROM_START( gldncrwn )
 	ROM_REGION( 0x10, "proms", 0 )
 	ROM_LOAD("gcrpal.bin", 0, 8 , CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7))
 ROM_END
+
+ROM_START( gldncrwnhop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("95752007.gam", 0x00000, 0x10000, CRC(ba009ab7) SHA1(df58f5ff4e9fdf8db5931833b909fb0e4ba8e23d))
+
+	ROM_REGION( 0x20000, "adder2", 0 )
+	ROM_LOAD("95770146.vid", 0x00000, 0x20000, CRC(f3109cd5) SHA1(8da5207c07015d6f5a72397eaa6ab70800785f7f))
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD("95770139.snd", 0x00000, 0x20000, CRC(e76ca414) SHA1(2c441e3369e374c033b5585e8f6a9c34a4c5ec0f))
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD("95770147.chr", 0x00000, 0x20000, CRC(5a4d2b79) SHA1(c2f2f39ef6816e0da1b2ff4b723612c671c6215f))
+
+	ROM_REGION( 0x10, "proms", 0 )
+	ROM_LOAD("gcrpal.bin", 0, 8 , BAD_DUMP CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7)) // This was missing with dump, using gldncrwn
+ROM_END
+
 
 // ROM definition Dutch Paradice //////////////////////////////////////////
 
@@ -3668,7 +3688,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 
 /* machine driver for scorpion2 board */
 
-static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2 )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
@@ -3729,7 +3749,7 @@ MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion2 board + matrix board */
-static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2_dm01 )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,dm01_init)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
@@ -3752,8 +3772,8 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
-	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
-	MCFG_BF_DM01_BUSY_CB(WRITELINE(bfm_sc2_state, bfmdm01_busy))
+	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
+	MCFG_BFM_DM01_BUSY_CB(WRITELINE(bfm_sc2_state, bfmdm01_busy))
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
@@ -7646,6 +7666,7 @@ GAMEL( 1996, sltblgpo, 0,         scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsb
 GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 
 GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
+GAMEL( 1997, gldncrwnhop,gldncrwn,scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown Hopper (Dutch, Game Card)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
 
 /* Non-Video */
 

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __TC0080VCO_H__
-#define __TC0080VCO_H__
+#ifndef MAME_VIDEO_TC0080VCO_H
+#define MAME_VIDEO_TC0080VCO_H
+
+#pragma once
 
 class tc0080vco_device : public device_t
 {
 public:
-	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0080vco_device() {}
+	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -25,7 +26,7 @@ public:
 	DECLARE_WRITE16_MEMBER( word_w );
 
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
 	void set_fg0_debug(bool debug) { m_has_fg0 = debug ? 0 : 1; }
 
 	DECLARE_READ16_MEMBER( cram_0_r );
@@ -42,30 +43,30 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT16[]>       m_ram;
-	UINT16 *       m_bg0_ram_0;
-	UINT16 *       m_bg0_ram_1;
-	UINT16 *       m_bg1_ram_0;
-	UINT16 *       m_bg1_ram_1;
-	UINT16 *       m_tx_ram_0;
-	UINT16 *       m_tx_ram_1;
-	UINT16 *       m_char_ram;
-	UINT16 *       m_bgscroll_ram;
+	std::unique_ptr<uint16_t[]>       m_ram;
+	uint16_t *       m_bg0_ram_0;
+	uint16_t *       m_bg0_ram_1;
+	uint16_t *       m_bg1_ram_0;
+	uint16_t *       m_bg1_ram_1;
+	uint16_t *       m_tx_ram_0;
+	uint16_t *       m_tx_ram_1;
+	uint16_t *       m_char_ram;
+	uint16_t *       m_bgscroll_ram;
 
 /* FIXME: This sprite related stuff still needs to be accessed in video/taito_h */
-	UINT16 *       m_chain_ram_0;
-	UINT16 *       m_chain_ram_1;
-	UINT16 *       m_spriteram;
-	UINT16 *       m_scroll_ram;
+	uint16_t *       m_chain_ram_0;
+	uint16_t *       m_chain_ram_1;
+	uint16_t *       m_spriteram;
+	uint16_t *       m_scroll_ram;
 
-	UINT16         m_bg0_scrollx;
-	UINT16         m_bg0_scrolly;
-	UINT16         m_bg1_scrollx;
-	UINT16         m_bg1_scrolly;
+	uint16_t         m_bg0_scrollx;
+	uint16_t         m_bg0_scrolly;
+	uint16_t         m_bg1_scrollx;
+	uint16_t         m_bg1_scrolly;
 
 	tilemap_t      *m_tilemap[3];
 
-	INT32          m_flipscreen;
+	int32_t          m_flipscreen;
 
 	int            m_gfxnum;
 	int            m_txnum;
@@ -78,11 +79,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
-	void bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
+	void bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority );
+	void bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority );
 };
 
-extern const device_type TC0080VCO;
+DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
 
 #define MCFG_TC0080VCO_GFX_REGION(_region) \
 	tc0080vco_device::set_gfx_region(*device, _region);
@@ -99,4 +100,4 @@ extern const device_type TC0080VCO;
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
 	tc0080vco_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
-#endif
+#endif // MAME_VIDEO_TC0080VCO_H

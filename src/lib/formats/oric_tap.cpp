@@ -51,7 +51,7 @@ static oric_t oric;
 /* 8 periods at 2400Hz */
 /* hi,lo, hi,lo, hi,lo, hi,lo */
 
-static INT16 *oric_emit_level(INT16 *p, int count, INT16 wave_state)
+static int16_t *oric_emit_level(int16_t *p, int count, int16_t wave_state)
 {
 	int i;
 
@@ -63,7 +63,7 @@ static INT16 *oric_emit_level(INT16 *p, int count, INT16 wave_state)
 }
 
 /* 4 periods at 1200Hz */
-static INT16* oric_output_bit(INT16 *p, UINT8 b)
+static int16_t* oric_output_bit(int16_t *p, uint8_t b)
 {
 	p = oric_emit_level(p, 1, WAVEENTRY_HIGH);
 	p = oric_emit_level(p, b ? 1 : 2, WAVEENTRY_LOW);
@@ -71,7 +71,7 @@ static INT16* oric_output_bit(INT16 *p, UINT8 b)
 	return p;
 }
 
-static int oric_get_bit_size_in_samples(UINT8 b)
+static int oric_get_bit_size_in_samples(uint8_t b)
 {
 	int count;
 
@@ -119,12 +119,12 @@ static int oric_get_bit_size_in_samples(UINT8 b)
     1   * ?         ->      ???
 */
 
-static int oric_calculate_byte_size_in_samples(UINT8 byte)
+static int oric_calculate_byte_size_in_samples(uint8_t byte)
 {
 	int count;
 	int i;
-	UINT8 parity;
-	UINT8 data;
+	uint8_t parity;
+	uint8_t data;
 
 	count = 0;
 
@@ -139,7 +139,7 @@ static int oric_calculate_byte_size_in_samples(UINT8 byte)
 	data = byte;
 	for (i=0; i<8; i++)
 	{
-		UINT8 data_bit;
+		uint8_t data_bit;
 
 		data_bit = data & 0x01;
 
@@ -162,11 +162,11 @@ static int oric_calculate_byte_size_in_samples(UINT8 byte)
 }
 
 
-static INT16 *oric_output_byte(INT16 *p, UINT8 byte)
+static int16_t *oric_output_byte(int16_t *p, uint8_t byte)
 {
 	int i;
-	UINT8 parity;
-	UINT8 data;
+	uint8_t parity;
+	uint8_t data;
 
 	/* start bit */
 	p = oric_output_bit(p, 0);
@@ -178,7 +178,7 @@ static INT16 *oric_output_byte(INT16 *p, UINT8 byte)
 	data = byte;
 	for (i=0; i<8; i++)
 	{
-		UINT8 data_bit;
+		uint8_t data_bit;
 
 		data_bit = data & 0x01;
 
@@ -200,7 +200,7 @@ static INT16 *oric_output_byte(INT16 *p, UINT8 byte)
 	return p;
 }
 
-static INT16 *oric_fill_pause(INT16 *p, int sample_count)
+static int16_t *oric_fill_pause(int16_t *p, int sample_count)
 {
 	int i;
 
@@ -218,14 +218,14 @@ static int oric_seconds_to_samples(float seconds)
 }
 
 /* length is length of .tap file! */
-static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int oric_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	unsigned char header[9];
 	int count;
 
-	const UINT8 *data_ptr;
+	const uint8_t *data_ptr;
 	int i;
-	UINT8 data;
+	uint8_t data;
 
 	oric.tap_size = length;
 
@@ -302,7 +302,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 				/* got end of filename? */
 				if (data==0)
 				{
-					UINT16 end, start;
+					uint16_t end, start;
 					LOG_FORMATS("got end of filename\n");
 
 					/* 100 1 bits to separate header from data */
@@ -343,13 +343,13 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 }
 
 /* length is length of sample buffer to fill! */
-static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int oric_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	unsigned char header[9];
-	UINT8 *data_ptr;
-	INT16 *p;
+	uint8_t *data_ptr;
+	int16_t *p;
 	int i;
-	UINT8 data;
+	uint8_t data;
 
 	p = buffer;
 
@@ -438,7 +438,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 				/* got end of filename? */
 				if (data==0)
 				{
-					UINT16 end, start;
+					uint16_t end, start;
 					LOG_FORMATS("got end of filename\n");
 
 					/* oric includes a small delay, but I don't see

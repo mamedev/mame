@@ -79,11 +79,16 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/champbas.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/champbas.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -98,9 +103,9 @@ CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
 
-WRITE8_MEMBER(champbas_state::irq_enable_w)
+WRITE_LINE_MEMBER(champbas_state::irq_enable_w)
 {
-	m_irq_mask = data & 1;
+	m_irq_mask = state;
 
 	if (!m_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -111,16 +116,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(champbas_state::dac1_w)
-{
-	m_dac1->write_signed8(data << 2);
-}
-
-WRITE8_MEMBER(champbas_state::dac2_w)
-{
-	m_dac2->write_signed8(data << 2);
-}
-
 
 
 /*************************************
@@ -129,21 +124,21 @@ WRITE8_MEMBER(champbas_state::dac2_w)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::mcu_switch_w)
+WRITE_LINE_MEMBER(champbas_state::mcu_switch_w)
 {
 	// switch shared RAM between CPU and MCU bus
-	m_alpha_8201->bus_dir_w(data & 1);
+	m_alpha_8201->bus_dir_w(state);
 }
 
-WRITE8_MEMBER(champbas_state::mcu_start_w)
+WRITE_LINE_MEMBER(champbas_state::mcu_start_w)
 {
-	m_alpha_8201->mcu_start_w(data & 1);
+	m_alpha_8201->mcu_start_w(state);
 }
 
 /* champbja another protection */
 READ8_MEMBER(champbas_state::champbja_protection_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	/*
 	(68BA) & 0x99 == 0x00
 	(6867) & 0x99 == 0x99
@@ -196,14 +191,7 @@ static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x0020) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP // !WORK board output (no use?)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(palette_bank_w)
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP // n.c.
-	AM_RANGE(0xa006, 0xa006) AM_WRITENOP // no MCU
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP // no MCU
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -213,8 +201,6 @@ ADDRESS_MAP_END
 // base map + ALPHA-8x0x protection
 static ADDRESS_MAP_START( champbasj_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(mcu_start_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(mcu_switch_w)
 	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
@@ -237,25 +223,16 @@ static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
 	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
-// talbot
-static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0xa002, 0xa002) AM_WRITENOP // no gfxbank
-	AM_RANGE(0xa004, 0xa004) AM_WRITENOP // no palettebank
-	AM_IMPORT_FROM( champbasj_map )
-ADDRESS_MAP_END
-
 // more sprites in exctsccr
 static ADDRESS_MAP_START( exctsccr_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0xa004, 0xa004) AM_WRITENOP // no palettebank
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
 // exctsccrb
 static ADDRESS_MAP_START( exctsccrb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0xa004, 0xa004) AM_WRITENOP // no palettebank
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
@@ -269,7 +246,7 @@ static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_WRITE(dac1_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -277,8 +254,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_WRITE(dac1_w)
-	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
+	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0xc00c, 0xc00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
@@ -526,12 +503,22 @@ INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( talbot, champbas_state )
+static MACHINE_CONFIG_START( talbot )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(talbot_map)
+	MCFG_CPU_PROGRAM_MAP(champbasj_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // no gfxbank
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -554,21 +541,31 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( champbas, champbas_state )
+static MACHINE_CONFIG_START( champbas )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9D; 8G on Champion Baseball II Double Board Configuration
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(champbas_state, palette_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // no MCU
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // no MCU
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
@@ -591,15 +588,16 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( champbasj, champbas )
@@ -607,6 +605,10 @@ static MACHINE_CONFIG_DERIVED( champbasj, champbas )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasj_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // note: 8302 rom on champbb2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -634,12 +636,22 @@ static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( exctsccr, champbas_state )
+static MACHINE_CONFIG_START( exctsccr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sound_map)
@@ -670,37 +682,47 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
 	MCFG_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay3", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("ay4", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /* Bootleg running on a modified Champion Baseball board */
-static MACHINE_CONFIG_START( exctsccrb, champbas_state )
+static MACHINE_CONFIG_START( exctsccrb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
@@ -726,15 +748,16 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1199,13 +1222,13 @@ ROM_END
 DRIVER_INIT_MEMBER(champbas_state,champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memregion("gfx1")->base();
-	UINT8 *rom2 = memregion("gfx2")->base();
+	uint8_t *rom1 = memregion("gfx1")->base();
+	uint8_t *rom2 = memregion("gfx2")->base();
 	int len = memregion("gfx1")->bytes();
 
 	for (int i = 0; i < len/2; i++)
 	{
-		UINT8 t = rom1[i + len/2];
+		uint8_t t = rom1[i + len/2];
 		rom1[i + len/2] = rom2[i];
 		rom2[i] = t;
 	}
@@ -1215,13 +1238,13 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memregion("gfx1")->base();
-	UINT8 *rom2 = memregion("gfx2")->base();
+	uint8_t *rom1 = memregion("gfx1")->base();
+	uint8_t *rom2 = memregion("gfx2")->base();
 
 	// planes 0,1
 	for (int i = 0; i < 0x1000; i++)
 	{
-		UINT8 t = rom1[i + 0x1000];
+		uint8_t t = rom1[i + 0x1000];
 		rom1[i + 0x1000] = rom2[i];
 		rom2[i] = t;
 	}
@@ -1247,8 +1270,8 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
  *
  *************************************/
 
-/*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR, COMPANY, FULLNAME, FLAGS */
-GAME( 1982, talbot,     0,        talbot,     talbot,   driver_device,  0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR COMPANY, FULLNAME, FLAGS */
+GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, 0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )

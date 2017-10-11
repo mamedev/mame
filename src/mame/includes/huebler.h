@@ -10,11 +10,11 @@
 #define Z80PIO1_TAG     "z80pio1"
 #define Z80PIO2_TAG     "z80pio2"
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
@@ -42,13 +42,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_memory_region m_kb_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<16> m_key_row;
 	required_ioport m_special;
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( keyboard_r );
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );

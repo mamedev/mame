@@ -35,6 +35,8 @@
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -61,22 +63,22 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd765a_device> m_fdc;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<beep_device> m_beeper;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_ipl_rom;
-	UINT8 *m_basic_rom;
-	std::unique_ptr<UINT8[]> m_work_ram;
-	std::unique_ptr<UINT8[]> m_shared_ram;
-	UINT8 *m_char_rom;
+	uint8_t *m_ipl_rom;
+	uint8_t *m_basic_rom;
+	std::unique_ptr<uint8_t[]> m_work_ram;
+	std::unique_ptr<uint8_t[]> m_shared_ram;
+	uint8_t *m_char_rom;
 
-	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
-	UINT8 m_crtc[0x10];
+	uint8_t m_ma,m_mo,m_ms,m_me2,m_me1;
+	uint8_t m_crtc[0x10];
 
-	UINT8 m_srdy;
+	uint8_t m_srdy;
 
-	UINT8 m_fdd_sel;
+	uint8_t m_fdd_sel;
 
 	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
 	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
@@ -97,7 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -158,11 +160,11 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 	int xi,yi;
 	int tile;
 	int attr;
-	UINT8 tile_data;
-	UINT8 width80;
-	UINT8 char_size;
-	UINT8 hires;
-	UINT8 color_mode;
+	uint8_t tile_data;
+	uint8_t width80;
+	uint8_t char_size;
+	uint8_t hires;
+	uint8_t color_mode;
 
 //  popmessage("%02x",m_crtc[6]);
 
@@ -232,7 +234,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 
 }
 
-UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(m_palette->pen((m_crtc[4] & 2) ? m_crtc[3] & 7 : 0), cliprect);
 
@@ -741,8 +743,8 @@ void mz3500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_basic_rom = memregion("basic")->base();
 	m_char_rom = memregion("gfx1")->base();
-	m_work_ram = make_unique_clear<UINT8[]>(0x40000);
-	m_shared_ram = make_unique_clear<UINT8[]>(0x800);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x40000);
+	m_shared_ram = make_unique_clear<uint8_t[]>(0x800);
 
 	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 
@@ -784,12 +786,12 @@ void mz3500_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, mz3500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -798,7 +800,7 @@ static SLOT_INTERFACE_START( mz3500_floppies )
 SLOT_INTERFACE_END
 
 /* TODO: clocks */
-static MACHINE_CONFIG_START( mz3500, mz3500_state )
+static MACHINE_CONFIG_START( mz3500 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)
@@ -824,12 +826,12 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz3500_state, hgdc_display_pixels)
 
 	/* video hardware */
@@ -869,4 +871,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, driver_device,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, mz3500_state,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )

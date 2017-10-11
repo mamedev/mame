@@ -7,11 +7,11 @@
     NEOGEO Memory card functions.
 
 *********************************************************************/
+#ifndef MAME_MACHINE_NG_MEMCARD_H
+#define MAME_MACHINE_NG_MEMCARD_H
 
 #pragma once
 
-#ifndef __NG_MEMCARD_H__
-#define __NG_MEMCARD_H__
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -31,7 +31,7 @@ class ng_memcard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
@@ -48,7 +48,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -56,12 +55,12 @@ public:
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }
 private:
-	UINT8 m_memcard_data[0x800];
+	uint8_t m_memcard_data[0x800];
 };
 
 
 // device type definition
-extern const device_type NG_MEMCARD;
+DECLARE_DEVICE_TYPE(NG_MEMCARD, ng_memcard_device)
 
 
-#endif  /* __NG_MEMCARD_H__ */
+#endif // MAME_MACHINE_NG_MEMCARD_H

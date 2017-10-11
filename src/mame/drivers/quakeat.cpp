@@ -63,6 +63,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "screen.h"
 
 
 class quakeat_state : public pcat_base_state
@@ -74,7 +75,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -82,7 +83,7 @@ void quakeat_state::video_start()
 {
 }
 
-UINT32 quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -115,7 +116,7 @@ void quakeat_state::machine_start()
 }
 /*************************************************************/
 
-static MACHINE_CONFIG_START( quake, quakeat_state )
+static MACHINE_CONFIG_START( quake )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
 	MCFG_CPU_PROGRAM_MAP(quake_map)
@@ -147,4 +148,4 @@ ROM_START(quake)
 ROM_END
 
 
-GAME( 1998, quake,  0,   quake, quake, driver_device, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,   quake, quake, quakeat_state, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )

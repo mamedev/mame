@@ -40,16 +40,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	required_shared_ptr<UINT8> m_videoram;
-	UINT8 m_chunky_graphics;
-	std::unique_ptr<UINT8[]> m_chunky_buffer;
-	UINT8 m_keypad_column;
-	UINT8 m_keyboard_ascii;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint8_t m_chunky_graphics;
+	std::unique_ptr<uint8_t[]> m_chunky_buffer;
+	uint8_t m_keypad_column;
+	uint8_t m_keyboard_ascii;
 	emu_timer *m_timer;
 	int m_via_0_irq_line;
 	int m_via_1_irq_line;
 	int m_kbd_irq_line;
-	UINT8 m_keyrows[10];
+	uint8_t m_keyrows[10];
 	int m_lastrow;
 	int m_mask;
 	int m_key;
@@ -65,7 +65,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(microtan_interrupt);
 	TIMER_CALLBACK_MEMBER(microtan_read_cassette);
 	TIMER_CALLBACK_MEMBER(microtan_pulse_nmi);
@@ -85,14 +85,14 @@ public:
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
 	required_device<gfxdecode_device> m_gfxdecode;
-	UINT8 read_dsw();
+	uint8_t read_dsw();
 	void microtan_set_irq_line();
 	void store_key(int key);
-	image_verify_result microtan_verify_snapshot(UINT8 *data, int size);
-	image_init_result parse_intel_hex(UINT8 *snapshot_buff, char *src);
-	image_init_result parse_zillion_hex(UINT8 *snapshot_buff, char *src);
-	void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base);
-	void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size);
+	image_verify_result microtan_verify_snapshot(uint8_t *data, int size);
+	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);
+	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
+	void microtan_set_cpu_regs(const uint8_t *snapshot_buff, int base);
+	void microtan_snapshot_copy(uint8_t *snapshot_buff, int snapshot_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 

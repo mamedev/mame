@@ -19,12 +19,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MOS6702_H
+#define MAME_MACHINE_MOS6702_H
+
 #pragma once
-
-#ifndef __MOS6702__
-#define __MOS6702__
-
-#include "emu.h"
 
 
 
@@ -32,8 +30,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6702_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, MOS6702, _clock)
+#define MCFG_MOS6702_ADD(tag, clock) \
+	MCFG_DEVICE_ADD(tag, MOS6702, clock)
 
 
 
@@ -47,7 +45,7 @@ class mos6702_device :  public device_t
 {
 public:
 	// construction/destruction
-	mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -59,8 +57,6 @@ protected:
 
 
 // device type definition
-extern const device_type MOS6702;
+DECLARE_DEVICE_TYPE(MOS6702, mos6702_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MOS6702_H

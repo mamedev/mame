@@ -10,9 +10,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "tmpz84c011.h"
 
-const device_type TMPZ84C011 = &device_creator<tmpz84c011_device>;
+DEFINE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device, "tmpz84c011", "TMPZ84C011")
 
 static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_device )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c011_ctc", z80ctc_device, read, write)
@@ -30,8 +31,8 @@ static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_devic
 ADDRESS_MAP_END
 
 
-tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80_device(mconfig, TMPZ84C011, "TMPZ84C011", tag, owner, clock, "tmpz84c011", __FILE__),
+tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80_device(mconfig, TMPZ84C011, tag, owner, clock),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME( tmpz84c011_internal_io_map ) ),
 	m_ctc(*this, "tmpz84c011_ctc"),
 	m_outportsa(*this),
@@ -52,6 +53,12 @@ tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *
 	memset(m_pio_latch, 0, 5);
 }
 
+device_memory_interface::space_config_vector tmpz84c011_device::memory_space_config() const
+{
+	auto r = z80_device::memory_space_config();
+	r.back().second = &m_io_space_config;
+	return r;
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -110,15 +117,10 @@ void tmpz84c011_device::device_reset()
 
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( tmpz84c011 )
+MACHINE_CONFIG_MEMBER( tmpz84c011_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("tmpz84c011_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(tmpz84c011_device, zc0_cb_trampoline_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(tmpz84c011_device, zc1_cb_trampoline_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(tmpz84c011_device, zc2_cb_trampoline_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor tmpz84c011_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tmpz84c011 );
-}

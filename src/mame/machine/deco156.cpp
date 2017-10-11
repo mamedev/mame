@@ -36,7 +36,7 @@
 #include "machine/deco156.h"
 
 
-static void decrypt(UINT32 *src, UINT32 *dst, int length)
+static void decrypt(uint32_t *src, uint32_t *dst, int length)
 {
 	int a;
 
@@ -126,9 +126,9 @@ static void decrypt(UINT32 *src, UINT32 *dst, int length)
 
 void deco156_decrypt(running_machine &machine)
 {
-	UINT32 *rom = (UINT32 *)machine.root_device().memregion("maincpu")->base();
+	uint32_t *rom = (uint32_t *)machine.root_device().memregion("maincpu")->base();
 	int length = machine.root_device().memregion("maincpu")->bytes();
-	std::vector<UINT32> buf(length/4);
+	std::vector<uint32_t> buf(length/4);
 
 	memcpy(&buf[0], rom, length);
 	decrypt(&buf[0], rom, length);

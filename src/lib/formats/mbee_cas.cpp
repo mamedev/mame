@@ -69,7 +69,7 @@ TAP - has an ID header of TAP_DGOS_BEE or MBEE, null terminated.
 static int mbee_image_size;
 static bool mbee_speed;
 
-static int mbee_put_samples(INT16 *buffer, int sample_pos, int count, int level)
+static int mbee_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
@@ -80,7 +80,7 @@ static int mbee_put_samples(INT16 *buffer, int sample_pos, int count, int level)
 	return count;
 }
 
-static int mbee_output_bit(INT16 *buffer, int sample_pos, bool bit)
+static int mbee_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 	if (mbee_speed)
@@ -135,10 +135,10 @@ static int mbee_output_bit(INT16 *buffer, int sample_pos, bool bit)
 	return samples;
 }
 
-static int mbee_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int mbee_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
-	UINT8 i;
+	uint8_t i;
 
 	/* start */
 	samples += mbee_output_bit (buffer, sample_pos + samples, 0);
@@ -154,14 +154,14 @@ static int mbee_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static int mbee_handle_tap(INT16 *buffer, const UINT8 *bytes)
+static int mbee_handle_tap(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
-	UINT32 byte_count = 0;
-	UINT32 i = 0;
+	uint32_t sample_count = 0;
+	uint32_t byte_count = 0;
+	uint32_t i = 0;
 	bool temp_speed = 0;
-	UINT8 temp_blocks = 0;
-	UINT16 temp_size = 0;
+	uint8_t temp_blocks = 0;
+	uint16_t temp_size = 0;
 
 	// TAP file starts with a null-terminate ID string. We just skip this.
 	while (bytes[byte_count])
@@ -211,7 +211,7 @@ static int mbee_handle_tap(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int mbee_tap_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int mbee_tap_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return mbee_handle_tap(buffer, bytes);
 }
@@ -220,7 +220,7 @@ static int mbee_tap_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int mbee_tap_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int mbee_tap_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	mbee_image_size = length;
 

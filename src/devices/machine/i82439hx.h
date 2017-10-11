@@ -2,8 +2,10 @@
 // copyright-holders:Olivier Galibert
 // Intel i82439hx northbridge (440hx)
 
-#ifndef I82439HX_H
-#define I82439HX_H
+#ifndef MAME_MACHINE_I82439HX_H
+#define MAME_MACHINE_I82439HX_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -14,7 +16,7 @@
 
 class i82439hx_host_device : public pci_host_device {
 public:
-	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
@@ -29,10 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dramc_w);
 	DECLARE_READ8_MEMBER (dramt_r);
 	DECLARE_WRITE8_MEMBER(dramt_w);
-	DECLARE_READ8_MEMBER (pam0_r);
-	DECLARE_WRITE8_MEMBER(pam0_w);
-	DECLARE_READ8_MEMBER (pam3_r);
-	DECLARE_WRITE8_MEMBER(pam3_w);
+	DECLARE_READ8_MEMBER (pam_r);
+	DECLARE_WRITE8_MEMBER(pam_w);
 	DECLARE_READ8_MEMBER (drb_r);
 	DECLARE_WRITE8_MEMBER(drb_w);
 	DECLARE_READ8_MEMBER (drt_r);
@@ -49,8 +49,8 @@ public:
 
 	virtual void reset_all_mappings() override;
 
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
@@ -62,13 +62,13 @@ private:
 	const char *cpu_tag;
 	int ram_size;
 	cpu_device *cpu;
-	std::vector<UINT32> ram;
+	std::vector<uint32_t> ram;
 
-	UINT8 pcon, cc, dramec, dramc, dramt;
-	UINT8 pam[7], drb[8];
-	UINT8 drt, drat, smram, errcmd, errsts, errsyn;
+	uint8_t pcon, cc, dramec, dramc, dramt;
+	uint8_t pam[7], drb[8];
+	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
-extern const device_type I82439HX;
+DECLARE_DEVICE_TYPE(I82439HX, i82439hx_host_device)
 
-#endif
+#endif // MAME_MACHINE_I82439HX_H

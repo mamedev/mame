@@ -13,38 +13,39 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "screen.h"
 
 class k8915_state : public driver_device
 {
 public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_videoram(*this, "p_videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( k8915_52_r );
-	DECLARE_READ8_MEMBER( k8915_53_r );
-	DECLARE_WRITE8_MEMBER( k8915_a8_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	required_shared_ptr<UINT8> m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
-	UINT8 m_term_data;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(k8915_52_r);
+	DECLARE_READ8_MEMBER(k8915_53_r);
+	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(k8915);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	uint8_t m_framecnt;
+	uint8_t m_term_data;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ8_MEMBER( k8915_state::k8915_52_r )
 {
 // get data from ascii keyboard
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -67,7 +68,7 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -89,19 +90,14 @@ void k8915_state::machine_reset()
 
 DRIVER_INIT_MEMBER(k8915_state,k8915)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-void k8915_state::video_start()
+uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	m_framecnt++;
 
@@ -109,7 +105,7 @@ UINT32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -144,19 +140,19 @@ UINT32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER( k8915_state::kbd_put )
+void k8915_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( k8915, k8915_state )
+static MACHINE_CONFIG_START( k8915 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(k8915_mem)
 	MCFG_CPU_IO_MAP(k8915_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(k8915_state, screen_update)
@@ -166,8 +162,8 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(k8915_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -183,5 +179,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0,     k8915,  k8915, k8915_state,  k8915, "Robotron",   "K8915", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY     FULLNAME  FLAGS
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

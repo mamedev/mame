@@ -25,11 +25,15 @@ ToDO:
 
 **********************************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "machine/clock.h"
+#include "speaker.h"
+
 
 class idsa_state : public genpin_class
 {
@@ -50,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
 private:
-	UINT16 m_irqcnt;
+	uint16_t m_irqcnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<sp0256_device> m_speech;
@@ -208,8 +212,8 @@ INPUT_PORTS_END
 // This came from pinmame, even though there's no spb640 chip
 READ8_MEMBER( idsa_state::portb0_r )
 {
-	UINT16 data = m_speech->spb640_r(space, offset / 2);
-	return offset % 2 ? (UINT8)(data >> 8) : (UINT8)(data & 0xff);
+	uint16_t data = m_speech->spb640_r(space, offset / 2);
+	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
 // ports 80 & 90 for the display
@@ -259,7 +263,7 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-static MACHINE_CONFIG_START( idsa, idsa_state )
+static MACHINE_CONFIG_START( idsa )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -304,5 +308,5 @@ ROM_START(bsktbllp)
 ROM_END
 
 
-GAME( 1985, v1,       0, idsa, idsa, driver_device, 0, ROT0, "IDSA", "V.1", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, idsa, idsa, driver_device, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, bsktbllp, 0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )

@@ -19,10 +19,13 @@ Notes:
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/strnskil.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "sound/sn76496.h"
-#include "includes/strnskil.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -114,12 +117,6 @@ static ADDRESS_MAP_START( strnskil_map2, AS_PROGRAM, 8, strnskil_state )
 
 	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_device, write)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, strnskil_state )
-//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
-//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -339,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 }
 
 
-static MACHINE_CONFIG_START( strnskil, strnskil_state )
+static MACHINE_CONFIG_START( strnskil )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -380,7 +377,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( banbam, strnskil )
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+//  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
+//  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))
+//  MCFG_MB88XX_WRITE_R0_CB(WRITE8(strnskil_state, mcu_portr0_w))
 MACHINE_CONFIG_END
 
 /****************************************************************************/
@@ -543,7 +542,7 @@ DRIVER_INIT_MEMBER(strnskil_state,banbam)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 }
 
-GAME( 1984, strnskil, 0,        strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, banbam,   0,        banbam,   banbam, strnskil_state,   banbam,  ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pettanp,  banbam,   strnskil, banbam, strnskil_state,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, strnskil, 0,        strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "Strength & Skill",    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, banbam,   0,        banbam,   banbam,   strnskil_state, banbam,  ROT0, "Sun Electronics", "BanBam",              MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pettanp,  banbam,   strnskil, banbam,   strnskil_state, pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

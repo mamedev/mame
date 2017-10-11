@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(gotya_state, gotya)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -56,7 +56,7 @@ PALETTE_INIT_MEMBER(gotya_state, gotya)
 
 	for (i = 0; i < 0x40; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x07;
+		uint8_t ctabentry = color_prom[i] & 0x07;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -138,7 +138,7 @@ void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void gotya_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 2; offs < 0x0e; offs += 2)
@@ -169,7 +169,7 @@ void gotya_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	draw_status_row(bitmap, cliprect, 34, 15);
 }
 
-UINT32 gotya_state::screen_update_gotya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gotya_state::screen_update_gotya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, -(*m_scroll + (m_scroll_bit_8 * 256)) - 2 * 8);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

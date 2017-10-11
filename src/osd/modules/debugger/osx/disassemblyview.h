@@ -10,7 +10,6 @@
 
 #import "debugview.h"
 
-#include "emu.h"
 #include "debug/dvdisasm.h"
 
 #import <Cocoa/Cocoa.h>
@@ -40,5 +39,8 @@
 
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 @end

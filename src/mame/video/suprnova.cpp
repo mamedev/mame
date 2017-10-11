@@ -8,7 +8,7 @@
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, uint32_t* scrollram)
 {
 	//bitmap_ind16 *destbitmap = bitmap;
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -17,18 +17,18 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
-	UINT32 cx;
-	UINT32 cy;
+	uint32_t cx;
+	uint32_t cy;
 	int x;
 	int sx;
 	int sy;
 	int ex;
 	int ey;
-	UINT16 *dest;
-	UINT8* destflags;
-//  UINT8 *pri;
-	//const UINT16 *src;
-	//const UINT8 *maskptr;
+	uint16_t *dest;
+	uint8_t* destflags;
+//  uint8_t *pri;
+	//const uint16_t *src;
+	//const uint8_t *maskptr;
 	//int destadvance = destbitmap->bpp / 8;
 
 	/* pre-advance based on the cliprect */
@@ -219,7 +219,7 @@ WRITE32_MEMBER(skns_state::palette_ram_w)
 }
 
 
-void skns_state::palette_set_rgb_brightness (int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
+void skns_state::palette_set_rgb_brightness (int offset, uint8_t brightness_r, uint8_t brightness_g, uint8_t brightness_b)
 {
 	int use_bright, r, g, b/*, alpha*/;
 
@@ -405,7 +405,7 @@ void skns_state::draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 	int nowrap_a = (m_v3_regs[0x10/4] >> 0) & 0x0004;
 
 
-	UINT32 startx,starty;
+	uint32_t startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
 
@@ -435,7 +435,7 @@ void skns_state::draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 	int nowrap_b = (m_v3_regs[0x34/4] >> 0) & 0x0004;
 
 
-	UINT32 startx,starty;
+	uint32_t startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
 
@@ -459,7 +459,7 @@ void skns_state::draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 	}
 }
 
-UINT32 skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	palette_update();
 
@@ -485,11 +485,11 @@ UINT32 skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 		{
 			int x,y;
-			UINT8* srcflags, *src2flags;
-			UINT16* src, *src2, *src3;
-			UINT32* dst;
-			UINT16 pri, pri2, pri3;
-			UINT16 bgpri;
+			uint8_t* srcflags, *src2flags;
+			uint16_t* src, *src2, *src3;
+			uint32_t* dst;
+			uint16_t pri, pri2, pri3;
+			uint16_t bgpri;
 			const pen_t *clut = &m_palette->pen(0);
 //          int drawpri;
 
@@ -509,12 +509,12 @@ UINT32 skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 				for (x=0;x<320;x++)
 				{
-					UINT16 pendata  = src[x]&0x7fff;
-					UINT16 pendata2 = src2[x]&0x7fff;
-					UINT16 bgpendata;
-					UINT16 pendata3 = src3[x]&0x3fff;
+					uint16_t pendata  = src[x]&0x7fff;
+					uint16_t pendata2 = src2[x]&0x7fff;
+					uint16_t bgpendata;
+					uint16_t pendata3 = src3[x]&0x3fff;
 
-					UINT32 coldat;
+					uint32_t coldat;
 
 					pri = ((srcflags[x] & 0x07)<<1) | (supernova_pri_b);
 					pri2= ((src2flags[x] & 0x07)<<1) | (supernova_pri_a);
@@ -569,14 +569,14 @@ UINT32 skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					{
 						if (pendata3&0xff)
 						{
-							UINT16 palvalue = m_palette_ram[pendata3];
+							uint16_t palvalue = m_palette_ram[pendata3];
 
 							coldat = clut[pendata3];
 
 							if (palvalue&0x8000)
 							{
-								UINT32 srccolour = clut[bgpendata&0x7fff];
-								UINT32 dstcolour = clut[pendata3&0x3fff];
+								uint32_t srccolour = clut[bgpendata&0x7fff];
+								uint32_t dstcolour = clut[pendata3&0x3fff];
 
 								int r,g,b;
 								int r2,g2,b2;

@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(aquarius_state, aquarius)
 
 WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
@@ -58,7 +58,7 @@ WRITE8_MEMBER(aquarius_state::aquarius_colorram_w)
 
 TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int bank = 0;
 	int code = videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -72,7 +72,7 @@ void aquarius_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarius_state::aquarius_gettileinfo),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
-UINT32 aquarius_state::screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t aquarius_state::screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

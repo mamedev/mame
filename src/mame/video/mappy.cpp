@@ -34,7 +34,7 @@
 
 PALETTE_INIT_MEMBER(mappy_state,superpac)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -77,21 +77,21 @@ PALETTE_INIT_MEMBER(mappy_state,superpac)
 	/* characters map to the upper 16 palette entries */
 	for (i = 0; i < 64*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, (ctabentry ^ 15) + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 PALETTE_INIT_MEMBER(mappy_state,mappy)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -134,14 +134,14 @@ PALETTE_INIT_MEMBER(mappy_state,mappy)
 	/* characters map to the upper 16 palette entries */
 	for (i = 0*4; i < 64*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < palette.entries(); i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(mappy_state,mappy)
 
 PALETTE_INIT_MEMBER(mappy_state,phozon)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -207,14 +207,14 @@ PALETTE_INIT_MEMBER(mappy_state,phozon)
 	/* characters map to the lower 16 palette entries */
 	for (i = 0; i < 64*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites map to the upper 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry + 0x10);
 	}
 }
@@ -266,7 +266,7 @@ TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 
 TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x400];
+	uint8_t attr = m_videoram[tile_index + 0x400];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
@@ -278,7 +278,7 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 
 TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x400];
+	uint8_t attr = m_videoram[tile_index + 0x400];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
@@ -290,7 +290,7 @@ TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 
 TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x800];
+	uint8_t attr = m_videoram[tile_index + 0x800];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
@@ -377,11 +377,11 @@ WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 
 ***************************************************************************/
 
-void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base)
 {
-	UINT8 *spriteram = spriteram_base + 0x780;
-	UINT8 *spriteram_2 = spriteram + 0x800;
-	UINT8 *spriteram_3 = spriteram_2 + 0x800;
+	uint8_t *spriteram = spriteram_base + 0x780;
+	uint8_t *spriteram_2 = spriteram + 0x800;
+	uint8_t *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -389,7 +389,7 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static const UINT8 gfx_offs[2][2] =
+			static const uint8_t gfx_offs[2][2] =
 			{
 				{ 0, 1 },
 				{ 2, 3 }
@@ -454,11 +454,11 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base)
 {
-	UINT8 *spriteram = spriteram_base + 0x780;
-	UINT8 *spriteram_2 = spriteram + 0x800;
-	UINT8 *spriteram_3 = spriteram_2 + 0x800;
+	uint8_t *spriteram = spriteram_base + 0x780;
+	uint8_t *spriteram_2 = spriteram + 0x800;
+	uint8_t *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -466,8 +466,8 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static const UINT8 size[4] = { 1, 0, 3, 0 };    /* 16, 8, 32 pixels; fourth combination unused? */
-			static const UINT8 gfx_offs[4][4] =
+			static const uint8_t size[4] = { 1, 0, 3, 0 };    /* 16, 8, 32 pixels; fourth combination unused? */
+			static const uint8_t gfx_offs[4][4] =
 			{
 				{ 0, 1, 4, 5 },
 				{ 2, 3, 6, 7 },
@@ -510,7 +510,7 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 }
 
 
-UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &sprite_bitmap = m_sprite_bitmap;
 	int x,y;
@@ -538,7 +538,7 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
@@ -552,7 +552,7 @@ UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-UINT32 mappy_state::screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mappy_state::screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

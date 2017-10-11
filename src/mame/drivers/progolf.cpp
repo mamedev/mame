@@ -58,6 +58,10 @@ Twenty four 8116 rams.
 #include "video/mc6845.h"
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
+#include "machine/gen_latch.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class progolf_state : public driver_device
 {
@@ -76,24 +80,21 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_fbram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_fbram;
 
-	UINT8 m_char_pen;
-	UINT8 m_char_pen_vreg;
-	std::unique_ptr<UINT8[]> m_fg_fb;
-	UINT8 m_scrollx_hi;
-	UINT8 m_scrollx_lo;
-	UINT8 m_gfx_switch;
-	UINT8 m_sound_cmd;
+	uint8_t m_char_pen;
+	uint8_t m_char_pen_vreg;
+	std::unique_ptr<uint8_t[]> m_fg_fb;
+	uint8_t m_scrollx_hi;
+	uint8_t m_scrollx_lo;
+	uint8_t m_gfx_switch;
 
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(char_vregs_w);
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
@@ -103,13 +104,12 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(progolf);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 void progolf_state::machine_start()
 {
-	save_item(NAME(m_sound_cmd));
 }
 
 void progolf_state::video_start()
@@ -117,7 +117,7 @@ void progolf_state::video_start()
 	m_scrollx_hi = 0;
 	m_scrollx_lo = 0;
 
-	m_fg_fb = std::make_unique<UINT8[]>(0x2000*8);
+	m_fg_fb = std::make_unique<uint8_t[]>(0x2000*8);
 
 	save_item(NAME(m_char_pen));
 	save_item(NAME(m_char_pen_vreg));
@@ -128,7 +128,7 @@ void progolf_state::video_start()
 }
 
 
-UINT32 progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count,color,x,y,xi,yi;
 
@@ -225,21 +225,9 @@ WRITE8_MEMBER(progolf_state::flip_screen_w)
 		printf("$9600 with data = %02x used\n",data);
 }
 
-WRITE8_MEMBER(progolf_state::audio_command_w)
-{
-	m_sound_cmd = data;
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(progolf_state::audio_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_sound_cmd;
-}
-
 READ8_MEMBER(progolf_state::videoram_r)
 {
-	UINT8 *gfx_rom = memregion("gfx1")->base();
+	uint8_t *gfx_rom = memregion("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
@@ -280,7 +268,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 //  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -291,7 +279,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(audio_command_r) AM_WRITENOP //volume control?
+	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -394,7 +382,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(progolf_state, progolf)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < m_palette->entries();i++)
@@ -421,7 +409,7 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 	}
 }
 
-static MACHINE_CONFIG_START( progolf, progolf_state )
+static MACHINE_CONFIG_START( progolf )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
@@ -430,6 +418,10 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -514,6 +506,6 @@ ROM_END
 
 
 // this uses DECO222 style encryption
-GAME( 1981, progolf,  0,       progolf, progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
-GAME( 1981, progolfa, progolf, progolfa,progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

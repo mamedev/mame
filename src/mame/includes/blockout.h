@@ -8,6 +8,8 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class blockout_state : public driver_device
 {
@@ -24,13 +26,13 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_frontvideoram;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_frontvideoram;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmap;
-	UINT16   m_color;
+	uint16_t   m_color;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -40,7 +42,6 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
-	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
@@ -49,7 +50,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
 	void setcolor( int color, int rgb );
 	void update_pixels( int x, int y );

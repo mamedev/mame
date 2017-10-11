@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_ATAINTF_H
+#define MAME_MACHINE_ATAINTF_H
 
-#ifndef __ATAINTF_H__
-#define __ATAINTF_H__
+#pragma once
 
 #include "atadev.h"
 
@@ -26,20 +26,21 @@ class ata_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	ata_device_interface *dev() { return m_dev; }
+	device_ata_interface *dev() { return m_dev; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
 private:
-	ata_device_interface *m_dev;
+	device_ata_interface *m_dev;
 };
 
 // device type definition
-extern const device_type ATA_SLOT;
+DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -77,26 +78,28 @@ SLOT_INTERFACE_EXTERN(ata_devices);
 class ata_interface_device : public device_t
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
-	UINT16 read_dma();
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dmarq_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dasp_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(std::forward<Object>(cb)); }
+
+	uint16_t read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
 
-	void write_dma(UINT16 data);
+	void write_dma(uint16_t data);
 	virtual DECLARE_WRITE16_MEMBER(write_cs0);
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 protected:
+	ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);
@@ -124,6 +127,6 @@ private:
 	devcb_write_line m_dasp_handler;
 };
 
-extern const device_type ATA_INTERFACE;
+DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)
 
-#endif  /* __ATAINTF_H__ */
+#endif // MAME_MACHINE_ATAINTF_H

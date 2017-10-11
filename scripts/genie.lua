@@ -2,6 +2,10 @@
 -- copyright-holders:MAMEdev Team
 STANDALONE = false
 
+-- Big project specific
+premake.make.makefile_ignore = true
+premake._checkgenerate = false
+
 newoption {
 	trigger = 'build-dir',
 	description = 'Build directory name',
@@ -368,15 +372,6 @@ newoption {
 }
 
 newoption {
-	trigger = "USE_LIBUV",
-	description = "Use libuv.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "DEBUG_DIR",
 	description = "Default directory for debugger.",
 }
@@ -384,6 +379,16 @@ newoption {
 newoption {
 	trigger = "DEBUG_ARGS",
 	description = "Arguments for running debug build.",
+}
+
+newoption {
+	trigger = "WEBASSEMBLY",
+	description = "Produce WebAssembly output when building with Emscripten.",
+}
+
+newoption {
+	trigger = "PROJECT",
+	description = "Select projects to be built. Will look into project folder for files.",
 }
 
 dofile ("extlib.lua")
@@ -410,10 +415,6 @@ if not _OPTIONS["NOASM"] then
 	else
 		_OPTIONS["NOASM"] = "0"
 	end
-end
-
-if not _OPTIONS["USE_LIBUV"] then
-	_OPTIONS["USE_LIBUV"] = "1"
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -464,6 +465,9 @@ flags {
 }
 
 configuration { "vs*" }
+	buildoptions {
+		"/bigobj",
+	}
 	flags {
 		"NoPCH",
 		"ExtraWarnings",
@@ -479,6 +483,7 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
+		"NoIncrementalLink",
 	}
 
 configuration { "Release", "vs*" }
@@ -486,7 +491,7 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
--- Force VS2015 targets to use bundled SDL2
+-- Force VS2015/17 targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
 		_OPTIONS["with-bundled-sdl2"] = "1"
@@ -498,6 +503,12 @@ if _OPTIONS["targetos"] == "android" then
 end
 
 configuration {}
+
+if _OPTIONS["osd"] == "uwp" then
+	windowstargetplatformversion("10.0.14393.0")
+	windowstargetplatformminversion("10.0.14393.0")
+	premake._filelevelconfig = true
+end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
@@ -513,7 +524,14 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["PROJECT"] ~= nil) then
+	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+	end
+	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+end
+if (_OPTIONS["SOURCES"] == nil and _OPTIONS["PROJECT"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
@@ -526,12 +544,6 @@ configuration { "gmake or ninja" }
 	}
 
 dofile ("toolchain.lua")
-
-if _OPTIONS["USE_LIBUV"]=="0" then
-	defines {
-		"NO_LIBUV",
-	}
-end
 
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
@@ -695,7 +707,7 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-x objective-c++",
 		"-std=c++1y",
 	}
@@ -705,7 +717,7 @@ else
 		"-std=c++14",
 	}
 
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-x objective-c++",
 		"-std=c++14",
 	}
@@ -930,7 +942,7 @@ if _OPTIONS["targetos"]~="freebsd" then
 end
 
 -- warnings only applicable to OBJ-C compiles
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-Wpointer-arith",
 	}
 
@@ -1039,6 +1051,7 @@ configuration { "android*" }
 		"-Wno-undef",
 		"-Wno-typedef-redefinition",
 		"-Wno-unknown-warning-option",
+		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
 		"-x c++",
@@ -1120,10 +1133,14 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
+		local version = str_to_version(_OPTIONS["gcc_version"])
+		if not (_OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang")) or version < 40000
+		then
+			linkoptions {
+				"-static",
+			}
+		end
 		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"-static",
 			"-Wl,--start-group",
 		}
 		links {
@@ -1138,10 +1155,14 @@ configuration { "mingw*" }
 			"shell32",
 			"userenv",
 		}
+
 configuration { "mingw-clang" }
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
 		linkoptions {
 			"-pthread",
 		}
+	end
 
 
 configuration { "vs*" }
@@ -1153,6 +1174,8 @@ configuration { "vs*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
+-- Windows Store/Phone projects already link against the available libraries.
+if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
 			"user32",
 			"winmm",
@@ -1165,6 +1188,7 @@ configuration { "vs*" }
 			"shell32",
 			"userenv",
 		}
+end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
@@ -1272,7 +1296,7 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
-configuration { "vs2015*" }
+configuration { "vs201*" }
 		buildoptions {
 			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -1287,15 +1311,6 @@ configuration { "vs2015*" }
 			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
-	removelinks {
-		"DelayImp",
-		"gdi32",
-		"psapi"
-	}
-	links {
-		"d3d11",
-		"dxgi"
-	}
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
@@ -1310,6 +1325,13 @@ configuration { "Debug", "gmake" }
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
+	local str = _OPTIONS["SOURCES"]
+	for word in string.gmatch(str, '([^,]+)') do
+		if (not os.isfile(path.join(MAME_DIR ,word))) then
+			print("File " .. word.. " does not exist")
+			os.exit()
+		end
+	end
 	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"]..".flt")

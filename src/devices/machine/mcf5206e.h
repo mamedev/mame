@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_MCF5206E_H
+#define MAME_MACHINE_MCF5206E_H
+
 #pragma once
 
-#ifndef __MCF5206E_PERIPHERAL_H__
-#define __MCF5206E_PERIPHERAL_H__
-
-#include "emu.h"
 
 
 
@@ -28,32 +27,32 @@
 
 // ======================> mcf5206e_peripheral_device
 
-enum
-{
-	ICR1 = 0,
-	ICR2,
-	ICR3,
-	ICR4,
-	ICR5,
-	ICR6,
-	ICR7,
-	ICR8,
-	ICR9,
-	ICR10,
-	ICR11,
-	ICR12,
-	ICR13,
-	MAX_ICR
-};
-
 class mcf5206e_peripheral_device :  public device_t,
 									public device_memory_interface
 {
 public:
-	// construction/destruction
-	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	enum
+	{
+		ICR1 = 0,
+		ICR2,
+		ICR3,
+		ICR4,
+		ICR5,
+		ICR6,
+		ICR7,
+		ICR8,
+		ICR9,
+		ICR10,
+		ICR11,
+		ICR12,
+		ICR13,
+		MAX_ICR
+	};
 
-	void ICR_info(UINT8 ICR);
+	// construction/destruction
+	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void ICR_info(uint8_t ICR);
 
 	DECLARE_READ32_MEMBER( dev_r );
 	DECLARE_WRITE32_MEMBER( dev_w );
@@ -68,12 +67,12 @@ public:
 	DECLARE_READ8_MEMBER( ICR13_r );
 	DECLARE_WRITE8_MEMBER( ICR13_w );
 
-	UINT16 CSAR_r(int which, int offset, UINT16 mem_mask);
-	void CSAR_w(int which, int offset, UINT16 data, UINT16 mem_mask);
-	UINT32 CSMR_r(int which, UINT32 mem_mask);
-	void CSMR_w(int which, UINT32 data, UINT32 mem_mask);
-	UINT16 CSCR_r(int which, int offset, UINT16 mem_mask);
-	void CSCR_w(int which, int offset, UINT16 data, UINT16 mem_mask);
+	uint16_t CSAR_r(int which, int offset, uint16_t mem_mask);
+	void CSAR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
+	uint32_t CSMR_r(int which, uint32_t mem_mask);
+	void CSMR_w(int which, uint32_t data, uint32_t mem_mask);
+	uint16_t CSCR_r(int which, int offset, uint16_t mem_mask);
+	void CSCR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(  CSAR0_r );
 	DECLARE_WRITE16_MEMBER( CSAR0_w );
@@ -156,60 +155,54 @@ public:
 	DECLARE_READ8_MEMBER( MBDR_r );
 	DECLARE_WRITE8_MEMBER( MBDR_w );
 
-
-
-
-	cpu_device* m_cpu;
-
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-	address_space_config        m_space_config;
-
+	virtual space_config_vector memory_space_config() const override;
 
 private:
+	TIMER_CALLBACK_MEMBER(timer1_callback);
 
 	void init_regs(bool first_init);
 
-	UINT8 m_ICR[MAX_ICR];
+	cpu_device* m_cpu;
 
-	UINT16 m_CSAR[8];
-	UINT32 m_CSMR[8];
-	UINT16 m_CSCR[8];
+	address_space_config m_space_config;
 
-	UINT16 m_DMCR;
-	UINT16 m_PAR;
+	uint8_t m_ICR[MAX_ICR];
+
+	uint16_t m_CSAR[8];
+	uint32_t m_CSMR[8];
+	uint16_t m_CSCR[8];
+
+	uint16_t m_DMCR;
+	uint16_t m_PAR;
 
 	emu_timer *m_timer1;
-	UINT16 m_TMR1;
-	UINT16 m_TRR1;
-	UINT8 m_TER1;
-	UINT16 m_TCN1;
-	TIMER_CALLBACK_MEMBER(timer1_callback);
+	uint16_t m_TMR1;
+	uint16_t m_TRR1;
+	uint8_t m_TER1;
+	uint16_t m_TCN1;
 
 
-	UINT8 m_PPDDR;
-	UINT8 m_PPDAT;
+	uint8_t m_PPDDR;
+	uint8_t m_PPDAT;
 
-	UINT16 m_IMR;
+	uint16_t m_IMR;
 
-	UINT8 m_MBCR;
-	UINT8 m_MBSR;
-	UINT8 m_MFDR;
-	UINT8 m_MBDR;
+	uint8_t m_MBCR;
+	uint8_t m_MBSR;
+	uint8_t m_MFDR;
+	uint8_t m_MBDR;
 
-	UINT32 m_coldfire_regs[0x400/4];
-
-private:
+	uint32_t m_coldfire_regs[0x400/4];
 };
 
 
 // device type definition
-extern const device_type MCF5206E_PERIPHERAL;
+DECLARE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device)
 
-#endif  /* __MCF5206E_PERIPHERAL_H__ */
+#endif // MAME_MACHINE_MCF5206E_H

@@ -13,10 +13,10 @@
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0062                      */
 /****************************************************************************/
-static UINT8 sega_decrypt62(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt62(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x03)
 	{
@@ -62,10 +62,10 @@ static UINT8 sega_decrypt62(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0063                      */
 /****************************************************************************/
-static UINT8 sega_decrypt63(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt63(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -111,10 +111,10 @@ static UINT8 sega_decrypt63(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0064                      */
 /****************************************************************************/
-static UINT8 sega_decrypt64(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt64(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x03)
 	{
@@ -161,10 +161,10 @@ static UINT8 sega_decrypt64(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0070                      */
 /****************************************************************************/
-static UINT8 sega_decrypt70(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt70(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -210,10 +210,10 @@ static UINT8 sega_decrypt70(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0076                      */
 /****************************************************************************/
-static UINT8 sega_decrypt76(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt76(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -259,10 +259,10 @@ static UINT8 sega_decrypt76(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971025 - Emulate Sega G80 security chip 315-0082                      */
 /****************************************************************************/
-static UINT8 sega_decrypt82(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt82(offs_t pc, uint8_t lo)
 {
-	UINT32 i = 0;
-	UINT32 b = lo;
+	uint32_t i = 0;
+	uint32_t b = lo;
 
 	switch (pc & 0x11)
 	{
@@ -308,7 +308,7 @@ static UINT8 sega_decrypt82(offs_t pc, UINT8 lo)
 /****************************************************************************/
 /* MB 971031 - Emulate no Sega G80 security chip                            */
 /****************************************************************************/
-static UINT8 sega_decrypt0(offs_t pc, UINT8 lo)
+static uint8_t sega_decrypt0(offs_t pc, uint8_t lo)
 {
 		return lo;
 }

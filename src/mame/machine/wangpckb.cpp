@@ -49,8 +49,10 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wangpckb.h"
 
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -68,7 +70,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_KEYBOARD = &device_creator<wangpc_keyboard_t>;
+DEFINE_DEVICE_TYPE(WANGPC_KEYBOARD, wangpc_keyboard_device, "wangpckb", "Wang PC Keyboard")
 
 
 
@@ -86,7 +88,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *wangpc_keyboard_t::device_rom_region() const
+const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( wangpc_keyboard );
 }
@@ -96,7 +98,7 @@ const tiny_rom_entry *wangpc_keyboard_t::device_rom_region() const
 //  ADDRESS_MAP( wangpc_keyboard_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_t )
+static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
 	AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)
@@ -107,31 +109,20 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( wangpc_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
+MACHINE_CONFIG_MEMBER( wangpc_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_t, mcs51_tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_t, mcs51_rx_callback))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_keyboard_t::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -239,7 +230,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2ND") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) // 25
 
-	PORT_START("YA")
+	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEC TAB") PORT_CODE(KEYCODE_F4) // 7b
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FORMAT") PORT_CODE(KEYCODE_F5) // 7a
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x95") // 71
@@ -249,7 +240,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 27
 
-	PORT_START("YB")
+	PORT_START("Y11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAGE") PORT_CODE(KEYCODE_F2) // 7d
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CENTER") PORT_CODE(KEYCODE_F3) // 7c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MOVE") PORT_CODE(KEYCODE_F12) // 73
@@ -259,7 +250,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YC")
+	PORT_START("Y12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_ESC) // 36
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INDENT") PORT_CODE(KEYCODE_F1) // 7e
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPLC") PORT_CODE(KEYCODE_F10) // 75
@@ -269,7 +260,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 1d
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YD")
+	PORT_START("Y13")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\x97") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) // 14
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\xB7") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 18
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PRINT") // 19
@@ -279,7 +270,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 1c
 
-	PORT_START("YE")
+	PORT_START("Y14")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad + *") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))// 60
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad - !") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 13
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8 >") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 15
@@ -289,7 +280,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3 #") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 10
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 1b
 
-	PORT_START("YF")
+	PORT_START("Y15")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INSERT") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) // 62
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PREV") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) // 61
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) // 51
@@ -357,7 +348,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor wangpc_keyboard_t::device_input_ports() const
+ioport_constructor wangpc_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( wangpc_keyboard );
 }
@@ -369,30 +360,17 @@ ioport_constructor wangpc_keyboard_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  wangpc_keyboard_t - constructor
+//  wangpc_keyboard_device - constructor
 //-------------------------------------------------
 
-wangpc_keyboard_t::wangpc_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock, "wangpckb", __FILE__),
+wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WANGPC_KEYBOARD, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, I8051_TAG),
-	m_y0(*this, "Y0"),
-	m_y1(*this, "Y1"),
-	m_y2(*this, "Y2"),
-	m_y3(*this, "Y3"),
-	m_y4(*this, "Y4"),
-	m_y5(*this, "Y5"),
-	m_y6(*this, "Y6"),
-	m_y7(*this, "Y7"),
-	m_y8(*this, "Y8"),
-	m_y9(*this, "Y9"),
-	m_ya(*this, "YA"),
-	m_yb(*this, "YB"),
-	m_yc(*this, "YC"),
-	m_yd(*this, "YD"),
-	m_ye(*this, "YE"),
-	m_yf(*this, "YF"),
-	m_txd_handler(*this)
+	m_y(*this, "Y%u", 0),
+	m_txd_handler(*this),
+	m_keylatch(0),
+	m_rxd(1)
 {
 }
 
@@ -401,7 +379,7 @@ wangpc_keyboard_t::wangpc_keyboard_t(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void wangpc_keyboard_t::device_start()
+void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
 
@@ -409,6 +387,9 @@ void wangpc_keyboard_t::device_start()
 
 	set_rcv_rate(62500);
 	//set_tra_rate(62500);
+
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_rxd));
 }
 
 
@@ -416,7 +397,7 @@ void wangpc_keyboard_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void wangpc_keyboard_t::device_reset()
+void wangpc_keyboard_device::device_reset()
 {
 	receive_register_reset();
 	transmit_register_reset();
@@ -426,20 +407,10 @@ void wangpc_keyboard_t::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void wangpc_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-
-//-------------------------------------------------
 //  tra_callback -
 //-------------------------------------------------
 
-void wangpc_keyboard_t::tra_callback()
+void wangpc_keyboard_device::tra_callback()
 {
 	int bit = transmit_register_get_data_bit();
 
@@ -453,7 +424,7 @@ void wangpc_keyboard_t::tra_callback()
 //  tra_complete -
 //-------------------------------------------------
 
-void wangpc_keyboard_t::tra_complete()
+void wangpc_keyboard_device::tra_complete()
 {
 }
 
@@ -462,7 +433,7 @@ void wangpc_keyboard_t::tra_complete()
 //  rcv_callback -
 //-------------------------------------------------
 
-void wangpc_keyboard_t::rcv_callback()
+void wangpc_keyboard_device::rcv_callback()
 {
 	if (LOG) logerror("KB '%s' Receive Bit %u\n", tag(), m_rxd);
 
@@ -474,7 +445,7 @@ void wangpc_keyboard_t::rcv_callback()
 //  rcv_complete -
 //-------------------------------------------------
 
-void wangpc_keyboard_t::rcv_complete()
+void wangpc_keyboard_device::rcv_complete()
 {
 	receive_register_extract();
 
@@ -489,7 +460,7 @@ void wangpc_keyboard_t::rcv_complete()
 //  write_rxd -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wangpc_keyboard_t::write_rxd)
+WRITE_LINE_MEMBER(wangpc_keyboard_device::write_rxd)
 {
 	m_rxd = state;
 
@@ -501,7 +472,7 @@ WRITE_LINE_MEMBER(wangpc_keyboard_t::write_rxd)
 //  mcs51_rx_callback -
 //-------------------------------------------------
 
-READ8_MEMBER(wangpc_keyboard_t::mcs51_rx_callback)
+READ8_MEMBER(wangpc_keyboard_device::mcs51_rx_callback)
 {
 	if (LOG) logerror("KB '%s' CPU Receive Data %02x\n", tag(), get_received_char());
 
@@ -513,7 +484,7 @@ READ8_MEMBER(wangpc_keyboard_t::mcs51_rx_callback)
 //  mcs51_tx_callback -
 //-------------------------------------------------
 
-WRITE8_MEMBER(wangpc_keyboard_t::mcs51_tx_callback)
+WRITE8_MEMBER(wangpc_keyboard_device::mcs51_tx_callback)
 {
 	if (LOG) logerror("KB '%s' CPU Transmit Data %02x\n", tag(), data);
 
@@ -531,31 +502,9 @@ WRITE8_MEMBER(wangpc_keyboard_t::mcs51_tx_callback)
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_keyboard_t::kb_p1_r )
+READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
 {
-	UINT8 data = 0xff;
-
-	switch (m_y & 0x0f)
-	{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 9: data &= m_y9->read(); break;
-		case 0xa: data &= m_ya->read(); break;
-		case 0xb: data &= m_yb->read(); break;
-		case 0xc: data &= m_yc->read(); break;
-		case 0xd: data &= m_yd->read(); break;
-		case 0xe: data &= m_ye->read(); break;
-		case 0xf: data &= m_yf->read(); break;
-	}
-
-	return data;
+	return m_y[m_keylatch]->read();
 }
 
 
@@ -563,7 +512,7 @@ READ8_MEMBER( wangpc_keyboard_t::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p1_w )
+WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 {
 	/*
 
@@ -593,7 +542,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
+WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 {
 	/*
 
@@ -610,7 +559,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
 
 	*/
 
-	m_y = data & 0x0f;
+	m_keylatch = data & 0x0f;
 
 	//if (LOG) logerror("P2 %02x\n", data);
 }
@@ -620,7 +569,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
 //  kb_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p3_w )
+WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
 {
 	/*
 

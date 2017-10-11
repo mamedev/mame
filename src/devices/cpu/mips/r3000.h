@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __R3000_H__
-#define __R3000_H__
+#ifndef MAME_CPU_MIPS_R3000_H
+#define MAME_CPU_MIPS_R3000_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -66,6 +68,36 @@ enum
 
 class r3000_device : public cpu_device
 {
+public:
+	// construction/destruction
+	virtual ~r3000_device();
+
+	// inline configuration helpers
+	static void static_set_endianness(device_t &device, endianness_t endianness)
+	{
+		downcast<r3000_device &>(device).m_endianness = endianness;
+	}
+
+	template <class Object> static devcb_base &static_set_brcond0_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond1_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond2_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond3_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(std::forward<Object>(cb));
+	}
+
 protected:
 	enum chip_type
 	{
@@ -76,52 +108,22 @@ protected:
 		CHIP_TYPE_R3081
 	};
 
-	// construction/destruction
-	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source);
-	virtual ~r3000_device();
+	r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype);
 
-public:
-	// inline configuration helpers
-	static void static_set_endianness(device_t &device, endianness_t endianness)
-	{
-		downcast<r3000_device &>(device).m_endianness = endianness;
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond0_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond1_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond2_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond3_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(object);
-	}
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -129,42 +131,42 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// memory accessors
 	struct r3000_data_accessors
 	{
-		UINT8   (r3000_device::*m_read_byte)(offs_t byteaddress);
-		UINT16  (r3000_device::*m_read_word)(offs_t byteaddress);
-		UINT32  (r3000_device::*m_read_dword)(offs_t byteaddress);
-		void    (r3000_device::*m_write_byte)(offs_t byteaddress, UINT8 data);
-		void    (r3000_device::*m_write_word)(offs_t byteaddress, UINT16 data);
-		void    (r3000_device::*m_write_dword)(offs_t byteaddress, UINT32 data);
+		uint8_t   (r3000_device::*m_read_byte)(offs_t byteaddress);
+		uint16_t  (r3000_device::*m_read_word)(offs_t byteaddress);
+		uint32_t  (r3000_device::*m_read_dword)(offs_t byteaddress);
+		void    (r3000_device::*m_write_byte)(offs_t byteaddress, uint8_t data);
+		void    (r3000_device::*m_write_word)(offs_t byteaddress, uint16_t data);
+		void    (r3000_device::*m_write_dword)(offs_t byteaddress, uint32_t data);
 	};
 
-	UINT32 readop(offs_t pc);
-	UINT8 readmem(offs_t offset);
-	UINT16 readmem_word(offs_t offset);
-	UINT32 readmem_dword(offs_t offset);
-	void writemem(offs_t offset, UINT8 data);
-	void writemem_word(offs_t offset, UINT16 data);
-	void writemem_dword(offs_t offset, UINT32 data);
+	uint32_t readop(offs_t pc);
+	uint8_t readmem(offs_t offset);
+	uint16_t readmem_word(offs_t offset);
+	uint32_t readmem_dword(offs_t offset);
+	void writemem(offs_t offset, uint8_t data);
+	void writemem_word(offs_t offset, uint16_t data);
+	void writemem_dword(offs_t offset, uint32_t data);
 
-	UINT8 readcache_be(offs_t offset);
-	UINT16 readcache_be_word(offs_t offset);
-	UINT32 readcache_be_dword(offs_t offset);
-	void writecache_be(offs_t offset, UINT8 data);
-	void writecache_be_word(offs_t offset, UINT16 data);
-	void writecache_be_dword(offs_t offset, UINT32 data);
+	uint8_t readcache_be(offs_t offset);
+	uint16_t readcache_be_word(offs_t offset);
+	uint32_t readcache_be_dword(offs_t offset);
+	void writecache_be(offs_t offset, uint8_t data);
+	void writecache_be_word(offs_t offset, uint16_t data);
+	void writecache_be_dword(offs_t offset, uint32_t data);
 
-	UINT8 readcache_le(offs_t offset);
-	UINT16 readcache_le_word(offs_t offset);
-	UINT32 readcache_le_dword(offs_t offset);
-	void writecache_le(offs_t offset, UINT8 data);
-	void writecache_le_word(offs_t offset, UINT16 data);
-	void writecache_le_dword(offs_t offset, UINT32 data);
+	uint8_t readcache_le(offs_t offset);
+	uint16_t readcache_le_word(offs_t offset);
+	uint32_t readcache_le_dword(offs_t offset);
+	void writecache_le(offs_t offset, uint8_t data);
+	void writecache_le_word(offs_t offset, uint16_t data);
+	void writecache_le_dword(offs_t offset, uint32_t data);
 
 	// interrupts
 	void generate_exception(int exception);
@@ -173,28 +175,28 @@ protected:
 	void invalid_instruction();
 
 	// instructions
-	UINT32 get_cop0_reg(int idx);
-	void set_cop0_reg(int idx, UINT32 val);
-	UINT32 get_cop0_creg(int idx);
-	void set_cop0_creg(int idx, UINT32 val);
+	uint32_t get_cop0_reg(int idx);
+	void set_cop0_reg(int idx, uint32_t val);
+	uint32_t get_cop0_creg(int idx);
+	void set_cop0_creg(int idx, uint32_t val);
 	void handle_cop0();
 
-	UINT32 get_cop1_reg(int idx);
-	void set_cop1_reg(int idx, UINT32 val);
-	UINT32 get_cop1_creg(int idx);
-	void set_cop1_creg(int idx, UINT32 val);
+	uint32_t get_cop1_reg(int idx);
+	void set_cop1_reg(int idx, uint32_t val);
+	uint32_t get_cop1_creg(int idx);
+	void set_cop1_creg(int idx, uint32_t val);
 	void handle_cop1();
 
-	UINT32 get_cop2_reg(int idx);
-	void set_cop2_reg(int idx, UINT32 val);
-	UINT32 get_cop2_creg(int idx);
-	void set_cop2_creg(int idx, UINT32 val);
+	uint32_t get_cop2_reg(int idx);
+	void set_cop2_reg(int idx, uint32_t val);
+	uint32_t get_cop2_creg(int idx);
+	void set_cop2_creg(int idx, uint32_t val);
 	void handle_cop2();
 
-	UINT32 get_cop3_reg(int idx);
-	void set_cop3_reg(int idx, UINT32 val);
-	UINT32 get_cop3_creg(int idx);
-	void set_cop3_creg(int idx, UINT32 val);
+	uint32_t get_cop3_reg(int idx);
+	void set_cop3_reg(int idx, uint32_t val);
+	uint32_t get_cop3_creg(int idx);
+	void set_cop3_creg(int idx, uint32_t val);
 	void handle_cop3();
 
 	// complex opcodes
@@ -220,19 +222,19 @@ protected:
 	endianness_t    m_endianness;
 
 	// core registers
-	UINT32      m_pc;
-	UINT32      m_nextpc;
-	UINT32      m_hi;
-	UINT32      m_lo;
-	UINT32      m_r[32];
+	uint32_t      m_pc;
+	uint32_t      m_nextpc;
+	uint32_t      m_hi;
+	uint32_t      m_lo;
+	uint32_t      m_r[32];
 
 	// COP registers
-	UINT32      m_cpr[4][32];
-	UINT32      m_ccr[4][32];
+	uint32_t      m_cpr[4][32];
+	uint32_t      m_ccr[4][32];
 
 	// internal stuff
-	UINT32      m_ppc;
-	UINT32      m_op;
+	uint32_t      m_ppc;
+	uint32_t      m_op;
 	int         m_icount;
 	int         m_interrupt_cycles;
 
@@ -248,9 +250,9 @@ protected:
 	r3000_data_accessors m_cache_hand;
 
 	// cache memory
-	UINT32 *    m_cache;
-	std::vector<UINT32> m_icache;
-	std::vector<UINT32> m_dcache;
+	uint32_t *    m_cache;
+	std::vector<uint32_t> m_icache;
+	std::vector<uint32_t> m_dcache;
 	size_t      m_cache_size;
 	size_t      m_icache_size;
 	size_t      m_dcache_size;
@@ -268,7 +270,7 @@ protected:
 class r3041_device : public r3000_device
 {
 public:
-	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -277,7 +279,7 @@ public:
 class r3051_device : public r3000_device
 {
 public:
-	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -286,7 +288,7 @@ public:
 class r3052_device : public r3000_device
 {
 public:
-	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -295,7 +297,7 @@ public:
 class r3071_device : public r3000_device
 {
 public:
-	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -304,16 +306,16 @@ public:
 class r3081_device : public r3000_device
 {
 public:
-	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
 
-extern const device_type R3041;
-extern const device_type R3051;
-extern const device_type R3052;
-extern const device_type R3071;
-extern const device_type R3081;
+DECLARE_DEVICE_TYPE(R3041, r3041_device)
+DECLARE_DEVICE_TYPE(R3051, r3051_device)
+DECLARE_DEVICE_TYPE(R3052, r3052_device)
+DECLARE_DEVICE_TYPE(R3071, r3071_device)
+DECLARE_DEVICE_TYPE(R3081, r3081_device)
 
-#endif /* __R3000_H__ */
+#endif // MAME_CPU_MIPS_R3000_H

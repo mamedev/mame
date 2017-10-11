@@ -11,11 +11,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/fastfred.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "speaker.h"
 
 
 void fastfred_state::machine_start()
@@ -140,9 +144,9 @@ MACHINE_START_MEMBER(fastfred_state,imago)
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
+WRITE_LINE_MEMBER(fastfred_state::imago_dma_irq_w)
 {
-	m_maincpu->set_input_line(0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
@@ -152,8 +156,8 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 {
-	UINT8 *rom = (UINT8 *)memregion("gfx2")->base();
-	UINT8 sprites_data;
+	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
+	uint8_t sprites_data;
 
 	sprites_data = rom[m_imago_sprites_address + 0x2000*0 + m_imago_sprites_bank * 0x1000];
 	m_imago_sprites[offset + 0x800*0] = sprites_data;
@@ -173,9 +177,9 @@ READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
 	return 0xff; //not really used
 }
 
-WRITE8_MEMBER(fastfred_state::nmi_mask_w)
+WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
 {
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
 }
 
 WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
@@ -193,15 +197,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_SHARE("bgcolor")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(fastfred_charbank2_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
@@ -218,16 +214,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(fastfred_charbank2_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
 	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE("ay8910.1", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -247,14 +234,8 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP // writes 1 when level starts, 0 when game over
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(imago_dma_irq_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(imago_charbank_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW")
+	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x03f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -645,7 +626,7 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( fastfred, fastfred_state )
+static MACHINE_CONFIG_START( fastfred )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12_432MHz/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
@@ -655,6 +636,15 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12_432MHz/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // "Control Signal Latch" at D10
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(fastfred_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(fastfred_state, colorbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(fastfred_state, colorbank2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, charbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, charbank2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(fastfred_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(fastfred_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -707,6 +697,11 @@ static MACHINE_CONFIG_DERIVED( imago, fastfred )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(imago_map)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // writes 1 when level starts, 0 when game over
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, imago_dma_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, imago_charbank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
@@ -1057,13 +1052,13 @@ DRIVER_INIT_MEMBER(fastfred_state,imago)
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy, fastfred_state,   flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy, fastfred_state,   flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboy,   0,        fastfred, flyboy,   fastfred_state, flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   fastfred_state, flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84, fastfred_state,  boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84, fastfred_state,  boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  fastfred_state, boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  fastfred_state, boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,    0,        imago,    imago, fastfred_state,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,    imago,    imagoa, fastfred_state,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1984, imago,    0,        imago,    imago,    fastfred_state, imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,   imago,    imago,    imagoa,   fastfred_state, imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

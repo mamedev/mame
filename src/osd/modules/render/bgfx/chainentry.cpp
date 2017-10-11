@@ -270,7 +270,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 
 void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const
 {
-	if (bgfx::checkAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
+	if (6 == bgfx::getAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
 	{
 		bgfx::allocTransientVertexBuffer(buffer, 6, ScreenVertex::ms_decl);
 	}

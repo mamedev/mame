@@ -56,22 +56,22 @@
 
 #ifndef MODEL2_TEXTURED
 /* non-textured render path */
-void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
+void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 #if !defined( MODEL2_TRANSLUCENT)
 	model2_state *state = object.state;
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)&m_destmap;
-	UINT32 *p = &destmap->pix32(scanline);
+	uint32_t *p = &destmap->pix32(scanline);
 
 	/* extract color information */
-	const UINT16 *colortable_r = (const UINT16 *)&state->m_colorxlat[0x0000/4];
-	const UINT16 *colortable_g = (const UINT16 *)&state->m_colorxlat[0x4000/4];
-	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
-	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
-	UINT32  lumabase = object.lumabase;
-	UINT32  color = object.colorbase;
-	UINT8   luma;
-	UINT32  tr, tg, tb;
+	const uint16_t *colortable_r = (const uint16_t *)&state->m_colorxlat[0x0000/4];
+	const uint16_t *colortable_g = (const uint16_t *)&state->m_colorxlat[0x4000/4];
+	const uint16_t *colortable_b = (const uint16_t *)&state->m_colorxlat[0x8000/4];
+	const uint16_t *lumaram = (const uint16_t *)state->m_lumaram.target();
+	uint32_t  lumabase = object.lumabase;
+	uint32_t  color = object.colorbase;
+	uint8_t   luma;
+	uint32_t  tr, tg, tb;
 	int     x;
 #endif
 	/* if it's translucent, there's nothing to render */
@@ -79,7 +79,11 @@ void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extr
 	return;
 #else
 
-	luma = lumaram[BYTE_XOR_LE(lumabase + (0xf << 3))] & 0x3F;
+	luma = lumaram[BYTE_XOR_LE(lumabase + (0xf << 3))];
+
+	// fix luma overflow
+	if(luma > 0x3f)
+		luma = 0x3f;
 
 	color = state->m_palram[BYTE_XOR_LE(color + 0x1000)] & 0x7fff;
 
@@ -108,28 +112,28 @@ void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extr
 
 #else
 /* textured render path */
-void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
+void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)&m_destmap;
-	UINT32 *p = &destmap->pix32(scanline);
+	uint32_t *p = &destmap->pix32(scanline);
 
-	UINT32  tex_width = object.texwidth;
-	UINT32  tex_height = object.texheight;
+	uint32_t  tex_width = object.texwidth;
+	uint32_t  tex_height = object.texheight;
 
 	/* extract color information */
-	const UINT16 *colortable_r = (const UINT16 *)&state->m_colorxlat[0x0000/4];
-	const UINT16 *colortable_g = (const UINT16 *)&state->m_colorxlat[0x4000/4];
-	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
-	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
-	UINT32  colorbase = object.colorbase;
-	UINT32  lumabase = object.lumabase;
-	UINT32  tex_x = object.texx;
-	UINT32  tex_y = object.texy;
-	UINT32  tex_x_mask, tex_y_mask;
-	UINT32  tex_mirr_x = object.texmirrorx;
-	UINT32  tex_mirr_y = object.texmirrory;
-	UINT32 *sheet = object.texsheet;
+	const uint16_t *colortable_r = (const uint16_t *)&state->m_colorxlat[0x0000/4];
+	const uint16_t *colortable_g = (const uint16_t *)&state->m_colorxlat[0x4000/4];
+	const uint16_t *colortable_b = (const uint16_t *)&state->m_colorxlat[0x8000/4];
+	const uint16_t *lumaram = (const uint16_t *)state->m_lumaram.target();
+	uint32_t  colorbase = object.colorbase;
+	uint32_t  lumabase = object.lumabase;
+	uint32_t  tex_x = object.texx;
+	uint32_t  tex_y = object.texy;
+	uint32_t  tex_x_mask, tex_y_mask;
+	uint32_t  tex_mirr_x = object.texmirrorx;
+	uint32_t  tex_mirr_y = object.texmirrory;
+	uint32_t *sheet = object.texsheet;
 	float ooz = extent.param[0].start;
 	float uoz = extent.param[1].start;
 	float voz = extent.param[2].start;
@@ -150,11 +154,11 @@ void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extr
 	for(x = extent.startx; x < extent.stopx; x++, uoz += duoz, voz += dvoz, ooz += dooz)
 	{
 		float z = recip_approx(ooz) * 256.0f;
-		INT32 u = uoz * z;
-		INT32 v = voz * z;
-		UINT32  tr, tg, tb;
-		UINT16  t;
-		UINT8 luma;
+		int32_t u = uoz * z;
+		int32_t v = voz * z;
+		uint32_t  tr, tg, tb;
+		uint16_t  t;
+		uint8_t luma;
 		int u2;
 		int v2;
 
@@ -177,7 +181,11 @@ void MODEL2_FUNC_NAME(INT32 scanline, const extent_t& extent, const m2_poly_extr
 		if ( t == 0x0f )
 			continue;
 #endif
-		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))] & 0x3f;
+		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))];
+
+		// Virtua Striker sets up a luma of 0x40 for flags, fix here.
+		if(luma > 0x3f)
+			luma = 0x3f;
 
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */

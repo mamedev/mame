@@ -28,10 +28,11 @@ Then 2 nibbles are read to form a byte (first high nibble, then low nibble) indi
 whether the pen is on the graphic board, a value of FD, FE, or FF used for this. For
 any other value the following 2 bytes are not read.
 Then 2 nibbles are read to form a byte containing the absolute X coordinate.
-THen 2 nibbles are read to form a byte containing the absolute Y coordiante.
+Then 2 nibbles are read to form a byte containing the absolute Y coordiante.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "graphic.h"
 
 
@@ -40,7 +41,7 @@ THen 2 nibbles are read to form a byte containing the absolute Y coordiante.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_GRAPHIC = &device_creator<sms_graphic_device>;
+DEFINE_DEVICE_TYPE(SMS_GRAPHIC, sms_graphic_device, "sms_graphic", "Sega SMS Graphic Board")
 
 
 static INPUT_PORTS_START( sms_graphic )
@@ -75,8 +76,8 @@ ioport_constructor sms_graphic_device::device_input_ports() const
 //  sms_graphic_device - constructor
 //-------------------------------------------------
 
-sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SMS_GRAPHIC, "Sega SMS Graphic Board", tag, owner, clock, "sms_graphic", __FILE__)
+sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SMS_GRAPHIC, tag, owner, clock)
 	, device_sms_control_port_interface(mconfig, *this)
 	, m_buttons(*this, "BUTTONS")
 	, m_x(*this, "X")
@@ -103,7 +104,7 @@ void sms_graphic_device::device_start()
 //  sms_peripheral_r - joypad read
 //-------------------------------------------------
 
-UINT8 sms_graphic_device::peripheral_r()
+uint8_t sms_graphic_device::peripheral_r()
 {
 	switch (m_index)
 	{
@@ -138,7 +139,7 @@ UINT8 sms_graphic_device::peripheral_r()
 	return 0xff;
 }
 
-void sms_graphic_device::peripheral_w(UINT8 data)
+void sms_graphic_device::peripheral_w(uint8_t data)
 {
 	// Check for toggle on TH/TL
 	if ((data ^ m_previous_write) & 0xc0)

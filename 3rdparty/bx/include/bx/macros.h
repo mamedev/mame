@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,7 @@
 #define BX_MACROS_H_HEADER_GUARD
 
 #include "bx.h"
+#include <type_traits>
 
 ///
 #if BX_COMPILER_MSVC
@@ -100,8 +101,7 @@
 #	error "Unknown BX_COMPILER_?"
 #endif
 
-// #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
-#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
+#define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
 ///
 #define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
@@ -180,12 +180,10 @@
 #endif // BX_COMPILER_
 
 ///
-#if BX_COMPILER_GCC && defined(__is_pod)
-#	define BX_TYPE_IS_POD(t) __is_pod(t)
-#elif BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC
 #	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
 #else
-#	define BX_TYPE_IS_POD(t) false
+#	define BX_TYPE_IS_POD(t) std::is_pod<t>::value
 #endif
 ///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
@@ -225,5 +223,8 @@
 #ifndef BX_WARN
 #	define BX_WARN(_condition, ...) BX_NOOP()
 #endif // BX_CHECK
+
+// static_assert sometimes causes unused-local-typedef...
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")
 
 #endif // BX_MACROS_H_HEADER_GUARD

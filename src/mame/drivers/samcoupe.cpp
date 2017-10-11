@@ -28,15 +28,16 @@
 /* core includes */
 #include "emu.h"
 #include "includes/samcoupe.h"
-#
-/* components */
+
 #include "cpu/z80/z80.h"
 #include "sound/saa1099.h"
 
-/* devices */
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include "formats/tzx_cas.h"
 #include "formats/coupedsk.h"
-#include "softlist.h"
 
 /***************************************************************************
     CONSTANTS
@@ -64,7 +65,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sam_video_update_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in samcoupe_state::device_timer");
+		assert_always(false, "Unknown id in samcoupe_state::device_timer");
 	}
 }
 
@@ -117,7 +118,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
 	screen_device *scr = machine().first_screen();
-	UINT8 data;
+	uint8_t data;
 
 	if (offset & 0x100)
 	{
@@ -145,7 +146,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_clut_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 {
-	UINT8 data = 0xe0;
+	uint8_t data = 0xe0;
 
 	/* bit 5-7, keyboard input */
 	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0xe0;
@@ -220,7 +221,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_midi_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 {
-	UINT8 data = 0x1f;
+	uint8_t data = 0x1f;
 
 	/* bit 0-4, keyboard input */
 	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0x1f;
@@ -345,7 +346,7 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
 
 }
 
-void samcoupe_state::samcoupe_irq(UINT8 src)
+void samcoupe_state::samcoupe_irq(uint8_t src)
 {
 	/* assert irq and a timer to set it off again */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -424,12 +425,12 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('=') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('"') PORT_CHAR('\xa9')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('"') PORT_CHAR(0xA9)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(F10))
 
 	PORT_START("keyboard_row_bf")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('\xa3')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0xA3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
@@ -488,9 +489,9 @@ PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
 {
 	for (int i = 0; i < 128; i++)
 	{
-		UINT8 b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
-		UINT8 r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
-		UINT8 g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
+		uint8_t b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
+		uint8_t r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
+		uint8_t g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
 
 		r <<= 5;
 		g <<= 5;
@@ -516,7 +517,7 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
+static MACHINE_CONFIG_START( samcoupe )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
@@ -617,5 +618,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, driver_device, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                        FULLNAME     FLAGS
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )

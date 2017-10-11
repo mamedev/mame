@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef CASSETTE_H
-#define CASSETTE_H
+#ifndef MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#define MAME_DEVICES_IMAGEDEV_CASSETTE_H
 
 #include "formats/cassimg.h"
 #include "softlist_dev.h"
@@ -47,7 +47,7 @@ class cassette_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cassette_image_device();
 
 	static void static_set_formats(device_t &device, const struct CassetteFormat*  const *formats) { downcast<cassette_image_device &>(device).m_formats = formats; }
@@ -103,7 +103,7 @@ private:
 	cassette_state  m_state;
 	double          m_position;
 	double          m_position_time;
-	INT32           m_value;
+	int32_t           m_value;
 	int             m_channel;
 	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
 	int             m_direction; // direction select
@@ -117,10 +117,10 @@ private:
 };
 
 // device type definition
-extern const device_type CASSETTE;
+DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 
 // device iterator
-typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_image_device> cassette_device_iterator;
+typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -143,4 +143,4 @@ typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_im
 #define MCFG_CASSETTE_INTERFACE(_interface) \
 	cassette_image_device::static_set_interface(*device, _interface);
 
-#endif /* CASSETTE_H */
+#endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H

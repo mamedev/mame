@@ -17,12 +17,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_DM9368_H
+#define MAME_VIDEO_DM9368_H
+
 #pragma once
 
-#ifndef __DM9368__
-#define __DM9368__
-
-#include "emu.h"
+#include "dioutput.h"
 
 
 
@@ -46,9 +46,9 @@ class dm9368_device :   public device_t,
 {
 public:
 	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void a_w(UINT8 data);
+	void a_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rbi_w ) { m_rbi = state; }
 	DECLARE_READ_LINE_MEMBER( rbo_r ) { return m_rbo; }
@@ -63,13 +63,11 @@ private:
 	int m_rbi;
 	int m_rbo;
 
-	static const UINT8 m_segment_data[];
+	static const uint8_t s_segment_data[16];
 };
 
 
 // device type definition
-extern const device_type DM9368;
+DECLARE_DEVICE_TYPE(DM9368, dm9368_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_DM9368_H

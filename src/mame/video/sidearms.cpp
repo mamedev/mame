@@ -75,7 +75,7 @@ WRITE8_MEMBER(sidearms_state::gfxctrl_w)
 
 WRITE8_MEMBER(sidearms_state::star_scrollx_w)
 {
-	UINT32 last_state = m_hcount_191;
+	uint32_t last_state = m_hcount_191;
 
 	m_hcount_191++;
 	m_hcount_191 &= 0x1ff;
@@ -175,7 +175,7 @@ void sidearms_state::video_start()
 
 void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int offs, attr, color, code, x, y, flipx, flipy;
 
@@ -208,9 +208,9 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 {
 	int x, y, i;
-	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
-	UINT8 *sf_rom;
-	UINT16 *lineptr;
+	uint32_t hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
+	uint8_t *sf_rom;
+	uint16_t *lineptr;
 	int pixadv, lineadv;
 
 	// clear starfield background
@@ -270,7 +270,7 @@ void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 
 			if ((~((latch_374^hadd_283)^1) & 0x1f)) continue; // logic rejection 3
 
-			*lineptr = (UINT16)(latch_374>>5 | 0x378); // to color mixer
+			*lineptr = (uint16_t)(latch_374>>5 | 0x378); // to color mixer
 		}
 		lineptr += lineadv;
 	}
@@ -321,7 +321,7 @@ void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 
 			if ((~((m_latch_374^hadd_283)^1) & 0x1f)) continue; // logic rejection 3
 
-			*lineptr = (UINT16)(m_latch_374>>5 | 0x378); // to color mixer
+			*lineptr = (uint16_t)(m_latch_374>>5 | 0x378); // to color mixer
 		}
 		lineptr += lineadv;
 	}
@@ -341,7 +341,7 @@ void sidearms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 sidearms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sidearms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_starfield(bitmap);
 

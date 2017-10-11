@@ -13,7 +13,6 @@
 
     T2 pulse counting mode
     Pulse mode handshake output
-    More shift register
 
 **********************************************************************/
 
@@ -22,6 +21,10 @@
    vc20 random number generation only partly working
    (reads (uninitialized) timer 1 and timer 2 counter)
    timer init, reset, read changed
+
+  2017-Feb-15 Edstrom
+   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
+   on correct flanks and leading and trailing flanks added + logging.
  */
 
 #include "emu.h"
@@ -31,7 +34,20 @@
     PARAMETERS
 ***************************************************************************/
 
-#define TRACE_VIA       0
+#define LOG_SETUP   (1U <<  1)
+#define LOG_SHIFT   (1U <<  2)
+#define LOG_READ    (1U <<  3)
+#define LOG_INT     (1U <<  4)
+
+//#define VERBOSE (LOG_SHIFT|LOG_INT|LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
+
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGSHIFT(...) LOGMASKED(LOG_SHIFT,   __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
 
 
 /***************************************************************************
@@ -110,9 +126,9 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-UINT16 via6522_device::get_counter1_value()
+uint16_t via6522_device::get_counter1_value()
 {
-	UINT16 val;
+	uint16_t val;
 
 	if(m_t1_active)
 	{
@@ -132,7 +148,7 @@ UINT16 via6522_device::get_counter1_value()
 //**************************************************************************
 
 // device type definition
-const device_type VIA6522 = &device_creator<via6522_device>;
+DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
 DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
@@ -142,8 +158,8 @@ ADDRESS_MAP_END
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
+via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VIA6522, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
 		m_out_a_handler(*this),
@@ -193,6 +209,7 @@ void via6522_device::device_start()
 	m_t2 = timer_alloc(TIMER_T2);
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
+	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
 
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
@@ -283,6 +300,7 @@ void via6522_device::output_irq()
 	{
 		if ((m_ifr & INT_ANY) == 0)
 		{
+			LOGINT("INT asserted\n");
 			m_ifr |= INT_ANY;
 			m_irq_handler(ASSERT_LINE);
 		}
@@ -291,6 +309,7 @@ void via6522_device::output_irq()
 	{
 		if (m_ifr & INT_ANY)
 		{
+			LOGINT("INT cleared\n");
 			m_ifr &= ~INT_ANY;
 			m_irq_handler(CLEAR_LINE);
 		}
@@ -310,10 +329,12 @@ void via6522_device::set_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOGINT("granted\n");
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+	}
+	else
+	{
+		LOGINT("denied\n");
 	}
 }
 
@@ -330,10 +351,7 @@ void via6522_device::clear_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
 	}
 }
 
@@ -344,69 +362,95 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift_out()
 {
-	m_out_cb2 = (m_sr >> 7) & 1;
-	m_sr =  (m_sr << 1) | m_out_cb2;
-
-	m_cb2_handler(m_out_cb2);
-
-	if (!SO_T2_RATE(m_acr))
+	// Only shift out msb on falling flank
+	if (m_shift_counter & 1)
 	{
-		m_shift_counter = (m_shift_counter + 1) % 8;
+		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
+		m_out_cb2 = (m_sr >> 7) & 1;
+		m_sr =  (m_sr << 1) | m_out_cb2;
+		LOGSHIFT("%02x CB2: %d\n", m_sr, m_out_cb2);
 
-		if (m_shift_counter == 0)
+		m_cb2_handler(m_out_cb2);
+
+		if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
 		{
-			set_int(INT_SR);
+			LOGINT("SHIFT EXT out INT request ");
+			set_int(INT_SR); // IRQ on last falling flank for external clock (mode 7)
 		}
 	}
+	else // Check for INT condition, eg the last and raising flank of the 15-0 falling/raising flanks
+	{
+		if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
+		{
+			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
+			{
+				LOGINT("SHIFT O2/T2 out INT request ");
+				set_int(INT_SR); // IRQ on last raising flank for internal clock (mode 5-6)
+			}
+		}
+	}
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
 }
 
 void via6522_device::shift_in()
 {
-	m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-
-	m_shift_counter = (m_shift_counter + 1) % 8;
-
-	if (m_shift_counter == 0)
+	// Only shift in data on raising flank
+	if ( !(m_shift_counter & 1) )
 	{
-		set_int(INT_SR);
-	}
-}
+		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
+		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
+		LOGSHIFT("%02x\n", m_sr);
 
+		if (m_shift_counter == 0)
+		{
+			LOGINT("SHIFT in INT request ");
+//            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
+			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
+		}
+	}
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
+}
 
 void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
+		case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
+			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising flank
+			m_shift_irq_timer->adjust(attotime::never); // Not needed really...
+			break;
 		case TIMER_SHIFT:
-			m_out_cb1 = 0;
+			LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
+			m_out_cb1 ^= 1;
 			m_cb1_handler(m_out_cb1);
 
+			// we call shift methods for all flanks
 			if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
 				shift_out();
 			}
-
-			m_out_cb1 = 1;
-			m_cb1_handler(m_out_cb1);
-
-			if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+			else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 			{
 				shift_in();
 			}
 
-			if (SO_T2_RATE(m_acr) || m_shift_counter)
+			// If in continous mode or the shifter is still shifting we re-arm the timer
+			if (SO_T2_RATE(m_acr) || (m_shift_counter != 0x0f))
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(2));
+					m_shift_timer->adjust(clocks_to_attotime(1) / 2);
 				}
-				else
+				else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+				}
+				else // otherwise we stop it
+				{
+					m_shift_timer->adjust(attotime::never);
 				}
 			}
 			break;
-
 		case TIMER_T1:
 			if (T1_CONTINUOUS (m_acr))
 			{
@@ -425,6 +469,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				output_pb();
 			}
 
+			LOGINT("T1 INT request ");
 			set_int(INT_T1);
 			break;
 
@@ -432,6 +477,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_t2_active = 0;
 			m_time2 = machine().time();
 
+			LOGINT("T2 INT request ");
 			set_int(INT_T2);
 			break;
 
@@ -442,7 +488,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-UINT8 via6522_device::input_pa()
+uint8_t via6522_device::input_pa()
 {
 	/// TODO: REMOVE THIS
 	if (!m_in_a_handler.isnull())
@@ -458,11 +504,11 @@ UINT8 via6522_device::input_pa()
 
 void via6522_device::output_pa()
 {
-	UINT8 pa = (m_out_a & m_ddr_a) | ~m_ddr_a;
+	uint8_t pa = (m_out_a & m_ddr_a) | ~m_ddr_a;
 	m_out_a_handler(pa);
 }
 
-UINT8 via6522_device::input_pb()
+uint8_t via6522_device::input_pb()
 {
 	/// TODO: REMOVE THIS
 	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
@@ -470,7 +516,7 @@ UINT8 via6522_device::input_pb()
 		m_in_b = m_in_b_handler(0);
 	}
 
-	UINT8 pb = (m_out_b & m_ddr_b) + (m_in_b & ~m_ddr_b);
+	uint8_t pb = (m_out_b & m_ddr_b) + (m_in_b & ~m_ddr_b);
 
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
@@ -480,7 +526,7 @@ UINT8 via6522_device::input_pb()
 
 void via6522_device::output_pb()
 {
-	UINT8 pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
+	uint8_t pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
 
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
@@ -495,7 +541,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	offset &= 0xf;
@@ -615,17 +661,29 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_SR:
+		LOGSHIFT("Read SR: %02x ", m_sr);
 		val = m_sr;
-		m_shift_counter=0;
+		m_out_cb1 = 1;
+		m_cb1_handler(m_out_cb1);
+		m_shift_counter = 0x0f;
 		clear_int(INT_SR);
-		if (SI_O2_CONTROL(m_acr))
+		LOGSHIFT(" - ACR: %02x ", m_acr);
+		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a read
+			LOGSHIFT(" - read SR starts O2 timer ");
 		}
-		if (SI_T2_CONTROL(m_acr))
+		else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+			LOGSHIFT(" - read SR starts T2 timer ");
 		}
+		else if (! SO_T2_RATE(m_acr))
+		{
+			m_shift_timer->adjust(attotime::never);
+			LOGSHIFT("Timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
@@ -644,6 +702,9 @@ READ8_MEMBER( via6522_device::read )
 		val = m_ifr;
 		break;
 	}
+	LOGR(" * %s Reg %02x -> %02x - %s\n", tag(), offset, val, std::array<char const *, 16>
+		 {{"IRB", "IRA", "DDRB", "DDRA", "T1CL","T1CH","T1LL","T1LH","T2CL","T2CH","SR","ACR","PCR","IFR","IER","IRA (nh)"}}[offset]);
+
 	return val;
 }
 
@@ -655,6 +716,9 @@ READ8_MEMBER( via6522_device::read )
 WRITE8_MEMBER( via6522_device::write )
 {
 	offset &=0x0f;
+
+	LOGSETUP(" * %s Reg %02x <- %02x - %s\n", tag(), offset, data, std::array<char const *, 16>
+		 {{"ORB", "ORA", "DDRB", "DDRA", "T1CL","T1CH","T1LL","T1LH","T2CL","T2CH","SR","ACR","PCR","IFR","IER","ORA (nh)"}}[offset]);
 
 	switch (offset)
 	{
@@ -692,7 +756,7 @@ WRITE8_MEMBER( via6522_device::write )
 		}
 
 		if (CA2_PULSE_OUTPUT(m_pcr))
-			m_ca2_timer->adjust(clocks_to_attotime(1));
+		m_ca2_timer->adjust(clocks_to_attotime(1));
 
 		break;
 
@@ -776,25 +840,41 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_SR:
 		m_sr = data;
-		m_shift_counter=0;
+		LOGSHIFT("Write SR: %02x\n", m_sr);
+
+		// make sure CB1 is high - this should not be needed though
+		if (m_out_cb1 != 1)
+		{
+			logerror("VIA: CB1 is low starting shifter\n");
+			m_out_cb1 = 1;
+			m_cb1_handler(m_out_cb1);
+		}
+
+		m_shift_counter = 0x0f;
 		clear_int(INT_SR);
-		if (SO_O2_CONTROL(m_acr))
+		LOGSHIFT(" - ACR is: %02x ", m_acr);
+		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a write
+			LOGSHIFT(" - write SR starts O2 timer");
 		}
-		if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
+		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+			LOGSHIFT(" - write starts T2 timer");
 		}
+		else
+		{
+			m_shift_timer->adjust(attotime::never); // In case we change mode before counter expire
+			LOGSHIFT(" - timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
 		m_pcr = data;
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
-		}
+		LOG("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
 
 		if (CA2_FIX_OUTPUT(data) && m_out_ca2 != CA2_OUTPUT_LEVEL(data))
 		{
@@ -811,16 +891,34 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_ACR:
 		{
-			UINT16 counter1 = get_counter1_value();
+			uint16_t counter1 = get_counter1_value();
 			m_acr = data;
+			LOGSHIFT("Write ACR: %02x ", m_acr);
 
 			output_pb();
 
-			if (T1_CONTINUOUS(data))
+			LOGSHIFT("Shift mode [%02x]: ", (m_acr >> 2) & 7);
+			if (SR_DISABLED(m_acr))    LOGSHIFT("Disabled");
+			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2");
+			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2");
+			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2");
+			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2");
+			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2");
+			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT");
+
+			if (SR_DISABLED(m_acr) || SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))
+			{
+				m_shift_timer->adjust(attotime::never);
+				LOGSHIFT(" Timer stops");
+			}
+
+			if (T1_CONTINUOUS(m_acr))
 			{
 				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
+			LOGSHIFT("\n");
 		}
 		break;
 
@@ -870,8 +968,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 	{
 		m_in_ca1 = state;
 
-		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
+		LOG("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
 
 		if ((m_in_ca1 && CA1_LOW_TO_HIGH(m_pcr)) || (!m_in_ca1 && CA1_HIGH_TO_LOW(m_pcr)))
 		{
@@ -880,6 +977,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 				m_latch_a = input_pa();
 			}
 
+			LOGINT("CA1 INT request ");
 			set_int(INT_CA1);
 
 			if (!m_out_ca2 && CA2_AUTO_HS(m_pcr))
@@ -906,6 +1004,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 		{
 			if ((m_in_ca2 && CA2_LOW_TO_HIGH(m_pcr)) || (!m_in_ca2 && CA2_HIGH_TO_LOW(m_pcr)))
 			{
+				LOGINT("CA2 INT request ");
 				set_int(INT_CA2);
 			}
 		}
@@ -926,7 +1025,7 @@ WRITE8_MEMBER( via6522_device::write_pb )
 }
 
 /*-------------------------------------------------
-    cb1_w - interface setting VIA port CB1 input
+    write_cb1 - interface setting VIA port CB1 input
 -------------------------------------------------*/
 
 WRITE_LINE_MEMBER( via6522_device::write_cb1 )
@@ -941,17 +1040,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			{
 				m_latch_b = input_pb();
 			}
-
-			if (SO_EXT_CONTROL(m_acr))
-			{
-				shift_out();
-			}
-
-			if (SI_EXT_CONTROL(m_acr))
-			{
-				shift_in();
-			}
-
+			LOGINT("CB1 INT request ");
 			set_int(INT_CB1);
 
 			if (!m_out_cb2 && CB2_AUTO_HS(m_pcr))
@@ -960,12 +1049,24 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				m_cb2_handler(1);
 			}
 		}
+
+		// The shifter shift is not controlled by PCR
+		if (SO_EXT_CONTROL(m_acr))
+		{
+			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
+			shift_out();
+		}
+		else if (SI_EXT_CONTROL(m_acr))
+		{
+			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
+			shift_in();
+		}
 	}
 }
 
 
 /*-------------------------------------------------
-    cb2_w - interface setting VIA port CB2 input
+    write_cb2 - interface setting VIA port CB2 input
 -------------------------------------------------*/
 
 WRITE_LINE_MEMBER( via6522_device::write_cb2 )
@@ -973,11 +1074,13 @@ WRITE_LINE_MEMBER( via6522_device::write_cb2 )
 	if (m_in_cb2 != state)
 	{
 		m_in_cb2 = state;
+		LOGSHIFT("CB2 IN: %d\n", m_in_cb2);
 
 		if (CB2_INPUT(m_pcr))
 		{
 			if ((m_in_cb2 && CB2_LOW_TO_HIGH(m_pcr)) || (!m_in_cb2 && CB2_HIGH_TO_LOW(m_pcr)))
 			{
+				LOGINT("CB2 INT request ");
 				set_int(INT_CB2);
 			}
 		}

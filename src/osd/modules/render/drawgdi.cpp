@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "drawgdi.h"
 #include "rendersw.hxx"
 
@@ -50,7 +51,7 @@ render_primitive_list *renderer_gdi::get_primitives()
 		return nullptr;
 
 	RECT client;
-	GetClientRect(win->platform_window<HWND>(), &client);
+	GetClientRect(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client);
 	win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
 	return &win->target()->get_primitives();
 }
@@ -69,7 +70,7 @@ int renderer_gdi::draw(const int update)
 
 	// get the target bounds
 	RECT bounds;
-	GetClientRect(win->platform_window<HWND>(), &bounds);
+	GetClientRect(std::static_pointer_cast<win_window_info>(win)->platform_window(), &bounds);
 
 	// compute width/height/pitch of target
 	int width = rect_width(&bounds);
@@ -81,12 +82,12 @@ int renderer_gdi::draw(const int update)
 	{
 		m_bmsize = pitch * height * 4 * 2;
 		global_free_array(m_bmdata);
-		m_bmdata = global_alloc_array(UINT8, m_bmsize);
+		m_bmdata = global_alloc_array(uint8_t, m_bmsize);
 	}
 
 	// draw the primitives to the bitmap
 	win->m_primlist->acquire_lock();
-	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
+	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
 	win->m_primlist->release_lock();
 
 	// fill in bitmap-specific info

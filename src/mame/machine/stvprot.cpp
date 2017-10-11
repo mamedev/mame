@@ -30,15 +30,15 @@
 
 READ32_MEMBER( stv_state::common_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
+	uint32_t *ROM = (uint32_t *)space.machine().root_device().memregion("abus")->base();
 
 	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			UINT8* base;
-			UINT16 res = m_cryptdevice->do_decrypt(base);
-			UINT16 res2 = m_cryptdevice->do_decrypt(base);
+			uint8_t* base;
+			uint16_t res = m_cryptdevice->do_decrypt(base);
+			uint16_t res2 = m_cryptdevice->do_decrypt(base);
 			res = ((res & 0xff00) >> 8) | ((res & 0x00ff) << 8);
 			res2 = ((res2 & 0xff00) >> 8) | ((res2 & 0x00ff) << 8);
 
@@ -54,9 +54,9 @@ READ32_MEMBER( stv_state::common_prot_r )
 }
 
 
-UINT16 stv_state::crypt_read_callback(UINT32 addr)
+uint16_t stv_state::crypt_read_callback(uint32_t addr)
 {
-	UINT16 dat= m_maincpu->space().read_word((0x02000000+2*addr));
+	uint16_t dat= m_maincpu->space().read_word((0x02000000+2*addr));
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 

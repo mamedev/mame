@@ -26,16 +26,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
-	required_shared_ptr<UINT8> m_bg_scrollx;
-	required_shared_ptr<UINT8> m_bg_scrolly;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_bg_scrollx;
+	required_shared_ptr<uint8_t> m_bg_scrolly;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	optional_ioport_array<5> m_ports;
 
 	int m_gameid;
 
-	UINT8 *m_tilerom;
+	uint8_t *m_tilerom;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
@@ -45,10 +45,10 @@ public:
 	int m_charon;
 	int m_flipon;
 
-	UINT32 m_hflop_74a_n;
-	UINT32 m_hcount_191;
-	UINT32 m_vcount_191;
-	UINT32 m_latch_374;
+	uint32_t m_hflop_74a_n;
+	uint32_t m_hcount_191;
+	uint32_t m_vcount_191;
+	uint32_t m_latch_374;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -74,7 +74,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );
 	void draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

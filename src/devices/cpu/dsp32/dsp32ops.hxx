@@ -41,8 +41,8 @@
 #define SET_NZ00_24(r)          m_nzcflags = ((r) & 0xffffff); m_vflags = 0
 
 #define TRUNCATE24(a)           ((a) & 0xffffff)
-#define EXTEND16_TO_24(a)       TRUNCATE24((INT32)(INT16)(a))
-#define REG16(a)                ((UINT16)m_r[a])
+#define EXTEND16_TO_24(a)       TRUNCATE24((int32_t)(int16_t)(a))
+#define REG16(a)                ((uint16_t)m_r[a])
 #define REG24(a)                (m_r[a])
 
 #define WRITEABLE_REGS          (0x6f3efffe)
@@ -100,7 +100,7 @@
 union int_double
 {
 	double d;
-	UINT32 i[2];
+	uint32_t i[2];
 };
 
 
@@ -109,12 +109,12 @@ union int_double
 //  IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::illegal(UINT32 op)
+void dsp32c_device::illegal(uint32_t op)
 {
 }
 
 
-void dsp32c_device::unimplemented(UINT32 op)
+void dsp32c_device::unimplemented(uint32_t op)
 {
 	fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)\n", PC - 4, op, op >> 25, op >> 21);
 }
@@ -122,7 +122,7 @@ void dsp32c_device::unimplemented(UINT32 op)
 
 inline void dsp32c_device::execute_one()
 {
-	UINT32 op;
+	uint32_t op;
 
 	PROCESS_DEFERRED_MEMORY();
 	m_ppc = PC;
@@ -140,7 +140,7 @@ inline void dsp32c_device::execute_one()
 //  CAU HELPERS
 //**************************************************************************
 
-UINT32 dsp32c_device::cau_read_pi_special(UINT8 i)
+uint32_t dsp32c_device::cau_read_pi_special(uint8_t i)
 {
 	switch (i)
 	{
@@ -157,7 +157,7 @@ UINT32 dsp32c_device::cau_read_pi_special(UINT8 i)
 }
 
 
-void dsp32c_device::cau_write_pi_special(UINT8 i, UINT32 val)
+void dsp32c_device::cau_write_pi_special(uint8_t i, uint32_t val)
 {
 	switch (i)
 	{
@@ -173,13 +173,13 @@ void dsp32c_device::cau_write_pi_special(UINT8 i, UINT32 val)
 }
 
 
-inline UINT8 dsp32c_device::cau_read_pi_1byte(int pi)
+inline uint8_t dsp32c_device::cau_read_pi_1byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RBYTE(m_r[p]);
+		uint32_t result = RBYTE(m_r[p]);
 		m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		return result;
 	}
@@ -188,13 +188,13 @@ inline UINT8 dsp32c_device::cau_read_pi_1byte(int pi)
 }
 
 
-inline UINT16 dsp32c_device::cau_read_pi_2byte(int pi)
+inline uint16_t dsp32c_device::cau_read_pi_2byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RWORD(m_r[p]);
+		uint32_t result = RWORD(m_r[p]);
 		if (i < 22 || i > 23)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
@@ -206,13 +206,13 @@ inline UINT16 dsp32c_device::cau_read_pi_2byte(int pi)
 }
 
 
-inline UINT32 dsp32c_device::cau_read_pi_4byte(int pi)
+inline uint32_t dsp32c_device::cau_read_pi_4byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RLONG(m_r[p]);
+		uint32_t result = RLONG(m_r[p]);
 		if (i < 22 || i > 23)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
@@ -224,7 +224,7 @@ inline UINT32 dsp32c_device::cau_read_pi_4byte(int pi)
 }
 
 
-inline void dsp32c_device::cau_write_pi_1byte(int pi, UINT8 val)
+inline void dsp32c_device::cau_write_pi_1byte(int pi, uint8_t val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
@@ -238,7 +238,7 @@ inline void dsp32c_device::cau_write_pi_1byte(int pi, UINT8 val)
 }
 
 
-inline void dsp32c_device::cau_write_pi_2byte(int pi, UINT16 val)
+inline void dsp32c_device::cau_write_pi_2byte(int pi, uint16_t val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
@@ -255,13 +255,13 @@ inline void dsp32c_device::cau_write_pi_2byte(int pi, UINT16 val)
 }
 
 
-inline void dsp32c_device::cau_write_pi_4byte(int pi, UINT32 val)
+inline void dsp32c_device::cau_write_pi_4byte(int pi, uint32_t val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WLONG(m_r[p], (INT32)(val << 8) >> 8);
+		WLONG(m_r[p], (int32_t)(val << 8) >> 8);
 		if (i < 22 || i > 23)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
@@ -304,11 +304,11 @@ inline double dsp32c_device::dau_get_anzflags()
 }
 
 
-inline UINT8 dsp32c_device::dau_get_avuflags()
+inline uint8_t dsp32c_device::dau_get_avuflags()
 {
 #if (!IGNORE_DAU_UV_FLAGS)
 	int bufidx = (m_abuf_index - 1) & 3;
-	UINT8 vuflags = m_VUflags;
+	uint8_t vuflags = m_VUflags;
 	while (m_icount >= m_abufcycle[bufidx] - 3 * 4)
 	{
 		vuflags = m_abufVUflags[bufidx];
@@ -370,13 +370,13 @@ inline void dsp32c_device::dau_set_val_flags(int aidx, double res)
 }
 
 
-inline double dsp32c_device::dsp_to_double(UINT32 val)
+inline double dsp32c_device::dsp_to_double(uint32_t val)
 {
 	int_double id;
 
 	if (val == 0)
 		return 0;
-	else if ((INT32)val > 0)
+	else if ((int32_t)val > 0)
 	{
 		int exponent = ((val & 0xff) - 128 + 1023) << 20;
 		id.i[BYTE_XOR_BE(0)] = exponent + (val >> 11);
@@ -393,7 +393,7 @@ inline double dsp32c_device::dsp_to_double(UINT32 val)
 }
 
 
-inline UINT32 dsp32c_device::double_to_dsp(double val)
+inline uint32_t dsp32c_device::double_to_dsp(double val)
 {
 	int mantissa, exponent;
 	int_double id;
@@ -406,9 +406,9 @@ inline UINT32 dsp32c_device::double_to_dsp(double val)
 	{
 //      machine().debug_break();
 //      fprintf(stderr, "Exponent = %d\n", exponent);
-		return ((INT32)id.i[BYTE_XOR_BE(0)] >= 0) ? 0x7fffffff : 0x800000ff;
+		return ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0) ? 0x7fffffff : 0x800000ff;
 	}
-	else if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
+	else if ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0)
 		return exponent | mantissa;
 	else
 	{
@@ -440,7 +440,7 @@ inline double dsp32c_device::dau_read_pi_double_1st(int pi, int multiplier)
 	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(m_r[p]);
+		uint32_t result = RLONG(m_r[p]);
 		if (i < 6)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
@@ -463,7 +463,7 @@ inline double dsp32c_device::dau_read_pi_double_2nd(int pi, int multiplier, doub
 	m_lastp = p;
 	if (p)
 	{
-		UINT32 result;
+		uint32_t result;
 		result = RLONG(m_r[p]);
 		if (i < 6)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
@@ -478,7 +478,7 @@ inline double dsp32c_device::dau_read_pi_double_2nd(int pi, int multiplier, doub
 }
 
 
-inline UINT32 dsp32c_device::dau_read_pi_4bytes(int pi)
+inline uint32_t dsp32c_device::dau_read_pi_4bytes(int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -486,7 +486,7 @@ inline UINT32 dsp32c_device::dau_read_pi_4bytes(int pi)
 	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(m_r[p]);
+		uint32_t result = RLONG(m_r[p]);
 		if (i < 6)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
@@ -500,7 +500,7 @@ inline UINT32 dsp32c_device::dau_read_pi_4bytes(int pi)
 }
 
 
-inline UINT16 dsp32c_device::dau_read_pi_2bytes(int pi)
+inline uint16_t dsp32c_device::dau_read_pi_2bytes(int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -508,7 +508,7 @@ inline UINT16 dsp32c_device::dau_read_pi_2bytes(int pi)
 	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RWORD(m_r[p]);
+		uint32_t result = RWORD(m_r[p]);
 		if (i < 6)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
@@ -543,7 +543,7 @@ inline void dsp32c_device::dau_write_pi_double(int pi, double val)
 }
 
 
-inline void dsp32c_device::dau_write_pi_4bytes(int pi, UINT32 val)
+inline void dsp32c_device::dau_write_pi_4bytes(int pi, uint32_t val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -565,7 +565,7 @@ inline void dsp32c_device::dau_write_pi_4bytes(int pi, UINT32 val)
 }
 
 
-inline void dsp32c_device::dau_write_pi_2bytes(int pi, UINT16 val)
+inline void dsp32c_device::dau_write_pi_2bytes(int pi, uint16_t val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -679,405 +679,405 @@ int dsp32c_device::condition(int cond)
 //  CAU BRANCH INSTRUCTION IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::nop(UINT32 op)
+void dsp32c_device::nop(uint32_t op)
 {
 	if (op == 0)
 		return;
 	execute_one();
-	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 }
 
 
-void dsp32c_device::goto_t(UINT32 op)
+void dsp32c_device::goto_t(uint32_t op)
 {
 	execute_one();
-	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 }
 
 
-void dsp32c_device::goto_pl(UINT32 op)
+void dsp32c_device::goto_pl(uint32_t op)
 {
 	if (!nFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_mi(UINT32 op)
+void dsp32c_device::goto_mi(uint32_t op)
 {
 	if (nFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ne(UINT32 op)
+void dsp32c_device::goto_ne(uint32_t op)
 {
 	if (!zFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_eq(UINT32 op)
+void dsp32c_device::goto_eq(uint32_t op)
 {
 	if (zFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_vc(UINT32 op)
+void dsp32c_device::goto_vc(uint32_t op)
 {
 	if (!vFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_vs(UINT32 op)
+void dsp32c_device::goto_vs(uint32_t op)
 {
 	if (vFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_cc(UINT32 op)
+void dsp32c_device::goto_cc(uint32_t op)
 {
 	if (!cFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_cs(UINT32 op)
+void dsp32c_device::goto_cs(uint32_t op)
 {
 	if (cFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ge(UINT32 op)
+void dsp32c_device::goto_ge(uint32_t op)
 {
 	if (!(nFLAG ^ vFLAG))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_lt(UINT32 op)
+void dsp32c_device::goto_lt(uint32_t op)
 {
 	if (nFLAG ^ vFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_gt(UINT32 op)
+void dsp32c_device::goto_gt(uint32_t op)
 {
 	if (!(zFLAG | (nFLAG ^ vFLAG)))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_le(UINT32 op)
+void dsp32c_device::goto_le(uint32_t op)
 {
 	if (zFLAG | (nFLAG ^ vFLAG))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_hi(UINT32 op)
+void dsp32c_device::goto_hi(uint32_t op)
 {
 	if (!cFLAG && !zFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ls(UINT32 op)
+void dsp32c_device::goto_ls(uint32_t op)
 {
 	if (cFLAG || zFLAG)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_auc(UINT32 op)
+void dsp32c_device::goto_auc(uint32_t op)
 {
 	if (!(DEFERRED_VUFLAGS() & UFLAGBIT))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_aus(UINT32 op)
+void dsp32c_device::goto_aus(uint32_t op)
 {
 	if (DEFERRED_VUFLAGS() & UFLAGBIT)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_age(UINT32 op)
+void dsp32c_device::goto_age(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() >= 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_alt(UINT32 op)
+void dsp32c_device::goto_alt(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() < 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ane(UINT32 op)
+void dsp32c_device::goto_ane(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() != 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_aeq(UINT32 op)
+void dsp32c_device::goto_aeq(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() == 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_avc(UINT32 op)
+void dsp32c_device::goto_avc(uint32_t op)
 {
 	if (!(DEFERRED_VUFLAGS() & VFLAGBIT))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_avs(UINT32 op)
+void dsp32c_device::goto_avs(uint32_t op)
 {
 	if (DEFERRED_VUFLAGS() & VFLAGBIT)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_agt(UINT32 op)
+void dsp32c_device::goto_agt(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() > 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ale(UINT32 op)
+void dsp32c_device::goto_ale(uint32_t op)
 {
 	if (DEFERRED_NZFLAGS() <= 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_ibe(UINT32 op)
+void dsp32c_device::goto_ibe(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_ibf(UINT32 op)
+void dsp32c_device::goto_ibf(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_obf(UINT32 op)
+void dsp32c_device::goto_obf(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_obe(UINT32 op)
+void dsp32c_device::goto_obe(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_pde(UINT32 op)
+void dsp32c_device::goto_pde(uint32_t op)
 {
 	if (!(m_pcr & PCR_PDFs))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_pdf(UINT32 op)
+void dsp32c_device::goto_pdf(uint32_t op)
 {
 	if (m_pcr & PCR_PDFs)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_pie(UINT32 op)
+void dsp32c_device::goto_pie(uint32_t op)
 {
 	if (!(m_pcr & PCR_PIFs))
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_pif(UINT32 op)
+void dsp32c_device::goto_pif(uint32_t op)
 {
 	if (m_pcr & PCR_PIFs)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::goto_syc(UINT32 op)
+void dsp32c_device::goto_syc(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_sys(UINT32 op)
+void dsp32c_device::goto_sys(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_fbc(UINT32 op)
+void dsp32c_device::goto_fbc(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_fbs(UINT32 op)
+void dsp32c_device::goto_fbs(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_irq1lo(UINT32 op)
+void dsp32c_device::goto_irq1lo(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_irq1hi(UINT32 op)
+void dsp32c_device::goto_irq1hi(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_irq2lo(UINT32 op)
+void dsp32c_device::goto_irq2lo(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::goto_irq2hi(UINT32 op)
+void dsp32c_device::goto_irq2hi(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::dec_goto(UINT32 op)
+void dsp32c_device::dec_goto(uint32_t op)
 {
 	int hr = (op >> 21) & 0x1f;
-	int old = (INT16)m_r[hr];
+	int old = (int16_t)m_r[hr];
 	m_r[hr] = EXTEND16_TO_24(m_r[hr] - 1);
 	if (old >= 0)
 	{
 		execute_one();
-		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 	}
 }
 
 
-void dsp32c_device::call(UINT32 op)
+void dsp32c_device::call(uint32_t op)
 {
 	int mr = (op >> 21) & 0x1f;
 	if (IS_WRITEABLE(mr))
 		m_r[mr] = PC + 4;
 	execute_one();
-	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (int16_t)op);
 }
 
 
-void dsp32c_device::goto24(UINT32 op)
+void dsp32c_device::goto24(uint32_t op)
 {
 	execute_one();
 	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
 }
 
 
-void dsp32c_device::call24(UINT32 op)
+void dsp32c_device::call24(uint32_t op)
 {
 	int mr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(mr))
@@ -1087,13 +1087,13 @@ void dsp32c_device::call24(UINT32 op)
 }
 
 
-void dsp32c_device::do_i(UINT32 op)
+void dsp32c_device::do_i(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::do_r(UINT32 op)
+void dsp32c_device::do_r(uint32_t op)
 {
 	unimplemented(op);
 }
@@ -1104,18 +1104,18 @@ void dsp32c_device::do_r(UINT32 op)
 //  CAU 16-BIT ARITHMETIC IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::add_si(UINT32 op)
+void dsp32c_device::add_si(uint32_t op)
 {
 	int dr = (op >> 21) & 0x1f;
 	int hrval = REG16((op >> 16) & 0x1f);
-	int res = hrval + (UINT16)op;
+	int res = hrval + (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZCV_16(hrval, op, res);
 }
 
 
-void dsp32c_device::add_ss(UINT32 op)
+void dsp32c_device::add_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1130,7 +1130,7 @@ void dsp32c_device::add_ss(UINT32 op)
 }
 
 
-void dsp32c_device::mul2_s(UINT32 op)
+void dsp32c_device::mul2_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1144,7 +1144,7 @@ void dsp32c_device::mul2_s(UINT32 op)
 }
 
 
-void dsp32c_device::subr_ss(UINT32 op)
+void dsp32c_device::subr_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1159,13 +1159,13 @@ void dsp32c_device::subr_ss(UINT32 op)
 }
 
 
-void dsp32c_device::addr_ss(UINT32 op)
+void dsp32c_device::addr_ss(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::sub_ss(UINT32 op)
+void dsp32c_device::sub_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1180,7 +1180,7 @@ void dsp32c_device::sub_ss(UINT32 op)
 }
 
 
-void dsp32c_device::neg_s(UINT32 op)
+void dsp32c_device::neg_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1194,7 +1194,7 @@ void dsp32c_device::neg_s(UINT32 op)
 }
 
 
-void dsp32c_device::andc_ss(UINT32 op)
+void dsp32c_device::andc_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1209,7 +1209,7 @@ void dsp32c_device::andc_ss(UINT32 op)
 }
 
 
-void dsp32c_device::cmp_ss(UINT32 op)
+void dsp32c_device::cmp_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1221,7 +1221,7 @@ void dsp32c_device::cmp_ss(UINT32 op)
 }
 
 
-void dsp32c_device::xor_ss(UINT32 op)
+void dsp32c_device::xor_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1236,7 +1236,7 @@ void dsp32c_device::xor_ss(UINT32 op)
 }
 
 
-void dsp32c_device::rcr_s(UINT32 op)
+void dsp32c_device::rcr_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1251,7 +1251,7 @@ void dsp32c_device::rcr_s(UINT32 op)
 }
 
 
-void dsp32c_device::or_ss(UINT32 op)
+void dsp32c_device::or_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1266,7 +1266,7 @@ void dsp32c_device::or_ss(UINT32 op)
 }
 
 
-void dsp32c_device::rcl_s(UINT32 op)
+void dsp32c_device::rcl_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1281,7 +1281,7 @@ void dsp32c_device::rcl_s(UINT32 op)
 }
 
 
-void dsp32c_device::shr_s(UINT32 op)
+void dsp32c_device::shr_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1296,7 +1296,7 @@ void dsp32c_device::shr_s(UINT32 op)
 }
 
 
-void dsp32c_device::div2_s(UINT32 op)
+void dsp32c_device::div2_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1311,7 +1311,7 @@ void dsp32c_device::div2_s(UINT32 op)
 }
 
 
-void dsp32c_device::and_ss(UINT32 op)
+void dsp32c_device::and_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1326,7 +1326,7 @@ void dsp32c_device::and_ss(UINT32 op)
 }
 
 
-void dsp32c_device::test_ss(UINT32 op)
+void dsp32c_device::test_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1338,101 +1338,101 @@ void dsp32c_device::test_ss(UINT32 op)
 }
 
 
-void dsp32c_device::add_di(UINT32 op)
+void dsp32c_device::add_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval + (UINT16)op;
+	int res = drval + (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZCV_16(drval, op, res);
 }
 
 
-void dsp32c_device::subr_di(UINT32 op)
+void dsp32c_device::subr_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = (UINT16)op - drval;
+	int res = (uint16_t)op - drval;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZCV_16(drval, op, res);
 }
 
 
-void dsp32c_device::addr_di(UINT32 op)
+void dsp32c_device::addr_di(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::sub_di(UINT32 op)
+void dsp32c_device::sub_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval - (UINT16)op;
+	int res = drval - (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZCV_16(drval, op, res);
 }
 
 
-void dsp32c_device::andc_di(UINT32 op)
+void dsp32c_device::andc_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval & ~(UINT16)op;
+	int res = drval & ~(uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZ00_16(res);
 }
 
 
-void dsp32c_device::cmp_di(UINT32 op)
+void dsp32c_device::cmp_di(uint32_t op)
 {
 	int drval = REG16((op >> 16) & 0x1f);
-	int res = drval - (UINT16)op;
+	int res = drval - (uint16_t)op;
 	SET_NZCV_16(drval, op, res);
 }
 
 
-void dsp32c_device::xor_di(UINT32 op)
+void dsp32c_device::xor_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval ^ (UINT16)op;
+	int res = drval ^ (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZ00_16(res);
 }
 
 
-void dsp32c_device::or_di(UINT32 op)
+void dsp32c_device::or_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval | (UINT16)op;
+	int res = drval | (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZ00_16(res);
 }
 
 
-void dsp32c_device::and_di(UINT32 op)
+void dsp32c_device::and_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG16(dr);
-	int res = drval & (UINT16)op;
+	int res = drval & (uint16_t)op;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	SET_NZ00_16(res);
 }
 
 
-void dsp32c_device::test_di(UINT32 op)
+void dsp32c_device::test_di(uint32_t op)
 {
 	int drval = REG16((op >> 16) & 0x1f);
-	int res = drval & (UINT16)op;
+	int res = drval & (uint16_t)op;
 	SET_NZ00_16(res);
 }
 
@@ -1442,7 +1442,7 @@ void dsp32c_device::test_di(UINT32 op)
 //  CAU 24-BIT ARITHMETIC IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::adde_si(UINT32 op)
+void dsp32c_device::adde_si(uint32_t op)
 {
 	int dr = (op >> 21) & 0x1f;
 	int hrval = REG24((op >> 16) & 0x1f);
@@ -1453,7 +1453,7 @@ void dsp32c_device::adde_si(UINT32 op)
 }
 
 
-void dsp32c_device::adde_ss(UINT32 op)
+void dsp32c_device::adde_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1468,7 +1468,7 @@ void dsp32c_device::adde_ss(UINT32 op)
 }
 
 
-void dsp32c_device::mul2e_s(UINT32 op)
+void dsp32c_device::mul2e_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1482,7 +1482,7 @@ void dsp32c_device::mul2e_s(UINT32 op)
 }
 
 
-void dsp32c_device::subre_ss(UINT32 op)
+void dsp32c_device::subre_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1497,13 +1497,13 @@ void dsp32c_device::subre_ss(UINT32 op)
 }
 
 
-void dsp32c_device::addre_ss(UINT32 op)
+void dsp32c_device::addre_ss(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::sube_ss(UINT32 op)
+void dsp32c_device::sube_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1518,7 +1518,7 @@ void dsp32c_device::sube_ss(UINT32 op)
 }
 
 
-void dsp32c_device::nege_s(UINT32 op)
+void dsp32c_device::nege_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1532,7 +1532,7 @@ void dsp32c_device::nege_s(UINT32 op)
 }
 
 
-void dsp32c_device::andce_ss(UINT32 op)
+void dsp32c_device::andce_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1547,7 +1547,7 @@ void dsp32c_device::andce_ss(UINT32 op)
 }
 
 
-void dsp32c_device::cmpe_ss(UINT32 op)
+void dsp32c_device::cmpe_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1559,7 +1559,7 @@ void dsp32c_device::cmpe_ss(UINT32 op)
 }
 
 
-void dsp32c_device::xore_ss(UINT32 op)
+void dsp32c_device::xore_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1574,7 +1574,7 @@ void dsp32c_device::xore_ss(UINT32 op)
 }
 
 
-void dsp32c_device::rcre_s(UINT32 op)
+void dsp32c_device::rcre_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1589,7 +1589,7 @@ void dsp32c_device::rcre_s(UINT32 op)
 }
 
 
-void dsp32c_device::ore_ss(UINT32 op)
+void dsp32c_device::ore_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1604,7 +1604,7 @@ void dsp32c_device::ore_ss(UINT32 op)
 }
 
 
-void dsp32c_device::rcle_s(UINT32 op)
+void dsp32c_device::rcle_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1619,7 +1619,7 @@ void dsp32c_device::rcle_s(UINT32 op)
 }
 
 
-void dsp32c_device::shre_s(UINT32 op)
+void dsp32c_device::shre_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1634,7 +1634,7 @@ void dsp32c_device::shre_s(UINT32 op)
 }
 
 
-void dsp32c_device::div2e_s(UINT32 op)
+void dsp32c_device::div2e_s(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1649,7 +1649,7 @@ void dsp32c_device::div2e_s(UINT32 op)
 }
 
 
-void dsp32c_device::ande_ss(UINT32 op)
+void dsp32c_device::ande_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1664,7 +1664,7 @@ void dsp32c_device::ande_ss(UINT32 op)
 }
 
 
-void dsp32c_device::teste_ss(UINT32 op)
+void dsp32c_device::teste_ss(uint32_t op)
 {
 	if (CONDITION_IS_TRUE())
 	{
@@ -1676,7 +1676,7 @@ void dsp32c_device::teste_ss(UINT32 op)
 }
 
 
-void dsp32c_device::adde_di(UINT32 op)
+void dsp32c_device::adde_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1687,7 +1687,7 @@ void dsp32c_device::adde_di(UINT32 op)
 }
 
 
-void dsp32c_device::subre_di(UINT32 op)
+void dsp32c_device::subre_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1698,13 +1698,13 @@ void dsp32c_device::subre_di(UINT32 op)
 }
 
 
-void dsp32c_device::addre_di(UINT32 op)
+void dsp32c_device::addre_di(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::sube_di(UINT32 op)
+void dsp32c_device::sube_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1715,7 +1715,7 @@ void dsp32c_device::sube_di(UINT32 op)
 }
 
 
-void dsp32c_device::andce_di(UINT32 op)
+void dsp32c_device::andce_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1726,7 +1726,7 @@ void dsp32c_device::andce_di(UINT32 op)
 }
 
 
-void dsp32c_device::cmpe_di(UINT32 op)
+void dsp32c_device::cmpe_di(uint32_t op)
 {
 	int drval = REG24((op >> 16) & 0x1f);
 	int res = drval - EXTEND16_TO_24(op);
@@ -1734,7 +1734,7 @@ void dsp32c_device::cmpe_di(UINT32 op)
 }
 
 
-void dsp32c_device::xore_di(UINT32 op)
+void dsp32c_device::xore_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1745,7 +1745,7 @@ void dsp32c_device::xore_di(UINT32 op)
 }
 
 
-void dsp32c_device::ore_di(UINT32 op)
+void dsp32c_device::ore_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1756,7 +1756,7 @@ void dsp32c_device::ore_di(UINT32 op)
 }
 
 
-void dsp32c_device::ande_di(UINT32 op)
+void dsp32c_device::ande_di(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
 	int drval = REG24(dr);
@@ -1767,7 +1767,7 @@ void dsp32c_device::ande_di(UINT32 op)
 }
 
 
-void dsp32c_device::teste_di(UINT32 op)
+void dsp32c_device::teste_di(uint32_t op)
 {
 	int drval = REG24((op >> 16) & 0x1f);
 	int res = drval & EXTEND16_TO_24(op);
@@ -1780,10 +1780,10 @@ void dsp32c_device::teste_di(UINT32 op)
 //  CAU LOAD/STORE IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::load_hi(UINT32 op)
+void dsp32c_device::load_hi(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
-	UINT32 res = RBYTE(EXTEND16_TO_24(op));
+	uint32_t res = RBYTE(EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
 	m_nzcflags = res << 8;
@@ -1791,10 +1791,10 @@ void dsp32c_device::load_hi(UINT32 op)
 }
 
 
-void dsp32c_device::load_li(UINT32 op)
+void dsp32c_device::load_li(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
-	UINT32 res = RBYTE(EXTEND16_TO_24(op));
+	uint32_t res = RBYTE(EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = res;
 	m_nzcflags = res << 8;
@@ -1802,9 +1802,9 @@ void dsp32c_device::load_li(UINT32 op)
 }
 
 
-void dsp32c_device::load_i(UINT32 op)
+void dsp32c_device::load_i(uint32_t op)
 {
-	UINT32 res = RWORD(EXTEND16_TO_24(op));
+	uint32_t res = RWORD(EXTEND16_TO_24(op));
 	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = EXTEND16_TO_24(res);
@@ -1813,9 +1813,9 @@ void dsp32c_device::load_i(UINT32 op)
 }
 
 
-void dsp32c_device::load_ei(UINT32 op)
+void dsp32c_device::load_ei(uint32_t op)
 {
-	UINT32 res = TRUNCATE24(RLONG(EXTEND16_TO_24(op)));
+	uint32_t res = TRUNCATE24(RLONG(EXTEND16_TO_24(op)));
 	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = res;
@@ -1824,36 +1824,36 @@ void dsp32c_device::load_ei(UINT32 op)
 }
 
 
-void dsp32c_device::store_hi(UINT32 op)
+void dsp32c_device::store_hi(uint32_t op)
 {
 	WBYTE(EXTEND16_TO_24(op), m_r[(op >> 16) & 0x1f] >> 8);
 }
 
 
-void dsp32c_device::store_li(UINT32 op)
+void dsp32c_device::store_li(uint32_t op)
 {
 	WBYTE(EXTEND16_TO_24(op), m_r[(op >> 16) & 0x1f]);
 }
 
 
-void dsp32c_device::store_i(UINT32 op)
+void dsp32c_device::store_i(uint32_t op)
 {
 	WWORD(EXTEND16_TO_24(op), REG16((op >> 16) & 0x1f));
 }
 
 
-void dsp32c_device::store_ei(UINT32 op)
+void dsp32c_device::store_ei(uint32_t op)
 {
-	WLONG(EXTEND16_TO_24(op), (INT32)(REG24((op >> 16) & 0x1f) << 8) >> 8);
+	WLONG(EXTEND16_TO_24(op), (int32_t)(REG24((op >> 16) & 0x1f) << 8) >> 8);
 }
 
 
-void dsp32c_device::load_hr(UINT32 op)
+void dsp32c_device::load_hr(uint32_t op)
 {
 	if (!(op & 0x400))
 	{
 		int dr = (op >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(op) << 8;
+		uint32_t res = cau_read_pi_1byte(op) << 8;
 		if (IS_WRITEABLE(dr))
 			m_r[dr] = EXTEND16_TO_24(res);
 		m_nzcflags = res << 8;
@@ -1864,12 +1864,12 @@ void dsp32c_device::load_hr(UINT32 op)
 }
 
 
-void dsp32c_device::load_lr(UINT32 op)
+void dsp32c_device::load_lr(uint32_t op)
 {
 	if (!(op & 0x400))
 	{
 		int dr = (op >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(op);
+		uint32_t res = cau_read_pi_1byte(op);
 		if (IS_WRITEABLE(dr))
 			m_r[dr] = res;
 		m_nzcflags = res << 8;
@@ -1880,11 +1880,11 @@ void dsp32c_device::load_lr(UINT32 op)
 }
 
 
-void dsp32c_device::load_r(UINT32 op)
+void dsp32c_device::load_r(uint32_t op)
 {
 	if (!(op & 0x400))
 	{
-		UINT32 res = cau_read_pi_2byte(op);
+		uint32_t res = cau_read_pi_2byte(op);
 		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
 			m_r[dr] = EXTEND16_TO_24(res);
@@ -1896,11 +1896,11 @@ void dsp32c_device::load_r(UINT32 op)
 }
 
 
-void dsp32c_device::load_er(UINT32 op)
+void dsp32c_device::load_er(uint32_t op)
 {
 	if (!(op & 0x400))
 	{
-		UINT32 res = TRUNCATE24(cau_read_pi_4byte(op));
+		uint32_t res = TRUNCATE24(cau_read_pi_4byte(op));
 		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
 			m_r[dr] = res;
@@ -1912,7 +1912,7 @@ void dsp32c_device::load_er(UINT32 op)
 }
 
 
-void dsp32c_device::store_hr(UINT32 op)
+void dsp32c_device::store_hr(uint32_t op)
 {
 	if (!(op & 0x400))
 		cau_write_pi_1byte(op, m_r[(op >> 16) & 0x1f] >> 8);
@@ -1921,7 +1921,7 @@ void dsp32c_device::store_hr(UINT32 op)
 }
 
 
-void dsp32c_device::store_lr(UINT32 op)
+void dsp32c_device::store_lr(uint32_t op)
 {
 	if (!(op & 0x400))
 		cau_write_pi_1byte(op, m_r[(op >> 16) & 0x1f]);
@@ -1930,7 +1930,7 @@ void dsp32c_device::store_lr(UINT32 op)
 }
 
 
-void dsp32c_device::store_r(UINT32 op)
+void dsp32c_device::store_r(uint32_t op)
 {
 	if (!(op & 0x400))
 		cau_write_pi_2byte(op, REG16((op >> 16) & 0x1f));
@@ -1939,7 +1939,7 @@ void dsp32c_device::store_r(UINT32 op)
 }
 
 
-void dsp32c_device::store_er(UINT32 op)
+void dsp32c_device::store_er(uint32_t op)
 {
 	if (!(op & 0x400))
 		cau_write_pi_4byte(op, REG24((op >> 16) & 0x1f));
@@ -1948,10 +1948,10 @@ void dsp32c_device::store_er(UINT32 op)
 }
 
 
-void dsp32c_device::load24(UINT32 op)
+void dsp32c_device::load24(uint32_t op)
 {
 	int dr = (op >> 16) & 0x1f;
-	UINT32 res = (op & 0xffff) + ((op >> 5) & 0xff0000);
+	uint32_t res = (op & 0xffff) + ((op >> 5) & 0xff0000);
 	if (IS_WRITEABLE(dr))
 		m_r[dr] = res;
 }
@@ -1962,7 +1962,7 @@ void dsp32c_device::load24(UINT32 op)
 //  DAU FORM 1 IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::d1_aMpp(UINT32 op)
+void dsp32c_device::d1_aMpp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -1974,7 +1974,7 @@ void dsp32c_device::d1_aMpp(UINT32 op)
 }
 
 
-void dsp32c_device::d1_aMpm(UINT32 op)
+void dsp32c_device::d1_aMpm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -1986,7 +1986,7 @@ void dsp32c_device::d1_aMpm(UINT32 op)
 }
 
 
-void dsp32c_device::d1_aMmp(UINT32 op)
+void dsp32c_device::d1_aMmp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -1998,7 +1998,7 @@ void dsp32c_device::d1_aMmp(UINT32 op)
 }
 
 
-void dsp32c_device::d1_aMmm(UINT32 op)
+void dsp32c_device::d1_aMmm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2010,7 +2010,7 @@ void dsp32c_device::d1_aMmm(UINT32 op)
 }
 
 
-void dsp32c_device::d1_0px(UINT32 op)
+void dsp32c_device::d1_0px(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2023,7 +2023,7 @@ void dsp32c_device::d1_0px(UINT32 op)
 }
 
 
-void dsp32c_device::d1_0mx(UINT32 op)
+void dsp32c_device::d1_0mx(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2036,7 +2036,7 @@ void dsp32c_device::d1_0mx(UINT32 op)
 }
 
 
-void dsp32c_device::d1_1pp(UINT32 op)
+void dsp32c_device::d1_1pp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2048,7 +2048,7 @@ void dsp32c_device::d1_1pp(UINT32 op)
 }
 
 
-void dsp32c_device::d1_1pm(UINT32 op)
+void dsp32c_device::d1_1pm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2060,7 +2060,7 @@ void dsp32c_device::d1_1pm(UINT32 op)
 }
 
 
-void dsp32c_device::d1_1mp(UINT32 op)
+void dsp32c_device::d1_1mp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2072,7 +2072,7 @@ void dsp32c_device::d1_1mp(UINT32 op)
 }
 
 
-void dsp32c_device::d1_1mm(UINT32 op)
+void dsp32c_device::d1_1mm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2084,25 +2084,25 @@ void dsp32c_device::d1_1mm(UINT32 op)
 }
 
 
-void dsp32c_device::d1_aMppr(UINT32 op)
+void dsp32c_device::d1_aMppr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d1_aMpmr(UINT32 op)
+void dsp32c_device::d1_aMpmr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d1_aMmpr(UINT32 op)
+void dsp32c_device::d1_aMmpr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d1_aMmmr(UINT32 op)
+void dsp32c_device::d1_aMmmr(uint32_t op)
 {
 	unimplemented(op);
 }
@@ -2113,7 +2113,7 @@ void dsp32c_device::d1_aMmmr(UINT32 op)
 //  DAU FORM 2 IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::d2_aMpp(UINT32 op)
+void dsp32c_device::d2_aMpp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2125,7 +2125,7 @@ void dsp32c_device::d2_aMpp(UINT32 op)
 }
 
 
-void dsp32c_device::d2_aMpm(UINT32 op)
+void dsp32c_device::d2_aMpm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2137,7 +2137,7 @@ void dsp32c_device::d2_aMpm(UINT32 op)
 }
 
 
-void dsp32c_device::d2_aMmp(UINT32 op)
+void dsp32c_device::d2_aMmp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2149,7 +2149,7 @@ void dsp32c_device::d2_aMmp(UINT32 op)
 }
 
 
-void dsp32c_device::d2_aMmm(UINT32 op)
+void dsp32c_device::d2_aMmm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2161,25 +2161,25 @@ void dsp32c_device::d2_aMmm(UINT32 op)
 }
 
 
-void dsp32c_device::d2_aMppr(UINT32 op)
+void dsp32c_device::d2_aMppr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d2_aMpmr(UINT32 op)
+void dsp32c_device::d2_aMpmr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d2_aMmpr(UINT32 op)
+void dsp32c_device::d2_aMmpr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d2_aMmmr(UINT32 op)
+void dsp32c_device::d2_aMmmr(uint32_t op)
 {
 	unimplemented(op);
 }
@@ -2190,7 +2190,7 @@ void dsp32c_device::d2_aMmmr(UINT32 op)
 //  DAU FORM 3 IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::d3_aMpp(UINT32 op)
+void dsp32c_device::d3_aMpp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2202,7 +2202,7 @@ void dsp32c_device::d3_aMpp(UINT32 op)
 }
 
 
-void dsp32c_device::d3_aMpm(UINT32 op)
+void dsp32c_device::d3_aMpm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2214,7 +2214,7 @@ void dsp32c_device::d3_aMpm(UINT32 op)
 }
 
 
-void dsp32c_device::d3_aMmp(UINT32 op)
+void dsp32c_device::d3_aMmp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2226,7 +2226,7 @@ void dsp32c_device::d3_aMmp(UINT32 op)
 }
 
 
-void dsp32c_device::d3_aMmm(UINT32 op)
+void dsp32c_device::d3_aMmm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
@@ -2238,25 +2238,25 @@ void dsp32c_device::d3_aMmm(UINT32 op)
 }
 
 
-void dsp32c_device::d3_aMppr(UINT32 op)
+void dsp32c_device::d3_aMppr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d3_aMpmr(UINT32 op)
+void dsp32c_device::d3_aMpmr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d3_aMmpr(UINT32 op)
+void dsp32c_device::d3_aMmpr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d3_aMmmr(UINT32 op)
+void dsp32c_device::d3_aMmmr(uint32_t op)
 {
 	unimplemented(op);
 }
@@ -2267,7 +2267,7 @@ void dsp32c_device::d3_aMmmr(UINT32 op)
 //  DAU FORM 4 IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::d4_pp(UINT32 op)
+void dsp32c_device::d4_pp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2279,7 +2279,7 @@ void dsp32c_device::d4_pp(UINT32 op)
 }
 
 
-void dsp32c_device::d4_pm(UINT32 op)
+void dsp32c_device::d4_pm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2291,7 +2291,7 @@ void dsp32c_device::d4_pm(UINT32 op)
 }
 
 
-void dsp32c_device::d4_mp(UINT32 op)
+void dsp32c_device::d4_mp(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2303,7 +2303,7 @@ void dsp32c_device::d4_mp(UINT32 op)
 }
 
 
-void dsp32c_device::d4_mm(UINT32 op)
+void dsp32c_device::d4_mm(uint32_t op)
 {
 	double xval = dau_read_pi_double_1st(op >> 14, 1);
 	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
@@ -2315,25 +2315,25 @@ void dsp32c_device::d4_mm(UINT32 op)
 }
 
 
-void dsp32c_device::d4_ppr(UINT32 op)
+void dsp32c_device::d4_ppr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d4_pmr(UINT32 op)
+void dsp32c_device::d4_pmr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d4_mpr(UINT32 op)
+void dsp32c_device::d4_mpr(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d4_mmr(UINT32 op)
+void dsp32c_device::d4_mmr(uint32_t op)
 {
 	unimplemented(op);
 }
@@ -2344,21 +2344,21 @@ void dsp32c_device::d4_mmr(UINT32 op)
 //  DAU FORM 5 IMPLEMENTATION
 //**************************************************************************
 
-void dsp32c_device::d5_ic(UINT32 op)
+void dsp32c_device::d5_ic(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d5_oc(UINT32 op)
+void dsp32c_device::d5_oc(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d5_float(UINT32 op)
+void dsp32c_device::d5_float(uint32_t op)
 {
-	double res = (double)(INT16)dau_read_pi_2bytes(op >> 7);
+	double res = (double)(int16_t)dau_read_pi_2bytes(op >> 7);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
 		dau_write_pi_double(zpi, res);
@@ -2366,21 +2366,21 @@ void dsp32c_device::d5_float(UINT32 op)
 }
 
 
-void dsp32c_device::d5_int(UINT32 op)
+void dsp32c_device::d5_int(uint32_t op)
 {
 	double val = dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
-	INT16 res;
+	int16_t res;
 	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
-	res = (INT16)val;
+	res = (int16_t)val;
 	if (zpi != 7)
 		dau_write_pi_2bytes(zpi, res);
 	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 16));
 }
 
 
-void dsp32c_device::d5_round(UINT32 op)
+void dsp32c_device::d5_round(uint32_t op)
 {
 	double res = (double)(float)dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
@@ -2390,7 +2390,7 @@ void dsp32c_device::d5_round(UINT32 op)
 }
 
 
-void dsp32c_device::d5_ifalt(UINT32 op)
+void dsp32c_device::d5_ifalt(uint32_t op)
 {
 	int ar = (op >> 21) & 3;
 	double res = m_a[ar];
@@ -2403,7 +2403,7 @@ void dsp32c_device::d5_ifalt(UINT32 op)
 }
 
 
-void dsp32c_device::d5_ifaeq(UINT32 op)
+void dsp32c_device::d5_ifaeq(uint32_t op)
 {
 	int ar = (op >> 21) & 3;
 	double res = m_a[ar];
@@ -2416,7 +2416,7 @@ void dsp32c_device::d5_ifaeq(UINT32 op)
 }
 
 
-void dsp32c_device::d5_ifagt(UINT32 op)
+void dsp32c_device::d5_ifagt(uint32_t op)
 {
 	int ar = (op >> 21) & 3;
 	double res = m_a[ar];
@@ -2429,9 +2429,9 @@ void dsp32c_device::d5_ifagt(UINT32 op)
 }
 
 
-void dsp32c_device::d5_float24(UINT32 op)
+void dsp32c_device::d5_float24(uint32_t op)
 {
-	double res = (double)((INT32)(dau_read_pi_4bytes(op >> 7) << 8) >> 8);
+	double res = (double)((int32_t)(dau_read_pi_4bytes(op >> 7) << 8) >> 8);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
 		dau_write_pi_double(zpi, res);
@@ -2439,42 +2439,42 @@ void dsp32c_device::d5_float24(UINT32 op)
 }
 
 
-void dsp32c_device::d5_int24(UINT32 op)
+void dsp32c_device::d5_int24(uint32_t op)
 {
 	double val = dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
-	INT32 res;
+	int32_t res;
 	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
-	res = (INT32)val;
+	res = (int32_t)val;
 	if (res > 0x7fffff) res = 0x7fffff;
 	else if (res < -0x800000) res = -0x800000;
 	if (zpi != 7)
-		dau_write_pi_4bytes(zpi, (INT32)(res << 8) >> 8);
+		dau_write_pi_4bytes(zpi, (int32_t)(res << 8) >> 8);
 	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 8));
 }
 
 
-void dsp32c_device::d5_ieee(UINT32 op)
+void dsp32c_device::d5_ieee(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d5_dsp(UINT32 op)
+void dsp32c_device::d5_dsp(uint32_t op)
 {
 	unimplemented(op);
 }
 
 
-void dsp32c_device::d5_seed(UINT32 op)
+void dsp32c_device::d5_seed(uint32_t op)
 {
-	UINT32 val = dau_read_pi_4bytes(op >> 7);
-	INT32 res = val ^ 0x7fffffff;
+	uint32_t val = dau_read_pi_4bytes(op >> 7);
+	int32_t res = val ^ 0x7fffffff;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
 		dau_write_pi_4bytes(zpi, res);
-	dau_set_val_flags((op >> 21) & 3, dsp_to_double((INT32)res));
+	dau_set_val_flags((op >> 21) & 3, dsp_to_double((int32_t)res));
 }
 
 
@@ -2483,7 +2483,7 @@ void dsp32c_device::d5_seed(UINT32 op)
 //  FUNCTION TABLE
 //**************************************************************************
 
-void (dsp32c_device::*const dsp32c_device::s_dsp32ops[])(UINT32 op) =
+void (dsp32c_device::*const dsp32c_device::s_dsp32ops[])(uint32_t op) =
 {
 	&dsp32c_device::nop,        &dsp32c_device::goto_t,     &dsp32c_device::goto_pl,    &dsp32c_device::goto_mi,    &dsp32c_device::goto_ne,    &dsp32c_device::goto_eq,    &dsp32c_device::goto_vc,    &dsp32c_device::goto_vs,    // 00
 	&dsp32c_device::goto_cc,    &dsp32c_device::goto_cs,    &dsp32c_device::goto_ge,    &dsp32c_device::goto_lt,    &dsp32c_device::goto_gt,    &dsp32c_device::goto_le,    &dsp32c_device::goto_hi,    &dsp32c_device::goto_ls,

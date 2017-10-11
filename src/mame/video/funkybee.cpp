@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(funkybee_state, funkybee)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */
@@ -54,13 +54,10 @@ WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
+WRITE_LINE_MEMBER(funkybee_state::gfx_bank_w)
 {
-	if (m_gfx_bank != (data & 0x01))
-	{
-		m_gfx_bank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
-	}
+	m_gfx_bank = state;
+	machine().tilemap().mark_all_dirty();
 }
 
 WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
@@ -68,9 +65,9 @@ WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
+WRITE_LINE_MEMBER(funkybee_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(state);
 }
 
 TILE_GET_INFO_MEMBER(funkybee_state::get_bg_tile_info)
@@ -155,7 +152,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

@@ -15,7 +15,7 @@
 
 PALETTE_INIT_MEMBER(dogfgt_state, dogfgt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* first 16 colors are RAM */
@@ -70,7 +70,7 @@ void dogfgt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_bitmapram = std::make_unique<UINT8[]>(BITMAPRAM_SIZE);
+	m_bitmapram = std::make_unique<uint8_t[]>(BITMAPRAM_SIZE);
 	save_pointer(NAME(m_bitmapram.get()), BITMAPRAM_SIZE);
 
 	m_screen->register_screen_bitmap(m_pixbitmap);
@@ -203,7 +203,7 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 }
 
 
-UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

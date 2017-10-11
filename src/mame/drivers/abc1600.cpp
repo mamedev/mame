@@ -53,6 +53,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/abc1600.h"
 #include "softlist.h"
 
@@ -102,10 +103,10 @@ enum
 
 READ8_MEMBER( abc1600_state::bus_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// card select pulse
-	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+	uint8_t cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
 	m_bus0i->cs_w(cs);
 	m_bus0x->cs_w(cs);
@@ -244,7 +245,7 @@ READ8_MEMBER( abc1600_state::bus_r )
 
 WRITE8_MEMBER( abc1600_state::bus_w )
 {
-	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+	uint8_t cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
 	m_bus0i->cs_w(cs);
 	m_bus0x->cs_w(cs);
@@ -479,10 +480,10 @@ static ADDRESS_MAP_START( mac_mem, AS_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, vram_map)
 	AM_RANGE(0x1fe000, 0x1fefff) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(0x1ff000, 0x1ff000) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, status_r, cmd_w)
-	AM_RANGE(0x1ff002, 0x1ff002) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, track_r, track_w)
-	AM_RANGE(0x1ff004, 0x1ff004) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, sector_r, sector_w)
-	AM_RANGE(0x1ff006, 0x1ff006) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, data_r, data_w)
+	AM_RANGE(0x1ff000, 0x1ff000) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, status_r, cmd_w)
+	AM_RANGE(0x1ff002, 0x1ff002) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, track_r, track_w)
+	AM_RANGE(0x1ff004, 0x1ff004) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, sector_r, sector_w)
+	AM_RANGE(0x1ff006, 0x1ff006) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, data_r, data_w)
 	AM_RANGE(0x1ff100, 0x1ff101) AM_MIRROR(0xfe) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, crtc_map)
 	AM_RANGE(0x1ff200, 0x1ff207) AM_MIRROR(0xf8) AM_READWRITE(dart_r, dart_w)
 	AM_RANGE(0x1ff300, 0x1ff300) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_0_TAG, z80dma_device, read, write)
@@ -632,7 +633,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_bus2->irq_r();
 	data |= m_bus1->irq_r() << 1;
@@ -663,7 +664,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= !m_sysscc << 5;
 	data |= !m_sysfs << 6;
@@ -711,7 +712,7 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 
 	*/
 
-	UINT8 data = 0x0d;
+	uint8_t data = 0x0d;
 
 	// data in
 	data |= (m_rtc->dio_r() || m_nvram->do_r()) << 1;
@@ -848,7 +849,7 @@ void abc1600_state::machine_reset()
 //  MACHINE_CONFIG( abc1600 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc1600, abc1600_state )
+static MACHINE_CONFIG_START( abc1600 )
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
@@ -883,7 +884,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w))
 
-	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z8470AB1_TAG, Z80DART, XTAL_64MHz/16)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -972,5 +973,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, driver_device, 0,    "Luxor", "ABC 1600", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME    FLAGS
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, 0,    "Luxor", "ABC 1600", MACHINE_NOT_WORKING )

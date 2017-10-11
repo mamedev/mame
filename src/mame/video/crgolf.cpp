@@ -26,13 +26,13 @@
 PALETTE_INIT_MEMBER(crgolf_state, crgolf)
 {
 	offs_t offs;
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = prom[offs];
+		uint8_t data = prom[offs];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;
@@ -65,9 +65,9 @@ PALETTE_INIT_MEMBER(crgolf_state, mastrglf)
  *
  *************************************/
 
-UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flip = *m_screen_flip & 1;
+	int flip = m_screen_flip;
 
 	offs_t offs;
 
@@ -76,15 +76,15 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &b
 	{
 		int i;
 
-		UINT8 y = (offs & 0x1fe0) >> 5;
-		UINT8 x = (offs & 0x001f) << 3;
+		uint8_t y = (offs & 0x1fe0) >> 5;
+		uint8_t x = (offs & 0x001f) << 3;
 
-		UINT8 data_a0 = m_videoram_a[0x2000 | offs];
-		UINT8 data_a1 = m_videoram_a[0x0000 | offs];
-		UINT8 data_a2 = m_videoram_a[0x4000 | offs];
-		UINT8 data_b0 = m_videoram_b[0x2000 | offs];
-		UINT8 data_b1 = m_videoram_b[0x0000 | offs];
-		UINT8 data_b2 = m_videoram_b[0x4000 | offs];
+		uint8_t data_a0 = m_videoram_a[0x2000 | offs];
+		uint8_t data_a1 = m_videoram_a[0x0000 | offs];
+		uint8_t data_a2 = m_videoram_a[0x4000 | offs];
+		uint8_t data_b0 = m_videoram_b[0x2000 | offs];
+		uint8_t data_b1 = m_videoram_b[0x0000 | offs];
+		uint8_t data_b2 = m_videoram_b[0x4000 | offs];
 
 		if (flip)
 		{
@@ -96,13 +96,13 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &b
 		for (i = 0; i < 8; i++)
 		{
 			offs_t color;
-			UINT8 data_b = 0;
-			UINT8 data_a = 0;
+			uint8_t data_b = 0;
+			uint8_t data_a = 0;
 
-			if (~*m_screena_enable & 1)
+			if (!m_screena_enable)
 				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
 
-			if (~*m_screenb_enable & 1)
+			if (!m_screenb_enable)
 				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
 
 			/* screen A has priority over B */
@@ -112,7 +112,7 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &b
 				color = data_b | 0x08;
 
 			/* add HI bit if enabled */
-			if (*m_color_select)
+			if (m_color_select)
 				color = color | 0x10;
 
 			bitmap.pix16(y, x) = color;

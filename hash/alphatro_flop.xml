@@ -3,25 +3,25 @@
 <softwarelist name="alphatro_flop" description="Triumph-Adler Alphatronic PC diskettes">
 
 	<software name="cpm">
-		<description>CP/M</description>
+		<description>CP/M 2.2 / 3.1</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Triumph-Adler</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="338176">
-				<rom name="cpm.dsk" size="338176" crc="c7f83bf6" sha1="0dc6d2a95dcf2911d95425b7bee5d9fcc38e5296" offset="0" />
+			<dataarea name="flop" size="128877">
+				<rom name="roycpm.td0" size="128877" crc="bf47c534" sha1="e69cc39d9a6229c5e5a2055e8950d085b34e607d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="basic">
-		<description>Disk Basic</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Disk Basic 5.26b</description>
+		<year>1984</year>
+		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="338176">
-				<rom name="diskbasic.dsk" size="338176" crc="07dce496" sha1="a48b4f722e14b2df0bd84ca6ff900905750b8934" offset="0" />
+			<dataarea name="flop" size="64140">
+				<rom name="dskbasic.td0" size="64140" crc="38834574" sha1="27a813ba8f7bb7f024ff5ebc49374bd46e005c65" offset="0" />
 			</dataarea>
 		</part>
 	</software>

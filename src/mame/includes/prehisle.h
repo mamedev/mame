@@ -21,11 +21,11 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 
-	required_shared_ptr<UINT16> m_tx_vram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_fg_vram;
-	required_region_ptr<UINT8> m_tilemap_rom;
-	UINT16 m_invert_controls;
+	required_shared_ptr<uint16_t> m_tx_vram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_fg_vram;
+	required_region_ptr<uint8_t> m_tilemap_rom;
+	uint16_t m_invert_controls;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -42,7 +42,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;

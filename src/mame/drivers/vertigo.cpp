@@ -12,11 +12,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vertigo.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
-#include "includes/vertigo.h"
+#include "screen.h"
 
 
 
@@ -111,7 +113,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vertigo, vertigo_state )
+static MACHINE_CONFIG_START( vertigo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -221,4 +223,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, topgunnr, 0, vertigo, vertigo, driver_device, 0, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, topgunnr, 0, vertigo, vertigo, vertigo_state, 0, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )

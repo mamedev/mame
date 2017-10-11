@@ -48,7 +48,7 @@ WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
 
 PALETTE_INIT_MEMBER(snookr10_state, snookr10)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i;
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 
 PALETTE_INIT_MEMBER(snookr10_state, apple10)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i, cn;
@@ -183,7 +183,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 
 PALETTE_INIT_MEMBER(snookr10_state, crystalc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i, cn;
@@ -256,7 +256,7 @@ VIDEO_START_MEMBER(snookr10_state, crystalc)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::crystalc_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-UINT32 snookr10_state::screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snookr10_state::screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

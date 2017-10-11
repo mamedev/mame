@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "includes/lethal.h"
+#include "screen.h"
+
 
 K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {
@@ -94,7 +96,7 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 	}
 }
 
-UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_back_colorbase, cliprect);
 	screen.priority().fill(0, cliprect);

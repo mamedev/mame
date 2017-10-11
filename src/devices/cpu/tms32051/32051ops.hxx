@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
 // stack is LIFO and is 8 levels deep, there is no stackpointer on the real chip
-void tms32051_device::PUSH_STACK(UINT16 pc)
+void tms32051_device::PUSH_STACK(uint16_t pc)
 {
 	m_pcstack_ptr = (m_pcstack_ptr - 1) & 7;
 	m_pcstack[m_pcstack_ptr] = pc;
 }
 
-UINT16 tms32051_device::POP_STACK()
+uint16_t tms32051_device::POP_STACK()
 {
-	UINT16 pc = m_pcstack[m_pcstack_ptr];
+	uint16_t pc = m_pcstack[m_pcstack_ptr];
 	m_pcstack_ptr = (m_pcstack_ptr + 1) & 7;
 	m_pcstack[(m_pcstack_ptr + 7) & 7] = m_pcstack[(m_pcstack_ptr + 6) & 7];
 	return pc;
 }
 
-INT32 tms32051_device::SUB(UINT32 a, UINT32 b, bool shift16)
+int32_t tms32051_device::SUB(uint32_t a, uint32_t b, bool shift16)
 {
-	UINT32 res = a - b;
+	uint32_t res = a - b;
 
 	if (shift16)
 	{
@@ -35,19 +35,19 @@ INT32 tms32051_device::SUB(UINT32 a, UINT32 b, bool shift16)
 	{
 		if (m_st0.ovm)  // overflow saturation mode
 		{
-			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
+			res = ((int32_t)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
 
 		// set OV, this is a sticky flag
 		m_st0.ov = 1;
 	}
 
-	return (INT32)(res);
+	return (int32_t)(res);
 }
 
-INT32 tms32051_device::ADD(UINT32 a, UINT32 b, bool shift16)
+int32_t tms32051_device::ADD(uint32_t a, uint32_t b, bool shift16)
 {
-	UINT32 res = a + b;
+	uint32_t res = a + b;
 
 	if (shift16)
 	{
@@ -65,14 +65,14 @@ INT32 tms32051_device::ADD(UINT32 a, UINT32 b, bool shift16)
 	{
 		if (m_st0.ovm)  // overflow saturation mode
 		{
-			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
+			res = ((int32_t)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
 
 		// set OV, this is a sticky flag
 		m_st0.ov = 1;
 	}
 
-	return (INT32)(res);
+	return (int32_t)(res);
 }
 
 
@@ -119,11 +119,11 @@ void tms32051_device::UPDATE_ARP(int nar)
 	m_st0.arp = nar;
 }
 
-UINT16 tms32051_device::GET_ADDRESS()
+uint16_t tms32051_device::GET_ADDRESS()
 {
 	if (m_op & 0x80)        // Indirect Addressing
 	{
-		UINT16 ea;
+		uint16_t ea;
 		int arp = m_st0.arp;
 		int nar = m_op & 0x7;
 
@@ -219,18 +219,18 @@ bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 		case 0x01: break;                                           // MZ=0, ML=0, Z=0, L=1
 		case 0x02: break;                                           // MZ=0, ML=0, Z=1, L=0
 		case 0x03: break;                                           // MZ=0, ML=0, Z=1, L=1
-		case 0x04: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=0, L=0  (GT)
-		case 0x05: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=0, L=1  (LT)
-		case 0x06: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=1, L=0  (GT)
-		case 0x07: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=1, L=1  (LT)
-		case 0x08: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=0  (NEQ)
-		case 0x09: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=1  (NEQ)
-		case 0x0a: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=0  (EQ)
-		case 0x0b: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=1  (EQ)
-		case 0x0c: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=1, ML=1, Z=0, L=0  (GT)
-		case 0x0d: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=1, ML=1, Z=0, L=1  (LT)
-		case 0x0e: if ((INT32)(m_acc) < 0) return false;     break;     // MZ=1, ML=1, Z=1, L=0  (GEQ)
-		case 0x0f: if ((INT32)(m_acc) > 0) return false;     break;     // MZ=1, ML=1, Z=1, L=1  (LEQ)
+		case 0x04: if ((int32_t)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=0, L=0  (GT)
+		case 0x05: if ((int32_t)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=0, L=1  (LT)
+		case 0x06: if ((int32_t)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=1, L=0  (GT)
+		case 0x07: if ((int32_t)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=1, L=1  (LT)
+		case 0x08: if ((int32_t)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=0  (NEQ)
+		case 0x09: if ((int32_t)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=1  (NEQ)
+		case 0x0a: if ((int32_t)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=0  (EQ)
+		case 0x0b: if ((int32_t)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=1  (EQ)
+		case 0x0c: if ((int32_t)(m_acc) <= 0) return false; break;        // MZ=1, ML=1, Z=0, L=0  (GT)
+		case 0x0d: if ((int32_t)(m_acc) >= 0) return false; break;        // MZ=1, ML=1, Z=0, L=1  (LT)
+		case 0x0e: if ((int32_t)(m_acc) < 0) return false;     break;     // MZ=1, ML=1, Z=1, L=0  (GEQ)
+		case 0x0f: if ((int32_t)(m_acc) > 0) return false;     break;     // MZ=1, ML=1, Z=1, L=1  (LEQ)
 	}
 	return true;
 }
@@ -255,7 +255,7 @@ bool tms32051_device::GET_TP_CONDITION(int tp)
 	return true;
 }
 
-INT32 tms32051_device::PREG_PSCALER(INT32 preg)
+int32_t tms32051_device::PREG_PSCALER(int32_t preg)
 {
 	switch (m_st1.pm & 3)
 	{
@@ -273,7 +273,7 @@ INT32 tms32051_device::PREG_PSCALER(INT32 preg)
 		}
 		case 3:     // Right-shifted 6 bits, sign-extended, 6 LSBs lost
 		{
-			return (INT32)(preg >> 6);
+			return (int32_t)(preg >> 6);
 		}
 	}
 	return 0;
@@ -300,18 +300,18 @@ void tms32051_device::op_adcb()
 
 void tms32051_device::op_add_mem()
 {
-	INT32 d;
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	int32_t d;
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 	int shift = (m_op >> 8) & 0xf;
 
 	if (m_st1.sxm)
 	{
-		d = (INT32)(INT16)(data) << shift;
+		d = (int32_t)(int16_t)(data) << shift;
 	}
 	else
 	{
-		d = (UINT32)(UINT16)(data) << shift;
+		d = (uint32_t)(uint16_t)(data) << shift;
 	}
 
 	m_acc = ADD(m_acc, d, false);
@@ -321,7 +321,7 @@ void tms32051_device::op_add_mem()
 
 void tms32051_device::op_add_simm()
 {
-	UINT16 imm = m_op & 0xff;
+	uint16_t imm = m_op & 0xff;
 
 	m_acc = ADD(m_acc, imm, false);
 
@@ -330,17 +330,17 @@ void tms32051_device::op_add_simm()
 
 void tms32051_device::op_add_limm()
 {
-	INT32 d;
-	UINT16 imm = ROPCODE();
+	int32_t d;
+	uint16_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	if (m_st1.sxm)
 	{
-		d = (INT32)(INT16)(imm) << shift;
+		d = (int32_t)(int16_t)(imm) << shift;
 	}
 	else
 	{
-		d = (UINT32)(UINT16)(imm) << shift;
+		d = (uint32_t)(uint16_t)(imm) << shift;
 	}
 
 	m_acc = ADD(m_acc, d, false);
@@ -350,8 +350,8 @@ void tms32051_device::op_add_limm()
 
 void tms32051_device::op_add_s16_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT32 data = DM_READ16(ea) << 16;
+	uint16_t ea = GET_ADDRESS();
+	uint32_t data = DM_READ16(ea) << 16;
 
 	m_acc = ADD(m_acc, data, true);
 
@@ -382,17 +382,17 @@ void tms32051_device::op_addt()
 
 void tms32051_device::op_and_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
-	m_acc &= (UINT32)(data);
+	m_acc &= (uint32_t)(data);
 
 	CYCLES(1);
 }
 
 void tms32051_device::op_and_limm()
 {
-	UINT32 imm = ROPCODE();
+	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	m_acc &= imm << shift;
@@ -416,11 +416,11 @@ void tms32051_device::op_bsar()
 
 	if (m_st1.sxm)
 	{
-		m_acc = (INT32)(m_acc) >> shift;
+		m_acc = (int32_t)(m_acc) >> shift;
 	}
 	else
 	{
-		m_acc = (UINT32)(m_acc) >> shift;
+		m_acc = (uint32_t)(m_acc) >> shift;
 	}
 
 	CYCLES(1);
@@ -428,7 +428,7 @@ void tms32051_device::op_bsar()
 
 void tms32051_device::op_cmpl()
 {
-	m_acc = ~(UINT32)(m_acc);
+	m_acc = ~(uint32_t)(m_acc);
 
 	CYCLES(1);
 }
@@ -467,7 +467,7 @@ void tms32051_device::op_crlt()
 
 void tms32051_device::op_exar()
 {
-	INT32 tmp = m_acc;
+	int32_t tmp = m_acc;
 	m_acc = m_accb;
 	m_accb = tmp;
 
@@ -484,16 +484,16 @@ void tms32051_device::op_lacb()
 void tms32051_device::op_lacc_mem()
 {
 	int shift = (m_op >> 8) & 0xf;
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	if (m_st1.sxm)
 	{
-		m_acc = (INT32)(INT16)(data) << shift;
+		m_acc = (int32_t)(int16_t)(data) << shift;
 	}
 	else
 	{
-		m_acc = (UINT32)(UINT16)(data) << shift;
+		m_acc = (uint32_t)(uint16_t)(data) << shift;
 	}
 
 	CYCLES(1);
@@ -501,16 +501,16 @@ void tms32051_device::op_lacc_mem()
 
 void tms32051_device::op_lacc_limm()
 {
-	UINT16 imm = ROPCODE();
+	uint16_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	if (m_st1.sxm)
 	{
-		m_acc = (INT32)(INT16)(imm) << shift;
+		m_acc = (int32_t)(int16_t)(imm) << shift;
 	}
 	else
 	{
-		m_acc = (UINT32)(UINT16)(imm) << shift;
+		m_acc = (uint32_t)(uint16_t)(imm) << shift;
 	}
 
 	CYCLES(1);
@@ -518,7 +518,7 @@ void tms32051_device::op_lacc_limm()
 
 void tms32051_device::op_lacc_s16_mem()
 {
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ea = GET_ADDRESS();
 	m_acc = DM_READ16(ea) << 16;
 
 	CYCLES(1);
@@ -533,7 +533,7 @@ void tms32051_device::op_lacl_simm()
 
 void tms32051_device::op_lacl_mem()
 {
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ea = GET_ADDRESS();
 	m_acc = DM_READ16(ea) & 0xffff;
 
 	CYCLES(1);
@@ -546,7 +546,7 @@ void tms32051_device::op_lact()
 
 void tms32051_device::op_lamm()
 {
-	UINT16 ea = GET_ADDRESS() & 0x7f;
+	uint16_t ea = GET_ADDRESS() & 0x7f;
 	m_acc = DM_READ16(ea) & 0xffff;
 
 	CYCLES(1);
@@ -554,7 +554,7 @@ void tms32051_device::op_lamm()
 
 void tms32051_device::op_neg()
 {
-	if ((UINT32)(m_acc) == 0x80000000)
+	if ((uint32_t)(m_acc) == 0x80000000)
 	{
 		m_st0.ov = 1;
 		m_st1.c = 0;
@@ -562,7 +562,7 @@ void tms32051_device::op_neg()
 	}
 	else
 	{
-		m_acc = 0 - (UINT32)(m_acc);
+		m_acc = 0 - (uint32_t)(m_acc);
 		m_st1.c = (m_acc == 0) ? 1 : 0;
 	}
 
@@ -576,17 +576,17 @@ void tms32051_device::op_norm()
 
 void tms32051_device::op_or_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
-	m_acc |= (UINT32)(data);
+	m_acc |= (uint32_t)(data);
 
 	CYCLES(1);
 }
 
 void tms32051_device::op_or_limm()
 {
-	UINT32 imm = ROPCODE();
+	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	m_acc |= imm << shift;
@@ -613,9 +613,9 @@ void tms32051_device::op_rol()
 
 void tms32051_device::op_rolb()
 {
-	UINT32 acc = m_acc;
-	UINT32 accb = m_accb;
-	UINT32 c = m_st1.c & 1;
+	uint32_t acc = m_acc;
+	uint32_t accb = m_accb;
+	uint32_t c = m_st1.c & 1;
 
 	m_acc = (acc << 1) | ((accb >> 31) & 1);
 	m_accb = (accb << 1) | c;
@@ -643,28 +643,28 @@ void tms32051_device::op_sacb()
 
 void tms32051_device::op_sach()
 {
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ea = GET_ADDRESS();
 	int shift = (m_op >> 8) & 0x7;
 
-	DM_WRITE16(ea, (UINT16)((m_acc << shift) >> 16));
+	DM_WRITE16(ea, (uint16_t)((m_acc << shift) >> 16));
 	CYCLES(1);
 }
 
 void tms32051_device::op_sacl()
 {
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ea = GET_ADDRESS();
 	int shift = (m_op >> 8) & 0x7;
 
-	DM_WRITE16(ea, (UINT16)(m_acc << shift));
+	DM_WRITE16(ea, (uint16_t)(m_acc << shift));
 	CYCLES(1);
 }
 
 void tms32051_device::op_samm()
 {
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ea = GET_ADDRESS();
 	ea &= 0x7f;
 
-	DM_WRITE16(ea, (UINT16)(m_acc));
+	DM_WRITE16(ea, (uint16_t)(m_acc));
 	CYCLES(1);
 }
 
@@ -678,11 +678,11 @@ void tms32051_device::op_satl()
 	int count = m_treg1 & 0xf;
 	if (m_st1.sxm)
 	{
-		m_acc = (INT32)(m_acc) >> count;
+		m_acc = (int32_t)(m_acc) >> count;
 	}
 	else
 	{
-		m_acc = (UINT32)(m_acc) >> count;
+		m_acc = (uint32_t)(m_acc) >> count;
 	}
 
 	CYCLES(1);
@@ -690,10 +690,10 @@ void tms32051_device::op_satl()
 
 void tms32051_device::op_sbb()
 {
-	UINT32 res = m_acc - m_accb;
+	uint32_t res = m_acc - m_accb;
 
 	// C is cleared if borrow was generated
-	m_st1.c = ((UINT32)(m_acc) < res) ? 0 : 1;
+	m_st1.c = ((uint32_t)(m_acc) < res) ? 0 : 1;
 
 	m_acc = res;
 
@@ -715,8 +715,8 @@ void tms32051_device::op_sfl()
 
 void tms32051_device::op_sflb()
 {
-	UINT32 acc = m_acc;
-	UINT32 accb = m_accb;
+	uint32_t acc = m_acc;
+	uint32_t accb = m_accb;
 
 	m_acc = (acc << 1) | ((accb >> 31) & 1);
 	m_accb = (accb << 1);
@@ -731,11 +731,11 @@ void tms32051_device::op_sfr()
 
 	if (m_st1.sxm)
 	{
-		m_acc = (INT32)(m_acc) >> 1;
+		m_acc = (int32_t)(m_acc) >> 1;
 	}
 	else
 	{
-		m_acc = (UINT32)(m_acc) >> 1;
+		m_acc = (uint32_t)(m_acc) >> 1;
 	}
 
 	CYCLES(1);
@@ -748,18 +748,18 @@ void tms32051_device::op_sfrb()
 
 void tms32051_device::op_sub_mem()
 {
-	INT32 d;
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	int32_t d;
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 	int shift = (m_op >> 8) & 0xf;
 
 	if (m_st1.sxm)
 	{
-		d = (INT32)(INT16)(data) << shift;
+		d = (int32_t)(int16_t)(data) << shift;
 	}
 	else
 	{
-		d = (UINT32)(UINT16)(data) << shift;
+		d = (uint32_t)(uint16_t)(data) << shift;
 	}
 
 	m_acc = SUB(m_acc, d, false);
@@ -774,7 +774,7 @@ void tms32051_device::op_sub_s16_mem()
 
 void tms32051_device::op_sub_simm()
 {
-	UINT16 imm = m_op & 0xff;
+	uint16_t imm = m_op & 0xff;
 
 	m_acc = SUB(m_acc, imm, false);
 
@@ -783,17 +783,17 @@ void tms32051_device::op_sub_simm()
 
 void tms32051_device::op_sub_limm()
 {
-	INT32 d;
-	UINT16 imm = ROPCODE();
+	int32_t d;
+	uint16_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	if (m_st1.sxm)
 	{
-		d = (INT32)(INT16)(imm) << shift;
+		d = (int32_t)(int16_t)(imm) << shift;
 	}
 	else
 	{
-		d = (UINT32)(UINT16)(imm) << shift;
+		d = (uint32_t)(uint16_t)(imm) << shift;
 	}
 
 	m_acc = SUB(m_acc, d, false);
@@ -823,17 +823,17 @@ void tms32051_device::op_subt()
 
 void tms32051_device::op_xor_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
-	m_acc ^= (UINT32)(data);
+	m_acc ^= (uint32_t)(data);
 
 	CYCLES(1);
 }
 
 void tms32051_device::op_xor_limm()
 {
-	UINT32 imm = ROPCODE();
+	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
 
 	m_acc ^= imm << shift;
@@ -868,7 +868,7 @@ void tms32051_device::op_zap()
 
 void tms32051_device::op_adrk()
 {
-	UINT16 imm = m_op & 0xff;
+	uint16_t imm = m_op & 0xff;
 	UPDATE_AR(m_st0.arp, imm);
 
 	CYCLES(1);
@@ -920,8 +920,8 @@ void tms32051_device::op_cmpr()
 void tms32051_device::op_lar_mem()
 {
 	int arx = (m_op >> 8) & 0x7;
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_ar[arx] = data;
 
@@ -939,7 +939,7 @@ void tms32051_device::op_lar_simm()
 void tms32051_device::op_lar_limm()
 {
 	int arx = m_op & 0x7;
-	UINT16 imm = ROPCODE();
+	uint16_t imm = ROPCODE();
 	m_ar[arx] = imm;
 
 	CYCLES(2);
@@ -969,8 +969,8 @@ void tms32051_device::op_mar()
 void tms32051_device::op_sar()
 {
 	int arx = (m_op >> 8) & 0x7;
-	UINT16 ar = m_ar[arx];
-	UINT16 ea = GET_ADDRESS();
+	uint16_t ar = m_ar[arx];
+	uint16_t ea = GET_ADDRESS();
 	DM_WRITE16(ea, ar);
 
 	CYCLES(1);
@@ -978,7 +978,7 @@ void tms32051_device::op_sar()
 
 void tms32051_device::op_sbrk()
 {
-	UINT16 imm = m_op & 0xff;
+	uint16_t imm = m_op & 0xff;
 	UPDATE_AR(m_st0.arp, -imm);
 
 	CYCLES(1);
@@ -988,7 +988,7 @@ void tms32051_device::op_sbrk()
 
 void tms32051_device::op_b()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
 
 	CHANGE_PC(pma);
@@ -997,14 +997,14 @@ void tms32051_device::op_b()
 
 void tms32051_device::op_bacc()
 {
-	CHANGE_PC((UINT16)(m_acc));
+	CHANGE_PC((uint16_t)(m_acc));
 
 	CYCLES(4);
 }
 
 void tms32051_device::op_baccd()
 {
-	UINT16 pc = (UINT16)(m_acc);
+	uint16_t pc = (uint16_t)(m_acc);
 
 	delay_slot(m_pc);
 	CHANGE_PC(pc);
@@ -1014,7 +1014,7 @@ void tms32051_device::op_baccd()
 
 void tms32051_device::op_banz()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 
 	if (m_ar[m_st0.arp] != 0)
 	{
@@ -1036,7 +1036,7 @@ void tms32051_device::op_banzd()
 
 void tms32051_device::op_bcnd()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1055,7 +1055,7 @@ void tms32051_device::op_bcnd()
 
 void tms32051_device::op_bcndd()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1075,7 +1075,7 @@ void tms32051_device::op_bcndd()
 
 void tms32051_device::op_bd()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
 
 	delay_slot(m_pc);
@@ -1094,7 +1094,7 @@ void tms32051_device::op_cala()
 
 void tms32051_device::op_calad()
 {
-	UINT16 pma = m_acc;
+	uint16_t pma = m_acc;
 	PUSH_STACK(m_pc+2);
 
 	delay_slot(m_pc);
@@ -1105,7 +1105,7 @@ void tms32051_device::op_calad()
 
 void tms32051_device::op_call()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
 	PUSH_STACK(m_pc);
 
@@ -1116,7 +1116,7 @@ void tms32051_device::op_call()
 
 void tms32051_device::op_calld()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
 	PUSH_STACK(m_pc+2);
 
@@ -1128,7 +1128,7 @@ void tms32051_device::op_calld()
 
 void tms32051_device::op_cc()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1149,7 +1149,7 @@ void tms32051_device::op_cc()
 
 void tms32051_device::op_ccd()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1180,7 +1180,7 @@ void tms32051_device::op_retc()
 {
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		UINT16 pc = POP_STACK();
+		uint16_t pc = POP_STACK();
 		CHANGE_PC(pc);
 		CYCLES(4);
 	}
@@ -1194,7 +1194,7 @@ void tms32051_device::op_retcd()
 {
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		UINT16 pc = POP_STACK();
+		uint16_t pc = POP_STACK();
 		delay_slot(m_pc);
 		CHANGE_PC(pc);
 		CYCLES(4);
@@ -1207,7 +1207,7 @@ void tms32051_device::op_retcd()
 
 void tms32051_device::op_rete()
 {
-	UINT16 pc = POP_STACK();
+	uint16_t pc = POP_STACK();
 	CHANGE_PC(pc);
 
 	restore_interrupt_context();
@@ -1245,12 +1245,12 @@ void tms32051_device::op_xc()
 
 void tms32051_device::op_bldd_slimm()
 {
-	UINT16 pfc = ROPCODE();
+	uint16_t pfc = ROPCODE();
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(pfc);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(pfc);
 		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
@@ -1261,12 +1261,12 @@ void tms32051_device::op_bldd_slimm()
 
 void tms32051_device::op_bldd_dlimm()
 {
-	UINT16 pfc = ROPCODE();
+	uint16_t pfc = ROPCODE();
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(ea);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(ea);
 		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
@@ -1277,12 +1277,12 @@ void tms32051_device::op_bldd_dlimm()
 
 void tms32051_device::op_bldd_sbmar()
 {
-	UINT16 pfc = m_bmar;
+	uint16_t pfc = m_bmar;
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(pfc);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(pfc);
 		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
@@ -1293,12 +1293,12 @@ void tms32051_device::op_bldd_sbmar()
 
 void tms32051_device::op_bldd_dbmar()
 {
-	UINT16 pfc = m_bmar;
+	uint16_t pfc = m_bmar;
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(ea);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(ea);
 		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
@@ -1309,12 +1309,12 @@ void tms32051_device::op_bldd_dbmar()
 
 void tms32051_device::op_bldp()
 {
-	UINT16 pfc = m_bmar;
+	uint16_t pfc = m_bmar;
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(ea);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(ea);
 		PM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(1);
@@ -1330,12 +1330,12 @@ void tms32051_device::op_blpd_bmar()
 
 void tms32051_device::op_blpd_imm()
 {
-	UINT16 pfc = ROPCODE();
+	uint16_t pfc = ROPCODE();
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = PM_READ16(pfc);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = PM_READ16(pfc);
 		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
@@ -1358,12 +1358,12 @@ void tms32051_device::op_in()
 
 void tms32051_device::op_lmmr()
 {
-	UINT16 pfc = ROPCODE();
+	uint16_t pfc = ROPCODE();
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(pfc);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(pfc);
 		DM_WRITE16(ea & 0x7f, data);
 		pfc++;
 		CYCLES(2);
@@ -1374,10 +1374,10 @@ void tms32051_device::op_lmmr()
 
 void tms32051_device::op_out()
 {
-	UINT16 port = ROPCODE();
-	UINT16 ea = GET_ADDRESS();
+	uint16_t port = ROPCODE();
+	uint16_t ea = GET_ADDRESS();
 
-	UINT16 data = DM_READ16(ea);
+	uint16_t data = DM_READ16(ea);
 	m_io->write_word(port << 1, data);
 
 	// TODO: handle repeat
@@ -1386,12 +1386,12 @@ void tms32051_device::op_out()
 
 void tms32051_device::op_smmr()
 {
-	UINT16 pfc = ROPCODE();
+	uint16_t pfc = ROPCODE();
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(ea & 0x7f);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(ea & 0x7f);
 		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
@@ -1402,12 +1402,12 @@ void tms32051_device::op_smmr()
 
 void tms32051_device::op_tblr()
 {
-	UINT16 pfc = (UINT16)(m_acc);
+	uint16_t pfc = (uint16_t)(m_acc);
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = PM_READ16(pfc);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = PM_READ16(pfc);
 		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
@@ -1418,12 +1418,12 @@ void tms32051_device::op_tblr()
 
 void tms32051_device::op_tblw()
 {
-	UINT16 pfc = (UINT16)(m_acc);
+	uint16_t pfc = (uint16_t)(m_acc);
 
 	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS();
-		UINT16 data = DM_READ16(ea);
+		uint16_t ea = GET_ADDRESS();
+		uint16_t data = DM_READ16(ea);
 		PM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
@@ -1436,8 +1436,8 @@ void tms32051_device::op_tblw()
 
 void tms32051_device::op_apl_dbmr()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	data &= m_dbmr;
 
@@ -1449,9 +1449,9 @@ void tms32051_device::op_apl_dbmr()
 
 void tms32051_device::op_apl_imm()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 imm = ROPCODE();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t imm = ROPCODE();
+	uint16_t data = DM_READ16(ea);
 
 	data &= imm;
 
@@ -1468,9 +1468,9 @@ void tms32051_device::op_cpl_dbmr()
 
 void tms32051_device::op_cpl_imm()
 {
-	UINT16 imm = ROPCODE();
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t imm = ROPCODE();
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_st1.tc = (data == imm) ? 1 : 0;
 
@@ -1479,8 +1479,8 @@ void tms32051_device::op_cpl_imm()
 
 void tms32051_device::op_opl_dbmr()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 	data |= m_dbmr;
 
 	m_st1.tc = (data == 0) ? 1 : 0;
@@ -1491,9 +1491,9 @@ void tms32051_device::op_opl_dbmr()
 
 void tms32051_device::op_opl_imm()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 imm = ROPCODE();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t imm = ROPCODE();
+	uint16_t data = DM_READ16(ea);
 	data |= imm;
 
 	m_st1.tc = (data == 0) ? 1 : 0;
@@ -1504,8 +1504,8 @@ void tms32051_device::op_opl_imm()
 
 void tms32051_device::op_splk()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 imm = ROPCODE();
+	uint16_t ea = GET_ADDRESS();
+	uint16_t imm = ROPCODE();
 
 	DM_WRITE16(ea, imm);
 
@@ -1524,7 +1524,7 @@ void tms32051_device::op_xpl_imm()
 
 void tms32051_device::op_apac()
 {
-	INT32 spreg = PREG_PSCALER(m_preg);
+	int32_t spreg = PREG_PSCALER(m_preg);
 	m_acc = ADD(m_acc, spreg, false);
 
 	CYCLES(1);
@@ -1537,8 +1537,8 @@ void tms32051_device::op_lph()
 
 void tms32051_device::op_lt()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_treg0 = data;
 	if (m_pmst.trm == 0)
@@ -1552,9 +1552,9 @@ void tms32051_device::op_lt()
 
 void tms32051_device::op_lta()
 {
-	INT32 spreg;
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	int32_t spreg;
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_treg0 = data;
 	spreg = PREG_PSCALER(m_preg);
@@ -1605,10 +1605,10 @@ void tms32051_device::op_mads()
 
 void tms32051_device::op_mpy_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	INT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	int16_t data = DM_READ16(ea);
 
-	m_preg = (INT32)(data) * (INT32)(INT16)(m_treg0);
+	m_preg = (int32_t)(data) * (int32_t)(int16_t)(m_treg0);
 
 	CYCLES(1);
 }
@@ -1650,8 +1650,8 @@ void tms32051_device::op_spac()
 
 void tms32051_device::op_sph()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 spreg = (UINT16)(PREG_PSCALER(m_preg) >> 16);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t spreg = (uint16_t)(PREG_PSCALER(m_preg) >> 16);
 	DM_WRITE16(ea, spreg);
 
 	CYCLES(1);
@@ -1659,8 +1659,8 @@ void tms32051_device::op_sph()
 
 void tms32051_device::op_spl()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 spreg = (UINT16)(PREG_PSCALER(m_preg));
+	uint16_t ea = GET_ADDRESS();
+	uint16_t spreg = (uint16_t)(PREG_PSCALER(m_preg));
 	DM_WRITE16(ea, spreg);
 
 	CYCLES(1);
@@ -1690,8 +1690,8 @@ void tms32051_device::op_zpr()
 
 void tms32051_device::op_bit()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_st1.tc = (data >> (~m_op >> 8 & 0xf)) & 1;
 
@@ -1700,8 +1700,8 @@ void tms32051_device::op_bit()
 
 void tms32051_device::op_bitt()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 
 	m_st1.tc = (data >> (~m_treg2 & 0xf)) & 1;
 
@@ -1804,8 +1804,8 @@ void tms32051_device::op_push()
 
 void tms32051_device::op_rpt_mem()
 {
-	UINT16 ea = GET_ADDRESS();
-	UINT16 data = DM_READ16(ea);
+	uint16_t ea = GET_ADDRESS();
+	uint16_t data = DM_READ16(ea);
 	m_rptc = data;
 	m_rpt_start = m_pc;
 	m_rpt_end = m_pc;
@@ -1815,7 +1815,7 @@ void tms32051_device::op_rpt_mem()
 
 void tms32051_device::op_rpt_limm()
 {
-	m_rptc = (UINT16)ROPCODE();
+	m_rptc = (uint16_t)ROPCODE();
 	m_rpt_start = m_pc;
 	m_rpt_end = m_pc;
 
@@ -1833,7 +1833,7 @@ void tms32051_device::op_rpt_simm()
 
 void tms32051_device::op_rptb()
 {
-	UINT16 pma = ROPCODE();
+	uint16_t pma = ROPCODE();
 	m_pmst.braf = 1;
 	m_pasr = m_pc;
 	m_paer = pma + 1;

@@ -44,13 +44,13 @@ SVT - The full explanation may be found on the Solace web site,
 #define SOL20_WAV_FREQUENCY   4800
 
 // image size
-static UINT32 sol20_image_size;
+static uint32_t sol20_image_size;
 static bool level;
-static UINT8 sol20_cksm_byte;
-static UINT32 sol20_byte_num;
-static UINT8 sol20_header[16];
+static uint8_t sol20_cksm_byte;
+static uint32_t sol20_byte_num;
+static uint8_t sol20_header[16];
 
-static int sol20_put_samples(INT16 *buffer, int sample_pos, int count)
+static int sol20_put_samples(int16_t *buffer, int sample_pos, int count)
 {
 	if (buffer)
 	{
@@ -63,7 +63,7 @@ static int sol20_put_samples(INT16 *buffer, int sample_pos, int count)
 	return count;
 }
 
-static int sol20_output_bit(INT16 *buffer, int sample_pos, bool bit)
+static int sol20_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
@@ -80,10 +80,10 @@ static int sol20_output_bit(INT16 *buffer, int sample_pos, bool bit)
 	return samples;
 }
 
-static int sol20_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
+static int sol20_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
-	UINT8 i;
+	uint8_t i;
 
 	/* start */
 	samples += sol20_output_bit (buffer, sample_pos + samples, 0);
@@ -100,7 +100,7 @@ static int sol20_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 }
 
 // Calculate checksum
-static UINT8 sol20_calc_cksm(UINT8 cksm, UINT8 data)
+static uint8_t sol20_calc_cksm(uint8_t cksm, uint8_t data)
 {
 	data -= cksm;
 	cksm = data;
@@ -111,7 +111,7 @@ static UINT8 sol20_calc_cksm(UINT8 cksm, UINT8 data)
 }
 
 // Ignore remainder of line
-static void sol20_scan_to_eol(const UINT8 *bytes)
+static void sol20_scan_to_eol(const uint8_t *bytes)
 {
 	bool t = 1;
 	while (t)
@@ -130,7 +130,7 @@ static void sol20_scan_to_eol(const UINT8 *bytes)
 }
 
 // skip spaces and symbols looking for a hex digit
-static void sol20_scan_to_hex(const UINT8 *bytes)
+static void sol20_scan_to_hex(const uint8_t *bytes)
 {
 	bool t = 1;
 	while (t)
@@ -142,7 +142,7 @@ static void sol20_scan_to_hex(const UINT8 *bytes)
 		}
 		else
 		{
-			UINT8 chr = bytes[sol20_byte_num];
+			uint8_t chr = bytes[sol20_byte_num];
 			if (chr == 0x0d)
 				t = 0;
 			else
@@ -155,10 +155,10 @@ static void sol20_scan_to_hex(const UINT8 *bytes)
 }
 
 // Turn n digits into hex
-static int sol20_read_hex(const UINT8 *bytes, UINT8 numdigits)
+static int sol20_read_hex(const uint8_t *bytes, uint8_t numdigits)
 {
 	int data = 0;
-	UINT8 i,chr;
+	uint8_t i,chr;
 
 	for (i = 0; i < numdigits; i++)
 	{
@@ -181,7 +181,7 @@ static int sol20_read_hex(const UINT8 *bytes, UINT8 numdigits)
 }
 
 // Turn digits into decimal
-static int sol20_read_dec(const UINT8 *bytes)
+static int sol20_read_dec(const uint8_t *bytes)
 {
 	int data = 0;
 
@@ -194,14 +194,14 @@ static int sol20_read_dec(const UINT8 *bytes)
 	return data;
 }
 
-static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
-	UINT32 sample_count = 0;
-	UINT32 i = 0,t = 0;
-	UINT16 cc = 0;
+	uint32_t sample_count = 0;
+	uint32_t i = 0,t = 0;
+	uint16_t cc = 0;
 	sol20_byte_num = 1;
 	bool process_d = 0;
-	UINT16 length = 0;
+	uint16_t length = 0;
 
 	// 1st line of file must say SVT
 	if ((bytes[0] == 'S') && (bytes[1] == 'V') && (bytes[2] == 'T'))
@@ -216,7 +216,7 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 	while (sol20_byte_num)
 	{
 		sol20_byte_num+=2; // bump to start of next line
-		UINT8 chr = bytes[sol20_byte_num];  // Get command
+		uint8_t chr = bytes[sol20_byte_num];  // Get command
 		if (sol20_byte_num >= sol20_image_size)
 			sol20_byte_num = 0;
 		else
@@ -340,7 +340,7 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int sol20_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int sol20_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 {
 	return sol20_handle_cassette(buffer, bytes);
 }
@@ -349,7 +349,7 @@ static int sol20_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int sol20_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int sol20_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
 	sol20_image_size = length;
 

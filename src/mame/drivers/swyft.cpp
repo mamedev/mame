@@ -253,6 +253,17 @@ ToDo:
 
 ****************************************************************************/
 
+// Includes
+#include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -284,15 +295,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA1 1
 
 
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/6850acia.h"
-#include "machine/6522via.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
-
 class swyft_state : public driver_device
 {
 public:
@@ -323,7 +325,7 @@ public:
 	required_device<via6522_device> m_via0; // only swyft uses this
 	required_device<via6522_device> m_via1; // only swyft uses this
 	optional_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_p_swyft_videoram;
+	required_shared_ptr<uint8_t> m_p_swyft_videoram;
 	/*optional_ioport m_y0;
 	optional_ioport m_y1;
 	optional_ioport m_y2;
@@ -337,7 +339,7 @@ public:
 	DECLARE_MACHINE_RESET(swyft);
 	DECLARE_VIDEO_START(swyft);
 
-	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(swyft_d0000);
 
@@ -374,8 +376,8 @@ public:
 	   The watchdog counter and the 6ms counter are both incremented
 	   every time the KTOBF pulses.
 	 */
-	UINT8 m_keyboard_line;
-	UINT8 m_floppy_control;
+	uint8_t m_keyboard_line;
+	uint8_t m_floppy_control;
 
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -391,7 +393,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\xa2')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR(0xA2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START("Y1")
@@ -439,7 +441,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\xbd') PORT_CHAR('\xbc') //PORT_CHAR('}') PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0xBD) PORT_CHAR(0xBC) //PORT_CHAR('}') PORT_CHAR('{')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
@@ -462,7 +464,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Erase") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // totally unused
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UNDO") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\xb1') PORT_CHAR('\xb0') // PORT_CHAR('\\') PORT_CHAR('~')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xB1) PORT_CHAR(0xB0) // PORT_CHAR('\\') PORT_CHAR('~')
 INPUT_PORTS_END
 
 
@@ -598,9 +600,9 @@ VIDEO_START_MEMBER(swyft_state,swyft)
 {
 }
 
-UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 
 	int addr = 0;
@@ -622,7 +624,7 @@ UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bit
 READ8_MEMBER( swyft_state::swyft_d0000 )
 {
 	// wtf is this supposed to be?
-	UINT8 byte = 0xFF; // ?
+	uint8_t byte = 0xFF; // ?
 	logerror("mystery device: read from 0x%5X, returning %02X\n", offset+0xD0000, byte);
 	return byte;
 }
@@ -639,7 +641,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via0->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via0->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA0
 	logerror("VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -658,7 +660,7 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via1->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via1->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA1
 	logerror(" VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -766,7 +768,7 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( swyft, swyft_state )
+static MACHINE_CONFIG_START( swyft )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
@@ -890,5 +892,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    DEVICE       INIT  COMPANY                       FULLNAME  FLAGS
+COMP( 1985, swyft, 0,      0,       swyft,     swyft,   swyft_state, 0,    "Information Applicance Inc", "Swyft",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -25,11 +25,11 @@ enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 void pmd85_state::pmd851_update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
-		UINT8 *mem = m_region_maincpu->base();
+		uint8_t *mem = m_region_maincpu->base();
 
 		space.unmap_write(0x0000, 0x0fff);
 		space.nop_write(0x1000, 0x1fff);
@@ -69,11 +69,11 @@ void pmd85_state::pmd851_update_memory()
 void pmd85_state::pmd852a_update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
-		UINT8 *mem = m_region_maincpu->base();
+		uint8_t *mem = m_region_maincpu->base();
 
 		space.unmap_write(0x0000, 0x0fff);
 		space.unmap_write(0x2000, 0x2fff);
@@ -105,8 +105,8 @@ void pmd85_state::pmd852a_update_memory()
 
 void pmd85_state::pmd853_update_memory()
 {
-	UINT8 *mem = m_region_maincpu->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *mem = m_region_maincpu->base();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
@@ -143,11 +143,11 @@ void pmd85_state::pmd853_update_memory()
 void pmd85_state::alfa_update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
-		UINT8 *mem = m_region_maincpu->base();
+		uint8_t *mem = m_region_maincpu->base();
 
 		space.unmap_write(0x0000, 0x0fff);
 		space.unmap_write(0x1000, 0x33ff);
@@ -176,11 +176,11 @@ void pmd85_state::alfa_update_memory()
 void pmd85_state::mato_update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
-		UINT8 *mem = m_region_maincpu->base();
+		uint8_t *mem = m_region_maincpu->base();
 
 		space.unmap_write(0x0000, 0x3fff);
 
@@ -201,8 +201,8 @@ void pmd85_state::mato_update_memory()
 void pmd85_state::c2717_update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *mem = m_region_maincpu->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *mem = m_region_maincpu->base();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_startup_mem_map)
 	{
@@ -272,7 +272,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portc_w)
 READ8_MEMBER(pmd85_state::mato_ppi_0_portb_r)
 {
 	int i;
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (i = 0; i < 8; i++)
 	{
@@ -658,7 +658,7 @@ void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		pmd85_cassette_timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pmd85_state::device_timer");
+		assert_always(false, "Unknown id in pmd85_state::device_timer");
 	}
 }
 

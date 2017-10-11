@@ -12,9 +12,9 @@
 #include "includes/pcw.h"
 #include "machine/ram.h"
 
-inline void pcw_state::pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void pcw_state::pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
 /***************************************************************************
@@ -56,7 +56,7 @@ PALETTE_INIT_MEMBER(pcw_state, pcw)
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-UINT32 pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,b;
 	unsigned short roller_ram_offs;
@@ -169,10 +169,10 @@ UINT32 pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// printer output
-	INT32 feed;
+	int32_t feed;
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 	feed = -(m_paper_feed / 2);
 	copyscrollbitmap(bitmap,*m_prn_output,0,nullptr,1,&feed,rect);

@@ -9,14 +9,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gomoku.h"
+#include "audio/gomoku.h"
 
-static const int samplerate = 48000;
-static const int defgain = 48;
+static constexpr int samplerate = 48000;
+static constexpr int defgain = 48;
 
 
 // device type definition
-const device_type GOMOKU = &device_creator<gomoku_sound_device>;
+DEFINE_DEVICE_TYPE(GOMOKU, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Audio Custom")
 
 
 //**************************************************************************
@@ -27,8 +27,8 @@ const device_type GOMOKU = &device_creator<gomoku_sound_device>;
 //  gomoku_sound_device - constructor
 //-------------------------------------------------
 
-gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GOMOKU, "Gomoku Narabe Renju Audio Custom", tag, owner, clock, "gomoku_sound", __FILE__),
+gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GOMOKU, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_last_channel(nullptr),
 		m_sound_rom(nullptr),
@@ -40,9 +40,9 @@ gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const ch
 		m_mixer_buffer(nullptr),
 		m_mixer_buffer_2(nullptr)
 {
-	memset(m_channel_list, 0, sizeof(gomoku_sound_channel)*GOMOKU_MAX_VOICES);
-	memset(m_soundregs1, 0, sizeof(UINT8)*0x20);
-	memset(m_soundregs2, 0, sizeof(UINT8)*0x20);
+	memset(m_channel_list, 0, sizeof(gomoku_sound_channel)*MAX_VOICES);
+	memset(m_soundregs1, 0, sizeof(uint8_t)*0x20);
+	memset(m_soundregs2, 0, sizeof(uint8_t)*0x20);
 }
 
 
@@ -66,7 +66,7 @@ void gomoku_sound_device::device_start()
 	make_mixer_table(8, defgain);
 
 	/* extract globals from the interface */
-	m_num_voices = GOMOKU_MAX_VOICES;
+	m_num_voices = MAX_VOICES;
 	m_last_channel = m_channel_list + m_num_voices;
 
 	m_sound_rom = memregion(":gomoku")->base();
@@ -180,7 +180,7 @@ void gomoku_sound_device::make_mixer_table(int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	m_mixer_table = std::make_unique<INT16[]>(256 * voices);
+	m_mixer_table = std::make_unique<int16_t[]>(256 * voices);
 
 	/* find the middle of the table */
 	m_mixer_lookup = m_mixer_table.get() + (128 * voices);

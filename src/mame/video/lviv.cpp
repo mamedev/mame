@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(lviv_state, lviv)
 }
 
 
-void lviv_state::lviv_update_palette(UINT8 pal)
+void lviv_state::lviv_update_palette(uint8_t pal)
 {
 	m_colortable[0][0] = 0;
 	m_colortable[0][1] = 0;
@@ -64,11 +64,11 @@ void lviv_state::video_start()
 {
 }
 
-UINT32 lviv_state::screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lviv_state::screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int pen;
-	UINT8 data;
+	uint8_t data;
 
 	for (y=0; y<256; y++)
 		for (x=0; x<256; x+=4)

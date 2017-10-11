@@ -99,20 +99,28 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+#include "emu.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
-#include "machine/clock.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/mos6551.h"
+#include "machine/7474.h"
+#include "machine/clock.h"
 #include "machine/i8214.h"
-#include "machine/wd_fdc.h"
-#include "machine/msm5832.h"
 #include "machine/input_merger.h"
+#include "machine/mos6551.h"
+#include "machine/msm5832.h"
+#include "machine/wd_fdc.h"
+
 #include "video/dl1416.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define Q209_CPU_CLOCK      4000000 // ?
 
@@ -210,37 +218,19 @@ static const int ch_int_levels[8] =
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	cmi01a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
-	DECLARE_WRITE8_MEMBER( ptm_out0 );
-
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-
-	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
-
-	DECLARE_WRITE8_MEMBER( pia_1_a_w );
-	DECLARE_WRITE8_MEMBER( pia_1_b_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
-
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-
-	DECLARE_READ_LINE_MEMBER( eosi_r );
-	DECLARE_READ_LINE_MEMBER( zx_r );
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static const device_timer_id TIMER_ZX = 0;
@@ -261,16 +251,19 @@ private:
 	void update_interrupts();
 
 	emu_timer * m_zx_timer;
-	UINT8       m_zx_flag;
-	UINT8       m_zx_ff;
+	uint8_t       m_zx_flag;
+	uint8_t       m_zx_ff;
 
 	int     m_channel;
-	std::unique_ptr<UINT8[]>    m_wave_ram;
-	UINT16  m_segment_cnt;
-	UINT8   m_new_addr;     // Flag
-	UINT8   m_env_dir_ctrl;
-	UINT8   m_vol_latch;
-	UINT8   m_flt_latch;
+	std::unique_ptr<uint8_t[]>    m_wave_ram;
+	uint16_t  m_segment_cnt;
+	uint8_t   m_new_addr;     // Flag
+	uint8_t   m_env_dir_ctrl;
+	uint8_t   m_vol_latch;
+	uint8_t   m_flt_latch;
+	uint8_t m_rp;
+	uint8_t m_ws;
+	int     m_dir;
 
 	double  m_freq;
 	bool    m_active;
@@ -283,12 +276,30 @@ private:
 	int     m_pia_1_irqb;
 	int     m_ptm_irq;
 	int     m_irq_state;
+
+	DECLARE_WRITE8_MEMBER( rp_w );
+	DECLARE_WRITE8_MEMBER( ws_dir_w );
+	DECLARE_READ_LINE_MEMBER( tri_r );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
+
+	DECLARE_READ_LINE_MEMBER( eosi_r );
+	DECLARE_READ_LINE_MEMBER( zx_r );
+	DECLARE_WRITE8_MEMBER( pia_1_a_w );
+	DECLARE_WRITE8_MEMBER( pia_1_b_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
+
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
 };
 
-const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
+DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
 
-cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CMI01A_CHANNEL_CARD, "Fairlight CMI-01A Channel Card", tag, owner, clock, "cmi_01a", __FILE__)
+cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CMI01A_CHANNEL_CARD, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_pia_0(*this, "cmi01a_pia_0")
 	, m_pia_1(*this, "cmi01a_pia_1")
@@ -299,8 +310,11 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_FRAGMENT( cmi01a_device )
+MACHINE_CONFIG_MEMBER( cmi01a_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
+	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, rp_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, pia_0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, pia_0_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_0_irqa))
@@ -314,17 +328,12 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_1_irqa))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_1_irqb))
 
-	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_OUT0_CB(WRITE8(cmi01a_device, ptm_out0))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(cmi01a_device, ptm_out0))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
-machine_config_constructor cmi01a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(cmi01a_device);
-}
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
@@ -332,7 +341,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	{
 		int length = samples;
 		int seg_addr = m_segment_cnt & 0x7f;
-		UINT8 *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
+		uint8_t *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
 		stream_sample_t *buf = outputs[0];
 
 		while (length--)
@@ -351,7 +360,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void cmi01a_device::device_start()
 {
-	m_wave_ram = std::make_unique<UINT8[]>(0x4000);
+	m_wave_ram = std::make_unique<uint8_t[]>(0x4000);
 
 	m_zx_timer = timer_alloc(TIMER_ZX);
 	m_zx_timer->adjust(attotime::never);
@@ -377,6 +386,9 @@ void cmi01a_device::device_reset()
 	m_env_dir_ctrl = 0;
 	m_vol_latch = 0;
 	m_flt_latch = 0;
+	m_rp = 0;
+	m_ws = 0;
+	m_dir = 0;
 
 	m_freq = 0.0;
 	m_active = false;
@@ -486,7 +498,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
 	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
-	UINT32 screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
 	DECLARE_READ8_MEMBER( rom_r );
@@ -516,6 +528,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cmi02_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
+	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o1 );
 
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
@@ -582,7 +595,7 @@ protected:
 	required_memory_region m_qfc9_region;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_device<fd1791_t> m_wd1791;
+	required_device<fd1791_device> m_wd1791;
 
 	required_device_array<cmi01a_device, 8> m_channels;
 
@@ -606,7 +619,7 @@ protected:
 
 	required_ioport_array<3> m_key_mux_ports[4];
 
-	required_shared_ptr<UINT8> m_cmi07_ram;
+	required_shared_ptr<uint8_t> m_cmi07_ram;
 
 	address_space *m_cpu1space;
 	address_space *m_cpu2space;
@@ -618,11 +631,11 @@ private:
 	emu_timer *m_cmi10_scnd_timer;
 	emu_timer *m_jam_timeout_timer;
 
-	UINT8 m_video_data;
+	uint8_t m_video_data;
 
 	// Memory
-	bool map_is_active(int cpunum, int map, UINT8 *map_info);
-	void update_address_space(int cpunum, UINT8 mapinfo);
+	bool map_is_active(int cpunum, int map, uint8_t *map_info);
+	void update_address_space(int cpunum, uint8_t mapinfo);
 	void install_video_ram(int cpunum);
 	void install_peripherals(int cpunum);
 
@@ -633,53 +646,53 @@ private:
 
 	// Floppy
 	void dma_fdc_rom();
-	void write_fdc_ctrl(UINT8 data);
+	void write_fdc_ctrl(uint8_t data);
 	void fdc_dma_transfer();
 
 	// Q133 CPU Card
-	UINT8 *m_q133_rom;
-	UINT8 m_q133_acia_irq;
+	uint8_t *m_q133_rom;
+	uint8_t m_q133_acia_irq;
 
-	UINT8   m_hp_int;
-	std::unique_ptr<UINT8[]>    m_shared_ram;
-	std::unique_ptr<UINT8[]>    m_scratch_ram[2];
+	uint8_t   m_hp_int;
+	std::unique_ptr<uint8_t[]>    m_shared_ram;
+	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	UINT8   m_map_sel[16];
-	std::unique_ptr<UINT8[]>    m_map_ram[2];
-	std::unique_ptr<UINT8[]>    m_q256_ram[2];
-	UINT8   m_map_ram_latch;
+	uint8_t   m_map_sel[16];
+	std::unique_ptr<uint8_t[]>    m_map_ram[2];
+	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
+	uint8_t   m_map_ram_latch;
 	int     m_cpu_active_space[2]; // TODO: Make one register
 	int     m_cpu_map_switch[2];
-	UINT8   m_irq_address[2][2];
+	uint8_t   m_irq_address[2][2];
 	int     m_m6809_bs_hack_cnt;
 	int     m_m6809_bs_hack_cpu;
 
 	/* Q219 lightpen/graphics card */
-	std::unique_ptr<UINT8[]>    m_video_ram;
-	UINT16  m_x_pos;
-	UINT8   m_y_pos;
-	UINT16  m_lp_x;
-	UINT8   m_lp_y;
-	UINT8   m_q219_b_touch;
+	std::unique_ptr<uint8_t[]>    m_video_ram;
+	uint16_t  m_x_pos;
+	uint8_t   m_y_pos;
+	uint16_t  m_lp_x;
+	uint8_t   m_lp_y;
+	uint8_t   m_q219_b_touch;
 
 	/* QFC9 floppy disk controller card */
-	UINT8 * m_qfc9_region_ptr;
+	uint8_t * m_qfc9_region_ptr;
 	int     m_fdc_drq;
-	UINT8   m_fdc_addr;
-	UINT8   m_fdc_ctrl;
-	UINT8   m_fdc_status;
+	uint8_t   m_fdc_addr;
+	uint8_t   m_fdc_ctrl;
+	uint8_t   m_fdc_status;
 	PAIR    m_fdc_dma_addr;
 	PAIR    m_fdc_dma_cnt;
 
 	/* CMI-07 */
-	UINT8   m_cmi07_ctrl;
+	uint8_t   m_cmi07_ctrl;
 
 	/* CMI-10 */
-	UINT8   m_scnd;
+	uint8_t   m_scnd;
 
 	/* Musical keyboard */
-	UINT8   m_msm5832_addr;
+	uint8_t   m_msm5832_addr;
 	int     m_mkbd_kbd_acia_irq;
 	int     m_mkbd_cmi_acia_irq;
 
@@ -697,20 +710,20 @@ private:
  *
  *************************************/
 
-UINT32 cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	UINT8 y_scroll = m_q219_pia->a_output();
-	UINT8 invert = (!BIT(m_q219_pia->b_output(), 3)) & 1;
+	uint8_t y_scroll = m_q219_pia->a_output();
+	uint8_t invert = (!BIT(m_q219_pia->b_output(), 3)) & 1;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint8_t *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
-			UINT8 data = *src++;
+			uint8_t data = *src++;
 
 			/* Store 8 pixels */
 			for (int i = 0; i < 8; ++i)
@@ -770,7 +783,7 @@ void cmi_state::hblank()
 
 void cmi_state::update_video_pos(int y, int x, int byte_size)
 {
-	UINT8 *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
+	uint8_t *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
 	if (byte_size)
 	{
@@ -817,6 +830,9 @@ void cmi_state::video_write(int offset)
 
 READ8_MEMBER( cmi_state::video_r )
 {
+	if (machine().side_effect_disabled())
+		return m_video_data;
+
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
 	video_write(offset);
@@ -860,6 +876,9 @@ WRITE8_MEMBER( cmi_state::vram_w )
 
 READ8_MEMBER( cmi_state::vram_r )
 {
+	if (machine().side_effect_disabled())
+		return m_video_ram[offset];
+
 	/* Latch the current video position */
 	m_y_pos = (offset >> 6) & 0xff;
 	m_x_pos = (offset & 0x3f) << 3;
@@ -873,8 +892,8 @@ READ8_MEMBER( cmi_state::vram_r )
 
 READ8_MEMBER( cmi_state::rom_r )
 {
-	UINT16 base = (&space == m_cpu2space ? 0x1000 : 0x2000);
-	return *(((UINT8 *)m_q133_region->base()) + base + offset);
+	uint16_t base = (&space == m_cpu2space ? 0x1000 : 0x2000);
+	return *(((uint8_t *)m_q133_region->base()) + base + offset);
 }
 
 WRITE8_MEMBER( cmi_state::map_ram_w )
@@ -887,7 +906,7 @@ WRITE8_MEMBER( cmi_state::map_ram_w )
 	{
 		for (int i = 0; i < NUM_Q256_CARDS; ++i)
 		{
-			UINT8 map_info;
+			uint8_t map_info;
 			int map = (offset >> 6);
 			int page_enable = ((m_map_ram_latch & 0x80) && (i == (m_map_ram_latch & 7))) ? 0x80 : 0;
 
@@ -911,7 +930,7 @@ READ8_MEMBER( cmi_state::vector_r )
 READ8_MEMBER( cmi_state::map_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
-	UINT8 data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
+	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 	return data;
 }
 
@@ -925,6 +944,10 @@ WRITE8_MEMBER( cmi_state::map_w )
 READ8_MEMBER( cmi_state::irq_ram_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
+
+	if (machine().side_effect_disabled())
+		return m_scratch_ram[cpunum][0xf8 + offset];
+
 	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
 	{
 		m_m6809_bs_hack_cnt--;
@@ -945,10 +968,8 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 		case TIMER_MAP_SWITCH:
 		{
-			//printf("Timer 0 expired\n");
-			//printf("Map switch timer: CPU %d\n", param);
 			m_cpu_active_space[param] = m_cpu_map_switch[param];
-			UINT8 map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
+			uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
 							 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
 							 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
 			update_address_space(param, map_info);
@@ -1324,7 +1345,7 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")
 INPUT_PORTS_END
 
-bool cmi_state::map_is_active(int cpunum, int map, UINT8 *map_info)
+bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
 {
 	if (m_cpu_active_space[cpunum] == MAPPING_A)
 	{
@@ -1344,7 +1365,7 @@ bool cmi_state::map_is_active(int cpunum, int map, UINT8 *map_info)
 	return 0;
 }
 
-void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
+void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 {
 	int map = mapinfo & 0x1f;
 	bool vram_en = !BIT(mapinfo, 5);
@@ -1359,7 +1380,7 @@ void cmi_state::update_address_space(int cpunum, UINT8 mapinfo)
 	for (int page = 0; page < PAGE_COUNT; ++page)
 	{
 		int address = page * PAGE_SIZE;
-		UINT8 page_info = 0;
+		uint8_t page_info = 0;
 
 		/* Scan through the cards */
 		for (i = 0; i < NUM_Q256_CARDS; ++i)
@@ -1417,7 +1438,7 @@ WRITE8_MEMBER( cmi_state::cmi07_w )
 	m_cmi07cpu->set_input_line(INPUT_LINE_HALT,  BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* We need to update the address spaces */
-	UINT8 map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
+	uint8_t map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
 	update_address_space(0, map_info);
 
 	map_info = (m_cpu_active_space[1] == MAPPING_A) ? m_map_sel[MAPSEL_P2_A] : m_map_sel[MAPSEL_P2_B];
@@ -1482,11 +1503,11 @@ READ8_MEMBER( cmi_state::ank_col_r )
 void cmi_state::dma_fdc_rom()
 {
 	/* DMA channel 1 is used*/
-	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 	int addr = m_fdc_dma_addr.w.l & ~PAGE_MASK;
 	int page = addr / PAGE_SIZE;
-	UINT8 p_info = 0;
+	uint8_t p_info = 0;
 
 	/* Active low */
 	m_fdc_status &= ~FDC_STATUS_DRIVER_LOAD;
@@ -1516,7 +1537,7 @@ void cmi_state::dma_fdc_rom()
 	m_fdc_dma_cnt.w.l = 0;
 }
 
-void cmi_state::write_fdc_ctrl(UINT8 data)
+void cmi_state::write_fdc_ctrl(uint8_t data)
 {
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
@@ -1560,6 +1581,9 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 
 READ8_MEMBER( cmi_state::fdc_r )
 {
+	if (machine().side_effect_disabled())
+		return 0;
+
 	if (offset == 0)
 	{
 		switch (m_fdc_addr)
@@ -1578,7 +1602,7 @@ READ8_MEMBER( cmi_state::fdc_r )
 void cmi_state::fdc_dma_transfer()
 {
 	/* DMA channel 1 is used*/
-	UINT8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 
 	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
@@ -1599,7 +1623,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		UINT8 data = m_wd1791->data_r() ^ 0xff;
+		uint8_t data = m_wd1791->data_r() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1625,7 +1649,7 @@ void cmi_state::fdc_dma_transfer()
 			return;
 
 		/* Write a byte at a time */
-		UINT8 data = 0;
+		uint8_t data = 0;
 
 		/* TODO: This should be stuck in a deferred write */
 		if (phys_page & 0x80)
@@ -1686,6 +1710,10 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 28 - 2B = PIA
 */
 
+WRITE8_MEMBER( cmi_state::master_tune_w )
+{
+//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
+}
 
 WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
 {
@@ -1712,11 +1740,6 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqb )
 	update_interrupts();
 }
 
-WRITE8_MEMBER( cmi_state::master_tune_w )
-{
-//  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
-}
-
 WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
 {
 // top two
@@ -1724,6 +1747,24 @@ WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
 
 WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
 {
+}
+
+WRITE8_MEMBER( cmi01a_device::rp_w )
+{
+	m_rp = data;
+}
+
+WRITE8_MEMBER( cmi01a_device::ws_dir_w )
+{
+	m_ws = data & 0x7f;
+	m_dir = (data >> 7) & 1;
+}
+
+READ_LINE_MEMBER( cmi01a_device::tri_r )
+{
+	bool top_terminal_count = (m_dir == ENV_DIR_UP && m_rp == 0);
+	bool bottom_terminal_count = (m_dir == ENV_DIR_DOWN && m_rp == 0xff);
+	return (top_terminal_count || bottom_terminal_count) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqa )
@@ -1868,7 +1909,6 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_cb2_w )
 void cmi01a_device::update_wave_addr(int inc)
 {
 	int old_cnt = m_segment_cnt;
-	//printf("update_wave_addr, m_segment_cnt %04x\n", m_segment_cnt);
 
 	if (inc)
 		++m_segment_cnt;
@@ -1890,8 +1930,25 @@ void cmi01a_device::update_wave_addr(int inc)
 	/* Zero crossing interrupt is a pulse */
 }
 
+WRITE_LINE_MEMBER( cmi01a_device::ptm_out0 )
+{
+	m_ptm_out0 = state;
+}
+
+READ_LINE_MEMBER( cmi01a_device::eosi_r )
+{
+	return (m_segment_cnt & 0x4000) >> 14;
+}
+
+READ_LINE_MEMBER( cmi01a_device::zx_r )
+{
+	return m_segment_cnt & 0x40;
+}
+
 WRITE8_MEMBER( cmi01a_device::write )
 {
+	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
+
 	switch (offset)
 	{
 		case 0x0:
@@ -1933,16 +1990,23 @@ WRITE8_MEMBER( cmi01a_device::write )
 			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			//printf("CH%d PTM: [%x] %x, %d %d %d, %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data, a2, a1, a0, offset);
+			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
+
+		default:
+			printf("Unknown channel card %d write to E0%02X = %02X\n", m_channel, offset, data);
+			break;
 	}
 }
 
 READ8_MEMBER( cmi01a_device::read )
 {
-	UINT8 data = 0;
+	if (machine().side_effect_disabled())
+		return 0;
+
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -1964,6 +2028,10 @@ READ8_MEMBER( cmi01a_device::read )
 			m_env_dir_ctrl = ENV_DIR_UP;
 			break;
 
+		case 0x5:
+			data = 0xff;
+			break;
+
 		case 0x8: case 0x9: case 0xa: case 0xb:
 			data = m_pia_0->read(space, offset & 3);
 			break;
@@ -1979,16 +2047,19 @@ READ8_MEMBER( cmi01a_device::read )
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
+
+			//printf("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
+
+		default:
+			printf("Unknown channel card %d read from E0%02X\n", m_channel, offset);
+			break;
 	}
 
-	return data;
-}
+	//printf("C%d R: %02x = %02x\n", m_channel, offset, data);
 
-WRITE8_MEMBER( cmi01a_device::ptm_out0 )
-{
-	m_ptm_out0 = data;
+	return data;
 }
 
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
@@ -1998,8 +2069,17 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
+{
+	m_cmi02_ptm->set_c1(state);
+	m_cmi02_ptm->set_c3(state);
+}
+
 READ8_MEMBER( cmi_state::cmi02_r )
 {
+	if (machine().side_effect_disabled())
+		return 0;
+
 	if (offset <= 0x1f)
 	{
 		int ch_mask = m_cmi02_pia_0->a_output();
@@ -2112,6 +2192,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 
 WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 {
+	//printf("i8214_cpu2_w: %02x\n", data);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	data ^= 0xff;
 	m_i8214_1->sgs_w((data >> 3) & 1);
@@ -2153,16 +2234,6 @@ READ_LINE_MEMBER( cmi_state::ank_rts_r )
 {
 //  printf("ANK RTS?\n");
 	return 0;
-}
-
-READ_LINE_MEMBER( cmi01a_device::eosi_r )
-{
-	return (m_segment_cnt & 0x4000) >> 14;
-}
-
-READ_LINE_MEMBER( cmi01a_device::zx_r )
-{
-	return m_segment_cnt & 0x40;
 }
 
 void cmi_state::install_peripherals(int cpunum)
@@ -2275,10 +2346,7 @@ WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 {
 	//printf("i8214_1_int_w: %d\n", state);
 	if (state)
-	{
-		//machine().debug_break();
 		m_maincpu1->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	}
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
@@ -2351,7 +2419,6 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 	m_msm5832->hold_w(BIT(data, 0));
 	m_msm5832->read_w(BIT(data, 1));
 	m_msm5832->write_w(BIT(data, 2));
-	m_msm5832->cs_w(1);
 }
 
 /*
@@ -2372,6 +2439,11 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 
 WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 {
+	// low 7 bits connected to alphanumeric display data lines
+	m_dp1->data_w(data & 0x7f);
+	m_dp2->data_w(data & 0x7f);
+	m_dp3->data_w(data & 0x7f);
+
 	/*
 	int bk = data;
 	int bit = 0;
@@ -2387,6 +2459,20 @@ WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 
 WRITE8_MEMBER( cmi_state::cmi10_u20_b_w )
 {
+	// connected to alphanumeric display control lines
+	uint8_t const addr = bitswap<2>(data, 0, 1);
+
+	m_dp1->ce_w(BIT(data, 6));
+	m_dp1->cu_w(BIT(data, 7));
+	m_dp1->addr_w(addr);
+
+	m_dp2->ce_w(BIT(data, 4));
+	m_dp2->cu_w(BIT(data, 5));
+	m_dp2->addr_w(addr);
+
+	m_dp3->ce_w(BIT(data, 2));
+	m_dp3->cu_w(BIT(data, 3));
+	m_dp3->addr_w(addr);
 }
 
 READ_LINE_MEMBER( cmi_state::cmi10_u20_cb1_r )
@@ -2404,28 +2490,10 @@ READ_LINE_MEMBER( cmi_state::cmi10_u20_cb1_r )
 
 WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 {
-	UINT8 data = m_cmi10_pia_u20->a_output() & 0x7f;
-	UINT8 b_port = m_cmi10_pia_u20->b_output();
-	int addr = (BIT(b_port, 0) << 1) | BIT(b_port, 1);
-	address_space &space = m_maincpu1->space(AS_PROGRAM); // Just needed to call data_w
-
-	/* DP1 */
-	m_dp1->ce_w(BIT(b_port, 6));
-	m_dp1->cu_w(BIT(b_port, 7));
+	// connected to alphanumeric display write strobe
 	m_dp1->wr_w(state);
-	m_dp1->data_w(space, addr, data, 0xff);
-
-	/* DP2 */
-	m_dp2->ce_w(BIT(b_port, 4));
-	m_dp2->cu_w(BIT(b_port, 5));
 	m_dp2->wr_w(state);
-	m_dp2->data_w(space, addr & 3, data, 0xff);
-
-	/* DP3 */
-	m_dp3->ce_w(BIT(b_port, 2));
-	m_dp3->cu_w(BIT(b_port, 3));
 	m_dp3->wr_w(state);
-	m_dp3->data_w(space, addr & 3, data, 0xff);
 }
 
 WRITE16_MEMBER( cmi_state::cmi_iix_update_dp1 )
@@ -2458,13 +2526,13 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
-	UINT8 data = 0x38; // slave keyboard not used
+	uint8_t data = 0x38; // slave keyboard not used
 
 
 	for (int module = 0; module < 3; ++module)
 	{
 //      char keyname[16];
-		UINT8 keyval;
+		uint8_t keyval;
 		int state = 1;
 
 		if (mux == 0 && key == 3)
@@ -2499,11 +2567,11 @@ READ8_MEMBER( cmi_state::cmi10_u21_a_r )
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
-	UINT8 data = 0xf8; // slave keyboard not used
+	uint8_t data = 0xf8; // slave keyboard not used
 
 	for (int module = 0; module < 3; ++module)
 	{
-		UINT8 keyval = m_key_mux_ports[mux][module]->read();
+		uint8_t keyval = m_key_mux_ports[mux][module]->read();
 		data |= BIT(keyval, key) << module;
 	}
 
@@ -2573,7 +2641,7 @@ void cmi_state::machine_reset()
 	m_cpu1space = &m_maincpu1->space(AS_PROGRAM);
 	m_cpu2space = &m_maincpu2->space(AS_PROGRAM);
 
-	m_qfc9_region_ptr = (UINT8 *)m_qfc9_region->base();
+	m_qfc9_region_ptr = (uint8_t *)m_qfc9_region->base();
 
 	/* Set 8214 interrupt lines */
 	m_i8214_0->etlg_w(1);
@@ -2622,7 +2690,7 @@ void cmi_state::machine_reset()
 
 void cmi_state::machine_start()
 {
-	m_q133_rom = (UINT8 *)m_q133_region->base();
+	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
 	m_map_switch_timer = timer_alloc(TIMER_MAP_SWITCH);
@@ -2636,22 +2704,24 @@ void cmi_state::machine_start()
 	m_jam_timeout_timer->adjust(attotime::never);
 
 	/* Allocate 1kB memory mapping RAM */
-	m_map_ram[0] = std::make_unique<UINT8[]>(0x400);
-	m_map_ram[1] = std::make_unique<UINT8[]>(0x400);
+	m_map_ram[0] = std::make_unique<uint8_t[]>(0x400);
+	m_map_ram[1] = std::make_unique<uint8_t[]>(0x400);
 
 	/* Allocate 256kB for each Q256 RAM card */
-	m_q256_ram[0] = std::make_unique<UINT8[]>(0x40000);
-	m_q256_ram[1] = std::make_unique<UINT8[]>(0x40000);
+	m_q256_ram[0] = std::make_unique<uint8_t[]>(0x40000);
+	m_q256_ram[1] = std::make_unique<uint8_t[]>(0x40000);
 
 	/* Allocate 16kB video RAM */
-	m_video_ram = std::make_unique<UINT8[]>(0x4000);
+	m_video_ram = std::make_unique<uint8_t[]>(0x4000);
 
 	/* Allocate 512B shared RAM */
-	m_shared_ram = std::make_unique<UINT8[]>(0x200);
+	m_shared_ram = std::make_unique<uint8_t[]>(0x200);
 
 	/* Allocate 256B scratch RAM per CPU */
-	m_scratch_ram[0] = std::make_unique<UINT8[]>(0x100);
-	m_scratch_ram[1] = std::make_unique<UINT8[]>(0x100);
+	m_scratch_ram[0] = std::make_unique<uint8_t[]>(0x100);
+	m_scratch_ram[1] = std::make_unique<uint8_t[]>(0x100);
+
+	m_msm5832->cs_w(1);
 }
 
 INTERRUPT_GEN_MEMBER( cmi_state::cmi_iix_vblank )
@@ -2669,7 +2739,7 @@ static SLOT_INTERFACE_START( cmi2x_floppies )
 	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( cmi2x, cmi_state )
+static MACHINE_CONFIG_START( cmi2x )
 	MCFG_CPU_ADD("maincpu1", M6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)
@@ -2703,7 +2773,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp3))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -2711,11 +2781,11 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_MSM5832_ADD("msm5832", XTAL_32_768kHz)
 
 	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
 	MCFG_DEVICE_ADD("i8214_2", I8214, 1000000) // cmi_8214_intf_2
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_2_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_2_int_w))
 	MCFG_DEVICE_ADD("i8214_3", I8214, 1000000) // cmi_8214_intf_3
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_3_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_3_int_w))
 	MCFG_I8214_ENLG_CALLBACK(WRITELINE(cmi_state, i8214_3_enlg))
 
 	MCFG_DEVICE_ADD("q133_pia_1", PIA6821, 0) // pia_q133_1_config
@@ -2724,8 +2794,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, q133_1_portb_w));
 
 	MCFG_DEVICE_ADD("q133_pia_2", PIA6821, 0) // pia_q133_2_config
-	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 0) // ptm_q133_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 2000000) // ptm_q133_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1024, 1, 111) // Third is todo
 
 	MCFG_DEVICE_ADD("q219_pia", PIA6821, 0) // pia_q219_config
@@ -2735,8 +2804,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi_state, pia_q219_irqa))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, pia_q219_irqb))
 
-	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 0) // ptm_q219_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ, VBLANK_FREQ, 1000000)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, ptm_q219_irq))
 
@@ -2745,8 +2813,8 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 
 	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
 
-	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 0) // ptm_cmi02_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
+	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 9600*16)
@@ -2786,7 +2854,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca2_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_kbd_acia_int))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_MODIFY("ank_pia")
@@ -2800,8 +2868,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca1_w))
 
-	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 0) // ptm_cmi07_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi07_irq))
 
 	MCFG_FD1791_ADD("wd1791", XTAL_16MHz / 8) // wd1791_interface

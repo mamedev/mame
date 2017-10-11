@@ -26,7 +26,7 @@ static int cas_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-static inline int ace_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
+static inline int ace_tap_cycle(int16_t *buffer, int sample_pos, int high, int low)
 {
 	int i = 0;
 
@@ -48,7 +48,7 @@ static inline int ace_tap_cycle(INT16 *buffer, int sample_pos, int high, int low
 }
 
 
-static inline int ace_tap_silence(INT16 *buffer, int sample_pos, int samples)
+static inline int ace_tap_silence(int16_t *buffer, int sample_pos, int samples)
 {
 	int i = 0;
 
@@ -64,7 +64,7 @@ static inline int ace_tap_silence(INT16 *buffer, int sample_pos, int samples)
 }
 
 
-static inline int ace_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int ace_tap_byte(int16_t *buffer, int sample_pos, uint8_t data)
 {
 	int i, samples;
 
@@ -82,7 +82,7 @@ static inline int ace_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 }
 
 
-static int ace_handle_tap(INT16 *buffer, const UINT8 *casdata)
+static int ace_handle_tap(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count;
 
@@ -97,7 +97,7 @@ static int ace_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 	while( data_pos < cas_size )
 	{
-		UINT16  block_size;
+		uint16_t  block_size;
 		int     i;
 
 		/* Handle a block of tape data */
@@ -138,7 +138,7 @@ static int ace_handle_tap(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int ace_tap_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int ace_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return ace_handle_tap( buffer, bytes );
 }
@@ -147,7 +147,7 @@ static int ace_tap_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int ace_tap_to_wav_size(const UINT8 *casdata, int caslen)
+static int ace_tap_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen;
 

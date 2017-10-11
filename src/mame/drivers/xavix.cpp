@@ -4,19 +4,53 @@
 
     Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
-    CPU is M6502 derivative, almost likely to be a G65816
+    CPU is an M6502 derivative where opcode 0x22 has 3 bytes of operands.
+    Definitely not: 65C816 or Mitsu M740.
+
+    Code at F34F is thus:
+
+    F34F:  STA $6200,X
+    F352:  INX
+    F353:  BNE $F34F
+    F355:  UNK 12 FA 80
+    F359:  UNK 12 A8 80
+    F35D:  UNK 12 1B 80
+    F361:  SEC
+    F362:  LDA #$CD
+    F364:  SBC #$CA
+
+    later on
+
+    F3C9:  UNK 00 E4 C4
 
     TODO:
-    - understand how to map ROM at 0x800000-0x9fffff / 0xc00000 / 0xdfffff
-      banks (granted that we have the ROM for that, of course)
+    - identify CPU
+    - figure out ROM banking
+
+    Notes from http://www.videogameconsolelibrary.com/pg00-xavix.htm#page=reviews (thanks Guru!)
+
+    XaviXPORT arrived on the scene with 3 game titles (XaviX Tennis, XaviX Bowling and XaviX Baseball) using their
+    original XaviX Multiprocessor.  This proprietary chip is reported to contain an 8-bit high speed central processing
+    unit (6502) at 21 MHz, picture processor, sound processor, DMA controller, 1K bytes high speed RAM, universal timer,
+    AD/Converter and I/O device control.  Each cartridge comes with a wireless peripheral to be used with the game (Baseball Bat,
+    Tennis Racquet, etc.) that requires "AA" batteries.  The XaviXPORT system retailed for $79.99 USD with the cartridges
+    retailing for $49.99 USD.
+
+    The following year at CES 2005, SSD COMPANY LIMITED introduced two new XaviXPORT titles (XaviX Golf and XaviX Bass Fishing) each
+    containing the upgraded "Super XaviX".  This new chip is said to sport a 16-bit high central processing unit (65816) at 43 MHz.
+    SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor
+    with 3D capabilities.
 
 ***************************************************************************/
 
 
 #include "emu.h"
+#include "cpu/g65816/g65816.h"
 #include "cpu/m6502/m6502.h"
 //#include "sound/ay8910.h"
-#include "cpu/g65816/g65816.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_21_4772MHz
 
@@ -32,7 +66,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -46,7 +80,7 @@ void xavix_state::video_start()
 {
 }
 
-UINT32 xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -139,7 +173,7 @@ void xavix_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( xavix, xavix_state )
+static MACHINE_CONFIG_START( xavix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816,MAIN_CLOCK/4)
@@ -176,4 +210,4 @@ ROM_START( taitons1 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix, driver_device,  0,   "Bandai / SSD Company LTD / Taito",      "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )

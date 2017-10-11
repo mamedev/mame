@@ -108,7 +108,7 @@ ROM                 R       000000-03ffff       <
 Work RAM            RW      0c0000-0c3fff       180000-183fff
 Shared RAM          RW      040000-047fff       080000-087fff
 Road RAM            RW      080000-0807ff       100000-1007ff
-Whatchdog                   100000-100001       200000-200001
+Watchdog                    100000-100001       200000-200001
 ----------------------------------------------------------------
 
 ----------------------------------------------------------------
@@ -170,11 +170,13 @@ Cisco Heat.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cischeat.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
-#include "includes/cischeat.h"
+#include "speaker.h"
 
 #include "cischeat.lh"
 #include "f1gpstar.lh"
@@ -215,10 +217,10 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
 	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
-		Each board expects reads from the other boards and writes to own bank.
-		Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
-		so it's likely to be the only thing needed. */
-	AM_RANGE(0x084000, 0x087fff) AM_RAM                                                 // Linking with other units
+	    Each board expects reads from the other boards and writes to own bank.
+	    Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
+	    so it's likely to be the only thing needed. */
+	AM_RANGE(0x084000, 0x0847ff) AM_RAM                                                 // Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
 
@@ -268,7 +270,7 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_WRITE(cischeat_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
 
 /*  Only the first 0x800 bytes are tested but:
     CPU #0 PC 0000278c: warning - write 68c0 to unmapped memory address 0009c7fe
@@ -330,7 +332,7 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -351,15 +353,47 @@ ADDRESS_MAP_END
                             Wild Pilot
 **************************************************************************/
 
+// ad stick read select
+READ16_MEMBER(cischeat_state::wildplt_xy_r)
+{
+	switch(m_ip_select)
+	{
+		case 1: return ioport("P2Y")->read() | (ioport("P2X")->read()<<8);
+		case 2: return ioport("P1Y")->read() | (ioport("P1X")->read()<<8);
+	}
+
+	return 0xffff;
+}
+
+// buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
+READ16_MEMBER(cischeat_state::wildplt_mux_r)
+{
+	uint16_t split_in = 0xffff;
+	switch(m_wildplt_output & 0xc)
+	{
+//      case 0: return ioport("IN1")->read();
+		case 4: split_in = ioport("IN1_1")->read(); break;
+		case 8: split_in = ioport("IN1_2")->read(); break;
+	}
+
+	return split_in & ioport("IN1_COMMON")->read();
+}
+
+WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
+{
+	m_wildplt_output = data & 0xc;
+}
+
+
 // Same as f1gpstar, but vregs are slightly different:
 static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") AM_WRITE(f1gpstr2_io_w)    // DSW 1 & 2
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN1") AM_WRITE(f1gpstar_motor_w) // Buttons
+	AM_RANGE(0x080004, 0x080005) AM_READ(wildplt_mux_r) AM_WRITE(wildplt_mux_w) // Buttons
 	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)     // From sound cpu
 	AM_RANGE(0x080008, 0x080009) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)    // To sound cpu
 	AM_RANGE(0x08000c, 0x08000d) AM_WRITENOP // 1000, 3000
-	AM_RANGE(0x080010, 0x080011) AM_READ(wildplt_xy_r) AM_WRITENOP // X, Y
+	AM_RANGE(0x080010, 0x080011) AM_READ(wildplt_xy_r) AM_WRITE(ip_select_w) // X, Y
 	AM_RANGE(0x080014, 0x080015) AM_WRITENOP
 	AM_RANGE(0x080018, 0x080019) AM_READWRITE(f1gpstr2_ioready_r, f1gpstar_soundint_w)
 
@@ -373,7 +407,7 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -417,7 +451,8 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+	// 0x100 RAM banks instead of 0x200
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -585,7 +620,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
 {
 	int arm_x = ioport("IN1")->read();
 
-	UINT16 ret = ioport("IN0")->read();
+	uint16_t ret = ioport("IN0")->read();
 
 	if (arm_x < 0x40)       ret &= ~1;
 	else if (arm_x > 0xc0)  ret &= ~2;
@@ -695,9 +730,9 @@ WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
 	captflag_motor_move(LEFT, data);
 }
 
-void cischeat_state::captflag_motor_move(int side, UINT16 data)
+void cischeat_state::captflag_motor_move(int side, uint16_t data)
 {
-	UINT16 & pos  = m_captflag_motor_pos[side];
+	uint16_t & pos  = m_captflag_motor_pos[side];
 
 	timer_device &dev((side == RIGHT) ? *m_captflag_motor_right : *m_captflag_motor_left);
 
@@ -752,8 +787,8 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
 {
-	const UINT8 pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
-	return ~pos[m_captflag_motor_pos[(FPTR)param]];
+	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
+	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
 }
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
@@ -785,12 +820,12 @@ static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x100060, 0x10007d) AM_RAM                                                                 // 7-seg? NVRAM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( captflag_oki1_map, AS_0, 8, cischeat_state )
+static ADDRESS_MAP_START( captflag_oki1_map, 0, 8, cischeat_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1_bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( captflag_oki2_map, AS_0, 8, cischeat_state )
+static ADDRESS_MAP_START( captflag_oki2_map, 0, 8, cischeat_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2_bank")
 ADDRESS_MAP_END
@@ -1381,6 +1416,20 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( f1gpstr2 )
+	PORT_INCLUDE( f1gpstar )
+
+	PORT_MODIFY("IN4")
+	PORT_DIPNAME( 0x0e, 0x00, "Unit ID" ) PORT_DIPLOCATION("SW03:2,3,4")          // -> !f901c
+	PORT_DIPSETTING(    0x00, "1 (McLaren)" )
+	PORT_DIPSETTING(    0x02, "2 (Williams)" )
+	PORT_DIPSETTING(    0x04, "3 (Benetton)" )
+	PORT_DIPSETTING(    0x06, "4 (Ferrari)" )
+	PORT_DIPSETTING(    0x08, "5 (Tyrrell)" )
+	PORT_DIPSETTING(    0x0a, "6 (Lotus)" )
+	PORT_DIPSETTING(    0x0c, "7 (Jordan)" )
+	PORT_DIPSETTING(    0x0e, "8 (Ligier)" )
+INPUT_PORTS_END
 
 /**************************************************************************
                                 Wild Pilot
@@ -1436,29 +1485,44 @@ static INPUT_PORTS_START( wildplt )
 	PORT_DIPSETTING(      0xc000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(      0x0000, "France?" )
 
-	PORT_START("IN1")
+	PORT_START("IN1_COMMON")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) //service 1 too
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW ) //start 2 too
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1_1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0xfff3, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1_2")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Bomb")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shot")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Missile")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shot")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Missile")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
+	PORT_BIT( 0xfe01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+#if 0
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Up Limit SW.
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Dow Limit SW.
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Center SW.
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Senser SW. #1
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Senser SW. #2
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Emergency Button") //E Stop for motors? ( Senser SW. #3 )
+#endif
+	PORT_START("P1Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("IN2")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_REVERSE
+	PORT_START("P1X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("IN3")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15)
+	PORT_START("P2Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("P2X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1604,21 +1668,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( captflag )
 	PORT_START("Buttons")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(2) // up left
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // down left
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(1) // up right
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // down right
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP   ) PORT_NAME("Left Red Stick Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("Left Red Stick Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP   ) PORT_NAME("Right White Stick Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("Right White Stick Down")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_IMPULSE(1) // coin 2
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1  ) // decide
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Decide Button") // decide
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(1) // coin 1
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE  ) // test
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2  ) // select
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Select Button") // select
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH,IPT_OUTPUT   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // prize sensor
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // potery on schems?
 
@@ -1735,7 +1799,7 @@ static const gfx_layout tiles_16x16_quad =
 	16*16*4
 };
 
-static const UINT32 road_layout_xoffset[64] =
+static const uint32_t road_layout_xoffset[64] =
 {
 	STEP16(16*4*0,4),STEP16(16*4*1,4),
 	STEP16(16*4*2,4),STEP16(16*4*3,4)
@@ -1819,19 +1883,22 @@ GFXDECODE_END
                     Big Run, Cisco Heat, F1 GrandPrix Star
 **************************************************************************/
 
-/* TODO: this is hackish */
+/*
+ irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
+ irq 2/4 controls gameplay speed, currently unknown about the timing
+ */
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_cpu1->set_input_line(4, HOLD_LINE);
+		m_cpu1->set_input_line(m_screen->frame_number() & 1 ? 4 : 1, HOLD_LINE);
 
-	if(scanline == 154)
+	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 69)
-		m_cpu1->set_input_line(1, HOLD_LINE);
+//  if(scanline == 69)
+//      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -1842,7 +1909,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-static MACHINE_CONFIG_START( bigrun, cischeat_state )
+static MACHINE_CONFIG_START( bigrun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1866,7 +1933,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
@@ -1874,7 +1941,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
-	MCFG_PALETTE_ADD("palette", 0x4000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -1892,11 +1959,11 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -2020,7 +2087,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( scudhamm, cischeat_state )
+static MACHINE_CONFIG_START( scudhamm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -2040,7 +2107,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
-	MCFG_PALETTE_ADD("palette", 0x8000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -2050,11 +2117,11 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2107,7 +2174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captflag, cischeat_state )
+static MACHINE_CONFIG_START( captflag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)  // TMP68000P-12
@@ -2129,7 +2196,7 @@ static MACHINE_CONFIG_START( captflag, cischeat_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
-	MCFG_PALETTE_ADD("palette", 0x8000/2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -2146,13 +2213,13 @@ static MACHINE_CONFIG_START( captflag, cischeat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki1_map)
+	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki2_map)
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2179,12 +2246,12 @@ MACHINE_CONFIG_END
 */
 void cischeat_state::cischeat_untangle_sprites(const char *region)
 {
-	UINT8       *src = memregion(region)->base();
-	const UINT8 *end = src + memregion(region)->bytes();
+	uint8_t       *src = memregion(region)->base();
+	const uint8_t *end = src + memregion(region)->bytes();
 
 	while (src < end)
 	{
-		UINT8 sprite[16*8];
+		uint8_t sprite[16*8];
 		int i;
 
 		for (i = 0; i < 16 ; i++)
@@ -2580,6 +2647,90 @@ GFX & Misc       - GS90015-02 (100 pin PQFP),  uses ROM 90015-31-R56
 ***************************************************************************/
 
 ROM_START( f1gpstar )
+	ROM_REGION( 0x100000, "cpu1", 0 )
+	ROM_LOAD16_BYTE( "gp9188a27ver3.0.ic125", 0x000000, 0x040000, CRC(e3ab0085) SHA1(c2de842f427d5e982a42467ca7354b728f63bf88) )
+	ROM_LOAD16_BYTE( "gp9188a22ver3.0.ic92",  0x000001, 0x040000, CRC(7022061b) SHA1(241261f79072f09dbc325185e8e5b039c592a491) )
+
+	ROM_REGION( 0x80000, "cpu2", 0 )
+	/* Should Use ROMs: 90015-01.W06, 90015-02.W07, 90015-03.W08, 90015-04.W09 */
+	ROM_LOAD16_BYTE( "9188a-16.v10",  0x000000, 0x020000, CRC(ef0f7ca9) SHA1(98ad687fdab67dd9f54b50cf21fd10ac34b61e7a) )
+	ROM_LOAD16_BYTE( "9188a-11.v10",  0x000001, 0x020000, CRC(de292ea3) SHA1(04ed19045edb4edfff2b8fedac37c4a3352dfa76) )
+
+	ROM_REGION( 0x80000, "cpu3", 0 )
+	/* Should Use ROMs: 90015-01.W06, 90015-02.W07, 90015-03.W08, 90015-04.W09 */
+	ROM_LOAD16_BYTE( "9188a-6.v10",  0x000000, 0x020000, CRC(18ba0340) SHA1(e46e10a350f18cf3a46c0d3a0cb08fc369fced6d) )
+	ROM_LOAD16_BYTE( "9188a-1.v10",  0x000001, 0x020000, CRC(109d2913) SHA1(e117556481e801d51b8526a143bc202dda222f7f) )
+
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "9190a-2.v11", 0x000000, 0x020000, CRC(acb2fd80) SHA1(bbed505ce745490ae11df8efdd3633181cfd4dec) )
+	ROM_LOAD16_BYTE( "9190a-1.v11", 0x000001, 0x020000, CRC(7cccadaf) SHA1(d1b79fbd0e27e8d479ef533fa00b18d1f2982dda) )
+
+	ROM_REGION16_BE( 0x80000, "user1", 0 )  /* second halves of program ROMs */
+	ROM_LOAD16_BYTE( "9188a-26.v10", 0x000000, 0x040000, CRC(0b76673f) SHA1(cf29333ffb51250ae2d5363d612260f536cd15af) ) // cpu #1
+	ROM_LOAD16_BYTE( "9188a-21.v10", 0x000001, 0x040000, CRC(3e098d77) SHA1(0bf7e8ca36086a7ae3d44a10b4ca43f869403eb0) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 )
+	ROM_LOAD( "90015-31.r56",  0x000000, 0x080000, CRC(0c8f0e2b) SHA1(6b0917a632c6beaca018146b6be66a3561b863b3) ) // scroll 0
+
+	ROM_REGION( 0x080000, "scroll1", 0 )
+	ROM_LOAD( "90015-32.r57",  0x000000, 0x080000, CRC(9c921cfb) SHA1(006d4af6dbbc34bee05f3620ba0a947a568a2400) ) // scroll 1
+
+	ROM_REGION( 0x020000, "scroll2", 0 )
+	ROM_LOAD( "9188a-30.v10",  0x000000, 0x020000, CRC(0ef1fbf1) SHA1(28fa0b677e70833954a5fc2fdce233d0dec4f43c) ) // scroll 2
+
+	ROM_REGION( 0x500000, "sprites", 0 )   /* sprites */
+	ROM_LOAD16_BYTE( "90015-21.r46",  0x000000, 0x080000, CRC(6f30211f) SHA1(aedba39fc6aab7847a3a2314e152bc00615cbd72) )
+	ROM_LOAD16_BYTE( "90015-22.r47",  0x000001, 0x080000, CRC(05a9a5da) SHA1(807c43c3ee76bce8e4874fa51d2453917b1e4f3b) )
+	ROM_LOAD16_BYTE( "90015-23.r48",  0x100000, 0x080000, CRC(58e9c6d2) SHA1(b81208819dbc5887183855001c72d0d91d32fc4b) )
+	ROM_LOAD16_BYTE( "90015-24.r49",  0x100001, 0x080000, CRC(abd6c91d) SHA1(ccbf47a37008a0ec64d7058225e6ba991b559a39) )
+	ROM_LOAD16_BYTE( "90015-25.r50",  0x200000, 0x080000, CRC(7ded911f) SHA1(d0083c17266f03f70f2d4b2953237fed0cb0696c) )
+	ROM_LOAD16_BYTE( "90015-26.r51",  0x200001, 0x080000, CRC(18a6c663) SHA1(b39cbb4b6d09150c7d1a8cf2cd3a96b61c265d83) )
+	ROM_LOAD16_BYTE( "90015-27.r52",  0x300000, 0x080000, CRC(7378c82f) SHA1(3e65064a36393b5d6ecb118a560f3fccc5b3c3c2) )
+	ROM_LOAD16_BYTE( "90015-28.r53",  0x300001, 0x080000, CRC(9944dacd) SHA1(722a0c152ef97830d5ab6251d5447293d951261f) )
+	ROM_LOAD16_BYTE( "90015-29.r54",  0x400000, 0x080000, CRC(2cdec370) SHA1(9fd8e8d6783a6c820d1f580a8872b5cc59641aa9) )
+	ROM_LOAD16_BYTE( "90015-30.r55",  0x400001, 0x080000, CRC(47e37604) SHA1(114eb01d3258bf481c01a8378f5f08b2bdeffbba) )
+
+	ROM_REGION( 0x200000, "road0", 0 )
+	ROM_LOAD( "90015-05.w10",  0x000000, 0x080000, CRC(8eb48a23) SHA1(e394eb013dd1fdc1c30616ce356bebd187453d08) ) // Road 0
+	ROM_LOAD( "90015-06.w11",  0x080000, 0x080000, CRC(32063a68) SHA1(587d35edec2755df11f4d63ff7bfd134a0f9fb36) )
+	ROM_LOAD( "90015-07.w12",  0x100000, 0x080000, CRC(0d0d54f3) SHA1(8040945ea8f9487f0527140c90d6a66965c27ff4) )
+	ROM_LOAD( "90015-08.w14",  0x180000, 0x080000, CRC(f48a42c5) SHA1(5caf50fbde682d7d1e4ec0cceacf0db7682b72a9) )
+
+	ROM_REGION( 0x100000, "road1", 0 )
+	ROM_LOAD( "90015-09.w13",  0x000000, 0x080000, CRC(55f49315) SHA1(ad338cb53149ccea2dbe5ad890433c9f09a8211c) ) // Road 1
+	ROM_LOAD( "90015-10.w15",  0x080000, 0x080000, CRC(678be0cb) SHA1(3857b549170b62b29644cf5ebdd4aac1afa9e420) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )    /* samples */
+	ROM_LOAD( "90015-34.w32", 0x000000, 0x080000, CRC(2ca9b062) SHA1(c01b8020b409d826c0ae69c153fdc5d89241771e) ) // 2 x 0x40000
+
+	ROM_REGION( 0x80000, "oki2", 0 )    /* samples */
+	ROM_LOAD( "90015-33.w31", 0x000000, 0x080000, CRC(6121d247) SHA1(213c7c45bc3d57c09778b1d58dbb5fe26d0b2477) ) // 2 x 0x40000
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* ? Unused ROMs ? */
+// "I know that one of the ROM images in the archive looks bad (90015-04.W09)
+//  however, it is good as far as I can tell. There were two of those ROMs
+// (soldered) onto the board and I checked them both against each other. "
+
+	ROM_LOAD( "90015-04.w09",  0x000000, 0x080000, CRC(5b324c81) SHA1(ce61f2ea29086a74bdcf9f4df8e2edb749e41da5) )   // x 2 xxxxxxxxx0xxxxxxxxx = 0x00
+	ROM_LOAD( "90015-03.w08",  0x000000, 0x080000, CRC(ccf5b158) SHA1(06250762646e0da1fb71fd7b638492eaab3f5b7f) )   // x 2 FIXED BITS (000x000x)
+	ROM_LOAD( "90015-02.w07",  0x000000, 0x080000, CRC(fcbecc9b) SHA1(0670c276730ee282ef8c9599c00571b8d97725ab) )   // x 2
+	ROM_LOAD( "90015-01.w06",  0x000000, 0x080000, CRC(ce4bfe6e) SHA1(d428eb3d5da3bd080957c585c5b72b94a7849fca) )   // x 2 FIXED BITS (000x000x)
+
+	ROM_LOAD( "90015-20.r45",  0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) ) // x 2
+
+	ROM_LOAD( "ch9072-4",  0x000000, 0x001000, CRC(5bc23535) SHA1(2fd1b7184175c416b19e6570de7ecb0d897deb9a) )   // FIXED BITS (0000000x)
+	ROM_LOAD( "ch9072-5",  0x000000, 0x001000, CRC(0efac5b4) SHA1(a3e945aaf142bb62e0e791b8ca49a34891f31077) )   // FIXED BITS (xxxx0xxx)
+	ROM_LOAD( "ch9072-6",  0x000000, 0x001000, CRC(76ff63c5) SHA1(652754533cc14773f4d7590a65183349eed9eb62) )
+	ROM_LOAD( "ch9072-8",  0x000000, 0x001000, CRC(ca04bace) SHA1(3771ef4bf7983e97e3346309fcb0271e17a6d359) )   // FIXED BITS (0xxx0xxx)
+
+	ROM_LOAD( "pr88004q",  0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )   // FIXED BITS (1xxxxxxx1111x1xx)
+	ROM_LOAD( "pr88004w",  0x000000, 0x000100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) )   // FIXED BITS (00xxxxxx)
+
+	ROM_LOAD( "pr90015a",  0x000000, 0x000800, CRC(777583db) SHA1(8fd060a68fbb6156feb55afcfc5afd95999a8a62) )   // FIXED BITS (00000xxx0000xxxx)
+	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
+ROM_END
+
+ROM_START( f1gpstaro )
 	ROM_REGION( 0x100000, "cpu1", 0 )
 	ROM_LOAD16_BYTE( "9188a-27.v20", 0x000000, 0x040000, CRC(0a9d3896) SHA1(5e3332a1b779dead1e4f9ef274a2f168721db0ed) )
 	ROM_LOAD16_BYTE( "9188a-22.v20", 0x000001, 0x040000, CRC(de15c9ca) SHA1(f356b02ca66b7e8ab0293e6e28fcd3f7996c80c8) )
@@ -3451,12 +3602,13 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES?)
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt, cischeat_state,  f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS )
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
 GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,         ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

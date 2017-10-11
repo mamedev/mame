@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_PET_64K_H
+#define MAME_BUS_PET_64K_H
+
 #pragma once
 
-#ifndef __PET_64K__
-#define __PET_64K__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -22,12 +21,11 @@
 
 // ======================> pet_64k_expansion_device
 
-class pet_64k_expansion_device : public device_t,
-									public device_pet_expansion_card_interface
+class pet_64k_expansion_device : public device_t, public device_pet_expansion_card_interface
 {
 public:
 	// construction/destruction
-	pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -36,21 +34,20 @@ protected:
 
 	// device_pet_expansion_card_interface overrides
 	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
-	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel) override;
-	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel) override;
+	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) override;
+	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) override;
 
 private:
-	inline UINT8 read_ram(offs_t offset);
-	inline void write_ram(offs_t offset, UINT8 data);
+	inline uint8_t read_ram(offs_t offset);
+	inline void write_ram(offs_t offset, uint8_t data);
 
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
-	UINT8 m_ctrl;
+	uint8_t m_ctrl;
 };
 
 
 // device type definition
-extern const device_type PET_64K;
+DECLARE_DEVICE_TYPE(PET_64K, pet_64k_expansion_device)
 
-
-#endif
+#endif // MAME_BUS_PET_64K_H

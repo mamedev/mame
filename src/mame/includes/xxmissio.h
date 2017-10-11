@@ -18,16 +18,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 m_status;
-	UINT8 m_xscroll;
-	UINT8 m_yscroll;
-	UINT8 m_flipscreen;
+	uint8_t m_status;
+	uint8_t m_xscroll;
+	uint8_t m_yscroll;
+	uint8_t m_flipscreen;
 
 	DECLARE_WRITE8_MEMBER(bank_sel_w);
 	DECLARE_WRITE8_MEMBER(status_m_w);
@@ -51,6 +51,6 @@ public:
 
 	DECLARE_PALETTE_DECODER(BBGGRRII);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 };

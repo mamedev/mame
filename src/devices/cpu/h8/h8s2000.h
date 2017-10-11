@@ -12,20 +12,21 @@
 
 ***************************************************************************/
 
-#ifndef __H8S2000_H__
-#define __H8S2000_H__
+#ifndef MAME_CPU_H8_H8S2000_H
+#define MAME_CPU_H8_H8S2000_H
+
+#pragma once
 
 #include "h8h.h"
 #include "h8_dtc.h"
 
 class h8s2000_device : public h8h_device {
-public:
-	h8s2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate);
-
 protected:
+	h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate);
+
 	static const disasm_entry disasm_entries[];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

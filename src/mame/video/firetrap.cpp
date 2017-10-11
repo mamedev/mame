@@ -38,7 +38,7 @@
 
 PALETTE_INIT_MEMBER(firetrap_state, firetrap)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
 			0);
 }
 
-inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
+inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index, uint8_t *bgvideoram, int gfx_region)
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
@@ -260,7 +260,7 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 firetrap_state::screen_update_firetrap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t firetrap_state::screen_update_firetrap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);

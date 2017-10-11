@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_IQ151_STAPER_H
+#define MAME_BUS_IQ151_STAPER_H
+
 #pragma once
 
-#ifndef __IQ151_STAPER_H__
-#define __IQ151_STAPER_H__
-
-#include "emu.h"
 #include "iq151.h"
 #include "machine/i8255.h"
 #include "imagedev/printer.h"
@@ -22,26 +21,25 @@ class iq151_staper_device :
 {
 public:
 	// construction/destruction
-	iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// i8255 callbacks
-	DECLARE_READ8_MEMBER( ppi_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi_portc_w );
+	iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// iq151cart_interface overrides
-	virtual void io_read(offs_t offset, UINT8 &data) override;
-	virtual void io_write(offs_t offset, UINT8 data) override;
+	virtual void io_read(offs_t offset, uint8_t &data) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
+	// i8255 callbacks
+	DECLARE_READ8_MEMBER( ppi_porta_r );
+	DECLARE_WRITE8_MEMBER( ppi_portb_w );
+	DECLARE_WRITE8_MEMBER( ppi_portc_w );
 
 	static const device_timer_id TIMER_PRINTER = 0;
 
@@ -49,11 +47,11 @@ private:
 	required_device<printer_image_device>   m_printer;
 
 	emu_timer*      m_printer_timer;
-	UINT8           m_ppi_portc;
+	uint8_t           m_ppi_portc;
 };
 
 
 // device type definition
-extern const device_type IQ151_STAPER;
+DECLARE_DEVICE_TYPE(IQ151_STAPER, iq151_staper_device)
 
-#endif  /* __IQ151_STAPER_H__ */
+#endif // MAME_BUS_IQ151_STAPER_H

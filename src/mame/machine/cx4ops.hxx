@@ -35,7 +35,7 @@ static void CX4_op01(running_machine& machine)
 //Propulsion
 static void CX4_op05(running_machine &machine)
 {
-	INT32 temp = 0x10000;
+	int32_t temp = 0x10000;
 	if(CX4_readw(0x1f83))
 	{
 		temp = CX4_sar((temp / CX4_readw(0x1f83)) * CX4_readw(0x1f81), 8);
@@ -51,8 +51,8 @@ static void CX4_op0d(running_machine &machine)
 	cx4.C41FDistVal = CX4_readw(0x1f86);
 	cx4.tanval = sqrt(((double)cx4.C41FYVal) * ((double)cx4.C41FYVal) + ((double)cx4.C41FXVal) * ((double)cx4.C41FXVal));
 	cx4.tanval = (double)cx4.C41FDistVal / cx4.tanval;
-	cx4.C41FYVal = (INT16)(((double)cx4.C41FYVal * cx4.tanval) * 0.99);
-	cx4.C41FXVal = (INT16)(((double)cx4.C41FXVal * cx4.tanval) * 0.98);
+	cx4.C41FYVal = (int16_t)(((double)cx4.C41FYVal * cx4.tanval) * 0.99);
+	cx4.C41FXVal = (int16_t)(((double)cx4.C41FXVal * cx4.tanval) * 0.98);
 	CX4_writew(machine, 0x1f89, cx4.C41FXVal);
 	CX4_writew(machine, 0x1f8c, cx4.C41FYVal);
 }
@@ -116,7 +116,7 @@ static void CX4_op15(running_machine &machine)
 	cx4.C41FXVal = CX4_readw(0x1f80);
 	cx4.C41FYVal = CX4_readw(0x1f83);
 	temp = sqrt((double)cx4.C41FXVal * (double)cx4.C41FXVal + (double)cx4.C41FYVal * (double)cx4.C41FYVal);
-	cx4.C41FDist = (INT16)temp;
+	cx4.C41FDist = (int16_t)temp;
 	CX4_writew(machine, 0x1f80, cx4.C41FDist);
 }
 
@@ -132,7 +132,7 @@ static void CX4_op1f(running_machine &machine)
 	else
 	{
 		cx4.tanval = ((double)cx4.C41FYVal) / ((double)cx4.C41FXVal);
-		cx4.C41FAngleRes = (INT16)(atan(cx4.tanval) / (PI * 2) * 512);
+		cx4.C41FAngleRes = (int16_t)(atan(cx4.tanval) / (PI * 2) * 512);
 		cx4.C41FAngleRes = cx4.C41FAngleRes;
 		if(cx4.C41FXVal < 0)
 		{
@@ -146,20 +146,20 @@ static void CX4_op1f(running_machine &machine)
 //Trapezoid
 static void CX4_op22(void)
 {
-	INT16 angle1 = CX4_readw(0x1f8c) & 0x1ff;
-	INT16 angle2 = CX4_readw(0x1f8f) & 0x1ff;
-	INT32 tan1 = CX4_Tan(angle1);
-	INT32 tan2 = CX4_Tan(angle2);
-	INT16 y = CX4_readw(0x1f83) - CX4_readw(0x1f89);
-	INT16 left, right;
-	INT32 j;
+	int16_t angle1 = CX4_readw(0x1f8c) & 0x1ff;
+	int16_t angle2 = CX4_readw(0x1f8f) & 0x1ff;
+	int32_t tan1 = CX4_Tan(angle1);
+	int32_t tan2 = CX4_Tan(angle2);
+	int16_t y = CX4_readw(0x1f83) - CX4_readw(0x1f89);
+	int16_t left, right;
+	int32_t j;
 
 	for(j = 0; j < 225; j++, y++)
 	{
 		if(y >= 0)
 		{
-			left  = CX4_sar((INT32)tan1 * y, 16) - CX4_readw(0x1f80) + CX4_readw(0x1f86);
-			right = CX4_sar((INT32)tan2 * y, 16) - CX4_readw(0x1f80) + CX4_readw(0x1f86) + CX4_readw(0x1f93);
+			left  = CX4_sar((int32_t)tan1 * y, 16) - CX4_readw(0x1f80) + CX4_readw(0x1f86);
+			right = CX4_sar((int32_t)tan2 * y, 16) - CX4_readw(0x1f80) + CX4_readw(0x1f86) + CX4_readw(0x1f93);
 
 			if(left < 0 && right < 0)
 			{
@@ -194,8 +194,8 @@ static void CX4_op22(void)
 			left  = 1;
 			right = 0;
 		}
-		cx4.ram[j + 0x800] = (UINT8)left;
-		cx4.ram[j + 0x900] = (UINT8)right;
+		cx4.ram[j + 0x800] = (uint8_t)left;
+		cx4.ram[j + 0x900] = (uint8_t)right;
 	}
 }
 
@@ -227,7 +227,7 @@ static void CX4_op2d(running_machine &machine)
 //Sum
 static void CX4_op40(void)
 {
-	UINT32 i;
+	uint32_t i;
 	cx4.r0 = 0;
 	for(i=0;i<0x800;i++)
 	{

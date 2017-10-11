@@ -68,6 +68,7 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 *************************************************************************************************************/
 
+#include "emu.h"
 #include <functional>
 
 #include "includes/mbc55x.h"
@@ -77,12 +78,12 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 #define DEBUG_SET(flags)    ((m_debug_video & (flags))==(flags))
 
-void mbc55x_state::video_debug(int ref, int params, const char *param[])
+void mbc55x_state::video_debug(int ref, const std::vector<std::string> &params)
 {
-	if (params > 0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp);
+		sscanf(params[0].c_str(), "%d", &temp);
 		m_debug_video = temp;
 	}
 	else
@@ -96,19 +97,19 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	UINT8   *ram    = &m_ram->pointer()[0];
-	UINT8   *red    = &m_video_mem[RED_PLANE_OFFSET];
-	UINT8   *blue   = &m_video_mem[BLUE_PLANE_OFFSET];
-	UINT8   *green;
+	uint8_t   *ram    = &m_ram->pointer()[0];
+	uint8_t   *red    = &m_video_mem[RED_PLANE_OFFSET];
+	uint8_t   *blue   = &m_video_mem[BLUE_PLANE_OFFSET];
+	uint8_t   *green;
 	int     offset;
-	UINT8   rpx,gpx,bpx;
-	UINT8   rb,gb,bb;
+	uint8_t   rpx,gpx,bpx;
+	uint8_t   rb,gb,bb;
 
 	int     x_pos;
 	int     pixelno;
-	UINT8   bitno;
-	UINT8   shifts;
-	UINT8   colour;
+	uint8_t   bitno;
+	uint8_t   shifts;
+	uint8_t   colour;
 
 	switch(m_vram_page)
 	{
@@ -130,7 +131,7 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 
 	for(x_pos=0; x_pos<x_count; x_pos++)
 	{
-		UINT16 mem = (offset+(x_pos*4)) % COLOUR_PLANE_SIZE;
+		uint16_t mem = (offset+(x_pos*4)) % COLOUR_PLANE_SIZE;
 		rpx=red[mem];
 		gpx=green[mem];
 		bpx=blue[mem];
@@ -171,7 +172,7 @@ void mbc55x_state::video_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&mbc55x_state::video_debug, this, _1, _2, _3));
+		machine().debugger().console().register_command("mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&mbc55x_state::video_debug, this, _1, _2));
 	}
 }
 
@@ -183,7 +184,7 @@ void mbc55x_state::video_reset()
 	logerror("Video reset\n");
 }
 
-void mbc55x_state::screen_eof_mbc55x(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mbc55x_state::screen_vblank_mbc55x)
 {
-//  logerror("screen_eof_mbc55x\n");
+//  logerror("screen_vblank_mbc55x\n");
 }

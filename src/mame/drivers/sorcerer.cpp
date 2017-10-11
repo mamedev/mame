@@ -161,8 +161,12 @@ NOTES (2016-06-06)
 
 ********************************************************************************/
 
+#include "emu.h"
 #include "includes/sorcerer.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -355,11 +359,11 @@ void sorcerer_state::video_start()
 	m_p_videoram = memregion("maincpu")->base()+0xf000;
 }
 
-UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0x80,x;
-	UINT16 *p;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0x80,x;
+	uint16_t *p;
 
 	for (y = 0; y < 30; y++)
 	{
@@ -409,7 +413,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
+static MACHINE_CONFIG_START( sorcerer )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
@@ -493,7 +497,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -531,7 +535,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
 ROM_END
 
-/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     INIT        COMPANY     FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer", 0 )
-COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2", 0 )
+/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     STATE           INIT      COMPANY      FULLNAME */
+COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer",                     0 )
+COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
 COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

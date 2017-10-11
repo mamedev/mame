@@ -6,13 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_INTV_CTRL_CTRL_H
+#define MAME_BUS_INTV_CTRL_CTRL_H
 
 #pragma once
 
-#ifndef __INTV_CONTROL_PORT__
-#define __INTV_CONTROL_PORT__
-
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,12 +24,13 @@ class device_intv_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_intv_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_intv_control_port_interface();
 
-	virtual UINT8 read_ctrl() { return 0; };
+	virtual uint8_t read_ctrl() { return 0; };
 
 protected:
+	device_intv_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	intv_control_port_device *m_port;
 };
 
@@ -42,11 +41,11 @@ class intv_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~intv_control_port_device();
 
 	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
-	UINT8 read_ctrl();
+	uint8_t read_ctrl();
 
 protected:
 	// device-level overrides
@@ -57,7 +56,7 @@ protected:
 
 
 // device type definition
-extern const device_type INTV_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device)
 
 
 //**************************************************************************
@@ -73,4 +72,4 @@ extern const device_type INTV_CONTROL_PORT;
 SLOT_INTERFACE_EXTERN( intv_control_port_devices );
 
 
-#endif
+#endif // MAME_BUS_INTV_CTRL_CTRL_H

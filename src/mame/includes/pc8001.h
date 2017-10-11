@@ -6,7 +6,6 @@
 #define __PC8001__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"

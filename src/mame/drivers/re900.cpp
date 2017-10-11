@@ -71,17 +71,21 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
+#include "speaker.h"
+
+#include "re900.lh"
+
 
 #define MAIN_CLOCK      XTAL_11_0592MHz
 #define VDP_CLOCK       XTAL_10_730MHz
 #define TMS_CLOCK       VDP_CLOCK / 24
-
-#include "emu.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/tms9928a.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "re900.lh"
 
 
 class re900_state : public driver_device
@@ -94,15 +98,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	required_shared_ptr<UINT8> m_rom;
+	required_shared_ptr<uint8_t> m_rom;
 
 	// re900 specific
-	UINT8 m_psg_pa;
-	UINT8 m_psg_pb;
-	UINT8 m_mux_data;
-	UINT8 m_ledant;
-	UINT8 m_player;
-	UINT8 m_stat_a;
+	uint8_t m_psg_pa;
+	uint8_t m_psg_pb;
+	uint8_t m_mux_data;
+	uint8_t m_ledant;
+	uint8_t m_player;
+	uint8_t m_stat_a;
 
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
@@ -140,7 +144,7 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 
 READ8_MEMBER(re900_state::re_psg_portB_r)
 {
-	UINT8 retval = 0xff;
+	uint8_t retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
@@ -206,7 +210,7 @@ WRITE8_MEMBER(re900_state::re_mux_port_A_w)
 
 WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 {
-	UINT8 led;
+	uint8_t led;
 	m_psg_pb = data;
 	led = (m_psg_pa >> 2) & 0x3f;
 
@@ -373,7 +377,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900, re900_state )
+static MACHINE_CONFIG_START( re900 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -448,6 +452,6 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME   PARENT MACHINE INPUT  INIT   ROT     COMPANY                    FULLNAME            FLAGS LAYOUT */
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state,   re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE,    layout_re900)
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , driver_device, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME   PARENT MACHINE INPUT  STATE        INIT   ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
+GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

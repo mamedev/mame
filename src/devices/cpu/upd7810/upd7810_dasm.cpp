@@ -24,7 +24,7 @@ public:
 	bool is_call() const { return (m_token == CALB) || (m_token == CALF) || (m_token == CALL) || (m_token == CALT); }
 	bool is_return() const { return (m_token == RET) || (m_token == RETI); }
 
-	const dasm_s &prefix_get(UINT8 op) const { assert(m_token == prefix); return reinterpret_cast<const dasm_s *>(m_args)[op]; }
+	const dasm_s &prefix_get(uint8_t op) const { assert(m_token == prefix); return reinterpret_cast<const dasm_s *>(m_args)[op]; }
 
 	static const dasm_s XX_7810[256];
 	static const dasm_s XX_7807[256];
@@ -214,10 +214,10 @@ protected:
 	};
 
 	dasm_s() : m_token(illegal), m_args(nullptr) { }
-	dasm_s(UINT8 t, const char *a) : m_token(t), m_args(a) { }
+	dasm_s(uint8_t t, const char *a) : m_token(t), m_args(a) { }
 	dasm_s(const dasm_s (&a)[256]) : m_token(prefix), m_args(a) { }
 
-	UINT8 m_token;
+	uint8_t m_token;
 	const void *m_args;
 
 	static const char *const token_names[];
@@ -5416,20 +5416,20 @@ const char *const regname[32] =
 	"illegal", "TMM",     "PT",      "illegal"
 };
 
-offs_t Dasm( char *buffer, offs_t pc, const dasm_s (&dasmXX)[256], const UINT8 *oprom, const UINT8 *opram, int is_7810 )
+offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const uint8_t *oprom, const uint8_t *opram, bool is_7810 )
 {
 	unsigned idx = 0;
-	const UINT8 op = oprom[idx++];
+	const uint8_t op = oprom[idx++];
 	const dasm_s *desc = &dasmXX[op];
 	if (desc->is_prefix())
 		desc = &desc->prefix_get(oprom[idx++]);
 
-	buffer += sprintf(buffer, "%-8.8s", desc->name());
+	util::stream_format(stream, "%-8.8s", desc->name());
 
-	UINT32 flags = desc->is_call() ? DASMFLAG_STEP_OVER : desc->is_return() ? DASMFLAG_STEP_OUT : 0;
-	UINT8 op2;
+	uint32_t flags = desc->is_call() ? DASMFLAG_STEP_OVER : desc->is_return() ? DASMFLAG_STEP_OUT : 0;
+	uint8_t op2;
 	int offset;
-	UINT16 ea;
+	uint16_t ea;
 
 	for (const char *a = desc->args(); a && *a; a++)
 	{
@@ -5440,46 +5440,45 @@ offs_t Dasm( char *buffer, offs_t pc, const dasm_s (&dasmXX)[256], const UINT8 *
 			{
 			case 'a':   /* address V * 256 + offset */
 				op2 = opram[idx++];
-				buffer += sprintf(buffer, "VV:%02X", op2);
+				util::stream_format(stream, "VV:%02X", op2);
 				break;
 			case 'b':   /* immediate byte */
-				buffer += sprintf(buffer, "$%02X", opram[idx++]);
+				util::stream_format(stream, "$%02X", opram[idx++]);
 				break;
 			case 'w':   /* immediate word */
 				ea = opram[idx++];
 				ea += opram[idx++] << 8;
-				buffer += sprintf(buffer, "$%04X", ea);
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'd':   /* JRE address */
 				op2 = oprom[idx++];
 				offset = (op & 1) ? -(256 - op2): + op2;
-				buffer += sprintf(buffer, "$%04X", ( pc + idx + offset ) & 0xFFFF );
+				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
 				break;
 			case 't':   /* CALT address */
 				ea = 0x80 + 2 * (op & (is_7810 ? 0x1f : 0x3f));
-				buffer += sprintf(buffer, "($%04X)", ea);
+				util::stream_format(stream, "($%04X)", ea);
 				break;
 			case 'f':   /* CALF address */
 				op2 = oprom[idx++];
 				ea = 0x800 + 0x100 * (op & 0x07) + op2;
-				buffer += sprintf(buffer, "$%04X", ea);
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'o':   /* JR offset */
 				offset = ( ( op & 0x20 ) ? -0x20 : 0 ) + ( op & 0x1F );
-				buffer += sprintf(buffer, "$%04X", ( pc + idx + offset ) & 0xFFFF );
+				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
 				break;
 			case 'i':   /* bit manipulation */
 				op2 = oprom[idx++];
-				buffer += sprintf(buffer, "%s,%d", regname[op2 & 0x1f], op2 >> 5);
+				util::stream_format(stream, "%s,%d", regname[op2 & 0x1f], op2 >> 5);
 				break;
 			default:
-				*buffer++ = *a;
+				stream << *a;
 			}
 		}
 		else
-			*buffer++ = *a;
+			stream << *a;
 	}
-	*buffer = '\0';
 
 	return idx | flags | DASMFLAG_SUPPORTED;
 }
@@ -5488,20 +5487,20 @@ offs_t Dasm( char *buffer, offs_t pc, const dasm_s (&dasmXX)[256], const UINT8 *
 
 CPU_DISASSEMBLE( upd7810 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7810, oprom, opram, 1 );
+	return Dasm( stream, pc, dasm_s::XX_7810, oprom, opram, true );
 }
 
 CPU_DISASSEMBLE( upd7807 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7807, oprom, opram, 1 );
+	return Dasm( stream, pc, dasm_s::XX_7807, oprom, opram, true );
 }
 
 CPU_DISASSEMBLE( upd7801 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7801, oprom, opram, 0 );
+	return Dasm( stream, pc, dasm_s::XX_7801, oprom, opram, false );
 }
 
 CPU_DISASSEMBLE( upd78c05 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_78c05, oprom, opram, 0 );
+	return Dasm( stream, pc, dasm_s::XX_78c05, oprom, opram, false );
 }

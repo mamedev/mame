@@ -8,13 +8,15 @@
 
 *********************************************************************/
 
-#ifndef __DEBUGCON_H__
-#define __DEBUGCON_H__
+#ifndef MAME_EMU_DEBUG_DEBUGCON_H
+#define MAME_EMU_DEBUG_DEBUGCON_H
+
+#pragma once
+
+#include "textbuf.h"
 
 #include <functional>
 
-#include "emu.h"
-#include "textbuf.h"
 
 /***************************************************************************
     CONSTANTS
@@ -67,7 +69,7 @@
 ***************************************************************************/
 
 /* CMDERR is an error code for command evaluation */
-typedef UINT32 CMDERR;
+typedef u32 CMDERR;
 
 class debugger_console
 {
@@ -75,9 +77,9 @@ public:
 	debugger_console(running_machine &machine);
 
 	/* command handling */
-	CMDERR          execute_command(const char *command, bool echo);
+	CMDERR          execute_command(const std::string &command, bool echo);
 	CMDERR          validate_command(const char *command);
-	void            register_command(const char *command, UINT32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler);
+	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
 
 	/* console management */
 	void            vprintf(util::format_argument_pack<std::ostream> const &args);
@@ -109,7 +111,7 @@ private:
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
-	CMDERR internal_parse_command(const char *original_command, bool execute);
+	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
 	struct debug_command
 	{
@@ -117,8 +119,8 @@ private:
 		char            command[32];
 		const char *    params;
 		const char *    help;
-		std::function<void(int, int, const char **)> handler;
-		UINT32          flags;
+		std::function<void(int, const std::vector<std::string> &)> handler;
+		u32             flags;
 		int             ref;
 		int             minparams;
 		int             maxparams;
@@ -132,4 +134,4 @@ private:
 	debug_command   *m_commandlist;
 };
 
-#endif
+#endif // MAME_EMU_DEBUG_DEBUGCON_H

@@ -105,7 +105,9 @@ macro(CheckALSA)
   if(ALSA)
     CHECK_INCLUDE_FILE(alsa/asoundlib.h HAVE_ASOUNDLIB_H)
     if(HAVE_ASOUNDLIB_H)
-      CHECK_LIBRARY_EXISTS(asound snd_pcm_open "" HAVE_LIBASOUND)
+      CHECK_LIBRARY_EXISTS(asound snd_pcm_recover "" HAVE_LIBASOUND)
+    endif()
+    if(HAVE_LIBASOUND)
       set(HAVE_ALSA TRUE)
       file(GLOB ALSA_SOURCES ${SDL2_SOURCE_DIR}/src/audio/alsa/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${ALSA_SOURCES})
@@ -537,6 +539,27 @@ macro(CheckMir)
     endif()
 endmacro()
 
+macro(WaylandProtocolGen _SCANNER _XML _PROTL)
+    set(_WAYLAND_PROT_C_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+    set(_WAYLAND_PROT_H_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-client-protocol.h")
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_H_CODE}"
+        DEPENDS "${_XML}"
+        COMMAND "${_SCANNER}"
+        ARGS client-header "${_XML}" "${_WAYLAND_PROT_H_CODE}"
+    )
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_C_CODE}"
+        DEPENDS "${_WAYLAND_PROT_H_CODE}"
+        COMMAND "${_SCANNER}"
+        ARGS code "${_XML}" "${_WAYLAND_PROT_C_CODE}"
+    )
+
+    set(SOURCE_FILES ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+endmacro()
+
 # Requires:
 # - EGL
 # - PkgCheckModules
@@ -545,7 +568,51 @@ endmacro()
 # - HAVE_DLOPEN opt
 macro(CheckWayland)
   if(VIDEO_WAYLAND)
-    pkg_check_modules(WAYLAND wayland-client wayland-cursor wayland-egl egl xkbcommon)
+    pkg_check_modules(WAYLAND wayland-client wayland-scanner wayland-protocols wayland-egl wayland-cursor egl xkbcommon)
+
+    # We have to generate some protocol interface code for some various Wayland features.
+    if(WAYLAND_FOUND)
+      execute_process(
+        COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=pkgdatadir wayland-client
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        RESULT_VARIABLE WAYLAND_CORE_PROTOCOL_DIR_RC
+        OUTPUT_VARIABLE WAYLAND_CORE_PROTOCOL_DIR
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      if(NOT WAYLAND_CORE_PROTOCOL_DIR_RC EQUAL 0)
+        set(WAYLAND_FOUND FALSE)
+      endif()
+    endif()
+
+    if(WAYLAND_FOUND)
+      execute_process(
+        COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=pkgdatadir wayland-protocols
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        RESULT_VARIABLE WAYLAND_PROTOCOLS_DIR_RC
+        OUTPUT_VARIABLE WAYLAND_PROTOCOLS_DIR
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      if(NOT WAYLAND_PROTOCOLS_DIR_RC EQUAL 0)
+        set(WAYLAND_FOUND FALSE)
+      endif()
+    endif()
+
+    if(WAYLAND_FOUND)
+      execute_process(
+        COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=wayland_scanner wayland-scanner
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        RESULT_VARIABLE WAYLAND_SCANNER_RC
+        OUTPUT_VARIABLE WAYLAND_SCANNER
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      if(NOT WAYLAND_SCANNER_RC EQUAL 0)
+        set(WAYLAND_FOUND FALSE)
+      endif()
+    endif()
+
     if(WAYLAND_FOUND)
       link_directories(
           ${WAYLAND_LIBRARY_DIRS}
@@ -558,6 +625,17 @@ macro(CheckWayland)
 
       file(GLOB WAYLAND_SOURCES ${SDL2_SOURCE_DIR}/src/video/wayland/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${WAYLAND_SOURCES})
+
+      # We have to generate some protocol interface code for some unstable Wayland features.
+      file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+      include_directories("${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+
+      WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_CORE_PROTOCOL_DIR}/wayland.xml" "wayland")
+
+      foreach(_PROTL relative-pointer-unstable-v1 pointer-constraints-unstable-v1)
+        string(REGEX REPLACE "\\-unstable\\-.*$" "" PROTSUBDIR ${_PROTL})
+        WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_PROTOCOLS_DIR}/unstable/${PROTSUBDIR}/${_PROTL}.xml" "${_PROTL}")
+      endforeach()
 
       if(VIDEO_WAYLAND_QT_TOUCH)
           set(SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH 1)
@@ -679,7 +757,6 @@ macro(CheckOpenGLX11)
       set(SDL_VIDEO_OPENGL 1)
       set(SDL_VIDEO_OPENGL_GLX 1)
       set(SDL_VIDEO_RENDER_OGL 1)
-      list(APPEND EXTRA_LIBS GL)
     endif()
   endif()
 endmacro()
@@ -767,7 +844,8 @@ macro(CheckPTHREAD)
     endif()
 
     # Run some tests
-    set(CMAKE_REQUIRED_FLAGS "${PTHREAD_CFLAGS} ${PTHREAD_LDFLAGS}")
+    set(ORIG_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${PTHREAD_CFLAGS} ${PTHREAD_LDFLAGS}")
     if(CMAKE_CROSSCOMPILING)
       set(HAVE_PTHREADS 1)
     else()
@@ -829,7 +907,7 @@ macro(CheckPTHREAD)
           int main(int argc, char** argv) { return 0; }" HAVE_PTHREAD_NP_H)
       check_function_exists(pthread_setname_np HAVE_PTHREAD_SETNAME_NP)
       check_function_exists(pthread_set_name_np HAVE_PTHREAD_SET_NAME_NP)
-      set(CMAKE_REQUIRED_FLAGS)
+      set(CMAKE_REQUIRED_FLAGS "${ORIG_CMAKE_REQUIRED_FLAGS}")
 
       set(SOURCE_FILES ${SOURCE_FILES}
           ${SDL2_SOURCE_DIR}/src/thread/pthread/SDL_systhread.c
@@ -883,7 +961,8 @@ macro(CheckUSBHID)
     endif()
   endif()
 
-  set(CMAKE_REQUIRED_FLAGS "${USB_CFLAGS}")
+  set(ORIG_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
+  set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${USB_CFLAGS}")
   set(CMAKE_REQUIRED_LIBRARIES "${USB_LIBS}")
   check_c_source_compiles("
        #include <sys/types.h>
@@ -984,7 +1063,7 @@ macro(CheckUSBHID)
     set(HAVE_SDL_JOYSTICK TRUE)
 
     set(CMAKE_REQUIRED_LIBRARIES)
-    set(CMAKE_REQUIRED_FLAGS)
+    set(CMAKE_REQUIRED_FLAGS "${ORIG_CMAKE_REQUIRED_FLAGS}")
   endif()
 endmacro()
 
@@ -998,12 +1077,13 @@ macro(CheckRPI)
     listtostr(VIDEO_RPI_INCLUDE_DIRS VIDEO_RPI_INCLUDE_FLAGS "-I")
     listtostr(VIDEO_RPI_LIBRARY_DIRS VIDEO_RPI_LIBRARY_FLAGS "-L")
 
-    set(CMAKE_REQUIRED_FLAGS "${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS}")
+    set(ORIG_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS}")
     set(CMAKE_REQUIRED_LIBRARIES "${VIDEO_RPI_LIBS}")
     check_c_source_compiles("
         #include <bcm_host.h>
         int main(int argc, char **argv) {}" HAVE_VIDEO_RPI)
-    set(CMAKE_REQUIRED_FLAGS)
+    set(CMAKE_REQUIRED_FLAGS "${ORIG_CMAKE_REQUIRED_FLAGS}")
     set(CMAKE_REQUIRED_LIBRARIES)
 
     if(SDL_VIDEO AND HAVE_VIDEO_RPI)

@@ -237,10 +237,10 @@
 			SRC    = OPER_8_##MODE();                                       \
 			if(FLAG_D)                                                      \
 			{                                                               \
-				INT32 result, r0, r1, carry;                                                    \
+				int32_t result, r0, r1, carry;                                                    \
 				r0 = REGISTER_A;    \
 				r1 = SRC;       \
-				carry = CFLAG_AS_1();   \
+				carry = CFLAG_1();   \
 				result = (r0 & 0x0f) + (r1 & 0x0f) + (carry << 0);                          \
 				if (result > 0x09) result += 0x06;                                      \
 				carry = result > 0x0f;                                              \
@@ -253,7 +253,7 @@
 			}                                                               \
 			else                                                            \
 			{                                                               \
-				FLAG_C = tmp16 = REGISTER_A + SRC + CFLAG_AS_1();           \
+				FLAG_C = tmp16 = REGISTER_A + SRC + CFLAG_1();           \
 				FLAG_V = VFLAG_ADD_8(SRC, REGISTER_A, FLAG_C);              \
 				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(tmp16);              \
 			}                                                               \
@@ -263,10 +263,10 @@
 #define OP_ADC(MODE)                                                        \
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);                             \
 			SRC    = OPER_16_##MODE();                                      \
-			INT32 result, r0, r1, carry;                                                    \
+			int32_t result, r0, r1, carry;                                                    \
 			r0 = REGISTER_A;    \
 			r1 = SRC;       \
-			carry = CFLAG_AS_1();   \
+			carry = CFLAG_1();   \
 			if (!FLAG_D)    \
 			{   \
 				result = r0 + r1 + carry;   \
@@ -994,12 +994,12 @@
 #if FLAG_SET_M
 #define OP_ROL()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REGISTER_A<<1) | CFLAG_AS_1();                                \
+			FLAG_C = (REGISTER_A<<1) | CFLAG_1();                                \
 			FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(FLAG_C)
 #else
 #define OP_ROL()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_C = (REGISTER_A<<1) | CFLAG_AS_1();                                \
+			FLAG_C = (REGISTER_A<<1) | CFLAG_1();                                \
 			FLAG_Z = REGISTER_A = MAKE_UINT_16(FLAG_C);                         \
 			FLAG_N = NFLAG_16(FLAG_C);                                      \
 			FLAG_C = CFLAG_16(FLAG_C)
@@ -1011,14 +1011,14 @@
 #define OP_ROLM(MODE)                                                       \
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);                          \
 			DST = EA_##MODE();                                              \
-			FLAG_C = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();                \
+			FLAG_C = (read_8_##MODE(DST)<<1) | CFLAG_1();                \
 			FLAG_N = FLAG_Z = MAKE_UINT_8(FLAG_C);                          \
 			write_8_##MODE(DST, FLAG_Z)
 #else
 #define OP_ROLM(MODE)                                                       \
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);                         \
 			DST = EA_##MODE();                                              \
-			FLAG_C = (read_16_##MODE(DST)<<1) | CFLAG_AS_1();               \
+			FLAG_C = (read_16_##MODE(DST)<<1) | CFLAG_1();               \
 			FLAG_Z = MAKE_UINT_16(FLAG_C);                                  \
 			FLAG_N = NFLAG_16(FLAG_C);                                      \
 			FLAG_C = CFLAG_16(FLAG_C);                                      \
@@ -1102,7 +1102,7 @@
 			if(!FLAG_D)                                                     \
 			{                                                               \
 				FLAG_C = ~FLAG_C;                                               \
-				FLAG_C = REGISTER_A - SRC - CFLAG_AS_1();                   \
+				FLAG_C = REGISTER_A - SRC - CFLAG_1();                   \
 				FLAG_V = VFLAG_SUB_8(SRC, REGISTER_A, FLAG_C);              \
 				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_8(FLAG_C);         \
 				FLAG_C = ~FLAG_C;                                           \
@@ -1110,11 +1110,11 @@
 			}                                                               \
 			else                                                            \
 			{                                                               \
-				INT32 result, r0, r1, carry;                                                    \
+				int32_t result, r0, r1, carry;                                                    \
 				r0 = REGISTER_A;    \
 				r1 = SRC;       \
 				r1 ^= 0xff;     \
-				carry = CFLAG_AS_1();   \
+				carry = CFLAG_1();   \
 				result = (r0 & 0x0f) + (r1 & 0x0f) + (carry << 0);  \
 				if (result <= 0x0f) result -= 0x06; \
 				carry = result > 0x0f;  \
@@ -1129,11 +1129,11 @@
 #define OP_SBC(MODE)                                                        \
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);                             \
 			SRC    = OPER_16_##MODE();                                      \
-			INT32 result, r0, r1, carry;                                                    \
+			int32_t result, r0, r1, carry;                                                    \
 			r0 = REGISTER_A;    \
 			r1 = SRC;       \
 			r1 ^= 0xffff;       \
-			carry = CFLAG_AS_1();   \
+			carry = CFLAG_1();   \
 			if (!FLAG_D)    \
 			{   \
 				result = r0 + r1 + carry;   \
@@ -1450,7 +1450,7 @@
 #undef OP_XCE
 #define OP_XCE()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			SRC = CFLAG_AS_1();                                             \
+			SRC = CFLAG_1();                                             \
 			FLAG_C = FLAG_E<<8;                                             \
 			g65816i_set_flag_e(SRC)
 
@@ -1858,7 +1858,7 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 
 
 /* Get a register from the CPU core */
-TABLE_FUNCTION(uint, get_reg, (int regnum))
+TABLE_FUNCTION(unsigned, get_reg, (int regnum))
 {
 	switch(regnum)
 	{
@@ -1883,7 +1883,7 @@ TABLE_FUNCTION(uint, get_reg, (int regnum))
 
 
 
-TABLE_FUNCTION(void, set_reg, (int regnum, uint val))
+TABLE_FUNCTION(void, set_reg, (int regnum, unsigned val))
 {
 	switch(regnum)
 	{

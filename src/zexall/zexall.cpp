@@ -48,11 +48,11 @@ public:
 	DECLARE_DRIVER_INIT(zexall);
 private:
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_main_ram;
-	UINT8 m_out_data; // byte written to 0xFFFF
-	UINT8 m_out_req; // byte written to 0xFFFE
-	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
-	UINT8 m_out_ack; // byte written to 0xFFFC
+	required_shared_ptr<uint8_t> m_main_ram;
+	uint8_t m_out_data; // byte written to 0xFFFF
+	uint8_t m_out_req; // byte written to 0xFFFE
+	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
+	uint8_t m_out_ack; // byte written to 0xFFFC
 	virtual void machine_reset() override;
 	std::string terminate_string;
 };
@@ -140,7 +140,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( zexall, zexall_state )
+static MACHINE_CONFIG_START( zexall )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)

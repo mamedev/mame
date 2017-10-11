@@ -33,7 +33,7 @@ static int cas_size;
 static int level;
 
 
-static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
+static int cgenie_output_byte(int16_t *buffer, int sample_count, uint8_t data)
 {
 	int samples = 0;
 
@@ -58,7 +58,7 @@ static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
 }
 
 
-static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
+static int cgenie_handle_cas(int16_t *buffer, const uint8_t *casdata)
 {
 	int data_pos, sample_count;
 
@@ -108,7 +108,7 @@ static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int cgenie_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int cgenie_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	return cgenie_handle_cas(buffer, bytes);
 }
@@ -117,7 +117,7 @@ static int cgenie_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int cgenie_cas_to_wav_size(const UINT8 *casdata, int caslen)
+static int cgenie_cas_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	cas_size = caslen;
 

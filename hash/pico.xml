@@ -42,7 +42,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
 * それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
-* アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
@@ -305,6 +304,20 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+	<software name="poohcornsw" cloneof="poohcorn">
+		<description>Ett År med Nalle Puh (Swe)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49021-24"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18576-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18576-t.ic1" size="524288" crc="0a48bbb9" sha1="a702d91a72066bea72e7cff9013f1b94f2623761" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohcornu" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (USA)</description>
 		<year>1994</year>
@@ -419,6 +432,25 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="PICO-9516S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pico-9516s.ic1" size="1048576" crc="68bc6c65" sha1="94d3c164524fd9b5667bcba7a6533993b673366a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanwpk">
+		<description>Anpanman Pico Wakuwaku Pan Koujou (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133350"/>
+		<info name="release" value="200106xx"/>
+		<info name="alt_title" value="アンパンマンピコ わくわくパン工場 ~ Anpanman Pico Wakuwaku Pan Koujou"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0041A" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9k0-0041a-rv.ic1" size="1048576" crc="a10118a5" sha1="b9fce10b2558f73048d30398410b0e3340e87610" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -647,6 +679,31 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="9K0-0032-RV" />
 			<dataarea name="rom" size="2097152">
 				<rom name="9k0-0032-rv.ic1" size="2097152" crc="c95a4ef3" sha1="24d03589c4192e139f0eb33ce6e4b4a87c949a9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cookpico">
+		<description>Cooking Pico (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0001A-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0001a-rv.ic1" size="2097152" crc="b94f7d54" sha1="dabeb440adbb7477cc880c51fb0cfc1e5f99d23b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cookpicok" cloneof="cookpico">
+		<description>Cooking Pico (Kor)</description>
+		<year>1999</year> <!-- PCB had a 2001 date so could be later -->
+		<publisher>Sega Toys / Samsung</publisher>
+		<info name="serial" value="HPC-6076"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samsung pico-cook.u1" size="2097152" crc="c8fd3ad4" sha1="6d35b3411df37222acb3a36e4c7830e92a8e3fba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1354,6 +1411,17 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojri" cloneof="eccojr">
+		<description>Ecco Jr. e la Grande Caccia al Tesoro nell'Oceano! (Ita)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17738-h.ic1" size="524288" crc="03ca1014" sha1="64e5d8f749e9e6c839b3655c9e8cf38e699c058d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2071,6 +2139,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+  <!-- The 'Best Selection' release has been confirmed to contain the exact same data as the original (but stored in an epoxy block) -->
 	<software name="ihthomas">
 		<description>Issho ni Hashirou Kikansha Thomas (Jpn)</description>
 		<year>199?</year>
@@ -2526,6 +2595,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+		<software name="lionkingsw" cloneof="lionking" supported="no">
+		<description>Lejonkungen Äventyr (Swe)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49037-24"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18578-U" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18578-u.ic1" size="1048576" crc="c515eb6e" sha1="f72f9037c7f21a6ba5bebd7f835ae74be352d29a"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkingu" cloneof="lionking" supported="no">
 		<description>The Lion King - Adventure at Pride Rock (USA)</description>
 		<year>19??</year>
@@ -2540,6 +2623,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- This was also released for the Swedish market with serial MK-49026-24, pcb 171-6882A. ROM is marked MPR-17729-T but contents match -->
 	<software name="magiccra">
 		<description>Magic Crayons (Euro)</description>
 		<year>1994</year>
@@ -4721,6 +4805,18 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="toystor2k" cloneof="toystor2">
+		<description>Toy Story 2 (Kor)</description>
+		<year>199?</year>
+		<publisher>Sega Toys / Samsung</publisher>
+		<info name="serial" value="HPC-6090"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samsung pico-toy2.u1" size="2097152" crc="27ef458e" sha1="e4f908d235d25d21390a8965416a34c91b880b63" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultraher">
 		<description>UltraHero (Jpn)</description>
 		<year>1995</year>
@@ -5104,12 +5200,13 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="gakkohik">
-		<description>Gakken no Obenkyou Soft - Tashizan Hikizan (Jpn, Prototype)</description>
+		<description>Gakken no Obenkyou Soft - Tashizan Hikizan (Japan)</description> <!-- release matches previously dumped prototype -->
 		<year>1995</year>
 		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169070-00"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="gakken no obenkyou soft tasizan hikizan (1995)(chips - gakken)(jp)(beta).bin" size="524288" crc="25639a73" sha1="d0a768236e21d05ea1734691ab9031ea7a4b3e47" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17620-s.u1" size="524288" crc="25639a73" sha1="d0a768236e21d05ea1734691ab9031ea7a4b3e47" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6004,6 +6101,42 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-20642 J54" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-20642 j54.ic1" size="1048576" crc="27b74c2d" sha1="459b9c49124894e0a3e5124d13ce34ff109ff076" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clouwizd">
+		<description>The Cloud is Wizard (Kor)</description>
+		<year>1997</year>
+		<publisher>Sega / Samsung</publisher>
+		<info name="serial" value="T-102131-08" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="samsung km23c8100dg pico-9837g.u1" size="1048576" crc="70b7440e" sha1="d6f7b9c9e5714afebfdb116480f73976eae23d17" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muattago">
+		<description>Muat Tago Galka (Kor)</description>
+		<year>1998</year>
+		<publisher>Sega / Samsung</publisher>
+		<info name="serial" value="T-102151-08" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="samsung km23c8100dg pico-9840g.u1" size="1048576" crc="9974d421" sha1="7026dec346ce459ad5e81f3c4d209e2480d6626c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmtour">
+		<description>Dreamland Tour (Kor)</description>
+		<year>1997</year>
+		<publisher>Sega / Samsung</publisher>
+		<info name="serial" value="T-102161-08" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="samsung km23c8100dg pico-9728g.u1" size="1048576" crc="7d2aaa9a" sha1="17060b1d622fa8dffe0db2de748472c21aaac364" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

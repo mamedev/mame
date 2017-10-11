@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_KC_RAM_H
+#define MAME_BUS_KC_RAM_H
+
 #pragma once
 
-#ifndef __KC_RAM_H__
-#define __KC_RAM_H__
-
-#include "emu.h"
 #include "kc.h"
 
 //**************************************************************************
@@ -20,19 +19,20 @@ class kc_m011_device :
 {
 public:
 	// construction/destruction
-	kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0xf6; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0xf6; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
 
 protected:
@@ -40,15 +40,15 @@ protected:
 
 	// internal state
 	int     m_mei;          // module enable line
-	UINT8 * m_ram;
-	UINT8   m_enabled;
-	UINT8   m_write_enabled;
-	UINT16  m_base;
-	UINT8   m_segment;
+	uint8_t * m_ram;
+	uint8_t   m_enabled;
+	uint8_t   m_write_enabled;
+	uint16_t  m_base;
+	uint8_t   m_segment;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const { return 0x10000; }
+	virtual uint32_t get_ram_size() const { return 0x10000; }
 };
 
 
@@ -59,17 +59,17 @@ class kc_m022_device :
 {
 public:
 	// construction/destruction
-	kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0xf4; }
-	virtual void read(offs_t offset, UINT8 &ata) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0xf4; }
+	virtual void read(offs_t offset, uint8_t &ata) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const override { return 0x4000; }
+	virtual uint32_t get_ram_size() const override { return 0x4000; }
 };
 
 
@@ -80,21 +80,21 @@ class kc_m032_device :
 {
 public:
 	// construction/destruction
-	kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0x79; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0x79; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const override { return 0x40000; }
+	virtual uint32_t get_ram_size() const override { return 0x40000; }
 };
 
 
@@ -105,21 +105,21 @@ class kc_m034_device :
 {
 public:
 	// construction/destruction
-	kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0x7a; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0x7a; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const override { return 0x80000; }
+	virtual uint32_t get_ram_size() const override { return 0x80000; }
 };
 
 
@@ -130,18 +130,18 @@ class kc_m035_device :
 {
 public:
 	// construction/destruction
-	kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0x7b; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0x7b; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const override { return 0x100000; }
+	virtual uint32_t get_ram_size() const override { return 0x100000; }
 };
 
 
@@ -152,29 +152,29 @@ class kc_m036_device :
 {
 public:
 	// construction/destruction
-	kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() override { return 0x78; }
-	virtual void control_w(UINT8 data) override;
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
+	virtual uint8_t module_id_r() override { return 0x78; }
+	virtual void control_w(uint8_t data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	// internal helpers
-	virtual UINT32 get_ram_size() const override { return 0x20000; }
+	virtual uint32_t get_ram_size() const override { return 0x20000; }
 };
 
 // device type definition
-extern const device_type KC_M011;
-extern const device_type KC_M022;
-extern const device_type KC_M032;
-extern const device_type KC_M034;
-extern const device_type KC_M035;
-extern const device_type KC_M036;
+DECLARE_DEVICE_TYPE(KC_M011, kc_m011_device)
+DECLARE_DEVICE_TYPE(KC_M022, kc_m022_device)
+DECLARE_DEVICE_TYPE(KC_M032, kc_m032_device)
+DECLARE_DEVICE_TYPE(KC_M034, kc_m034_device)
+DECLARE_DEVICE_TYPE(KC_M035, kc_m035_device)
+DECLARE_DEVICE_TYPE(KC_M036, kc_m036_device)
 
-#endif  /* __KC_RAM_H__ */
+#endif // MAME_BUS_KC_RAM_H

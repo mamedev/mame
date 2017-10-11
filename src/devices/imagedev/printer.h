@@ -8,8 +8,10 @@
 
 ****************************************************************************/
 
-#ifndef __PRINTER_H__
-#define __PRINTER_H__
+#ifndef MAME_DEVICES_IMAGEDEV_PRINTER_H
+#define MAME_DEVICES_IMAGEDEV_PRINTER_H
+
+#pragma once
 
 #define MCFG_PRINTER_ONLINE_CB(_devcb) \
 	devcb = &printer_image_device::set_online_callback(*device, DEVCB_##_devcb);
@@ -25,7 +27,7 @@ class printer_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_online_callback(device_t &device, _Object object) { return downcast<printer_image_device &>(device).m_online_cb.set_callback(object); }
 
@@ -48,17 +50,16 @@ public:
 	/* checks to see if a printer is ready */
 	int is_ready();
 	/* outputs data to a printer */
-	void output(UINT8 data);
+	void output(uint8_t data);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	devcb_write_line m_online_cb;
 };
 
 
 // device type definition
-extern const device_type PRINTER;
+DECLARE_DEVICE_TYPE(PRINTER, printer_image_device)
 
-#endif /* __PRINTER_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_PRINTER_H

@@ -98,28 +98,21 @@ Dip Locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "includes/bombjack.h"
 
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
-TIMER_CALLBACK_MEMBER(bombjack_state::soundlatch_callback)
+
+READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 {
-	m_latch = param;
-}
-
-WRITE8_MEMBER(bombjack_state::bombjack_soundlatch_w)
-{
-	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bombjack_state::soundlatch_callback),this), data);
-}
-
-READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)
-{
-	int res;
-
-	res = m_latch;
-	m_latch = 0;
+	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
+	// (this flip-flop is then cleared in sync with the sound CPU clock)
+	uint8_t res = m_soundlatch->read(space, 0);
+	if (!machine().side_effect_disabled())
+		m_soundlatch->clear_w(space, 0, 0);
 	return res;
 }
 
@@ -152,14 +145,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(bombjack_flipscreen_w)
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(bombjack_soundlatch_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(bombjack_soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_read_and_clear)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, bombjack_state )
@@ -333,14 +326,12 @@ GFXDECODE_END
 
 void bombjack_state::machine_start()
 {
-	save_item(NAME(m_latch));
 	save_item(NAME(m_background_image));
 }
 
 
 void bombjack_state::machine_reset()
 {
-	m_latch = 0;
 	m_background_image = 0;
 }
 
@@ -351,7 +342,7 @@ INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bombjack, bombjack_state )
+static MACHINE_CONFIG_START( bombjack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)     /* Confirmed from PCB */
@@ -363,6 +354,7 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	MCFG_CPU_IO_MAP(audio_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  nmi_line_pulse)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -504,6 +496,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bombjack,  0,        bombjack, bombjack, driver_device, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjack2, bombjack, bombjack, bombjack, driver_device, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjackt, bombjack, bombjack, bombjack, driver_device, 0, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence
+GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence

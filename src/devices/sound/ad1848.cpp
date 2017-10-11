@@ -3,37 +3,49 @@
 
 // Analog Devices AD1848, main codec in Windows Sound System adapters
 
+#include "emu.h"
 #include "sound/ad1848.h"
 
-const device_type AD1848 = device_creator<ad1848_device>;
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
-ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AD1848, "Analog Devices AD1848", tag, owner, clock, "ad1848", __FILE__),
+
+DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "Analog Device AD1848")
+
+ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, AD1848, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this),
-	m_dacl(*this, "dacl"),
-	m_dacr(*this, "dacr")
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac")
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( ad1848_config )
+MACHINE_CONFIG_MEMBER( ad1848_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-machine_config_constructor ad1848_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ad1848_config );
-}
 
 void ad1848_device::device_start()
 {
 	m_timer = timer_alloc(0, nullptr);
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
+	save_item(NAME(m_regs.idx));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_stat));
+	save_item(NAME(m_sam_cnt));
+	save_item(NAME(m_samples));
+	save_item(NAME(m_count));
+	save_item(NAME(m_play));
+	save_item(NAME(m_mce));
+	save_item(NAME(m_trd));
+	save_item(NAME(m_irq));
 }
 
 void ad1848_device::device_reset()
@@ -44,6 +56,7 @@ void ad1848_device::device_reset()
 	m_sam_cnt = 0;
 	m_samples = 0;
 	m_play = false;
+	m_irq = false;
 }
 
 READ8_MEMBER(ad1848_device::read)
@@ -55,7 +68,7 @@ READ8_MEMBER(ad1848_device::read)
 		case 1:
 			return m_regs.idx[m_addr];
 		case 2:
-			return m_stat;
+			return m_stat | (m_irq ? 1 : 0);
 		case 3:
 			break; // capture
 	}
@@ -64,7 +77,7 @@ READ8_MEMBER(ad1848_device::read)
 
 WRITE8_MEMBER(ad1848_device::write)
 {
-	const int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
+	static constexpr int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
 	switch(offset)
 	{
 		case 0:
@@ -99,6 +112,7 @@ WRITE8_MEMBER(ad1848_device::write)
 			break;
 		case 2:
 			m_irq_cb(CLEAR_LINE);
+			m_irq = false;
 			if(m_regs.iface & 1)
 				m_play = true;
 			break;
@@ -149,12 +163,12 @@ void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch(m_regs.dform >> 4)
 	{
 		case 0: // 8bit mono
-			m_dacl->write_unsigned8(m_samples & 0xff);
-			m_dacr->write_unsigned8(m_samples & 0xff);
+			m_ldac->write(m_samples << 8);
+			m_rdac->write(m_samples << 8);
 			break;
 		case 1: // 8bit stereo
-			m_dacl->write_unsigned8(m_samples & 0xff);
-			m_dacr->write_unsigned8((m_samples >> 8) & 0xff);
+			m_ldac->write(m_samples << 8);
+			m_rdac->write(m_samples & 0xff00);
 			break;
 		case 2: // ulaw mono
 		case 3: // ulaw stereo
@@ -162,12 +176,12 @@ void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case 7: // alaw stereo
 			break;
 		case 4: // 16bit mono
-			m_dacl->write(m_samples & 0xffff);
-			m_dacr->write(m_samples & 0xffff);
+			m_ldac->write(m_samples ^ 0x8000);
+			m_rdac->write(m_samples ^ 0x8000);
 			break;
 		case 5: // 16bit stereo
-			m_dacl->write(m_samples & 0xffff);
-			m_dacr->write(m_samples >> 16);
+			m_ldac->write(m_samples ^ 0x8000);
+			m_rdac->write((m_samples >> 16) ^ 0x8000);
 			break;
 	}
 	if(!m_count)
@@ -177,6 +191,7 @@ void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if(m_trd)
 				m_play = false;
 			m_irq_cb(ASSERT_LINE);
+			m_irq = true;
 		}
 		m_count = (m_regs.ubase << 8) | m_regs.lbase;
 	}

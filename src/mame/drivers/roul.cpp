@@ -65,9 +65,12 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/ay8910.h"
-#include "roul.lh"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "roul.lh"
 
 
 class roul_state : public driver_device
@@ -83,9 +86,9 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_reg[0x10];
-	std::unique_ptr<UINT8[]> m_videobuf;
-	UINT8 m_lamp_old;
+	uint8_t m_reg[0x10];
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp_old;
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
@@ -95,7 +98,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(roul);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -104,7 +107,7 @@ public:
 
 PALETTE_INIT_MEMBER(roul_state, roul)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -225,14 +228,14 @@ ADDRESS_MAP_END
 
 void roul_state::video_start()
 {
-	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
 	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 
-UINT32 roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,j;
 	for (i = 0; i < 256; i++)
@@ -291,7 +294,7 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( roul, roul_state )
+static MACHINE_CONFIG_START( roul )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(roul_map)
@@ -338,4 +341,4 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
-GAMEL( 1990, roul,  0,   roul, roul, driver_device, 0, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )
+GAMEL( 1990, roul,  0,   roul, roul, roul_state, 0, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )

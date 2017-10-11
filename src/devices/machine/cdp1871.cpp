@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cdp1871.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CDP1871 = &device_creator<cdp1871_device>;
+DEFINE_DEVICE_TYPE(CDP1871, cdp1871_device, "cdp1871", "RCA CDP1871 Keyboard Encoder")
 
 
 
@@ -22,7 +23,7 @@ const device_type CDP1871 = &device_creator<cdp1871_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-const UINT8 cdp1871_device::key_codes[4][11][8] =
+const uint8_t cdp1871_device::key_codes[4][11][8] =
 {
 	// normal
 	{
@@ -95,8 +96,8 @@ const UINT8 cdp1871_device::key_codes[4][11][8] =
 //  cdp1871_device - constructor
 //-------------------------------------------------
 
-cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock, "cdp1871", __FILE__),
+cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CDP1871, tag, owner, clock),
 	m_read_d1(*this),
 	m_read_d2(*this),
 	m_read_d3(*this),
@@ -235,7 +236,7 @@ void cdp1871_device::clock_scan_counters()
 
 void cdp1871_device::detect_keypress()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_drive) {
 	case 0: data = m_read_d1(0); break;

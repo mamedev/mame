@@ -33,19 +33,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/taito_f3.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "includes/taito_f3.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	int data = m_dial[num]->read();
 	return ((data & 0xf)<<12) | ((data & 0xff0)>>4);
 }
@@ -53,7 +55,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	return m_coin_word[num];
 }
 
@@ -119,8 +121,8 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memregion("taito_en:audiocpu")->base();
-		UINT32 idx;
+		uint16_t *rom = (uint16_t *)memregion("taito_en:audiocpu")->base();
+		uint32_t idx;
 
 		idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
@@ -199,9 +201,28 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("snd_shared")
+	AM_RANGE(0xc00000, 0xc007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bubsympb_map, AS_PROGRAM, 32, taito_f3_state )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
+	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
+	AM_RANGE(0x4a0000, 0x4a001b) AM_READWRITE(f3_control_r,  f3_control_w)
+	AM_RANGE(0x4a001c, 0x4a001f) AM_READWRITE(bubsympb_oki_r, bubsympb_oki_w)
+	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
+	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
+	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
+	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
+	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
+	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
+	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
+	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
+	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -402,17 +423,17 @@ void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taito_f3_state::device_timer");
+		assert_always(false, "Unknown id in taito_f3_state::device_timer");
 	}
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 {
 	device.execute().set_input_line(2, HOLD_LINE);  // vblank
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);
+	m_interrupt3_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
-static const UINT16 recalh_eeprom[64] = {
+static const uint16_t recalh_eeprom[64] = {
 	0x8554,0x0000,0x3000,0x0000,0x0000,0x0000,0x0000,0xf335,
 	0x0001,0x86a0,0x0013,0x0413,0x0000,0xc350,0x0019,0x000a,
 	0x0000,0x4e20,0x0003,0x180d,0x0000,0x2710,0x0005,0x1418,
@@ -423,8 +444,10 @@ static const UINT16 recalh_eeprom[64] = {
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-MACHINE_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_start()
 {
+	m_interrupt3_timer = timer_alloc(TIMER_F3_INTERRUPT3);
+
 	save_item(NAME(m_coin_word));
 }
 
@@ -434,14 +457,13 @@ MACHINE_RESET_MEMBER(taito_f3_state,f3)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( f3, taito_f3_state )
+static MACHINE_CONFIG_START( f3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
-	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -455,7 +477,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_DRIVER(taito_f3_state, screen_eof_f3)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_f3)
 	MCFG_PALETTE_ADD("palette", 0x2000)
@@ -531,13 +553,11 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
+static MACHINE_CONFIG_START( bubsympb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
-
-	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
+	MCFG_CPU_PROGRAM_MAP(bubsympb_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -550,7 +570,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_DRIVER(taito_f3_state, screen_eof_f3)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bubsympb)
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -560,7 +580,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH) // not verified
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3815,9 +3835,9 @@ ROM_END
 
 static void tile_decode(running_machine &machine)
 {
-	UINT8 lsb,msb;
-	UINT32 offset,i;
-	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	uint8_t lsb,msb;
+	uint32_t offset,i;
+	uint8_t *gfx = machine.root_device().memregion("gfx2")->base();
 	int size=machine.root_device().memregion("gfx2")->bytes();
 	int data;
 
@@ -3993,7 +4013,7 @@ WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memregion("oki")->base();
+		uint8_t *snd = memregion("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -4013,11 +4033,11 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = memregion("gfx2")->base();
+		uint8_t *gfx = memregion("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
-			UINT8 byte = gfx[i];
+			uint8_t byte = gfx[i];
 			gfx[i+0] = (byte & 0x80)? 1<<4 : 0<<4;
 			gfx[i+0]|= (byte & 0x40)? 1<<0 : 0<<0;
 			gfx[i+1] = (byte & 0x20)? 1<<4 : 0<<4;
@@ -4028,9 +4048,6 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 			gfx[i+3]|= (byte & 0x01)? 1<<0 : 0<<0;
 		}
 	}
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4a001c, 0x4a001f, read32_delegate(FUNC(taito_f3_state::bubsympb_oki_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4a001c, 0x4a001f, write32_delegate(FUNC(taito_f3_state::bubsympb_oki_w),this));
 }
 
 
@@ -4060,7 +4077,7 @@ DRIVER_INIT_MEMBER(taito_f3_state,landmakr)
 
 DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
 {
-	UINT32 *RAM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *RAM = (uint32_t *)memregion("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
 	ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -4103,7 +4120,7 @@ DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	/* protection? */
 	ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);
@@ -4208,11 +4225,11 @@ GAME( 1994, hthero94, intcup94, f3_224a, f3, taito_f3_state, intcup94, ROT0,   "
 GAME( 1994, kaiserkn, 0,        f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )
 GAME( 1994, kaiserknj,kaiserkn, f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation",         "Kaiser Knuckle (Ver 2.1J 1994/07/29)", 0 )
 GAME( 1994, gblchmp,  kaiserkn, f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito America Corporation", "Global Champion (Ver 2.1A 1994/07/29)", 0 )
-GAME( 1994, dankuga,  kaiserkn, f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
+GAME( 1994, dankuga,  0,        f3_224a, kn, taito_f3_state, kaiserkn, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
 GAME( 1994, dariusg,  0,        f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation Japan",   "Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)", 0 )
 GAME( 1994, dariusgj, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
 GAME( 1994, dariusgu, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
-GAME( 1994, dariusgx, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
+GAME( 1994, dariusgx, 0,        f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
 GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
 GAME( 1994, bublbob2o,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bublbob2p,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )

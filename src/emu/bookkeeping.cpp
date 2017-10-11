@@ -39,7 +39,7 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 	machine.save().save_item(NAME(m_dispensed_tickets));
 
 	// register for configuration
-	machine.configuration().config_register("counters", config_saveload_delegate(FUNC(bookkeeping_manager::config_load), this), config_saveload_delegate(FUNC(bookkeeping_manager::config_save), this));
+	machine.configuration().config_register("counters", config_load_delegate(&bookkeeping_manager::config_load, this), config_save_delegate(&bookkeeping_manager::config_save, this));
 }
 
 
@@ -80,19 +80,19 @@ void bookkeeping_manager::increment_dispensed_tickets(int delta)
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
-	xml_data_node *coinnode, *ticketnode;
+	util::xml::data_node const *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
-	if (cfg_type == config_type::CONFIG_TYPE_INIT)
+	if (cfg_type == config_type::INIT)
 	{
 		memset(m_coin_count, 0, sizeof(m_coin_count));
 		m_dispensed_tickets = 0;
 	}
 
 	/* only care about game-specific data */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	/* might not have any data */
@@ -100,17 +100,17 @@ void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *paren
 		return;
 
 	/* iterate over coins nodes */
-	for (coinnode = xml_get_sibling(parentnode->child, "coins"); coinnode; coinnode = xml_get_sibling(coinnode->next, "coins"))
+	for (coinnode = parentnode->get_child("coins"); coinnode; coinnode = coinnode->get_next_sibling("coins"))
 	{
-		int index = xml_get_attribute_int(coinnode, "index", -1);
+		int index = coinnode->get_attribute_int("index", -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			m_coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
+			m_coin_count[index] = coinnode->get_attribute_int("number", 0);
 	}
 
 	/* get the single tickets node */
-	ticketnode = xml_get_sibling(parentnode->child, "tickets");
+	ticketnode = parentnode->get_child("tickets");
 	if (ticketnode != nullptr)
-		m_dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
+		m_dispensed_tickets = ticketnode->get_attribute_int("number", 0);
 }
 
 
@@ -119,32 +119,34 @@ void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *paren
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	int i;
 
 	/* only care about game-specific data */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	/* iterate over coin counters */
 	for (i = 0; i < COIN_COUNTERS; i++)
+	{
 		if (m_coin_count[i] != 0)
 		{
-			xml_data_node *coinnode = xml_add_child(parentnode, "coins", nullptr);
+			util::xml::data_node *coinnode = parentnode->add_child("coins", nullptr);
 			if (coinnode != nullptr)
 			{
-				xml_set_attribute_int(coinnode, "index", i);
-				xml_set_attribute_int(coinnode, "number", m_coin_count[i]);
+				coinnode->set_attribute_int("index", i);
+				coinnode->set_attribute_int("number", m_coin_count[i]);
 			}
 		}
+	}
 
 	/* output tickets */
 	if (m_dispensed_tickets != 0)
 	{
-		xml_data_node *tickets = xml_add_child(parentnode, "tickets", nullptr);
+		util::xml::data_node *tickets = parentnode->add_child("tickets", nullptr);
 		if (tickets != nullptr)
-			xml_set_attribute_int(tickets, "number", m_dispensed_tickets);
+			tickets->set_attribute_int("number", m_dispensed_tickets);
 	}
 }
 
@@ -198,7 +200,7 @@ void bookkeeping_manager::coin_lockout_w(int num,int on)
 int bookkeeping_manager::coin_lockout_get_state(int num)
 {
 	if (num >= ARRAY_LENGTH(m_coinlockedout))
-		return FALSE;
+		return false;
 	return m_coinlockedout[num];
 }
 

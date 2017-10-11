@@ -528,17 +528,22 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/ram.h"
+#include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
-#include "machine/upd765.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+
 #include "formats/imd_dsk.h"
+
 
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"
@@ -592,7 +597,7 @@ public:
 	required_device<i8257_device> m_dmac;
 	required_device<mc6845_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
-	required_shared_ptr<UINT8> m_shared;
+	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -627,16 +632,16 @@ public:
 
 	DECLARE_DRIVER_INIT(fanucspmg);
 
-	UINT8 m_vram[24576];
-	UINT8 m_video_ctrl;
+	uint8_t m_vram[24576];
+	uint8_t m_video_ctrl;
 
 private:
 	virtual void machine_reset() override;
-	INT32 m_vram_bank;
-	UINT8 m_vbl_ctrl;
-	UINT8 m_keyboard_row;
-	UINT8 m_vbl_stat;
-	UINT8 m_dma_page;
+	int32_t m_vram_bank;
+	uint8_t m_vbl_ctrl;
+	uint8_t m_keyboard_row;
+	uint8_t m_vbl_stat;
+	uint8_t m_dma_page;
 };
 
 DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
@@ -851,23 +856,23 @@ WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
-	UINT8 *chargen = m_chargen->base();
+	uint8_t *chargen = m_chargen->base();
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ma + i );
+		uint16_t offset = ( ma + i );
 
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
 			{
-				UINT8 chr = m_vram[offset + 0x600];
-				UINT8 attr = m_vram[offset];
-				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = 0;
-				UINT32 bg = 0;
+				uint8_t chr = m_vram[offset + 0x600];
+				uint8_t attr = m_vram[offset];
+				uint8_t data = chargen[ chr + (ra * 256) ];
+				uint32_t fg = 0;
+				uint32_t bg = 0;
 
 				if (attr & 0x20) fg |= 0xff0000;
 				if (attr & 0x40) fg |= 0x00ff00;
@@ -899,23 +904,23 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
-	UINT8 *chargen = m_chargen->base();
+	uint8_t *chargen = m_chargen->base();
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ma + i );
+		uint16_t offset = ( ma + i );
 
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
 			{
-				UINT8 chr = m_vram[offset + 0x600];
-//              UINT8 attr = m_vram[offset];
-				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = 0xff00;
-				UINT32 bg = 0;
+				uint8_t chr = m_vram[offset + 0x600];
+//              uint8_t attr = m_vram[offset];
+				uint8_t data = chargen[ chr + (ra * 256) ];
+				uint32_t fg = 0xff00;
+				uint32_t bg = 0;
 
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;
@@ -949,7 +954,7 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
+static MACHINE_CONFIG_START( fanucspmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
@@ -981,8 +986,14 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_I8257_IN_IOR_0_CB(READ8(fanucspmg_state, fdcdma_r))
 	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
 
-	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, READ8(fanucspmg_state, get_slave_ack))
-	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(fanucspmg_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
@@ -1037,6 +1048,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME       PARENT       COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
-COMP( 1983, fanucspg,  0,             0,    fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg,      0,    fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

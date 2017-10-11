@@ -192,13 +192,15 @@ Notes:
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
+#include "machine/terminal.h"
 #include "softlist.h"
+#include "screen.h"
 
 struct CDE_DMA
 {
-	UINT32 dst_addr;
+	uint32_t dst_addr;
 	int length;
-	UINT32 next_dst_addr;
+	uint32_t next_dst_addr;
 	int next_length;
 	int dma_done;
 };
@@ -209,21 +211,30 @@ public:
 	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
+		m_terminal(*this, "terminal"),
+		m_in_country(*this, "COUNTRY"),
+		m_in_card(*this, "CARD"),
+		m_in_monitor(*this, "MONITOR"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub") { }
 
-	required_shared_ptr<UINT64> m_main_ram;
-	UINT32 m_vdl0_address;
-	UINT32 m_vdl1_address;
-	UINT32 m_irq_enable;
-	UINT32 m_irq_active;
-	UINT64 m_unk3;
-	UINT32 m_unk20004;
+	required_shared_ptr<uint64_t> m_main_ram;
+	required_device<generic_terminal_device> m_terminal;
+	required_ioport m_in_country;
+	required_ioport m_in_card;
+	required_ioport m_in_monitor;
+
+	uint32_t m_vdl0_address;
+	uint32_t m_vdl1_address;
+	uint32_t m_irq_enable;
+	uint32_t m_irq_active;
+	uint64_t m_unk3;
+	uint32_t m_unk20004;
 	int m_counter1;
 	int m_cde_num_status_bytes;
-	UINT32 m_cde_status_bytes[16];
+	uint32_t m_cde_status_bytes[16];
 	int m_cde_status_byte_ptr;
-	UINT32 m_cde_command_bytes[16];
+	uint32_t m_cde_command_bytes[16];
 	int m_cde_command_byte_ptr;
 	int m_cde_response;
 	int m_cde_drive_state;
@@ -242,18 +253,25 @@ public:
 	DECLARE_READ64_MEMBER(unk30000_r);
 	DECLARE_READ64_MEMBER(unk30030_r);
 	DECLARE_WRITE64_MEMBER(video_w);
-	DECLARE_WRITE64_MEMBER(video_irq_ack_w);
+	DECLARE_WRITE32_MEMBER(video_irq_ack_w);
 	DECLARE_READ64_MEMBER(unk4000280_r);
-	DECLARE_WRITE64_MEMBER(unk4000010_w);
+	DECLARE_WRITE8_MEMBER(serial_w);
 	DECLARE_WRITE64_MEMBER(unk4000418_w);
 	DECLARE_WRITE64_MEMBER(reset_w);
 	DECLARE_READ64_MEMBER(cde_r);
 	DECLARE_WRITE64_MEMBER(cde_w);
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
+	DECLARE_READ8_MEMBER(id3_r);
+	DECLARE_READ8_MEMBER(id4_r);
+	DECLARE_READ8_MEMBER(id5_r);
+	DECLARE_READ8_MEMBER(id6_r);
+	DECLARE_READ8_MEMBER(id7_r);
+
 	DECLARE_DRIVER_INIT(m2);
 	virtual void video_start() override;
-	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
+	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
 	void cde_init();
 	void cde_handle_command();
@@ -268,24 +286,35 @@ void konamim2_state::video_start()
 {
 }
 
-UINT32 konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
+	uint32_t fb_start = 0xffffffff;
+	uint32_t fb_size;
+	//uint32_t config;
+	int height = 384,width = 512;
 
-	UINT32 fb_start = 0xffffffff;
 	if (m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&m_main_ram[(m_vdl0_address - 0x40000000) / 8] - 0x40000000;
+		uint32_t cur_vdl_address = screen.frame_number() & 1 ? m_vdl0_address : m_vdl1_address;
+		// TODO: this looks more likely to be a framebuffer copy, with parameters!
+		fb_start = *(uint32_t*)&m_main_ram[(cur_vdl_address - 0x40000000) / 8] - 0x40000000;
+		fb_size = m_main_ram[((cur_vdl_address - 0x40000000) / 8) + 2] >> 32;
+		//config = m_main_ram[(cur_vdl_address - 0x40000000) / 8] >> 32;
+		//popmessage("%08x",config);
+
+		height = fb_size & 0x1ff;
+		width = (fb_size >> 24) * 16;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&m_main_ram[fb_start/8];
-		for (j=0; j < 384; j++)
+		uint16_t *frame = (uint16_t*)&m_main_ram[fb_start/8];
+		for (j=0; j < height; j++)
 		{
-			UINT16 *fb = &frame[(j*512)];
-			UINT16 *d = &bitmap.pix16(j);
-			for (i=0; i < 512; i++)
+			uint16_t *fb = &frame[(j*width)];
+			uint16_t *d = &bitmap.pix16(j);
+			for (i=0; i < width; i++)
 			{
 				d[i^3] = *fb++ & 0x7fff;
 			}
@@ -300,11 +329,11 @@ UINT32 konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bit
 
 READ64_MEMBER(konamim2_state::irq_enable_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(m_irq_enable) << 32;
+		r |= (uint64_t)(m_irq_enable) << 32;
 	}
 
 	return r;
@@ -314,17 +343,17 @@ WRITE64_MEMBER(konamim2_state::irq_enable_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_irq_enable |= (UINT32)(data >> 32);
+		m_irq_enable |= (uint32_t)(data >> 32);
 	}
 }
 
 READ64_MEMBER(konamim2_state::irq_active_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(m_irq_active) << 32;
+		r |= (uint64_t)(m_irq_active) << 32;
 	}
 
 	return r;
@@ -334,7 +363,7 @@ READ64_MEMBER(konamim2_state::irq_active_r)
 
 READ64_MEMBER(konamim2_state::unk1_r)
 {
-	return U64(0xffffffffffffffff);
+	return 0xffffffffffffffffU;
 	//return 0;
 }
 
@@ -343,7 +372,7 @@ READ64_MEMBER(konamim2_state::unk2_r)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)0xa5 << 32;
+		return (uint64_t)0xa5 << 32;
 	}
 	return 0;
 }
@@ -351,19 +380,19 @@ READ64_MEMBER(konamim2_state::unk2_r)
 
 READ64_MEMBER(konamim2_state::unk3_r)
 {
-	//return U64(0xffffffffffffffff);
+	//return 0xffffffffffffffffU;
 	return m_unk3;
 }
 
 READ64_MEMBER(konamim2_state::unk4_r)
 {
-	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
+	uint64_t r = 0;
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_32_63)
 	{
 		// MCfg
-		r |= (UINT64)((0 << 13) | (5 << 10)) << 32;
+		r |= (uint64_t)((0 << 13) | (5 << 10)) << 32;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
@@ -374,18 +403,18 @@ READ64_MEMBER(konamim2_state::unk4_r)
 
 WRITE64_MEMBER(konamim2_state::unk4_w)
 {
-//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data),
+//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
 //          osd_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
-			m_subcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_subcpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 		}
 
-		m_unk20004 = (UINT32)(data);
+		m_unk20004 = (uint32_t)(data);
 		return;
 	}
 }
@@ -393,7 +422,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 READ64_MEMBER(konamim2_state::unk30000_r)
 {
 	m_counter1++;
-	return (UINT64)(m_counter1 & 0x7f) << 32;
+	return (uint64_t)(m_counter1 & 0x7f) << 32;
 }
 
 READ64_MEMBER(konamim2_state::unk30030_r)
@@ -409,22 +438,20 @@ WRITE64_MEMBER(konamim2_state::video_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		m_vdl0_address = (UINT32)(data >> 32);
+		m_vdl0_address = (uint32_t)(data >> 32);
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		m_vdl1_address = (UINT32)(data);
+		m_vdl1_address = (uint32_t)(data);
 	}
 }
 
-WRITE64_MEMBER(konamim2_state::video_irq_ack_w)
+WRITE32_MEMBER(konamim2_state::video_irq_ack_w)
 {
-	if (ACCESSING_BITS_32_63)
+	if (data & 0x8000)
 	{
-		if ((data >> 32) & 0x8000)
-		{
-			m_irq_active &= ~0x800000;
-		}
+		m_irq_active &= ~0x800000;
+		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 	}
 }
 
@@ -434,36 +461,29 @@ READ64_MEMBER(konamim2_state::unk4000280_r)
 {
 	// SysCfg
 
-	UINT32 sys_config = 0x03600000;
+	uint32_t sys_config = 0x03600000;
 
-	sys_config |= 0 << 0;           // Bit 0:       PAL/NTSC switch (default is selected by encoder)
-	sys_config |= 0 << 2;           // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
-	sys_config |= 3 << 11;          // Bit 11-12:   Country
+	sys_config |= 0 << 0;  // Bit 0:       PAL/NTSC switch (default is selected by encoder)
+	sys_config |= 0 << 2;                         // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
+	sys_config |= m_in_country->read() << 11;     // Bit 11-12:   Country
 									//              0 = ???
 									//              1 = UK
 									//              2 = Japan
 									//              3 = US
-	sys_config |= 0xb << 15;        // Bit 15-18:   0x8 = AC-DevCard
+	sys_config |= m_in_card->read() << 15;        // Bit 15-18:   0x8 = AC-DevCard
 									//              0xb = AC-CoreBoard
 									//              0xc = DevCard (not allowed)
 									//              0xe = Upgrade (not allowed)
 									//              0xf = Multiplayer (not allowed)
 	sys_config |= 3 << 29;          // Bit 29-30:   Audio chip (1 = CS4216, 3 = Asahi AK4309)
 
-	return ((UINT64)(sys_config) << 32);
+	return ((uint64_t)(sys_config) << 32);
 
 }
 
-WRITE64_MEMBER(konamim2_state::unk4000010_w)
+WRITE8_MEMBER(konamim2_state::serial_w)
 {
-	if ((data & 0xff) == 0xd)
-	{
-//      osd_printf_debug("\n");
-	}
-	else
-	{
-//      osd_printf_debug("%c", (UINT8)(data & 0xff));
-	}
+	m_terminal->write(space,0,data & 0xff);
 }
 
 WRITE64_MEMBER(konamim2_state::unk4000418_w)
@@ -474,7 +494,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		if (data & U64(0x100000000))
+		if (data & 0x100000000U)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			m_unk3 = 0;
@@ -827,7 +847,7 @@ void konamim2_state::cde_handle_reports()
 
 void konamim2_state::cde_dma_transfer(address_space &space, int channel, int next)
 {
-	UINT32 address;
+	uint32_t address;
 	//int length;
 	int i;
 
@@ -851,7 +871,7 @@ void konamim2_state::cde_dma_transfer(address_space &space, int channel, int nex
 
 READ64_MEMBER(konamim2_state::cde_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_0_31)
@@ -916,27 +936,27 @@ READ64_MEMBER(konamim2_state::cde_r)
 
 	if (reg & 1)
 	{
-		return (UINT64)(r);
+		return (uint64_t)(r);
 	}
 	else
 	{
-		return (UINT64)(r) << 32;
+		return (uint64_t)(r) << 32;
 	}
 }
 
 WRITE64_MEMBER(konamim2_state::cde_w)
 {
 	int reg = offset * 2;
-	UINT32 d;
+	uint32_t d;
 
 	if (ACCESSING_BITS_0_31)
 	{
 		reg++;
-		d = (UINT32)(data);
+		d = (uint32_t)(data);
 	}
 	else
 	{
-		d = (UINT32)(data >> 32);
+		d = (uint32_t)(data >> 32);
 	}
 
 	switch (reg)
@@ -1079,7 +1099,7 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 
 READ64_MEMBER(konamim2_state::device2_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_0_31)
@@ -1100,60 +1120,138 @@ READ64_MEMBER(konamim2_state::device2_r)
 
 	if (reg & 1)
 	{
-		return (UINT64)(r);
+		return (uint64_t)(r);
 	}
 	else
 	{
-		return (UINT64)(r) << 32;
+		return (uint64_t)(r) << 32;
 	}
 }
 
 READ64_MEMBER(konamim2_state::cpu_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((&space.device() != m_maincpu) ? 0x80000000 : 0);
-		//r |= 0x40000000;  // sets Video-LowRes !?
+		r = (uint64_t)((&space.device() != m_maincpu) ? 0x80000000 : 0);
+		r |= m_in_monitor->read() << 30;
 		return r << 32;
 	}
 
 	return 0;
 }
 
+READ8_MEMBER(konamim2_state::id3_r)
+{
+	return 0x03;
+}
+
+READ8_MEMBER(konamim2_state::id4_r)
+{
+	return 0x04;
+}
+
+READ8_MEMBER(konamim2_state::id5_r)
+{
+	return 0x05;
+}
+
+READ8_MEMBER(konamim2_state::id6_r)
+{
+	return 0x06;
+}
+
+READ8_MEMBER(konamim2_state::id7_r)
+{
+	return 0x07;
+}
+
 static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
+	AM_RANGE(0x00000000, 0x0000007f) AM_RAM // ???
 	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(unk4_r, unk4_w)
+	AM_RANGE(0x00020400, 0x000207ff) AM_RAM // ???
+	AM_RANGE(0x00020800, 0x00020807) AM_RAM // ???
 	AM_RANGE(0x00030000, 0x00030007) AM_READ(unk30000_r)
 	AM_RANGE(0x00030010, 0x00030017) AM_WRITE(video_w)
 	AM_RANGE(0x00030030, 0x00030037) AM_READ(unk30030_r)
-	AM_RANGE(0x00030400, 0x00030407) AM_WRITE(video_irq_ack_w)
+	AM_RANGE(0x00030400, 0x00030407) AM_WRITE32(video_irq_ack_w,0x00000000ffffffffU)
+
 	AM_RANGE(0x01000000, 0x01000fff) AM_READWRITE(cde_r, cde_w)
+
 	AM_RANGE(0x02000000, 0x02000fff) AM_READ(device2_r)
-	AM_RANGE(0x04000010, 0x04000017) AM_WRITE(unk4000010_w)
-	AM_RANGE(0x04000018, 0x0400001f) AM_READ(unk1_r)
+
+	AM_RANGE(0x03000000, 0x03000007) AM_READ8(id3_r, 0x00ff000000000000U)
+
+	AM_RANGE(0x04000000, 0x04000007) AM_READ8(id4_r, 0x00ff000000000000U)
+	AM_RANGE(0x04000010, 0x04000017) AM_WRITE8(serial_w,0x00000000000000ffU)
+	AM_RANGE(0x04000018, 0x0400001f) AM_READ(unk1_r) // serial status
 	AM_RANGE(0x04000020, 0x04000027) AM_WRITE(reset_w)
-	AM_RANGE(0x04000418, 0x0400041f) AM_WRITE(unk4000418_w)
+	AM_RANGE(0x04000418, 0x0400041f) AM_WRITE(unk4000418_w) // serial status ack
 	AM_RANGE(0x04000208, 0x0400020f) AM_READ(unk3_r)
 	AM_RANGE(0x04000280, 0x04000287) AM_READ(unk4000280_r)
+
+	AM_RANGE(0x05000000, 0x05000007) AM_READ8(id5_r, 0x00ff000000000000U)
+
+	AM_RANGE(0x06000000, 0x06000007) AM_READ8(id6_r, 0x00ff000000000000U)
+
+	AM_RANGE(0x07000000, 0x07000007) AM_READ8(id7_r, 0x00ff000000000000U)
+
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP     // ???
+
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
+//  ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM( m2_main )
+
+//  AM_RANGE(0x00000000, 0x000cffff) devices?
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( m2 )
+	// TODO: it's unknown if these are actual dip-switches or internal to something
+	PORT_START("COUNTRY")
+	PORT_CONFNAME( 0x03, 0x03, "Country" )
+	PORT_CONFSETTING(    0x00, "<Invalid>" )
+	PORT_CONFSETTING(    0x01, "UK" )
+	PORT_CONFSETTING(    0x02, "Japan" )
+	PORT_CONFSETTING(    0x03, "US" )
+
+	PORT_START("CARD")
+	PORT_CONFNAME( 0x0f, 0x0b, "Card Type" )
+	PORT_CONFSETTING(    0x08, "AC-DevCard" )
+	PORT_CONFSETTING(    0x0b, "AC-CoreBoard" )
+	PORT_CONFSETTING(    0x0c, "DevCard (not allowed)" )
+	PORT_CONFSETTING(    0x0e, "Upgrade (not allowed)" )
+	PORT_CONFSETTING(    0x0f, "Multiplayer (not allowed)" )
+
+	PORT_START("MONITOR")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x01, "15 KHz" )
+	PORT_CONFSETTING(    0x00, "24 KHz" )
 INPUT_PORTS_END
 
 
 INTERRUPT_GEN_MEMBER(konamim2_state::m2)
 {
+	/*
+	 0x000001
+	 0x000008
+	 0x200000
+	 0x800000 VBlank irq
+	 */
+
 	if (m_irq_enable & 0x800000)
 	{
+		//m_irq_enable |= 0x800000;
 		m_irq_active |= 0x800000;
+		device.execute().set_input_line(PPC_IRQ, ASSERT_LINE);
 	}
 
 	/*if (m_irq_enable & 0x8)
@@ -1161,10 +1259,17 @@ INTERRUPT_GEN_MEMBER(konamim2_state::m2)
 	    m_irq_active |= 0x8;
 	}*/
 
-	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+
 }
 
-static MACHINE_CONFIG_START( m2, konamim2_state )
+void konamim2_state::machine_reset()
+{
+	m_unk3 = 0xffffffffffffffffU;
+	m_unk20004 = 0;
+	cde_init();
+}
+
+static MACHINE_CONFIG_START( m2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
@@ -1176,24 +1281,34 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(m2_main)
 
+	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(704, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(konamim2_state, screen_update_m2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-		/*cd-rom*/
+
+	/*cd-rom*/
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("3do_m2_cdrom")
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS ( 3do_m2, m2, konamim2_state )
+static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
+
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 
@@ -1329,9 +1444,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(konamim2_state,m2)
 {
-	m_unk3 = U64(0xffffffffffffffff);
-	m_unk20004 = 0;
-	cde_init();
+
 }
 
 GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1345,4 +1458,4 @@ GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

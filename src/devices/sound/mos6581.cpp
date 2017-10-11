@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mos6581.h"
 #include "sid.h"
 
@@ -24,8 +25,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type MOS6581 = &device_creator<mos6581_device>;
-const device_type MOS8580 = &device_creator<mos8580_device>;
+DEFINE_DEVICE_TYPE(MOS6581, mos6581_device, "mos6581", "MOS 6581 SID")
+DEFINE_DEVICE_TYPE(MOS8580, mos8580_device, "mos8580", "MOS 8580 SID")
 
 
 
@@ -37,39 +38,33 @@ const device_type MOS8580 = &device_creator<mos8580_device>;
 //  mos6581_device - constructor
 //-------------------------------------------------
 
-mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_read_potx(*this),
-		m_read_poty(*this),
-		m_stream(nullptr),
-		m_variant(variant)
+mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_read_potx(*this)
+	, m_read_poty(*this)
+	, m_stream(nullptr)
+	, m_variant(variant)
+	, m_token(make_unique_clear<SID6581_t>())
+
 {
-	m_token = global_alloc_clear<SID6581_t>();
 }
 
-mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6581, "MOS6581", tag, owner, clock, "mos6581", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_read_potx(*this),
-		m_read_poty(*this),
-		m_stream(nullptr),
-		m_variant(TYPE_6581)
+mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6581_device(mconfig, MOS6581, tag, owner, clock, TYPE_6581)
 {
-	m_token = global_alloc_clear<SID6581_t>();
 }
 
 mos6581_device::~mos6581_device()
 {
-	global_free(m_token);
 }
 
 //-------------------------------------------------
 //  mos8580_device - constructor
 //-------------------------------------------------
 
-mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mos6581_device(mconfig, MOS8580, "MOS8580", tag, owner, clock, TYPE_8580, "mos8580", __FILE__)
+mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6581_device(mconfig, MOS8580, tag, owner, clock, TYPE_8580)
 {
 }
 
@@ -94,7 +89,7 @@ void mos6581_device::device_start()
 	m_token->clock = clock();
 	m_token->type = m_variant;
 
-	sid6581_init(m_token);
+	m_token->init();
 	sidInitWaveformTables(m_variant);
 }
 
@@ -105,7 +100,7 @@ void mos6581_device::device_start()
 
 void mos6581_device::device_reset()
 {
-	sidEmuReset(m_token);
+	m_token->reset();
 }
 
 
@@ -116,7 +111,7 @@ void mos6581_device::device_reset()
 
 void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	sidEmuFillBuffer(m_token, outputs[0], samples);
+	m_token->fill_buffer(outputs[0], samples);
 }
 
 
@@ -126,7 +121,7 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 READ8_MEMBER( mos6581_device::read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	switch (offset & 0x1f)
 	{
@@ -139,7 +134,7 @@ READ8_MEMBER( mos6581_device::read )
 		break;
 
 	default:
-		data = sid6581_port_r(machine(), m_token, offset);
+		data = m_token->port_r(machine(), offset);
 		break;
 	}
 
@@ -153,5 +148,5 @@ READ8_MEMBER( mos6581_device::read )
 
 WRITE8_MEMBER( mos6581_device::write )
 {
-	sid6581_port_w(m_token, offset, data);
+	m_token->port_w(offset, data);
 }

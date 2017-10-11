@@ -13,8 +13,6 @@
 
     TODO (specific issues only):
     - Sound is currently ugly in both games, recognizable but still nowhere near perfection
-    - ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
-                whatever reason (should be triggered as soon as it executes the POST)
     - poizone: video timings are off, causing various glitches.
     - Does this Arcade conversion have I2C device? It seems unused afaik.
     - Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"
@@ -24,11 +22,12 @@ PCB has a single OSC at 24MHz
 
 *******************************************************************************************/
 #include "emu.h"
-#include "cpu/arm/arm.h"
-#include "sound/dac.h"
 #include "includes/archimds.h"
-#include "machine/i2cmem.h"
+#include "cpu/arm/arm.h"
 #include "machine/aakart.h"
+#include "machine/i2cmem.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 class ertictac_state : public archimedes_state
@@ -107,7 +106,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )     PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Music" )     PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Music" )     PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x30, 0x30, "Game Timing" )   PORT_DIPLOCATION("DSW1:5,6")
@@ -156,6 +155,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
+	// TODO: default settings
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW1:3" )
 	PORT_DIPNAME( 0x30, 0x40, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
@@ -173,7 +173,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPNAME( 0x01, 0x01, "Setting 1" ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x01, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x1A, 0x00, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
+	PORT_DIPNAME( 0x1A, 0x1A, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
 	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x08, "Easy - 2:00")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
@@ -202,9 +202,6 @@ DRIVER_INIT_MEMBER(ertictac_state,ertictac)
 void ertictac_state::machine_start()
 {
 	archimedes_init();
-
-	// reset the DAC to centerline
-	//m_dac->write_signed8(0x80);
 }
 
 void ertictac_state::machine_reset()
@@ -221,7 +218,7 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 #define NVRAM_SIZE 256
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 
-static MACHINE_CONFIG_START( ertictac, ertictac_state )
+static MACHINE_CONFIG_START( ertictac )
 
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
@@ -233,38 +230,29 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 //  MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1280, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac0")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac4")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac5")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac6")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
-
-	MCFG_DAC_ADD("dac7")
-	MCFG_SOUND_ROUTE(0, "mono", 0.05)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ertictac )
@@ -358,7 +346,7 @@ ROM_START( poizone )
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone, ertictac_state, ertictac,  ROT0, "Eterna" ,"Poizone" ,MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
+GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)

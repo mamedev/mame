@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef __PSION_PACK_H__
-#define __PSION_PACK_H__
+#ifndef MAME_MACHINE_PSION_PACK_H
+#define MAME_MACHINE_PSION_PACK_H
 
 #include "softlist_dev.h"
 
@@ -23,7 +23,7 @@ class datapack_device : public device_t,
 {
 public:
 	// construction/destruction
-	datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~datapack_device();
 
 	// image-level overrides
@@ -43,10 +43,10 @@ public:
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
-	UINT8 data_r();
-	void  data_w(UINT8 data);
-	UINT8 control_r();
-	void control_w(UINT8 data);
+	uint8_t data_r();
+	void  data_w(uint8_t data);
+	uint8_t control_r();
+	void control_w(uint8_t data);
 
 protected:
 	// internal helper
@@ -58,18 +58,18 @@ protected:
 
 private:
 	// internal device state
-	UINT8  m_id;                //datapack ID
-	UINT8  m_size;              //size in 8k blocks
-	UINT8  m_data;              //data lines
-	UINT8  m_control;           //control lines
-	UINT16 m_counter;           //address counter
-	UINT8  m_page;              //active page (only for paged Datapack)
-	UINT8  m_segment;           //active segment (only for segmented Datapack)
+	uint8_t  m_id;                //datapack ID
+	uint8_t  m_size;              //size in 8k blocks
+	uint8_t  m_data;              //data lines
+	uint8_t  m_control;           //control lines
+	uint16_t m_counter;           //address counter
+	uint8_t  m_page;              //active page (only for paged Datapack)
+	uint8_t  m_segment;           //active segment (only for segmented Datapack)
 };
 
 
 // device type definition
-extern const device_type PSION_DATAPACK;
+DECLARE_DEVICE_TYPE(PSION_DATAPACK, datapack_device)
 
 
 /***************************************************************************
@@ -78,4 +78,5 @@ extern const device_type PSION_DATAPACK;
 
 #define MCFG_PSION_DATAPACK_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PSION_DATAPACK, 0)
-#endif /* __PSION_PACK_H__ */
+
+#endif // MAME_MACHINE_PSION_PACK_H

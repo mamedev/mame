@@ -41,8 +41,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class carjmbre_state : public driver_device
 {
@@ -60,13 +62,13 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	bool m_nmi_enabled;
-	UINT8 m_bgcolor;
+	uint8_t m_bgcolor;
 	tilemap_t *m_tilemap;
 
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
@@ -76,7 +78,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	DECLARE_PALETTE_INIT(carjmbre);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -126,7 +128,7 @@ static const res_net_info carjmbre_net_info =
 
 PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, carjmbre_decode_info, carjmbre_net_info);
@@ -163,7 +165,7 @@ void carjmbre_state::video_start()
 }
 
 
-UINT32 carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -343,7 +345,7 @@ static GFXDECODE_START( carjmbre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
+static MACHINE_CONFIG_START( carjmbre )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -417,4 +419,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, driver_device, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

@@ -155,13 +155,16 @@ JC-301-00  W11 9510K7059    23C16000        U85
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "screen.h"
+#include "speaker.h"
 
 class jchan_state : public driver_device
 {
@@ -180,7 +183,7 @@ public:
 		m_sprregs_2(*this, "sprregs_2"),
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
 		m_ctrl(*this, "ctrl")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -189,19 +192,19 @@ public:
 	required_device<sknsspr_device> m_spritegen2;
 	required_device<kaneko_view2_tilemap_device> m_view2_0;
 
-	required_shared_ptr<UINT16> m_spriteram_1;
-	required_shared_ptr<UINT16> m_sprregs_1;
-	required_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT16> m_sprregs_2;
-	required_shared_ptr<UINT16> m_mainsub_shared_ram;
-	required_shared_ptr<UINT16> m_ctrl;
+	required_shared_ptr<uint16_t> m_spriteram_1;
+	required_shared_ptr<uint16_t> m_sprregs_1;
+	required_shared_ptr<uint16_t> m_spriteram_2;
+	required_shared_ptr<uint16_t> m_sprregs_2;
+	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
+	required_shared_ptr<uint16_t> m_ctrl;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_1;
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_2;
-	std::unique_ptr<UINT32[]> m_sprite_ram32_1;
-	std::unique_ptr<UINT32[]> m_sprite_ram32_2;
-	std::unique_ptr<UINT32[]> m_sprite_regs32_1;
-	std::unique_ptr<UINT32[]> m_sprite_regs32_2;
+	std::unique_ptr<uint32_t[]> m_sprite_ram32_1;
+	std::unique_ptr<uint32_t[]> m_sprite_ram32_2;
+	std::unique_ptr<uint32_t[]> m_sprite_regs32_1;
+	std::unique_ptr<uint32_t[]> m_sprite_regs32_2;
 	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
@@ -216,7 +219,7 @@ public:
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
 };
@@ -266,11 +269,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 void jchan_state::video_start()
 {
 	/* so we can use sknsspr.c */
-	m_sprite_ram32_1 = std::make_unique<UINT32[]>(0x4000/4);
-	m_sprite_ram32_2 = std::make_unique<UINT32[]>(0x4000/4);
+	m_sprite_ram32_1 = std::make_unique<uint32_t[]>(0x4000/4);
+	m_sprite_ram32_2 = std::make_unique<uint32_t[]>(0x4000/4);
 
-	m_sprite_regs32_1 = std::make_unique<UINT32[]>(0x40/4);
-	m_sprite_regs32_2 = std::make_unique<UINT32[]>(0x40/4);
+	m_sprite_regs32_1 = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32_2 = std::make_unique<uint32_t[]>(0x40/4);
 
 	m_sprite_bitmap_1 = std::make_unique<bitmap_ind16>(1024,1024);
 	m_sprite_bitmap_2 = std::make_unique<bitmap_ind16>(1024,1024);
@@ -291,14 +294,14 @@ void jchan_state::video_start()
 
 
 
-UINT32 jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT16* src1;
-	UINT16* src2;
-	UINT16* dst;
-	UINT16 pixdata1;
-	UINT16 pixdata2;
+	uint16_t* src1;
+	uint16_t* src2;
+	uint16_t* dst;
+	uint16_t pixdata1;
+	uint16_t pixdata2;
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -574,7 +577,7 @@ INPUT_PORTS_END
 
 /* machine driver */
 
-static MACHINE_CONFIG_START( jchan, jchan_state )
+static MACHINE_CONFIG_START( jchan )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_main)
@@ -711,5 +714,5 @@ DRIVER_INIT_MEMBER( jchan_state, jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan, jchan_state,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,     0,        jchan,    jchan,  jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

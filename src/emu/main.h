@@ -13,9 +13,10 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef MAME_EMU_MAIN_H
+#define MAME_EMU_MAIN_H
 
+#include <thread>
 #include <time.h>
 
 //**************************************************************************
@@ -39,7 +40,6 @@ enum
 //**************************************************************************
 //    TYPE DEFINITIONS
 //**************************************************************************
-class osd_interface;
 
 class emulator_info
 {
@@ -55,25 +55,24 @@ public:
 	static const char * get_bare_build_version();
 	static const char * get_build_version();
 	static void display_ui_chooser(running_machine& machine);
+	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
-	static void layout_file_cb(xml_data_node &layout);
+	static void layout_file_cb(util::xml::data_node const &layout);
 	static bool standalone();
 };
 
-// ======================> machine_manager
-class ui_manager;
 
 class machine_manager
 {
 	DISABLE_COPYING(machine_manager);
 protected:
 	// construction/destruction
-	machine_manager(emu_options &options, osd_interface &osd) : m_osd(osd), m_options(options), m_machine(nullptr) { }
+	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual  ~machine_manager() { }
+	virtual ~machine_manager() { }
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -84,14 +83,19 @@ public:
 
 	virtual ui_manager* create_ui(running_machine& machine) { return nullptr;  }
 	virtual void create_custom(running_machine& machine) { }
+	virtual void load_cheatfiles(running_machine& machine) { }
 	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }
+
+	http_manager *http() { return m_http.get(); }
+	void start_http_server();
+
 protected:
-	osd_interface &         m_osd;                  // reference to OSD system
-	emu_options &           m_options;              // reference to options
-	running_machine *       m_machine;
+	osd_interface &               m_osd;                  // reference to OSD system
+	emu_options &                 m_options;              // reference to options
+	running_machine *             m_machine;
+	std::unique_ptr<http_manager> m_http;
 };
 
-
-#endif  /* __MAIN_H__ */
+#endif // MAME_EMU_MAIN_H

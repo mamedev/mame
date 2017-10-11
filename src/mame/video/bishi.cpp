@@ -41,7 +41,7 @@ void bishi_state::video_start()
 	m_layer_colorbase[3] = 0xc0;
 }
 
-UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */

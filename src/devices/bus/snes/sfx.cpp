@@ -15,12 +15,12 @@
 //  sns_rom_superfx_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERFX = &device_creator<sns_rom_superfx_device>;
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX, sns_rom_superfx_device, "sns_rom_superfx", "SNES Cart (LoROM) + SuperFX")
 
 
-sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, "SNES Cart (LoROM) + SuperFX", tag, owner, clock, "sns_rom_superfx", __FILE__),
-			m_superfx(*this, "superfx")
+sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, tag, owner, clock)
+	, m_superfx(*this, "superfx")
 {
 }
 
@@ -85,16 +85,11 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( snes_sfx )
+MACHINE_CONFIG_MEMBER( sns_rom_superfx_device::device_add_mconfig )
 	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(sfx_map)
 	MCFG_SUPERFX_OUT_IRQ(WRITELINE(sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */
 MACHINE_CONFIG_END
-
-machine_config_constructor sns_rom_superfx_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_sfx );
-}
 
 READ8_MEMBER( sns_rom_superfx_device::chip_read )
 {
@@ -124,7 +119,7 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 		}
 		else
 		{
-			static const UINT8 sfx_data[16] = {
+			static const uint8_t sfx_data[16] = {
 				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
 				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
 			};

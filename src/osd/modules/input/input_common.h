@@ -13,14 +13,14 @@
 
 #include "input_module.h"
 
+#include "inputdev.h"
+
 #include <chrono>
 #include <memory>
 #include <mutex>
 #include <queue>
 #include <algorithm>
 #include <functional>
-#undef min
-#undef max
 
 
 //============================================================
@@ -335,6 +335,12 @@ public:
 		// allocate the device object
 		auto devinfo = std::make_unique<TActual>(machine, name, id, module, std::forward<TArgs>(args)...);
 
+		return add_device(machine, std::move(devinfo));
+	}
+
+	template <typename TActual>
+	TActual* add_device(running_machine &machine, std::unique_ptr<TActual> devinfo)
+	{
 		// Add the device to the machine
 		devinfo->m_device = machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo->id(), devinfo.get());
 
@@ -350,12 +356,15 @@ public:
 struct key_trans_entry {
 	input_item_id   mame_key;
 
-#if !defined(OSD_WINDOWS)
+#if defined(OSD_SDL)
 	int             sdl_scancode;
 	int             sdl_key;
-#else
+#elif defined(OSD_WINDOWS)
 	int             scan_code;
 	unsigned char   virtual_key;
+#elif defined(OSD_UWP)
+	int             scan_code;
+	Windows::System::VirtualKey virtual_key;
 #endif
 
 	char            ascii_key;
@@ -373,14 +382,14 @@ private:
 	std::unique_ptr<key_trans_entry[]>  m_custom_table;
 
 	key_trans_entry *                   m_table;
-	UINT32                              m_table_size;
+	uint32_t                              m_table_size;
 
 public:
 	// constructor
 	keyboard_trans_table(std::unique_ptr<key_trans_entry[]> table, unsigned int size);
 
 	// getters/setters
-	UINT32 size() const { return m_table_size; }
+	uint32_t size() const { return m_table_size; }
 
 	// public methods
 	input_item_id lookup_mame_code(const char * scode) const;
@@ -389,6 +398,9 @@ public:
 #if defined(OSD_WINDOWS)
 	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
 	int vkey_for_mame_code(input_code code) const;
+#elif defined(OSD_UWP)
+	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
+	const char* ui_label_for_mame_key(input_item_id code) const;
 #endif
 
 	static keyboard_trans_table& instance()
@@ -558,26 +570,26 @@ const char *const default_axis_name[] =
 	"RY", "RZ", "SL1", "SL2"
 };
 
-inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
+inline static int32_t normalize_absolute_axis(double raw, double rawmin, double rawmax)
 {
-	INT32 center = (rawmax + rawmin) / 2;
+	double center = (rawmax + rawmin) / 2.0;
 
 	// make sure we have valid data
 	if (rawmin >= rawmax)
-		return raw;
+		return int32_t(raw);
 
 	// above center
 	if (raw >= center)
 	{
-		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
-		return std::min(result, INPUT_ABSOLUTE_MAX);
+		double result = (raw - center) * INPUT_ABSOLUTE_MAX / (rawmax - center);
+		return std::min(result, (double)INPUT_ABSOLUTE_MAX);
 	}
 
 	// below center
 	else
 	{
-		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
-		return std::max(result, INPUT_ABSOLUTE_MIN);
+		double result = -((center - raw) * (double)-INPUT_ABSOLUTE_MIN / (center - rawmin));
+		return std::max(result, (double)INPUT_ABSOLUTE_MIN);
 	}
 }
 

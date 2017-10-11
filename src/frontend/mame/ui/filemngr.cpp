@@ -78,7 +78,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 		filename.assign(img->basename());
 
 		// if the image has been loaded through softlist, also show the loaded part
-		if (img->part_entry() != nullptr)
+		if (img->loaded_through_softlist())
 		{
 			const software_part *tmp = img->part_entry();
 			if (!tmp->name().empty())
@@ -103,7 +103,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 //  populate
 //-------------------------------------------------
 
-void menu_file_manager::populate()
+void menu_file_manager::populate(float &customtop, float &custombottom)
 {
 	std::string tmp_inst, tmp_name;
 	bool first_entry = true;
@@ -170,7 +170,7 @@ void menu_file_manager::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->itemref != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		if ((FPTR)event->itemref == 1)
+		if ((uintptr_t)event->itemref == 1)
 		{
 			if (m_curr_selected)
 				machine().schedule_hard_reset();

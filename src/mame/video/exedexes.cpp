@@ -35,7 +35,7 @@
 
 PALETTE_INIT_MEMBER(exedexes_state, exedexes)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -54,28 +54,28 @@ PALETTE_INIT_MEMBER(exedexes_state, exedexes)
 	/* characters use colors 0xc0-0xcf */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | 0xc0;
+		uint8_t ctabentry = color_prom[i] | 0xc0;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* 32x32 tiles use colors 0-0x0f */
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = color_prom[i];
+		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* 16x16 tiles use colors 0x40-0x4f */
 	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | 0x40;
+		uint8_t ctabentry = color_prom[i] | 0x40;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xbf in four banks */
 	for (i = 0x300; i < 0x400; i++)
 	{
-		UINT8 ctabentry = color_prom[i] | (color_prom[i + 0x100] << 4) | 0x80;
+		uint8_t ctabentry = color_prom[i] | (color_prom[i + 0x100] << 4) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -124,7 +124,7 @@ WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx5")->base();
+	uint8_t *tilerom = memregion("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -175,7 +175,7 @@ void exedexes_state::video_start()
 
 void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	if (!m_objon)
@@ -205,7 +205,7 @@ void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_sc2on)
 	{

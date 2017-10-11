@@ -83,7 +83,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (!m_sp_layer_enabled)
 		return;
 
-	UINT16 *sprites = m_spriteram->buffer();
+	uint16_t *sprites = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 
 	for (int offs = 0x1000/2-4; offs >= 0; offs -= 4)
@@ -139,7 +139,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	}
 }
 
-UINT32 raiden_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *scrollregs)
+uint32_t raiden_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *scrollregs)
 {
 	// set tilemaps scroll
 	m_bg_layer->set_scrollx(0, scrollregs[0]);
@@ -170,7 +170,7 @@ UINT32 raiden_state::screen_update_common(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// set up scrollregs
 	// scroll_ram is only 8 bits wide. 4 bytes per scroll, skip uneven ones
@@ -178,7 +178,7 @@ UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &b
 	// 08-0b: 28 *0 ** b9  -  bg layer scroll x
 	// 10-13: 28 *0 ** ae  -  fg layer scroll y
 	// 18-1b: 28 *0 ** b9  -  fg layer scroll x
-	UINT16 scrollregs[4];
+	uint16_t scrollregs[4];
 	scrollregs[0] = ((m_scroll_ram[0x09] & 0xf0) << 4) | ((m_scroll_ram[0x0a] & 0x7f) << 1) | ((m_scroll_ram[0x0a] & 0x80) >> 7);
 	scrollregs[1] = ((m_scroll_ram[0x01] & 0xf0) << 4) | ((m_scroll_ram[0x02] & 0x7f) << 1) | ((m_scroll_ram[0x02] & 0x80) >> 7);
 	scrollregs[2] = ((m_scroll_ram[0x19] & 0xf0) << 4) | ((m_scroll_ram[0x1a] & 0x7f) << 1) | ((m_scroll_ram[0x1a] & 0x80) >> 7);
@@ -187,7 +187,7 @@ UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &b
 	return screen_update_common(screen, bitmap, cliprect, scrollregs);
 }
 
-UINT32 raiden_state::screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t raiden_state::screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update_common(screen, bitmap, cliprect, m_raidenb_scroll_ram);
 }

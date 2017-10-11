@@ -83,15 +83,19 @@
 #ifdef HAVE_FLOAT_H
 # include <float.h>
 #endif
-#if defined(HAVE_ICONV) && defined(HAVE_ICONV_H)
-# include <iconv.h>
-#endif
 
 /**
  *  The number of elements in an array.
  */
 #define SDL_arraysize(array)    (sizeof(array)/sizeof(array[0]))
 #define SDL_TABLESIZE(table)    SDL_arraysize(table)
+
+/**
+ *  Macro useful for building other macros with strings in them
+ *
+ *  e.g. #define LOG_ERROR(X) OutputDebugString(SDL_STRINGIFY_ARG(__FUNCTION__) ": " X "\n")
+ */
+#define SDL_STRINGIFY_ARG(arg)  #arg
 
 /**
  *  \name Cast operators

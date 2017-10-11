@@ -72,8 +72,8 @@ WRITE16_MEMBER(pirates_state::bg_tileram_w)
 void pirates_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT16 *source = m_spriteram + 4;
-	UINT16 *finish = source + 0x800/2-4;
+	uint16_t *source = m_spriteram + 4;
+	uint16_t *finish = source + 0x800/2-4;
 
 	while( source<finish )
 	{
@@ -101,7 +101,7 @@ void pirates_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 pirates_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pirates_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_scroll[0]);
 	m_fg_tilemap->set_scrollx(0,m_scroll[0]);

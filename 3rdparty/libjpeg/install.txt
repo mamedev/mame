@@ -1,6 +1,6 @@
 INSTALLATION INSTRUCTIONS for the Independent JPEG Group's JPEG software
 
-Copyright (C) 1991-2010, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1991-2015, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -147,9 +147,10 @@ makefile.bcc	jconfig.bcc	MS-DOS or OS/2, Borland C
 makefile.dj	jconfig.dj	MS-DOS, DJGPP (Delorie's port of GNU C)
 makefile.mc6	jconfig.mc6	MS-DOS, Microsoft C (16-bit only)
 makefile.wat	jconfig.wat	MS-DOS, OS/2, or Windows NT, Watcom C
-makefile.vc	jconfig.vc	Windows NT/95, MS Visual C++
-make*.vc6	jconfig.vc	Windows NT/95, MS Visual C++ 6
-make*.v10	jconfig.vc	Windows NT/95, MS Visual C++ 2010 (v10)
+makefile.vc	jconfig.vc	Windows NT/9x, MS Visual C++
+make*.vc6	jconfig.vc	Windows NT/9x, MS Visual C++ 6
+make*.v10	jconfig.vc	Windows NT/9x, MS Visual C++ 2010 (v10)
+makefile.b32	jconfig.vc	Windows NT/9x, Borland C++ 32-bit (bcc32)
 makefile.mms	jconfig.vms	Digital VMS, with MMS software
 makefile.vms	jconfig.vms	Digital VMS, without MMS software
 
@@ -321,9 +322,9 @@ several forms:
 	testimg.jpg	The output of cjpeg testimg.ppm
 	testprog.jpg	Progressive-mode equivalent of testorig.jpg.
 	testimgp.jpg	The output of cjpeg -progressive -optimize testimg.ppm
-(The first- and second-generation .jpg files aren't identical since JPEG is
-lossy.)  If you can generate duplicates of the testimg* files then you
-probably have working programs.
+(The first- and second-generation .jpg files aren't identical since the
+default compression parameters are lossy.)  If you can generate duplicates
+of the testimg* files then you probably have working programs.
 
 With most of the makefiles, "make test" will perform the necessary
 comparisons.
@@ -418,54 +419,58 @@ support as follows:
 	    the directory containing the URT "librle.a" file (typically the
 	    "lib" subdirectory of the URT distribution).
 
-Support for 12-bit-deep pixel data:
+Support for 9-bit to 12-bit deep pixel data:
 
-The JPEG standard allows either 8-bit or 12-bit data precision.  (For color,
-this means 8 or 12 bits per channel, of course.)  If you need to work with
-deeper than 8-bit data, you can compile the IJG code for 12-bit operation.
+The IJG code currently allows 8, 9, 10, 11, or 12 bits sample data precision.
+(For color, this means 8 to 12 bits per channel, of course.)  If you need to
+work with deeper than 8-bit data, you can compile the IJG code for 9-bit to
+12-bit operation.
 To do so:
-  1. In jmorecfg.h, define BITS_IN_JSAMPLE as 12 rather than 8.
+  1. In jmorecfg.h, define BITS_IN_JSAMPLE as 9, 10, 11, or 12 rather than 8.
   2. In jconfig.h, undefine BMP_SUPPORTED, RLE_SUPPORTED, and TARGA_SUPPORTED,
-     because the code for those formats doesn't handle 12-bit data and won't
-     even compile.  (The PPM code does work, as explained below.  The GIF
-     code works too; it scales 8-bit GIF data to and from 12-bit depth
-     automatically.)
+     because the code for those formats doesn't handle deeper than 8-bit data
+     and won't even compile.  (The PPM code does work, as explained below.
+     The GIF code works too; it scales 8-bit GIF data to and from 12-bit
+     depth automatically.)
   3. Compile.  Don't expect "make test" to pass, since the supplied test
      files are for 8-bit data.
 
-Currently, 12-bit support does not work on 16-bit-int machines.
+Currently, 9-bit to 12-bit support does not work on 16-bit-int machines.
 
-Note that a 12-bit version will not read 8-bit JPEG files, nor vice versa;
-so you'll want to keep around a regular 8-bit compilation as well.
-(Run-time selection of data depth, to allow a single copy that does both,
-is possible but would probably slow things down considerably; it's very low
-on our to-do list.)
+Run-time selection and conversion of data precision are currently not
+supported and may be added later.
+Exception:  The transcoding part (jpegtran) supports all settings in a
+single instance, since it operates on the level of DCT coefficients and
+not sample values.
 
-The PPM reader (rdppm.c) can read 12-bit data from either text-format or
-binary-format PPM and PGM files.  Binary-format PPM/PGM files which have a
-maxval greater than 255 are assumed to use 2 bytes per sample, MSB first
-(big-endian order).  As of early 1995, 2-byte binary format is not
+The PPM reader (rdppm.c) can read deeper than 8-bit data from either
+text-format or binary-format PPM and PGM files.  Binary-format PPM/PGM files
+which have a maxval greater than 255 are assumed to use 2 bytes per sample,
+MSB first (big-endian order).  As of early 1995, 2-byte binary format is not
 officially supported by the PBMPLUS library, but it is expected that a
 future release of PBMPLUS will support it.  Note that the PPM reader will
 read files of any maxval regardless of the BITS_IN_JSAMPLE setting; incoming
-data is automatically rescaled to either maxval=255 or maxval=4095 as
-appropriate for the cjpeg bit depth.
+data is automatically rescaled to maxval=MAXJSAMPLE as appropriate for the
+cjpeg bit depth.
 
 The PPM writer (wrppm.c) will normally write 2-byte binary PPM or PGM
-format, maxval 4095, when compiled with BITS_IN_JSAMPLE=12.  Since this
+format, maxval=MAXJSAMPLE, when compiled with BITS_IN_JSAMPLE>8.  Since this
 format is not yet widely supported, you can disable it by compiling wrppm.c
 with PPM_NORAWWORD defined; then the data is scaled down to 8 bits to make a
 standard 1-byte/sample PPM or PGM file.  (Yes, this means still another copy
 of djpeg to keep around.  But hopefully you won't need it for very long.
 Poskanzer's supposed to get that new PBMPLUS release out Real Soon Now.)
 
-Of course, if you are working with 12-bit data, you probably have it stored
-in some other, nonstandard format.  In that case you'll probably want to
-write your own I/O modules to read and write your format.
+Of course, if you are working with 9-bit to 12-bit data, you probably have
+it stored in some other, nonstandard format.  In that case you'll probably
+want to write your own I/O modules to read and write your format.
 
-Note that a 12-bit version of cjpeg always runs in "-optimize" mode, in
-order to generate valid Huffman tables.  This is necessary because our
-default Huffman tables only cover 8-bit data.
+Note:
+The standard Huffman tables are only valid for 8-bit data precision.  If
+you selected more than 8-bit data precision, cjpeg uses arithmetic coding
+by default.  The Huffman encoder normally uses entropy optimization to
+compute usable tables for higher precision.  Otherwise, you'll have to
+supply different default Huffman tables.
 
 Removing code:
 
@@ -534,17 +539,17 @@ In general, it's worth trying the maximum optimization level of your compiler,
 and experimenting with any optional optimizations such as loop unrolling.
 (Unfortunately, far too many compilers have optimizer bugs ... be prepared to
 back off if the code fails self-test.)  If you do any experimentation along
-these lines, please report the optimal settings to jpeg-info@uc.ag so we
-can mention them in future releases.  Be sure to specify your machine
-and compiler version.
+these lines, please report the optimal settings to jpeg-info@jpegclub.org so
+we can mention them in future releases.  Be sure to specify your machine and
+compiler version.
 
 
 HINTS FOR SPECIFIC SYSTEMS
 ==========================
 
 We welcome reports on changes needed for systems not mentioned here.  Submit
-'em to jpeg-info@uc.ag.  Also, if configure or ckconfig.c is wrong about how
-to configure the JPEG software for your system, please let us know.
+'em to jpeg-info@jpegclub.org.  Also, if configure or ckconfig.c is wrong
+about how to configure the JPEG software for your system, please let us know.
 
 
 Acorn RISC OS:
@@ -848,16 +853,22 @@ with /Oo-.
 Microsoft Windows (all versions), generic comments:
 
 Some Windows system include files define typedef boolean as "unsigned char".
-The IJG code also defines typedef boolean, but we make it "int" by default.
+The IJG code also defines typedef boolean, but we make it an "enum" by default.
 This doesn't affect the IJG programs because we don't import those Windows
 include files.  But if you use the JPEG library in your own program, and some
 of your program's files import one definition of boolean while some import the
 other, you can get all sorts of mysterious problems.  A good preventive step
 is to make the IJG library use "unsigned char" for boolean.  To do that,
 add something like this to your jconfig.h file:
-	/* Define "boolean" as unsigned char, not int, per Windows custom */
+	/* Define "boolean" as unsigned char, not enum, per Windows custom */
 	#ifndef __RPCNDR_H__	/* don't conflict if rpcndr.h already read */
 	typedef unsigned char boolean;
+	#endif
+	#ifndef FALSE		/* in case these macros already exist */
+	#define FALSE	0	/* values of boolean */
+	#endif
+	#ifndef TRUE
+	#define TRUE	1
 	#endif
 	#define HAVE_BOOLEAN	/* prevent jmorecfg.h from redefining it */
 (This is already in jconfig.vc, by the way.)

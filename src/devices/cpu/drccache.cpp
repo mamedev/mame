@@ -18,8 +18,8 @@
 //**************************************************************************
 
 // ensure that all memory allocated is aligned to an 8-byte boundary
-#define ALIGN_PTR_UP(p)         ((void *)(((FPTR)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
-#define ALIGN_PTR_DOWN(p)       ((void *)((FPTR)(p) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_UP(p)         ((void *)(((uintptr_t)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_DOWN(p)       ((void *)((uintptr_t)(p) & ~(CACHE_ALIGNMENT - 1)))
 
 
 
@@ -184,7 +184,7 @@ void drc_cache::dealloc(void *memory, size_t bytes)
 //  begin_codegen - begin code generation
 //-------------------------------------------------
 
-drccodeptr *drc_cache::begin_codegen(UINT32 reserve_bytes)
+drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 {
 	// can't restart in the middle of codegen
 	assert(m_codegen == nullptr);
@@ -218,6 +218,7 @@ drccodeptr drc_cache::end_codegen()
 		assert(m_top - m_codegen < CODEGEN_MAX_BYTES);
 
 		// release our memory
+		oob->~oob_handler();
 		dealloc(oob, sizeof(*oob));
 	}
 
@@ -241,6 +242,7 @@ void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, voi
 	// pull an item from the free list
 	oob_handler *oob = (oob_handler *)alloc(sizeof(*oob));
 	assert(oob != nullptr);
+	new (oob) oob_handler();
 
 	// fill it in
 	oob->m_callback = callback;

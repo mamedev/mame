@@ -52,7 +52,7 @@ void lazercmd_state::plot_pattern( bitmap_ind16 &bitmap, int x, int y )
 }
 
 
-UINT32 lazercmd_state::screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lazercmd_state::screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, x, y;
 

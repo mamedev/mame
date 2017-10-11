@@ -7,9 +7,12 @@ Atari Sky Raider driver
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/skyraid.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
-#include "includes/skyraid.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -39,7 +42,7 @@ PALETTE_INIT_MEMBER(skyraid_state, skyraid)
 
 READ8_MEMBER(skyraid_state::skyraid_port_0_r)
 {
-	UINT8 val = ioport("LANGUAGE")->read();
+	uint8_t val = ioport("LANGUAGE")->read();
 
 	if (ioport("STICKY")->read() > m_analog_range)
 		val |= 0x40;
@@ -215,7 +218,7 @@ static GFXDECODE_START( skyraid )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( skyraid, skyraid_state )
+static MACHINE_CONFIG_START( skyraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 12)
@@ -278,4 +281,4 @@ ROM_START( skyraid )
 ROM_END
 
 
-GAME( 1978, skyraid, 0, skyraid, skyraid, driver_device, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )
+GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )

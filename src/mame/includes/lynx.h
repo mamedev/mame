@@ -21,33 +21,33 @@
 struct BLITTER
 {
 	// global
-	UINT16 screen;
-	UINT16 colbuf;
-	UINT16 colpos; // byte where value of collision is written
-	INT16 xoff, yoff;
+	uint16_t screen;
+	uint16_t colbuf;
+	uint16_t colpos; // byte where value of collision is written
+	int16_t xoff, yoff;
 	// in command
 	int mode;
-	UINT8 spr_coll;
-	UINT8 spritenr;
-	INT16 x_pos,y_pos;
-	UINT16 width, height; // uint16 important for blue lightning
-	INT16 tilt_accumulator;
-	UINT16 height_accumulator, width_accumulator;
-	UINT16 width_offset, height_offset;
-	INT16 stretch, tilt;
-	UINT8 color[16]; // or stored
-	UINT16 bitmap;
+	uint8_t spr_coll;
+	uint8_t spritenr;
+	int16_t x_pos,y_pos;
+	uint16_t width, height; // uint16 important for blue lightning
+	int16_t tilt_accumulator;
+	uint16_t height_accumulator, width_accumulator;
+	uint16_t width_offset, height_offset;
+	int16_t stretch, tilt;
+	uint8_t color[16]; // or stored
+	uint16_t bitmap;
 	int use_rle;
 	int line_color;
 
-	UINT8 spr_ctl0;
-	UINT8 spr_ctl1;
-	UINT16 scb;
-	UINT16 scb_next;
-	UINT8 sprite_collide;
+	uint8_t spr_ctl0;
+	uint8_t spr_ctl1;
+	uint16_t scb;
+	uint16_t scb_next;
+	uint8_t sprite_collide;
 
 	int everon;
-	UINT8 fred;
+	uint8_t fred;
 	int memory_accesses;
 	attotime time;
 
@@ -59,8 +59,8 @@ struct BLITTER
 
 struct UART
 {
-	UINT8 serctl;
-	UINT8 data_received, data_to_send, buffer;
+	uint8_t serctl;
+	uint8_t data_received, data_to_send, buffer;
 	int received;
 	int sending;
 	int buffer_loaded;
@@ -68,8 +68,8 @@ struct UART
 
 struct SUZY
 {
-	UINT8 data[0x100];
-	UINT8 high;
+	uint8_t data[0x100];
+	uint8_t high;
 	int low;
 	int signed_math;
 	int accumulate;
@@ -78,17 +78,17 @@ struct SUZY
 
 struct MIKEY
 {
-	UINT8 data[0x100];
-	UINT16 disp_addr;
-	UINT8 vb_rest;
+	uint8_t data[0x100];
+	uint16_t disp_addr;
+	uint8_t vb_rest;
 };
 
 struct LYNX_TIMER
 {
-	UINT8   bakup;
-	UINT8   cntrl1;
-	UINT8   cntrl2;
-	UINT8   counter;
+	uint8_t   bakup;
+	uint8_t   cntrl1;
+	uint8_t   cntrl2;
+	uint8_t   counter;
 	emu_timer   *timer;
 	int     timer_active;
 };
@@ -120,23 +120,23 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_shared_ptr<UINT8> m_mem_0000;
-	required_shared_ptr<UINT8> m_mem_fc00;
-	required_shared_ptr<UINT8> m_mem_fd00;
-	required_shared_ptr<UINT8> m_mem_fe00;
-	required_shared_ptr<UINT8> m_mem_fffa;
+	required_shared_ptr<uint8_t> m_mem_0000;
+	required_shared_ptr<uint8_t> m_mem_fc00;
+	required_shared_ptr<uint8_t> m_mem_fd00;
+	required_shared_ptr<uint8_t> m_mem_fe00;
+	required_shared_ptr<uint8_t> m_mem_fffa;
 	required_device<cpu_device> m_maincpu;
 	required_device<lynx_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
 	required_device<palette_device> m_palette;
-	UINT16 m_granularity;
+	uint16_t m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
-	UINT32 m_lynx_palette[0x10];
+	uint32_t m_lynx_palette[0x10];
 	int m_rotate;
-	UINT8 m_memory_config;
+	uint8_t m_memory_config;
 
 	BLITTER m_blitter;
 	SUZY m_suzy;
@@ -156,8 +156,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
 	void lynx_divide();
 	void lynx_multiply();
-	UINT8 lynx_timer_read(int which, int offset);
-	void lynx_timer_write(int which, int offset, UINT8 data);
+	uint8_t lynx_timer_read(int which, int offset);
+	void lynx_timer_write(int which, int offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(lynx);
@@ -168,18 +168,18 @@ public:
 	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
 	void lynx_postload();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
-	UINT8 lynx_read_ram(UINT16 address);
-	void lynx_write_ram(UINT16 address, UINT8 data);
-	inline void lynx_plot_pixel(const int mode, const INT16 x, const int y, const int color);
+	uint8_t lynx_read_ram(uint16_t address);
+	void lynx_write_ram(uint16_t address, uint8_t data);
+	inline void lynx_plot_pixel(const int mode, const int16_t x, const int y, const int color);
 	void lynx_blit_do_work(const int y, const int xdir, const int bits_per_pixel, const int mask );
-	void lynx_blit_rle_do_work(  const INT16 y, const int xdir, const int bits_per_pixel, const int mask );
+	void lynx_blit_rle_do_work(  const int16_t y, const int xdir, const int bits_per_pixel, const int mask );
 	void lynx_blit_lines();
 	void lynx_blitter();
 	void lynx_draw_line();
 	void lynx_timer_init(int which);
 	void lynx_timer_signal_irq(int which);
 	void lynx_timer_count_down(int which);
-	UINT32 lynx_time_factor(int val);
+	uint32_t lynx_time_factor(int val);
 	void lynx_uart_reset();
 	image_verify_result lynx_verify_cart(char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );

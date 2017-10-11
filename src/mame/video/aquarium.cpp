@@ -82,12 +82,12 @@ void aquarium_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 {
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		UINT16* srcline = &m_temp_sprite_bitmap.pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
+		uint16_t* srcline = &m_temp_sprite_bitmap.pix16(y);
+		uint16_t* dstline = &bitmap.pix16(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			UINT16 pixel = srcline[x];
+			uint16_t pixel = srcline[x];
 
 			if (pixel & 0xf)
 				if ((pixel & priority_mask) == priority_value)
@@ -97,7 +97,7 @@ void aquarium_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 	}
 }
 
-UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_mid_tilemap->set_scrollx(0, m_scroll[0]);
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]);

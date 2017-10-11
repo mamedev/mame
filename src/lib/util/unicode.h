@@ -60,26 +60,21 @@
 #define o_UMLAUT                "\xc3\xb6"          /* small o with an umlaut */
 #define u_UMLAUT                "\xc3\xbc"          /* small u with an umlaut */
 #define e_ACUTE                 "\xc3\xa9"          /* small e with an acute */
+#define n_TILDE                 "\xc3\xb1"          /* small n with a tilde */
 
 #define A_RING                  "\xc3\x85"          /* capital A with a ring */
 #define A_UMLAUT                "\xc3\x84"          /* capital A with an umlaut */
 #define O_UMLAUT                "\xc3\x96"          /* capital O with an umlaut */
 #define U_UMLAUT                "\xc3\x9c"          /* capital U with an umlaut */
 #define E_ACUTE                 "\xc3\x89"          /* capital E with an acute */
+#define N_TILDE                 "\xc3\x91"          /* capital N with a tilde */
 
 #define UTF8_LEFT               "\xe2\x86\x90"      /* cursor left */
 #define UTF8_RIGHT              "\xe2\x86\x92"      /* cursor right */
 #define UTF8_UP                 "\xe2\x86\x91"      /* cursor up */
 #define UTF8_DOWN               "\xe2\x86\x93"      /* cursor down */
 
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef UINT16 utf16_char;
-typedef UINT32 unicode_char;
+enum class unicode_normalization_form { C, D, KC, KD };
 
 
 
@@ -88,24 +83,37 @@ typedef UINT32 unicode_char;
 ***************************************************************************/
 
 // tests to see if a unicode char is a valid code point
-bool uchar_isvalid(unicode_char uchar);
+bool uchar_isvalid(char32_t uchar);
 
 // tests to see if a unicode char is printable
-bool uchar_is_printable(unicode_char uchar);
+bool uchar_is_printable(char32_t uchar);
 
 // tests to see if a unicode char is a digit
-bool uchar_is_digit(unicode_char uchar);
+bool uchar_is_digit(char32_t uchar);
 
 // converting strings to 32-bit Unicode chars
-int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count);
-int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count);
-int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count);
+int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count);
+int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count);
+int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count);
 
 // converting 32-bit Unicode chars to strings
-int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar);
-std::string utf8_from_uchar(unicode_char uchar);
-int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
-int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
+int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar);
+std::string utf8_from_uchar(char32_t uchar);
+int utf16_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
+int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
+
+// converting UTF-8 strings to/from "wide" strings
+std::wstring wstring_from_utf8(const std::string &utf8string);
+std::string utf8_from_wstring(const std::wstring &string);
+
+// unicode normalization
+std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form);
+std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form);
+std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form);
+
+// upper and lower case
+char32_t uchar_toupper(char32_t ch);
+char32_t uchar_tolower(char32_t ch);
 
 // misc UTF-8 helpers
 const char *utf8_previous_char(const char *utf8string);

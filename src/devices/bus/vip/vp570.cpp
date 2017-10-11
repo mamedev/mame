@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "vp570.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP570 = &device_creator<vp570_device>;
+DEFINE_DEVICE_TYPE(VP570, vp570_device, "vp570", "VP-570 4K RAM Expansion")
 
 
 //-------------------------------------------------
@@ -59,8 +60,8 @@ ioport_constructor vp570_device::device_input_ports() const
 //  vp570_device - constructor
 //-------------------------------------------------
 
-vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VP570, "VP570", tag, owner, clock, "vp570", __FILE__),
+vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VP570, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram"),
 	m_base(*this, "BASE"),
@@ -83,9 +84,9 @@ void vp570_device::device_start()
 //  vip_program_r - program read
 //-------------------------------------------------
 
-UINT8 vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	offs_t base = m_base->read() << 12;
 
@@ -104,7 +105,7 @@ UINT8 vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp570_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
+void vp570_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	offs_t base = m_base->read() << 12;
 

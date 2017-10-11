@@ -7,6 +7,9 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class btime_state : public driver_device
 {
@@ -24,6 +27,7 @@ public:
 		, m_audio_rambase(*this, "audio_rambase")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_audionmi(*this, "audionmi")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -33,28 +37,26 @@ public:
 	}
 
 	/* memory pointers */
-	optional_shared_ptr<UINT8> m_rambase;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_bnj_backgroundram;
-	optional_shared_ptr<UINT8> m_zoar_scrollram;
-	optional_shared_ptr<UINT8> m_lnc_charbank;
-	optional_shared_ptr<UINT8> m_deco_charram;
-	optional_shared_ptr<UINT8> m_spriteram;     // used by disco
-//  UINT8 *  m_decrypted;
-	optional_shared_ptr<UINT8> m_audio_rambase;
+	optional_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_bnj_backgroundram;
+	optional_shared_ptr<uint8_t> m_zoar_scrollram;
+	optional_shared_ptr<uint8_t> m_lnc_charbank;
+	optional_shared_ptr<uint8_t> m_deco_charram;
+	optional_shared_ptr<uint8_t> m_spriteram;     // used by disco
+//  uint8_t *  m_decrypted;
+	optional_shared_ptr<uint8_t> m_audio_rambase;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_background_bitmap;
-	UINT8    m_btime_palette;
-	UINT8    m_bnj_scroll1;
-	UINT8    m_bnj_scroll2;
-	UINT8    m_btime_tilemap[4];
+	uint8_t    m_btime_palette;
+	uint8_t    m_bnj_scroll1;
+	uint8_t    m_bnj_scroll2;
+	uint8_t    m_btime_tilemap[4];
 
 	/* audio-related */
-	UINT8    m_audio_nmi_enable_type;
-	UINT8    m_audio_nmi_enabled;
-	UINT8    m_audio_nmi_state;
+	uint8_t    m_audio_nmi_enable_type;
 
 	/* protection-related (for mmonkey) */
 	int      m_protection_command;
@@ -65,6 +67,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<input_merger_device> m_audionmi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -72,8 +75,6 @@ public:
 	optional_memory_region m_prom_region;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);
 	DECLARE_READ8_MEMBER(wtennis_reset_hack_r);
 	DECLARE_READ8_MEMBER(mmonkey_protection_r);
@@ -116,18 +117,18 @@ public:
 	DECLARE_MACHINE_RESET(mmonkey);
 	DECLARE_VIDEO_START(bnj);
 	DECLARE_VIDEO_START(disco);
-	UINT32 screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(audio_nmi_gen);
-	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority );
-	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color );
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
-							UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
-							UINT8 *sprite_ram, offs_t interleave );
+	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority );
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* tmap, uint8_t color );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,
+							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
+							uint8_t *sprite_ram, offs_t interleave );
 
 };

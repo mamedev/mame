@@ -404,11 +404,11 @@ HRESULT CDecoder::Decode(
           len = password.Len();
         }
         CByteBuffer buffer(len * 2);
-        for (size_t i = 0; i < len; i++)
+        for (size_t k = 0; k < len; k++)
         {
-          wchar_t c = passwordBSTR[i];
-          ((Byte *)buffer)[i * 2] = (Byte)c;
-          ((Byte *)buffer)[i * 2 + 1] = (Byte)(c >> 8);
+          wchar_t c = passwordBSTR[k];
+          ((Byte *)buffer)[k * 2] = (Byte)c;
+          ((Byte *)buffer)[k * 2 + 1] = (Byte)(c >> 8);
         }
         RINOK(cryptoSetPassword->CryptoSetPassword((const Byte *)buffer, (UInt32)buffer.Size()));
       }

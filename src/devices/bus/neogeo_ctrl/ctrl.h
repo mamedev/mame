@@ -6,13 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NEOGEO_CTRL_CTRL_H
+#define MAME_BUS_NEOGEO_CTRL_CTRL_H
 
 #pragma once
 
-#ifndef __NEOGEO_CONTROL_PORT__
-#define __NEOGEO_CONTROL_PORT__
-
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,30 +25,30 @@ class device_neogeo_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_control_port_interface();
 
-	virtual UINT8 read_ctrl() { return 0xff; };
-	virtual UINT8 read_start_sel() { return 0xff; };
-	virtual void write_ctrlsel(UINT8 data) { };
+	virtual uint8_t read_ctrl() { return 0xff; }
+	virtual uint8_t read_start_sel() { return 0xff; }
+	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
+	device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	neogeo_control_port_device *m_port;
 };
 
 // ======================> neogeo_control_port_device
 
-class neogeo_control_port_device : public device_t,
-								public device_slot_interface
+class neogeo_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_control_port_device();
 
-	UINT8 read_ctrl();
-	UINT8 read_start_sel();
-	void write_ctrlsel(UINT8 data);
+	uint8_t read_ctrl();
+	uint8_t read_start_sel();
+	void write_ctrlsel(uint8_t data);
 	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
 
 protected:
@@ -67,32 +65,32 @@ class device_neogeo_ctrl_edge_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_ctrl_edge_interface();
 
-	virtual UINT8 read_start_sel() { return 0xff; }
+	virtual uint8_t read_start_sel() { return 0xff; }
 	virtual DECLARE_READ8_MEMBER( in0_r ) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER( in1_r ) { return 0xff; }
-	virtual void write_ctrlsel(UINT8 data) { }
+	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
+	device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device);
+
 	neogeo_ctrl_edge_port_device *m_port;
 };
 
 // ======================> neogeo_ctrl_edge_port_device
 
-class neogeo_ctrl_edge_port_device : public device_t,
-										public device_slot_interface
+class neogeo_ctrl_edge_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_ctrl_edge_port_device();
 
-	UINT8 read_start_sel();
+	uint8_t read_start_sel();
 	DECLARE_READ8_MEMBER( in0_r );
 	DECLARE_READ8_MEMBER( in1_r );
-	void write_ctrlsel(UINT8 data);
+	void write_ctrlsel(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -103,8 +101,8 @@ protected:
 
 
 // device type definition
-extern const device_type NEOGEO_CONTROL_PORT;
-extern const device_type NEOGEO_CTRL_EDGE_CONNECTOR;
+DECLARE_DEVICE_TYPE(NEOGEO_CONTROL_PORT,        neogeo_control_port_device)
+DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
 
 
 //**************************************************************************
@@ -127,4 +125,4 @@ SLOT_INTERFACE_EXTERN( neogeo_arc_edge_fixed );
 SLOT_INTERFACE_EXTERN( neogeo_arc_pin15 );
 
 
-#endif
+#endif // MAME_BUS_NEOGEO_CTRL_CTRL_H

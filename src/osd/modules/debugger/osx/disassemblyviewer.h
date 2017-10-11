@@ -10,7 +10,6 @@
 
 #import "debugwindowhandler.h"
 
-#include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -33,5 +32,8 @@
 - (IBAction)debugRunToCursor:(id)sender;
 
 - (IBAction)changeSubview:(id)sender;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 @end

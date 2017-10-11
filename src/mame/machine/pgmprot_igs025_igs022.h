@@ -15,7 +15,7 @@ public:
 	void pgm_dw3_decrypt();
 	void pgm_killbld_decrypt();
 
-	required_shared_ptr<UINT16> m_sharedprotram;
+	required_shared_ptr<uint16_t> m_sharedprotram;
 
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);

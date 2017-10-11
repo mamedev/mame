@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K051316_H
+#define MAME_VIDEO_K051316_H
+
 #pragma once
-#ifndef __K051316_H__
-#define __K051316_H__
+
 
 typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
 #define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
@@ -24,12 +26,10 @@ typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_del
 	k051316_device::set_wrap(*device, _wrap);
 
 
-class k051316_device : public device_t,
-						public device_gfx_interface
+class k051316_device : public device_t, public device_gfx_interface
 {
 public:
-	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k051316_device() {}
+	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static const gfx_layout charlayout4;
 	static const gfx_layout charlayout7;
@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
-	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
+	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
 	void wraparound_enable(int status);
 
 	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
@@ -80,11 +80,11 @@ protected:
 
 private:
 	// internal state
-	std::vector<UINT8> m_ram;
-	UINT8 m_ctrlram[16];
+	std::vector<uint8_t> m_ram;
+	uint8_t m_ctrlram[16];
 	tilemap_t *m_tmap;
 
-	optional_region_ptr<UINT8> m_zoom_rom;
+	optional_region_ptr<uint8_t> m_zoom_rom;
 
 	int m_dx, m_dy;
 	int m_wrap;
@@ -95,6 +95,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-extern const device_type K051316;
+DECLARE_DEVICE_TYPE(K051316, k051316_device)
 
-#endif
+#endif // MAME_VIDEO_K051316_H

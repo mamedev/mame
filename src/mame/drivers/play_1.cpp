@@ -19,12 +19,16 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 
 **********************************************************************************/
 
-
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "play_1.lh"
+
 
 class play_1_state : public genpin_class
 {
@@ -51,12 +55,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
-	UINT16 m_resetcnt;
-	UINT16 m_clockcnt;
-	UINT16 m_waitcnt;
-	UINT8 m_segment;
-	UINT8 m_match;
-	UINT8 m_ball;
+	uint16_t m_resetcnt;
+	uint16_t m_clockcnt;
+	uint16_t m_waitcnt;
+	uint8_t m_segment;
+	uint8_t m_match;
+	uint8_t m_ball;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<4> m_dips;
@@ -249,7 +253,7 @@ void play_1_state::machine_reset()
 
 READ8_MEMBER( play_1_state::port07_r )
 {
-	UINT8 data = m_dips[3]->read() & 0x3f;
+	uint8_t data = m_dips[3]->read() & 0x3f;
 	data |= (m_segment & m_dips[1]->read()) ? 0x40 : 0;
 	data |= (m_segment & m_dips[2]->read()) ? 0x80 : 0;
 	return data;
@@ -257,7 +261,7 @@ READ8_MEMBER( play_1_state::port07_r )
 
 WRITE8_MEMBER( play_1_state::port01_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// d0-1 via 4013 to match-game board
 	// d4-7 via 4511 to match-game board
 	if (BIT(data, 0))
@@ -289,7 +293,7 @@ WRITE8_MEMBER( play_1_state::port02_w )
 
 WRITE8_MEMBER( play_1_state::port03_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// D1-4, digit select
 	switch (~data & 15)
 	{
@@ -321,8 +325,8 @@ WRITE8_MEMBER( play_1_state::port03_w )
 			// display player number
 			{
 				char wordnum[8];
-				UINT8 player = m_segment >> 5;
-				for (UINT8 i = 1; i < 5; i++)
+				uint8_t player = m_segment >> 5;
+				for (uint8_t i = 1; i < 5; i++)
 				{
 					sprintf(wordnum,"text%d", i);
 					output().set_value(wordnum, (player == i) ? 0:1);
@@ -453,7 +457,7 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 	}
 }
 
-static MACHINE_CONFIG_START( play_1, play_1_state )
+static MACHINE_CONFIG_START( play_1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
@@ -534,8 +538,8 @@ ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979, party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

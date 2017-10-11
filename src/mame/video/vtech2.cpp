@@ -115,9 +115,9 @@ static const int offs_0[96] = {
 	0x26a0,0x2ea0,0x36a0,0x3ea0,0x27a0,0x2fa0,0x37a0,0x3fa0
 };
 
-UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int offs, x, y;
 	int full_refresh = 1;
 

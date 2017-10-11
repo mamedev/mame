@@ -798,7 +798,7 @@ struct test_walker: xml_tree_walker
 	#endif
 	}
 
-	virtual bool begin(xml_node& node)
+	virtual bool begin(xml_node& node) PUGIXML_OVERRIDE
 	{
 		log += STR("|");
 		log += depthstr();
@@ -810,7 +810,7 @@ struct test_walker: xml_tree_walker
 		return ++call_count != stop_count && xml_tree_walker::begin(node);
 	}
 
-	virtual bool for_each(xml_node& node)
+	virtual bool for_each(xml_node& node) PUGIXML_OVERRIDE
 	{
 		log += STR("|");
 		log += depthstr();
@@ -822,7 +822,7 @@ struct test_walker: xml_tree_walker
 		return ++call_count != stop_count && xml_tree_walker::end(node);
 	}
 
-	virtual bool end(xml_node& node)
+	virtual bool end(xml_node& node) PUGIXML_OVERRIDE
 	{
 		log += STR("|");
 		log += depthstr();

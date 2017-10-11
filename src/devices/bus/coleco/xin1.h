@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COLECO_XIN1_H
+#define MAME_BUS_COLECO_XIN1_H
 
-#ifndef __COLECOVISION_XIN1_CARTRIDGE__
-#define __COLECOVISION_XIN1_CARTRIDGE__
+#pragma once
 
 #include "exp.h"
 
@@ -26,7 +26,7 @@ class colecovision_xin1_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_xin1_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	colecovision_xin1_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -34,15 +34,15 @@ protected:
 	virtual void device_reset() override;
 
 	// device_colecovision_expansion_card_interface overrides
-	virtual UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000) override;
+	virtual uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) override;
 
 private:
-	UINT32 m_current_offset;
+	uint32_t m_current_offset;
 };
 
 
 // device type definition
-extern const device_type COLECOVISION_XIN1;
+DECLARE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_COLECO_XIN1_H

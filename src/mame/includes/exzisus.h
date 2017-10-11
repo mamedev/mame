@@ -19,12 +19,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_objectram1;
-	required_shared_ptr<UINT8> m_videoram1;
-	required_shared_ptr<UINT8> m_sharedram_ac;
-	required_shared_ptr<UINT8> m_sharedram_ab;
-	required_shared_ptr<UINT8> m_objectram0;
-	required_shared_ptr<UINT8> m_videoram0;
+	required_shared_ptr<uint8_t> m_objectram1;
+	required_shared_ptr<uint8_t> m_videoram1;
+	required_shared_ptr<uint8_t> m_sharedram_ac;
+	required_shared_ptr<uint8_t> m_sharedram_ab;
+	required_shared_ptr<uint8_t> m_objectram0;
+	required_shared_ptr<uint8_t> m_videoram0;
 
 	DECLARE_WRITE8_MEMBER(cpua_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpub_bankswitch_w);
@@ -33,5 +33,5 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -26,10 +26,12 @@
 
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
-#include "debugger.h"
-#include "sound/dac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    16000000
 #define LOG_PORTS 0
@@ -161,23 +163,23 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT8 m_port_a;
-	UINT8 m_port_b;
-	UINT8 m_port_c;
-	UINT8 m_port_d;
-	UINT8 m_port_e;
-	UINT8 m_port_f;
-	UINT8 m_port_g;
-	UINT8 m_port_h;
-	UINT8 m_port_j;
-	UINT8 m_port_k;
-	UINT8 m_port_l;
+	uint8_t m_port_a;
+	uint8_t m_port_b;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
+	uint8_t m_port_e;
+	uint8_t m_port_f;
+	uint8_t m_port_g;
+	uint8_t m_port_h;
+	uint8_t m_port_j;
+	uint8_t m_port_k;
+	uint8_t m_port_l;
 
-	UINT8 shift_register_value;
+	uint8_t shift_register_value;
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -283,8 +285,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_a) break;
 #if LOG_PORTS
-			UINT8 old_port_a = m_port_a;
-			UINT8 changed = data ^ old_port_a;
+			uint8_t old_port_a = m_port_a;
+			uint8_t changed = data ^ old_port_a;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & A_AXIS_DIR) printf("[A] A_AXIS_DIR: %s\n", data & A_AXIS_DIR ? "HIGH" : "LOW");
@@ -301,8 +303,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_b) break;
 #if LOG_PORTS
-			UINT8 old_port_b = m_port_b;
-			UINT8 changed = data ^ old_port_b;
+			uint8_t old_port_b = m_port_b;
+			uint8_t changed = data ^ old_port_b;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & SD_CS) printf("[B] SD Card Chip Select: %s\n", data & SD_CS ? "HIGH" : "LOW");
@@ -321,8 +323,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_c) break;
 
-			UINT8 old_port_c = m_port_c;
-			UINT8 changed = data ^ old_port_c;
+			uint8_t old_port_c = m_port_c;
+			uint8_t changed = data ^ old_port_c;
 #if LOG_PORTS
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & EX2_1280) printf("[C] EX2_1280: %s\n", data & EX2_1280 ? "HIGH" : "LOW");
@@ -348,7 +350,7 @@ WRITE8_MEMBER(replicator_state::port_w)
 					bool RS = (shift_register_value >> 1) & 1;
 					bool RW = (shift_register_value >> 2) & 1;
 					bool enable = (shift_register_value >> 3) & 1;
-					UINT8 lcd_data = shift_register_value & 0xF0;
+					uint8_t lcd_data = shift_register_value & 0xF0;
 
 					if (enable && RW==0){
 						if (RS==0){
@@ -367,8 +369,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_d) break;
 #if LOG_PORTS
-			UINT8 old_port_d = m_port_d;
-			UINT8 changed = data ^ old_port_d;
+			uint8_t old_port_d = m_port_d;
+			uint8_t changed = data ^ old_port_d;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & PORTD_SCL) printf("[D] PORTD_SCL: %s\n", data & PORTD_SCL ? "HIGH" : "LOW");
@@ -383,8 +385,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_e) break;
 #if LOG_PORTS
-			UINT8 old_port_e = m_port_e;
-			UINT8 changed = data ^ old_port_e;
+			uint8_t old_port_e = m_port_e;
+			uint8_t changed = data ^ old_port_e;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & RX_1280) printf("[E] 1280-RX: %s\n", data & RX_1280 ? "HIGH" : "LOW");
@@ -401,8 +403,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_f) break;
 #if LOG_PORTS
-			UINT8 old_port_f = m_port_f;
-			UINT8 changed = data ^ old_port_f;
+			uint8_t old_port_f = m_port_f;
+			uint8_t changed = data ^ old_port_f;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & X_AXIS_DIR) printf("[F] X_AXIS_DIR: %s\n", data & X_AXIS_DIR ? "HIGH" : "LOW");
@@ -421,8 +423,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_g) break;
 
-			UINT8 old_port_g = m_port_g;
-			UINT8 changed = data ^ old_port_g;
+			uint8_t old_port_g = m_port_g;
+			uint8_t changed = data ^ old_port_g;
 
 #if LOG_PORTS
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
@@ -433,14 +435,9 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & BUZZ) printf("[G] BUZZ: %s\n", data & BUZZ ? "HIGH" : "LOW");
 #endif
 
-			if(changed & BUZZ){
-				/* FIX-ME: What is the largest sample value allowed?
-				I'm using 0x3F based on what I see in src/mame/drivers/craft.c
-				But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
-				Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
-				*/
-				UINT8 audio_sample = (data & BUZZ) ? 0x3F : 0;
-				m_dac->write_unsigned8(audio_sample << 1);
+			if (changed & BUZZ)
+			{
+				m_dac->write(BIT(data, 5));
 			}
 
 			m_port_g = data;
@@ -450,8 +447,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_h) break;
 #if LOG_PORTS
-			UINT8 old_port_h = m_port_h;
-			UINT8 changed = data ^ old_port_h;
+			uint8_t old_port_h = m_port_h;
+			uint8_t changed = data ^ old_port_h;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & CUTOFF_TEST) printf("[H] CUTOFF_TEST: %s\n", data & CUTOFF_TEST ? "HIGH" : "LOW");
@@ -469,8 +466,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_j) break;
 #if LOG_PORTS
-			UINT8 old_port_j = m_port_j;
-			UINT8 changed = data ^ old_port_j;
+			uint8_t old_port_j = m_port_j;
+			uint8_t changed = data ^ old_port_j;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & BUTTON_CENTER) printf("[J] BUTTON_CENTER: %s\n", data & BUTTON_CENTER ? "HIGH" : "LOW");
@@ -488,8 +485,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_k) break;
 #if LOG_PORTS
-			UINT8 old_port_k = m_port_k;
-			UINT8 changed = data ^ old_port_k;
+			uint8_t old_port_k = m_port_k;
+			uint8_t changed = data ^ old_port_k;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & Z_AXIS_DIR) printf("[K] Z_AXIS_DIR: %s\n", data & Z_AXIS_DIR ? "HIGH" : "LOW");
@@ -508,8 +505,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_l) break;
 #if LOG_PORTS
-			UINT8 old_port_l = m_port_l;
-			UINT8 changed = data ^ old_port_l;
+			uint8_t old_port_l = m_port_l;
+			uint8_t changed = data ^ old_port_l;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & X_MIN) printf("[L] X_MIN: %s\n", data & X_MIN ? "HIGH" : "LOW");
@@ -602,7 +599,7 @@ static GFXDECODE_START( replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( replicator, replicator_state )
+static MACHINE_CONFIG_START( replicator )
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
@@ -636,10 +633,10 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
-	MCFG_SPEAKER_STANDARD_MONO("buzzer")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "buzzer", 1.00)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )
@@ -723,5 +720,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-COMP(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME        PARENT    COMPAT    MACHINE        INPUT       STATE                INIT           COMPANY     FULLNAME */
+COMP(2012, replica1,   0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

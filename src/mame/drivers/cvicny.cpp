@@ -49,8 +49,8 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w );
-	UINT8 m_digit;
-	UINT8 m_digit_last;
+	uint8_t m_digit;
+	uint8_t m_digit_last;
 };
 
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
@@ -68,7 +68,7 @@ WRITE8_MEMBER( cvicny_state::digit_w ) // set keyboard scanning row; set digit t
 
 READ8_MEMBER( cvicny_state::key_r )
 {
-	UINT8 data;
+	uint8_t data;
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d",m_digit);
 	data = ioport(kbdrow)->read();
@@ -128,7 +128,7 @@ static INPUT_PORTS_START( cvicny )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cvicny, cvicny_state )
+static MACHINE_CONFIG_START( cvicny )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(cvicny_mem)
@@ -145,5 +145,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, driver_device,  0,     "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY      FULLNAME        FLAGS
+COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, cvicny_state,  0,     "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)

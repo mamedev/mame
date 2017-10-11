@@ -159,9 +159,6 @@
     <ClInclude Include="..\..\src\audio\SDL_audiodev_c.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\audio\SDL_audiomem.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\audio\SDL_audio_c.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -370,6 +367,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\video\SDL_egl_c.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\video\winrt\SDL_winrtgamebar_cpp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -672,6 +672,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\video\SDL_egl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\video\winrt\SDL_winrtgamebar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

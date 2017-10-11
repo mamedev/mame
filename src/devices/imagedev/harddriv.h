@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef HARDDRIV_H
-#define HARDDRIV_H
+#ifndef MAME_DEVICES_IMAGEDEV_HARDDRIV_H
+#define MAME_DEVICES_IMAGEDEV_HARDDRIV_H
 
 #include "harddisk.h"
 #include "softlist_dev.h"
@@ -25,7 +25,7 @@ class harddisk_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~harddisk_image_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<harddisk_image_device &>(device).m_device_image_load = callback; }
@@ -54,7 +54,7 @@ public:
 	chd_file *get_chd_file();
 
 protected:
-	harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -74,7 +74,7 @@ protected:
 };
 
 // device type definition
-extern const device_type HARDDISK;
+DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -84,12 +84,12 @@ extern const device_type HARDDISK;
 	MCFG_DEVICE_ADD(_tag, HARDDISK, 0)
 
 #define MCFG_HARDDISK_LOAD(_class,_method)                                \
-	harddisk_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	harddisk_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 #define MCFG_HARDDISK_UNLOAD(_class,_method)                            \
-	harddisk_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	harddisk_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 #define MCFG_HARDDISK_INTERFACE(_interface)                         \
 	harddisk_image_device::static_set_interface(*device, _interface);
 
-#endif /* HARDDRIV_H */
+#endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H

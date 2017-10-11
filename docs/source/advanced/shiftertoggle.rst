@@ -27,7 +27,7 @@ Inside the *spyhunt.cfg* file, you will find the following for the input. The ac
 |                     JOYCODE_1_RYAXIS_NEG_SWITCH OR JOYCODE_1_RYAXIS_POS_SWITCH
 |                 </newseq>
 |             </port>
-| 
+|
 
 The line you need to edit will be the port line defining the actual input. For Spy Hunter, that's going to be *P1_BUTTON2*. Add **toggle="no"** to the end of the tag, like follows:
 
@@ -36,6 +36,6 @@ The line you need to edit will be the port line defining the actual input. For S
 |                     JOYCODE_1_RYAXIS_NEG_SWITCH OR JOYCODE_1_RYAXIS_POS_SWITCH
 |                 </newseq>
 |             </port>
-| 
+|
 
 Save and exit. To disable this, simply remove the **toggle="no"** from each desired .CFG input.

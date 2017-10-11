@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "speaker.h"
 
 
 class deco_ld_state : public driver_device
@@ -146,12 +147,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	required_shared_ptr<UINT8> m_vram0;
-	required_shared_ptr<UINT8> m_attr0;
-	required_shared_ptr<UINT8> m_vram1;
-	required_shared_ptr<UINT8> m_attr1;
+	required_shared_ptr<uint8_t> m_vram0;
+	required_shared_ptr<uint8_t> m_attr0;
+	required_shared_ptr<uint8_t> m_vram1;
+	required_shared_ptr<uint8_t> m_attr1;
 
-	UINT8 m_laserdisc_data;
+	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
@@ -159,12 +160,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
-	UINT32 screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 };
 
-void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
+void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int i,spr_offs,x,y,col,fx,fy;
@@ -209,7 +210,7 @@ void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -455,7 +456,7 @@ void deco_ld_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rblaster, deco_ld_state )
+static MACHINE_CONFIG_START( rblaster )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
@@ -658,9 +659,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, driver_device,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

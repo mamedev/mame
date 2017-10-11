@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "idehd.h"
 
 /***************************************************************************
@@ -19,8 +20,8 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
-	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ata_hle_device(mconfig, type, tag, owner, clock),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
 	m_num_sectors(0),
@@ -36,7 +37,7 @@ ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, 
  *
  *************************************/
 
-UINT32 ata_mass_storage_device::lba_address()
+uint32_t ata_mass_storage_device::lba_address()
 {
 	/* LBA direct? */
 	if (m_device_head & IDE_DEVICE_HEAD_L)
@@ -54,11 +55,11 @@ UINT32 ata_mass_storage_device::lba_address()
  *
  *************************************/
 
-static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
+static void swap_strncpy(uint16_t *dst, const char *src, int field_size_in_words)
 {
 	for (int i = 0; i < field_size_in_words; i++)
 	{
-		UINT16 d;
+		uint16_t d;
 
 		if (*src)
 		{
@@ -309,7 +310,7 @@ void ata_mass_storage_device::finished_command()
 
 void ata_mass_storage_device::next_sector()
 {
-	UINT8 cur_head = m_device_head & IDE_DEVICE_HEAD_HS;
+	uint8_t cur_head = m_device_head & IDE_DEVICE_HEAD_HS;
 
 	/* LBA direct? */
 	if (m_device_head & IDE_DEVICE_HEAD_L)
@@ -678,7 +679,7 @@ void ata_mass_storage_device::process_command()
 			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
 
 		/* reset the buffer */
-		m_sectors_until_int = 1;
+		m_sectors_until_int = m_block_count;
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -773,20 +774,19 @@ void ata_mass_storage_device::process_command()
 //**************************************************************************
 
 // device type definition
-const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
+DEFINE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device, "idehd", "IDE Hard Disk")
 
 //-------------------------------------------------
 //  ide_hdd_device - constructor
 //-------------------------------------------------
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ata_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
-	m_image(*this, "image")
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ide_hdd_device(mconfig, IDE_HARDDISK, tag, owner, clock)
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: ata_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source),
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ata_mass_storage_device(mconfig, type, tag, owner, clock),
 	m_image(*this, "image")
 {
 }
@@ -821,7 +821,7 @@ void ide_hdd_device::device_reset()
 		}
 
 		// build the features page
-		UINT32 metalength;
+		uint32_t metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength) == CHDERR_NONE)
 		{
 			for( int w = 0; w < 256; w++ )
@@ -840,9 +840,9 @@ void ide_hdd_device::device_reset()
 	ata_mass_storage_device::device_reset();
 }
 
-UINT8 ide_hdd_device::calculate_status()
+uint8_t ide_hdd_device::calculate_status()
 {
-	UINT8 result = ata_hle_device::calculate_status();
+	uint8_t result = ata_hle_device::calculate_status();
 
 	if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
 	{
@@ -854,14 +854,9 @@ UINT8 ide_hdd_device::calculate_status()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( hdd_image )
+
+MACHINE_CONFIG_MEMBER( ide_hdd_device::device_add_mconfig )
 	MCFG_HARDDISK_ADD( "image" )
 MACHINE_CONFIG_END
-
-machine_config_constructor ide_hdd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hdd_image );
-}

@@ -4,7 +4,8 @@
 
     "Universal System 16" Hardware (c) 1983/1986 Namco
 
-    driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by Edgardo E. Contini Salvan.
+    driver by Angelo Salese,
+    original "wiped off due of not anymore licenseable" driver by Edgardo E. Contini Salvan.
 
     TODO:
     - PAL is presumably inverted with address bit 11 (0x800) for 0x6000-0x7fff area
@@ -26,10 +27,15 @@
 ****************************************/
 
 #include "emu.h"
+#include "machine/namcoio.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/namcoio.h"
+#include "machine/timer.h"
 #include "sound/namco.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_6_144MHz
 
@@ -65,13 +71,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_master_workram;
-	required_shared_ptr<UINT8> m_slave_sharedram;
-	required_shared_ptr<UINT16> m_bgvram;
-	required_shared_ptr<UINT8> m_fgvram;
-	required_shared_ptr<UINT8> m_fgattr;
+	required_shared_ptr<uint8_t> m_master_workram;
+	required_shared_ptr<uint8_t> m_slave_sharedram;
+	required_shared_ptr<uint16_t> m_bgvram;
+	required_shared_ptr<uint8_t> m_fgvram;
+	required_shared_ptr<uint8_t> m_fgattr;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
@@ -104,7 +110,7 @@ protected:
 private:
 	bool m_master_irq_enable;
 	bool m_slave_irq_enable;
-	UINT8 m_pal_bank;
+	uint8_t m_pal_bank;
 
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -113,7 +119,7 @@ private:
 
 PALETTE_INIT_MEMBER(namcos16_state, toypop)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0;i < 256;i++)
 	{
@@ -143,7 +149,7 @@ PALETTE_INIT_MEMBER(namcos16_state, toypop)
 
 	for (int i = 0;i < 256;i++)
 	{
-		UINT8 entry;
+		uint8_t entry;
 
 		// characters
 		palette.set_pen_indirect(i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
@@ -163,18 +169,18 @@ PALETTE_INIT_MEMBER(namcos16_state, toypop)
 void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x, y;
-	const UINT16 pal_base = 0x300 + (m_pal_bank << 4);
-	const UINT32 src_base = 0x200/2;
-	const UINT16 src_pitch = 288 / 2;
+	const uint16_t pal_base = 0x300 + (m_pal_bank << 4);
+	const uint32_t src_base = 0x200/2;
+	const uint16_t src_pitch = 288 / 2;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		uint16_t *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
+		uint16_t *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			UINT32 srcpix = *src++;
+			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen(((srcpix >> 8) & 0xf) + pal_base);
 			*dst++ = m_palette->pen((srcpix & 0xf) + pal_base);
 		}
@@ -207,8 +213,8 @@ void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 			y = (count / 32) - 2;
 		}
 
-		UINT16 tile = m_fgvram[count];
-		UINT8 color = (m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
+		uint16_t tile = m_fgvram[count];
+		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
 
 		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
 	}
@@ -219,9 +225,9 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 {
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
 	int count;
-	UINT8 *base_spriteram = m_master_workram;
-	const UINT16 bank1 = 0x0800;
-	const UINT16 bank2 = 0x1000;
+	uint8_t *base_spriteram = m_master_workram;
+	const uint16_t bank1 = 0x0800;
+	const uint16_t bank2 = 0x1000;
 
 
 	for (count=0x780;count<0x800;count+=2)
@@ -231,8 +237,8 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		if(enabled == false)
 			continue;
 
-		UINT8 tile = base_spriteram[count];
-		UINT8 color = base_spriteram[count+1];
+		uint8_t tile = base_spriteram[count];
+		uint8_t color = base_spriteram[count+1];
 		int x = base_spriteram[count+bank1+1] + (base_spriteram[count+bank2+1] << 8);
 		x -= 71;
 
@@ -243,8 +249,8 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 		bool fx = (base_spriteram[count+bank2] & 1) == 1;
 		bool fy = (base_spriteram[count+bank2] & 2) == 2;
-		UINT8 width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
-		UINT8 height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
+		uint8_t width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
+		uint8_t height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
 
 		if(height == 2)
 			y -=16;
@@ -253,14 +259,14 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		{
 			for(int xi=0;xi<width;xi++)
 			{
-				UINT16 sprite_offs = tile + (xi ^ ((width - 1) & fx)) + yi * 2;
+				uint16_t sprite_offs = tile + (xi ^ ((width - 1) & fx)) + yi * 2;
 				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
 			}
 		}
 	}
 }
 
-UINT32 namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
@@ -312,7 +318,7 @@ WRITE16_MEMBER(namcos16_state::slave_irq_enable_w)
 
 READ8_MEMBER(namcos16_state::bg_rmw_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 	// note: following offset is written as offset * 2
@@ -646,7 +652,7 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl, namcos16_state )
+static MACHINE_CONFIG_START( liblrabl )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
@@ -660,20 +666,20 @@ static MACHINE_CONFIG_START( liblrabl, namcos16_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
 
-	MCFG_DEVICE_ADD("58xx", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1_RIGHT"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2_RIGHT"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("56xx_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
 	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
 
-	MCFG_DEVICE_ADD("56xx_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2_LEFT"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("SERVICE"))
@@ -759,5 +765,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   driver_device, 0,   ROT0,   "Namco", "Toypop", MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

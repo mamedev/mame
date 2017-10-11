@@ -6,43 +6,43 @@
 
 */
 
-#ifndef _UCOM4_H_
-#define _UCOM4_H_
+#ifndef MAME_CPU_UCOM4_UCOM4_H
+#define MAME_CPU_UCOM4_UCOM4_H
 
-#include "emu.h"
+#pragma once
 
 
 // I/O ports setup
 #define MCFG_UCOM4_READ_A_CB(_devcb) \
-	ucom4_cpu_device::set_read_a_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_a_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_B_CB(_devcb) \
-	ucom4_cpu_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_b_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_C_CB(_devcb) \
-	ucom4_cpu_device::set_read_c_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_c_callback(*device, DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_C_CB(_devcb) \
-	ucom4_cpu_device::set_write_c_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_D_CB(_devcb) \
-	ucom4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_D_CB(_devcb) \
-	ucom4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_E_CB(_devcb) \
-	ucom4_cpu_device::set_write_e_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_e_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_F_CB(_devcb) \
-	ucom4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_G_CB(_devcb) \
-	ucom4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_H_CB(_devcb) \
-	ucom4_cpu_device::set_write_h_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_h_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_I_CB(_devcb) \
-	ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
 
 enum
 {
@@ -77,10 +77,10 @@ enum
    /INT  6 |                 | 37 PB0
   RESET  7 |                 | 36 PA3
     PD0  8 |                 | 35 PA2
-    PD1  9 |     uPD552      | 34 PA1
-    PD2 10 |     uPD553      | 33 PA0
-    PD3 11 |     uPD650*     | 32 PI2
-    PE0 12 |                 | 31 PI1
+    PD1  9 |     uPD546      | 34 PA1
+    PD2 10 |     uPD552      | 33 PA0
+    PD3 11 |     uPD553      | 32 PI2
+    PE0 12 |     uPD650*     | 31 PI1
     PE1 13 |                 | 30 PI0
     PE2 14 |                 | 29 PH3
     PE3 15 |                 | 28 PH2
@@ -99,63 +99,44 @@ enum
 class ucom4_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_family(family)
-		, m_stack_levels(stack_levels)
-		, m_read_a(*this)
-		, m_read_b(*this)
-		, m_read_c(*this)
-		, m_read_d(*this)
-		, m_write_c(*this)
-		, m_write_d(*this)
-		, m_write_e(*this)
-		, m_write_f(*this)
-		, m_write_g(*this)
-		, m_write_h(*this)
-		, m_write_i(*this)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_a.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_b.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_d.set_callback(object); }
+	template <class Object> static devcb_base &set_read_a_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_e_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_e.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_f.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_h_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_i_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(object); }
+	template <class Object> static devcb_base &set_write_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_e_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_e.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_g_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_g.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_h_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_i_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	// construction/destruction
+	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); } // "
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 2; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 4); } // "
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 2; }
+	virtual u32 execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -169,30 +150,30 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;           // MCU family (43/44/45)
-	int m_stack_levels;     // number of callstack levels
-	UINT16 m_stack[3];      // max 3
-	UINT8 m_port_out[0x10]; // last value written to output port
-	UINT8 m_op;
-	UINT8 m_prev_op;        // previous opcode
-	UINT8 m_arg;            // opcode argument for 2-byte opcodes
-	UINT8 m_bitmask;        // opcode bit argument
-	bool m_skip;            // skip next opcode
+	int m_family;        // MCU family (43/44/45)
+	int m_stack_levels;  // number of callstack levels
+	u16 m_stack[3];      // max 3
+	u8 m_port_out[0x10]; // last value written to output port
+	u8 m_op;
+	u8 m_prev_op;        // previous opcode
+	u8 m_arg;            // opcode argument for 2-byte opcodes
+	u8 m_bitmask;        // opcode bit argument
+	bool m_skip;         // skip next opcode
 	int m_icount;
 	emu_timer *m_timer;
 
-	UINT16 m_pc;            // program counter
-	UINT16 m_prev_pc;
-	UINT8 m_acc;            // 4-bit accumulator
-	UINT8 m_dpl;            // 4-bit data pointer low (RAM x)
-	UINT8 m_dph;            // 4-bit(?) data pointer high (RAM y)
-	UINT8 m_dph_mask;
-	UINT8 m_carry_f;        // carry flag
-	UINT8 m_carry_s_f;      // carry save flag
-	UINT8 m_timer_f;        // timer out flag
-	UINT8 m_int_f;          // interrupt flag
-	UINT8 m_inte_f;         // interrupt enable flag
-	int m_int_line;         // interrupt pin state
+	u16 m_pc;            // program counter
+	u16 m_prev_pc;
+	u8 m_acc;            // 4-bit accumulator
+	u8 m_dpl;            // 4-bit data pointer low (RAM x)
+	u8 m_dph;            // 4-bit(?) data pointer high (RAM y)
+	u8 m_dph_mask;
+	u8 m_carry_f;        // carry flag
+	u8 m_carry_s_f;      // carry save flag
+	u8 m_timer_f;        // timer out flag
+	u8 m_int_f;          // interrupt flag
+	u8 m_inte_f;         // interrupt enable flag
+	int m_int_line;      // interrupt pin state
 
 	// i/o handlers
 	devcb_read8 m_read_a;
@@ -208,23 +189,23 @@ protected:
 	devcb_write8 m_write_h;
 	devcb_write8 m_write_i;
 
-	virtual UINT8 input_r(int index);
-	virtual void output_w(int index, UINT8 data);
+	virtual u8 input_r(int index);
+	virtual void output_w(int index, u8 data);
 
 	// misc internal helpers
 	void increment_pc();
 	void fetch_arg();
 	void do_interrupt();
 
-	UINT8 ram_r();
-	void ram_w(UINT8 data);
+	u8 ram_r();
+	void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
 
 	bool check_op_43();
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
-	UINT8 ucom43_reg_r(int index);
-	void ucom43_reg_w(int index, UINT8 data);
+	u8 ucom43_reg_r(int index);
+	void ucom43_reg_w(int index, u8 data);
 
 	// opcode handlers
 	void op_illegal();
@@ -313,43 +294,50 @@ protected:
 };
 
 
+class upd546_cpu_device : public ucom4_cpu_device
+{
+public:
+	upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 class upd553_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class upd557l_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual UINT8 input_r(int index) override;
-	virtual void output_w(int index, UINT8 data) override;
+	virtual u8 input_r(int index) override;
+	virtual void output_w(int index, u8 data) override;
 };
 
 
 class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class upd552_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 
-extern const device_type NEC_D553;
-extern const device_type NEC_D557L;
-extern const device_type NEC_D650;
-extern const device_type NEC_D552;
+DECLARE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device)
 
-
-#endif /* _UCOM4_H_ */
+#endif // MAME_CPU_UCOM4_UCOM4_H

@@ -27,7 +27,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( beep_w );
@@ -36,7 +36,7 @@ public:
 
 	//LCD controller
 	void update_ac(void);
-	void set_busy_flag(UINT16 usec);
+	void set_busy_flag(uint16_t usec);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE8_MEMBER(lcd_control_w);
@@ -51,20 +51,20 @@ public:
 	emu_timer *m_blink_timer;
 	emu_timer *m_busy_timer;
 
-	UINT8 m_busy_flag;
-	UINT8 m_ddram[0xa0];
-	UINT8 m_cgram[0x40];
-	INT16 m_ac;
-	UINT8 m_ac_mode;
-	UINT8 m_data_bus_flag;
-	INT16 m_cursor_pos;
-	UINT8 m_display_on;
-	UINT8 m_cursor_on;
-	UINT8 m_blink_on;
-	UINT8 m_shift_on;
-	INT8 m_disp_shift;
-	INT8 m_direction;
-	UINT8 m_blink;
+	uint8_t m_busy_flag;
+	uint8_t m_ddram[0xa0];
+	uint8_t m_cgram[0x40];
+	int16_t m_ac;
+	uint8_t m_ac_mode;
+	uint8_t m_data_bus_flag;
+	int16_t m_cursor_pos;
+	uint8_t m_display_on;
+	uint8_t m_cursor_on;
+	uint8_t m_blink_on;
+	uint8_t m_shift_on;
+	int8_t m_disp_shift;
+	int8_t m_direction;
+	uint8_t m_blink;
 	DECLARE_PALETTE_INIT(pc4);
 
 protected:

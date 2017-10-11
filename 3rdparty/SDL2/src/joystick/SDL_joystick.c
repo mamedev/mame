@@ -142,8 +142,8 @@ SDL_JoystickOpen(int device_index)
         joystick->name = NULL;
 
     if (joystick->naxes > 0) {
-        joystick->axes = (Sint16 *) SDL_malloc
-            (joystick->naxes * sizeof(Sint16));
+        joystick->axes = (Sint16 *) SDL_malloc(joystick->naxes * sizeof(Sint16));
+        joystick->axes_zero = (Sint16 *) SDL_malloc(joystick->naxes * sizeof(Sint16));
     }
     if (joystick->nhats > 0) {
         joystick->hats = (Uint8 *) SDL_malloc
@@ -167,6 +167,7 @@ SDL_JoystickOpen(int device_index)
     }
     if (joystick->axes) {
         SDL_memset(joystick->axes, 0, joystick->naxes * sizeof(Sint16));
+        SDL_memset(joystick->axes_zero, 0, joystick->naxes * sizeof(Sint16));
     }
     if (joystick->hats) {
         SDL_memset(joystick->hats, 0, joystick->nhats * sizeof(Uint8));
@@ -497,6 +498,71 @@ SDL_PrivateJoystickShouldIgnoreEvent()
 
 /* These are global for SDL_sysjoystick.c and SDL_events.c */
 
+void SDL_PrivateJoystickAdded(int device_index)
+{
+#if !SDL_EVENTS_DISABLED
+    SDL_Event event;
+
+    event.type = SDL_JOYDEVICEADDED;
+
+    if (SDL_GetEventState(event.type) == SDL_ENABLE) {
+        event.jdevice.which = device_index;
+        if ( (SDL_EventOK == NULL) ||
+             (*SDL_EventOK) (SDL_EventOKParam, &event) ) {
+            SDL_PushEvent(&event);
+        }
+    }
+#endif /* !SDL_EVENTS_DISABLED */
+}
+
+/*
+ * If there is an existing add event in the queue, it needs to be modified
+ * to have the right value for which, because the number of controllers in
+ * the system is now one less.
+ */
+static void UpdateEventsForDeviceRemoval()
+{
+    int i, num_events;
+    SDL_Event *events;
+
+    num_events = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, SDL_JOYDEVICEADDED, SDL_JOYDEVICEADDED);
+    if (num_events <= 0) {
+        return;
+    }
+
+    events = SDL_stack_alloc(SDL_Event, num_events);
+    if (!events) {
+        return;
+    }
+
+    num_events = SDL_PeepEvents(events, num_events, SDL_GETEVENT, SDL_JOYDEVICEADDED, SDL_JOYDEVICEADDED);
+    for (i = 0; i < num_events; ++i) {
+        --events[i].jdevice.which;
+    }
+    SDL_PeepEvents(events, num_events, SDL_ADDEVENT, 0, 0);
+
+    SDL_stack_free(events);
+}
+
+void SDL_PrivateJoystickRemoved(SDL_JoystickID device_instance)
+{
+#if !SDL_EVENTS_DISABLED
+    SDL_Event event;
+
+    event.type = SDL_JOYDEVICEREMOVED;
+
+    if (SDL_GetEventState(event.type) == SDL_ENABLE) {
+        event.jdevice.which = device_instance;
+        if ( (SDL_EventOK == NULL) ||
+             (*SDL_EventOK) (SDL_EventOKParam, &event) ) {
+            SDL_PushEvent(&event);
+        }
+    }
+
+    UpdateEventsForDeviceRemoval();
+#endif /* !SDL_EVENTS_DISABLED */
+}
+
 int
 SDL_PrivateJoystickAxis(SDL_Joystick * joystick, Uint8 axis, Sint16 value)
 {
@@ -514,8 +580,8 @@ SDL_PrivateJoystickAxis(SDL_Joystick * joystick, Uint8 axis, Sint16 value)
      * events.
      */
     if (SDL_PrivateJoystickShouldIgnoreEvent()) {
-        if ((value > 0 && value >= joystick->axes[axis]) ||
-            (value < 0 && value <= joystick->axes[axis])) {
+        if ((value > joystick->axes_zero[axis] && value >= joystick->axes[axis]) ||
+            (value < joystick->axes_zero[axis] && value <= joystick->axes[axis])) {
             return 0;
         }
     }
@@ -688,7 +754,7 @@ SDL_JoystickUpdate(void)
 
             /* Tell the app that everything is centered/unpressed...  */
             for (i = 0; i < joystick->naxes; i++) {
-                SDL_PrivateJoystickAxis(joystick, i, 0);
+                SDL_PrivateJoystickAxis(joystick, i, joystick->axes_zero[i]);
             }
 
             for (i = 0; i < joystick->nbuttons; i++) {

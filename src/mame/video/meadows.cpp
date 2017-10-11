@@ -22,7 +22,7 @@
 
 TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index] & 0x7f, 0, 0);
 }
 
@@ -49,7 +49,7 @@ void meadows_state::video_start()
 
 WRITE8_MEMBER(meadows_state::meadows_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -79,7 +79,7 @@ WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
 
 void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -103,7 +103,7 @@ void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
  *
  *************************************/
 
-UINT32 meadows_state::screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meadows_state::screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

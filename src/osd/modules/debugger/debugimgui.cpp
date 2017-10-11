@@ -106,6 +106,7 @@ public:
 		m_win_count(0),
 		m_has_images(false),
 		m_initialised(false),
+		m_dialog_image(nullptr),
 		m_filelist_refresh(false),
 		m_mount_open(false),
 		m_create_open(false),
@@ -175,8 +176,8 @@ private:
 	static int history_set(ImGuiTextEditCallbackData* data);
 
 	running_machine* m_machine;
-	INT32            m_mouse_x;
-	INT32            m_mouse_y;
+	int32_t            m_mouse_x;
+	int32_t            m_mouse_y;
 	bool             m_mouse_button;
 	bool             m_prev_mouse_button;
 	bool             m_running;
@@ -184,7 +185,7 @@ private:
 	float            font_size;
 	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
 	ImguiFontHandle  m_font;
-	UINT8            m_key_char;
+	uint8_t            m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
 	bool             m_has_images; // true if current system has any image devices
@@ -357,7 +358,7 @@ void debug_imgui::handle_keys()
 	{
 		switch (event.event_type)
 		{
-		case UI_EVENT_CHAR:
+			case ui_event::IME_CHAR:
 			m_key_char = event.ch;
 			if(focus_view != nullptr)
 				focus_view->view->process_char(m_key_char);
@@ -859,7 +860,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool physical = mem->physical();
 				bool rev = mem->reverse();
 				int format = mem->get_data_format();
-				UINT32 chunks = mem->chunks_per_row();
+				uint32_t chunks = mem->chunks_per_row();
 
 				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
@@ -999,6 +1000,7 @@ void debug_imgui::refresh_filelist()
 	util::zippath_directory* dir = nullptr;
 	const char *volume_name;
 	const osd::directory::entry *dirent;
+	uint8_t first = 0;
 
 	// todo
 	m_filelist.clear();
@@ -1018,6 +1020,7 @@ void debug_imgui::refresh_filelist()
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
+		first = m_filelist.size();
 		while((dirent = util::zippath_readdir(dir)) != nullptr)
 		{
 			file_entry temp;
@@ -1039,6 +1042,9 @@ void debug_imgui::refresh_filelist()
 	}
 	if (dir != nullptr)
 		util::zippath_closedir(dir);
+
+	// sort file list, as it is not guaranteed to be in any particular order
+	std::sort(m_filelist.begin()+first,m_filelist.end(),[](file_entry x, file_entry y) { return x.basename < y.basename; } );
 }
 
 void debug_imgui::refresh_typelist()
@@ -1377,7 +1383,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
-
+	ImGui::PushStyleColor(ImGuiCol_ComboBg,ImVec4(0.4f,0.4f,0.4f,0.9f));
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
@@ -1419,7 +1425,7 @@ void debug_imgui::update()
 		global_free(to_delete);
 	}
 
-	ImGui::PopStyleColor(12);
+	ImGui::PopStyleColor(13);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
@@ -1478,8 +1484,8 @@ void debug_imgui::init_debugger(running_machine &machine)
 
 void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 {
-	UINT32 width = m_machine->render().ui_target().width();
-	UINT32 height = m_machine->render().ui_target().height();
+	uint32_t width = m_machine->render().ui_target().width();
+	uint32_t height = m_machine->render().ui_target().height();
 	if(firststop && !m_initialised)
 	{
 		view_main_console = dview_alloc(device.machine(), DVT_CONSOLE);
@@ -1524,10 +1530,10 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_imgui::debugger_update()
 {
-	if (m_machine && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
+	if (m_machine && (m_machine->phase() == machine_phase::RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
-		UINT32 width = m_machine->render().ui_target().width();
-		UINT32 height = m_machine->render().ui_target().height();
+		uint32_t width = m_machine->render().ui_target().width();
+		uint32_t height = m_machine->render().ui_target().height();
 		handle_mouse();
 		handle_keys();
 		imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height, m_key_char);

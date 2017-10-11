@@ -104,7 +104,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
 
 void tiamc1_state::update_bg_palette()
 {
-	UINT8 bplmask = ((m_bg_bplctrl >> 0) & 1) | ((m_bg_bplctrl >> 1) & 2) | ((m_bg_bplctrl >> 2) & 4) | ((m_bg_bplctrl >> 3) & 8);
+	uint8_t bplmask = ((m_bg_bplctrl >> 0) & 1) | ((m_bg_bplctrl >> 1) & 2) | ((m_bg_bplctrl >> 2) & 4) | ((m_bg_bplctrl >> 3) & 8);
 	for (int i = 0; i < 16; i++)
 		m_palette->set_pen_color(i + 16, m_palette_ptr[m_paletteram[i | bplmask]]);
 }
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 
 void tiamc1_state::video_start()
 {
-	m_videoram = make_unique_clear<UINT8[]>(0x3050);
+	m_videoram = make_unique_clear<uint8_t[]>(0x3050);
 
 		m_charram = m_videoram.get() + 0x0800;     /* Ram is banked */
 		m_tileram = m_videoram.get() + 0x0000;
@@ -192,7 +192,7 @@ VIDEO_START_MEMBER(tiamc1_state, kot)
 {
 	m_charram = memregion("gfx2")->base();
 
-	m_videoram    = make_unique_clear<UINT8[]>(0x450);
+	m_videoram    = make_unique_clear<uint8_t[]>(0x450);
 	m_tileram     = m_videoram.get() + 0x000;
 	m_spriteram_y = m_videoram.get() + 0x400;
 	m_spriteram_x = m_videoram.get() + 0x410;
@@ -239,7 +239,7 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -266,7 +266,7 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 tiamc1_state::screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tiamc1_state::screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int i = 0; i < 32; i++)
 		m_bg_tilemap1->set_scrolly(i, m_bg_vshift);

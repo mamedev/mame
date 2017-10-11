@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "1mhzbus.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_1MHZBUS_SLOT = &device_creator<bbc_1mhzbus_slot_device>;
+DEFINE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device, "bbc_1mhzbus_slot", "BBC Micro 1MHz Bus port")
 
 
 
@@ -50,9 +51,9 @@ device_bbc_1mhzbus_interface::~device_bbc_1mhzbus_interface()
 //  bbc_1mhzbus_slot_device - constructor
 //-------------------------------------------------
 
-bbc_1mhzbus_slot_device::bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, BBC_1MHZBUS_SLOT, "BBC Micro 1MHz Bus port", tag, owner, clock, "bbc_1mhzbus_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
+bbc_1mhzbus_slot_device::bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BBC_1MHZBUS_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
@@ -106,37 +107,27 @@ void bbc_1mhzbus_slot_device::device_reset()
 //#include "ieee488.h"
 //#include "music500.h"
 //#include "music5000.h"
+//#include "multiform.h"
 #include "opus3.h"
 //#include "ramdisc.h"
 //#include "torchg400.h"
 //#include "torchg800.h"
-//#include "beebsid.h"
+#include "beebsid.h"
 //#include "prisma3.h"
 
 
-SLOT_INTERFACE_START(bbcb_1mhzbus_devices)
+SLOT_INTERFACE_START(bbc_1mhzbus_devices)
 //  SLOT_INTERFACE("teletext",  BBC_TELETEXT)        /* Acorn ANE01 Teletext Adapter */
 //  SLOT_INTERFACE("ieee488",   BBC_IEEE488)         /* Acorn ANK01 IEEE488 Interface */
 //  SLOT_INTERFACE("music500",  BBC_MUSIC500)        /* Acorn ANV02 Music500 */
 //  SLOT_INTERFACE("music2000", BBC_MUSIC2000)       /* Hybrid Music 2000 MIDI Interface */
 //  SLOT_INTERFACE("music3000", BBC_MUSIC3000)       /* Hybrid Music 3000 Expander */
 //  SLOT_INTERFACE("music5000", BBC_MUSIC5000)       /* Hybrid Music 5000 Synthesiser */
+//  SLOT_INTERFACE("multiform", BBC_MULTIFORM)       /* Technomatic Multiform Z80 */
 	SLOT_INTERFACE("opus3",     BBC_OPUS3)           /* Opus Challenger 3 */
 //  SLOT_INTERFACE("ramdisc",   BBC_RAMDISC)         /* Morley Electronics RAM Disc */
 //  SLOT_INTERFACE("torchg400", BBC_TORCHG400)       /* Torch Graduate G400 */
 //  SLOT_INTERFACE("torchg800", BBC_TORCHG800)       /* Torch Graduate G800 */
-//  SLOT_INTERFACE("beebsid",   BBC_BEEBSID)         /* BeebSID */
-//  SLOT_INTERFACE("prisma3",   BBC_PRISMA3)         /* Prisma 3 - Millipede 1989 */
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START( bbcm_1mhzbus_devices )
-//  SLOT_INTERFACE("teletext",  BBC_TELETEXT)        /* Acorn ANE01 Teletext Adapter */
-//  SLOT_INTERFACE("ieee488",   BBC_IEEE488)         /* Acorn ANK01 IEEE488 Interface */
-//  SLOT_INTERFACE("music500",  BBC_MUSIC500)        /* Acorn ANV02 Music500 */
-//  SLOT_INTERFACE("music2000", BBC_MUSIC2000)       /* Hybrid Music 2000 MIDI Interface */
-//  SLOT_INTERFACE("music3000", BBC_MUSIC3000)       /* Hybrid Music 3000 Expander */
-//  SLOT_INTERFACE("music5000", BBC_MUSIC5000)       /* Hybrid Music 5000 Synthesiser */
-//  SLOT_INTERFACE("ramdisc",   BBC_RAMDISC)         /* Morley Electronics RAM Disc */
-//  SLOT_INTERFACE("beebsid",   BBC_BEEBSID)         /* BeebSID */
+	SLOT_INTERFACE("beebsid",   BBC_BEEBSID)         /* BeebSID */
 //  SLOT_INTERFACE("prisma3",   BBC_PRISMA3)         /* Prisma 3 - Millipede 1989 */
 SLOT_INTERFACE_END

@@ -18,7 +18,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -67,7 +67,7 @@ PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 	/* sprite lookup table */
 	for (i = 0x80; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
+		uint8_t ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -176,7 +176,7 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_scroll_w)
 
 void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	rectangle clip = cliprect;
 	gfx_element *gfx = m_gfxdecode->gfx(1 + m_sprite_bank);
 	int i, j;
@@ -231,7 +231,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 }
 
-UINT32 kncljoe_state::screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kncljoe_state::screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

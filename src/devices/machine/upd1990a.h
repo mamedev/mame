@@ -16,12 +16,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_UPD1990A_H
+#define MAME_MACHINE_UPD1990A_H
+
 #pragma once
 
-#ifndef __UPD1990A__
-#define __UPD1990A__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -47,16 +47,14 @@
 
 // ======================> upd1990a_device
 
-class upd1990a_device : public device_t,
-						public device_rtc_interface
+class upd1990a_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
-	template<class _tp> void set_tp_callback(_tp tp) { m_write_tp.set_callback(tp); }
+	template <class Object> void set_data_callback(Object &&data) { m_write_data.set_callback(std::forward<Object>(data)); }
+	template <class Object> void set_tp_callback(Object &&tp) { m_write_tp.set_callback(std::forward<Object>(tp)); }
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
@@ -71,6 +69,8 @@ public:
 
 protected:
 	// device-level overrides
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -115,8 +115,8 @@ private:
 	devcb_write_line m_write_data;
 	devcb_write_line m_write_tp;
 
-	UINT8 m_time_counter[6];    // time counter
-	UINT8 m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)
+	uint8_t m_time_counter[6];    // time counter
+	uint8_t m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)
 
 	int m_oe;                   // output enable
 	int m_cs;                   // chip select
@@ -130,7 +130,7 @@ private:
 
 	bool m_testmode;            // testmode active
 
-	int m_variant;
+	int const m_variant;
 
 	// timers
 	emu_timer *m_timer_clock;
@@ -148,14 +148,12 @@ private:
 class upd4990a_device : public upd1990a_device
 {
 public:
-	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definitions
-extern const device_type UPD1990A;
-extern const device_type UPD4990A;
+DECLARE_DEVICE_TYPE(UPD1990A, upd1990a_device)
+DECLARE_DEVICE_TYPE(UPD4990A, upd4990a_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_UPD1990A_H

@@ -14,24 +14,21 @@
     * F988 - YMZ294 #2 (left) register select
 */
 
-#ifndef CPC_PLAYCITY_H_
-#define CPC_PLAYCITY_H_
+#ifndef MAME_BUS_CPC_PLAYCITY_H
+#define MAME_BUS_CPC_PLAYCITY_H
+
+#pragma once
 
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/ay8910.h"
 #include "machine/z80ctc.h"
 
-class cpc_playcity_device : public device_t,
-				public device_cpc_expansion_card_interface
+class cpc_playcity_device : public device_t, public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
-	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(ctc_r);
 	DECLARE_WRITE8_MEMBER(ctc_w);
@@ -41,8 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ymz2_data_w);
 	DECLARE_READ8_MEMBER(ymz1_data_r);
 	DECLARE_READ8_MEMBER(ymz2_data_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
-	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
 
 	virtual WRITE_LINE_MEMBER(cursor_w) override { m_ctc->trg1(state); }
 
@@ -51,7 +46,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
+	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
+
 	cpc_expansion_slot_device *m_slot;
 
 	required_device<z80ctc_device> m_ctc;
@@ -62,7 +63,7 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_PLAYCITY;
+DECLARE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device)
 
 
-#endif /* CPC_PLAYCITY_H_ */
+#endif // MAME_BUS_CPC_PLAYCITY_H

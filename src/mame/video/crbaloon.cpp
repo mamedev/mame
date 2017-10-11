@@ -31,7 +31,7 @@ PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		UINT8 pen;
+		uint8_t pen;
 		int h, r, g, b;
 
 		if (i & 0x01)
@@ -78,7 +78,7 @@ void crbaloon_state::video_start()
 }
 
 
-UINT16 crbaloon_state::crbaloon_get_collision_address()
+uint16_t crbaloon_state::crbaloon_get_collision_address()
 {
 	return m_collision_address_clear ? 0xffff : m_collision_address;
 }
@@ -94,11 +94,11 @@ void crbaloon_state::crbaloon_set_clear_collision_address(int _crbaloon_collisio
 void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 {
 	int y;
-	UINT8 code = m_spriteram[0] & 0x0f;
-	UINT8 color = m_spriteram[0] >> 4;
-	UINT8 sy = m_spriteram[2] - 32;
+	uint8_t code = m_spriteram[0] & 0x0f;
+	uint8_t color = m_spriteram[0] >> 4;
+	uint8_t sy = m_spriteram[2] - 32;
 
-	UINT8 *gfx = memregion("gfx2")->base() + (code << 7);
+	uint8_t *gfx = memregion("gfx2")->base() + (code << 7);
 
 
 	if (flip_screen())
@@ -110,8 +110,8 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 	for (y = 0x1f; y >= 0; y--)
 	{
 		int x;
-		UINT8 data = 0;
-		UINT8 sx = m_spriteram[1];
+		uint8_t data = 0;
+		uint8_t sx = m_spriteram[1];
 
 		for (x = 0x1f; x >= 0; x--)
 		{
@@ -143,7 +143,7 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 }
 
 
-UINT32 crbaloon_state::screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crbaloon_state::screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

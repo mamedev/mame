@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAM_EXP_H
+#define MAME_BUS_ADAM_EXP_H
+
 #pragma once
 
-#ifndef __ADAM_EXPANSION_SLOT__
-#define __ADAM_EXPANSION_SLOT__
-
-#include "emu.h"
 #include "softlist_dev.h"
 
 
@@ -53,21 +52,20 @@ class adam_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~adam_expansion_slot_device() { }
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
-	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
-	void bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
+	void bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -86,7 +84,7 @@ protected:
 	virtual const char *file_extensions() const override { return "bin,rom"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_irq;
 
@@ -100,30 +98,26 @@ class device_adam_expansion_slot_card_interface : public device_slot_card_interf
 {
 	friend class adam_expansion_slot_device;
 
-public:
+protected:
 	// construction/destruction
 	device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_adam_expansion_slot_card_interface() { }
 
-protected:
 	// runtime
-	virtual UINT8 adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
-	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
+	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
+	virtual void adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
 
 	adam_expansion_slot_device *m_slot;
 
-	optional_shared_ptr<UINT8> m_rom;
+	optional_shared_ptr<uint8_t> m_rom;
 };
 
 
 // device type definition
-extern const device_type ADAM_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(ADAM_EXPANSION_SLOT, adam_expansion_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( adam_slot1_devices );
 SLOT_INTERFACE_EXTERN( adam_slot2_devices );
 SLOT_INTERFACE_EXTERN( adam_slot3_devices );
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_EXP_H

@@ -19,12 +19,14 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "screen.h"
+
 
 #define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
 	do { \
-	if(VERBOSE_DBG>=N) \
+		if(VERBOSE_DBG>=N) \
 		{ \
 			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
 			logerror A; \
@@ -35,20 +37,22 @@ class vt240_state : public driver_device
 {
 public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_i8085(*this, "charcpu"),
-		m_i8251(*this, "i8251"),
-		m_duart(*this, "duart"),
-		m_host(*this, "host"),
-		m_hgdc(*this, "upd7220"),
-		m_bank(*this, "bank"),
-		m_nvram(*this, "x2212"),
-		m_palette(*this, "palette"),
-		m_rom(*this, "maincpu"),
-		m_video_ram(*this, "vram"),
-		m_monitor(*this, "monitor"),
-		m_lk201(*this, "lk201"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_i8085(*this, "charcpu")
+		, m_i8251(*this, "i8251")
+		, m_duart(*this, "duart")
+		, m_host(*this, "host")
+		, m_hgdc(*this, "upd7220")
+		, m_bank(*this, "bank")
+		, m_nvram(*this, "x2212")
+		, m_palette(*this, "palette")
+		, m_rom(*this, "maincpu")
+		, m_video_ram(*this, "vram")
+		, m_monitor(*this, "monitor")
+		, m_lk201(*this, "lk201")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
@@ -59,8 +63,8 @@ public:
 	required_device<address_map_bank_device> m_bank;
 	required_device<x2212_device> m_nvram;
 	required_device<palette_device> m_palette;
-	required_region_ptr<UINT16> m_rom;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_region_ptr<uint16_t> m_rom;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_ioport m_monitor;
 	optional_device<lk201_device> m_lk201;
 
@@ -108,16 +112,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq9_w);
 	DECLARE_WRITE_LINE_MEMBER(irq13_w);
 
-	UINT8 m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
-	UINT8 m_mem_map[16];
-	UINT8 m_mem_map_sel;
-	UINT8 m_char_buf[16];
-	UINT8 m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
-	UINT8 m_vom[16];
-	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
-	UINT16 m_irqs;
+	uint8_t m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
+	uint8_t m_mem_map[16];
+	uint8_t m_mem_map_sel;
+	uint8_t m_char_buf[16];
+	uint8_t m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
+	uint8_t m_vom[16];
+	uint8_t m_vpat, m_patmult, m_patcnt, m_patidx;
+	uint16_t m_irqs;
 	bool m_lb;
-	UINT16 m_scrl;
+	uint16_t m_scrl;
 };
 
 void vt240_state::irq_encoder(int irq, int state)
@@ -200,7 +204,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi, gfx1, gfx2;
-	UINT8 vom;
+	uint8_t vom;
 
 	if(!BIT(m_reg0, 7))
 	{
@@ -374,7 +378,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(!BIT(m_reg0, 3) || space.debugger_access())
+	if(!BIT(m_reg0, 3) || machine().side_effect_disabled())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
 		return m_video_ram[offset & 0x7fff];
@@ -384,7 +388,7 @@ READ16_MEMBER(vt240_state::vram_r)
 
 WRITE16_MEMBER(vt240_state::vram_w)
 {
-	UINT8 *video_ram = (UINT8 *)(&m_video_ram[0]);
+	uint8_t *video_ram = (uint8_t *)(&m_video_ram[0]);
 	offset <<= 1;
 	offset = ((offset & 0x30000) >> 1) | (offset & 0x7fff);
 	if(!BIT(m_reg0, 3))
@@ -400,7 +404,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 			data &= 0xff;
 	}
 	offset &= 0xffff;
-	UINT8 chr = data;
+	uint8_t chr = data;
 
 	if(BIT(m_reg0, 4))
 	{
@@ -424,8 +428,8 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		{
 			if(ps == 0)
 				i++;
-			UINT8 mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
-			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
+			uint8_t mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
+			uint8_t out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
 			for(int j = 0; j < 8; j++)
 				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
 			switch(m_lu >> 6)
@@ -448,7 +452,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 				out = (out & data) | (mem & ~data);
 			if(BIT(m_reg1, 3))
 			{
-				UINT8 out2 = out;
+				uint8_t out2 = out;
 				if(BIT(m_reg1, 2))
 				{
 					out = video_ram[((offset & 0x7ffe) | 0) + (0x8000 * i)];
@@ -473,7 +477,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		data = (chr & data) | (video_ram[offset] & ~data);
 	if(BIT(m_reg1, 3))
 	{
-		UINT8 data2 = data;
+		uint8_t data2 = data;
 		if(BIT(m_reg1, 2))
 		{
 			data = video_ram[(offset & ~1) | 0];
@@ -592,7 +596,7 @@ static ADDRESS_MAP_START(vt240_char_io, AS_IO, 8, vt240_state)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(lbscrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, vt240_state)
+static ADDRESS_MAP_START( upd7220_map, 0, 16, vt240_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -634,7 +638,7 @@ static INPUT_PORTS_START( vt240 )
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vt240, vt240_state )
+static MACHINE_CONFIG_START( vt240 )
 	MCFG_CPU_ADD("maincpu", T11, XTAL_7_3728MHz) // confirm
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_T11_INITIAL_MODE(5 << 13)
@@ -662,7 +666,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4MHz / 4)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(vt240_state, hgdc_draw)
 	MCFG_UPD7220_VSYNC_CALLBACK(INPUTLINE("charcpu", I8085_RST75_LINE))
 	MCFG_UPD7220_BLANK_CALLBACK(INPUTLINE("charcpu", I8085_RST55_LINE))
@@ -770,7 +774,7 @@ ROM_START( vt240 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, vt240,  0,      0,       vt240,    vt240, vt240_state,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt240_state,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )

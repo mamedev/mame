@@ -5,8 +5,8 @@
  *
  */
 
-#include <devices/nlid_cmos.h>
-#include "analog/nld_twoterm.h"
+#include "nlid_cmos.h"
+#include "../analog/nlid_twoterm.h"
 #include "nld_4066.h"
 
 namespace netlist
@@ -24,16 +24,24 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI() { }
+		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
 	public:
-		NETLIB_SUB(vdd_vss) m_supply;
-		NETLIB_SUB(R) m_R;
+		NETLIB_SUB(vdd_vss)        m_supply;
+		analog::NETLIB_SUB(R_base) m_R;
 
-		analog_input_t m_control;
-		param_double_t m_base_r;
+		analog_input_t             m_control;
+		param_double_t             m_base_r;
 	};
+
+	NETLIB_RESET(CD4066_GATE)
+	{
+		// Start in off condition
+		// FIXME: is ROFF correct?
+		m_R.set_R(NL_FCONST(1.0) / netlist().gmin());
+
+	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
@@ -59,7 +67,7 @@ namespace netlist
 			{
 				m_R.update_dev();
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
 			else
 			{

@@ -15,9 +15,11 @@ ToDo:
 *********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "st_mp100.lh"
 
 
@@ -57,18 +59,18 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 private:
-	UINT8 m_u10a;
-	UINT8 m_u10b;
-	UINT8 m_u11a;
-	UINT8 m_u11b;
+	uint8_t m_u10a;
+	uint8_t m_u10b;
+	uint8_t m_u11a;
+	uint8_t m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb2;
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
-	UINT8 m_digit;
-	UINT8 m_counter;
-	UINT8 m_segment[5];
+	uint8_t m_digit;
+	uint8_t m_counter;
+	uint8_t m_segment[5];
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
@@ -547,7 +549,7 @@ WRITE8_MEMBER( st_mp100_state::u10_a_w )
 
 READ8_MEMBER( st_mp100_state::u10_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
@@ -610,7 +612,7 @@ WRITE8_MEMBER( st_mp100_state::u11_a_w )
 
 		if (BIT(data, 0) && (m_counter > 8))
 		{
-			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 			output().set_digit_value(m_digit, patterns[m_segment[0]]);
 			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
 			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
@@ -698,7 +700,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp100_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-static MACHINE_CONFIG_START( st_mp100, st_mp100_state )
+static MACHINE_CONFIG_START( st_mp100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_CPU_PROGRAM_MAP(st_mp100_map)
@@ -844,19 +846,19 @@ ROM_START(magic)
 ROM_END
 
 // chimes
-GAME(1977,  pinball,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Pinball", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1977,  stingray,   0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Stingray", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  stars,      0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Stars", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  memlane,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Memory Lane", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // sound unit B-521
-GAME(1978,  lectrono,   0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Lectronamo", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1978,  wildfyre,   0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Wildfyre", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1978,  nugent,     0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Nugent", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1979,  dracula,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Dracula (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Lectronamo",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Wildfyre",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Nugent",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Dracula (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // different inputs
-GAME(1979,  trident,    0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Trident", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1979,  hothand,    0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Hot Hand", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1979,  princess,   0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Cosmic Princess", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1979,  magic,      0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Magic", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  trident,    0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  hothand,    0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Hot Hand",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  princess,   0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Cosmic Princess",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  magic,      0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Magic",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

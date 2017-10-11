@@ -42,7 +42,7 @@
 		}   \
 	}
 
-OP( 0x0f, i_pre_v25  ) { UINT32 ModRM, tmp, tmp2;
+OP( 0x0f, i_pre_v25  ) { uint32_t ModRM, tmp, tmp2;
 	switch (FETCH()) {
 		case 0x10 : BITOP_BYTE; CLKS(3,3,4); tmp2 = Breg(CL) & 0x7; m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0; m_CarryVal=m_OverVal=0; break; /* Test */
 		case 0x11 : BITOP_WORD; CLKS(3,3,4); tmp2 = Breg(CL) & 0xf; m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0; m_CarryVal=m_OverVal=0; break; /* Test */

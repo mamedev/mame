@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "cr589.h"
 
 
-static const int identity_offset = 0x3ab;
-static const char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";
+static constexpr int identity_offset = 0x3ab;
+static constexpr char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
@@ -80,7 +81,7 @@ void matsushita_cr589_device::ExecCommand()
 	}
 }
 
-void matsushita_cr589_device::ReadData( UINT8 *data, int dataLength )
+void matsushita_cr589_device::ReadData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -110,7 +111,7 @@ void matsushita_cr589_device::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void matsushita_cr589_device::WriteData( UINT8 *data, int dataLength )
+void matsushita_cr589_device::WriteData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -137,10 +138,10 @@ void matsushita_cr589_device::WriteData( UINT8 *data, int dataLength )
 }
 
 // device type definition
-const device_type CR589 = &device_creator<matsushita_cr589_device>;
+DEFINE_DEVICE_TYPE(CR589, matsushita_cr589_device, "cr589", "Matsushita CR589 CD-ROM Drive")
 
-matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	atapi_cdrom_device(mconfig, CR589, "Matsushita CR589 CD-ROM Drive", tag, owner, clock, "cr589", __FILE__),
+matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, CR589, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {
 }

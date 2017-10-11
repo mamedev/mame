@@ -1,14 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
-#ifndef __FGA002_H__
-#define __FGA002_H__
+#ifndef MAME_MACHINE_FGA002_H
+#define MAME_MACHINE_FGA002_H
 
-#include "emu.h"
-#include "cpu/m68000/m68000.h" // The FGA002 is designed for the 68K interrupt PL0-PL2 signalling, however used on Sparc and x86 boards too
-
-#ifndef VERBOSE
-#define LOG(x)
-#endif
+#include "cpu/m68000/m68000.h" // The FGA002 is designed for the 68K interrupt PL0-PL2 signalling, however used on SPARC and x86 boards too
 
 #define MCFG_FGA002_ADD(_tag, _clock)   MCFG_DEVICE_ADD(_tag, FGA002, _clock)
 
@@ -28,13 +23,6 @@
 #define MCFG_FGA002_OUT_LIACK7_CB(_devcb)                               \
 	devcb = &fga002_device::set_liack7_callback(*device, DEVCB_##_devcb);
 
-// type for array of mapping of FGA registers that assembles an IRQ source
-typedef struct {
-	int vector;
-	int status;
-	int control;
-} fga_irq_t;
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -46,8 +34,7 @@ class fga002_device :  public device_t
 {
 	public:
 	// construction/destruction
-	fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
@@ -66,16 +53,25 @@ class fga002_device :  public device_t
 	int acknowledge();
 	int get_irq_level();
 
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_liack4_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack4_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_liack5_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack5_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_liack6_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack6_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_liack7_callback(device_t &device, _Object object) { return downcast<fga002_device &>(device).m_liack7_cb.set_callback(object); }
-
-	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
-	const static fga_irq_t m_irq_sources[];
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_liack4_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack4_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_liack5_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack5_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_liack6_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack6_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_liack7_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack7_cb.set_callback(std::forward<Object>(cb)); }
 
  protected:
+	// type for array of mapping of FGA registers that assembles an IRQ source
+	typedef struct {
+		int vector;
+		int status;
+		int control;
+	} fga_irq_t;
+
+	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
+	const static fga_irq_t s_irq_sources[];
+
+	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -85,7 +81,7 @@ class fga002_device :  public device_t
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 #endif
-	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	devcb_write_line    m_out_int_cb;
 	devcb_read8         m_liack4_cb;
@@ -96,23 +92,23 @@ class fga002_device :  public device_t
 
  private:
 
-	UINT8 m_tim0count;
-	UINT8   m_fga002[0x500];
+	uint8_t m_tim0count;
+	uint8_t   m_fga002[0x500];
 
-	UINT8 do_fga002reg_ctl3_r();
-	void do_fga002reg_ctl3_w(UINT8 data);
+	uint8_t do_fga002reg_ctl3_r();
+	void do_fga002reg_ctl3_w(uint8_t data);
 
 	/* Timer functions */
-	UINT8 do_fga002reg_tim0preload_r();
-	void  do_fga002reg_tim0preload_w(UINT8 data);
-	UINT8 do_fga002reg_tim0ctl_r();
-	void  do_fga002reg_tim0ctl_w(UINT8 data);
-	UINT8 do_fga002reg_tim0count_r();
-	void  do_fga002reg_tim0count_w(UINT8 data);
-	UINT8 do_fga002reg_icrtim0_r();
-	void  do_fga002reg_icrtim0_w(UINT8 data);
-	UINT8 do_fga002reg_istim0_r();
-	void  do_fga002reg_istim0_w(UINT8 data);
+	uint8_t do_fga002reg_tim0preload_r();
+	void  do_fga002reg_tim0preload_w(uint8_t data);
+	uint8_t do_fga002reg_tim0ctl_r();
+	void  do_fga002reg_tim0ctl_w(uint8_t data);
+	uint8_t do_fga002reg_tim0count_r();
+	void  do_fga002reg_tim0count_w(uint8_t data);
+	uint8_t do_fga002reg_icrtim0_r();
+	void  do_fga002reg_icrtim0_w(uint8_t data);
+	uint8_t do_fga002reg_istim0_r();
+	void  do_fga002reg_istim0_w(uint8_t data);
 	emu_timer *fga_timer;
 	enum
 	{
@@ -146,47 +142,47 @@ class fga002_device :  public device_t
 	};
 
 	/* Interrupt support */
-	UINT8 m_irq_level;
-	UINT8 do_fga002reg_localiack_r();
-	void do_fga002reg_localiack_w(UINT8 data);
+	uint8_t m_irq_level;
+	uint8_t do_fga002reg_localiack_r();
+	void do_fga002reg_localiack_w(uint8_t data);
 
-	UINT8 do_fga002reg_islocal0_r();
-	UINT8 do_fga002reg_islocal1_r();
-	UINT8 do_fga002reg_islocal2_r();
-	UINT8 do_fga002reg_islocal3_r();
-	UINT8 do_fga002reg_islocal4_r();
-	UINT8 do_fga002reg_islocal5_r();
-	UINT8 do_fga002reg_islocal6_r();
-	UINT8 do_fga002reg_islocal7_r();
+	uint8_t do_fga002reg_islocal0_r();
+	uint8_t do_fga002reg_islocal1_r();
+	uint8_t do_fga002reg_islocal2_r();
+	uint8_t do_fga002reg_islocal3_r();
+	uint8_t do_fga002reg_islocal4_r();
+	uint8_t do_fga002reg_islocal5_r();
+	uint8_t do_fga002reg_islocal6_r();
+	uint8_t do_fga002reg_islocal7_r();
 
 	void islocal_w(int status, int vector, int control, int data);
-	void  do_fga002reg_islocal0_w(UINT8 data);
-	void  do_fga002reg_islocal1_w(UINT8 data);
-	void  do_fga002reg_islocal2_w(UINT8 data);
-	void  do_fga002reg_islocal3_w(UINT8 data);
-	void  do_fga002reg_islocal4_w(UINT8 data);
-	void  do_fga002reg_islocal5_w(UINT8 data);
-	void  do_fga002reg_islocal6_w(UINT8 data);
-	void  do_fga002reg_islocal7_w(UINT8 data);
+	void  do_fga002reg_islocal0_w(uint8_t data);
+	void  do_fga002reg_islocal1_w(uint8_t data);
+	void  do_fga002reg_islocal2_w(uint8_t data);
+	void  do_fga002reg_islocal3_w(uint8_t data);
+	void  do_fga002reg_islocal4_w(uint8_t data);
+	void  do_fga002reg_islocal5_w(uint8_t data);
+	void  do_fga002reg_islocal6_w(uint8_t data);
+	void  do_fga002reg_islocal7_w(uint8_t data);
 
-	UINT8 do_fga002reg_icrlocal0_r();
-	UINT8 do_fga002reg_icrlocal1_r();
-	UINT8 do_fga002reg_icrlocal2_r();
-	UINT8 do_fga002reg_icrlocal3_r();
-	UINT8 do_fga002reg_icrlocal4_r();
-	UINT8 do_fga002reg_icrlocal5_r();
-	UINT8 do_fga002reg_icrlocal6_r();
-	UINT8 do_fga002reg_icrlocal7_r();
-	void  do_fga002reg_icrlocal0_w(UINT8 data);
-	void  do_fga002reg_icrlocal1_w(UINT8 data);
-	void  do_fga002reg_icrlocal2_w(UINT8 data);
-	void  do_fga002reg_icrlocal3_w(UINT8 data);
-	void  do_fga002reg_icrlocal4_w(UINT8 data);
-	void  do_fga002reg_icrlocal5_w(UINT8 data);
-	void  do_fga002reg_icrlocal6_w(UINT8 data);
-	void  do_fga002reg_icrlocal7_w(UINT8 data);
+	uint8_t do_fga002reg_icrlocal0_r();
+	uint8_t do_fga002reg_icrlocal1_r();
+	uint8_t do_fga002reg_icrlocal2_r();
+	uint8_t do_fga002reg_icrlocal3_r();
+	uint8_t do_fga002reg_icrlocal4_r();
+	uint8_t do_fga002reg_icrlocal5_r();
+	uint8_t do_fga002reg_icrlocal6_r();
+	uint8_t do_fga002reg_icrlocal7_r();
+	void  do_fga002reg_icrlocal0_w(uint8_t data);
+	void  do_fga002reg_icrlocal1_w(uint8_t data);
+	void  do_fga002reg_icrlocal2_w(uint8_t data);
+	void  do_fga002reg_icrlocal3_w(uint8_t data);
+	void  do_fga002reg_icrlocal4_w(uint8_t data);
+	void  do_fga002reg_icrlocal5_w(uint8_t data);
+	void  do_fga002reg_icrlocal6_w(uint8_t data);
+	void  do_fga002reg_icrlocal7_w(uint8_t data);
 
-	void trigger_interrupt(UINT8 data);
+	void trigger_interrupt(uint8_t data);
 	void check_interrupts();
 
 	enum {
@@ -338,5 +334,6 @@ class fga002_device :  public device_t
 
 
 // device type definition
-extern const device_type FGA002;
-#endif // __FGA002_H__
+DECLARE_DEVICE_TYPE(FGA002, fga002_device)
+
+#endif // MAME_MACHINE_FGA002_H

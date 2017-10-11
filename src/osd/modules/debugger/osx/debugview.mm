@@ -8,10 +8,13 @@
 
 #import "debugview.h"
 
+#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "modules/lib/osdobj_common.h"
+
+#include "util/xmlfile.h"
 
 #include <string.h>
 
@@ -68,7 +71,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (NSColor *)foregroundForAttribute:(UINT8)attrib {
+- (NSColor *)foregroundForAttribute:(uint8_t)attrib {
 	if (attrib & DCA_COMMENT)
 		return (attrib & DCA_DISABLED) ? DisabledCommentForeground : CommentForeground;
 	else if (attrib & DCA_INVALID)
@@ -80,7 +83,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (NSColor *)backgroundForAttribute:(UINT8)attrib {
+- (NSColor *)backgroundForAttribute:(uint8_t)attrib {
 	BOOL const active = [[self window] isKeyWindow] && ([[self window] firstResponder] == self);
 	if ((attrib & DCA_SELECTED) && (attrib & DCA_CURRENT))
 		return active ? SelectedCurrentBackground : InactiveSelectedCurrentBackground;
@@ -117,9 +120,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	else
 	{
 		data += ((position.y - view->visible_position().y) * view->visible_size().x);
-		int			attr = -1;
-		NSUInteger	start = 0, length = 0;
-		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		int         attr = -1;
+		NSUInteger  start = 0, length = 0;
+		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
 			if ((start < length) && (attr != data[col - origin.x].attrib))
@@ -162,7 +165,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (void)convertBounds:(NSRect)b toFirstAffectedLine:(INT32 *)f count:(INT32 *)c {
+- (void)convertBounds:(NSRect)b toFirstAffectedLine:(int32_t *)f count:(int32_t *)c {
 	*f = lround(floor(b.origin.y / fontHeight));
 	*c = lround(ceil((b.origin.y + b.size.height) / fontHeight)) - *f;
 }
@@ -184,7 +187,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)typeCharacterAndScrollToCursor:(char)ch {
 	debug_view_xy const oldPos = view->cursor_position();
 	view->process_char(ch);
-	if (view->cursor_supported() && view->cursor_visible())
+	if (view->cursor_supported())
 	{
 		debug_view_xy const newPos = view->cursor_position();
 		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
@@ -200,7 +203,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)adjustSizeAndRecomputeVisible {
-	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
+	NSScrollView *const scroller = [self enclosingScrollView];
+	NSSize const clip = [[scroller contentView] bounds].size;
 	NSSize content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
 								fontHeight * totalHeight);
 	if (wholeLineScroll)
@@ -208,6 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 								  ceil(std::max(clip.height, content.height)))];
 	[self recomputeVisible];
+	[scroller reflectScrolledClipView:[scroller contentView]];
 }
 
 
@@ -284,6 +289,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 				content.height += (fontHeight * 2) - 1;
 			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 										  ceil(std::max(clip.height, content.height)))];
+			[scroller reflectScrolledClipView:[scroller contentView]];
 		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
@@ -352,12 +358,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		return;
 	}
 
-	for (UINT32 row = 0; row < size.y; row++, data += size.x)
+	for (uint32_t row = 0; row < size.y; row++, data += size.x)
 	{
 		// add content for the line and set colours
-		int			attr = -1;
-		NSUInteger	start = [text length], length = start;
-		for (UINT32 col = 0; col < size.x; col++)
+		int         attr = -1;
+		NSUInteger  start = [text length], length = start;
+		for (uint32_t col = 0; col < size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col].byte];
 			if ((start < length) && (attr != (data[col].attrib & ~DCA_SELECTED)))
@@ -469,7 +475,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)addContextMenuItemsToMenu:(NSMenu *)menu {
-	NSMenuItem	*item;
+	NSMenuItem  *item;
 
 	item = [menu addItemWithTitle:@"Copy Visible"
 						   action:@selector(copyVisible:)
@@ -483,6 +489,54 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	if (view->cursor_supported())
+	{
+		util::xml::data_node *const selection = node->add_child("selection", nullptr);
+		if (selection)
+		{
+			debug_view_xy const pos = view->cursor_position();
+			selection->set_attribute_int("visible", view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int("start_x", pos.x);
+			selection->set_attribute_int("start_y", pos.y);
+		}
+	}
+
+	util::xml::data_node *const scroll = node->add_child("scroll", nullptr);
+	if (scroll)
+	{
+		NSRect const visible = [self visibleRect];
+		scroll->set_attribute_float("position_x", visible.origin.x);
+		scroll->set_attribute_float("position_y", visible.origin.y);
+	}
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	if (view->cursor_supported())
+	{
+		util::xml::data_node const *const selection = node->get_child("selection");
+		if (selection)
+		{
+			debug_view_xy pos = view->cursor_position();
+			view->set_cursor_visible(0 != selection->get_attribute_int("visible", view->cursor_visible() ? 1 : 0));
+			pos.x = selection->get_attribute_int("start_x", pos.x);
+			pos.y = selection->get_attribute_int("start_y", pos.y);
+			view->set_cursor_position(pos);
+		}
+	}
+
+	util::xml::data_node const *const scroll = node->get_child("scroll");
+	if (scroll)
+	{
+		NSRect visible = [self visibleRect];
+		visible.origin.x = scroll->get_attribute_float("position_x", visible.origin.x);
+		visible.origin.y = scroll->get_attribute_float("position_y", visible.origin.y);
+		[self scrollRectToVisible:visible];
+	}
+}
+
+
 - (BOOL)acceptsFirstResponder {
 	return view->cursor_supported();
 }
@@ -491,13 +545,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (BOOL)becomeFirstResponder {
 	if (view->cursor_supported())
 	{
-		debug_view_xy pos;
 		view->set_cursor_visible(true);
-		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
-											 pos.y * fontHeight,
-											 fontWidth,
-											 fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
 	}
@@ -597,7 +645,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	debug_view_xy const size = view->visible_size();
 
 	// work out how much we need to draw
-	INT32 row, clip;
+	int32_t row, clip;
 	[self convertBounds:dirtyRect toFirstAffectedLine:&row count:&clip];
 	clip += row;
 	row = std::max(row, origin.y);
@@ -622,9 +670,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	// render entire lines to get character alignment right
 	for ( ; row < clip; row++, data += size.x)
 	{
-		int			attr = -1;
-		NSUInteger	start = 0, length = 0;
-		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		int         attr = -1;
+		NSUInteger  start = 0, length = 0;
+		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
 			if ((start < length) && (attr != data[col - origin.x].attrib))
@@ -729,8 +777,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)keyDown:(NSEvent *)event {
-	NSUInteger	modifiers = [event modifierFlags];
-	NSString	*str = [event charactersIgnoringModifiers];
+	NSUInteger  modifiers = [event modifierFlags];
+	NSString    *str = [event charactersIgnoringModifiers];
 
 	if ([str length] == 1)
 	{
@@ -798,6 +846,18 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (void)keyUp:(NSEvent *)event {
+	if (view->cursor_supported() && view->cursor_visible())
+	{
+		debug_view_xy const pos = view->cursor_position();
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
+											 pos.y * fontHeight,
+											 fontWidth,
+											 fontHeight)]; // FIXME: metrics
+	}
+}
+
+
 - (void)insertTab:(id)sender {
 	if ([[self window] firstResponder] == self)
 		[[self window] selectNextKeyView:self];
@@ -816,8 +876,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)insertText:(id)string {
-	NSUInteger	len;
-	NSRange		found;
+	NSUInteger  len;
+	NSRange     found;
 	if ([string isKindOfClass:[NSAttributedString class]])
 		string = [string string];
 	for (len = [string length], found = NSMakeRange(0, 0);
@@ -834,7 +894,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-	SEL	action = [item action];
+	SEL action = [item action];
 
 	if (action == @selector(paste:))
 	{

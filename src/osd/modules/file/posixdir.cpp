@@ -80,7 +80,11 @@ using sdl_stat = struct stat64;
 #define sdl_stat_fn stat64
 #endif
 
-#define HAS_DT_XXX (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__))
+#if (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__))
+#define HAS_DT_XXX 1
+#else
+#define HAS_DT_XXX 0
+#endif
 
 
 

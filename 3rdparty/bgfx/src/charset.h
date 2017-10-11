@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -522,16 +522,3 @@ static const uint8_t vga8x16[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-
-#include "vs_debugfont.bin.h"
-#include "fs_debugfont.bin.h"
-
-#include "vs_clear.bin.h"
-#include "fs_clear0.bin.h"
-#include "fs_clear1.bin.h"
-#include "fs_clear2.bin.h"
-#include "fs_clear3.bin.h"
-#include "fs_clear4.bin.h"
-#include "fs_clear5.bin.h"
-#include "fs_clear6.bin.h"
-#include "fs_clear7.bin.h"

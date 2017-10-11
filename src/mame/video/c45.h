@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Aaron Giles, Alex W. Jackson
-#pragma once
+#ifndef MAME_VIDEO_C45_H
+#define MAME_VIDEO_C45_H
 
-#ifndef __C45_H__
-#define __C45_H__
+#pragma once
 
 
 //**************************************************************************
@@ -23,18 +23,9 @@
 
 class namco_c45_road_device : public device_t, public device_gfx_interface, public device_memory_interface
 {
-	// constants
-	static const int ROAD_COLS = 64;
-	static const int ROAD_ROWS = 512;
-	static const int ROAD_TILE_SIZE = 16;
-	static const int ROAD_TILEMAP_WIDTH = ROAD_TILE_SIZE * ROAD_COLS;
-	static const int ROAD_TILEMAP_HEIGHT = ROAD_TILE_SIZE * ROAD_ROWS;
-	static const int WORDS_PER_ROAD_TILE = 0x40/2;
-	static const gfx_layout tilelayout;
-
 public:
 	// construction/destruction
-	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_ADDRESS_MAP(map, 16);
 
@@ -49,9 +40,18 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
+	// constants
+	static constexpr int ROAD_COLS = 64;
+	static constexpr int ROAD_ROWS = 512;
+	static constexpr int ROAD_TILE_SIZE = 16;
+	static constexpr int ROAD_TILEMAP_WIDTH = ROAD_TILE_SIZE * ROAD_COLS;
+	static constexpr int ROAD_TILEMAP_HEIGHT = ROAD_TILE_SIZE * ROAD_ROWS;
+	static constexpr int WORDS_PER_ROAD_TILE = 0x40/2;
+	static const gfx_layout tilelayout;
+
 	// internal helpers
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	DECLARE_WRITE16_MEMBER( tilemap_w );
@@ -60,16 +60,16 @@ private:
 
 	// internal state
 	address_space_config        m_space_config;
-	required_shared_ptr<UINT16> m_tmapram;
-	required_shared_ptr<UINT16> m_tileram;
-	required_shared_ptr<UINT16> m_lineram;
-	UINT8 *                     m_clut;
+	required_shared_ptr<uint16_t> m_tmapram;
+	required_shared_ptr<uint16_t> m_tileram;
+	required_shared_ptr<uint16_t> m_lineram;
+	uint8_t *                     m_clut;
 	tilemap_t *                 m_tilemap;
 	pen_t                       m_transparent_color;
 };
 
 
 // device type definition
-extern const device_type NAMCO_C45_ROAD;
+DECLARE_DEVICE_TYPE(NAMCO_C45_ROAD, namco_c45_road_device)
 
-#endif
+#endif // MAME_VIDEO_C45_H

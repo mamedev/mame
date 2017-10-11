@@ -16,7 +16,7 @@
 
 TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 {
-	UINT8 attributes = m_bg_videoram[2*tile_index+1];
+	uint8_t attributes = m_bg_videoram[2*tile_index+1];
 	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
@@ -91,22 +91,16 @@ WRITE8_MEMBER(tsamurai_state::bgcolor_w)
 	m_bgcolor = data;
 }
 
-WRITE8_MEMBER(tsamurai_state::textbank1_w)
+WRITE_LINE_MEMBER(tsamurai_state::textbank1_w)
 {
-	if( m_textbank1!=data )
-	{
-		m_textbank1 = data;
-		m_foreground ->mark_all_dirty();
-	}
+	m_textbank1 = state;
+	m_foreground->mark_all_dirty();
 }
 
-WRITE8_MEMBER(tsamurai_state::m660_textbank2_w)
+WRITE_LINE_MEMBER(tsamurai_state::textbank2_w)
 {
-	if( m_textbank2!=data )
-	{
-		m_textbank2 = data;
-		m_foreground ->mark_all_dirty();
-	}
+	m_textbank2 = state;
+	m_foreground->mark_all_dirty();
 }
 
 WRITE8_MEMBER(tsamurai_state::bg_videoram_w)
@@ -145,8 +139,8 @@ WRITE8_MEMBER(tsamurai_state::fg_colorram_w)
 void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	const UINT8 *source = m_spriteram+32*4-4;
-	const UINT8 *finish = m_spriteram; /* ? */
+	const uint8_t *source = m_spriteram+32*4-4;
+	const uint8_t *finish = m_spriteram; /* ? */
 	m_flicker = 1-m_flicker;
 
 	while( source>=finish )
@@ -200,7 +194,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 tsamurai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tsamurai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -263,7 +257,7 @@ VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 	video_start();
 }
 
-UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#ifdef MAME_DEBUG
 	if( machine().input().code_pressed( KEYCODE_Q ) ){

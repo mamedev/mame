@@ -48,6 +48,10 @@ end
 			"ppapi_gles2",
 			"pthread",
 		}
+
+	configuration { "winstore*" }
+		kind "WindowedApp"
+
 	configuration {  }
 
 	addprojectflags()
@@ -64,10 +68,35 @@ end
 			}
 	end
 
-	configuration { "vs*" }
-	flags {
-		"Unicode",
-	}
+	configuration { "winstore*" }
+		-- Windows Required Files
+		files {
+			-- Manifest file
+			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
+		}
+
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
+		}
+		configuration "**/scripts/resources/uwp/assets/*.png"
+			flags { "DeploymentContent" }
+
+	-- Effects and Shaders
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "artwork/*",
+			MAME_DIR .. "artwork/**/*",
+			MAME_DIR .. "bgfx/*",
+			MAME_DIR .. "bgfx/**/*",
+			MAME_DIR .. "hash/*",
+			MAME_DIR .. "language/*",
+			MAME_DIR .. "language/**/*",
+			MAME_DIR .. "plugins/*",
+			MAME_DIR .. "plugins/**/*",
+		}
+		configuration "**/*"
+			flags { "DeploymentContent" }
 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
@@ -123,18 +152,23 @@ end
 				.. " -s TOTAL_MEMORY=268435456"
 				.. " -s DISABLE_EXCEPTION_CATCHING=2"
 				.. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'"
-				.. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey']\""
+				.. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\""
 				.. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
 				.. " --post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
 
 			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 				emccopts = emccopts
 					.. " -g" .. _OPTIONS["SYMLEVEL"]
 					.. " -s DEMANGLE_SUPPORT=1"
+			end
+
+			if _OPTIONS["WEBASSEMBLY"] then
+				emccopts = emccopts
+					.. " -s BINARYEN=1"
 			end
 
 			if _OPTIONS["ARCHOPTS"] then
@@ -228,17 +262,33 @@ if (STANDALONE~=true) then
 		ext_lib("lua"),
 		"lualibs",
 	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	links {
+		"linenoise",
+	}
 end
-	if _OPTIONS["USE_LIBUV"]=="1" then
-		links {
-			ext_lib("uv"),
-		}
-	end
+end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
+		ext_lib("utf8proc"),
 	}
+if (STANDALONE~=true) then
+	links {
+		ext_lib("sqlite3"),
+	}
+end
 
+	if _OPTIONS["NO_USE_PORTAUDIO"]~="1" then
+		links {
+			ext_lib("portaudio"),
+		}
+		if _OPTIONS["targetos"]=="windows" then
+			links {
+				"setupapi",
+			}
+		end
+	end
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
 			ext_lib("portmidi"),
@@ -246,6 +296,7 @@ end
 	end
 	links {
 		"bgfx",
+		"bx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
 

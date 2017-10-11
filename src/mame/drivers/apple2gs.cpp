@@ -44,23 +44,18 @@
 
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "includes/apple2e.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ap2_dsk.h"
-#include "formats/ap_dsk35.h"
 #include "includes/apple2gs.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "sound/es5503.h"
-#include "machine/applefdc.h"
-#include "machine/8530scc.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
-#include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
+#include "cpu/g65816/g65816.h"
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
+#include "machine/applefdc.h"
+#include "machine/sonydriv.h"
+#include "machine/z80scc.h"
+#include "sound/es5503.h"
+
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
@@ -79,7 +74,13 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
+
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -208,7 +209,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
 
 READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	rv |= 0x40;     // no reset
 	rv |= (m_adb_line) ? 0x00 : 0x80;
@@ -306,7 +307,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
+static MACHINE_CONFIG_START( apple2gs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
@@ -374,7 +375,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NOOP)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
@@ -386,7 +386,19 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* SCC */
-	MCFG_DEVICE_ADD("scc", SCC8530, APPLE2GS_14M/2)
+	MCFG_SCC85C30_ADD(SCC_TAG, APPLE2GS_14M/2, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, z80scc_device, ctsb_w))
 
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
@@ -567,10 +579,10 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */
-COMP( 1989, apple2gs,     0,   apple2,  apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,  apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME */
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )

@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
+inline rsp_vec_t vec_vrcp_vrsq(uint32_t iw, int32_t dp, uint32_t src, uint32_t e, uint32_t dest, uint32_t de)
 {
 	// Get the element from VT.
-	INT16 vt = m_v[src].s[e & 0x7];
+	int16_t vt = m_v[src].s[e & 0x7];
 
-	UINT32 dp_input = ((UINT32) m_div_in << 16) | (UINT16) vt;
-	UINT32 sp_input = vt;
+	uint32_t dp_input = ((uint32_t) m_div_in << 16) | (uint16_t) vt;
+	uint32_t sp_input = vt;
 
-	INT32 input = (dp) ? dp_input : sp_input;
-	INT32 input_mask = input >> 31;
-	INT32 data = input ^ input_mask;
+	int32_t input = (dp) ? dp_input : sp_input;
+	int32_t input_mask = input >> 31;
+	int32_t data = input ^ input_mask;
 
 	if (input > -32768)
 	{
@@ -19,7 +19,7 @@ inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32
 	}
 
 	// Handle edge cases.
-	INT32 result;
+	int32_t result;
 	if (data == 0)
 	{
 		result = 0x7fffffff;
@@ -30,8 +30,8 @@ inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32
 	}
 	else // Main case: compute the reciprocal.
 	{
-		UINT32 shift = count_leading_zeros(data);
-		UINT32 idx = (((UINT64) data << shift) & 0x7FC00000) >> 22;
+		uint32_t shift = count_leading_zeros(data);
+		uint32_t idx = (((uint64_t) data << shift) & 0x7FC00000) >> 22;
 
 		if (iw & 0x4) // VRSQ
 		{

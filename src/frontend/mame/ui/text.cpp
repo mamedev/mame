@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "text.h"
 #include "rendfont.h"
 #include "render.h"
@@ -17,6 +18,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
 INLINE FUNCTIONS
 ***************************************************************************/
@@ -25,7 +27,7 @@ INLINE FUNCTIONS
 //  is_space_character
 //-------------------------------------------------
 
-inline bool is_space_character(unicode_char ch)
+inline bool is_space_character(char32_t ch)
 {
 	return ch == ' ';
 }
@@ -36,7 +38,7 @@ inline bool is_space_character(unicode_char ch)
 //  character a possible line break?
 //-------------------------------------------------
 
-inline bool is_breakable_char(unicode_char ch)
+inline bool is_breakable_char(char32_t ch)
 {
 	// regular spaces and hyphens are breakable
 	if (is_space_character(ch) || ch == '-')
@@ -81,8 +83,11 @@ CORE IMPLEMENTATION
 //-------------------------------------------------
 
 text_layout::text_layout(render_font &font, float xscale, float yscale, float width, text_layout::text_justify justify, text_layout::word_wrapping wrap)
-	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
-
+	: m_font(font)
+	, m_xscale(xscale), m_yscale(yscale)
+	, m_width(width)
+	, m_justify(justify), m_wrap(wrap)
+	, m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
 {
 	invalidate_calculated_actual_width();
 }
@@ -93,8 +98,11 @@ text_layout::text_layout(render_font &font, float xscale, float yscale, float wi
 //-------------------------------------------------
 
 text_layout::text_layout(text_layout &&that)
-	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_calculated_actual_width(that.m_calculated_actual_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
-		m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
+	: m_font(that.m_font)
+	, m_xscale(that.m_xscale), m_yscale(that.m_yscale)
+	, m_width(that.m_width), m_calculated_actual_width(that.m_calculated_actual_width)
+	, m_justify(that.m_justify), m_wrap(that.m_wrap)
+	, m_lines(std::move(that.m_lines)), m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
 {
 	that.invalidate_calculated_actual_width();
 }
@@ -127,7 +135,7 @@ void text_layout::add_text(const char *text, const char_style &style)
 		if (m_current_line == nullptr)
 		{
 			// get the current character
-			unicode_char schar;
+			char32_t schar;
 			int const scharcount = uchar_from_utf8(&schar, &text[position], text_length - position);
 			if (scharcount < 0)
 				break;
@@ -145,7 +153,7 @@ void text_layout::add_text(const char *text, const char_style &style)
 		}
 
 		// get the current character
-		unicode_char ch;
+		char32_t ch;
 		int const scharcount = uchar_from_utf8(&ch, &text[position], text_length - position);
 		if (scharcount < 0)
 			break;
@@ -303,7 +311,7 @@ void text_layout::start_new_line(text_layout::text_justify justify, float height
 //  get_char_width
 //-------------------------------------------------
 
-float text_layout::get_char_width(unicode_char ch, float size)
+float text_layout::get_char_width(char32_t ch, float size)
 {
 	return font().char_width(size * yscale(), xscale() / yscale(), ch);
 }
@@ -315,7 +323,7 @@ float text_layout::get_char_width(unicode_char ch, float size)
 
 void text_layout::truncate_wrap()
 {
-	const unicode_char elipsis = 0x2026;
+	const char32_t elipsis = 0x2026;
 
 	// for now, lets assume that we're only truncating the last character
 	size_t truncate_position = m_current_line->character_count() - 1;
@@ -516,7 +524,7 @@ text_layout::line::line(text_layout &layout, text_justify justify, float yoffset
 //  line::add_character
 //-------------------------------------------------
 
-void text_layout::line::add_character(unicode_char ch, const char_style &style, const source_info &source)
+void text_layout::line::add_character(char32_t ch, const char_style &style, const source_info &source)
 {
 	// get the width of this character
 	float chwidth = m_layout.get_char_width(ch, style.size);

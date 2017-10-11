@@ -1,18 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef INC_BFMADDER2
-#define INC_BFMADDER2
+#ifndef MAME_INCLUDES_BFM_ADR2_H
+#define MAME_INCLUDES_BFM_ADR2_H
+
+#pragma once
+
 
 class bfm_adder2_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER( adder2_vbl );
+
 	DECLARE_READ8_MEMBER( screen_ram_r );
 	DECLARE_WRITE8_MEMBER( screen_ram_w );
 	DECLARE_READ8_MEMBER( normal_ram_r );
@@ -39,32 +41,35 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-private:
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	int m_adder2_screen_page_reg;        // access/display select
 	int m_adder2_c101;
 	int m_adder2_rx;
 	int m_adder_vbl_triggered;           // flag <>0, VBL IRQ triggered
 	int m_adder2_acia_triggered;         // flag <>0, ACIA receive IRQ
 
-	UINT8 m_adder_ram[0xE80];              // normal RAM
-	UINT8 m_adder_screen_ram[2][0x1180];   // paged  display RAM
+	uint8_t m_adder_ram[0xE80];              // normal RAM
+	uint8_t m_adder_screen_ram[2][0x1180];   // paged  display RAM
 
 	tilemap_t *m_tilemap0;  // tilemap screen0
 	tilemap_t *m_tilemap1;  // timemap screen1
 
-	UINT8 m_adder2_data_from_sc2;
-	UINT8 m_adder2_data_to_sc2;
+	uint8_t m_adder2_data_from_sc2;
+	uint8_t m_adder2_data_to_sc2;
 
-	UINT8 m_adder2_data;
-	UINT8 m_adder2_sc2data;
+	uint8_t m_adder2_data;
+	uint8_t m_adder2_sc2data;
 
 	optional_device<cpu_device> m_cpu;
+
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER( adder2_vbl );
 };
 
 // device type definition
-extern const device_type BFM_ADDER2;
+DECLARE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device)
 
 
 //**************************************************************************
@@ -74,4 +79,4 @@ extern const device_type BFM_ADDER2;
 #define MCFG_BFM_ADDER2_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, BFM_ADDER2, 0)
 
-#endif
+#endif // MAME_INCLUDES_BFM_ADR2_H

@@ -12,29 +12,30 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/pic8259.h"
 #include "machine/am9517a.h"
+#include "machine/pic8259.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 class paso1600_state : public driver_device
 {
 public:
 	paso1600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pic(*this, "pic8259"),
-		m_dma(*this, "8237dma"),
-		m_crtc(*this, "crtc"),
-		m_p_vram(*this, "vram"),
-		m_p_gvram(*this, "gvram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic(*this, "pic8259")
+		, m_dma(*this, "8237dma")
+		, m_crtc(*this, "crtc")
+		, m_p_vram(*this, "vram")
+		, m_p_gvram(*this, "gvram")
+		, m_p_chargen(*this, "chargen")
+		, m_p_pcg(*this, "pcg")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pic8259_device> m_pic;
-	required_device<am9517a_device> m_dma;
-	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(paso1600_pcg_r);
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
 	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
@@ -44,22 +45,27 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ16_MEMBER(test_hi_r);
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 *m_p_chargen;
-	UINT8 *m_p_pcg;
-	required_shared_ptr<UINT16> m_p_vram;
-	required_shared_ptr<UINT16> m_p_gvram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	struct{
-		UINT8 portb;
-	}m_keyb;
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	struct{
+		uint8_t portb;
+	}m_keyb;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
+	required_device<am9517a_device> m_dma;
+	required_device<mc6845_device> m_crtc;
+	required_shared_ptr<uint16_t> m_p_vram;
+	required_shared_ptr<uint16_t> m_p_gvram;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_pcg;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -80,18 +86,12 @@ public:
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-void paso1600_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-	m_p_pcg = memregion("pcg")->base();
-}
-
-UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
 	#if 0
-	UINT32 count;
+	uint32_t count;
 	static int test_x;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
@@ -296,7 +296,7 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 	space.write_byte(offset, data);
 }
 
-static MACHINE_CONFIG_START( paso1600, paso1600_state )
+static MACHINE_CONFIG_START( paso1600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(paso1600_map)
@@ -321,7 +321,8 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("8237dma", AM9517A, 16000000/4)
 	MCFG_I8237_IN_MEMR_CB(READ8(paso1600_state, pc_dma_read_byte))
@@ -343,5 +344,5 @@ ROM_START( paso1600 )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT      INIT    COMPANY       FULLNAME       FLAGS */
-COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, driver_device,  0,     "Toshiba",  "Pasopia 1600" , MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT     STATE           INIT   COMPANY     FULLNAME        FLAGS
+COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, paso1600_state, 0,     "Toshiba",  "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

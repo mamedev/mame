@@ -37,7 +37,7 @@
 
 PALETTE_INIT_MEMBER(bankp_state, bankp)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 32; i++)
@@ -159,7 +159,7 @@ void bankp_state::video_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-UINT32 bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 	{

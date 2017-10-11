@@ -41,7 +41,7 @@
 
 PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	rgb_t palette_val[32];
 	int i;
 
@@ -166,14 +166,14 @@ WRITE8_MEMBER(timeplt_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(timeplt_state::flipscreen_w)
+WRITE_LINE_MEMBER(timeplt_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
-WRITE8_MEMBER(timeplt_state::video_enable_w)
+WRITE_LINE_MEMBER(timeplt_state::video_enable_w)
 {
-	m_video_enable = data & 1;
+	m_video_enable = state;
 }
 
 READ8_MEMBER(timeplt_state::scanline_r)
@@ -217,7 +217,7 @@ void timeplt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-UINT32 timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_enable)
 	{
