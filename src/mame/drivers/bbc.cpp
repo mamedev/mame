@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)                          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 																																																							/*    fe80-fe9f  FDC            Floppy disc controller          */
-	AM_RANGE(0xfea0, 0xfebf) AM_DEVREADWRITE("mc6854", mc6854_device, read, write)                              /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)                      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                                     /*    ff00-ffff                 OS ROM (continued)              */
@@ -1115,9 +1115,9 @@ static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Add Torch Z80 Communicator co-processor */
-	//MCFG_DEVICE_MODIFY("tube")
-	//MCFG_SLOT_DEFAULT_OPTION("zep100")
-	//MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("tube")
+	MCFG_SLOT_DEFAULT_OPTION("zep100")
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
@@ -1510,6 +1510,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 	/* Add ARM co-processor */
+	//MCFG_DEVICE_MODIFY("extube")
+	//MCFG_SLOT_DEFAULT_OPTION("arm")
+	//MCFG_SLOT_FIXED(true)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")
@@ -2337,7 +2340,7 @@ ROM_END
 /*     YEAR  NAME      PARENT   COMPAT MACHINE   INPUT   CLASS           INIT     COMPANY            FULLNAME                         FLAGS */
 COMP ( 1981, bbcb,     0,       bbca,  bbcb,     bbcb,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model B",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,    0,     bbca,     bbca,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model A",             MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchf,   bbcb,    0,     torchf,   torch,  torch240_state, bbc,     "Torch Computers", "Torch CF240",                   MACHINE_NOT_WORKING)
+COMP ( 1982, torchf,   bbcb,    0,     torchf,   torch,  torch240_state, bbc,     "Torch Computers", "Torch CF240",                   MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, torchh10, bbcb,    0,     torchh10, torch,  torch240_state, bbc,     "Torch Computers", "Torch CH240/10",                MACHINE_NOT_WORKING)
 COMP ( 1982, torchh21, bbcb,    0,     torchh21, torch,  torch240_state, bbc,     "Torch Computers", "Torch CH240/21",                MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,    0,     bbcb_de,  bbcb,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model B (German)",    MACHINE_IMPERFECT_GRAPHICS)
