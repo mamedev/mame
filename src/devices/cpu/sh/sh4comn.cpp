@@ -233,30 +233,6 @@ static const int sh3_intevt2_exception_codes[] =
 	-1 /* SH4_INTC_ROVI */
 };
 
-
-
-void sh34_base_device::sh4_change_register_bank(int to)
-{
-	int s;
-
-	if (to) // 0 -> 1
-	{
-		for (s = 0;s < 8;s++)
-		{
-			m_rbnk[0][s] = m_r[s];
-			m_r[s] = m_rbnk[1][s];
-		}
-	}
-	else // 1 -> 0
-	{
-		for (s = 0;s < 8;s++)
-		{
-			m_rbnk[1][s] = m_r[s];
-			m_r[s] = m_rbnk[0][s];
-		}
-	}
-}
-
 void sh34_base_device::sh4_swap_fp_registers()
 {
 	int s;
@@ -286,13 +262,36 @@ void sh34_base_device::sh4_swap_fp_couples()
 	}
 }
 
+
+void sh34_base_device::sh4_change_register_bank(int to)
+{
+	int s;
+
+	if (to) // 0 -> 1
+	{
+		for (s = 0;s < 8;s++)
+		{
+			m_rbnk[0][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_rbnk[1][s];
+		}
+	}
+	else // 1 -> 0
+	{
+		for (s = 0;s < 8;s++)
+		{
+			m_rbnk[1][s] = m_sh2_state->r[s];
+			m_sh2_state->r[s] = m_rbnk[0][s];
+		}
+	}
+}
+
 void sh34_base_device::sh4_syncronize_register_bank(int to)
 {
 	int s;
 
 	for (s = 0;s < 8;s++)
 	{
-		m_rbnk[to][s] = m_r[s];
+		m_rbnk[to][s] = m_sh2_state->r[s];
 	}
 }
 
@@ -317,9 +316,9 @@ void sh34_base_device::sh4_exception_recompute() // checks if there is any inter
 	int a,z;
 
 	m_test_irq = 0;
-	if ((!m_pending_irq) || ((m_sr & BL) && (m_exception_requesting[SH4_INTC_NMI] == 0)))
+	if ((!m_pending_irq) || ((m_sh2_state->sr & BL) && (m_exception_requesting[SH4_INTC_NMI] == 0)))
 		return;
-	z = (m_sr >> 4) & 15;
+	z = (m_sh2_state->sr >> 4) & 15;
 	for (a=0;a <= SH4_INTC_ROVI;a++)
 	{
 		if (m_exception_requesting[a])
@@ -367,17 +366,43 @@ void sh34_base_device::sh4_exception_checkunrequest(int exception)
 		sh4_exception_unrequest(exception);
 }
 
+
+void sh34_base_device::sh4_exception_process(int exception, uint32_t vector)
+{
+	sh4_exception_checkunrequest(exception);
+
+	m_spc = m_sh2_state->pc;
+	m_ssr = m_sh2_state->sr;
+	m_sgr = m_sh2_state->r[15];
+
+	//printf("stored m_spc %08x m_ssr %08x m_sgr %08x\n", m_spc, m_ssr, m_sgr);
+
+	m_sh2_state->sr |= MD;
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+	if (!(m_sh2_state->sr & sRB))
+		sh4_change_register_bank(1);
+	m_sh2_state->sr |= sRB;
+	m_sh2_state->sr |= BL;
+	sh4_exception_recompute();
+
+	/* fetch PC */
+	m_sh2_state->pc = m_sh2_state->vbr + vector;
+	m_willjump = 1; // for DRC
+	/* wake up if a sleep opcode is triggered */
+	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
+}
+
 void sh34_base_device::sh4_exception(const char *message, int exception) // handle exception
 {
 	uint32_t vector;
-
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		if (exception < SH4_INTC_NMI)
 			return; // Not yet supported
 		if (exception == SH4_INTC_NMI) {
-			if ((m_sr & BL) && (!(m_m[ICR] & 0x200)))
+			if ((m_sh2_state->sr & BL) && (!(m_m[ICR] & 0x200)))
 				return;
 
 			m_m[ICR] &= ~0x200;
@@ -390,9 +415,9 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 		} else {
 	//      if ((m_m[ICR] & 0x4000) && (m_nmi_line_state == ASSERT_LINE))
 	//          return;
-			if (m_sr & BL)
+			if (m_sh2_state->sr & BL)
 				return;
-			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sr >> 4) & 15))
+			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sh2_state->sr >> 4) & 15))
 				return;
 			m_m[INTEVT] = exception_codes[exception];
 			vector = 0x600;
@@ -415,9 +440,9 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 		}
 		else
 		{
-			if (m_sr & BL)
+			if (m_sh2_state->sr & BL)
 				return;
-			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sr >> 4) & 15))
+			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sh2_state->sr >> 4) & 15))
 				return;
 
 
@@ -440,25 +465,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 
 		/***** END ASSUME THIS TO BE WRONG FOR NOW *****/
 	}
-	sh4_exception_checkunrequest(exception);
-
-	m_spc = m_pc;
-	m_ssr = m_sr;
-	m_sgr = m_r[15];
-
-	m_sr |= MD;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank((m_sr & sRB) >> 29);
-	if (!(m_sr & sRB))
-		sh4_change_register_bank(1);
-	m_sr |= sRB;
-	m_sr |= BL;
-	sh4_exception_recompute();
-
-	/* fetch PC */
-	m_pc = m_vbr + vector;
-	/* wake up if a sleep opcode is triggered */
-	if(m_sleep_mode == 1) { m_sleep_mode = 2; }
+	sh4_exception_process(exception, vector);
 }
 
 
@@ -1098,7 +1105,7 @@ void sh34_base_device::sh4_set_frt_input(int state)
 	sh4_timer_resync();
 	m_icr = m_frc;
 	m_m[4] |= ICF;
-	logerror("SH4 '%s': ICF activated (%x)\n", tag(), m_pc & AM);
+	logerror("SH4 '%s': ICF activated (%x)\n", tag(), m_sh2_state->pc & AM);
 	sh4_recalc_irq();
 #endif
 }
@@ -1211,7 +1218,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag(), m_irln));
 			}
 		}
-		if (m_test_irq && (!m_delay))
+		if (m_test_irq && (!m_sh2_state->m_delay))
 			sh4_check_pending_irq("sh4_set_irq_line");
 	}
 }

@@ -565,6 +565,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_main_map)
 	MCFG_CPU_IO_MAP(atvtrack_main_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -579,6 +580,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_sub_map)
 	MCFG_CPU_IO_MAP(atvtrack_sub_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
