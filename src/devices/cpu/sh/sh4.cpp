@@ -34,25 +34,6 @@
 #include "debugger.h"
 
 
-#if SH4_USE_FASTRAM_OPTIMIZATION
-void sh34_base_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
-{
-	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
-	{
-		m_fastram[m_fastram_select].start = start;
-		m_fastram[m_fastram_select].end = end;
-		m_fastram[m_fastram_select].readonly = readonly;
-		m_fastram[m_fastram_select].base = base;
-		m_fastram_select++;
-	}
-}
-#else
-void sh34_base_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
-{
-}
-#endif
-
-
 CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
@@ -92,7 +73,7 @@ ADDRESS_MAP_END
 
 
 sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
-	: cpu_device(mconfig, type, tag, owner, clock)
+	: sh_common_execution(mconfig, type, tag, owner, clock, endianness, internal)
 	, m_program_config("program", endianness, 64, 32, 0, internal)
 	, m_io_config("io", endianness, 64, 8)
 	, c_md2(0)
@@ -106,17 +87,8 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 	, c_md8(0)
 	, c_clock(0)
 	, m_mmuhack(1)
-#if SH4_USE_FASTRAM_OPTIMIZATION
 	, m_bigendian(endianness == ENDIANNESS_BIG)
-	, m_byte_xor(m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0))
-	, m_word_xor(m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0))
-	, m_dword_xor(m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0))
-	, m_fastram_select(0)
-#endif
 {
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	memset(m_fastram, 0, sizeof(m_fastram));
-#endif
 }
 
 device_memory_interface::space_config_vector sh34_base_device::memory_space_config() const
@@ -132,6 +104,7 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH3;
+	m_am = SH34_AM;
 }
 
 
@@ -139,30 +112,35 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH4;
+	m_am = SH34_AM;
 }
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
+	m_xor = 1;
 }
 
 
 sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
 {
+	m_xor = 2;
 }
 
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
+	m_xor = 1;
 }
 
 
 sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
 {
+	m_xor = 2;
 }
 
 
@@ -207,20 +185,20 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 	logerror("using LDTLB to replace UTLB entry %02x\n", replace);
 
 	// these come from PTEH
-	m_utlb[replace].VPN =  (m_m[PTEH] & 0xfffffc00) >> 10;
-//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
-//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
+	m_utlb[replace].VPN = (m_m[PTEH] & 0xfffffc00) >> 10;
+	//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
+	//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
 	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
 	// these come from PTEL
 	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
-	m_utlb[replace].V =   (m_m[PTEL] & 0x00000100) >> 8;
+	m_utlb[replace].V = (m_m[PTEL] & 0x00000100) >> 8;
 	m_utlb[replace].PSZ = (m_m[PTEL] & 0x00000080) >> 6;
-	m_utlb[replace].PSZ |=(m_m[PTEL] & 0x00000010) >> 4;
-	m_utlb[replace].PPR=  (m_m[PTEL] & 0x00000060) >> 5;
-	m_utlb[replace].C =   (m_m[PTEL] & 0x00000008) >> 3;
-	m_utlb[replace].D =   (m_m[PTEL] & 0x00000004) >> 2;
-	m_utlb[replace].SH =  (m_m[PTEL] & 0x00000002) >> 1;
-	m_utlb[replace].WT =  (m_m[PTEL] & 0x00000001) >> 0;
+	m_utlb[replace].PSZ |= (m_m[PTEL] & 0x00000010) >> 4;
+	m_utlb[replace].PPR = (m_m[PTEL] & 0x00000060) >> 5;
+	m_utlb[replace].C = (m_m[PTEL] & 0x00000008) >> 3;
+	m_utlb[replace].D = (m_m[PTEL] & 0x00000004) >> 2;
+	m_utlb[replace].SH = (m_m[PTEL] & 0x00000002) >> 1;
+	m_utlb[replace].WT = (m_m[PTEL] & 0x00000001) >> 0;
 	// these come from PTEA
 	m_utlb[replace].TC = (m_m[PTEA] & 0x00000008) >> 3;
 	m_utlb[replace].SA = (m_m[PTEA] & 0x00000007) >> 0;
@@ -229,22 +207,22 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 #if 0
 int sign_of(int n)
 {
-	return(m_fr[n]>>31);
+	return(m_fr[n] >> 31);
 }
 
-void zero(int n,int sign)
+void zero(int n, int sign)
 {
-if (sign == 0)
-	m_fr[n] = 0x00000000;
-else
-	m_fr[n] = 0x80000000;
-if ((m_fpscr & PR) == 1)
-	m_fr[n+1] = 0x00000000;
+	if (sign == 0)
+		m_fr[n] = 0x00000000;
+	else
+		m_fr[n] = 0x80000000;
+	if ((m_fpscr & PR) == 1)
+		m_fr[n + 1] = 0x00000000;
 }
 
 int data_type_of(int n)
 {
-uint32_t abs;
+	uint32_t abs;
 
 	abs = m_fr[n] & 0x7fffffff;
 	if ((m_fpscr & PR) == 0) { /* Single-precision */
@@ -253,13 +231,16 @@ uint32_t abs;
 				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
-				} else {
+				}
+				else {
 					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else
+			}
+			else
 				return(SH4_FPU_DENORM);
-		} else
+		}
+		else
 			if (abs < 0x7f800000)
 				return(SH4_FPU_NORM);
 			else
@@ -268,33 +249,39 @@ uint32_t abs;
 						return(SH4_FPU_PINF);
 					else
 						return(SH4_FPU_NINF);
-				} else
+				}
+				else
 					if (abs < 0x7fc00000)
 						return(SH4_FPU_qNaN);
 					else
 						return(SH4_FPU_sNaN);
-	} else { /* Double-precision */
+	}
+	else { /* Double-precision */
 		if (abs < 0x00100000) {
-			if (((m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_fr[n+1] == 0x00000000))) {
-				if(sign_of(n) == 0) {
+			if (((m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_fr[n + 1] == 0x00000000))) {
+				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
-				} else {
+				}
+				else {
 					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else
+			}
+			else
 				return(SH4_FPU_DENORM);
-		} else
+		}
+		else
 			if (abs < 0x7ff00000)
 				return(SH4_FPU_NORM);
 			else
-				if ((abs == 0x7ff00000) && (m_fr[n+1] == 0x00000000)) {
+				if ((abs == 0x7ff00000) && (m_fr[n + 1] == 0x00000000)) {
 					if (sign_of(n) == 0)
 						return(SH4_FPU_PINF);
 					else
 						return(SH4_FPU_NINF);
-				} else
+				}
+				else
 					if (abs < 0x7ff80000)
 						return(SH4_FPU_qNaN);
 					else
@@ -311,35 +298,20 @@ inline uint8_t sh34_base_device::RB(offs_t A)
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			return fastbase[_A ^ m_byte_xor];
-		}
-		return m_program->read_byte(_A);
-#else
-		return m_program->read_byte(A & AM);
-#endif
+		return m_program->read_byte(A & SH34_AM);
 	}
 	else // P0 region
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_byte(A & AM);
+			return m_program->read_byte(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_byte(A);
 		}
 	}
-
 }
 
 inline uint16_t sh34_base_device::RW(offs_t A)
@@ -349,35 +321,20 @@ inline uint16_t sh34_base_device::RW(offs_t A)
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			return ((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1];
-		}
-		return m_program->read_word(_A);
-#else
-		return m_program->read_word(A & AM);
-#endif
+		return m_program->read_word(A & SH34_AM);
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_word(A & AM);
+			return m_program->read_word(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_word(A);
 		}
 	}
-
 }
 
 inline uint32_t sh34_base_device::RL(offs_t A)
@@ -387,820 +344,135 @@ inline uint32_t sh34_base_device::RL(offs_t A)
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			return ((uint32_t*)fastbase)[(_A^m_dword_xor) >> 2];
-		}
-		return m_program->read_dword(_A);
-#else
-		return m_program->read_dword(A & AM);
-#endif
+		return m_program->read_dword(A & SH34_AM);
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			return m_program->read_dword(A & AM);
+			return m_program->read_dword(A & SH34_AM);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			return m_program->read_dword(A);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WB(offs_t A, uint8_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_byte(A,V);
+		m_program->write_byte(A, V);
 		return;
 	}
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			fastbase[_A ^ m_byte_xor] = V;
-			return;
-		}
-		m_program->write_byte(_A, V);
-#else
-		m_program->write_byte(A & AM, V);
-#endif
+		m_program->write_byte(A & SH34_AM, V);
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_byte(A & AM, V);
+			m_program->write_byte(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_byte(A, V);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WW(offs_t A, uint16_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_word(A,V);
+		m_program->write_word(A, V);
 		return;
 	}
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1] = V;
-			return;
-		}
-		m_program->write_word(_A, V);
-#else
-		m_program->write_word(A & AM, V);
-#endif
+		m_program->write_word(A & SH34_AM, V);
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_word(A & AM, V);
+			m_program->write_word(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_word(A, V);
 		}
 	}
-
 }
 
 inline void sh34_base_device::WL(offs_t A, uint32_t V)
 {
 	if (A >= 0xe0000000)
 	{
-		m_program->write_dword(A,V);
+		m_program->write_dword(A, V);
 		return;
 	}
 
 	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-#if SH4_USE_FASTRAM_OPTIMIZATION
-		const offs_t _A = A & AM;
-		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
-		{
-			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
-			{
-				continue;
-			}
-			void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((uint32_t*)fastbase)[(_A ^ m_dword_xor) >> 2] = V;
-			return;
-		}
-		m_program->write_dword(_A, V);
-#else
-		m_program->write_dword(A & AM, V);
-#endif
+		m_program->write_dword(A & SH34_AM, V);
 	}
 	else
 	{
 		if (!m_sh4_mmu_enabled)
 		{
-			m_program->write_dword(A & AM, V);
+			m_program->write_dword(A & SH34_AM, V);
 		}
 		else
 		{
-			A = get_remap(A & AM);
+			A = get_remap(A & SH34_AM);
 			m_program->write_dword(A, V);
 		}
 	}
-
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1100  1       -
- *  ADD     Rm,Rn
- */
-inline void sh34_base_device::ADD(const uint16_t opcode)
+inline void sh34_base_device::ILLEGAL()
 {
-	m_r[Rn] += m_r[Rm];
+	NOP();
 }
 
-/*  code                 cycles  t-bit
- *  0111 nnnn iiii iiii  1       -
- *  ADD     #imm,Rn
- */
-inline void sh34_base_device::ADDI(const uint16_t opcode)
+/*  MOVCA.L     R0,@Rn */
+inline void sh34_base_device::MOVCAL(const uint16_t opcode)
 {
-	m_r[Rn] += (int32_t)(int16_t)(int8_t)(opcode&0xff);
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	WL(m_sh2_state->ea, m_sh2_state->r[0]);
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1110  1       carry
- *  ADDC    Rm,Rn
- */
-inline void sh34_base_device::ADDC(const uint16_t opcode)
+inline void sh34_base_device::CLRS(const uint16_t opcode)
 {
-	uint32_t m = Rm; uint32_t n = Rn;
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_r[n] + m_r[m];
-	tmp0 = m_r[n];
-	m_r[n] = tmp1 + (m_sr & T);
-	if (tmp0 > tmp1)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-	if (tmp1 > m_r[n])
-		m_sr |= T;
+	m_sh2_state->sr &= ~SH_S;
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1111  1       overflow
- *  ADDV    Rm,Rn
- */
-inline void sh34_base_device::ADDV(const uint16_t opcode)
+inline void sh34_base_device::SETS(const uint16_t opcode)
 {
-	uint32_t m = Rm; uint32_t n = Rn;
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_r[n] += m_r[m];
-	if ((int32_t) m_r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 0 || src == 2)
-	{
-		if (ans == 1)
-			m_sr |= T;
-		else
-			m_sr &= ~T;
-	}
-	else
-		m_sr &= ~T;
+	m_sh2_state->sr |= SH_S;
 }
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1001  1       -
- *  AND     Rm,Rn
- */
-inline void sh34_base_device::AND(const uint16_t opcode)
-{
-	m_r[Rn] &= m_r[Rm];
-}
-
-
-/*  code                 cycles  t-bit
- *  1100 1001 iiii iiii  1       -
- *  AND     #imm,R0
- */
-inline void sh34_base_device::ANDI(const uint16_t opcode)
-{
-	m_r[0] &= (opcode&0xff);
-}
-
-/*  code                 cycles  t-bit
- *  1100 1101 iiii iiii  1       -
- *  AND.B   #imm,@(R0,GBR)
- */
-inline void sh34_base_device::ANDM(const uint16_t opcode)
-{
-	uint32_t temp;
-
-	m_ea = m_gbr + m_r[0];
-	temp = (opcode&0xff) & RB( m_ea );
-	WB(m_ea, temp );
-	m_sh4_icount -= 2;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1011 dddd dddd  3/1     -
- *  BF      disp8
- */
-inline void sh34_base_device::BF(const uint16_t opcode)
-{
-	if ((m_sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_pc = m_ea = m_pc + disp * 2 + 2;
-		m_sh4_icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1111 dddd dddd  3/1     -
- *  BFS     disp8
- */
-inline void sh34_base_device::BFS(const uint16_t opcode)
-{
-	if ((m_sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_delay = m_ea = m_pc + disp * 2 + 2;
-		m_sh4_icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1010 dddd dddd dddd  2       -
- *  BRA     disp12
- */
-inline void sh34_base_device::BRA(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
-
-#if BUSY_LOOP_HACKS
-	if (disp == -2)
-	{
-		uint32_t next_opcode = RW(m_pc & AM);
-		/* BRA  $
-		 * NOP
-		 */
-		if (next_opcode == 0x0009)
-			m_sh4_icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
-	}
-#endif
-	m_delay = m_ea = m_pc + disp * 2 + 2;
-	m_sh4_icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0010 0011  2       -
- *  BRAF    Rm
- */
-inline void sh34_base_device::BRAF(const uint16_t opcode)
-{
-	m_delay = m_pc + m_r[Rn] + 2;
-	m_sh4_icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1011 dddd dddd dddd  2       -
- *  BSR     disp12
- */
-inline void sh34_base_device::BSR(const uint16_t opcode)
-{
-	int32_t disp = ((int32_t)(opcode&0xfff) << 20) >> 20;
-
-	m_pr = m_pc + 2;
-	m_delay = m_ea = m_pc + disp * 2 + 2;
-	m_sh4_icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0000 0011  2       -
- *  BSRF    Rm
- */
-inline void sh34_base_device::BSRF(const uint16_t opcode)
-{
-	m_pr = m_pc + 2;
-	m_delay = m_pc + m_r[Rn] + 2;
-	m_sh4_icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1001 dddd dddd  3/1     -
- *  BT      disp8
- */
-inline void sh34_base_device::BT(const uint16_t opcode)
-{
-	if ((m_sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_pc = m_ea = m_pc + disp * 2 + 2;
-		m_sh4_icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1101 dddd dddd  2/1     -
- *  BTS     disp8
- */
-inline void sh34_base_device::BTS(const uint16_t opcode)
-{
-	if ((m_sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)(opcode&0xff) << 24) >> 24;
-		m_delay = m_ea = m_pc + disp * 2 + 2;
-		m_sh4_icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0010 1000  1       -
- *  CLRMAC
- */
-inline void sh34_base_device::CLRMAC(const uint16_t opcode)
-{
-	m_mach = 0;
-	m_macl = 0;
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0000 1000  1       -
- *  CLRT
- */
-inline void sh34_base_device::CLRT(const uint16_t opcode)
-{
-	m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0000  1       comparison result
- *  CMP_EQ  Rm,Rn
- */
-inline void sh34_base_device::CMPEQ(const uint16_t opcode)
-{
-	if (m_r[Rn] == m_r[Rm])
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0011  1       comparison result
- *  CMP_GE  Rm,Rn
- */
-inline void sh34_base_device::CMPGE(const uint16_t opcode)
-{
-	if ((int32_t) m_r[Rn] >= (int32_t) m_r[Rm])
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0111  1       comparison result
- *  CMP_GT  Rm,Rn
- */
-inline void sh34_base_device::CMPGT(const uint16_t opcode)
-{
-	if ((int32_t) m_r[Rn] > (int32_t) m_r[Rm])
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0110  1       comparison result
- *  CMP_HI  Rm,Rn
- */
-inline void sh34_base_device::CMPHI(const uint16_t opcode)
-{
-	if ((uint32_t) m_r[Rn] > (uint32_t) m_r[Rm])
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0010  1       comparison result
- *  CMP_HS  Rm,Rn
- */
-inline void sh34_base_device::CMPHS(const uint16_t opcode)
-{
-	if ((uint32_t) m_r[Rn] >= (uint32_t) m_r[Rm])
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-
-/*  code                 cycles  t-bit
- *  0100 nnnn 0001 0101  1       comparison result
- *  CMP_PL  Rn
- */
-inline void sh34_base_device::CMPPL(const uint16_t opcode)
-{
-	if ((int32_t) m_r[Rn] > 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0100 nnnn 0001 0001  1       comparison result
- *  CMP_PZ  Rn
- */
-inline void sh34_base_device::CMPPZ(const uint16_t opcode)
-{
-	if ((int32_t) m_r[Rn] >= 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1100  1       comparison result
- * CMP_STR  Rm,Rn
- */
-inline void sh34_base_device::CMPSTR(const uint16_t opcode)
-{
-	uint32_t temp;
-	int32_t HH, HL, LH, LL;
-	temp = m_r[Rn] ^ m_r[Rm];
-	HH = (temp >> 24) & 0xff;
-	HL = (temp >> 16) & 0xff;
-	LH = (temp >> 8) & 0xff;
-	LL = temp & 0xff;
-	if (HH && HL && LH && LL)
-	m_sr &= ~T;
-	else
-	m_sr |= T;
-	}
-
-
-/*  code                 cycles  t-bit
- *  1000 1000 iiii iiii  1       comparison result
- *  CMP/EQ #imm,R0
- */
-inline void sh34_base_device::CMPIM(const uint16_t opcode)
-{
-	uint32_t imm = (uint32_t)(int32_t)(int16_t)(int8_t)(opcode&0xff);
-
-	if (m_r[0] == imm)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 0111  1       calculation result
- *  DIV0S   Rm,Rn
- */
-inline void sh34_base_device::DIV0S(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	if ((m_r[n] & 0x80000000) == 0)
-		m_sr &= ~Q;
-	else
-		m_sr |= Q;
-	if ((m_r[m] & 0x80000000) == 0)
-		m_sr &= ~M;
-	else
-		m_sr |= M;
-	if ((m_r[m] ^ m_r[n]) & 0x80000000)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0001 1001  1       0
- *  DIV0U
- */
-inline void sh34_base_device::DIV0U(const uint16_t opcode)
-{
-	m_sr &= ~(M | Q | T);
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0100  1       calculation result
- *  DIV1 Rm,Rn
- */
-inline void sh34_base_device::DIV1(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t tmp0;
-	uint32_t old_q;
-
-	old_q = m_sr & Q;
-	if (0x80000000 & m_r[n])
-		m_sr |= Q;
-	else
-		m_sr &= ~Q;
-
-	m_r[n] = (m_r[n] << 1) | (m_sr & T);
-
-	if (!old_q)
-	{
-		if (!(m_sr & M))
-		{
-			tmp0 = m_r[n];
-			m_r[n] -= m_r[m];
-			if(!(m_sr & Q))
-				if(m_r[n] > tmp0)
-					m_sr |= Q;
-				else
-					m_sr &= ~Q;
-			else
-				if(m_r[n] > tmp0)
-					m_sr &= ~Q;
-				else
-					m_sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_r[n];
-			m_r[n] += m_r[m];
-			if(!(m_sr & Q))
-			{
-				if(m_r[n] < tmp0)
-					m_sr &= ~Q;
-				else
-					m_sr |= Q;
-			}
-			else
-			{
-				if(m_r[n] < tmp0)
-					m_sr |= Q;
-				else
-					m_sr &= ~Q;
-			}
-		}
-	}
-	else
-	{
-		if (!(m_sr & M))
-		{
-			tmp0 = m_r[n];
-			m_r[n] += m_r[m];
-			if(!(m_sr & Q))
-				if(m_r[n] < tmp0)
-					m_sr |= Q;
-				else
-					m_sr &= ~Q;
-			else
-				if(m_r[n] < tmp0)
-					m_sr &= ~Q;
-				else
-					m_sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_r[n];
-			m_r[n] -= m_r[m];
-			if(!(m_sr & Q))
-				if(m_r[n] > tmp0)
-					m_sr &= ~Q;
-				else
-					m_sr |= Q;
-			else
-				if(m_r[n] > tmp0)
-					m_sr |= Q;
-				else
-					m_sr &= ~Q;
-		}
-	}
-
-	tmp0 = (m_sr & (Q | M));
-	if((!tmp0) || (tmp0 == 0x300)) /* if Q == M set T else clear T */
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  DMULS.L Rm,Rn */
-inline void sh34_base_device::DMULS(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
-
-	tempn = (int32_t) m_r[n];
-	tempm = (int32_t) m_r[m];
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	if ((int32_t) (m_r[n] ^ m_r[m]) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	m_mach = Res2;
-	m_macl = Res0;
-	m_sh4_icount--;
-}
-
-/*  DMULU.L Rm,Rn */
-inline void sh34_base_device::DMULU(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-
-	RnL = m_r[n] & 0x0000ffff;
-	RnH = (m_r[n] >> 16) & 0x0000ffff;
-	RmL = m_r[m] & 0x0000ffff;
-	RmH = (m_r[m] >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	m_mach = Res2;
-	m_macl = Res0;
-	m_sh4_icount--;
-}
-
-/*  DT      Rn */
-inline void sh34_base_device::DT(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n]--;
-	if (m_r[n] == 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-#if BUSY_LOOP_HACKS
-	{
-		uint32_t next_opcode = RW(m_pc & AM);
-		/* DT   Rn
-		 * BF   $-2
-		 */
-		if (next_opcode == 0x8bfd)
-		{
-			while (m_r[n] > 1 && m_sh4_icount > 4)
-			{
-				m_r[n]--;
-				m_sh4_icount -= 4;   /* cycles for DT (1) and BF taken (3) */
-			}
-		}
-	}
-#endif
-}
-
-/*  EXTS.B  Rm,Rn */
-inline void sh34_base_device::EXTSB(const uint16_t opcode)
-{
-	m_r[Rn] = ((int32_t)m_r[Rm] << 24) >> 24;
-}
-
-/*  EXTS.W  Rm,Rn */
-inline void sh34_base_device::EXTSW(const uint16_t opcode)
-{
-	m_r[Rn] = ((int32_t)m_r[Rm] << 16) >> 16;
-}
-
-/*  EXTU.B  Rm,Rn */
-inline void sh34_base_device::EXTUB(const uint16_t opcode)
-{
-	m_r[Rn] = m_r[Rm] & 0x000000ff;
-}
-
-/*  EXTU.W  Rm,Rn */
-inline void sh34_base_device::EXTUW(const uint16_t opcode)
-{
-	m_r[Rn] = m_r[Rm] & 0x0000ffff;
-}
-
-/*  JMP     @Rm */
-inline void sh34_base_device::JMP(const uint16_t opcode)
-{
-	m_delay = m_ea = m_r[Rn];
-}
-
-/*  JSR     @Rm */
-inline void sh34_base_device::JSR(const uint16_t opcode)
-{
-	m_pr = m_pc + 2;
-	m_delay = m_ea = m_r[Rn];
-	m_sh4_icount--;
-}
-
 
 /*  LDC     Rm,SR */
 inline void sh34_base_device::LDCSR(const uint16_t opcode)
 {
-	uint32_t reg;
-
-	reg = m_r[Rn];
+	// copy current registers to banked version of current register set
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank((m_sr & sRB) >> 29);
-	if ((m_r[Rn] & sRB) != (m_sr & sRB))
-		sh4_change_register_bank(m_r[Rn] & sRB ? 1 : 0);
-	m_sr = reg & FLAGS;
+		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+
+	// if the register bank in the new differs from the one already in SR
+	if ((m_sh2_state->r[Rn] & sRB) != (m_sh2_state->sr & sRB))
+		sh4_change_register_bank(m_sh2_state->r[Rn] & sRB ? 1 : 0);
+	
+	m_sh2_state->sr = m_sh2_state->r[Rn] & SH34_FLAGS;
 	sh4_exception_recompute();
-}
-
-/*  LDC     Rm,GBR */
-inline void sh34_base_device::LDCGBR(const uint16_t opcode)
-{
-	m_gbr = m_r[Rn];
-}
-
-/*  LDC     Rm,VBR */
-inline void sh34_base_device::LDCVBR(const uint16_t opcode)
-{
-	m_vbr = m_r[Rn];
 }
 
 /*  LDC.L   @Rm+,SR */
@@ -1208,924 +480,37 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 {
 	uint32_t old;
 
-	old = m_sr;
-	m_ea = m_r[Rn];
-	m_sr = RL(m_ea ) & FLAGS;
+	old = m_sh2_state->sr;
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_sh2_state->sr = RL(m_sh2_state->ea) & SH34_FLAGS;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((old & sRB) >> 29);
-	if ((old & sRB) != (m_sr & sRB))
-		sh4_change_register_bank(m_sr & sRB ? 1 : 0);
-	m_r[Rn] += 4;
-	m_sh4_icount -= 2;
+	if ((old & sRB) != (m_sh2_state->sr & sRB))
+		sh4_change_register_bank(m_sh2_state->sr & sRB ? 1 : 0);
+	m_sh2_state->r[Rn] += 4;
+	m_sh2_state->icount -= 2;
 	sh4_exception_recompute();
-}
-
-/*  LDC.L   @Rm+,GBR */
-inline void sh34_base_device::LDCMGBR(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	m_gbr = RL(m_ea );
-	m_r[Rn] += 4;
-	m_sh4_icount -= 2;
-}
-
-/*  LDC.L   @Rm+,VBR */
-inline void sh34_base_device::LDCMVBR(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	m_vbr = RL(m_ea );
-	m_r[Rn] += 4;
-	m_sh4_icount -= 2;
-}
-
-/*  LDS     Rm,MACH */
-inline void sh34_base_device::LDSMACH(const uint16_t opcode)
-{
-	m_mach = m_r[Rn];
-}
-
-/*  LDS     Rm,MACL */
-inline void sh34_base_device::LDSMACL(const uint16_t opcode)
-{
-	m_macl = m_r[Rn];
-}
-
-/*  LDS     Rm,PR */
-inline void sh34_base_device::LDSPR(const uint16_t opcode)
-{
-	m_pr = m_r[Rn];
-}
-
-/*  LDS.L   @Rm+,MACH */
-inline void sh34_base_device::LDSMMACH(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	m_mach = RL(m_ea );
-	m_r[Rn] += 4;
-}
-
-/*  LDS.L   @Rm+,MACL */
-inline void sh34_base_device::LDSMMACL(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	m_macl = RL(m_ea );
-	m_r[Rn] += 4;
-}
-
-/*  LDS.L   @Rm+,PR */
-inline void sh34_base_device::LDSMPR(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	m_pr = RL(m_ea );
-	m_r[Rn] += 4;
-}
-
-/*  MAC.L   @Rm+,@Rn+ */
-inline void sh34_base_device::MAC_L(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
-
-	tempn = (int32_t) RL(m_r[n] );
-	m_r[n] += 4;
-	tempm = (int32_t) RL(m_r[m] );
-	m_r[m] += 4;
-	if ((int32_t) (tempn ^ tempm) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	if (m_sr & S)
-	{
-		Res0 = m_macl + Res0;
-		if (m_macl > Res0)
-			Res2++;
-		Res2 += (m_mach & 0x0000ffff);
-		if (((int32_t) Res2 < 0) && (Res2 < 0xffff8000))
-		{
-			Res2 = 0x00008000;
-			Res0 = 0x00000000;
-		}
-		else if (((int32_t) Res2 > 0) && (Res2 > 0x00007fff))
-		{
-			Res2 = 0x00007fff;
-			Res0 = 0xffffffff;
-		}
-		m_mach = Res2;
-		m_macl = Res0;
-	}
-	else
-	{
-		Res0 = m_macl + Res0;
-		if (m_macl > Res0)
-			Res2++;
-		Res2 += m_mach;
-		m_mach = Res2;
-		m_macl = Res0;
-	}
-	m_sh4_icount -= 2;
-}
-
-/*  MAC.W   @Rm+,@Rn+ */
-inline void sh34_base_device::MAC_W(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	int32_t tempm, tempn, dest, src, ans;
-	uint32_t templ;
-
-	tempn = (int32_t) RW(m_r[n] );
-	m_r[n] += 2;
-	tempm = (int32_t) RW(m_r[m] );
-	m_r[m] += 2;
-	templ = m_macl;
-	tempm = ((int32_t) (short) tempn * (int32_t) (short) tempm);
-	if ((int32_t) m_macl >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) tempm >= 0)
-	{
-		src = 0;
-		tempn = 0;
-	}
-	else
-	{
-		src = 1;
-		tempn = 0xffffffff;
-	}
-	src += dest;
-	m_macl += tempm;
-	if ((int32_t) m_macl >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (m_sr & S)
-	{
-		if (ans == 1)
-			{
-				if (src == 0)
-					m_macl = 0x7fffffff;
-				if (src == 2)
-					m_macl = 0x80000000;
-			}
-	}
-	else
-	{
-		m_mach += tempn;
-		if (templ > m_macl)
-			m_mach += 1;
-	}
-	m_sh4_icount -= 2;
-}
-
-/*  MOV     Rm,Rn */
-inline void sh34_base_device::MOV(const uint16_t opcode)
-{
-	m_r[Rn] = m_r[Rm];
-}
-
-/*  MOV.B   Rm,@Rn */
-inline void sh34_base_device::MOVBS(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	WB(m_ea, m_r[Rm] & 0x000000ff);
-}
-
-/*  MOV.W   Rm,@Rn */
-inline void sh34_base_device::MOVWS(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	WW(m_ea, m_r[Rm] & 0x0000ffff);
-}
-
-/*  MOV.L   Rm,@Rn */
-inline void sh34_base_device::MOVLS(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	WL(m_ea, m_r[Rm] );
-}
-
-/*  MOV.B   @Rm,Rn */
-inline void sh34_base_device::MOVBL(const uint16_t opcode)
-{
-	m_ea = m_r[Rm];
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_ea );
-}
-
-/*  MOV.W   @Rm,Rn */
-inline void sh34_base_device::MOVWL(const uint16_t opcode)
-{
-	m_ea = m_r[Rm];
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t) RW(m_ea );
-}
-
-/*  MOV.L   @Rm,Rn */
-inline void sh34_base_device::MOVLL(const uint16_t opcode)
-{
-	m_ea = m_r[Rm];
-	m_r[Rn] = RL(m_ea );
-}
-
-/*  MOV.B   Rm,@-Rn */
-inline void sh34_base_device::MOVBM(const uint16_t opcode)
-{
-	uint32_t data = m_r[Rm] & 0x000000ff;
-
-	m_r[Rn] -= 1;
-	WB(m_r[Rn], data );
-}
-
-/*  MOV.W   Rm,@-Rn */
-inline void sh34_base_device::MOVWM(const uint16_t opcode)
-{
-	uint32_t data = m_r[Rm] & 0x0000ffff;
-
-	m_r[Rn] -= 2;
-	WW(m_r[Rn], data );
-}
-
-/*  MOV.L   Rm,@-Rn */
-inline void sh34_base_device::MOVLM(const uint16_t opcode)
-{
-	uint32_t data = m_r[Rm];
-
-	m_r[Rn] -= 4;
-	WL(m_r[Rn], data );
-}
-
-/*  MOV.B   @Rm+,Rn */
-inline void sh34_base_device::MOVBP(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	m_r[n] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_r[m] );
-	if (n != m)
-		m_r[m] += 1;
-}
-
-/*  MOV.W   @Rm+,Rn */
-inline void sh34_base_device::MOVWP(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	m_r[n] = (uint32_t)(int32_t)(int16_t) RW(m_r[m] );
-	if (n != m)
-		m_r[m] += 2;
-}
-
-/*  MOV.L   @Rm+,Rn */
-inline void sh34_base_device::MOVLP(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	m_r[n] = RL(m_r[m] );
-	if (n != m)
-		m_r[m] += 4;
-}
-
-/*  MOV.B   Rm,@(R0,Rn) */
-inline void sh34_base_device::MOVBS0(const uint16_t opcode)
-{
-	m_ea = m_r[Rn] + m_r[0];
-	WB(m_ea, m_r[Rm] & 0x000000ff );
-}
-
-/*  MOV.W   Rm,@(R0,Rn) */
-inline void sh34_base_device::MOVWS0(const uint16_t opcode)
-{
-	m_ea = m_r[Rn] + m_r[0];
-	WW(m_ea, m_r[Rm] & 0x0000ffff );
-}
-
-/*  MOV.L   Rm,@(R0,Rn) */
-inline void sh34_base_device::MOVLS0(const uint16_t opcode)
-{
-	m_ea = m_r[Rn] + m_r[0];
-	WL(m_ea, m_r[Rm] );
-}
-
-/*  MOV.B   @(R0,Rm),Rn */
-inline void sh34_base_device::MOVBL0(const uint16_t opcode)
-{
-	m_ea = m_r[Rm] + m_r[0];
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_ea );
-}
-
-/*  MOV.W   @(R0,Rm),Rn */
-inline void sh34_base_device::MOVWL0(const uint16_t opcode)
-{
-	m_ea = m_r[Rm] + m_r[0];
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t) RW(m_ea );
-}
-
-/*  MOV.L   @(R0,Rm),Rn */
-inline void sh34_base_device::MOVLL0(const uint16_t opcode)
-{
-	m_ea = m_r[Rm] + m_r[0];
-	m_r[Rn] = RL(m_ea );
-}
-
-/*  MOV     #imm,Rn */
-inline void sh34_base_device::MOVI(const uint16_t opcode)
-{
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t)(int8_t)(opcode&0xff);
-}
-
-/*  MOV.W   @(disp8,PC),Rn */
-inline void sh34_base_device::MOVWI(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_pc + disp * 2 + 2;
-	m_r[Rn] = (uint32_t)(int32_t)(int16_t) RW(m_ea );
-}
-
-/*  MOV.L   @(disp8,PC),Rn */
-inline void sh34_base_device::MOVLI(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = ((m_pc + 2) & ~3) + disp * 4;
-	m_r[Rn] = RL(m_ea );
-}
-
-/*  MOV.B   @(disp8,GBR),R0 */
-inline void sh34_base_device::MOVBLG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp;
-	m_r[0] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_ea );
-}
-
-/*  MOV.W   @(disp8,GBR),R0 */
-inline void sh34_base_device::MOVWLG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp * 2;
-	m_r[0] = (int32_t)(int16_t) RW(m_ea );
-}
-
-/*  MOV.L   @(disp8,GBR),R0 */
-inline void sh34_base_device::MOVLLG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp * 4;
-	m_r[0] = RL(m_ea );
-}
-
-/*  MOV.B   R0,@(disp8,GBR) */
-inline void sh34_base_device::MOVBSG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp;
-	WB(m_ea, m_r[0] & 0x000000ff );
-}
-
-/*  MOV.W   R0,@(disp8,GBR) */
-inline void sh34_base_device::MOVWSG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp * 2;
-	WW(m_ea, m_r[0] & 0x0000ffff );
-}
-
-/*  MOV.L   R0,@(disp8,GBR) */
-inline void sh34_base_device::MOVLSG(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = m_gbr + disp * 4;
-	WL(m_ea, m_r[0] );
-}
-
-/*  MOV.B   R0,@(disp4,Rm) */
-inline void sh34_base_device::MOVBS4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rm] + disp;
-	WB(m_ea, m_r[0] & 0x000000ff );
-}
-
-/*  MOV.W   R0,@(disp4,Rm) */
-inline void sh34_base_device::MOVWS4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rm] + disp * 2;
-	WW(m_ea, m_r[0] & 0x0000ffff );
-}
-
-/* MOV.L Rm,@(disp4,Rn) */
-inline void sh34_base_device::MOVLS4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rn] + disp * 4;
-	WL(m_ea, m_r[Rm] );
-}
-
-/*  MOV.B   @(disp4,Rm),R0 */
-inline void sh34_base_device::MOVBL4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rm] + disp;
-	m_r[0] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_ea );
-}
-
-/*  MOV.W   @(disp4,Rm),R0 */
-inline void sh34_base_device::MOVWL4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rm] + disp * 2;
-	m_r[0] = (uint32_t)(int32_t)(int16_t) RW(m_ea );
-}
-
-/*  MOV.L   @(disp4,Rm),Rn */
-inline void sh34_base_device::MOVLL4(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0x0f;
-	m_ea = m_r[Rm] + disp * 4;
-	m_r[Rn] = RL(m_ea );
-}
-
-/*  MOVA    @(disp8,PC),R0 */
-inline void sh34_base_device::MOVA(const uint16_t opcode)
-{
-	uint32_t disp = opcode & 0xff;
-	m_ea = ((m_pc + 2) & ~3) + disp * 4;
-	m_r[0] = m_ea;
-}
-
-/*  MOVT    Rn */
-void sh34_base_device::MOVT(const uint16_t opcode)
-{
-	m_r[Rn] = m_sr & T;
-}
-
-/*  MUL.L   Rm,Rn */
-inline void sh34_base_device::MULL(const uint16_t opcode)
-{
-	m_macl = m_r[Rn] * m_r[Rm];
-	m_sh4_icount--;
-}
-
-/*  MULS    Rm,Rn */
-inline void sh34_base_device::MULS(const uint16_t opcode)
-{
-	m_macl = (int16_t) m_r[Rn] * (int16_t) m_r[Rm];
-}
-
-/*  MULU    Rm,Rn */
-inline void sh34_base_device::MULU(const uint16_t opcode)
-{
-	m_macl = (uint16_t) m_r[Rn] * (uint16_t) m_r[Rm];
-}
-
-/*  NEG     Rm,Rn */
-inline void sh34_base_device::NEG(const uint16_t opcode)
-{
-	m_r[Rn] = 0 - m_r[Rm];
-}
-
-/*  NEGC    Rm,Rn */
-inline void sh34_base_device::NEGC(const uint16_t opcode)
-{
-	uint32_t temp;
-
-	temp = m_r[Rm];
-	m_r[Rn] = -temp - (m_sr & T);
-	if (temp || (m_sr & T))
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  NOP */
-inline void sh34_base_device::NOP(const uint16_t opcode)
-{
-}
-
-/*  NOT     Rm,Rn */
-inline void sh34_base_device::NOT(const uint16_t opcode)
-{
-	m_r[Rn] = ~m_r[Rm];
-}
-
-/*  OR      Rm,Rn */
-inline void sh34_base_device::OR(const uint16_t opcode)
-{
-	m_r[Rn] |= m_r[Rm];
-}
-
-/*  OR      #imm,R0 */
-inline void sh34_base_device::ORI(const uint16_t opcode)
-{
-	m_r[0] |= (opcode&0xff);
-	m_sh4_icount -= 2;
-}
-
-/*  OR.B    #imm,@(R0,GBR) */
-inline void sh34_base_device::ORM(const uint16_t opcode)
-{
-	uint32_t temp;
-
-	m_ea = m_gbr + m_r[0];
-	temp = RB( m_ea );
-	temp |= (opcode&0xff);
-	WB(m_ea, temp );
-}
-
-/*  ROTCL   Rn */
-inline void sh34_base_device::ROTCL(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	uint32_t temp;
-
-	temp = (m_r[n] >> 31) & T;
-	m_r[n] = (m_r[n] << 1) | (m_sr & T);
-	m_sr = (m_sr & ~T) | temp;
-}
-
-/*  ROTCR   Rn */
-inline void sh34_base_device::ROTCR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	uint32_t temp;
-	temp = (m_sr & T) << 31;
-	if (m_r[n] & T)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-	m_r[n] = (m_r[n] >> 1) | temp;
-}
-
-/*  ROTL    Rn */
-inline void sh34_base_device::ROTL(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | ((m_r[n] >> 31) & T);
-	m_r[n] = (m_r[n] << 1) | (m_r[n] >> 31);
-}
-
-/*  ROTR    Rn */
-inline void sh34_base_device::ROTR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | (m_r[n] & T);
-	m_r[n] = (m_r[n] >> 1) | (m_r[n] << 31);
 }
 
 /*  RTE */
-inline void sh34_base_device::RTE(const uint16_t opcode)
+inline void sh34_base_device::RTE()
 {
-	m_delay = m_ea = m_spc;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_spc;
+
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank((m_sr & sRB) >> 29);
-	if ((m_ssr & sRB) != (m_sr & sRB))
+		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+	if ((m_ssr & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_ssr & sRB ? 1 : 0);
-	m_sr = m_ssr;
-	m_sh4_icount--;
+
+	m_sh2_state->sr = m_ssr;
+	m_sh2_state->icount--;
 	sh4_exception_recompute();
 }
 
-/*  RTS */
-inline void sh34_base_device::RTS(const uint16_t opcode)
-{
-	m_delay = m_ea = m_pr;
-	m_sh4_icount--;
-}
-
-/*  SETT */
-inline void sh34_base_device::SETT(const uint16_t opcode)
-{
-	m_sr |= T;
-}
-
-/*  SHAL    Rn      (same as SHLL) */
-inline void sh34_base_device::SHAL(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | ((m_r[n] >> 31) & T);
-	m_r[n] <<= 1;
-}
-
-/*  SHAR    Rn */
-inline void sh34_base_device::SHAR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | (m_r[n] & T);
-	m_r[n] = (uint32_t)((int32_t)m_r[n] >> 1);
-}
-
-/*  SHLL    Rn      (same as SHAL) */
-inline void sh34_base_device::SHLL(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | ((m_r[n] >> 31) & T);
-	m_r[n] <<= 1;
-}
-
-/*  SHLL2   Rn */
-inline void sh34_base_device::SHLL2(const uint16_t opcode)
-{
-	m_r[Rn] <<= 2;
-}
-
-/*  SHLL8   Rn */
-inline void sh34_base_device::SHLL8(const uint16_t opcode)
-{
-	m_r[Rn] <<= 8;
-}
-
-/*  SHLL16  Rn */
-inline void sh34_base_device::SHLL16(const uint16_t opcode)
-{
-	m_r[Rn] <<= 16;
-}
-
-/*  SHLR    Rn */
-inline void sh34_base_device::SHLR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_sr = (m_sr & ~T) | (m_r[n] & T);
-	m_r[n] >>= 1;
-}
-
-/*  SHLR2   Rn */
-inline void sh34_base_device::SHLR2(const uint16_t opcode)
-{
-	m_r[Rn] >>= 2;
-}
-
-/*  SHLR8   Rn */
-inline void sh34_base_device::SHLR8(const uint16_t opcode)
-{
-	m_r[Rn] >>= 8;
-}
-
-/*  SHLR16  Rn */
-inline void sh34_base_device::SHLR16(const uint16_t opcode)
-{
-	m_r[Rn] >>= 16;
-}
-
-/*  SLEEP */
-inline void sh34_base_device::SLEEP(const uint16_t opcode)
-{
-	/* 0 = normal mode */
-	/* 1 = enters into power-down mode */
-	/* 2 = go out the power-down mode after an exception */
-	if(m_sleep_mode != 2)
-		m_pc -= 2;
-	m_sh4_icount -= 2;
-	/* Wait_for_exception; */
-	if(m_sleep_mode == 0)
-		m_sleep_mode = 1;
-	else if(m_sleep_mode == 2)
-		m_sleep_mode = 0;
-}
-
-/*  STC     SR,Rn */
-inline void sh34_base_device::STCSR(const uint16_t opcode)
-{
-	m_r[Rn] = m_sr;
-}
-
-/*  STC     GBR,Rn */
-inline void sh34_base_device::STCGBR(const uint16_t opcode)
-{
-	m_r[Rn] = m_gbr;
-}
-
-/*  STC     VBR,Rn */
-inline void sh34_base_device::STCVBR(const uint16_t opcode)
-{
-	m_r[Rn] = m_vbr;
-}
-
-/*  STC.L   SR,@-Rn */
-inline void sh34_base_device::STCMSR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_sr );
-	m_sh4_icount--;
-}
-
-/*  STC.L   GBR,@-Rn */
-inline void sh34_base_device::STCMGBR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_gbr );
-	m_sh4_icount--;
-}
-
-/*  STC.L   VBR,@-Rn */
-inline void sh34_base_device::STCMVBR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_vbr );
-	m_sh4_icount--;
-}
-
-/*  STS     MACH,Rn */
-inline void sh34_base_device::STSMACH(const uint16_t opcode)
-{
-	m_r[Rn] = m_mach;
-}
-
-/*  STS     MACL,Rn */
-inline void sh34_base_device::STSMACL(const uint16_t opcode)
-{
-	m_r[Rn] = m_macl;
-}
-
-/*  STS     PR,Rn */
-inline void sh34_base_device::STSPR(const uint16_t opcode)
-{
-	m_r[Rn] = m_pr;
-}
-
-/*  STS.L   MACH,@-Rn */
-inline void sh34_base_device::STSMMACH(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_mach );
-}
-
-/*  STS.L   MACL,@-Rn */
-inline void sh34_base_device::STSMMACL(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_macl );
-}
-
-/*  STS.L   PR,@-Rn */
-inline void sh34_base_device::STSMPR(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_pr );
-}
-
-/*  SUB     Rm,Rn */
-inline void sh34_base_device::SUB(const uint16_t opcode)
-{
-	m_r[Rn] -= m_r[Rm];
-}
-
-/*  SUBC    Rm,Rn */
-inline void sh34_base_device::SUBC(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_r[n] - m_r[m];
-	tmp0 = m_r[n];
-	m_r[n] = tmp1 - (m_sr & T);
-	if (tmp0 < tmp1)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-	if (tmp1 < m_r[n])
-		m_sr |= T;
-}
-
-/*  SUBV    Rm,Rn */
-inline void sh34_base_device::SUBV(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_r[n] -= m_r[m];
-	if ((int32_t) m_r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 1)
-	{
-		if (ans == 1)
-			m_sr |= T;
-		else
-			m_sr &= ~T;
-	}
-	else
-		m_sr &= ~T;
-}
-
-/*  SWAP.B  Rm,Rn */
-inline void sh34_base_device::SWAPB(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t temp0, temp1;
-
-	temp0 = m_r[m] & 0xffff0000;
-	temp1 = (m_r[m] & 0x000000ff) << 8;
-	m_r[n] = (m_r[m] >> 8) & 0x000000ff;
-	m_r[n] = m_r[n] | temp1 | temp0;
-}
-
-/*  SWAP.W  Rm,Rn */
-inline void sh34_base_device::SWAPW(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t temp;
-
-	temp = (m_r[m] >> 16) & 0x0000ffff;
-	m_r[n] = (m_r[m] << 16) | temp;
-}
-
-/*  TAS.B   @Rn */
-inline void sh34_base_device::TAS(const uint16_t opcode)
-{
-	uint32_t n = Rn;
-
-	uint32_t temp;
-	m_ea = m_r[n];
-	/* Bus Lock enable */
-	temp = RB( m_ea );
-	if (temp == 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-	temp |= 0x80;
-	/* Bus Lock disable */
-	WB(m_ea, temp );
-	m_sh4_icount -= 3;
-}
-
 /*  TRAPA   #imm */
-inline void sh34_base_device::TRAPA(const uint16_t opcode)
+inline void sh34_base_device::TRAPA(uint32_t i)
 {
-	uint32_t imm = opcode & 0xff;
+	uint32_t imm = i & 0xff;
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
@@ -2136,18 +521,18 @@ inline void sh34_base_device::TRAPA(const uint16_t opcode)
 		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
 	}
 
+	m_ssr = m_sh2_state->sr;
+	m_spc = m_sh2_state->pc;
 
-	m_ssr = m_sr;
-	m_spc = m_pc;
-	m_sgr = m_r[15];
+	m_sgr = m_sh2_state->r[15];
 
-	m_sr |= MD;
+	m_sh2_state->sr |= MD;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank((m_sr & sRB) >> 29);
-	if (!(m_sr & sRB))
+		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
+	if (!(m_sh2_state->sr & sRB))
 		sh4_change_register_bank(1);
-	m_sr |= sRB;
-	m_sr |= BL;
+	m_sh2_state->sr |= sRB;
+	m_sh2_state->sr |= BL;
 	sh4_exception_recompute();
 
 	if (m_cpu_type == CPU_TYPE_SH4)
@@ -2159,116 +544,9 @@ inline void sh34_base_device::TRAPA(const uint16_t opcode)
 		m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
 	}
 
-	m_pc = m_vbr + 0x00000100;
+	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
 
-	m_sh4_icount -= 7;
-}
-
-/*  TST     Rm,Rn */
-inline void sh34_base_device::TST(const uint16_t opcode)
-{
-	if ((m_r[Rn] & m_r[Rm]) == 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  TST     #imm,R0 */
-inline void sh34_base_device::TSTI(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-
-	if ((imm & m_r[0]) == 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-}
-
-/*  TST.B   #imm,@(R0,GBR) */
-inline void sh34_base_device::TSTM(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-
-	m_ea = m_gbr + m_r[0];
-	if ((imm & RB( m_ea )) == 0)
-		m_sr |= T;
-	else
-		m_sr &= ~T;
-	m_sh4_icount -= 2;
-}
-
-/*  XOR     Rm,Rn */
-inline void sh34_base_device::XOR(const uint16_t opcode)
-{
-	m_r[Rn] ^= m_r[Rm];
-}
-
-/*  XOR     #imm,R0 */
-inline void sh34_base_device::XORI(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-	m_r[0] ^= imm;
-}
-
-/*  XOR.B   #imm,@(R0,GBR) */
-inline void sh34_base_device::XORM(const uint16_t opcode)
-{
-	uint32_t imm = opcode & 0xff;
-	uint32_t temp;
-
-	m_ea = m_gbr + m_r[0];
-	temp = RB( m_ea );
-	temp ^= imm;
-	WB(m_ea, temp );
-	m_sh4_icount -= 2;
-}
-
-/*  XTRCT   Rm,Rn */
-inline void sh34_base_device::XTRCT(const uint16_t opcode)
-{
-	uint32_t m = Rm; uint32_t n = Rn;
-
-	uint32_t temp;
-
-	temp = (m_r[m] << 16) & 0xffff0000;
-	m_r[n] = (m_r[n] >> 16) & 0x0000ffff;
-	m_r[n] |= temp;
-}
-
-/*  STC     SSR,Rn */
-inline void sh34_base_device::STCSSR(const uint16_t opcode)
-{
-	m_r[Rn] = m_ssr;
-}
-
-/*  STC     SPC,Rn */
-inline void sh34_base_device::STCSPC(const uint16_t opcode)
-{
-	m_r[Rn] = m_spc;
-}
-
-/*  STC     SGR,Rn */
-inline void sh34_base_device::STCSGR(const uint16_t opcode)
-{
-	m_r[Rn] = m_sgr;
-}
-
-/*  STS     FPUL,Rn */
-inline void sh34_base_device::STSFPUL(const uint16_t opcode)
-{
-	m_r[Rn] = m_fpul;
-}
-
-/*  STS     FPSCR,Rn */
-inline void sh34_base_device::STSFPSCR(const uint16_t opcode)
-{
-	m_r[Rn] = m_fpscr & 0x003FFFFF;
-}
-
-/*  STC     DBR,Rn */
-inline void sh34_base_device::STCDBR(const uint16_t opcode)
-{
-	m_r[Rn] = m_dbr;
+	m_sh2_state->icount -= 7;
 }
 
 /*  STCRBANK   Rm_BANK,Rn */
@@ -2276,7 +554,7 @@ inline void sh34_base_device::STCRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm;
 
-	m_r[Rn] = m_rbnk[m_sr&sRB ? 0 : 1][m & 7];
+	m_sh2_state->r[Rn] = m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7];
 }
 
 /*  STCMRBANK   Rm_BANK,@-Rn */
@@ -2284,27 +562,10 @@ inline void sh34_base_device::STCMRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_rbnk[m_sr&sRB ? 0 : 1][m & 7]);
-	m_sh4_icount--;
-}
-
-/*  MOVCA.L     R0,@Rn */
-inline void sh34_base_device::MOVCAL(const uint16_t opcode)
-{
-	m_ea = m_r[Rn];
-	WL(m_ea, m_r[0] );
-}
-
-inline void sh34_base_device::CLRS(const uint16_t opcode)
-{
-	m_sr &= ~S;
-}
-
-inline void sh34_base_device::SETS(const uint16_t opcode)
-{
-	m_sr |= S;
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7]);
+	m_sh2_state->icount--;
 }
 
 /*  STS.L   SGR,@-Rn */
@@ -2312,9 +573,9 @@ inline void sh34_base_device::STCMSGR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_sgr );
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_sgr);
 }
 
 /*  STS.L   FPUL,@-Rn */
@@ -2322,9 +583,9 @@ inline void sh34_base_device::STSMFPUL(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_fpul );
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_fpul);
 }
 
 /*  STS.L   FPSCR,@-Rn */
@@ -2332,9 +593,9 @@ inline void sh34_base_device::STSMFPSCR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_fpscr & 0x003FFFFF);
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_fpscr & 0x003FFFFF);
 }
 
 /*  STC.L   DBR,@-Rn */
@@ -2342,9 +603,9 @@ inline void sh34_base_device::STCMDBR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_dbr );
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_dbr);
 }
 
 /*  STC.L   SSR,@-Rn */
@@ -2352,9 +613,9 @@ inline void sh34_base_device::STCMSSR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_ssr );
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_ssr);
 }
 
 /*  STC.L   SPC,@-Rn */
@@ -2362,17 +623,17 @@ inline void sh34_base_device::STCMSPC(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	m_r[n] -= 4;
-	m_ea = m_r[n];
-	WL(m_ea, m_spc );
+	m_sh2_state->r[n] -= 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	WL(m_sh2_state->ea, m_spc);
 }
 
 /*  LDS.L   @Rm+,FPUL */
 inline void sh34_base_device::LDSMFPUL(const uint16_t opcode)
 {
-	m_ea = m_r[Rn];
-	m_fpul = RL(m_ea );
-	m_r[Rn] += 4;
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_fpul = RL(m_sh2_state->ea);
+	m_sh2_state->r[Rn] += 4;
 }
 
 /*  LDS.L   @Rm+,FPSCR */
@@ -2381,10 +642,10 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 	uint32_t s;
 
 	s = m_fpscr;
-	m_ea = m_r[Rn];
-	m_fpscr = RL(m_ea );
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_fpscr = RL(m_sh2_state->ea);
 	m_fpscr &= 0x003FFFFF;
-	m_r[Rn] += 4;
+	m_sh2_state->r[Rn] += 4;
 	if ((s & FR) != (m_fpscr & FR))
 		sh4_swap_fp_registers();
 #ifdef LSB_FIRST
@@ -2398,9 +659,9 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 /*  LDC.L   @Rm+,DBR */
 inline void sh34_base_device::LDCMDBR(const uint16_t opcode)
 {
-	m_ea = m_r[Rn];
-	m_dbr = RL(m_ea );
-	m_r[Rn] += 4;
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_dbr = RL(m_sh2_state->ea);
+	m_sh2_state->r[Rn] += 4;
 }
 
 /*  LDC.L   @Rn+,Rm_BANK */
@@ -2408,31 +669,31 @@ inline void sh34_base_device::LDCMRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	m_ea = m_r[n];
-	m_rbnk[m_sr&sRB ? 0 : 1][m & 7] = RL(m_ea );
-	m_r[n] += 4;
+	m_sh2_state->ea = m_sh2_state->r[n];
+	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = RL(m_sh2_state->ea);
+	m_sh2_state->r[n] += 4;
 }
 
 /*  LDC.L   @Rm+,SSR */
 inline void sh34_base_device::LDCMSSR(const uint16_t opcode)
 {
-	m_ea = m_r[Rn];
-	m_ssr = RL(m_ea );
-	m_r[Rn] += 4;
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_ssr = RL(m_sh2_state->ea);
+	m_sh2_state->r[Rn] += 4;
 }
 
 /*  LDC.L   @Rm+,SPC */
 inline void sh34_base_device::LDCMSPC(const uint16_t opcode)
 {
-	m_ea = m_r[Rn];
-	m_spc = RL(m_ea );
-	m_r[Rn] += 4;
+	m_sh2_state->ea = m_sh2_state->r[Rn];
+	m_spc = RL(m_sh2_state->ea);
+	m_sh2_state->r[Rn] += 4;
 }
 
 /*  LDS     Rm,FPUL */
 inline void sh34_base_device::LDSFPUL(const uint16_t opcode)
 {
-	m_fpul = m_r[Rn];
+	m_fpul = m_sh2_state->r[Rn];
 }
 
 /*  LDS     Rm,FPSCR */
@@ -2441,7 +702,7 @@ inline void sh34_base_device::LDSFPSCR(const uint16_t opcode)
 	uint32_t s;
 
 	s = m_fpscr;
-	m_fpscr = m_r[Rn] & 0x003FFFFF;
+	m_fpscr = m_sh2_state->r[Rn] & 0x003FFFFF;
 	if ((s & FR) != (m_fpscr & FR))
 		sh4_swap_fp_registers();
 #ifdef LSB_FIRST
@@ -2455,7 +716,44 @@ inline void sh34_base_device::LDSFPSCR(const uint16_t opcode)
 /*  LDC     Rm,DBR */
 inline void sh34_base_device::LDCDBR(const uint16_t opcode)
 {
-	m_dbr = m_r[Rn];
+	m_dbr = m_sh2_state->r[Rn];
+}
+
+
+/*  STC     SSR,Rn */
+inline void sh34_base_device::STCSSR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_ssr;
+}
+
+/*  STC     SPC,Rn */
+inline void sh34_base_device::STCSPC(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_spc;
+}
+
+/*  STC     SGR,Rn */
+inline void sh34_base_device::STCSGR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_sgr;
+}
+
+/*  STS     FPUL,Rn */
+inline void sh34_base_device::STSFPUL(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_fpul;
+}
+
+/*  STS     FPSCR,Rn */
+inline void sh34_base_device::STSFPSCR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_fpscr & 0x003FFFFF;
+}
+
+/*  STC     DBR,Rn */
+inline void sh34_base_device::STCDBR(const uint16_t opcode)
+{
+	m_sh2_state->r[Rn] = m_dbr;
 }
 
 /*  SHAD    Rm,Rn */
@@ -2463,15 +761,16 @@ inline void sh34_base_device::SHAD(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if ((m_r[m] & 0x80000000) == 0)
-		m_r[n] = m_r[n] << (m_r[m] & 0x1F);
-	else if ((m_r[m] & 0x1F) == 0) {
-		if ((m_r[n] & 0x80000000) == 0)
-			m_r[n] = 0;
+	if ((m_sh2_state->r[m] & 0x80000000) == 0)
+		m_sh2_state->r[n] = m_sh2_state->r[n] << (m_sh2_state->r[m] & 0x1F);
+	else if ((m_sh2_state->r[m] & 0x1F) == 0) {
+		if ((m_sh2_state->r[n] & 0x80000000) == 0)
+			m_sh2_state->r[n] = 0;
 		else
-			m_r[n] = 0xFFFFFFFF;
-	} else
-		m_r[n]=(int32_t)m_r[n] >> ((~m_r[m] & 0x1F)+1);
+			m_sh2_state->r[n] = 0xFFFFFFFF;
+	}
+	else
+		m_sh2_state->r[n] = (int32_t)m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F) + 1);
 }
 
 /*  SHLD    Rm,Rn */
@@ -2479,12 +778,12 @@ inline void sh34_base_device::SHLD(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if ((m_r[m] & 0x80000000) == 0)
-		m_r[n] = m_r[n] << (m_r[m] & 0x1F);
-	else if ((m_r[m] & 0x1F) == 0)
-		m_r[n] = 0;
+	if ((m_sh2_state->r[m] & 0x80000000) == 0)
+		m_sh2_state->r[n] = m_sh2_state->r[n] << (m_sh2_state->r[m] & 0x1F);
+	else if ((m_sh2_state->r[m] & 0x1F) == 0)
+		m_sh2_state->r[n] = 0;
 	else
-		m_r[n] = m_r[n] >> ((~m_r[m] & 0x1F)+1);
+		m_sh2_state->r[n] = m_sh2_state->r[n] >> ((~m_sh2_state->r[m] & 0x1F) + 1);
 }
 
 /*  LDCRBANK   Rn,Rm_BANK */
@@ -2492,28 +791,28 @@ inline void sh34_base_device::LDCRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm;
 
-	m_rbnk[m_sr&sRB ? 0 : 1][m & 7] = m_r[Rn];
+	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = m_sh2_state->r[Rn];
 }
 
 /*  LDC     Rm,SSR */
 inline void sh34_base_device::LDCSSR(const uint16_t opcode)
 {
-	m_ssr = m_r[Rn];
+	m_ssr = m_sh2_state->r[Rn];
 }
 
 /*  LDC     Rm,SPC */
 inline void sh34_base_device::LDCSPC(const uint16_t opcode)
 {
-	m_spc = m_r[Rn];
+	m_spc = m_sh2_state->r[Rn];
 }
 
 /*  PREF     @Rn */
 inline void sh34_base_device::PREFM(const uint16_t opcode)
 {
 	int a;
-	uint32_t addr,dest,sq;
+	uint32_t addr, dest, sq;
 
-	addr = m_r[Rn]; // address
+	addr = m_sh2_state->r[Rn]; // address
 	if ((addr >= 0xE0000000) && (addr <= 0xE3FFFFFF))
 	{
 		if (m_sh4_mmu_enabled)
@@ -2582,28 +881,30 @@ inline void sh34_base_device::FMOVMRIFR(const uint16_t opcode)
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[m];
-			m_xf[n] = RL(m_ea );
-			m_r[m] += 4;
-			m_xf[n^1] = RL(m_ea+4 );
-			m_r[m] += 4;
-		} else {
+			m_sh2_state->ea = m_sh2_state->r[m];
+			m_xf[n] = RL(m_sh2_state->ea);
+			m_sh2_state->r[m] += 4;
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->r[m] += 4;
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[m];
-			m_fr[n] = RL(m_ea );
-			m_r[m] += 4;
-			m_fr[n^1] = RL(m_ea+4 );
-			m_r[m] += 4;
+			m_sh2_state->ea = m_sh2_state->r[m];
+			m_fr[n] = RL(m_sh2_state->ea);
+			m_sh2_state->r[m] += 4;
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->r[m] += 4;
 		}
-	} else {              /* SZ = 0 */
-		m_ea = m_r[m];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_ea );
-		m_r[m] += 4;
+		m_fr[n] = RL(m_sh2_state->ea);
+		m_sh2_state->r[m] += 4;
 	}
 }
 
@@ -2621,23 +922,25 @@ inline void sh34_base_device::FMOVFRMR(const uint16_t opcode)
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_ea = m_r[n];
-			WL(m_ea,m_xf[m] );
-			WL(m_ea+4,m_xf[m^1] );
-		} else {
+			m_sh2_state->ea = m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_ea = m_r[n];
-			WL(m_ea,m_fr[m] );
-			WL(m_ea+4,m_fr[m^1] );
+			m_sh2_state->ea = m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
-		m_ea = m_r[n];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -2655,26 +958,28 @@ inline void sh34_base_device::FMOVFRMDR(const uint16_t opcode)
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_r[n] -= 8;
-			m_ea = m_r[n];
-			WL(m_ea,m_xf[m] );
-			WL(m_ea+4,m_xf[m^1] );
-		} else {
+			m_sh2_state->r[n] -= 8;
+			m_sh2_state->ea = m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_r[n] -= 8;
-			m_ea = m_r[n];
-			WL(m_ea,m_fr[m] );
-			WL(m_ea+4,m_fr[m^1] );
+			m_sh2_state->r[n] -= 8;
+			m_sh2_state->ea = m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
-		m_r[n] -= 4;
-		m_ea = m_r[n];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->r[n] -= 4;
+		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -2692,23 +997,25 @@ inline void sh34_base_device::FMOVFRS0(const uint16_t opcode)
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_ea = m_r[0] + m_r[n];
-			WL(m_ea,m_xf[m] );
-			WL(m_ea+4,m_xf[m^1] );
-		} else {
+			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+		}
+		else {
 #ifdef LSB_FIRST
 			m ^= m_fpu_pr;
 #endif
-			m_ea = m_r[0] + m_r[n];
-			WL(m_ea,m_fr[m] );
-			WL(m_ea+4,m_fr[m^1] );
+			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
+			WL(m_sh2_state->ea, m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
 		}
-	} else {              /* SZ = 0 */
-		m_ea = m_r[0] + m_r[n];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
 #ifdef LSB_FIRST
 		m ^= m_fpu_pr;
 #endif
-		WL(m_ea,m_fr[m] );
+		WL(m_sh2_state->ea, m_fr[m]);
 	}
 }
 
@@ -2726,23 +1033,25 @@ inline void sh34_base_device::FMOVS0FR(const uint16_t opcode)
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[0] + m_r[m];
-			m_xf[n] = RL(m_ea );
-			m_xf[n^1] = RL(m_ea+4 );
-		} else {
+			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
+			m_xf[n] = RL(m_sh2_state->ea);
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[0] + m_r[m];
-			m_fr[n] = RL(m_ea );
-			m_fr[n^1] = RL(m_ea+4 );
+			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
+			m_fr[n] = RL(m_sh2_state->ea);
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
-	} else {              /* SZ = 0 */
-		m_ea = m_r[0] + m_r[m];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_ea );
+		m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -2761,23 +1070,25 @@ inline void sh34_base_device::FMOVMRFR(const uint16_t opcode)
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[m];
-			m_xf[n] = RL(m_ea );
-			m_xf[n^1] = RL(m_ea+4 );
-		} else {
+			m_sh2_state->ea = m_sh2_state->r[m];
+			m_xf[n] = RL(m_sh2_state->ea);
+			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+		}
+		else {
 #ifdef LSB_FIRST
 			n ^= m_fpu_pr;
 #endif
-			m_ea = m_r[m];
-			m_fr[n] = RL(m_ea );
-			m_fr[n^1] = RL(m_ea+4 );
+			m_sh2_state->ea = m_sh2_state->r[m];
+			m_fr[n] = RL(m_sh2_state->ea);
+			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
-	} else {              /* SZ = 0 */
-		m_ea = m_r[m];
+	}
+	else {              /* SZ = 0 */
+		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_ea );
+		m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -2790,7 +1101,7 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz == 0)  {  /* SZ = 0 */
+	if (m_fpu_sz == 0) {  /* SZ = 0 */
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 		m ^= m_fpu_pr;
@@ -2802,15 +1113,18 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 			if (n & 1) {
 				m_xf[n & 14] = m_xf[m & 14];
 				m_xf[n | 1] = m_xf[m | 1];
-			} else {
+			}
+			else {
 				m_fr[n] = m_xf[m & 14];
 				m_fr[n | 1] = m_xf[m | 1];
 			}
-		} else {
+		}
+		else {
 			if (n & 1) {
 				m_xf[n & 14] = m_fr[m];
 				m_xf[n | 1] = m_fr[m | 1]; // (a&14)+1 -> a|1
-			} else {
+			}
+			else {
 				m_fr[n] = m_fr[m];
 				m_fr[n | 1] = m_fr[m | 1];
 			}
@@ -2839,7 +1153,7 @@ inline void sh34_base_device::FLDI0(const uint16_t opcode)
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
-inline void sh34_base_device:: FLDS(const uint16_t opcode)
+inline void sh34_base_device::FLDS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
 	m_fpul = m_fr[Rn ^ m_fpu_pr];
@@ -2849,7 +1163,7 @@ inline void sh34_base_device:: FLDS(const uint16_t opcode)
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
-inline void sh34_base_device:: FSTS(const uint16_t opcode)
+inline void sh34_base_device::FSTS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
 	m_fr[Rn ^ m_fpu_pr] = m_fpul;
@@ -2879,13 +1193,14 @@ inline void sh34_base_device::FTRC(const uint16_t opcode)
 	uint32_t n = Rn;
 
 	if (m_fpu_pr) { /* PR = 1 */
-		if(n & 1)
-			fatalerror("SH-4: FTRC opcode used with n %d",n);
+		if (n & 1)
+			fatalerror("SH-4: FTRC opcode used with n %d", n);
 
 		n = n & 14;
 		*((int32_t *)&m_fpul) = (int32_t)FP_RFD(n);
-	} else {              /* PR = 0 */
-		/* read m_fr[n] as float -> truncate -> fpul(32) */
+	}
+	else {              /* PR = 0 */
+	 /* read m_fr[n] as float -> truncate -> fpul(32) */
 		*((int32_t *)&m_fpul) = (int32_t)FP_RFS(n);
 	}
 }
@@ -2897,12 +1212,13 @@ inline void sh34_base_device::FLOAT(const uint16_t opcode)
 	uint32_t n = Rn;
 
 	if (m_fpu_pr) { /* PR = 1 */
-		if(n & 1)
-			fatalerror("SH-4: FLOAT opcode used with n %d",n);
+		if (n & 1)
+			fatalerror("SH-4: FLOAT opcode used with n %d", n);
 
 		n = n & 14;
 		FP_RFD(n) = (double)*((int32_t *)&m_fpul);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = (float)*((int32_t *)&m_fpul);
 	}
 }
@@ -2915,7 +1231,8 @@ inline void sh34_base_device::FNEG(const uint16_t opcode)
 
 	if (m_fpu_pr) { /* PR = 1 */
 		FP_RFD(n) = -FP_RFD(n);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = -FP_RFS(n);
 	}
 }
@@ -2934,7 +1251,8 @@ inline void sh34_base_device::FABS(const uint16_t opcode)
 		n = n & 14;
 		m_fr[n] = m_fr[n] & 0x7fffffff;
 #endif
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		m_fr[n] = m_fr[n] & 0x7fffffff;
 	}
 }
@@ -2949,14 +1267,15 @@ inline void sh34_base_device::FCMP_EQ(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) == FP_RFD(m))
-			m_sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sr &= ~T;
-	} else {              /* PR = 0 */
+			m_sh2_state->sr &= ~SH_T;
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) == FP_RFS(m))
-			m_sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 }
 
@@ -2970,14 +1289,15 @@ inline void sh34_base_device::FCMP_GT(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) > FP_RFD(m))
-			m_sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sr &= ~T;
-	} else {              /* PR = 0 */
+			m_sh2_state->sr &= ~SH_T;
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) > FP_RFS(m))
-			m_sr |= T;
+			m_sh2_state->sr |= SH_T;
 		else
-			m_sr &= ~T;
+			m_sh2_state->sr &= ~SH_T;
 	}
 }
 
@@ -2989,7 +1309,7 @@ inline void sh34_base_device::FCNVDS(const uint16_t opcode)
 	if (m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		if (m_fpscr & RM)
-			m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0,1)] &= 0xe0000000; /* round toward zero*/
+			m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
 		*((float *)&m_fpul) = (float)FP_RFD(n);
 	}
 }
@@ -3015,7 +1335,8 @@ inline void sh34_base_device::FADD(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) + FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) + FP_RFS(m);
 	}
 }
@@ -3030,7 +1351,8 @@ inline void sh34_base_device::FSUB(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) - FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) - FP_RFS(m);
 	}
 }
@@ -3046,7 +1368,8 @@ inline void sh34_base_device::FMUL(const uint16_t opcode)
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) * FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		FP_RFS(n) = FP_RFS(n) * FP_RFS(m);
 	}
 }
@@ -3063,7 +1386,8 @@ inline void sh34_base_device::FDIV(const uint16_t opcode)
 		if (FP_RFD(m) == 0)
 			return;
 		FP_RFD(n) = FP_RFD(n) / FP_RFD(m);
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(m) == 0)
 			return;
 		FP_RFS(n) = FP_RFS(n) / FP_RFS(m);
@@ -3091,7 +1415,8 @@ inline void sh34_base_device::FSQRT(const uint16_t opcode)
 		if (FP_RFD(n) < 0)
 			return;
 		FP_RFD(n) = sqrtf(FP_RFD(n));
-	} else {              /* PR = 0 */
+	}
+	else {              /* PR = 0 */
 		if (FP_RFS(n) < 0)
 			return;
 		FP_RFS(n) = sqrtf(FP_RFS(n));
@@ -3115,9 +1440,9 @@ void sh34_base_device::FSSCA(const uint16_t opcode)
 
 	float angle;
 
-	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float) M_PI;
+	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float)M_PI;
 	FP_RFS(n) = sinf(angle);
-	FP_RFS(n+1) = cosf(angle);
+	FP_RFS(n + 1) = cosf(angle);
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
@@ -3125,15 +1450,15 @@ inline void sh34_base_device::FIPR(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-uint32_t m;
-float ml[4];
-int a;
+	uint32_t m;
+	float ml[4];
+	int a;
 
 	m = (n & 3) << 2;
 	n = n & 12;
 	for (a = 0;a < 4;a++)
-		ml[a] = FP_RFS(n+a) * FP_RFS(m+a);
-	FP_RFS(n+3) = ml[0] + ml[1] + ml[2] + ml[3];
+		ml[a] = FP_RFS(n + a) * FP_RFS(m + a);
+	FP_RFS(n + 3) = ml[0] + ml[1] + ml[2] + ml[3];
 }
 
 /* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
@@ -3141,13 +1466,13 @@ void sh34_base_device::FTRV(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-int i,j;
-float sum[4];
+	int i, j;
+	float sum[4];
 
 	n = n & 12;
 	for (i = 0;i < 4;i++) {
 		sum[i] = 0;
-		for (j=0;j < 4;j++)
+		for (j = 0;j < 4;j++)
 			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + j);
 	}
 	for (i = 0;i < 4;i++)
@@ -3157,25 +1482,27 @@ float sum[4];
 inline void sh34_base_device::op1111_0xf13(const uint16_t opcode)
 {
 	if (opcode & 0x100) {
-			if (opcode & 0x200) {
-				switch (opcode & 0xC00)
-				{
-					case 0x000:
-						FSCHG();
-						break;
-					case 0x800:
-						FRCHG();
-						break;
-					default:
-						machine().debug_break();
-						break;
-				}
-			} else {
-				FTRV(opcode);
+		if (opcode & 0x200) {
+			switch (opcode & 0xC00)
+			{
+			case 0x000:
+				FSCHG();
+				break;
+			case 0x800:
+				FRCHG();
+				break;
+			default:
+				machine().debug_break();
+				break;
 			}
-		} else {
-			FSSCA(opcode);
 		}
+		else {
+			FTRV(opcode);
+		}
+	}
+	else {
+		FSSCA(opcode);
+	}
 }
 
 void sh34_base_device::dbreak(const uint16_t opcode)
@@ -3186,24 +1513,24 @@ void sh34_base_device::dbreak(const uint16_t opcode)
 
 inline void sh34_base_device::op1111_0x13(uint16_t opcode)
 {
-	switch((opcode >> 4) & 0x0f)
+	switch ((opcode >> 4) & 0x0f)
 	{
-		case 0x00:  FSTS(opcode); break;
-		case 0x01:  FLDS(opcode); break;
-		case 0x02:  FLOAT(opcode); break;
-		case 0x03:  FTRC(opcode); break;
-		case 0x04:  FNEG(opcode); break;
-		case 0x05:  FABS(opcode); break;
-		case 0x06:  FSQRT(opcode); break;
-		case 0x07:  FSRRA(opcode); break;
-		case 0x08:  FLDI0(opcode); break;
-		case 0x09:  FLDI1(opcode); break;
-		case 0x0a:  FCNVSD(opcode); break;
-		case 0x0b:  FCNVDS(opcode); break;
-		case 0x0c:  dbreak(opcode); break;
-		case 0x0d:  dbreak(opcode); break;
-		case 0x0e:  FIPR(opcode); break;
-		case 0x0f:  op1111_0xf13(opcode); break;
+	case 0x00:  FSTS(opcode); break;
+	case 0x01:  FLDS(opcode); break;
+	case 0x02:  FLOAT(opcode); break;
+	case 0x03:  FTRC(opcode); break;
+	case 0x04:  FNEG(opcode); break;
+	case 0x05:  FABS(opcode); break;
+	case 0x06:  FSQRT(opcode); break;
+	case 0x07:  FSRRA(opcode); break;
+	case 0x08:  FLDI0(opcode); break;
+	case 0x09:  FLDI1(opcode); break;
+	case 0x0a:  FCNVSD(opcode); break;
+	case 0x0b:  FCNVDS(opcode); break;
+	case 0x0c:  dbreak(opcode); break;
+	case 0x0d:  dbreak(opcode); break;
+	case 0x0e:  FIPR(opcode); break;
+	case 0x0f:  op1111_0xf13(opcode); break;
 	}
 }
 
@@ -3215,20 +1542,20 @@ inline void sh34_base_device::op1111_0x13(uint16_t opcode)
 void sh34_base_device::device_reset()
 {
 	m_spc = 0;
-	m_pr = 0;
-	m_sr = 0;
+	m_sh2_state->pr = 0;
+	m_sh2_state->sr = 0;
 	m_ssr = 0;
-	m_gbr = 0;
-	m_vbr = 0;
-	m_mach = 0;
-	m_macl = 0;
-	memset(m_r, 0, sizeof(m_r));
+	m_sh2_state->gbr = 0;
+	m_sh2_state->vbr = 0;
+	m_sh2_state->mach = 0;
+	m_sh2_state->macl = 0;
+	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
 	memset(m_rbnk, 0, sizeof(m_rbnk));
 	m_sgr = 0;
 	memset(m_fr, 0, sizeof(m_fr));
 	memset(m_xf, 0, sizeof(m_xf));
-	m_ea = 0;
-	m_delay = 0;
+	m_sh2_state->ea = 0;
+	m_sh2_state->m_delay = 0;
 	m_cpu_off = 0;
 	m_pending_irq = 0;
 	m_test_irq = 0;
@@ -3290,10 +1617,10 @@ void sh34_base_device::device_reset()
 
 	m_rtc_timer->adjust(attotime::from_hz(128));
 
-	m_pc = 0xa0000000;
-	m_ppc = m_pc & AM;
-	m_r[15] = RL(4);
-	m_sr = 0x700000f0;
+	m_sh2_state->pc = 0xa0000000;
+	m_ppc = m_sh2_state->pc & SH34_AM;
+	m_sh2_state->r[15] = RL(4);
+	m_sh2_state->sr = 0x700000f0;
 	m_fpscr = 0x00040001;
 	m_fpu_sz = (m_fpscr & SZ) ? 1 : 0;
 	m_fpu_pr = (m_fpscr & PR) ? 1 : 0;
@@ -3302,7 +1629,7 @@ void sh34_base_device::device_reset()
 
 	m_internal_irq_level = -1;
 	m_irln = 15;
-	m_sleep_mode = 0;
+	m_sh2_state->sleep_mode = 0;
 
 	m_sh4_mmu_enabled = 0;
 }
@@ -3338,846 +1665,344 @@ void sh4_base_device::device_reset()
 
 inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 {
-	switch(opcode & 0xff)
+	switch (opcode & 0xff)
 	{
-		// 0x00
-		case 0x00:  NOP(opcode); break;
-		case 0x10:  NOP(opcode); break;
-		case 0x20:  NOP(opcode); break;
-		case 0x30:  NOP(opcode); break;
-		case 0x40:  NOP(opcode); break;
-		case 0x50:  NOP(opcode); break;
-		case 0x60:  NOP(opcode); break;
-		case 0x70:  NOP(opcode); break;
-		case 0x80:  NOP(opcode); break;
-		case 0x90:  NOP(opcode); break;
-		case 0xa0:  NOP(opcode); break;
-		case 0xb0:  NOP(opcode); break;
-		case 0xc0:  NOP(opcode); break;
-		case 0xd0:  NOP(opcode); break;
-		case 0xe0:  NOP(opcode); break;
-		case 0xf0:  NOP(opcode); break;
-		// 0x10
-		case 0x01:  NOP(opcode); break;
-		case 0x11:  NOP(opcode); break;
-		case 0x21:  NOP(opcode); break;
-		case 0x31:  NOP(opcode); break;
-		case 0x41:  NOP(opcode); break;
-		case 0x51:  NOP(opcode); break;
-		case 0x61:  NOP(opcode); break;
-		case 0x71:  NOP(opcode); break;
-		case 0x81:  NOP(opcode); break;
-		case 0x91:  NOP(opcode); break;
-		case 0xa1:  NOP(opcode); break;
-		case 0xb1:  NOP(opcode); break;
-		case 0xc1:  NOP(opcode); break;
-		case 0xd1:  NOP(opcode); break;
-		case 0xe1:  NOP(opcode); break;
-		case 0xf1:  NOP(opcode); break;
-		// 0x20
-		case 0x02:  STCSR(opcode); break;
-		case 0x12:  STCGBR(opcode); break;
-		case 0x22:  STCVBR(opcode); break;
-		case 0x32:  STCSSR(opcode); break;
-		case 0x42:  STCSPC(opcode); break;
-		case 0x52:  NOP(opcode); break;
-		case 0x62:  NOP(opcode); break;
-		case 0x72:  NOP(opcode); break;
-		case 0x82:  STCRBANK(opcode); break;
-		case 0x92:  STCRBANK(opcode); break;
-		case 0xa2:  STCRBANK(opcode); break;
-		case 0xb2:  STCRBANK(opcode); break;
-		case 0xc2:  STCRBANK(opcode); break;
-		case 0xd2:  STCRBANK(opcode); break;
-		case 0xe2:  STCRBANK(opcode); break;
-		case 0xf2:  STCRBANK(opcode); break;
-		// 0x30
-		case 0x03:  BSRF(opcode); break;
-		case 0x13:  NOP(opcode); break;
-		case 0x23:  BRAF(opcode); break;
-		case 0x33:  NOP(opcode); break;
-		case 0x43:  NOP(opcode); break;
-		case 0x53:  NOP(opcode); break;
-		case 0x63:  NOP(opcode); break;
-		case 0x73:  NOP(opcode); break;
-		case 0x83:  PREFM(opcode); break;
-		case 0x93:  TODO(opcode); break;
-		case 0xa3:  TODO(opcode); break;
-		case 0xb3:  TODO(opcode); break;
-		case 0xc3:  MOVCAL(opcode); break;
-		case 0xd3:  NOP(opcode); break;
-		case 0xe3:  NOP(opcode); break;
-		case 0xf3:  NOP(opcode); break;
-		// 0x40
-		case 0x04:  MOVBS0(opcode); break;
-		case 0x14:  MOVBS0(opcode); break;
-		case 0x24:  MOVBS0(opcode); break;
-		case 0x34:  MOVBS0(opcode); break;
-		case 0x44:  MOVBS0(opcode); break;
-		case 0x54:  MOVBS0(opcode); break;
-		case 0x64:  MOVBS0(opcode); break;
-		case 0x74:  MOVBS0(opcode); break;
-		case 0x84:  MOVBS0(opcode); break;
-		case 0x94:  MOVBS0(opcode); break;
-		case 0xa4:  MOVBS0(opcode); break;
-		case 0xb4:  MOVBS0(opcode); break;
-		case 0xc4:  MOVBS0(opcode); break;
-		case 0xd4:  MOVBS0(opcode); break;
-		case 0xe4:  MOVBS0(opcode); break;
-		case 0xf4:  MOVBS0(opcode); break;
-		// 0x50
-		case 0x05:  MOVWS0(opcode); break;
-		case 0x15:  MOVWS0(opcode); break;
-		case 0x25:  MOVWS0(opcode); break;
-		case 0x35:  MOVWS0(opcode); break;
-		case 0x45:  MOVWS0(opcode); break;
-		case 0x55:  MOVWS0(opcode); break;
-		case 0x65:  MOVWS0(opcode); break;
-		case 0x75:  MOVWS0(opcode); break;
-		case 0x85:  MOVWS0(opcode); break;
-		case 0x95:  MOVWS0(opcode); break;
-		case 0xa5:  MOVWS0(opcode); break;
-		case 0xb5:  MOVWS0(opcode); break;
-		case 0xc5:  MOVWS0(opcode); break;
-		case 0xd5:  MOVWS0(opcode); break;
-		case 0xe5:  MOVWS0(opcode); break;
-		case 0xf5:  MOVWS0(opcode); break;
-		// 0x60
-		case 0x06:  MOVLS0(opcode); break;
-		case 0x16:  MOVLS0(opcode); break;
-		case 0x26:  MOVLS0(opcode); break;
-		case 0x36:  MOVLS0(opcode); break;
-		case 0x46:  MOVLS0(opcode); break;
-		case 0x56:  MOVLS0(opcode); break;
-		case 0x66:  MOVLS0(opcode); break;
-		case 0x76:  MOVLS0(opcode); break;
-		case 0x86:  MOVLS0(opcode); break;
-		case 0x96:  MOVLS0(opcode); break;
-		case 0xa6:  MOVLS0(opcode); break;
-		case 0xb6:  MOVLS0(opcode); break;
-		case 0xc6:  MOVLS0(opcode); break;
-		case 0xd6:  MOVLS0(opcode); break;
-		case 0xe6:  MOVLS0(opcode); break;
-		case 0xf6:  MOVLS0(opcode); break;
-		// 0x70
-		case 0x07:  MULL(opcode); break;
-		case 0x17:  MULL(opcode); break;
-		case 0x27:  MULL(opcode); break;
-		case 0x37:  MULL(opcode); break;
-		case 0x47:  MULL(opcode); break;
-		case 0x57:  MULL(opcode); break;
-		case 0x67:  MULL(opcode); break;
-		case 0x77:  MULL(opcode); break;
-		case 0x87:  MULL(opcode); break;
-		case 0x97:  MULL(opcode); break;
-		case 0xa7:  MULL(opcode); break;
-		case 0xb7:  MULL(opcode); break;
-		case 0xc7:  MULL(opcode); break;
-		case 0xd7:  MULL(opcode); break;
-		case 0xe7:  MULL(opcode); break;
-		case 0xf7:  MULL(opcode); break;
-		// 0x80
-		case 0x08:  CLRT(opcode); break;
-		case 0x18:  SETT(opcode); break;
-		case 0x28:  CLRMAC(opcode); break;
-		case 0x38:  LDTLB(opcode); break;
-		case 0x48:  CLRS(opcode); break;
-		case 0x58:  SETS(opcode); break;
-		case 0x68:  NOP(opcode); break;
-		case 0x78:  NOP(opcode); break;
-		case 0x88:  CLRT(opcode); break;
-		case 0x98:  SETT(opcode); break;
-		case 0xa8:  CLRMAC(opcode); break;
-		case 0xb8:  LDTLB(opcode); break;
-		case 0xc8:  CLRS(opcode); break;
-		case 0xd8:  SETS(opcode); break;
-		case 0xe8:  NOP(opcode); break;
-		case 0xf8:  NOP(opcode); break;
-		// 0x90
-		case 0x09:  NOP(opcode); break;
-		case 0x19:  DIV0U(opcode); break;
-		case 0x29:  MOVT(opcode); break;
-		case 0x39:  NOP(opcode); break;
-		case 0x49:  NOP(opcode); break;
-		case 0x59:  DIV0U(opcode); break;
-		case 0x69:  MOVT(opcode); break;
-		case 0x79:  NOP(opcode); break;
-		case 0x89:  NOP(opcode); break;
-		case 0x99:  DIV0U(opcode); break;
-		case 0xa9:  MOVT(opcode); break;
-		case 0xb9:  NOP(opcode); break;
-		case 0xc9:  NOP(opcode); break;
-		case 0xd9:  DIV0U(opcode); break;
-		case 0xe9:  MOVT(opcode); break;
-		case 0xf9:  NOP(opcode); break;
-		// 0xa0
-		case 0x0a:  STSMACH(opcode); break;
-		case 0x1a:  STSMACL(opcode); break;
-		case 0x2a:  STSPR(opcode); break;
-		case 0x3a:  STCSGR(opcode); break;
-		case 0x4a:  NOP(opcode); break;
-		case 0x5a:  STSFPUL(opcode); break;
-		case 0x6a:  STSFPSCR(opcode); break;
-		case 0x7a:  STCDBR(opcode); break;
-		case 0x8a:  STSMACH(opcode); break;
-		case 0x9a:  STSMACL(opcode); break;
-		case 0xaa:  STSPR(opcode); break;
-		case 0xba:  STCSGR(opcode); break;
-		case 0xca:  NOP(opcode); break;
-		case 0xda:  STSFPUL(opcode); break;
-		case 0xea:  STSFPSCR(opcode); break;
-		case 0xfa:  STCDBR(opcode); break;
-		// 0xb0
-		case 0x0b:  RTS(opcode); break;
-		case 0x1b:  SLEEP(opcode); break;
-		case 0x2b:  RTE(opcode); break;
-		case 0x3b:  NOP(opcode); break;
-		case 0x4b:  RTS(opcode); break;
-		case 0x5b:  SLEEP(opcode); break;
-		case 0x6b:  RTE(opcode); break;
-		case 0x7b:  NOP(opcode); break;
-		case 0x8b:  RTS(opcode); break;
-		case 0x9b:  SLEEP(opcode); break;
-		case 0xab:  RTE(opcode); break;
-		case 0xbb:  NOP(opcode); break;
-		case 0xcb:  RTS(opcode); break;
-		case 0xdb:  SLEEP(opcode); break;
-		case 0xeb:  RTE(opcode); break;
-		case 0xfb:  NOP(opcode); break;
-		// 0xc0
-		case 0x0c:  MOVBL0(opcode); break;
-		case 0x1c:  MOVBL0(opcode); break;
-		case 0x2c:  MOVBL0(opcode); break;
-		case 0x3c:  MOVBL0(opcode); break;
-		case 0x4c:  MOVBL0(opcode); break;
-		case 0x5c:  MOVBL0(opcode); break;
-		case 0x6c:  MOVBL0(opcode); break;
-		case 0x7c:  MOVBL0(opcode); break;
-		case 0x8c:  MOVBL0(opcode); break;
-		case 0x9c:  MOVBL0(opcode); break;
-		case 0xac:  MOVBL0(opcode); break;
-		case 0xbc:  MOVBL0(opcode); break;
-		case 0xcc:  MOVBL0(opcode); break;
-		case 0xdc:  MOVBL0(opcode); break;
-		case 0xec:  MOVBL0(opcode); break;
-		case 0xfc:  MOVBL0(opcode); break;
-		// 0xd0
-		case 0x0d:  MOVWL0(opcode); break;
-		case 0x1d:  MOVWL0(opcode); break;
-		case 0x2d:  MOVWL0(opcode); break;
-		case 0x3d:  MOVWL0(opcode); break;
-		case 0x4d:  MOVWL0(opcode); break;
-		case 0x5d:  MOVWL0(opcode); break;
-		case 0x6d:  MOVWL0(opcode); break;
-		case 0x7d:  MOVWL0(opcode); break;
-		case 0x8d:  MOVWL0(opcode); break;
-		case 0x9d:  MOVWL0(opcode); break;
-		case 0xad:  MOVWL0(opcode); break;
-		case 0xbd:  MOVWL0(opcode); break;
-		case 0xcd:  MOVWL0(opcode); break;
-		case 0xdd:  MOVWL0(opcode); break;
-		case 0xed:  MOVWL0(opcode); break;
-		case 0xfd:  MOVWL0(opcode); break;
-		// 0xe0
-		case 0x0e:  MOVLL0(opcode); break;
-		case 0x1e:  MOVLL0(opcode); break;
-		case 0x2e:  MOVLL0(opcode); break;
-		case 0x3e:  MOVLL0(opcode); break;
-		case 0x4e:  MOVLL0(opcode); break;
-		case 0x5e:  MOVLL0(opcode); break;
-		case 0x6e:  MOVLL0(opcode); break;
-		case 0x7e:  MOVLL0(opcode); break;
-		case 0x8e:  MOVLL0(opcode); break;
-		case 0x9e:  MOVLL0(opcode); break;
-		case 0xae:  MOVLL0(opcode); break;
-		case 0xbe:  MOVLL0(opcode); break;
-		case 0xce:  MOVLL0(opcode); break;
-		case 0xde:  MOVLL0(opcode); break;
-		case 0xee:  MOVLL0(opcode); break;
-		case 0xfe:  MOVLL0(opcode); break;
-		// 0xf0
-		case 0x0f:  MAC_L(opcode); break;
-		case 0x1f:  MAC_L(opcode); break;
-		case 0x2f:  MAC_L(opcode); break;
-		case 0x3f:  MAC_L(opcode); break;
-		case 0x4f:  MAC_L(opcode); break;
-		case 0x5f:  MAC_L(opcode); break;
-		case 0x6f:  MAC_L(opcode); break;
-		case 0x7f:  MAC_L(opcode); break;
-		case 0x8f:  MAC_L(opcode); break;
-		case 0x9f:  MAC_L(opcode); break;
-		case 0xaf:  MAC_L(opcode); break;
-		case 0xbf:  MAC_L(opcode); break;
-		case 0xcf:  MAC_L(opcode); break;
-		case 0xdf:  MAC_L(opcode); break;
-		case 0xef:  MAC_L(opcode); break;
-		case 0xff:  MAC_L(opcode); break;
+	default:
+		// fall through to SH2 handlers
+		sh_common_execution::execute_one_0000(opcode); break;
+
+	case 0x52:
+	case 0x62:
+	case 0x43:
+	case 0x63:
+	case 0xe3:
+	case 0x68:
+	case 0xe8:
+	case 0x4a:
+	case 0xca:
+		ILLEGAL(); break; // illegal on sh4
+
+	case 0x93:
+	case 0xa3:
+	case 0xb3:
+		TODO(opcode); break;
+
+	case 0x82:
+	case 0x92:
+	case 0xa2:
+	case 0xb2:
+	case 0xc2:
+	case 0xd2:
+	case 0xe2:
+	case 0xf2:
+		STCRBANK(opcode); break; // sh4 only
+
+	case 0x32:  STCSSR(opcode); break; // sh4 only
+	case 0x42:  STCSPC(opcode); break; // sh4 only
+	case 0x83:  PREFM(opcode); break; // sh4 only
+	case 0xc3:  MOVCAL(opcode); break; // sh4 only
+
+	case 0x38:
+	case 0xb8:
+		LDTLB(opcode); break; // sh4 only
+
+	case 0x48:
+	case 0xc8:
+		CLRS(opcode); break; // sh4 only
+
+	case 0x58:
+	case 0xd8:
+		SETS(opcode); break; // sh4 only
+
+	case 0x3a:
+	case 0xba:
+		STCSGR(opcode); break; // sh4 only
+
+	case 0x5a:
+	case 0xda:
+		STSFPUL(opcode); break; // sh4 only
+
+	case 0x6a:
+	case 0xea:
+		STSFPSCR(opcode); break; // sh4 only
+
+	case 0x7a:
+	case 0xfa:
+		STCDBR(opcode); break; // sh4 only
 	}
 }
 
 inline void sh34_base_device::execute_one_4000(const uint16_t opcode)
 {
-	switch(opcode & 0xff)
+	switch (opcode & 0xff)
 	{
-		// 0x00
-		case 0x00:  SHLL(opcode); break;
-		case 0x10:  DT(opcode); break;
-		case 0x20:  SHAL(opcode); break;
-		case 0x30:  NOP(opcode); break;
-		case 0x40:  SHLL(opcode); break;
-		case 0x50:  DT(opcode); break;
-		case 0x60:  SHAL(opcode); break;
-		case 0x70:  NOP(opcode); break;
-		case 0x80:  SHLL(opcode); break;
-		case 0x90:  DT(opcode); break;
-		case 0xa0:  SHAL(opcode); break;
-		case 0xb0:  NOP(opcode); break;
-		case 0xc0:  SHLL(opcode); break;
-		case 0xd0:  DT(opcode); break;
-		case 0xe0:  SHAL(opcode); break;
-		case 0xf0:  NOP(opcode); break;
-		// 0x10
-		case 0x01:  SHLR(opcode); break;
-		case 0x11:  CMPPZ(opcode); break;
-		case 0x21:  SHAR(opcode); break;
-		case 0x31:  NOP(opcode); break;
-		case 0x41:  SHLR(opcode); break;
-		case 0x51:  CMPPZ(opcode); break;
-		case 0x61:  SHAR(opcode); break;
-		case 0x71:  NOP(opcode); break;
-		case 0x81:  SHLR(opcode); break;
-		case 0x91:  CMPPZ(opcode); break;
-		case 0xa1:  SHAR(opcode); break;
-		case 0xb1:  NOP(opcode); break;
-		case 0xc1:  SHLR(opcode); break;
-		case 0xd1:  CMPPZ(opcode); break;
-		case 0xe1:  SHAR(opcode); break;
-		case 0xf1:  NOP(opcode); break;
-		// 0x20
-		case 0x02:  STSMMACH(opcode); break;
-		case 0x12:  STSMMACL(opcode); break;
-		case 0x22:  STSMPR(opcode); break;
-		case 0x32:  STCMSGR(opcode); break;
-		case 0x42:  NOP(opcode); break;
-		case 0x52:  STSMFPUL(opcode); break;
-		case 0x62:  STSMFPSCR(opcode); break;
-		case 0x72:  NOP(opcode); break;
-		case 0x82:  NOP(opcode); break;
-		case 0x92:  NOP(opcode); break;
-		case 0xa2:  NOP(opcode); break;
-		case 0xb2:  NOP(opcode); break;
-		case 0xc2:  NOP(opcode); break;
-		case 0xd2:  NOP(opcode); break;
-		case 0xe2:  NOP(opcode); break;
-		case 0xf2:  STCMDBR(opcode); break;
-		// 0x30
-		case 0x03:  STCMSR(opcode); break;
-		case 0x13:  STCMGBR(opcode); break;
-		case 0x23:  STCMVBR(opcode); break;
-		case 0x33:  STCMSSR(opcode); break;
-		case 0x43:  STCMSPC(opcode); break;
-		case 0x53:  NOP(opcode); break;
-		case 0x63:  NOP(opcode); break;
-		case 0x73:  NOP(opcode); break;
-		case 0x83:  STCMRBANK(opcode); break;
-		case 0x93:  STCMRBANK(opcode); break;
-		case 0xa3:  STCMRBANK(opcode); break;
-		case 0xb3:  STCMRBANK(opcode); break;
-		case 0xc3:  STCMRBANK(opcode); break;
-		case 0xd3:  STCMRBANK(opcode); break;
-		case 0xe3:  STCMRBANK(opcode); break;
-		case 0xf3:  STCMRBANK(opcode); break;
-		// 0x40
-		case 0x04:  ROTL(opcode); break;
-		case 0x14:  NOP(opcode); break;
-		case 0x24:  ROTCL(opcode); break;
-		case 0x34:  NOP(opcode); break;
-		case 0x44:  ROTL(opcode); break;
-		case 0x54:  NOP(opcode); break;
-		case 0x64:  ROTCL(opcode); break;
-		case 0x74:  NOP(opcode); break;
-		case 0x84:  ROTL(opcode); break;
-		case 0x94:  NOP(opcode); break;
-		case 0xa4:  ROTCL(opcode); break;
-		case 0xb4:  NOP(opcode); break;
-		case 0xc4:  ROTL(opcode); break;
-		case 0xd4:  NOP(opcode); break;
-		case 0xe4:  ROTCL(opcode); break;
-		case 0xf4:  NOP(opcode); break;
-		// 0x50
-		case 0x05:  ROTR(opcode); break;
-		case 0x15:  CMPPL(opcode); break;
-		case 0x25:  ROTCR(opcode); break;
-		case 0x35:  NOP(opcode); break;
-		case 0x45:  ROTR(opcode); break;
-		case 0x55:  CMPPL(opcode); break;
-		case 0x65:  ROTCR(opcode); break;
-		case 0x75:  NOP(opcode); break;
-		case 0x85:  ROTR(opcode); break;
-		case 0x95:  CMPPL(opcode); break;
-		case 0xa5:  ROTCR(opcode); break;
-		case 0xb5:  NOP(opcode); break;
-		case 0xc5:  ROTR(opcode); break;
-		case 0xd5:  CMPPL(opcode); break;
-		case 0xe5:  ROTCR(opcode); break;
-		case 0xf5:  NOP(opcode); break;
-		// 0x60
-		case 0x06:  LDSMMACH(opcode); break;
-		case 0x16:  LDSMMACL(opcode); break;
-		case 0x26:  LDSMPR(opcode); break;
-		case 0x36:  NOP(opcode); break;
-		case 0x46:  NOP(opcode); break;
-		case 0x56:  LDSMFPUL(opcode); break;
-		case 0x66:  LDSMFPSCR(opcode); break;
-		case 0x76:  NOP(opcode); break;
-		case 0x86:  NOP(opcode); break;
-		case 0x96:  NOP(opcode); break;
-		case 0xa6:  NOP(opcode); break;
-		case 0xb6:  NOP(opcode); break;
-		case 0xc6:  NOP(opcode); break;
-		case 0xd6:  NOP(opcode); break;
-		case 0xe6:  NOP(opcode); break;
-		case 0xf6:  LDCMDBR(opcode); break;
-		// 0x70
-		case 0x07:  LDCMSR(opcode); break;
-		case 0x17:  LDCMGBR(opcode); break;
-		case 0x27:  LDCMVBR(opcode); break;
-		case 0x37:  LDCMSSR(opcode); break;
-		case 0x47:  LDCMSPC(opcode); break;
-		case 0x57:  NOP(opcode); break;
-		case 0x67:  NOP(opcode); break;
-		case 0x77:  NOP(opcode); break;
-		case 0x87:  LDCMRBANK(opcode); break;
-		case 0x97:  LDCMRBANK(opcode); break;
-		case 0xa7:  LDCMRBANK(opcode); break;
-		case 0xb7:  LDCMRBANK(opcode); break;
-		case 0xc7:  LDCMRBANK(opcode); break;
-		case 0xd7:  LDCMRBANK(opcode); break;
-		case 0xe7:  LDCMRBANK(opcode); break;
-		case 0xf7:  LDCMRBANK(opcode); break;
-		// 0x80
-		case 0x08:  SHLL2(opcode); break;
-		case 0x18:  SHLL8(opcode); break;
-		case 0x28:  SHLL16(opcode); break;
-		case 0x38:  NOP(opcode); break;
-		case 0x48:  SHLL2(opcode); break;
-		case 0x58:  SHLL8(opcode); break;
-		case 0x68:  SHLL16(opcode); break;
-		case 0x78:  NOP(opcode); break;
-		case 0x88:  SHLL2(opcode); break;
-		case 0x98:  SHLL8(opcode); break;
-		case 0xa8:  SHLL16(opcode); break;
-		case 0xb8:  NOP(opcode); break;
-		case 0xc8:  SHLL2(opcode); break;
-		case 0xd8:  SHLL8(opcode); break;
-		case 0xe8:  SHLL16(opcode); break;
-		case 0xf8:  NOP(opcode); break;
-		// 0x90
-		case 0x09:  SHLR2(opcode); break;
-		case 0x19:  SHLR8(opcode); break;
-		case 0x29:  SHLR16(opcode); break;
-		case 0x39:  NOP(opcode); break;
-		case 0x49:  SHLR2(opcode); break;
-		case 0x59:  SHLR8(opcode); break;
-		case 0x69:  SHLR16(opcode); break;
-		case 0x79:  NOP(opcode); break;
-		case 0x89:  SHLR2(opcode); break;
-		case 0x99:  SHLR8(opcode); break;
-		case 0xa9:  SHLR16(opcode); break;
-		case 0xb9:  NOP(opcode); break;
-		case 0xc9:  SHLR2(opcode); break;
-		case 0xd9:  SHLR8(opcode); break;
-		case 0xe9:  SHLR16(opcode); break;
-		case 0xf9:  NOP(opcode); break;
-		// 0xa0
-		case 0x0a:  LDSMACH(opcode); break;
-		case 0x1a:  LDSMACL(opcode); break;
-		case 0x2a:  LDSPR(opcode); break;
-		case 0x3a:  NOP(opcode); break;
-		case 0x4a:  NOP(opcode); break;
-		case 0x5a:  LDSFPUL(opcode); break;
-		case 0x6a:  LDSFPSCR(opcode); break;
-		case 0x7a:  NOP(opcode); break;
-		case 0x8a:  NOP(opcode); break;
-		case 0x9a:  NOP(opcode); break;
-		case 0xaa:  NOP(opcode); break;
-		case 0xba:  NOP(opcode); break;
-		case 0xca:  NOP(opcode); break;
-		case 0xda:  NOP(opcode); break;
-		case 0xea:  NOP(opcode); break;
-		case 0xfa:  LDCDBR(opcode); break;
-		// 0xb0
-		case 0x0b:  JSR(opcode); break;
-		case 0x1b:  TAS(opcode); break;
-		case 0x2b:  JMP(opcode); break;
-		case 0x3b:  NOP(opcode); break;
-		case 0x4b:  JSR(opcode); break;
-		case 0x5b:  TAS(opcode); break;
-		case 0x6b:  JMP(opcode); break;
-		case 0x7b:  NOP(opcode); break;
-		case 0x8b:  JSR(opcode); break;
-		case 0x9b:  TAS(opcode); break;
-		case 0xab:  JMP(opcode); break;
-		case 0xbb:  NOP(opcode); break;
-		case 0xcb:  JSR(opcode); break;
-		case 0xdb:  TAS(opcode); break;
-		case 0xeb:  JMP(opcode); break;
-		case 0xfb:  NOP(opcode); break;
-		// 0xc0
-		case 0x0c:  SHAD(opcode); break;
-		case 0x1c:  SHAD(opcode); break;
-		case 0x2c:  SHAD(opcode); break;
-		case 0x3c:  SHAD(opcode); break;
-		case 0x4c:  SHAD(opcode); break;
-		case 0x5c:  SHAD(opcode); break;
-		case 0x6c:  SHAD(opcode); break;
-		case 0x7c:  SHAD(opcode); break;
-		case 0x8c:  SHAD(opcode); break;
-		case 0x9c:  SHAD(opcode); break;
-		case 0xac:  SHAD(opcode); break;
-		case 0xbc:  SHAD(opcode); break;
-		case 0xcc:  SHAD(opcode); break;
-		case 0xdc:  SHAD(opcode); break;
-		case 0xec:  SHAD(opcode); break;
-		case 0xfc:  SHAD(opcode); break;
-		// 0xd0
-		case 0x0d:  SHLD(opcode); break;
-		case 0x1d:  SHLD(opcode); break;
-		case 0x2d:  SHLD(opcode); break;
-		case 0x3d:  SHLD(opcode); break;
-		case 0x4d:  SHLD(opcode); break;
-		case 0x5d:  SHLD(opcode); break;
-		case 0x6d:  SHLD(opcode); break;
-		case 0x7d:  SHLD(opcode); break;
-		case 0x8d:  SHLD(opcode); break;
-		case 0x9d:  SHLD(opcode); break;
-		case 0xad:  SHLD(opcode); break;
-		case 0xbd:  SHLD(opcode); break;
-		case 0xcd:  SHLD(opcode); break;
-		case 0xdd:  SHLD(opcode); break;
-		case 0xed:  SHLD(opcode); break;
-		case 0xfd:  SHLD(opcode); break;
-		// 0xe0
-		case 0x0e:  LDCSR(opcode); break;
-		case 0x1e:  LDCGBR(opcode); break;
-		case 0x2e:  LDCVBR(opcode); break;
-		case 0x3e:  LDCSSR(opcode); break;
-		case 0x4e:  LDCSPC(opcode); break;
-		case 0x5e:  NOP(opcode); break;
-		case 0x6e:  NOP(opcode); break;
-		case 0x7e:  NOP(opcode); break;
-		case 0x8e:  LDCRBANK(opcode); break;
-		case 0x9e:  LDCRBANK(opcode); break;
-		case 0xae:  LDCRBANK(opcode); break;
-		case 0xbe:  LDCRBANK(opcode); break;
-		case 0xce:  LDCRBANK(opcode); break;
-		case 0xde:  LDCRBANK(opcode); break;
-		case 0xee:  LDCRBANK(opcode); break;
-		case 0xfe:  LDCRBANK(opcode); break;
-		// 0xf0
-		case 0x0f:  MAC_W(opcode); break;
-		case 0x1f:  MAC_W(opcode); break;
-		case 0x2f:  MAC_W(opcode); break;
-		case 0x3f:  MAC_W(opcode); break;
-		case 0x4f:  MAC_W(opcode); break;
-		case 0x5f:  MAC_W(opcode); break;
-		case 0x6f:  MAC_W(opcode); break;
-		case 0x7f:  MAC_W(opcode); break;
-		case 0x8f:  MAC_W(opcode); break;
-		case 0x9f:  MAC_W(opcode); break;
-		case 0xaf:  MAC_W(opcode); break;
-		case 0xbf:  MAC_W(opcode); break;
-		case 0xcf:  MAC_W(opcode); break;
-		case 0xdf:  MAC_W(opcode); break;
-		case 0xef:  MAC_W(opcode); break;
-		case 0xff:  MAC_W(opcode); break;
+
+	default: // LDCMSR (0x0e) has sh2/4 flag difference
+		// fall through to SH2 handlers
+		sh_common_execution::execute_one_4000(opcode); break;
+
+	case 0x42:
+	case 0x46:
+	case 0x4a:
+	case 0x53:
+	case 0x57:
+	case 0x5e:
+	case 0x63:
+	case 0x67:
+	case 0x6e:
+	case 0x82:
+	case 0x86:
+	case 0x8a:
+	case 0x92:
+	case 0x96:
+	case 0x9a:
+	case 0xa2:
+	case 0xa6:
+	case 0xaa:
+	case 0xc2:
+	case 0xc6:
+	case 0xca:
+	case 0xd2:
+	case 0xd6:
+	case 0xda:
+	case 0xe2:
+	case 0xe6:
+	case 0xea:
+		ILLEGAL(); break; // defined as illegal on SH4
+
+	case 0x0c:
+	case 0x1c:
+	case 0x2c:
+	case 0x3c:
+	case 0x4c:
+	case 0x5c:
+	case 0x6c:
+	case 0x7c:
+	case 0x8c:
+	case 0x9c:
+	case 0xac:
+	case 0xbc:
+	case 0xcc:
+	case 0xdc:
+	case 0xec:
+	case 0xfc:
+		SHAD(opcode); break; // sh3/4 only
+
+	case 0x0d:
+	case 0x1d:
+	case 0x2d:
+	case 0x3d:
+	case 0x4d:
+	case 0x5d:
+	case 0x6d:
+	case 0x7d:
+	case 0x8d:
+	case 0x9d:
+	case 0xad:
+	case 0xbd:
+	case 0xcd:
+	case 0xdd:
+	case 0xed:
+	case 0xfd:
+		SHLD(opcode); break; // sh3/4 only
+
+	case 0x8e:
+	case 0x9e:
+	case 0xae:
+	case 0xbe:
+	case 0xce:
+	case 0xde:
+	case 0xee:
+	case 0xfe:
+		LDCRBANK(opcode); break; // sh3/4 only
+
+	case 0x83:
+	case 0x93:
+	case 0xa3:
+	case 0xb3:
+	case 0xc3:
+	case 0xd3:
+	case 0xe3:
+	case 0xf3:
+		STCMRBANK(opcode); break; // sh3/4 only
+
+	case 0x87:
+	case 0x97:
+	case 0xa7:
+	case 0xb7:
+	case 0xc7:
+	case 0xd7:
+	case 0xe7:
+	case 0xf7:
+		LDCMRBANK(opcode); break; // sh3/4 only
+
+	case 0x32:  STCMSGR(opcode); break; // sh4 only
+	case 0x33:  STCMSSR(opcode); break; // sh4 only
+	case 0x37:  LDCMSSR(opcode); break; // sh4 only
+	case 0x3e:  LDCSSR(opcode); break; // sh4 only
+	case 0x43:  STCMSPC(opcode); break; // sh4 only
+	case 0x47:  LDCMSPC(opcode); break; // sh4 only
+	case 0x4e:  LDCSPC(opcode); break; // sh4 only
+	case 0x52:  STSMFPUL(opcode); break; // sh4 only
+	case 0x56:  LDSMFPUL(opcode); break; // sh4 only
+	case 0x5a:  LDSFPUL(opcode); break; // sh4 only
+	case 0x62:  STSMFPSCR(opcode); break; // sh4 only
+	case 0x66:  LDSMFPSCR(opcode); break; // sh4 only
+	case 0x6a:  LDSFPSCR(opcode); break; // sh4 only
+	case 0xf2:  STCMDBR(opcode); break; // sh4 only
+	case 0xf6:  LDCMDBR(opcode); break; // sh4 only
+	case 0xfa:  LDCDBR(opcode); break; // sh4 only
+
 	}
 }
 
-
-inline void sh34_base_device::execute_one(const uint16_t opcode)
+inline void sh34_base_device::execute_one_f000(const uint16_t opcode)
 {
-	switch(opcode & 0xf000)
+	// the SH3 doesn't have these?
+
+	switch (opcode & 0x0f)
 	{
-		case 0x0000:
-			execute_one_0000(opcode);
-			break;
-
-		case 0x1000:
-			MOVLS4(opcode);
-			break;
-
-		case 0x2000:
-			switch(opcode & 0x0f)
-			{
-				case 0x00:  MOVBS(opcode); break;
-				case 0x01:  MOVWS(opcode); break;
-				case 0x02:  MOVLS(opcode); break;
-				case 0x03:  NOP(opcode); break;
-				case 0x04:  MOVBM(opcode); break;
-				case 0x05:  MOVWM(opcode); break;
-				case 0x06:  MOVLM(opcode); break;
-				case 0x07:  DIV0S(opcode); break;
-				case 0x08:  TST(opcode); break;
-				case 0x09:  AND(opcode); break;
-				case 0x0a:  XOR(opcode); break;
-				case 0x0b:  OR(opcode); break;
-				case 0x0c:  CMPSTR(opcode); break;
-				case 0x0d:  XTRCT(opcode); break;
-				case 0x0e:  MULU(opcode); break;
-				case 0x0f:  MULS(opcode); break;
-			}
-			break;
-
-		case 0x3000:
-			switch(opcode & 0x0f)
-			{
-				case 0x00:  CMPEQ(opcode); break;
-				case 0x01:  NOP(opcode); break;
-				case 0x02:  CMPHS(opcode); break;
-				case 0x03:  CMPGE(opcode); break;
-				case 0x04:  DIV1(opcode); break;
-				case 0x05:  DMULU(opcode); break;
-				case 0x06:  CMPHI(opcode); break;
-				case 0x07:  CMPGT(opcode); break;
-				case 0x08:  SUB(opcode); break;
-				case 0x09:  NOP(opcode); break;
-				case 0x0a:  SUBC(opcode); break;
-				case 0x0b:  SUBV(opcode); break;
-				case 0x0c:  ADD(opcode); break;
-				case 0x0d:  DMULS(opcode); break;
-				case 0x0e:  ADDC(opcode); break;
-				case 0x0f:  ADDV(opcode); break;
-			}
-			break;
-
-		case 0x4000:
-			execute_one_4000(opcode);
-			break;
-
-		case 0x5000:
-			MOVLL4(opcode);
-			break;
-
-		case 0x6000:
-			switch(opcode & 0x0f)
-			{
-				case 0x00:  MOVBL(opcode); break;
-				case 0x01:  MOVWL(opcode); break;
-				case 0x02:  MOVLL(opcode); break;
-				case 0x03:  MOV(opcode); break;
-				case 0x04:  MOVBP(opcode); break;
-				case 0x05:  MOVWP(opcode); break;
-				case 0x06:  MOVLP(opcode); break;
-				case 0x07:  NOT(opcode); break;
-				case 0x08:  SWAPB(opcode); break;
-				case 0x09:  SWAPW(opcode); break;
-				case 0x0a:  NEGC(opcode); break;
-				case 0x0b:  NEG(opcode); break;
-				case 0x0c:  EXTUB(opcode); break;
-				case 0x0d:  EXTUW(opcode); break;
-				case 0x0e:  EXTSB(opcode); break;
-				case 0x0f:  EXTSW(opcode); break;
-			}
-			break;
-
-		case 0x7000:
-			ADDI(opcode);
-			break;
-
-		case 0x8000:
-			switch((opcode >> 8) & 0x0f)
-			{
-				case 0x00:  MOVBS4(opcode); break;
-				case 0x01:  MOVWS4(opcode); break;
-				case 0x02:  NOP(opcode); break;
-				case 0x03:  NOP(opcode); break;
-				case 0x04:  MOVBL4(opcode); break;
-				case 0x05:  MOVWL4(opcode); break;
-				case 0x06:  NOP(opcode); break;
-				case 0x07:  NOP(opcode); break;
-				case 0x08:  CMPIM(opcode); break;
-				case 0x09:  BT(opcode); break;
-				case 0x0a:  NOP(opcode); break;
-				case 0x0b:  BF(opcode); break;
-				case 0x0c:  NOP(opcode); break;
-				case 0x0d:  BTS(opcode); break;
-				case 0x0e:  NOP(opcode); break;
-				case 0x0f:  BFS(opcode); break;
-			}
-			break;
-
-		case 0x9000:
-			MOVWI(opcode);
-			break;
-
-		case 0xa000:
-			BRA(opcode);
-			break;
-
-		case 0xb000:
-			BSR(opcode);
-			break;
-
-		case 0xc000:
-			switch((opcode >> 8) & 0x0f)
-			{
-				case 0x00:  MOVBSG(opcode); break;
-				case 0x01:  MOVWSG(opcode); break;
-				case 0x02:  MOVLSG(opcode); break;
-				case 0x03:  TRAPA(opcode); break;
-				case 0x04:  MOVBLG(opcode); break;
-				case 0x05:  MOVWLG(opcode); break;
-				case 0x06:  MOVLLG(opcode); break;
-				case 0x07:  MOVA(opcode); break;
-				case 0x08:  TSTI(opcode); break;
-				case 0x09:  ANDI(opcode); break;
-				case 0x0a:  XORI(opcode); break;
-				case 0x0b:  ORI(opcode); break;
-				case 0x0c:  TSTM(opcode); break;
-				case 0x0d:  ANDM(opcode); break;
-				case 0x0e:  XORM(opcode); break;
-				case 0x0f:  ORM(opcode); break;
-			}
-			break;
-
-		case 0xd000:
-			MOVLI(opcode);
-			break;
-
-		case 0xe000:
-			MOVI(opcode);
-			break;
-
-		case 0xf000:
-			switch(opcode & 0x0f)
-			{
-				case 0x00:  FADD(opcode); break;
-				case 0x01:  FSUB(opcode); break;
-				case 0x02:  FMUL(opcode); break;
-				case 0x03:  FDIV(opcode); break;
-				case 0x04:  FCMP_EQ(opcode); break;
-				case 0x05:  FCMP_GT(opcode); break;
-				case 0x06:  FMOVS0FR(opcode); break;
-				case 0x07:  FMOVFRS0(opcode); break;
-				case 0x08:  FMOVMRFR(opcode); break;
-				case 0x09:  FMOVMRIFR(opcode); break;
-				case 0x0a:  FMOVFRMR(opcode); break;
-				case 0x0b:  FMOVFRMDR(opcode); break;
-				case 0x0c:  FMOVFR(opcode); break;
-				case 0x0d:  op1111_0x13(opcode); break;
-				case 0x0e:  FMAC(opcode); break;
-				case 0x0f:  dbreak(opcode); break;
-			}
-			break;
+	case 0x00:  FADD(opcode); break;
+	case 0x01:  FSUB(opcode); break;
+	case 0x02:  FMUL(opcode); break;
+	case 0x03:  FDIV(opcode); break;
+	case 0x04:  FCMP_EQ(opcode); break;
+	case 0x05:  FCMP_GT(opcode); break;
+	case 0x06:  FMOVS0FR(opcode); break;
+	case 0x07:  FMOVFRS0(opcode); break;
+	case 0x08:  FMOVMRFR(opcode); break;
+	case 0x09:  FMOVMRIFR(opcode); break;
+	case 0x0a:  FMOVFRMR(opcode); break;
+	case 0x0b:  FMOVFRMDR(opcode); break;
+	case 0x0c:  FMOVFR(opcode); break;
+	case 0x0d:  op1111_0x13(opcode); break;
+	case 0x0e:  FMAC(opcode); break;
+	case 0x0f:  dbreak(opcode); break;
 	}
 }
-
 
 /* Execute cycles - returns number of cycles actually run */
 void sh34_base_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
-		m_sh4_icount = 0;
+		m_sh2_state->icount = 0;
 		return;
 	}
 
 	do
 	{
-		m_ppc = m_pc & AM;
-		debugger_instruction_hook(this, m_pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
 		uint16_t opcode;
 
-		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_pc & AM, WORD2_XOR_LE(0));
-		else opcode = RW(m_pc); // should probably use a different function as this needs to go through the ITLB
+		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD2_XOR_LE(0));
+		else opcode = RW(m_sh2_state->pc); // should probably use a different function as this needs to go through the ITLB
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
-			m_pc += 2;
+			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
 
-		m_sh4_icount--;
-	} while( m_sh4_icount > 0 );
+		m_sh2_state->icount--;
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh3be_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
-		m_sh4_icount = 0;
+		m_sh2_state->icount = 0;
 		return;
 	}
 
 	do
 	{
-		m_ppc = m_pc & AM;
-		debugger_instruction_hook(this, m_pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_pc & AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
-			m_pc += 2;
+			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
 
-		m_sh4_icount--;
-	} while( m_sh4_icount > 0 );
+		m_sh2_state->icount--;
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh4be_device::execute_run()
 {
+	if ( m_isdrc )
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_cpu_off)
 	{
-		m_sh4_icount = 0;
+		m_sh2_state->icount = 0;
 		return;
 	}
 
 	do
 	{
-		m_ppc = m_pc & AM;
-		debugger_instruction_hook(this, m_pc & AM);
+		m_ppc = m_sh2_state->pc & SH34_AM;
+		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_pc & AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
-			m_pc += 2;
+			m_sh2_state->pc += 2;
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
 
-		m_sh4_icount--;
-	} while( m_sh4_icount > 0 );
+		m_sh2_state->icount--;
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh4_base_device::device_start()
@@ -4185,7 +2010,7 @@ void sh4_base_device::device_start()
 	sh34_base_device::device_start();
 
 	int i;
-	for (i=0;i<64;i++)
+	for (i = 0;i < 64;i++)
 	{
 		m_utlb[i].ASID = 0;
 		m_utlb[i].VPN = 0;
@@ -4201,7 +2026,7 @@ void sh4_base_device::device_start()
 		m_utlb[i].TC = 0;
 	}
 
-	for (i=0;i<64;i++)
+	for (i = 0;i < 64;i++)
 	{
 		save_item(NAME(m_utlb[i].ASID), i);
 		save_item(NAME(m_utlb[i].VPN), i);
@@ -4216,20 +2041,23 @@ void sh4_base_device::device_start()
 		save_item(NAME(m_utlb[i].SA), i);
 		save_item(NAME(m_utlb[i].TC), i);
 	}
-
 }
 
 
 
 void sh34_base_device::device_start()
 {
-	for (int i=0; i<3; i++)
+	m_isdrc = allow_drc();
+
+	sh_common_execution::device_start();
+
+	for (int i = 0; i < 3; i++)
 	{
 		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_timer_callback), this));
 		m_timer[i]->adjust(attotime::never, i);
 	}
 
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_dma_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_dmac_callback), this));
 		m_dma_timer[i]->adjust(attotime::never, i);
@@ -4252,14 +2080,7 @@ void sh34_base_device::device_start()
 	m_irln = 15;
 	m_test_irq = 0;
 
-	save_item(NAME(m_pc));
-	save_item(NAME(m_r));
-	save_item(NAME(m_sr));
-	save_item(NAME(m_pr));
-	save_item(NAME(m_gbr));
-	save_item(NAME(m_vbr));
-	save_item(NAME(m_mach));
-	save_item(NAME(m_macl));
+
 	save_item(NAME(m_spc));
 	save_item(NAME(m_ssr));
 	save_item(NAME(m_sgr));
@@ -4267,8 +2088,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_rbnk));
 	save_item(NAME(m_fr));
 	save_item(NAME(m_xf));
-	save_item(NAME(m_ea));
-	save_item(NAME(m_delay));
+
 	save_item(NAME(m_cpu_off));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_test_irq));
@@ -4306,7 +2126,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_SH4_DMATCR3));
 	save_item(NAME(m_SH4_DMAOR));
 	save_item(NAME(m_nmi_line_state));
-	save_item(NAME(m_sleep_mode));
+
 	save_item(NAME(m_frt_input));
 	save_item(NAME(m_irln));
 	save_item(NAME(m_internal_irq_level));
@@ -4320,11 +2140,12 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_dma_source_increment));
 	save_item(NAME(m_dma_destination_increment));
 	save_item(NAME(m_dma_mode));
-	save_item(NAME(m_sh4_icount));
+
+
 	save_item(NAME(m_fpu_sz));
 	save_item(NAME(m_fpu_pr));
 	save_item(NAME(m_ioport16_pullup));
-	save_item(NAME( m_ioport16_direction));
+	save_item(NAME(m_ioport16_direction));
 	save_item(NAME(m_ioport4_pullup));
 	save_item(NAME(m_ioport4_direction));
 	save_item(NAME(m_sh4_mmu_enabled));
@@ -4333,92 +2154,70 @@ void sh34_base_device::device_start()
 
 	// Debugger state
 
-	state_add(SH4_PC,             "PC", m_pc).formatstr("%08X").callimport();
-	state_add(SH4_SR,             "SR", m_sr).formatstr("%08X").callimport();
-	state_add(SH4_PR,             "PR", m_pr).formatstr("%08X");
-	state_add(SH4_GBR,            "GBR", m_gbr).formatstr("%08X");
-	state_add(SH4_VBR,            "VBR", m_vbr).formatstr("%08X");
-	state_add(SH4_DBR,            "DBR", m_dbr).formatstr("%08X");
-	state_add(SH4_MACH,           "MACH", m_mach).formatstr("%08X");
-	state_add(SH4_MACL,           "MACL", m_macl).formatstr("%08X");
-	state_add(SH4_R0,             "R0", m_r[ 0]).formatstr("%08X");
-	state_add(SH4_R1,             "R1", m_r[ 1]).formatstr("%08X");
-	state_add(SH4_R2,             "R2", m_r[ 2]).formatstr("%08X");
-	state_add(SH4_R3,             "R3", m_r[ 3]).formatstr("%08X");
-	state_add(SH4_R4,             "R4", m_r[ 4]).formatstr("%08X");
-	state_add(SH4_R5,             "R5", m_r[ 5]).formatstr("%08X");
-	state_add(SH4_R6,             "R6", m_r[ 6]).formatstr("%08X");
-	state_add(SH4_R7,             "R7", m_r[ 7]).formatstr("%08X");
-	state_add(SH4_R8,             "R8", m_r[ 8]).formatstr("%08X");
-	state_add(SH4_R9,             "R9", m_r[ 9]).formatstr("%08X");
-	state_add(SH4_R10,            "R10", m_r[10]).formatstr("%08X");
-	state_add(SH4_R11,            "R11", m_r[11]).formatstr("%08X");
-	state_add(SH4_R12,            "R12", m_r[12]).formatstr("%08X");
-	state_add(SH4_R13,            "R13", m_r[13]).formatstr("%08X");
-	state_add(SH4_R14,            "R14", m_r[14]).formatstr("%08X");
-	state_add(SH4_R15,            "R15", m_r[15]).formatstr("%08X");
-	state_add(SH4_EA,             "EA", m_ea).formatstr("%08X");
-	state_add(SH4_R0_BK0,         "R0 BK 0", m_rbnk[0][0]).formatstr("%08X");
-	state_add(SH4_R1_BK0,         "R1 BK 0", m_rbnk[0][1]).formatstr("%08X");
-	state_add(SH4_R2_BK0,         "R2 BK 0", m_rbnk[0][2]).formatstr("%08X");
-	state_add(SH4_R3_BK0,         "R3 BK 0", m_rbnk[0][3]).formatstr("%08X");
-	state_add(SH4_R4_BK0,         "R4 BK 0", m_rbnk[0][4]).formatstr("%08X");
-	state_add(SH4_R5_BK0,         "R5 BK 0", m_rbnk[0][5]).formatstr("%08X");
-	state_add(SH4_R6_BK0,         "R6 BK 0", m_rbnk[0][6]).formatstr("%08X");
-	state_add(SH4_R7_BK0,         "R7 BK 0", m_rbnk[0][7]).formatstr("%08X");
-	state_add(SH4_R0_BK1,         "R0 BK 1", m_rbnk[1][0]).formatstr("%08X");
-	state_add(SH4_R1_BK1,         "R1 BK 1", m_rbnk[1][1]).formatstr("%08X");
-	state_add(SH4_R2_BK1,         "R2 BK 1", m_rbnk[1][2]).formatstr("%08X");
-	state_add(SH4_R3_BK1,         "R3 BK 1", m_rbnk[1][3]).formatstr("%08X");
-	state_add(SH4_R4_BK1,         "R4 BK 1", m_rbnk[1][4]).formatstr("%08X");
-	state_add(SH4_R5_BK1,         "R5 BK 1", m_rbnk[1][5]).formatstr("%08X");
-	state_add(SH4_R6_BK1,         "R6 BK 1", m_rbnk[1][6]).formatstr("%08X");
-	state_add(SH4_R7_BK1,         "R7 BK 1", m_rbnk[1][7]).formatstr("%08X");
-	state_add(SH4_SPC,            "SPC", m_spc).formatstr("%08X");
-	state_add(SH4_SSR,            "SSR", m_ssr).formatstr("%08X");
-	state_add(SH4_SGR,            "SGR", m_sgr).formatstr("%08X");
-	state_add(SH4_FPSCR,          "FPSCR", m_fpscr).formatstr("%08X");
-	state_add(SH4_FPUL,           "FPUL", m_fpul).formatstr("%08X");
 
-	state_add(SH4_FR0,            "FR0", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR1,            "FR1", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR2,            "FR2", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR3,            "FR3", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR4,            "FR4", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR5,            "FR5", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR6,            "FR6", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR7,            "FR7", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR8,            "FR8", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR9,            "FR9", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR10,           "FR10", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR11,           "FR11", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR12,           "FR12", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR13,           "FR13", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR14,           "FR14", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_FR15,           "FR15", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF0,            "XF0", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF1,            "XF1", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF2,            "XF2", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF3,            "XF3", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF4,            "XF4", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF5,            "XF5", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF6,            "XF6", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF7,            "XF7", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF8,            "XF8", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF9,            "XF9", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF10,           "XF10", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF11,           "XF11", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF12,           "XF12", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF13,           "XF13", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF14,           "XF14", m_debugger_temp).callimport().formatstr("%25s");
-	state_add(SH4_XF15,           "XF15", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_DBR, "DBR", m_dbr).formatstr("%08X");
+
+	state_add(SH4_R0_BK0, "R0 BK 0", m_rbnk[0][0]).formatstr("%08X");
+	state_add(SH4_R1_BK0, "R1 BK 0", m_rbnk[0][1]).formatstr("%08X");
+	state_add(SH4_R2_BK0, "R2 BK 0", m_rbnk[0][2]).formatstr("%08X");
+	state_add(SH4_R3_BK0, "R3 BK 0", m_rbnk[0][3]).formatstr("%08X");
+	state_add(SH4_R4_BK0, "R4 BK 0", m_rbnk[0][4]).formatstr("%08X");
+	state_add(SH4_R5_BK0, "R5 BK 0", m_rbnk[0][5]).formatstr("%08X");
+	state_add(SH4_R6_BK0, "R6 BK 0", m_rbnk[0][6]).formatstr("%08X");
+	state_add(SH4_R7_BK0, "R7 BK 0", m_rbnk[0][7]).formatstr("%08X");
+	state_add(SH4_R0_BK1, "R0 BK 1", m_rbnk[1][0]).formatstr("%08X");
+	state_add(SH4_R1_BK1, "R1 BK 1", m_rbnk[1][1]).formatstr("%08X");
+	state_add(SH4_R2_BK1, "R2 BK 1", m_rbnk[1][2]).formatstr("%08X");
+	state_add(SH4_R3_BK1, "R3 BK 1", m_rbnk[1][3]).formatstr("%08X");
+	state_add(SH4_R4_BK1, "R4 BK 1", m_rbnk[1][4]).formatstr("%08X");
+	state_add(SH4_R5_BK1, "R5 BK 1", m_rbnk[1][5]).formatstr("%08X");
+	state_add(SH4_R6_BK1, "R6 BK 1", m_rbnk[1][6]).formatstr("%08X");
+	state_add(SH4_R7_BK1, "R7 BK 1", m_rbnk[1][7]).formatstr("%08X");
+	state_add(SH4_SPC, "SPC", m_spc).formatstr("%08X");
+	state_add(SH4_SSR, "SSR", m_ssr).formatstr("%08X");
+	state_add(SH4_SGR, "SGR", m_sgr).formatstr("%08X");
+	state_add(SH4_FPSCR, "FPSCR", m_fpscr).formatstr("%08X");
+	state_add(SH4_FPUL, "FPUL", m_fpul).formatstr("%08X");
+
+	state_add(SH4_FR0, "FR0", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR1, "FR1", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR2, "FR2", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR3, "FR3", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR4, "FR4", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR5, "FR5", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR6, "FR6", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR7, "FR7", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR8, "FR8", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR9, "FR9", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR10, "FR10", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR11, "FR11", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR12, "FR12", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR13, "FR13", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR14, "FR14", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_FR15, "FR15", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF0, "XF0", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF1, "XF1", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF2, "XF2", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF3, "XF3", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF4, "XF4", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF5, "XF5", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF6, "XF6", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF7, "XF7", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF8, "XF8", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF9, "XF9", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF10, "XF10", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF11, "XF11", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF12, "XF12", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF13, "XF13", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF14, "XF14", m_debugger_temp).callimport().formatstr("%25s");
+	state_add(SH4_XF15, "XF15", m_debugger_temp).callimport().formatstr("%25s");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_r[15]).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%20s").noshow();
+	//state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 
-	m_icountptr = &m_sh4_icount;
+
+	drc_start();
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -4432,12 +2231,12 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			m_pc = m_debugger_temp;
+			m_sh2_state->pc = m_debugger_temp;
 		case SH4_PC:
-			m_delay = 0;
+			m_sh2_state->m_delay = 0;
 			break;
 
-		case SH4_SR:
+		case SH_SR:
 			sh4_exception_recompute();
 			sh4_check_pending_irq("sh4_set_info");
 			break;
@@ -4577,7 +2376,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 	case STATE_GENPC:
-		m_debugger_temp = (m_pc & AM);
+		m_debugger_temp = (m_sh2_state->pc & SH34_AM);
 		break;
 	}
 }
@@ -4594,15 +2393,15 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, std:
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%s%s%s%s%c%c%d%c%c",
-					m_sr & MD ? "MD ":"   ",
-					m_sr & sRB ? "RB ":"   ",
-					m_sr & BL ? "BL ":"   ",
-					m_sr & FD ? "FD ":"   ",
-					m_sr & M ? 'M':'.',
-					m_sr & Q ? 'Q':'.',
-					(m_sr & I) >> 4,
-					m_sr & S ? 'S':'.',
-					m_sr & T ? 'T':'.');
+					m_sh2_state->sr & MD ? "MD ":"   ",
+					m_sh2_state->sr & sRB ? "RB ":"   ",
+					m_sh2_state->sr & BL ? "BL ":"   ",
+					m_sh2_state->sr & FD ? "FD ":"   ",
+					m_sh2_state->sr & SH_M ? 'M':'.',
+					m_sh2_state->sr & SH_Q ? 'Q':'.',
+					(m_sh2_state->sr & SH_I) >> 4,
+					m_sh2_state->sr & SH_S ? 'S':'.',
+					m_sh2_state->sr & SH_T ? 'T':'.');
 			break;
 
 		case SH4_FR0:
@@ -4736,8 +2535,1375 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-
+/*
 void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 {
 	m_ftcsr_read_callback = callback;
 }
+*/
+
+using namespace uml;
+
+const opcode_desc* sh4be_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh4be_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+
+const opcode_desc* sh4_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh4_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+const opcode_desc* sh3be_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh3be_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+const opcode_desc* sh3_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+void sh3_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
+/*-------------------------------------------------
+    generate_update_cycles - generate code to
+    subtract cycles from the icount and generate
+    an exception if out
+-------------------------------------------------*/
+
+void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
+static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
+
+void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+{
+	/* TODO: this is likely wrong? - I've not seen it called when compiler->checkints is true */
+
+	/* check full interrupts if pending */
+	if (compiler->checkints)
+	{
+		compiler->checkints = false;
+
+		/* param is pc + 2 (the opcode after the current one)
+		   as we're calling from opcode handlers here that will point to the current opcode instead
+		   but I believe the exception functoin requires it to point to the next one so update the 
+		   local copy of the PC variable here for that? */
+ 		UML_MOV(block, mem(&m_sh2_state->pc), param); 
+
+	//	save_fast_iregs(block); 
+		UML_CALLC(block, cfunc_CHECKIRQ, this);
+		load_fast_iregs(block);
+	
+		/* generate a hash jump via the current mode and PC
+		   pc should be pointing to either the exception address
+		   or have been left on the next PC set above? */
+		UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
+	}
+
+	/* account for cycles */
+	if (compiler->cycles > 0)
+	{
+		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
+		if (allow_exception)
+			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
+																					// exh     out_of_cycles,nextpc
+	}
+	compiler->cycles = 0;
+}
+
+/*-------------------------------------------------
+    static_generate_entry_point - generate a
+    static entry point
+-------------------------------------------------*/
+
+
+void sh34_base_device::static_generate_entry_point()
+{
+
+	drcuml_state *drcuml = m_drcuml.get();
+	//code_label skip = 1;
+	drcuml_block *block;
+
+	/* begin generating */
+	block = drcuml->begin_block(200);
+
+	/* forward references */
+	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(drcuml, &m_write32, "write32");     // necessary?
+	alloc_handle(drcuml, &m_entry, "entry");
+	UML_HANDLE(block, *m_entry);                         // handle  entry
+
+	UML_CALLC(block, cfunc_CHECKIRQ, this);
+	load_fast_iregs(block);
+	
+	/* generate a hash jump via the current mode and PC */
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
+
+	block->end();
+
+}
+
+
+/*------------------------------------------------------------------
+    static_generate_memory_accessor
+------------------------------------------------------------------*/
+
+void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
+{
+	/* on entry, address is in I0; data for writes is in I1 */
+	/* on exit, read result is in I0 */
+	/* routine trashes I0 */
+	drcuml_state *drcuml = m_drcuml.get();
+	drcuml_block *block;
+	int label = 1;
+
+	/* begin generating */
+	block = drcuml->begin_block(1024);
+
+	/* add a global entry for this */
+	alloc_handle(drcuml, handleptr, name);
+	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
+
+#if 0
+	if (A >= 0xe0000000)
+	{
+		m_program->write_word(A, V);
+		return;
+	}
+
+	if (A >= 0x80000000) // P1/P2/P3 region
+	{
+		m_program->write_word(A & SH34_AM, V);
+	}
+	else
+	{
+		// MMU handling
+		m_program->write_word(A & SH34_AM, V);
+	}
+#endif
+
+	UML_CMP(block, I0, 0xe0000000);
+	UML_JMPc(block, COND_AE, label); 
+
+	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0x1fffffff)
+
+	UML_LABEL(block, label++);              // label:
+
+	for (auto & elem : m_fastram)
+	{
+		if (elem.base != nullptr && (!iswrite || !elem.readonly))
+		{
+			void *fastbase = (uint8_t *)elem.base - elem.start;
+			uint32_t skip = label++;
+			if (elem.end != 0xffffffff)
+			{
+				UML_CMP(block, I0, elem.end);   // cmp     i0,end
+				UML_JMPc(block, COND_A, skip);                                      // ja      skip
+			}
+			if (elem.start != 0x00000000)
+			{
+				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
+				UML_JMPc(block, COND_B, skip);                                      // jb      skip
+			}
+
+			if (!iswrite)
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+				}
+				else if (size == 4)
+				{
+					
+					UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+			else
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+				}
+				else if (size == 4)
+				{
+					UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+
+			UML_LABEL(block, skip);                                             // skip:
+		}
+	}
+
+	if (iswrite)
+	{
+		switch (size)
+		{
+			case 1:
+				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM); // write r0, r1, program_byte
+				break;
+
+			case 2:
+				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM); // write r0, r1, program_word
+				break;
+
+			case 4:
+				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);    // write r0, r1, program_dword
+				break;
+		}
+	}
+	else
+	{
+		switch (size)
+		{
+			case 1:
+				UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);  // read r0, program_byte
+				break;
+
+			case 2:
+				UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);  // read r0, program_word
+				break;
+
+			case 4:
+				UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM); // read r0, program_dword
+				break;
+		}
+	}
+
+	UML_RET(block);                         // ret
+
+	block->end();
+}
+
+bool sh34_base_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch (opcode & 0xff)
+	{
+	default:
+		// fall through to SH2 handlers
+		return sh_common_execution::generate_group_0(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+	case 0x52:
+	case 0x62:
+	case 0x43:
+	case 0x63:
+	case 0xe3:
+	case 0x68:
+	case 0xe8:
+	case 0x4a:
+	case 0xca:
+		return true; // ILLEGAL(); break; // illegal on sh4
+
+	case 0x93:
+	case 0xa3:
+	case 0xb3:
+		return true; // TODO(opcode); break;
+
+	case 0x82:
+	case 0x92:
+	case 0xa2:
+	case 0xb2:
+	case 0xc2:
+	case 0xd2:
+	case 0xe2:
+	case 0xf2:
+		return generate_group_0_STCRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+
+	case 0x32: return generate_group_0_STCSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+	case 0x42: return generate_group_0_STCSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+	case 0x83: return generate_group_0_PREFM(block, compiler, desc, opcode, in_delay_slot, ovrpc);  // sh4 only
+	case 0xc3: return generate_group_0_MOVCAL(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x38:
+	case 0xb8:
+		return generate_group_0_LDTLB(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x48:
+	case 0xc8:
+		return generate_group_0_CLRS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x58:
+	case 0xd8:
+		return generate_group_0_SETS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x3a:
+	case 0xba:
+		return generate_group_0_STCSGR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x5a:
+	case 0xda:
+		return generate_group_0_STSFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x6a:
+	case 0xea:
+		return generate_group_0_STSFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x7a:
+	case 0xfa:
+		return generate_group_0_STCDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+	}
+
+	return false;
+}
+
+void sh34_base_device::func_STCRBANK() { STCRBANK(m_sh2_state->arg0); }
+static void cfunc_STCRBANK(void *param) { ((sh34_base_device *)param)->func_STCRBANK(); };
+
+bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCRBANK, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCSSR() { STCSSR(m_sh2_state->arg0); }
+static void cfunc_STCSSR(void *param) { ((sh34_base_device *)param)->func_STCSSR(); };
+
+bool sh34_base_device::generate_group_0_STCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCSPC() { STCSPC(m_sh2_state->arg0); }
+static void cfunc_STCSPC(void *param) { ((sh34_base_device *)param)->func_STCSPC(); };
+
+bool sh34_base_device::generate_group_0_STCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSPC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_PREFM() { PREFM(m_sh2_state->arg0); }
+static void cfunc_PREFM(void *param) { ((sh34_base_device *)param)->func_PREFM(); };
+
+bool sh34_base_device::generate_group_0_PREFM(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_PREFM, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_MOVCAL() { MOVCAL(m_sh2_state->arg0); }
+static void cfunc_MOVCAL(void *param) { ((sh34_base_device *)param)->func_MOVCAL(); };
+
+bool sh34_base_device::generate_group_0_MOVCAL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_MOVCAL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDTLB() { LDTLB(m_sh2_state->arg0); }
+static void cfunc_LDTLB(void *param) { ((sh34_base_device *)param)->func_LDTLB(); };
+
+bool sh34_base_device::generate_group_0_LDTLB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDTLB, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_CLRS() { CLRS(m_sh2_state->arg0); }
+static void cfunc_CLRS(void *param) { ((sh34_base_device *)param)->func_CLRS(); };
+
+bool sh34_base_device::generate_group_0_CLRS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_CLRS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_SETS() { SETS(m_sh2_state->arg0); }
+static void cfunc_SETS(void *param) { ((sh34_base_device *)param)->func_SETS(); };
+
+bool sh34_base_device::generate_group_0_SETS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SETS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCSGR() { STCSGR(m_sh2_state->arg0); }
+static void cfunc_STCSGR(void *param) { ((sh34_base_device *)param)->func_STCSGR(); };
+
+bool sh34_base_device::generate_group_0_STCSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCSGR, this);
+	load_fast_iregs(block);
+	return true;
+
+}
+
+void sh34_base_device::func_STSFPUL() { STSFPUL(m_sh2_state->arg0); }
+static void cfunc_STSFPUL(void *param) { ((sh34_base_device *)param)->func_STSFPUL(); };
+
+bool sh34_base_device::generate_group_0_STSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STSFPUL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STSFPSCR() { STSFPSCR(m_sh2_state->arg0); }
+static void cfunc_STSFPSCR(void *param) { ((sh34_base_device *)param)->func_STSFPSCR(); };
+
+bool sh34_base_device::generate_group_0_STSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STSFPSCR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCDBR() { STCDBR(m_sh2_state->arg0); }
+static void cfunc_STCDBR(void *param) { ((sh34_base_device *)param)->func_STCDBR(); };
+
+bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCDBR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_RTE() { RTE(); }
+static void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
+
+bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	generate_delay_slot(block, compiler, desc, 0xffffffff);
+	save_fast_iregs(block); 
+	UML_CALLC(block, cfunc_RTE, this);
+	load_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->m_delay));
+	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
+	return true;
+}
+
+void sh34_base_device::func_TRAPA() { TRAPA(m_sh2_state->arg0 & 0xff); }
+static void cfunc_TRAPA(void *param) { ((sh34_base_device *)param)->func_TRAPA(); };
+
+bool sh34_base_device::generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_MOV(block, mem(&m_sh2_state->pc), desc->pc + 2); // copy the PC because we need to use it
+	UML_CALLC(block, cfunc_TRAPA, this);		
+	load_fast_iregs(block);
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); 
+	return true;
+}
+
+void sh34_base_device::func_LDCSR() { LDCSR(m_sh2_state->arg0); }
+static void cfunc_LDCSR(void *param) { ((sh34_base_device *)param)->func_LDCSR(); };
+
+bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCMSR() { LDCMSR(m_sh2_state->arg0); }
+static void cfunc_LDCMSR(void *param) { ((sh34_base_device *)param)->func_LDCMSR(); };
+
+bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
+static void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
+
+bool sh34_base_device::generate_group_4_SHAD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SHAD, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
+static void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
+
+bool sh34_base_device::generate_group_4_SHLD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_SHLD, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+bool sh34_base_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch (opcode & 0xff)
+	{
+	default: // LDCMSR (0x0e) has sh2/4 flag difference
+		// fall through to SH2 handlers
+		return sh_common_execution::generate_group_4(block, compiler, desc, opcode, in_delay_slot, ovrpc); break;
+
+	case 0x42:
+	case 0x46:
+	case 0x4a:
+	case 0x53:
+	case 0x57:
+	case 0x5e:
+	case 0x63:
+	case 0x67:
+	case 0x6e:
+	case 0x82:
+	case 0x86:
+	case 0x8a:
+	case 0x92:
+	case 0x96:
+	case 0x9a:
+	case 0xa2:
+	case 0xa6:
+	case 0xaa:
+	case 0xc2:
+	case 0xc6:
+	case 0xca:
+	case 0xd2:
+	case 0xd6:
+	case 0xda:
+	case 0xe2:
+	case 0xe6:
+	case 0xea:
+		return true; // ILLEGAL(); break; // defined as illegal on SH4
+
+	case 0x0c:
+	case 0x1c:
+	case 0x2c:
+	case 0x3c:
+	case 0x4c:
+	case 0x5c:
+	case 0x6c:
+	case 0x7c:
+	case 0x8c:
+	case 0x9c:
+	case 0xac:
+	case 0xbc:
+	case 0xcc:
+	case 0xdc:
+	case 0xec:
+	case 0xfc:
+		return generate_group_4_SHAD(block, compiler, desc, opcode, in_delay_slot, ovrpc); break;
+
+	case 0x0d:
+	case 0x1d:
+	case 0x2d:
+	case 0x3d:
+	case 0x4d:
+	case 0x5d:
+	case 0x6d:
+	case 0x7d:
+	case 0x8d:
+	case 0x9d:
+	case 0xad:
+	case 0xbd:
+	case 0xcd:
+	case 0xdd:
+	case 0xed:
+	case 0xfd:
+		return generate_group_4_SHLD(block, compiler, desc, opcode, in_delay_slot, ovrpc); break;
+
+	case 0x8e:
+	case 0x9e:
+	case 0xae:
+	case 0xbe:
+	case 0xce:
+	case 0xde:
+	case 0xee:
+	case 0xfe:
+		return generate_group_4_LDCRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh3/4 only
+
+	case 0x83:
+	case 0x93:
+	case 0xa3:
+	case 0xb3:
+	case 0xc3:
+	case 0xd3:
+	case 0xe3:
+	case 0xf3:
+		return generate_group_4_STCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh3/4 only
+
+	case 0x87:
+	case 0x97:
+	case 0xa7:
+	case 0xb7:
+	case 0xc7:
+	case 0xd7:
+	case 0xe7:
+	case 0xf7:
+		return generate_group_4_LDCMRBANK(block, compiler, desc, opcode, in_delay_slot, ovrpc); // sh4 only
+
+	case 0x32:  return generate_group_4_STCMSGR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x33:  return generate_group_4_STCMSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x37:  return generate_group_4_LDCMSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x3e:  return generate_group_4_LDCSSR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x43:  return generate_group_4_STCMSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x47:  return generate_group_4_LDCMSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x4e:  return generate_group_4_LDCSPC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x52:  return generate_group_4_STSMFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x56:  return generate_group_4_LDSMFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x5a:  return generate_group_4_LDSFPUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x62:  return generate_group_4_STSMFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x66:  return generate_group_4_LDSMFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x6a:  return generate_group_4_LDSFPSCR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xf2:  return generate_group_4_STCMDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xf6:  return generate_group_4_LDCMDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0xfa:  return generate_group_4_LDCDBR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	}
+	return false;
+}
+
+
+void sh34_base_device::func_LDCRBANK() { LDCRBANK(m_sh2_state->arg0); }
+static void cfunc_LDCRBANK(void *param) { ((sh34_base_device *)param)->func_LDCRBANK(); };
+
+bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCRBANK, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCMRBANK() { STCMRBANK(m_sh2_state->arg0); }
+static void cfunc_STCMRBANK(void *param) { ((sh34_base_device *)param)->func_STCMRBANK(); };
+
+bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMRBANK, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCMRBANK() { LDCMRBANK(m_sh2_state->arg0); }
+static void cfunc_LDCMRBANK(void *param) { ((sh34_base_device *)param)->func_LDCMRBANK(); };
+
+bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMRBANK, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCMSGR() { STCMSGR(m_sh2_state->arg0); }
+static void cfunc_STCMSGR(void *param) { ((sh34_base_device *)param)->func_STCMSGR(); };
+
+bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSGR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCMSSR() { STCMSSR(m_sh2_state->arg0); }
+static void cfunc_STCMSSR(void *param) { ((sh34_base_device *)param)->func_STCMSSR(); };
+
+bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCMSSR() { LDCMSSR(m_sh2_state->arg0); }
+static void cfunc_LDCMSSR(void *param) { ((sh34_base_device *)param)->func_LDCMSSR(); };
+
+bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCSSR() { LDCSSR(m_sh2_state->arg0); }
+static void cfunc_LDCSSR(void *param) { ((sh34_base_device *)param)->func_LDCSSR(); };
+
+bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCSSR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCMSPC() { STCMSPC(m_sh2_state->arg0); }
+static void cfunc_STCMSPC(void *param) { ((sh34_base_device *)param)->func_STCMSPC(); };
+
+bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMSPC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCMSPC() { LDCMSPC(m_sh2_state->arg0); }
+static void cfunc_LDCMSPC(void *param) { ((sh34_base_device *)param)->func_LDCMSPC(); };
+
+bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMSPC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCSPC() { LDCSPC(m_sh2_state->arg0); }
+static void cfunc_LDCSPC(void *param) { ((sh34_base_device *)param)->func_LDCSPC(); };
+
+bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCSPC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STSMFPUL() { STSMFPUL(m_sh2_state->arg0); }
+static void cfunc_STSMFPUL(void *param) { ((sh34_base_device *)param)->func_STSMFPUL(); };
+
+bool sh34_base_device::generate_group_4_STSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STSMFPUL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDSMFPUL() { LDSMFPUL(m_sh2_state->arg0); }
+static void cfunc_LDSMFPUL(void *param) { ((sh34_base_device *)param)->func_LDSMFPUL(); };
+
+bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDSMFPUL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDSFPUL() { LDSFPUL(m_sh2_state->arg0); }
+static void cfunc_LDSFPUL(void *param) { ((sh34_base_device *)param)->func_LDSFPUL(); };
+
+bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDSFPUL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STSMFPSCR() { STSMFPSCR(m_sh2_state->arg0); }
+static void cfunc_STSMFPSCR(void *param) { ((sh34_base_device *)param)->func_STSMFPSCR(); };
+
+bool sh34_base_device::generate_group_4_STSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STSMFPSCR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDSMFPSCR() { LDSMFPSCR(m_sh2_state->arg0); }
+static void cfunc_LDSMFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSMFPSCR(); };
+
+
+bool sh34_base_device::generate_group_4_LDSMFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDSMFPSCR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+
+void sh34_base_device::func_LDSFPSCR() { LDSFPSCR(m_sh2_state->arg0); }
+static void cfunc_LDSFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSFPSCR(); };
+
+bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDSFPSCR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_STCMDBR() { STCMDBR(m_sh2_state->arg0); }
+static void cfunc_STCMDBR(void *param) { ((sh34_base_device *)param)->func_STCMDBR(); };
+
+bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_STCMDBR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCMDBR() { LDCMDBR(m_sh2_state->arg0); }
+static void cfunc_LDCMDBR(void *param) { ((sh34_base_device *)param)->func_LDCMDBR(); };
+
+bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCMDBR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_LDCDBR() { LDCDBR(m_sh2_state->arg0); }
+static void cfunc_LDCDBR(void *param) { ((sh34_base_device *)param)->func_LDCDBR(); };
+
+bool sh34_base_device::generate_group_4_LDCDBR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_LDCDBR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+bool sh34_base_device::generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch (opcode & 0x0f)
+	{
+	case 0x00:  return generate_group_15_FADD(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x01:  return generate_group_15_FSUB(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x02:  return generate_group_15_FMUL(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x03:  return generate_group_15_FDIV(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x04:  return generate_group_15_FCMP_EQ(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x05:  return generate_group_15_FCMP_GT(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x06:  return generate_group_15_FMOVS0FR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x07:  return generate_group_15_FMOVFRS0(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x08:  return generate_group_15_FMOVMRFR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x09:  return generate_group_15_FMOVMRIFR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0a:  return generate_group_15_FMOVFRMR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0b:  return generate_group_15_FMOVFRMDR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0c:  return generate_group_15_FMOVFR(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0d:  return generate_group_15_op1111_0x13(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0e:  return generate_group_15_FMAC(block, compiler, desc, opcode, in_delay_slot, ovrpc);
+	case 0x0f:
+		return true;
+		//if (opcode == 0xffff) return true;	// atomiswave uses ffff as NOP?
+		//return false; // dbreak(opcode); break;
+	}
+	return false;
+}
+
+void sh34_base_device::func_FADD() { FADD(m_sh2_state->arg0); }
+static void cfunc_FADD(void *param) { ((sh34_base_device *)param)->func_FADD(); };
+
+bool sh34_base_device::generate_group_15_FADD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FADD, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FSUB() { FSUB(m_sh2_state->arg0); }
+static void cfunc_FSUB(void *param) { ((sh34_base_device *)param)->func_FSUB(); };
+
+bool sh34_base_device::generate_group_15_FSUB(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSUB, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMUL() { FMUL(m_sh2_state->arg0); }
+static void cfunc_FMUL(void *param) { ((sh34_base_device *)param)->func_FMUL(); };
+
+bool sh34_base_device::generate_group_15_FMUL(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMUL, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FDIV() { FDIV(m_sh2_state->arg0); }
+static void cfunc_FDIV(void *param) { ((sh34_base_device *)param)->func_FDIV(); };
+
+bool sh34_base_device::generate_group_15_FDIV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FDIV, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FCMP_EQ() { FCMP_EQ(m_sh2_state->arg0); }
+static void cfunc_FCMP_EQ(void *param) { ((sh34_base_device *)param)->func_FCMP_EQ(); };
+
+bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCMP_EQ, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FCMP_GT() { FCMP_GT(m_sh2_state->arg0); }
+static void cfunc_FCMP_GT(void *param) { ((sh34_base_device *)param)->func_FCMP_GT(); };
+
+bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCMP_GT, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVS0FR() { FMOVS0FR(m_sh2_state->arg0); }
+static void cfunc_FMOVS0FR(void *param) { ((sh34_base_device *)param)->func_FMOVS0FR(); };
+
+bool sh34_base_device::generate_group_15_FMOVS0FR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVS0FR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVFRS0() { FMOVFRS0(m_sh2_state->arg0); }
+static void cfunc_FMOVFRS0(void *param) { ((sh34_base_device *)param)->func_FMOVFRS0(); };
+
+bool sh34_base_device::generate_group_15_FMOVFRS0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVFRS0, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVMRFR() { FMOVMRFR(m_sh2_state->arg0); }
+static void cfunc_FMOVMRFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRFR(); };
+
+bool sh34_base_device::generate_group_15_FMOVMRFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVMRFR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVMRIFR() { FMOVMRIFR(m_sh2_state->arg0); }
+static void cfunc_FMOVMRIFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRIFR(); };
+
+bool sh34_base_device::generate_group_15_FMOVMRIFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVMRIFR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVFRMR() { FMOVFRMR(m_sh2_state->arg0); }
+static void cfunc_FMOVFRMR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMR(); };
+
+bool sh34_base_device::generate_group_15_FMOVFRMR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVFRMR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVFRMDR() { FMOVFRMDR(m_sh2_state->arg0); }
+static void cfunc_FMOVFRMDR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMDR(); };
+
+bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVFRMDR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMOVFR() { FMOVFR(m_sh2_state->arg0); }
+static void cfunc_FMOVFR(void *param) { ((sh34_base_device *)param)->func_FMOVFR(); };
+
+bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMOVFR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FMAC() { FMAC(m_sh2_state->arg0); }
+static void cfunc_FMAC(void *param) { ((sh34_base_device *)param)->func_FMAC(); };
+
+bool sh34_base_device::generate_group_15_FMAC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FMAC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	switch ((opcode >> 4) & 0x0f)
+	{
+	case 0x00:  return generate_group_15_op1111_0x13_FSTS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSTS(opcode); break;
+	case 0x01:  return generate_group_15_op1111_0x13_FLDS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDS(opcode); break;
+	case 0x02:  return generate_group_15_op1111_0x13_FLOAT(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLOAT(opcode); break;
+	case 0x03:  return generate_group_15_op1111_0x13_FTRC(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FTRC(opcode); break;
+	case 0x04:  return generate_group_15_op1111_0x13_FNEG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FNEG(opcode); break;
+	case 0x05:  return generate_group_15_op1111_0x13_FABS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FABS(opcode); break;
+	case 0x06:  return generate_group_15_op1111_0x13_FSQRT(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSQRT(opcode); break;
+	case 0x07:  return generate_group_15_op1111_0x13_FSRRA(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSRRA(opcode); break;
+	case 0x08:  return generate_group_15_op1111_0x13_FLDI0(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDI0(opcode); break;
+	case 0x09:  return generate_group_15_op1111_0x13_FLDI1(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FLDI1(opcode); break;
+	case 0x0a:  return generate_group_15_op1111_0x13_FCNVSD(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCNVSD(opcode); break;
+	case 0x0b:  return generate_group_15_op1111_0x13_FCNVDS(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FCNVDS(opcode); break;
+	case 0x0c:  return false; // dbreak(opcode); break;
+	case 0x0d:  return false; //dbreak(opcode); break;
+	case 0x0e:  return generate_group_15_op1111_0x13_FIPR(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FIPR(opcode); break;
+	case 0x0f:  return generate_group_15_op1111_0x13_op1111_0xf13(block, compiler, desc, opcode, in_delay_slot, ovrpc); // op1111_0xf13(opcode); break;
+	}
+	return false;
+}
+
+void sh34_base_device::func_FSTS() { FSTS(m_sh2_state->arg0); }
+static void cfunc_FSTS(void *param) { ((sh34_base_device *)param)->func_FSTS(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSTS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FLDS() { FLDS(m_sh2_state->arg0); }
+static void cfunc_FLDS(void *param) { ((sh34_base_device *)param)->func_FLDS(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FLDS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FLOAT() { FLOAT(m_sh2_state->arg0); }
+static void cfunc_FLOAT(void *param) { ((sh34_base_device *)param)->func_FLOAT(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FLOAT, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FTRC() { FTRC(m_sh2_state->arg0); }
+static void cfunc_FTRC(void *param) { ((sh34_base_device *)param)->func_FTRC(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FTRC, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FNEG() { FNEG(m_sh2_state->arg0); }
+static void cfunc_FNEG(void *param) { ((sh34_base_device *)param)->func_FNEG(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FNEG, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FABS() { FABS(m_sh2_state->arg0); }
+static void cfunc_FABS(void *param) { ((sh34_base_device *)param)->func_FABS(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FABS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FSQRT() { FSQRT(m_sh2_state->arg0); }
+static void cfunc_FSQRT(void *param) { ((sh34_base_device *)param)->func_FSQRT(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSQRT, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FSRRA() { FSRRA(m_sh2_state->arg0); }
+static void cfunc_FSRRA(void *param) { ((sh34_base_device *)param)->func_FSRRA(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSRRA, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FLDI0() { FLDI0(m_sh2_state->arg0); }
+static void cfunc_FLDI0(void *param) { ((sh34_base_device *)param)->func_FLDI0(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDI0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FLDI0, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FLDI1() { FLDI1(m_sh2_state->arg0); }
+static void cfunc_FLDI1(void *param) { ((sh34_base_device *)param)->func_FLDI1(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FLDI1, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FCNVSD() { FCNVSD(m_sh2_state->arg0); }
+static void cfunc_FCNVSD(void *param) { ((sh34_base_device *)param)->func_FCNVSD(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCNVSD, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FCNVDS() { FCNVDS(m_sh2_state->arg0); }
+static void cfunc_FCNVDS(void *param) { ((sh34_base_device *)param)->func_FCNVDS(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FCNVDS, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FIPR() { FIPR(m_sh2_state->arg0); }
+static void cfunc_FIPR(void *param) { ((sh34_base_device *)param)->func_FIPR(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FIPR, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	if (opcode & 0x100) {
+		if (opcode & 0x200) {
+			switch (opcode & 0xC00)
+			{
+			case 0x000:
+				return generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSCHG();
+				break;
+			case 0x800:
+				return generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FRCHG();
+				break;
+			default:
+				return false; //machine().debug_break();
+				break;
+			}
+		}
+		else {
+			return generate_group_15_op1111_0x13_op1111_0xf13_FTRV(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FTRV(opcode);
+		}
+	}
+	else {
+		return generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(block, compiler, desc, opcode, in_delay_slot, ovrpc); // FSSCA(opcode);
+	}
+	return false;
+}
+
+void sh34_base_device::func_FSCHG() { FSCHG(); }
+static void cfunc_FSCHG(void *param) { ((sh34_base_device *)param)->func_FSCHG(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	//UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSCHG, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FRCHG() { FRCHG(); }
+static void cfunc_FRCHG(void *param) { ((sh34_base_device *)param)->func_FRCHG(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	//UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FRCHG, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FTRV() { FTRV(m_sh2_state->arg0); }
+static void cfunc_FTRV(void *param) { ((sh34_base_device *)param)->func_FTRV(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FTRV, this);
+	load_fast_iregs(block);
+	return true;
+}
+
+void sh34_base_device::func_FSSCA() { FSSCA(m_sh2_state->arg0); }
+static void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
+
+bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
+{
+	save_fast_iregs(block); 
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_CALLC(block, cfunc_FSSCA, this);
+	load_fast_iregs(block);
+	return true;
+}
+

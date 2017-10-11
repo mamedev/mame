@@ -41,9 +41,12 @@ class naomi_state : public dc_state
 	public:
 		naomi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag),
-		m_eeprom(*this, "main_eeprom")  { }
+		m_eeprom(*this, "main_eeprom"),
+		m_rombase(*this, "rombase")
+		{ }
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_shared_ptr<uint64_t> m_rombase;
 
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_DRIVER_INIT(naomigd);
