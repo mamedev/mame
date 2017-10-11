@@ -105,7 +105,6 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 {
 	m_cpu_type = CPU_TYPE_SH3;
 	m_am = SH34_AM;
-	m_isdrc = allow_drc();
 }
 
 
@@ -114,7 +113,6 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 {
 	m_cpu_type = CPU_TYPE_SH4;
 	m_am = SH34_AM;
-	m_isdrc = allow_drc();
 }
 
 
@@ -2049,6 +2047,8 @@ void sh4_base_device::device_start()
 
 void sh34_base_device::device_start()
 {
+	m_isdrc = allow_drc();
+
 	sh_common_execution::device_start();
 
 	for (int i = 0; i < 3; i++)
