@@ -477,14 +477,6 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	sh4_exception_recompute();
 }
 
-/* for reference
-inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
-{
-	m_sh2_state->sr = m_sh2_state->r[Rn] & SH34_FLAGS;
-	m_test_irq = 1;
-}
-*/
-
 /*  LDC.L   @Rm+,SR */
 inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 {
@@ -501,19 +493,6 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 	m_sh2_state->icount -= 2;
 	sh4_exception_recompute();
 }
-
-/* for reference
-inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
-{
-	uint32_t x = Rn;
-
-	m_sh2_state->ea = m_sh2_state->r[x];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH34_FLAGS;
-	m_sh2_state->r[x] += 4;
-	m_sh2_state->icount -= 2;
-	m_test_irq = 1;
-}
-*/
 
 /*  RTE */
 inline void sh34_base_device::RTE()
@@ -2611,69 +2590,35 @@ void sh3_device::init_drc_frontend()
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
+
+void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
+static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
+
 void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
-	/* TODO: this likely needs adding for interrupts to work in all cases? */
-#if 0
+	/* TODO: this is likely wrong? - I've not seen it called when compiler->checkints is true */
+
 	/* check full interrupts if pending */
 	if (compiler->checkints)
 	{
-		code_label skip = compiler->labelnum++;
-
 		compiler->checkints = false;
-		compiler->labelnum += 4;
 
-		/* check for interrupts */
-		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
-		UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
-		UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+		/* param is pc + 2 (the opcode after the current one)
+		   as we're calling from opcode handlers here that will point to the current opcode instead
+		   but I believe the exception functoin requires it to point to the next one so update the 
+		   local copy of the PC variable here for that? */
+ 		UML_MOV(block, mem(&m_sh2_state->pc), param); 
 
-		UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
-		UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
-
-		UML_LABEL(block, skip+2);                   // skip+2:
-		UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
-		UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
-		UML_AND(block, I1,  I0, 0xffff);                // and r1, r0, 0xffff
-
-		UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, pending_irq
-		UML_CMP(block, I1, 32);             // cmp r1, #32
-		UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
-
-		UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
-
-		UML_LABEL(block, skip+4);                   // skip+4:
-		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
-		UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
-		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
-		UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
-
-		UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
-
-		UML_LABEL(block, skip+3);                   // skip+3:
-		UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
-		UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
-		UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
-
-		UML_LABEL(block, skip+1);                   // skip+1:
-		UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
-		UML_JMPc(block, COND_Z, skip);                  // jz skip
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
-		UML_CALLH(block, *m_write32);                    // call write32
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, param);              // mov r1, nextpc
-		UML_CALLH(block, *m_write32);                    // call write32
-
-		UML_HASHJMP(block, 0, mem(&m_sh2_state->evec), *m_nocode);       // hashjmp m_sh2_state->evec
-
-		UML_LABEL(block, skip);                         // skip:
+	//	save_fast_iregs(block); 
+		UML_CALLC(block, cfunc_CHECKIRQ, this);
+		load_fast_iregs(block);
+	
+		/* generate a hash jump via the current mode and PC
+		   pc should be pointing to either the exception address
+		   or have been left on the next PC set above? */
+		UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 	}
-#endif
+
 	/* account for cycles */
 	if (compiler->cycles > 0)
 	{
@@ -2691,8 +2636,6 @@ void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_stat
     static entry point
 -------------------------------------------------*/
 
-void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
-static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
 
 void sh34_base_device::static_generate_entry_point()
 {
@@ -2710,10 +2653,6 @@ void sh34_base_device::static_generate_entry_point()
 	alloc_handle(drcuml, &m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                         // handle  entry
 
-	/* load fast integer registers */
-	load_fast_iregs(block);
-
-	save_fast_iregs(block); 
 	UML_CALLC(block, cfunc_CHECKIRQ, this);
 	load_fast_iregs(block);
 	

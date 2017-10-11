@@ -221,6 +221,77 @@ public:
 	int sh4_dma_data(struct sh4_device_dma *s);
 	void sh4_dma_ddt(struct sh4_ddt_dma *s);
 
+	// DRC C-substitute ops
+	void func_STCRBANK();
+	void func_TRAPA();
+	void func_LDCSR();
+	void func_LDCMSR();
+	void func_RTE();
+	void func_SHAD();
+	void func_SHLD();
+	void func_CHECKIRQ();
+	void func_LDCRBANK();
+	void func_STCMSPC();
+	void func_LDCMSPC();
+	void func_STCMSSR();
+	void func_LDCMSSR();
+	void func_STCMRBANK();
+	void func_LDCMRBANK();
+	void func_PREFM();
+	void func_FADD();
+	void func_FSUB();
+	void func_FMUL();
+	void func_FDIV();
+	void func_FCMP_EQ();
+	void func_FCMP_GT();
+	void func_LDSFPSCR();
+	void func_LDCDBR();
+	void func_FMOVMRIFR();
+	void func_FRCHG();
+	void func_FSCHG();
+	void func_LDSMFPUL();
+	void func_LDSMFPSCR();
+	void func_FMOVFRMDR();
+	void func_LDCSSR();
+	void func_STSFPSCR();
+	void func_FLDI0();
+	void func_FLDI1();
+	void func_FMOVFR();
+	void func_FMOVFRS0();
+	void func_FTRC();
+	void func_FMOVMRFR();
+	void func_FMOVS0FR();
+	void func_STSFPUL();
+	void func_FMOVFRMR();
+	void func_LDSFPUL();
+	void func_FLOAT();
+	void func_STSMFPSCR();
+	void func_STSMFPUL();
+	void func_FNEG();
+	void func_FMAC();
+	void func_FABS();
+	void func_FLDS();
+	void func_FTRV();
+	void func_FSTS();
+	void func_FSSCA();
+	void func_FCNVSD();
+	void func_FIPR();
+	void func_FSRRA();
+	void func_FSQRT();
+	void func_FCNVDS();
+	void func_LDCMDBR();
+	void func_STCMDBR();
+	void func_LDCSPC();
+	void func_STCMSGR();
+	void func_STCDBR();
+	void func_STCSGR();
+	void func_SETS();
+	void func_CLRS();
+	void func_LDTLB();
+	void func_MOVCAL();
+	void func_STCSSR();
+	void func_STCSPC();
+
 protected:
 	// construction/destruction
 	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
@@ -354,7 +425,6 @@ protected:
 	int     m_dma_destination_increment[4];
 	int     m_dma_mode[4];
 
-	//int     m_sh2_state->icount;
 	int     m_is_slave;
 	int     m_cpu_clock;
 	int     m_bus_clock;
@@ -365,6 +435,8 @@ protected:
 	int     m_ioport16_direction;
 	int     m_ioport4_pullup;
 	int     m_ioport4_direction;
+
+	int     m_willjump;
 
 	//void    (*m_ftcsr_read_callback)(uint32_t data);
 
@@ -380,6 +452,8 @@ protected:
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
 		int a,irq,z;
+		
+		m_willjump = 0; // for the DRC
 
 		irq = 0;
 		z = -1;
@@ -662,84 +736,6 @@ protected:
 
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
-
-public:
-
-	void func_STCRBANK();
-
-
-	// DRC C-substitute ops
-	void func_TRAPA();
-	void func_LDCSR();
-	void func_LDCMSR();
-	void func_RTE();
-	void func_SHAD();
-	void func_SHLD();
-	void func_CHECKIRQ();
-	void func_LDCRBANK();
-	void func_STCMSPC();
-	void func_LDCMSPC();
-	void func_STCMSSR();
-	void func_LDCMSSR();
-	void func_STCMRBANK();
-	void func_LDCMRBANK();
-	void func_PREFM();
-	void func_FADD();
-	void func_FSUB();
-	void func_FMUL();
-	void func_FDIV();
-	void func_FCMP_EQ();
-	void func_FCMP_GT();
-
-	void func_LDSFPSCR();
-	void func_LDCDBR();
-	
-	void func_FMOVMRIFR();
-	void func_FRCHG();
-	void func_FSCHG();
-
-	void func_LDSMFPUL();
-	void func_LDSMFPSCR();
-	void func_FMOVFRMDR();
-	void func_LDCSSR();
-	void func_STSFPSCR();
-	void func_FLDI0();
-	void func_FLDI1();
-	void func_FMOVFR();
-	void func_FMOVFRS0();
-	void func_FTRC();
-	void func_FMOVMRFR();
-	void func_FMOVS0FR();
-	void func_STSFPUL();
-	void func_FMOVFRMR();
-	void func_LDSFPUL();
-	void func_FLOAT();
-	void func_STSMFPSCR();
-	void func_STSMFPUL();
-	void func_FNEG();
-	void func_FMAC();
-	void func_FABS();
-	void func_FLDS();
-	void func_FTRV();
-	void func_FSTS();
-	void func_FSSCA();
-	void func_FCNVSD();
-	void func_FIPR();
-	void func_FSRRA();
-	void func_FSQRT();
-	void func_FCNVDS();
-	void func_LDCMDBR();
-	void func_STCMDBR();
-	void func_LDCSPC();
-	void func_STCMSGR();
-	void func_STCDBR();
-	void func_STCSGR();
-	void func_SETS();
-	void func_CLRS();
-	void func_LDTLB();
-	void func_MOVCAL();
-	void func_STCSSR();
-	void func_STCSPC();
 
 private:
 	bool            m_bigendian;

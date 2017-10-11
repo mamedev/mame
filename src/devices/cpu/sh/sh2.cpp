@@ -700,7 +700,11 @@ const opcode_desc* sh2_device::get_desclist(offs_t pc)
     static entry point
 -------------------------------------------------*/
 
-static void cfunc_fastirq(void *param) { ((sh_common_execution *)param)->func_fastirq(); };
+void sh2_device::func_fastirq()
+{
+	sh2_exception("fastirq",m_sh2_state->irqline);
+}
+static void cfunc_fastirq(void *param) { ((sh2_device *)param)->func_fastirq(); };
 
 void sh2_device::static_generate_entry_point()
 {
@@ -775,6 +779,86 @@ void sh2_device::static_generate_entry_point()
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
 	block->end();
+}
+
+
+/*-------------------------------------------------
+    generate_update_cycles - generate code to
+    subtract cycles from the icount and generate
+    an exception if out
+-------------------------------------------------*/
+
+void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+{
+	/* check full interrupts if pending */
+	if (compiler->checkints)
+	{
+		code_label skip = compiler->labelnum++;
+
+		compiler->checkints = false;
+		compiler->labelnum += 4;
+
+		/* check for interrupts */
+		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
+		UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
+		UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+
+		UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
+		UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
+
+		UML_LABEL(block, skip+2);                   // skip+2:
+		UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
+		UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
+		UML_AND(block, I1,  I0, 0xffff);                // and r1, r0, 0xffff
+
+		UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, pending_irq
+		UML_CMP(block, I1, 32);             // cmp r1, #32
+		UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
+
+		UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
+
+		UML_LABEL(block, skip+4);                   // skip+4:
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
+		UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
+		UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
+
+		UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
+
+		UML_LABEL(block, skip+3);                   // skip+3:
+		UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
+		UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
+		UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+
+		UML_LABEL(block, skip+1);                   // skip+1:
+		UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
+		UML_JMPc(block, COND_Z, skip);                  // jz skip
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, param);              // mov r1, nextpc
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_HASHJMP(block, 0, mem(&m_sh2_state->evec), *m_nocode);       // hashjmp m_sh2_state->evec
+
+		UML_LABEL(block, skip);                         // skip:
+	}
+
+	/* account for cycles */
+	if (compiler->cycles > 0)
+	{
+		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
+		if (allow_exception)
+			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
+																					// exh     out_of_cycles,nextpc
+	}
+	compiler->cycles = 0;
 }
 
 /*------------------------------------------------------------------

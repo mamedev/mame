@@ -347,7 +347,6 @@ public:
 
 	void drc_start();
 
-
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
 	direct_read_data *m_direct;
@@ -382,9 +381,9 @@ public:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 	
-	virtual void sh2_exception(const char *message, int irqline) { };
+	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); };
 
-	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) = 0;
 
 	virtual bool generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	virtual bool generate_group_4_LDCSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
@@ -402,7 +401,6 @@ public:
 	bool generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	virtual bool generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 
-	void func_fastirq();
 	void func_printf_probe();
 	void func_unimplemented();
 	void func_MAC_W();

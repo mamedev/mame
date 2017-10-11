@@ -388,6 +388,7 @@ void sh34_base_device::sh4_exception_process(int exception, uint32_t vector)
 
 	/* fetch PC */
 	m_sh2_state->pc = m_sh2_state->vbr + vector;
+	m_willjump = 1; // for DRC
 	/* wake up if a sleep opcode is triggered */
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }

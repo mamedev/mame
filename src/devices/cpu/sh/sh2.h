@@ -83,6 +83,7 @@ public:
 
 	void sh2_set_frt_input(int state);
 	void sh2_notify_dma_data_available();
+	void func_fastirq();
 
 protected:
 	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
@@ -112,7 +113,7 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	address_space *m_decrypted_program;
-
+	
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
@@ -121,7 +122,6 @@ private:
 	
 	int8_t    m_irq_line_state[17];
 
-private:
 	address_space *m_internal;
 	uint32_t m_m[0x200/4];
 	int8_t  m_nmi_line_state;
@@ -183,9 +183,11 @@ private:
 
 	virtual void init_drc_frontend() override;
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
-	
+
+	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) override;
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
+
 };
 
 class sh2a_device : public sh2_device
