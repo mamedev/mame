@@ -85,8 +85,6 @@ public:
 	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
 	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
 
-	DECLARE_READ16_MEMBER( fpointbla_2002e_r );
-
 	// sound CPU read/write handlers
 	DECLARE_WRITE8_MEMBER( upd7759_control_w );
 	DECLARE_READ8_MEMBER( upd7759_status_r );
@@ -113,7 +111,7 @@ public:
 	DECLARE_DRIVER_INIT(hwchamp_5521);
 	DECLARE_DRIVER_INIT(altbeas5_5521);
 	DECLARE_DRIVER_INIT(sdi_5358_small);
-	DECLARE_DRIVER_INIT(generic_5358_fpointbla);	
+	DECLARE_DRIVER_INIT(fpointbla);
 	DECLARE_DRIVER_INIT(altbeasj_5521);
 	DECLARE_DRIVER_INIT(ddux_5704);
 	DECLARE_DRIVER_INIT(snapper);
