@@ -415,10 +415,6 @@ void stv_state::install_stvbios_speedups( void )
 
 DRIVER_INIT_MEMBER(stv_state,stv)
 {
-	system_time systime;
-
-	machine().base_datetime(systime);
-
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;
 	m_sinit_boost = 400;
