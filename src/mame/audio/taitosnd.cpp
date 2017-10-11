@@ -8,6 +8,9 @@
      - Add pinout and description
      - Create a separate implementation for the PC060HA
 
+    General rule seems to be that TC0140SYT supports a YM2610,
+    whereas PC060HA goes with a YM2203 or YM2151.
+
 **********************************************************************************************/
 
 #include "emu.h"
