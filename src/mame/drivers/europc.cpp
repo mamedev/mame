@@ -13,6 +13,7 @@
 * Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XT-IDE 20MB harddisk, connector for FD360 and FD720 was retained
 *
 * Only BIOS versions >2.06 are supported so far because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
+* Versions 2.04 and 2.05 only show a single dash on the top left of the screen.
 *
 * To get rid of the BIOS error messages when you first start the system, enter the BIOS with Ctrl-Alt-Esc, match the RAM size to your settings in MAME, set the CPU speed to 9.54MHz
 * and the graphics adapter to Color/Graphics 80, internal graphics off
