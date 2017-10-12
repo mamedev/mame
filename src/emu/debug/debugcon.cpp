@@ -344,7 +344,7 @@ CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 		if (!echo)
 			printf(">%s\n", command.c_str());
 		printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
-		printf("%s\n", cmderr_to_string(result));
+		printf("%s\n", cmderr_to_string(result).c_str());
 	}
 
 	/* update all views */
@@ -404,8 +404,9 @@ void debugger_console::register_command(const char *command, u32 flags, int ref,
     for a given command error
 -------------------------------------------------*/
 
-const char *debugger_console::cmderr_to_string(CMDERR error)
+std::string debugger_console::cmderr_to_string(CMDERR error)
 {
+	int offset = CMDERR_ERROR_OFFSET(error);
 	switch (CMDERR_ERROR_CLASS(error))
 	{
 		case CMDERR_UNKNOWN_COMMAND:        return "unknown command";
@@ -414,7 +415,8 @@ const char *debugger_console::cmderr_to_string(CMDERR error)
 		case CMDERR_UNBALANCED_QUOTES:      return "unbalanced quotes";
 		case CMDERR_NOT_ENOUGH_PARAMS:      return "not enough parameters for command";
 		case CMDERR_TOO_MANY_PARAMS:        return "too many parameters for command";
-		case CMDERR_EXPRESSION_ERROR:       return "error in assignment expression";
+		case CMDERR_EXPRESSION_ERROR:       return string_format("error in assignment expression: %s",
+		                                                         expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
 }
