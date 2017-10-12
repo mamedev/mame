@@ -75,19 +75,31 @@ bool mfm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	// read header
 	io_generic_read(io, &header, 0, sizeof(header));
+
+	int drivecyl, driveheads;
+	image->get_maximal_geometry(drivecyl, driveheads);
+	bool skip_odd = (drivecyl < 50 && header.number_of_track >= 80);
+
 	int counter = 0;
 	std::vector<uint8_t> trackbuf;
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
-			// read location of
-			io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+( counter *sizeof(trackdesc)),sizeof(trackdesc));
+			if (!skip_odd || track%2 == 0) {
+				// read location of
+				io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+( counter *sizeof(trackdesc)),sizeof(trackdesc));
 
-			trackbuf.resize(trackdesc.mfmtracksize);
+				trackbuf.resize(trackdesc.mfmtracksize);
 
-			// actual data read
-			io_generic_read(io, &trackbuf[0], trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
+				// actual data read
+				io_generic_read(io, &trackbuf[0], trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
 
-			generate_track_from_bitstream(track, side, &trackbuf[0], trackdesc.mfmtracksize*8, image);
+				if (skip_odd) {
+					generate_track_from_bitstream(track/2, side, &trackbuf[0], trackdesc.mfmtracksize*8, image);
+				}
+				else {
+					generate_track_from_bitstream(track, side, &trackbuf[0], trackdesc.mfmtracksize*8, image);
+				}
+			}
 
 			counter++;
 		}
