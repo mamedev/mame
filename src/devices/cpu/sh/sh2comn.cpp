@@ -181,11 +181,8 @@ void sh2_device::sh2_do_dma(int dma)
 					}
 				}
 
-				#ifdef USE_TIMER_FOR_DMA
-					//schedule next DMA callback
+				//schedule next DMA callback
 				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-				#endif
-
 
 				dmadata = m_program->read_byte(tempsrc);
 				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
