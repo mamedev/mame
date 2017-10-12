@@ -114,13 +114,13 @@ protected:
 	};
 
 	// construction/destruction
-	symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref);
+	symbol_entry(symbol_table &table, symbol_type type, std::string &&name, const std::string &format, void *ref);
 public:
 	virtual ~symbol_entry();
 
 	// getters
 	symbol_entry *next() const { return m_next; }
-	const char *name() const { return m_name.c_str(); }
+	const std::string &name() const { return m_name; }
 	const std::string &format() const { return m_format; }
 
 	// type checking
@@ -179,10 +179,16 @@ public:
 	void configure_memory(void *param, valid_func valid, read_func read, write_func write);
 
 	// symbol access
-	void add(const char *name, read_write rw, u64 *ptr = nullptr);
-	void add(const char *name, u64 constvalue);
-	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
-	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
+	void add(std::string &&name, read_write rw, u64 *ptr = nullptr);
+	void add(std::string &&name, u64 constvalue);
+#ifdef _MSC_VER
+	// MSVC2015 seems to not like the rvalue reference
+	void add(std::string &&name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
+	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute);
+#else
+	void add(std::string &&name, void *ref, getter_func &&getter, setter_func &&setter = nullptr, const std::string &format_string = "");
+	void add(std::string &&name, void *ref, int minparams, int maxparams, execute_func &&execute);
+#endif
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
@@ -196,6 +202,8 @@ public:
 	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se);
 
 private:
+	void internal_add(std::unique_ptr<symbol_entry> &&symentry);
+
 	// internal state
 	symbol_table *          m_parent;           // pointer to the parent symbol table
 	void *                  m_globalref;        // global reference parameter

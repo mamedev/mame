@@ -123,11 +123,10 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 		/* if this is a single-entry global, add it */
 		if (valcount == 1 && strstr(name, "/globals/"))
 		{
-			char symname[100];
-			sprintf(symname, ".%s", strrchr(name, '/') + 1);
+			std::string symname = util::string_format(".%s", strrchr(name, '/') + 1);
 			m_global_array[itemnum].base = base;
 			m_global_array[itemnum].size = valsize;
-			symtable->add(symname, &m_global_array, std::bind(&debugger_commands::global_get, this, _1, _2), std::bind(&debugger_commands::global_set, this, _1, _2, _3));
+			symtable->add(std::move(symname), &m_global_array, std::bind(&debugger_commands::global_get, this, _1, _2), std::bind(&debugger_commands::global_set, this, _1, _2, _3));
 		}
 	}
 
@@ -2961,7 +2960,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 		/* only display "register" type symbols */
 		if (!entry.second->is_function())
 		{
-			namelist[count++] = entry.second->name();
+			namelist[count++] = entry.second->name().c_str();
 			if (count >= ARRAY_LENGTH(namelist))
 				break;
 		}

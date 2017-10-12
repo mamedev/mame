@@ -112,9 +112,9 @@ class integer_symbol_entry : public symbol_entry
 {
 public:
 	// construction/destruction
-	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr = nullptr);
-	integer_symbol_entry(symbol_table &table, const char *name, u64 constval);
-	integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format);
+	integer_symbol_entry(symbol_table &table, std::string &&name, symbol_table::read_write rw, u64 *ptr = nullptr);
+	integer_symbol_entry(symbol_table &table, std::string &&name, u64 constval);
+	integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, const std::string &format);
 
 	// symbol access
 	virtual bool is_lval() const override;
@@ -122,6 +122,9 @@ public:
 	virtual void set_value(u64 newvalue) override;
 
 private:
+	// construction/destruction
+	integer_symbol_entry(symbol_table &table, std::string &&name, const std::string &format, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, u64 constval);
+
 	// internal helpers
 	static u64 internal_getter(symbol_table &table, void *symref);
 	static void internal_setter(symbol_table &table, void *symref, u64 value);
@@ -138,7 +141,7 @@ class function_symbol_entry : public symbol_entry
 {
 public:
 	// construction/destruction
-	function_symbol_entry(symbol_table &table, const char *name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute);
+	function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func &&execute);
 
 	// symbol access
 	virtual bool is_lval() const override;
@@ -203,11 +206,11 @@ const char *expression_error::code_string() const
 //  symbol_entry - constructor
 //-------------------------------------------------
 
-symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref)
+symbol_entry::symbol_entry(symbol_table &table, symbol_type type, std::string &&name, const std::string &format, void *ref)
 	: m_next(nullptr),
 		m_table(table),
 		m_type(type),
-		m_name(name),
+		m_name(std::move(name)),
 		m_format(format),
 		m_ref(ref)
 {
@@ -232,29 +235,29 @@ symbol_entry::~symbol_entry()
 //  integer_symbol_entry - constructor
 //-------------------------------------------------
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, name, "", (ptr == nullptr) ? &m_value : ptr),
-		m_getter(internal_getter),
-		m_setter((rw == symbol_table::READ_ONLY) ? nullptr : internal_setter),
-		m_value(0)
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, symbol_table::read_write rw, u64 *ptr)
+	: integer_symbol_entry(table, std::move(name), "", (ptr == nullptr) ? &m_value : ptr, symbol_table::getter_func(internal_getter), (rw == symbol_table::READ_ONLY) ? nullptr : internal_setter, 0)
 {
 }
 
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
-	: symbol_entry(table, SMT_INTEGER, name, "", &m_value),
-		m_getter(internal_getter),
-		m_setter(nullptr),
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, u64 constval)
+	: integer_symbol_entry(table, std::move(name), "", &m_value, symbol_table::getter_func(internal_getter), nullptr, constval)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, const std::string &format)
+	: integer_symbol_entry(table, std::move(name), format, ref, std::move(getter), std::move(setter), 0)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, std::string &&name, const std::string &format, void *ref, symbol_table::getter_func &&getter, symbol_table::setter_func &&setter, u64 constval)
+	: symbol_entry(table, SMT_INTEGER, std::move(name), format, ref),
+		m_getter(std::move(getter)),
+		m_setter(std::move(setter)),
 		m_value(constval)
-{
-}
-
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
-	: symbol_entry(table, SMT_INTEGER, name, format, ref),
-		m_getter(getter),
-		m_setter(setter),
-		m_value(0)
 {
 }
 
@@ -323,11 +326,11 @@ void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, u6
 //  function_symbol_entry - constructor
 //-------------------------------------------------
 
-function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute)
-	: symbol_entry(table, SMT_FUNCTION, name, "", ref),
+function_symbol_entry::function_symbol_entry(symbol_table &table, std::string &&name, void *ref, int minparams, int maxparams, symbol_table::execute_func &&execute)
+	: symbol_entry(table, SMT_FUNCTION, std::move(name), "", ref),
 		m_minparams(minparams),
 		m_maxparams(maxparams),
-		m_execute(execute)
+		m_execute(std::move(execute))
 {
 }
 
@@ -413,10 +416,10 @@ void symbol_table::configure_memory(void *param, valid_func valid, read_func rea
 //  add - add a new u64 pointer symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, read_write rw, u64 *ptr)
+void symbol_table::add(std::string &&name, read_write rw, u64 *ptr)
 {
-	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, rw, ptr));
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<integer_symbol_entry>(*this, std::move(name), rw, ptr);
+	internal_add(std::move(symentry));
 }
 
 
@@ -424,10 +427,10 @@ void symbol_table::add(const char *name, read_write rw, u64 *ptr)
 //  add - add a new value symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, u64 value)
+void symbol_table::add(std::string &&name, u64 value)
 {
-	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, value));
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<integer_symbol_entry>(*this, std::move(name), value);
+	internal_add(std::move(symentry));
 }
 
 
@@ -435,10 +438,14 @@ void symbol_table::add(const char *name, u64 value)
 //  add - add a new register symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, void *ref, getter_func getter, setter_func setter, const std::string &format_string)
+#ifdef _MSC_VER
+void symbol_table::add(std::string &&name, void *ref, getter_func getter, setter_func setter, const std::string &format_string)
+#else
+void symbol_table::add(std::string &&name, void *ref, getter_func &&getter, setter_func &&setter, const std::string &format_string)
+#endif
 {
-	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, ref, getter, setter, format_string));
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<integer_symbol_entry>(*this, std::move(name), ref, std::move(getter), std::move(setter), format_string);
+	internal_add(std::move(symentry));
 }
 
 
@@ -446,10 +453,24 @@ void symbol_table::add(const char *name, void *ref, getter_func getter, setter_f
 //  add - add a new function symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, void *ref, int minparams, int maxparams, execute_func execute)
+#ifdef _MSC_VER
+void symbol_table::add(std::string &&name, void *ref, int minparams, int maxparams, execute_func execute)
+#else
+void symbol_table::add(std::string &&name, void *ref, int minparams, int maxparams, execute_func &&execute)
+#endif
 {
-	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<function_symbol_entry>(*this, name, ref, minparams, maxparams, execute));
+	std::unique_ptr<symbol_entry> symentry = std::make_unique<function_symbol_entry>(*this, std::move(name), ref, minparams, maxparams, std::move(execute));
+	internal_add(std::move(symentry));
+}
+
+
+//-------------------------------------------------
+//  internal_add - add a newly created symbol_entry
+//-------------------------------------------------
+
+void symbol_table::internal_add(std::unique_ptr<symbol_entry> &&symentry)
+{
+	m_symlist[symentry->name()] = std::move(symentry);
 }
 
 
