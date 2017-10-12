@@ -3376,7 +3376,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 						goto nextpixel;
 				/* handle alpha test */
 				if (ALPHAMODE_ALPHATEST(vd->reg[alphaMode].u))
-					if (!alphaTest(vd, stats, vd->reg[alphaMode].u, color.get_a()))
+					if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, vd->reg[alphaMode].u, color.get_a()))
 						goto nextpixel;
 
 				/* perform fogging */

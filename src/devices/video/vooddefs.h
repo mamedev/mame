@@ -775,10 +775,9 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha)
+inline bool ATTR_FORCE_INLINE voodoo_device::alphaTest(uint8_t alpharef, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha)
 {
 	{
-		uint8_t alpharef = vd->reg[alphaMode].rgb.a;
 		switch (ALPHAMODE_ALPHAFUNCTION(alphaModeReg))
 		{
 			case 0:     /* alphaOP = never */
@@ -2375,11 +2374,13 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, uint32_t ALPHAMODE,
+inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE,
 													rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor)
 {
 	rgbaint_t c_other;
 	rgbaint_t c_local;
+	rgbaint_t blend_color, blend_factor;
+	rgbaint_t add_val;
 
 	/* compute c_other */
 	switch (FBZCP_CC_RGBSELECT(FBZCOLORPATH))
@@ -2396,8 +2397,8 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 			c_other.set(vd->reg[color1].u);
 			break;
 
-		default:    /* reserved - voodoo3 framebufferRGB */
-			c_other.set(0);
+		default:    /* reserved - voodoo3 LFB RGB */
+			c_other.zero();
 			break;
 	}
 
@@ -2422,8 +2423,8 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 			c_other.set_a(vd->reg[color1].rgb.a);
 			break;
 
-		default:    /* reserved */
-			c_other.set_a(0);
+		default:    /* reserved - voodoo3  LFB Alpha*/
+			c_other.zero_alpha();
 			break;
 	}
 
@@ -2479,32 +2480,35 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 		}
 	}
 
-	uint8_t a_other = c_other.get_a();
-	uint8_t a_local = c_local.get_a();
-	uint8_t tmp;
-	rgbaint_t add_val(c_local);
-
 	/* select zero or c_other */
 	if (FBZCP_CC_ZERO_OTHER(FBZCOLORPATH))
-		c_other.and_imm_rgba(-1, 0, 0, 0);
 		//r = g = b = 0;
+		blend_color.zero();
+	else
+		blend_color.set(c_other);
 
 	/* select zero or a_other */
 	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH))
-		c_other.set_a(0);
+		blend_color.zero_alpha();
+	else
+		blend_color.merge_alpha(c_other);
 
 	/* subtract a/c_local */
 	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH) || (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH)))
 	{
-		rgbaint_t sub_val = c_local;
+		rgbaint_t sub_val;
 
 		if (!FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH))
-			sub_val.set(a_local, 0, 0, 0);
+			sub_val.zero();
+		else
+			sub_val.set(c_local);
 
 		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
-			sub_val.set_a(0);
+			sub_val.zero_alpha();
+		else
+			sub_val.merge_alpha(c_local);
 
-		c_other.sub(sub_val);
+		blend_color.sub(sub_val);
 	}
 
 	/* blend RGB */
@@ -2512,28 +2516,27 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 	{
 		default:    /* reserved */
 		case 0:     /* 0 */
-			c_local.and_imm_rgba(-1, 0, 0, 0);
+			blend_factor.zero();
 			break;
 
 		case 1:     /* c_local */
+			blend_factor.set(c_local);
 			break;
 
 		case 2:     /* a_other */
-			c_local.set(a_local, a_other, a_other, a_other);
+			blend_factor.set(c_other.select_alpha32());
 			break;
 
 		case 3:     /* a_local */
-			c_local.set(a_local, a_local, a_local, a_local);
+			blend_factor.set(c_local.select_alpha32());
 			break;
 
 		case 4:     /* texture alpha */
-			tmp = TEXELARGB.get_a();
-			c_local.set(a_local, tmp, tmp, tmp);
+			blend_factor.set(TEXELARGB.select_alpha32());
 			break;
 
 		case 5:     /* texture RGB (Voodoo 2 only) */
-			// Warning wipes out c_local alpha
-			c_local.set(TEXELARGB);
+			blend_factor.set(TEXELARGB);
 			break;
 	}
 
@@ -2542,30 +2545,30 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 	{
 		default:    /* reserved */
 		case 0:     /* 0 */
-			c_local.set_a(0);
+			blend_factor.zero_alpha();
 			break;
 
 		case 1:     /* a_local */
 		case 3:     /* a_local */
-			c_local.set_a(a_local);
+			blend_factor.merge_alpha(c_local);
 			break;
 
 		case 2:     /* a_other */
-			c_local.set_a(a_other);
+			blend_factor.merge_alpha(c_other);
 			break;
 
 		case 4:     /* texture alpha */
-				c_local.merge_alpha(TEXELARGB);
+			blend_factor.merge_alpha(TEXELARGB);
 			break;
 	}
 
 	/* reverse the RGB blend */
 	if (!FBZCP_CC_REVERSE_BLEND(FBZCOLORPATH))
-		c_local.xor_imm_rgba(0, 0xff, 0xff, 0xff);
+		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
 	/* reverse the alpha blend */
 	if (!FBZCP_CCA_REVERSE_BLEND(FBZCOLORPATH))
-		c_local.xor_imm_rgba(0xff, 0, 0, 0);
+		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
 	/* do the blend */
 	//color.rgb.a = (color.rgb.a * (blenda + 1)) >> 8;
@@ -2578,44 +2581,41 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, sta
 	{
 		case 3:     /* reserved */
 		case 0:     /* nothing */
-			add_val.set(a_local, 0, 0, 0);
+			add_val.zero();
 			break;
 
 		case 1:     /* add c_local */
+			add_val.set(c_local);
 			break;
 
 		case 2:     /* add_alocal */
-			add_val.set(a_local, a_local, a_local, a_local);
+			add_val.set(c_local.select_alpha32());
 			break;
 	}
 
 	/* add clocal or alocal to alpha */
 	if (!FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))
-		add_val.set_a(0);
+		add_val.zero_alpha();
+	else
 		//color.rgb.a += c_local.rgb.a;
+		add_val.merge_alpha(c_local);
 
 	/* clamp */
 	//CLAMP(color.rgb.a, 0x00, 0xff);
 	//CLAMP(color.rgb.r, 0x00, 0xff);
 	//CLAMP(color.rgb.g, 0x00, 0xff);
 	//CLAMP(color.rgb.b, 0x00, 0xff);
-	c_local.add_imm(1);
-	c_other.scale_add_and_clamp(c_local, add_val);
-	srcColor.set(c_other);
+	blend_factor.add_imm(1);
+	blend_color.scale_add_and_clamp(blend_factor, add_val);
 
 	/* invert */
 	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))
-		srcColor.xor_imm_rgba(0xff, 0, 0, 0);
+		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
 	/* invert */
 	if (FBZCP_CC_INVERT_OUTPUT(FBZCOLORPATH))
-		srcColor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
+		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
-
-	/* handle alpha test */
-	if (ALPHAMODE_ALPHATEST(ALPHAMODE))
-		if (!alphaTest(vd, STATS, ALPHAMODE, srcColor.get_a()))
-			return false;
-	//APPLY_ALPHATEST(vd->m_vds, STATS, ALPHAMODE, color.rgb.a);
+	srcColor.set(blend_color);
 
 	return true;
 }
@@ -2758,15 +2758,19 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		}                                                                   \
 																				\
 		/* colorpath pipeline selects source colors and does blending */        \
-		color = clampARGB(iterargb, FBZCOLORPATH);           \
-		if (!combineColor(vd, stats, FBZCOLORPATH, FBZMODE, ALPHAMODE, texel, iterz, iterw, color)) \
-			goto skipdrawdepth; \
-																				\
-		/* perform fogging */                                                       \
-		preFog.set(color); \
-		if (FOGMODE_ENABLE_FOG(FOGMODE))                                                                        \
+		color = clampARGB(iterargb, FBZCOLORPATH);                                      \
+		if (!combineColor(vd, stats, FBZCOLORPATH, FBZMODE, texel, iterz, iterw, color)) \
+			goto skipdrawdepth;                                                          \
+		/* handle alpha test */                                                          \
+		if (ALPHAMODE_ALPHATEST(ALPHAMODE))                                              \
+			if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, ALPHAMODE, color.get_a()))   \
+				goto skipdrawdepth;                                                      \
+		                                                                                 \
+		/* perform fogging */                                                            \
+		preFog.set(color);                                                               \
+		if (FOGMODE_ENABLE_FOG(FOGMODE))                                                                         \
 			applyFogging(vd, FBZMODE, FOGMODE, FBZCOLORPATH, x, dither4, wfloat, color, iterz, iterw, iterargb); \
-																				\
+																				                                 \
 		/* perform alpha blending */                                                \
 		if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                                            \
 			alphaBlend(FBZMODE, ALPHAMODE, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565); \
@@ -3019,33 +3023,39 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 	return result;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod)
 {
-	int32_t a_other = c_other.get_a();
-	int32_t a_local = c_local.get_a();
-	rgbaint_t add_val = c_local;
-	uint8_t tmp;
+	rgbaint_t blend_color, blend_factor;
+	rgbaint_t add_val;
 
 	/* select zero/other for RGB */
 	if (TEXMODE_TC_ZERO_OTHER(TEXMODE))
-		c_other.and_imm_rgba(-1, 0, 0, 0);
+		blend_color.zero();
+	else
+		blend_color.set(c_other);
 
 	/* select zero/other for alpha */
 	if (TEXMODE_TCA_ZERO_OTHER(TEXMODE))
-		c_other.set_a(0);
+		blend_color.zero_alpha();
+	else
+		blend_color.merge_alpha(c_other);
 
 	if (TEXMODE_TC_SUB_CLOCAL(TEXMODE) || TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 	{
-		rgbaint_t sub_val = c_local;
+		rgbaint_t sub_val;
 
 		/* potentially subtract c_local */
 		if (!TEXMODE_TC_SUB_CLOCAL(TEXMODE))
-			sub_val.and_imm_rgba(-1, 0, 0, 0);
+			sub_val.zero();
+		else
+			sub_val.set(c_local);
 
 		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
-			sub_val.set_a(0);
+			sub_val.zero_alpha();
+		else
+			sub_val.merge_alpha(c_local);
 
-		c_other.sub(sub_val);
+		blend_color.sub(sub_val);
 	}
 
 	/* blend RGB */
@@ -3053,35 +3063,36 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	{
 		default:    /* reserved */
 		case 0:     /* zero */
-			c_local.and_imm_rgba(-1, 0, 0, 0);
+			blend_factor.zero();
 			break;
 
 		case 1:     /* c_local */
+			blend_factor.set(c_local);
 			break;
 
 		case 2:     /* a_other */
-			c_local.set(a_local, a_other, a_other, a_other);
+			blend_factor.set(c_other.select_alpha32());
 			break;
 
 		case 3:     /* a_local */
-			c_local.set(a_local, a_local, a_local, a_local);
+			blend_factor.set(c_local.select_alpha32());
 			break;
 
 		case 4:     /* LOD (detail factor) */
 			if (detailbias <= lod)
-				c_local.and_imm_rgba(-1, 0, 0, 0);
+				blend_factor.zero();
 			else
 			{
+				uint8_t tmp;
 				tmp = (((detailbias - lod) << detailscale) >> 8);
 				if (tmp > detailmax)
 					tmp = detailmax;
-				c_local.set(a_local, tmp, tmp, tmp);
+				blend_factor.set_all(tmp);
 			}
 			break;
 
 		case 5:     /* LOD fraction */
-			tmp = lod & 0xff;
-			c_local.set(a_local, tmp, tmp, tmp);
+			blend_factor.set_all(lod & 0xff);
 			break;
 	}
 
@@ -3090,45 +3101,46 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	{
 		default:    /* reserved */
 		case 0:     /* zero */
-			c_local.set_a(0);
+			blend_factor.zero_alpha();
 			break;
 
 		case 1:     /* c_local */
+			blend_factor.merge_alpha(c_local);
 			break;
 
 		case 2:     /* a_other */
-			c_local.set_a(a_other);
+			blend_factor.merge_alpha(c_other);
 			break;
 
 		case 3:     /* a_local */
+			blend_factor.merge_alpha(c_local);
 			break;
 
 		case 4:     /* LOD (detail factor) */
 			if (detailbias <= lod)
-				c_local.set_a(0);
+				blend_factor.zero_alpha();
 			else
 			{
+				uint8_t tmp;
 				tmp = (((detailbias - lod) << detailscale) >> 8);
 				if (tmp > detailmax)
 					tmp = detailmax;
-				c_local.set_a(tmp);
+				blend_factor.set_a(tmp);
 			}
 			break;
 
 		case 5:     /* LOD fraction */
-			c_local.set_a(lod & 0xff);
+			blend_factor.set_a(lod & 0xff);
 			break;
 	}
 
 	/* reverse the RGB blend */
 	if (!TEXMODE_TC_REVERSE_BLEND(TEXMODE))
-	{
-		c_local.xor_imm_rgba(0, 0xff, 0xff, 0xff);
-	}
+		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
 	/* reverse the alpha blend */
 	if (!TEXMODE_TCA_REVERSE_BLEND(TEXMODE))
-		c_local.xor_imm_rgba(0xff, 0, 0, 0);
+		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
 	/* do the blend */
 	//tr = (tr * (blendr + 1)) >> 8;
@@ -3141,39 +3153,38 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	{
 		case 3:     /* reserved */
 		case 0:     /* nothing */
-			add_val.set(a_local, 0, 0, 0);
+			add_val.zero();
 			break;
 
 		case 1:     /* add c_local */
+			add_val.set(c_local);
 			break;
 
 		case 2:     /* add_alocal */
-			add_val.set(a_local, a_local , a_local , a_local);
-			//tr += c_local.rgb.a;
-			//tg += c_local.rgb.a;
-			//tb += c_local.rgb.a;
+			add_val.set(c_local.select_alpha32());
 			break;
 	}
 
 	/* add clocal or alocal to alpha */
 	if (!TEXMODE_TCA_ADD_ACLOCAL(TEXMODE))
-		add_val.set_a(0);
-		//ta += c_local.rgb.a;
+		add_val.zero_alpha();
+	else
+		add_val.merge_alpha(c_local);
 
 	/* clamp */
 	//result.rgb.r = (tr < 0) ? 0 : (tr > 0xff) ? 0xff : tr;
 	//result.rgb.g = (tg < 0) ? 0 : (tg > 0xff) ? 0xff : tg;
 	//result.rgb.b = (tb < 0) ? 0 : (tb > 0xff) ? 0xff : tb;
 	//result.rgb.a = (ta < 0) ? 0 : (ta > 0xff) ? 0xff : ta;
-	c_local.add_imm(1);
-	c_other.scale_add_and_clamp(c_local, add_val);
-	rgbaint_t result(c_other);
+	blend_factor.add_imm(1);
+	blend_color.scale_add_and_clamp(blend_factor, add_val);
+
 	/* invert */
 	if (TEXMODE_TC_INVERT_OUTPUT(TEXMODE))
-		result.xor_imm_rgba(0, 0xff, 0xff, 0xff);
+		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 	if (TEXMODE_TCA_INVERT_OUTPUT(TEXMODE))
-		result.xor_imm_rgba(0xff, 0, 0, 0);
-	return result;
+		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
+	return blend_color;
 }
 
 #endif // MAME_VIDEO_VOODDEFS_H
