@@ -4331,6 +4331,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="msdos33s" cloneof="msdos33">
+		<description>MS-DOS (Version 3.30B) (V1.2) (Schneider) (German)</description>
+		<year>1989</year>
+		<publisher>Schneider Rdf. AG</publisher>
+		<info name="version" value="3.30B (V1.2)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "644953">
+				<rom name="schnds33.td0" size="644953" crc="c75d1ddf" sha1="90d02c565249753daf2e3316f431c9884e54c2d7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos4">
 		<description>MS-DOS (Version 4.00, 5.25")</description>
 		<year>1988</year>
@@ -6138,10 +6150,76 @@ has been replaced with an all-zero block. -->
 		<publisher>SSI</publisher>
 		<info name="developer" value="U.S. Gold" />
 		<info name="version" value="1.1" />
-		<info name="user_notes" value="Requires EGA or Tandy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Dragons of Flame [3.5DD] [Disk 1 of 1].img" size="737280" crc="0684051f" sha1="58ab0c9460ab9249a999ab00aba930ec92ebe744" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drakkhen">
+		<description>Drakkhen (EGA, CGA, VGA)</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 1).img" size="368640" crc="2bee4c4d" sha1="c8b91a175e66f16cf30b431a880daf0a6428151d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 2).img" size="368640" crc="1227d2a9" sha1="56c195e1ff5a49969cac0aa2ea5fd6aaec74e4ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 3).img" size="368640" crc="58e229c4" sha1="86860de84f40ecac0153042e545cb7624bf486b5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 4).img" size="368640" crc="e52dcc96" sha1="94e3039b488cd0eab0f486aa3ffeb0c49df242e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 5).img" size="368640" crc="6606cb1b" sha1="4d3cc62c7057e8cfffe625ca8a54815c7d658244" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA, VGA) (5.25'') (Disk 6).img" size="1228800" crc="f67ef70e" sha1="b2d6baeba776e5d9d8f88fe5672123e4b0f2843b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drakkhena" cloneof="drakkhen">
+		<description>Drakkhen (EGA, CGA)</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 1).img" size="368640" crc="a4a129b5" sha1="32acf3870bf2eb9e03d04ef9aadcd35724f5dd17" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 2).img" size="368640" crc="f4526865" sha1="c69cd580a535a483f6b4d752a1a4f0e2a6b1662d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 3).img" size="368640" crc="887533e1" sha1="8695ff06c7b70e595e8a2e87cda7ceb1e2f81463" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 4).img" size="368640" crc="98609dcb" sha1="a1c47db6c91bd24105753e0d2692ce5e27ab1531" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 5).img" size="368640" crc="0f814482" sha1="1f12e5315de9e3d82b74ccfeb7b3711dd6bac41e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6748,8 +6826,80 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="lsl3fr">
-		<description>Leisure Suit Larry 3: Patti la Passion à la Poursuite des Pectoraux Puissants (French)</description>
+	<software name="lsl3">
+		<description>Leisure Suit Larry 3: Passionate Patti in Pursuit of the Pulsating Pectorals (5.25")</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 1).img" size="368640" crc="c0f08381" sha1="292adabdab7a1d4fe85177663349a2ca0a1ed38f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 2).img" size="368640" crc="f5e9900f" sha1="6b99f448f6127f2106b4b4d770ea7b1740b532ed" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 3).img" size="368640" crc="6e61ab00" sha1="671ee856def2d919177ea5a99e27b73671a1db22" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 4).img" size="368640" crc="9d196dce" sha1="9212d37bdf438747126e007856d3bc478fe73b9d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 5).img" size="368640" crc="fd913e94" sha1="27e9c80a4b5633627b14a13f46ce363667b074b8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 6).img" size="368640" crc="2b9e05bd" sha1="c8b5595289f8471c07b43599b047410f31ea0531" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 7).img" size="368640" crc="515e7ea5" sha1="c5bd33eb577192125ee587d2d2d3e6863703e6dc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (5.25'') (Disk 8).img" size="368640" crc="a9d7b747" sha1="87d0605d23ab4b10615370f4858d62e18be749ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl3_35" cloneof="lsl3">
+		<description>Leisure Suit Larry 3: Passionate Patti in Pursuit of the Pulsating Pectorals (3.5")</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (3.5'') (Disk 1).img" size="737280" crc="bc63e897" sha1="0c2814635151b69017ba7e62341295bc3500cd0d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (3.5'') (Disk 2).img" size="737280" crc="388b085c" sha1="e7baa61de499a11954d5f50788d0b8e3a43058f8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (3.5'') (Disk 3).img" size="737280" crc="ca7193e6" sha1="7cd568a512882074f59302ae479e96fc651fe35d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 3 - Passionate Patti in Pursuit of the Pulsating Pectorals (USA) (v1.003) (3.5'') (Disk 4).img" size="737280" crc="d59e47f0" sha1="c97df6e4ffb11b0f626004077fb062209e2eb4d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl3fr" cloneof="lsl3">
+		<description>Leisure Suit Larry 3: Patti la Passion à la Poursuite des Pectoraux Puissants (3.5", French)</description>
 		<year>1989</year>
 		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6851,6 +7001,27 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Loom [3.5DD] [Disk 3 of 3].img" size="737280" crc="da3a8e6e" sha1="c7980c4e45ebc03edd883a0031a63e0825d6698c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loomde">
+		<description>Loom (German)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm Games</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (Germany) (EGA) (Disk 1).img" size="737280" crc="52b572e4" sha1="aad95abf7149c7759876c7eb54cf2119d7d86bbc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (Germany) (EGA) (Disk 2).img" size="737280" crc="faac49b8" sha1="ac50e17e33da8779fa7cf02dbd70984f82989051" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (Germany) (EGA) (Disk 3).img" size="737280" crc="a2b1725a" sha1="3ec7cf39aaa96c739a37d06826e9264086d379a0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7526,6 +7697,50 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Skweek D2.2 [5.25].img" size="368640" crc="29fb059e" sha1="c93d3411ec866b6c489bfad5b7825c89d79b6f90" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+	<software name="sq2">
+		<description>Space Quest II - Vohaul's Revenge (5.25")</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="2.0F" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2882752">
+				<rom name="sq2_1.mfm" size="2882752" crc="7da46c43" sha1="931fa509a3a4f5627777f571a298065c024ba6b4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="sq2_2.img" size="368640" crc="601485af" sha1="d2f930669cc3f72b633a664fab4a856118f20b8b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="sq2_3.img" size="368640" crc="f0910a9a" sha1="13007e67ad2f02683f14c691b83e48a34e0f3aae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq2_35" cloneof="sq2">
+		<description>Space Quest II - Vohaul's Revenge (3.5")</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="2.0F" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Dumped via Kryoflux, track 0 shows as modified -->
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2229387">
+				<rom name="sq2_35_1.mfm" size="2229387" crc="aa32aaab" sha1="c58cd7462aea635197d7e138ac8cb2b3b7596b43" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "2226684">
+				<rom name="sq2_35_2.img" size="737280" crc="1faf9960" sha1="7c0317d233cdb1bf8f958e3ae63ef3c2fe299bd0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
