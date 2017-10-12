@@ -81,17 +81,16 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
-#define LOG_PRINTF  (1U <<  2)
-#define LOG_READ    (1U <<  3)
-#define LOG_INT     (1U <<  4)
-#define LOG_CMD     (1U <<  5)
-#define LOG_TX      (1U <<  6)
-#define LOG_RCV     (1U <<  7)
-#define LOG_CTS     (1U <<  8)
-#define LOG_DCD     (1U <<  9)
-#define LOG_SYNC    (1U << 10)
+#define LOG_READ    (1U <<  2)
+#define LOG_INT     (1U <<  3)
+#define LOG_CMD     (1U <<  4)
+#define LOG_TX      (1U <<  5)
+#define LOG_RCV     (1U <<  6)
+#define LOG_CTS     (1U <<  7)
+#define LOG_DCD     (1U <<  8)
+#define LOG_SYNC    (1U <<  9)
 
-//#define VERBOSE (LOG_CMD|LOG_INT|LOG_SETUP|LOG_TX|LOG_RCV|LOG_READ|LOG_CTS|LOG_DCD)
+//#define VERBOSE (LOG_INT|LOG_READ|LOG_SETUP|LOG_TX|LOG_CMD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -187,7 +186,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 	m_variant(variant),
-	m_wr0_ptrbits(0)
+	m_wr0_ptrbits(0),
+	m_cputag(nullptr)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -371,6 +371,8 @@ int z80scc_device::z80daisy_irq_state()
 //-------------------------------------------------
 int z80scc_device::z80daisy_irq_ack()
 {
+	int ret = -1; // Indicate default vector
+
 	LOGINT("%s %s \n",tag(), FUNCNAME);
 	// loop over all interrupt sources
 	for (auto & elem : m_int_state)
@@ -383,18 +385,28 @@ int z80scc_device::z80daisy_irq_ack()
 			LOGINT(" - Found an INT request, ");
 			if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
 			{
-				LOGINT("but WR9 D1 set to use autovector, returning -1\n");
-				return -1;
+				LOGINT("but WR9 D1 set to use autovector, returning the default vector\n");
+				break;
 			}
 			else
 			{
 				LOGINT("returning RR2: %02x\n", m_chanB->m_rr2 );
-				return m_chanB->m_rr2;
+				ret = m_chanB->m_rr2;
+				break;
 			}
 		}
 	}
 
-	return -1;
+	// Did we not find a vector? Get the notion of a default vector from the CPU implementation 
+	if (ret == -1 && m_cputag != nullptr)
+	{
+		// default irq vector is -1 for 68000 but 0 for z80 for example...
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
+		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+	}
+
+	return ret;
 }
 
 

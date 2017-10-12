@@ -142,7 +142,7 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 	m_variant(variant),
-	m_cputag("maincpu")
+	m_cputag(nullptr)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -245,8 +245,7 @@ int z80sio_device::z80daisy_irq_state()
 //-------------------------------------------------
 int z80sio_device::z80daisy_irq_ack()
 {
-	// default irq vector is -1 for 68000 but 0 for z80 for example...
-	int ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+	int ret = -1; // Indicate default vector
 
 	LOGINT("%s %s \n",tag(), FUNCNAME);
 	// loop over all interrupt sources
@@ -260,12 +259,18 @@ int z80sio_device::z80daisy_irq_ack()
 			LOGINT(" - Found an INT request, ");
 			LOGINT("returning RR2: %02x\n", m_chanB->m_rr2 );
 			check_interrupts();
-			return m_chanB->m_rr2;
+			ret = m_chanB->m_rr2;
+			break;
 		}
 	}
-	ret = m_chanB->m_rr2;
-	LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
-	logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+	// Did we not find a vector? Get the notion of a default vector from the CPU implementation 
+	if (ret == -1 && m_cputag != nullptr)
+	{
+		// default irq vector is -1 for 68000 but 0 for z80 for example...
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_cputag, ret );
+		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+	}
 
 	return ret;
 }
