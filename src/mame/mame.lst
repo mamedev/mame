@@ -36285,7 +36285,8 @@ to9                             // 1985 Thomson T09
 to9p                            // 1986 Thomson T09+
 
 @source:thoop2.cpp
-thoop2                          // (c) 1994 - Ref ???
+thoop2                          // (c) 1994 - REF.940411
+thoop2a                         // (c) 1994 - REF.940411
 
 @source:thunderj.cpp
 thunderj                        // 136076           (c) 1990
