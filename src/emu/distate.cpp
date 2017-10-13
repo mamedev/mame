@@ -49,17 +49,17 @@ const u64 device_state_entry::k_decimal_divisor[] =
 //  device_state_entry - constructor
 //-------------------------------------------------
 
-device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, device_state_interface *dev)
+device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev)
 	: m_device_state(dev),
 		m_index(index),
 		m_datamask(sizemask),
 		m_datasize(size),
-		m_flags(0),
+		m_flags(flags),
 		m_symbol(symbol),
 		m_default_format(true),
 		m_sizemask(sizemask)
 {
-	assert(size == 1 || size == 2 || size == 4 || size == 8);
+	assert(size == 1 || size == 2 || size == 4 || size == 8 || (flags & DSF_FLOATING_POINT) != 0);
 
 	format_from_mask();
 
@@ -113,6 +113,12 @@ void device_state_entry::format_from_mask()
 	if (!m_default_format)
 		return;
 
+	if (is_float())
+	{
+		m_format = "%12s";
+		return;
+	}
+
 	// make up a format based on the mask
 	int width = 0;
 	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
@@ -139,6 +145,17 @@ void *device_state_entry::entry_baseptr() const
 u64 device_state_entry::entry_value() const
 {
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  entry_dvalue - return the current value as a
+//  double
+//-------------------------------------------------
+
+double device_state_entry::entry_dvalue() const
+{
+	return 0.0;
 }
 
 
@@ -352,11 +369,34 @@ void device_state_entry::set_value(u64 value) const
 
 
 //-------------------------------------------------
+//  set_dvalue - set the value from a double
+//-------------------------------------------------
+
+void device_state_entry::set_dvalue(double value) const
+{
+	assert((m_flags & DSF_READONLY) == 0);
+
+	// store the value
+	entry_set_dvalue(value);
+}
+
+
+//-------------------------------------------------
 //  entry_set_value - set the value from a u64
 //-------------------------------------------------
 
 void device_state_entry::entry_set_value(u64 value) const
 {
+}
+
+
+//-------------------------------------------------
+//  entry_set_dvalue - set the value from a double
+//-------------------------------------------------
+
+void device_state_entry::entry_set_dvalue(double value) const
+{
+	set_value(u64(value));
 }
 
 
@@ -435,6 +475,8 @@ std::string device_state_interface::state_string(int index) const
 	std::string custom;
 	if (entry->needs_custom_string())
 		state_string_export(*entry, custom);
+	else if (entry->is_float())
+		custom = string_format("%-12G", entry->dvalue());
 
 	// ask the entry to format itself
 	return entry->format(custom.c_str());

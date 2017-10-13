@@ -46,7 +46,7 @@ class device_state_entry
 	friend class device_state_interface;
 public:
 	// construction/destruction
-	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, device_state_interface *dev);
+	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
 
 public:
@@ -67,6 +67,7 @@ public:
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool writeable() const { return ((m_flags & DSF_READONLY) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
+	bool is_float() const { return m_flags & DSF_FLOATING_POINT; }
 	device_state_interface *parent_state() const {return m_device_state;}
 	const std::string &format_string() const { return m_format; }
 
@@ -79,6 +80,7 @@ protected:
 	static constexpr u8 DSF_CUSTOM_STRING   = 0x10; // set if the format has a custom string
 	static constexpr u8 DSF_DIVIDER         = 0x20; // set if this is a divider entry
 	static constexpr u8 DSF_READONLY        = 0x40; // set if this entry does not permit writes
+	static constexpr u8 DSF_FLOATING_POINT  = 0x80; // set if this entry represents a floating-point value
 
 	// helpers
 	bool needs_custom_string() const { return ((m_flags & DSF_CUSTOM_STRING) != 0); }
@@ -87,17 +89,21 @@ protected:
 	// return the current value -- only for our friends who handle export
 	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
 	u64 value() const { return entry_value() & m_datamask; }
+	double dvalue() const { return entry_dvalue(); }
 	std::string format(const char *string, bool maxout = false) const;
 
 	// set the current value -- only for our friends who handle import
 	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
 	void set_value(u64 value) const;
+	void set_dvalue(double value) const;
 	void set_value(const char *string) const;
 
 	// overrides
 	virtual void *entry_baseptr() const;
 	virtual u64 entry_value() const;
 	virtual void entry_set_value(u64 value) const;
+	virtual double entry_dvalue() const;
+	virtual void entry_set_dvalue(double value) const;
 
 	// statics
 	static const u64 k_decimal_divisor[20];      // divisors for outputting decimal values
@@ -124,7 +130,7 @@ class device_state_register : public device_state_entry
 public:
 	// construction/destruction
 	device_state_register(int index, const char *symbol, ItemType &data, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), dev),
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
 			m_data(data)
 	{
 		static_assert(std::is_integral<ItemType>().value, "Registration of non-integer types is not currently supported");
@@ -140,6 +146,30 @@ private:
 	ItemType &              m_data;                 // reference to where the data lives
 };
 
+// class template representing a floating-point state register
+template<>
+class device_state_register<double> : public device_state_entry
+{
+public:
+	// construction/destruction
+	device_state_register(int index, const char *symbol, double &data, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
+			m_data(data)
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return u64(m_data); }
+	virtual void entry_set_value(u64 value) const override { m_data = double(value); }
+	virtual double entry_dvalue() const override { return m_data; }
+	virtual void entry_set_dvalue(double value) const override { m_data = value; }
+
+private:
+	double &                m_data;                 // reference to where the data lives
+};
+
 
 // ======================> device_state_register
 
@@ -153,7 +183,7 @@ public:
 
 	// construction/destruction
 	device_pseudo_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), dev),
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
 			m_getter(std::move(getter)),
 			m_setter(std::move(setter))
 	{

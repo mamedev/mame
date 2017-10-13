@@ -212,12 +212,10 @@ void dsp32c_device::device_start()
 	state_add(DSP32_PIN,       "PIN",       m_pin).mask(0xffffff);
 	state_add(DSP32_POUT,      "POUT",      m_pout).mask(0xffffff);
 	state_add(DSP32_IVTP,      "IVTP",      m_ivtp).mask(0xffffff);
-#ifdef STATE_REGISTER_DOUBLE
 	state_add(DSP32_A0,        "A0",        m_a[0]).formatstr("%8s");
 	state_add(DSP32_A1,        "A1",        m_a[1]).formatstr("%8s");
 	state_add(DSP32_A2,        "A2",        m_a[2]).formatstr("%8s");
 	state_add(DSP32_A3,        "A3",        m_a[3]).formatstr("%8s");
-#endif
 	state_add(DSP32_DAUC,      "DAUC",      m_r[26]).mask(0xff);
 	state_add(DSP32_PAR,       "PAR",       m_par);
 	state_add(DSP32_PDR,       "PDR",       m_pdr);

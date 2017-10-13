@@ -150,7 +150,6 @@ void clipper_device::device_start()
 	state_add(CLIPPER_R14, "r14", m_r[14]);
 	state_add(CLIPPER_R15, "r15", m_r[15]);
 
-#ifdef STATE_REGISTER_DOUBLE
 	state_add(CLIPPER_F0, "f0", m_f[0]);
 	state_add(CLIPPER_F1, "f1", m_f[1]);
 	state_add(CLIPPER_F2, "f2", m_f[2]);
@@ -172,7 +171,6 @@ void clipper_device::device_start()
 		state_add(CLIPPER_F14, "f14", m_f[14]);
 		state_add(CLIPPER_F15, "f15", m_f[15]);
 	}
-#endif
 }
 
 void clipper_device::device_reset()
