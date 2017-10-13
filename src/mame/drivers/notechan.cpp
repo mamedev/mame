@@ -157,14 +157,6 @@
   Technical info:
 
 
-  Error codes:
-
-  E0 - PCB error, check ROM/RAM.
-  E1 - Home position sensor error.
-  E2 - Output sensor error.
-  C0 - Freebie / Giveaway (??).
-
-
   DIP Switches:
 
   +-----------------------------------+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -225,10 +217,10 @@
 
   Letter and number displayed alternately on the play count display.
 
-  C0 and prize out LED      Prizes out.
-  E0                        PCB failure.
-  E1                        Home position sensor failure.
-  E2                        Output sensor failure.
+  C0 (and prize out LED):   Prizes out.
+  E0:                       PCB failure, check ROM/RAM.
+  E1:                       Home position sensor failure.
+  E2:                       Output sensor failure.
 
 -------------------------------------------------------------------
 
@@ -466,7 +458,7 @@ static INPUT_PORTS_START( notechan )
       Maybe it's the 'coin-in' button.
 
   (4) Pulsing these three lines together (D3-D4-D5) trigger a partial sample (not recog-
-      nized) constantly.  
+      nized) constantly.
 
 */
 	PORT_START("DSW")
