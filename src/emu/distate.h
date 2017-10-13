@@ -127,6 +127,7 @@ public:
 		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), dev),
 			m_data(data)
 	{
+		static_assert(std::is_integral<ItemType>().value, "Registration of non-integer types is not currently supported");
 	}
 
 protected:

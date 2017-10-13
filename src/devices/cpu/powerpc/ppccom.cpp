@@ -849,6 +849,7 @@ void ppc_device::device_start()
 	state_add(PPC_R30,   "R30", m_core->r[30]).formatstr("%08X");
 	state_add(PPC_R31,   "R31", m_core->r[31]).formatstr("%08X");
 
+#ifdef STATE_REGISTER_DOUBLE
 	state_add(PPC_F0,    "F0", m_core->f[0]).formatstr("%12s");
 	state_add(PPC_F1,    "F1", m_core->f[1]).formatstr("%12s");
 	state_add(PPC_F2,    "F2", m_core->f[2]).formatstr("%12s");
@@ -881,6 +882,7 @@ void ppc_device::device_start()
 	state_add(PPC_F29,   "F29", m_core->f[29]).formatstr("%12s");
 	state_add(PPC_F30,   "F30", m_core->f[30]).formatstr("%12s");
 	state_add(PPC_F31,   "F31", m_core->f[31]).formatstr("%12s");
+#endif
 	state_add(PPC_FPSCR, "FPSCR", m_core->fpscr).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();

@@ -1021,7 +1021,10 @@ void netlist_mame_cpu_device::device_start()
 		}
 		else
 		{
+#ifdef STATE_REGISTER_DOUBLE
+			// This attempts to register state variables of type nl_double (double), which is currently not supported
 			state_add(i*2+1, n->name().c_str(), *downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+#endif
 		}
 	}
 
