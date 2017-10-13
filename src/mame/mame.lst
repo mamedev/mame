@@ -17118,6 +17118,7 @@ kaypro4a                        // Kaypro 4 - 4/84
 kaypro4p88                      // Kaypro 4 - 4/83 w/plus88 board installed
 kayproii                        // Kaypro II - 2/83
 omni2                           // Omni II
+omni4							// Omni 4
 robie                           // Kaypro Robie
 
 @source:kc.cpp
