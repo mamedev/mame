@@ -55,7 +55,7 @@
   04- GND
   05- DC +5V.
   06- GND
-  07- 
+  07-
   08- ACFAIL
   09- DC 12V
   10- GND
@@ -70,7 +70,7 @@
   Voltage:  AC 90/110 V., 50/60 Hz.
   Power:    30 W.
 
-  
+
 ****************************************************************************************
 
   Samples:
@@ -148,7 +148,7 @@
   $02E371-$030EDE:    Sample #2-31    voice: unknown.
   $030EDF-$0333F8:    Sample #2-32    voice: unknown.
 
- 
+
 ****************************************************************************************
 
   Technical info:
@@ -159,7 +159,7 @@
   E0 - PCB error, check ROM/RAM.
   E1 - Home position sensor error.
   E2 - Output sensor error.
-  C0 - Freebie / Giveaway (??). 
+  C0 - Freebie / Giveaway (??).
 
 
   DIP Switches:
@@ -180,32 +180,105 @@
   | PLAYS PER    | 1 CREDIT / 3 PLAYS |     |     |     |     | OFF |     |     |     |
   | CREDIT       | 1 CREDIT / 2 PLAYS |     |     |     |     | ON  |     |     |     |
   +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
-  | ????         | ???                |     |     |     |     |     | OFF |     |     |
-  |              | ???                |     |     |     |     |     | ON  |     |     |
+  | PAYOUT RATE  | AS CONFIGURED      |     |     |     |     |     | OFF |     |     |
+  | MULTIPLIER   | DOUBLE CONFIGURED  |     |     |     |     |     | ON  |     |     |
   +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
-  | ATTRACT      | SOUND OUTPUT       |     |     |     |     |     |     | OFF |     |
+  | ATTRACT      | WITH SOUND OUTPUT  |     |     |     |     |     |     | OFF |     |
   | SOUND        | NO SOUND OUTPUT    |     |     |     |     |     |     | ON  |     |
   +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
   | UNUSED       | LEAVE IT OFF       |     |     |     |     |     |     |     | OFF |
   +--------------+--------------------+-----+-----+-----+-----+-----+-----+-----+-----+
+  | SETTING AS SHIPPED                | OFF | OFF | ON  | OFF | OFF | OFF | OFF | OFF |
+  +-----------------------------------+-----+-----+-----+-----+-----+-----+-----+-----+
 
 
   Known Inputs:
 
-  1x Coin-In (100Y)
   1x Start/Stop button.
-  1x (comm with prize dispenser)
+  1x Coin-In (100Y)
+  1x Prize Payout Detector (optical)
+  1x Prizes Empty Sensor
+  1x Home Position Sensor (optical)
+  1x Service Switch (allows play without incrementing 100Y counter)
+  1x Test Switch (used to enter test mode)
 
 
   Known Outputs:
 
-  2x 7-seg LEDs for credits counter and error codes.
+  1x 7-seg LEDs for play count, error code, and test phase.
+  1x Start/Stop Switch lamp.
+  1x Prize payout lamp (arrow pointing to prize, blinks when wins).
+  1x Prizes empty LED.
   2x Red panels (2 lamps each).
   2x Blue panels (2 lamps each).
   2x Yellow panels (2 lamps each).
-  1x Empty prize stock LED.
-  1x Arrow lamp pointing to the prize (blinks when wins).
-  1x Prize dispenser.
+  1x "Note Vendor" prize dispenser.
+  1x Coin lockout.
+  1x 100Y counter (counts 100Y coins).
+  1x Prize counter (counts prizes paid out).
+
+
+  Error codes
+
+  Letter and number displayed alternately on the play count display
+
+  C0 and prize out LED      prizes out
+  E0                        PCB failure
+  E1                        home position sensor failure
+  E2                        output sensor failure
+
+
+  Test mode
+
+  Enter by pressing test switch
+  Test switch moves to next
+  Start switch moves to previous
+
+  1. game count display test
+    * press/hold service to increment displayed digit
+  2. lamp/LED test
+    * press/hold sevice to step through lamps/LEDs in order:
+      - Start/stop switch
+      - Prize payout lamp
+      - Prizes empty LED
+      - Left upper row 1
+      - Left upper row 2
+      - Middle upper row 1
+      - Middle upper row 2
+      - Right upper row 1
+      - Right upper row 2
+      - Left lower row 1
+      - Left lower row 2
+      - Middle lower row 1
+      - Middle lower row 2
+      - Right lower row 1
+      - Right lower row 2
+      - All lamps/LEDs off
+  3. sensor/switch test
+    * start/stop switch         -> start switch lamp        on=lit, off=unlit
+    * coin detector             -> left lower row 1         on=lit, off=unlit
+    * prize payout detector     -> left upper row 1         interrupted=lit, continuous=unlit
+    * prizes empty              -> middle upper row 1       on=lit, off=unlit
+    * home position             -> right upper row 1        interrupted=lit, continuous=unlit
+  4. audio output test
+  5. payout mechanism test
+    * dispenses one prize each time service swith is pressed
+    * dispenses prizes while start/stop is held
+    * counts prizes dispensed and shows sensor state on lamps (as for sensor/switch test)
+  6. coin mechanism test
+    * service switch actuates coin lockout
+    * counts/plays sound for coins
+    * shows coin detector state on lamp (as for sensor/swtich test)
+  7. DIP SW1..SW4 confirmation
+    * SW1 -> left upper row 1
+    * SW2 -> middle upper row 1
+    * SW3 -> left lower row 1
+    * SW4 -> middle lower row 1
+  8. DIP SW5..SW8 confirmation
+    * SW5 -> left upper row 1
+    * SW6 -> middle upper row 1
+    * SW7 -> left lower row 1
+    * SW8 -> middle lower row 1
 
 
 ***************************************************************************************/
@@ -367,21 +440,21 @@ static INPUT_PORTS_START( notechan )
   Inputs notes...
 
   Port FAh:
-  
+
   (1) Pulsed under reset, activates port FAh-D5 (lamp 21) and triggers sample #20 (boing
       or FX sound, depending of the OKI bank). Maybe it's the 'start' button.
 
   (2) Pulsing and keep pressed under reset, triggers the sample #01 (cling) and starts
       a sequence of 4-lines output through port FFh D3-D2-D1-D0 (lamps 27-26-25-24)
-	  that seems a 4-bits countdown (from 8 to 0) maybe related to the 7segment LEDs
-	  credits counter). Then triggers sample #04 (voice or effect depending of the OKI
-	  bank). After a little while also triggers sample #05 (voice).
-	  Maybe it's some kind of hardware testing mode or boot sequence...
+      that seems a 4-bits countdown (from 8 to 0) maybe related to the 7segment LEDs
+      credits counter). Then triggers sample #04 (voice or effect depending of the OKI
+      bank). After a little while also triggers sample #05 (voice).
+      Maybe it's some kind of hardware testing mode or boot sequence...
 
   (3) Pulsing this input activates port FAh-D1 (lamp 17) and triggers sample #01 (cling).
-      Maybe it's the 'coin-in' button. 
+      Maybe it's the 'coin-in' button.
 
-*/  
+*/
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
