@@ -326,6 +326,21 @@ Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
 On board ports: speaker
 Options: 8087 FPU
 
+Kaypro 16
+=======================
+Links: http://www.mofeel.net/679-comp-sys-ibm-pc-classic/309.aspx, https://groups.google.com/forum/#!topic/comp.os.cpm/HYQnpUOyQXg, https://amaus.org/static/S100/kaypro/systems/kaypro%2016/Kaypro%2016.pdf , http://ajordan.dpease.com/kaypro16/index.htm
+Form Factor: Luggable
+CPU: 8088 @ 4.77MHz
+RAM: 256K, expandable to 512K and 640K
+Mainboard with 4 ISA slots, video decoder circuitry to show 16 levels of grayscale on the internal monitor, interface to WD1002-HD0 harddisk controller
+Bus: 4x ISA:    1) 8088 slot CPU, keyboard connector, reset switch, 
+                2) Floppy disk controller, serial, parallel, RAM expansion
+                3) Kaypro CGA card with composite and colour TTL outputs, ROM 81-820 needs to be dumped
+                4) empty
+Video: CGA
+Mass storage: 1x 5.25" 360K, 10MB harddisk (Seagate ST212)
+Options: 8087 FPU
+Misc: A Kaypro 16/2 is a configuration without harddisk but with two floppy disk drives (interface ics on mainboard were not populated)
 ***************************************************************************/
 
 
@@ -702,7 +717,6 @@ static MACHINE_CONFIG_DERIVED(ataripc1, pccga)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_360K)
 MACHINE_CONFIG_END
 
-
 //Eagle 1600
 static MACHINE_CONFIG_DERIVED(eagle1600, pccga)
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -779,6 +793,23 @@ static MACHINE_CONFIG_DERIVED(olytext30, pccga)
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
+// Kaypro 16
+static MACHINE_CONFIG_DERIVED(kaypro16, pccga)
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa4")
+	MCFG_SLOT_FIXED(true)	
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -961,6 +992,11 @@ ROM_START( olytext30 )
 	ROM_LOAD("o45995.bin", 0xe000, 0x2000, CRC(fdc05b4f) SHA1(abb94e75e7394be1e85ff706d4d8f3b9cdfea09f))
 ROM_END
 
+ROM_START( kaypro16 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -992,3 +1028,4 @@ COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,  
 COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
 COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
 COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1985,   kaypro16,         ibm5150,    0,          kaypro16,       pccga,    pc_state, 0,        "Kaypro Corporation",              "Kaypro 16",            0 )
