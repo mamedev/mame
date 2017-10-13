@@ -40,6 +40,9 @@
   Clock:
   1x Xtal: 8.44800 MHz.
 
+  Output:
+  1x TD62309P (six high-current sink drivers)
+
   Other:
   1x 8-DIP switches bank.
   1x volume pot.
@@ -218,67 +221,75 @@
   1x Prize counter (counts prizes paid out).
 
 
-  Error codes
+  Error codes:
 
-  Letter and number displayed alternately on the play count display
+  Letter and number displayed alternately on the play count display.
 
-  C0 and prize out LED      prizes out
-  E0                        PCB failure
-  E1                        home position sensor failure
-  E2                        output sensor failure
+  C0 and prize out LED      Prizes out.
+  E0                        PCB failure.
+  E1                        Home position sensor failure.
+  E2                        Output sensor failure.
 
+-------------------------------------------------------------------
 
-  Test mode
+  Test mode.
 
-  Enter by pressing test switch
-  Test switch moves to next
-  Start switch moves to previous
+  Enter by pressing test switch.
+  Test switch moves to next.
+  Start switch moves to previous.
 
-  1. game count display test
-    * press/hold service to increment displayed digit
-  2. lamp/LED test
+  1. Game count display test.
+     * press/hold service to increment displayed digit.
+
+  2. Lamp/LED test.
     * press/hold sevice to step through lamps/LEDs in order:
-      - Start/stop switch
-      - Prize payout lamp
-      - Prizes empty LED
-      - Left upper row 1
-      - Left upper row 2
-      - Middle upper row 1
-      - Middle upper row 2
-      - Right upper row 1
-      - Right upper row 2
-      - Left lower row 1
-      - Left lower row 2
-      - Middle lower row 1
-      - Middle lower row 2
-      - Right lower row 1
-      - Right lower row 2
-      - All lamps/LEDs off
-  3. sensor/switch test
+      - Start/stop switch.
+      - Prize payout lamp.
+      - Prizes empty LED.
+      - Left upper row 1.
+      - Left upper row 2.
+      - Middle upper row 1.
+      - Middle upper row 2.
+      - Right upper row 1.
+      - Right upper row 2.
+      - Left lower row 1.
+      - Left lower row 2.
+      - Middle lower row 1.
+      - Middle lower row 2.
+      - Right lower row 1.
+      - Right lower row 2.
+      - All lamps/LEDs off.
+
+  3. Sensor/switch test.
     * start/stop switch         -> start switch lamp        on=lit, off=unlit
     * coin detector             -> left lower row 1         on=lit, off=unlit
     * prize payout detector     -> left upper row 1         interrupted=lit, continuous=unlit
     * prizes empty              -> middle upper row 1       on=lit, off=unlit
     * home position             -> right upper row 1        interrupted=lit, continuous=unlit
-  4. audio output test
-  5. payout mechanism test
-    * dispenses one prize each time service swith is pressed
-    * dispenses prizes while start/stop is held
-    * counts prizes dispensed and shows sensor state on lamps (as for sensor/switch test)
-  6. coin mechanism test
-    * service switch actuates coin lockout
-    * counts/plays sound for coins
-    * shows coin detector state on lamp (as for sensor/swtich test)
-  7. DIP SW1..SW4 confirmation
-    * SW1 -> left upper row 1
-    * SW2 -> middle upper row 1
-    * SW3 -> left lower row 1
-    * SW4 -> middle lower row 1
-  8. DIP SW5..SW8 confirmation
-    * SW5 -> left upper row 1
-    * SW6 -> middle upper row 1
-    * SW7 -> left lower row 1
-    * SW8 -> middle lower row 1
+
+  4. Audio output test.
+
+  5. Payout mechanism test.
+    * dispenses one prize each time service swith is pressed.
+    * dispenses prizes while start/stop is held.
+    * counts prizes dispensed and shows sensor state on lamps (as for sensor/switch test).
+
+  6. Coin mechanism test.
+    * service switch actuates coin lockout.
+    * counts/plays sound for coins.
+    * shows coin detector state on lamp (as for sensor/swtich test).
+
+  7. DIP SW1..SW4 confirmation.
+    * SW1 -> left upper row 1.
+    * SW2 -> middle upper row 1.
+    * SW3 -> left lower row 1.
+    * SW4 -> middle lower row 1.
+
+  8. DIP SW5..SW8 confirmation.
+    * SW5 -> left upper row 1.
+    * SW6 -> middle upper row 1.
+    * SW7 -> left lower row 1.
+    * SW8 -> middle lower row 1.
 
 
 ***************************************************************************************/
