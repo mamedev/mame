@@ -4,8 +4,12 @@
 
     ay31015.c by Robbbert, May 2008. Bugs fixed by Judge.
 
-    Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A), and AY-6-1013 UARTs
-    The HD6402 UART is compatible with the AY-3-1015 UART.
+    Code for the General Instruments AY-3-1014A, AY-3-1015(D), AY-5-1013(A),
+    and AY-6-1013 UARTs (Universal Asynchronous Receiver/Transmitters).
+
+    Compatible UARTs were produced by Harris (HD6402), TI (TMS6011),
+    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Standard
+    Microsystems (COM2502/COM2017), Tesla (MHB1012) and other companies.
 
     This is cycle-accurate according to the specifications.
 
