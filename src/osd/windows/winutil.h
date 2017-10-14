@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <windows.h>
 
 // Shared code
 osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes);

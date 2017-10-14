@@ -3,7 +3,16 @@
 
 #include <mutex>
 
+#include "input_windows.h"
 #include "modules/lib/osdlib.h"
+
+// standard windows headers
+#include <windows.h>
+
+// XInput header
+#include <xinput.h>
+
+#undef interface
 
 #define XINPUT_MAX_POV 4
 #define XINPUT_MAX_BUTTONS 10
@@ -140,6 +149,20 @@ public:
 	void poll() override;
 	void reset() override;
 	void configure();
+};
+
+class xinput_joystick_module : public wininput_module
+{
+private:
+	std::shared_ptr<xinput_api_helper> m_xinput_helper;
+
+public:
+	xinput_joystick_module();
+
+	virtual int init(const osd_options &options) override;
+
+protected:
+	virtual void input_init(running_machine &machine) override;
 };
 
 #endif

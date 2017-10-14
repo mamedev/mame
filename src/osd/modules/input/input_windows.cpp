@@ -19,6 +19,7 @@
 
 #include "input_common.h"
 #include "input_windows.h"
+#include "input_xinput.h"
 
 bool windows_osd_interface::should_hide_mouse() const
 {
@@ -76,6 +77,7 @@ void windows_osd_interface::poll_input(running_machine &machine) const
 void windows_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
 	const char* uimode;
+	bool xinput_gamepad = dynamic_cast<xinput_joystick_module*>(m_joystick_input) != nullptr;
 
 	// loop over the defaults
 	for (input_type_entry &entry : typelist)
@@ -154,6 +156,16 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// add a NOT-lctrl-lalt to our default F5
 			case IPT_UI_TOGGLE_DEBUG: // emu/input.c: input_seq(KEYCODE_F5)
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
+				break;
+
+			// XInput maps triggers onto separate axes instead of merging both onto the Z axis
+			case IPT_PEDAL:
+				if (xinput_gamepad)
+					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_Z_INDEXED(entry.player()));
+				break;
+			case IPT_PEDAL2:
+				if (xinput_gamepad)
+					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_W_INDEXED(entry.player()));
 				break;
 
 			// leave everything else alone

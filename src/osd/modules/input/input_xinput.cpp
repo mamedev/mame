@@ -11,14 +11,6 @@
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-
-// XInput header
-#include <xinput.h>
-
-#undef interface
-
 // MAME headers
 #include "emu.h"
 
@@ -197,60 +189,52 @@ void xinput_joystick_device::configure()
 //  xinput_joystick_module
 //============================================================
 
-class xinput_joystick_module : public wininput_module
-{
-private:
-	std::shared_ptr<xinput_api_helper> m_xinput_helper;
-
-public:
-	xinput_joystick_module()
-		: wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "xinput"),
+xinput_joystick_module::xinput_joystick_module()
+	: wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "xinput"),
 		m_xinput_helper(nullptr)
+{
+}
+
+int xinput_joystick_module::init(const osd_options &options)
+{
+	// Call the base
+	int status = wininput_module::init(options);
+	if (status != 0)
+		return status;
+
+	// Create and initialize our helper
+	m_xinput_helper = std::make_shared<xinput_api_helper>();
+	status = m_xinput_helper->initialize();
+	if (status != 0)
 	{
+		osd_printf_error("xinput_joystick_module failed to get XInput interface! Error: %u\n", static_cast<unsigned int>(status));
+		return -1;
 	}
 
-	int init(const osd_options &options) override
+	return 0;
+}
+
+void xinput_joystick_module::input_init(running_machine &machine)
+{
+	xinput_joystick_device *devinfo;
+
+	// Loop through each gamepad to determine if they are connected
+	for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		// Call the base
-		int status = wininput_module::init(options);
-		if (status != 0)
-			return status;
+		XINPUT_STATE state = {0};
 
-		// Create and initialize our helper
-		m_xinput_helper = std::make_shared<xinput_api_helper>();
-		status = m_xinput_helper->initialize();
-		if (status != 0)
+		if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 		{
-			osd_printf_error("xinput_joystick_module failed to get XInput interface! Error: %u\n", static_cast<unsigned int>(status));
-			return -1;
-		}
+			// allocate and link in a new device
+			devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
+			if (devinfo == nullptr)
+				continue;
 
-		return 0;
-	}
-
-protected:
-	virtual void input_init(running_machine &machine) override
-	{
-		xinput_joystick_device *devinfo;
-
-		// Loop through each gamepad to determine if they are connected
-		for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
-		{
-			XINPUT_STATE state = {0};
-
-			if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
-			{
-				// allocate and link in a new device
-				devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
-				if (devinfo == nullptr)
-					continue;
-
-				// Configure each gamepad to add buttons and Axes, etc.
-				devinfo->configure();
-			}
+			// Configure each gamepad to add buttons and Axes, etc.
+			devinfo->configure();
 		}
 	}
-};
+}
 
 #else
 MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput")
