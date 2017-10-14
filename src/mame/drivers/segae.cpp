@@ -192,7 +192,7 @@ Notes:
             Additionally, a wire must be tied from CN2 pin B22 to the side
             of PAD3 nearest IC6 (i.e. PAD3U).
 
-Megumi Rescue also includes a 834-6193 daughter card for spiner controls
+Megumi Rescue also includes a 834-6193 daughter card for spinner controls
 
 ROMs:
 -----
