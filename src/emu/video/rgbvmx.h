@@ -75,6 +75,13 @@ public:
 #endif
 	}
 
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { set(val, val, val, val); }
+	// This function zeros all elements
+	void zero() { set_all(0); }
+	// This function zeros only the alpha element
+	void zero_alpha() { set_a(0); }
+
 	inline rgb_t to_rgba() const
 	{
 		VECU32 temp = VECU32(vec_packs(m_value, m_value));

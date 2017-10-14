@@ -41,6 +41,12 @@ public:
 	void set(const u32& rgba) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgba), _mm_setzero_si128()), _mm_setzero_si128()); }
 	void set(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_set_epi32(a, r, g, b); }
 	void set(const rgb_t& rgb) { set((const u32&) rgb); }
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { m_value = _mm_set1_epi32(val); }
+	// This function zeros all elements
+	void zero() { m_value = _mm_xor_si128(m_value, m_value); }
+	// This function zeros only the alpha element
+	void zero_alpha() { m_value = _mm_and_si128(m_value, alpha_mask()); }
 
 	inline rgb_t to_rgba() const
 	{

@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
 
+#include "sh.h"
 
 #define SH2_INT_NONE    -1
 #define SH2_INT_VBLIN   0
@@ -40,20 +39,11 @@
 #define SH2_INT_15      15
 #define SH2_INT_ABUS    16
 
-enum
-{
-	SH2_PC = STATE_GENPC, SH2_SR=1, SH2_PR, SH2_GBR, SH2_VBR, SH2_MACH, SH2_MACL,
-	SH2_R0, SH2_R1, SH2_R2, SH2_R3, SH2_R4, SH2_R5, SH2_R6, SH2_R7,
-	SH2_R8, SH2_R9, SH2_R10, SH2_R11, SH2_R12, SH2_R13, SH2_R14, SH2_R15, SH2_EA
-};
-
-
 #define SH2_DMA_KLUDGE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
 #define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
-
 
 #define MCFG_SH2_IS_SLAVE(_slave) \
 	sh2_device::set_is_slave(*device, _slave);
@@ -68,22 +58,9 @@ enum
 	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
-/***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
-***************************************************************************/
-
-#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
-#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
-#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
-
-#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
-#define SH2DRC_FASTEST_OPTIONS  (0)
-
-#define SH2_MAX_FASTRAM       4
-
 class sh2_frontend;
 
-class sh2_device : public cpu_device
+class sh2_device : public sh_common_execution
 {
 	friend class sh2_frontend;
 
@@ -105,11 +82,8 @@ public:
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
 	void sh2_set_frt_input(int state);
-	void sh2drc_set_options(uint32_t options);
-	void sh2drc_add_pcflush(offs_t address);
-	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
-
 	void sh2_notify_dma_data_available();
+	void func_fastirq();
 
 protected:
 	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
@@ -138,55 +112,16 @@ protected:
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-	address_space *m_program, *m_decrypted_program;
-
+	address_space *m_decrypted_program;
+	
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
-	// Data that needs to be stored close to the generated DRC code
-	struct internal_sh2_state
-	{
-		uint32_t  pc;
-		uint32_t  pr;
-		uint32_t  sr;
-		uint32_t  gbr;
-		uint32_t  vbr;
-		uint32_t  mach;
-		uint32_t  macl;
-		uint32_t  r[16];
-		uint32_t  ea;
-		uint32_t  pending_irq;
-		uint32_t  pending_nmi;
-		int32_t   irqline;
-		uint32_t  evec;               // exception vector for DRC
-		uint32_t  irqsr;              // IRQ-time old SR for DRC
-		uint32_t  target;             // target for jmp/jsr/etc so the delay slot can't kill it
-		int     internal_irq_level;
-		int     icount;
-		uint8_t   sleep_mode;
-		uint32_t  arg0;              /* print_debug argument 1 */
-	};
-
-	uint32_t  m_delay;
 	uint32_t  m_cpu_off;
-	uint32_t  m_dvsr, m_dvdnth, m_dvdntl, m_dvcr;
 	uint32_t  m_test_irq;
-	struct
-	{
-		int irq_vector;
-		int irq_priority;
-	} m_irq_queue[16];
-
-	bool m_isdrc;
-
-	int m_pcfsel;                 // last pcflush entry set
-	int m_maxpcfsel;              // highest valid pcflush entry
-	uint32_t m_pcflushes[16];           // pcflush entries
-
+	
 	int8_t    m_irq_line_state[17];
-protected:
-	direct_read_data *m_direct;
-private:
+
 	address_space *m_internal;
 	uint32_t m_m[0x200/4];
 	int8_t  m_nmi_line_state;
@@ -213,273 +148,46 @@ private:
 	uint16_t m_wtcnt;
 	uint8_t m_wtcsr;
 
-	int     m_is_slave, m_cpu_type;
+	int     m_is_slave;
 	dma_kludge_delegate              m_dma_kludge_cb;
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
-	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
-	uint32_t              m_drcoptions;         /* configurable DRC options */
-
-	internal_sh2_state *m_sh2_state;
-
-	/* internal stuff */
-	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
-
-	/* parameters for subroutines */
-	uint64_t              m_numcycles;              /* return value from gettotalcycles */
-	uint32_t              m_arg1;                   /* print_debug argument 2 */
-	uint32_t              m_irq;                /* irq we're taking */
-
-	/* register mappings */
-	uml::parameter      m_regmap[16];                 /* parameter to register mappings for all 16 integer registers */
-
-	uml::code_handle *  m_entry;                      /* entry point */
-	uml::code_handle *  m_read8;                  /* read byte */
-	uml::code_handle *  m_write8;                 /* write byte */
-	uml::code_handle *  m_read16;                 /* read half */
-	uml::code_handle *  m_write16;                    /* write half */
-	uml::code_handle *  m_read32;                 /* read word */
-	uml::code_handle *  m_write32;                    /* write word */
-
-	uml::code_handle *  m_interrupt;              /* interrupt */
-	uml::code_handle *  m_nocode;                 /* nocode */
-	uml::code_handle *  m_out_of_cycles;              /* out of cycles exception handler */
-
-	/* fast RAM */
-	uint32_t              m_fastram_select;
-	struct
-	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
-	} m_fastram[SH2_MAX_FASTRAM];
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A);
-	inline uint16_t RW(offs_t A);
-	inline uint32_t RL(offs_t A);
-	inline void WB(offs_t A, uint8_t V);
-	inline void WW(offs_t A, uint16_t V);
-	inline void WL(offs_t A, uint32_t V);
-	inline void ADD(uint32_t m, uint32_t n);
-	inline void ADDI(uint32_t i, uint32_t n);
-	inline void ADDC(uint32_t m, uint32_t n);
-	inline void ADDV(uint32_t m, uint32_t n);
-	inline void AND(uint32_t m, uint32_t n);
-	inline void ANDI(uint32_t i);
-	inline void ANDM(uint32_t i);
-	inline void BF(uint32_t d);
-	inline void BFS(uint32_t d);
-	inline void BRA(uint32_t d);
-	inline void BRAF(uint32_t m);
-	inline void BSR(uint32_t d);
-	inline void BSRF(uint32_t m);
-	inline void BT(uint32_t d);
-	inline void BTS(uint32_t d);
-	inline void CLRMAC();
-	inline void CLRT();
-	inline void CMPEQ(uint32_t m, uint32_t n);
-	inline void CMPGE(uint32_t m, uint32_t n);
-	inline void CMPGT(uint32_t m, uint32_t n);
-	inline void CMPHI(uint32_t m, uint32_t n);
-	inline void CMPHS(uint32_t m, uint32_t n);
-	inline void CMPPL(uint32_t n);
-	inline void CMPPZ(uint32_t n);
-	inline void CMPSTR(uint32_t m, uint32_t n);
-	inline void CMPIM(uint32_t i);
-	inline void DIV0S(uint32_t m, uint32_t n);
-	inline void DIV0U();
-	inline void DIV1(uint32_t m, uint32_t n);
-	inline void DMULS(uint32_t m, uint32_t n);
-	inline void DMULU(uint32_t m, uint32_t n);
-	inline void DT(uint32_t n);
-	inline void EXTSB(uint32_t m, uint32_t n);
-	inline void EXTSW(uint32_t m, uint32_t n);
-	inline void EXTUB(uint32_t m, uint32_t n);
-	inline void EXTUW(uint32_t m, uint32_t n);
-	inline void ILLEGAL();
-	inline void JMP(uint32_t m);
-	inline void JSR(uint32_t m);
-	inline void LDCSR(uint32_t m);
-	inline void LDCGBR(uint32_t m);
-	inline void LDCVBR(uint32_t m);
-	inline void LDCMSR(uint32_t m);
-	inline void LDCMGBR(uint32_t m);
-	inline void LDCMVBR(uint32_t m);
-	inline void LDSMACH(uint32_t m);
-	inline void LDSMACL(uint32_t m);
-	inline void LDSPR(uint32_t m);
-	inline void LDSMMACH(uint32_t m);
-	inline void LDSMMACL(uint32_t m);
-	inline void LDSMPR(uint32_t m);
-	inline void MAC_L(uint32_t m, uint32_t n);
-	inline void MAC_W(uint32_t m, uint32_t n);
-	inline void MOV(uint32_t m, uint32_t n);
-	inline void MOVBS(uint32_t m, uint32_t n);
-	inline void MOVWS(uint32_t m, uint32_t n);
-	inline void MOVLS(uint32_t m, uint32_t n);
-	inline void MOVBL(uint32_t m, uint32_t n);
-	inline void MOVWL(uint32_t m, uint32_t n);
-	inline void MOVLL(uint32_t m, uint32_t n);
-	inline void MOVBM(uint32_t m, uint32_t n);
-	inline void MOVWM(uint32_t m, uint32_t n);
-	inline void MOVLM(uint32_t m, uint32_t n);
-	inline void MOVBP(uint32_t m, uint32_t n);
-	inline void MOVWP(uint32_t m, uint32_t n);
-	inline void MOVLP(uint32_t m, uint32_t n);
-	inline void MOVBS0(uint32_t m, uint32_t n);
-	inline void MOVWS0(uint32_t m, uint32_t n);
-	inline void MOVLS0(uint32_t m, uint32_t n);
-	inline void MOVBL0(uint32_t m, uint32_t n);
-	inline void MOVWL0(uint32_t m, uint32_t n);
-	inline void MOVLL0(uint32_t m, uint32_t n);
-	inline void MOVI(uint32_t i, uint32_t n);
-	inline void MOVWI(uint32_t d, uint32_t n);
-	inline void MOVLI(uint32_t d, uint32_t n);
-	inline void MOVBLG(uint32_t d);
-	inline void MOVWLG(uint32_t d);
-	inline void MOVLLG(uint32_t d);
-	inline void MOVBSG(uint32_t d);
-	inline void MOVWSG(uint32_t d);
-	inline void MOVLSG(uint32_t d);
-	inline void MOVBS4(uint32_t d, uint32_t n);
-	inline void MOVWS4(uint32_t d, uint32_t n);
-	inline void MOVLS4(uint32_t m, uint32_t d, uint32_t n);
-	inline void MOVBL4(uint32_t m, uint32_t d);
-	inline void MOVWL4(uint32_t m, uint32_t d);
-	inline void MOVLL4(uint32_t m, uint32_t d, uint32_t n);
-	inline void MOVA(uint32_t d);
-	inline void MOVT(uint32_t n);
-	inline void MULL(uint32_t m, uint32_t n);
-	inline void MULS(uint32_t m, uint32_t n);
-	inline void MULU(uint32_t m, uint32_t n);
-	inline void NEG(uint32_t m, uint32_t n);
-	inline void NEGC(uint32_t m, uint32_t n);
-	inline void NOP(void);
-	inline void NOT(uint32_t m, uint32_t n);
-	inline void OR(uint32_t m, uint32_t n);
-	inline void ORI(uint32_t i);
-	inline void ORM(uint32_t i);
-	inline void ROTCL(uint32_t n);
-	inline void ROTCR(uint32_t n);
-	inline void ROTL(uint32_t n);
-	inline void ROTR(uint32_t n);
-	inline void RTE();
-	inline void RTS();
-	inline void SETT();
-	inline void SHAL(uint32_t n);
-	inline void SHAR(uint32_t n);
-	inline void SHLL(uint32_t n);
-	inline void SHLL2(uint32_t n);
-	inline void SHLL8(uint32_t n);
-	inline void SHLL16(uint32_t n);
-	inline void SHLR(uint32_t n);
-	inline void SHLR2(uint32_t n);
-	inline void SHLR8(uint32_t n);
-	inline void SHLR16(uint32_t n);
-	inline void SLEEP();
-	inline void STCSR(uint32_t n);
-	inline void STCGBR(uint32_t n);
-	inline void STCVBR(uint32_t n);
-	inline void STCMSR(uint32_t n);
-	inline void STCMGBR(uint32_t n);
-	inline void STCMVBR(uint32_t n);
-	inline void STSMACH(uint32_t n);
-	inline void STSMACL(uint32_t n);
-	inline void STSPR(uint32_t n);
-	inline void STSMMACH(uint32_t n);
-	inline void STSMMACL(uint32_t n);
-	inline void STSMPR(uint32_t n);
-	inline void SUB(uint32_t m, uint32_t n);
-	inline void SUBC(uint32_t m, uint32_t n);
-	inline void SUBV(uint32_t m, uint32_t n);
-	inline void SWAPB(uint32_t m, uint32_t n);
-	inline void SWAPW(uint32_t m, uint32_t n);
-	inline void TAS(uint32_t n);
-	inline void TRAPA(uint32_t i);
-	inline void TST(uint32_t m, uint32_t n);
-	inline void TSTI(uint32_t i);
-	inline void TSTM(uint32_t i);
-	inline void XOR(uint32_t m, uint32_t n);
-	inline void XORI(uint32_t i);
-	inline void XORM(uint32_t i);
-	inline void XTRCT(uint32_t m, uint32_t n);
-	inline void op0000(uint16_t opcode);
-	inline void op0001(uint16_t opcode);
-	inline void op0010(uint16_t opcode);
-	inline void op0011(uint16_t opcode);
-	inline void op0100(uint16_t opcode);
-	inline void op0101(uint16_t opcode);
-	inline void op0110(uint16_t opcode);
-	inline void op0111(uint16_t opcode);
-	inline void op1000(uint16_t opcode);
-	inline void op1001(uint16_t opcode);
-	inline void op1010(uint16_t opcode);
-	inline void op1011(uint16_t opcode);
-	inline void op1100(uint16_t opcode);
-	inline void op1101(uint16_t opcode);
-	inline void op1110(uint16_t opcode);
-	inline void op1111(uint16_t opcode);
+	inline uint8_t RB(offs_t A) override;
+	inline uint16_t RW(offs_t A) override;
+	inline uint32_t RL(offs_t A) override;
+	inline void WB(offs_t A, uint8_t V) override;
+	inline void WW(offs_t A, uint16_t V) override;
+	inline void WL(offs_t A, uint32_t V) override;
+
+	virtual void LDCMSR(const uint16_t opcode) override;
+	virtual void LDCSR(const uint16_t opcode) override;
+	virtual void TRAPA(uint32_t i) override;
+	virtual void RTE() override;
+	virtual	void ILLEGAL() override;
+
+	virtual void execute_one_f000(uint16_t opcode) override;
+
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();
 	void sh2_timer_activate();
 	void sh2_do_dma(int dma);
-	void sh2_exception(const char *message, int irqline);
+	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();
 
-	/* internal compiler state */
-	struct compiler_state
-	{
-		uint32_t          cycles;                     /* accumulated cycles */
-		uint8_t           checkints;                  /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;                   /* index for local labels */
-	};
+	virtual void init_drc_frontend() override;
+	virtual const opcode_desc* get_desclist(offs_t pc) override;
 
-	inline uint32_t epc(const opcode_desc *desc);
-	inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
-	inline void load_fast_iregs(drcuml_block *block);
-	inline void save_fast_iregs(drcuml_block *block);
+	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) override;
+	virtual void static_generate_entry_point() override;
+	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr) override;
 
-	void code_flush_cache();
-	void execute_run_drc();
-	void code_compile_block(uint8_t mode, offs_t pc);
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle **handleptr);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
-	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
-	void generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc);
-	bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
-	bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-	bool generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
-
-public:
-	void func_printf_probe();
-	void func_unimplemented();
-	void func_fastirq();
-	void func_MAC_W();
-	void func_MAC_L();
-	void func_DIV1();
-	void func_ADDV();
-	void func_SUBV();
 };
 
 class sh2a_device : public sh2_device
@@ -528,30 +236,19 @@ private:
 };
 
 
-class sh2_frontend : public drc_frontend
+class sh2_frontend : public sh_frontend
 {
 public:
-	sh2_frontend(sh2_device *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-	bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-
-	sh2_device *m_sh2;
+	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
-
 
 DECLARE_DEVICE_TYPE(SH1,  sh1_device)
 DECLARE_DEVICE_TYPE(SH2,  sh2_device)
 DECLARE_DEVICE_TYPE(SH2A, sh2a_device)
-
 
 #endif // MAME_CPU_SH2_SH2_H

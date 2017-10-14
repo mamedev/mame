@@ -2,38 +2,44 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Acorn ANC04 Z80 2nd processor
+    Torch Z80 Communicator (ZEP100)
 
-    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Acorn_ANC04_Z802ndproc.html
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Torch_Z802ndproc.html
 
 **********************************************************************/
 
 
-#ifndef MAME_BUS_BBC_TUBE_Z80_H
-#define MAME_BUS_BBC_TUBE_Z80_H
+#ifndef MAME_BUS_BBC_TUBE_ZEP100_H
+#define MAME_BUS_BBC_TUBE_ZEP100_H
 
 #include "tube.h"
 #include "cpu/z80/z80.h"
+#include "machine/6522via.h"
+#include "machine/i8255.h"
 #include "machine/ram.h"
-#include "machine/tube.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> bbc_tube_z80_device
+// ======================> bbc_tube_zep100_device
 
-class bbc_tube_z80_device :
+class bbc_tube_zep100_device :
 	public device_t,
 	public device_bbc_tube_interface
 {
 public:
 	// construction/destruction
-	bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( opcode_r );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 
 protected:
 	// device-level overrides
@@ -48,20 +54,19 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER( host_w ) override;
 
 private:
-	IRQ_CALLBACK_MEMBER( irq_callback );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-
 	required_device<cpu_device> m_z80;
-	required_device<tube_device> m_ula;
+	required_device<via6522_device> m_via;
+	required_device<i8255_device> m_ppi;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
+	uint8_t m_port_b;
 	bool m_rom_enabled;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device)
+DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device)
 
 
-#endif /* MAME_BUS_BBC_TUBE_Z80_H */
+#endif /* MAME_BUS_BBC_TUBE_ZEP100_H */

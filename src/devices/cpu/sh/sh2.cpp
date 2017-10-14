@@ -102,26 +102,6 @@
 #include "logmacro.h"
 
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
-
-#define DISABLE_FAST_REGISTERS              (0) // set to 1 to turn off usage of register caching
-#define SINGLE_INSTRUCTION_MODE             (0)
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* size of the execution code cache */
-#define CACHE_SIZE                  (32 * 1024 * 1024)
-
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES         64
-#define COMPILE_FORWARDS_BYTES          256
-#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
-#define COMPILE_MAX_SEQUENCE            64
 
 
 DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "SH-1")
@@ -182,30 +162,18 @@ void sh2_device::device_stop()
 }
 
 
+
+
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines)
-	: cpu_device(mconfig, type, tag, owner, clock)
+	: sh_common_execution(mconfig, type, tag, owner, clock, ENDIANNESS_BIG, internal_map)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
-	, m_cpu_type(cpu_type)
-	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(nullptr)
-//  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
 	, m_drcfe(nullptr)
-	, m_drcoptions(0)
-	, m_sh2_state(nullptr)
-	, m_entry(nullptr)
-	, m_read8(nullptr)
-	, m_write8(nullptr)
-	, m_read16(nullptr)
-	, m_write16(nullptr)
-	, m_read32(nullptr)
-	, m_write32(nullptr)
-	, m_interrupt(nullptr)
-	, m_nocode(nullptr)
-	, m_out_of_cycles(nullptr)
 	, m_debugger_temp(0)
 {
+	m_cpu_type = cpu_type;
+	m_am = SH12_AM;
 	m_isdrc = allow_drc();
 }
 
@@ -239,13 +207,10 @@ offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uin
 }
 
 
-/* speed up delay loops, bail out of tight loops */
-#define BUSY_LOOP_HACKS     1
-
 uint8_t sh2_device::RB(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_byte(A & AM);
+		return m_program->read_byte(A & SH12_AM);
 
 	return m_program->read_byte(A);
 }
@@ -253,7 +218,7 @@ uint8_t sh2_device::RB(offs_t A)
 uint16_t sh2_device::RW(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_word(A & AM);
+		return m_program->read_word(A & SH12_AM);
 
 	return m_program->read_word(A);
 }
@@ -263,7 +228,7 @@ uint32_t sh2_device::RL(offs_t A)
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_dword(A & AM);
+		return m_program->read_dword(A & SH12_AM);
 
 	return m_program->read_dword(A);
 }
@@ -272,7 +237,7 @@ void sh2_device::WB(offs_t A, uint8_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_byte(A & AM,V);
+		m_program->write_byte(A & SH12_AM,V);
 		return;
 	}
 
@@ -283,7 +248,7 @@ void sh2_device::WW(offs_t A, uint16_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_word(A & AM,V);
+		m_program->write_word(A & SH12_AM,V);
 		return;
 	}
 
@@ -294,7 +259,7 @@ void sh2_device::WL(offs_t A, uint32_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_dword(A & AM,V);
+		m_program->write_dword(A & SH12_AM,V);
 		return;
 	}
 
@@ -303,1528 +268,42 @@ void sh2_device::WL(offs_t A, uint32_t V)
 	m_program->write_dword(A,V);
 }
 
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1100  1       -
- *  ADD     Rm,Rn
- */
-void sh2_device::ADD(uint32_t m, uint32_t n)
+/*  LDC.L   @Rm+,SR */
+inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 {
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-}
+	uint32_t x = Rn;
 
-/*  code                 cycles  t-bit
- *  0111 nnnn iiii iiii  1       -
- *  ADD     #imm,Rn
- */
-void sh2_device::ADDI(uint32_t i, uint32_t n)
-{
-	m_sh2_state->r[n] += (int32_t)(int16_t)(int8_t)i;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1110  1       carry
- *  ADDC    Rm,Rn
- */
-void sh2_device::ADDC(uint32_t m, uint32_t n)
-{
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_sh2_state->r[n] + m_sh2_state->r[m];
-	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 + (m_sh2_state->sr & T);
-	if (tmp0 > tmp1)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	if (tmp1 > m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 1111  1       overflow
- *  ADDV    Rm,Rn
- */
-void sh2_device::ADDV(uint32_t m, uint32_t n)
-{
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 0 || src == 2)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1001  1       -
- *  AND     Rm,Rn
- */
-void sh2_device::AND(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] &= m_sh2_state->r[m];
-}
-
-
-/*  code                 cycles  t-bit
- *  1100 1001 iiii iiii  1       -
- *  AND     #imm,R0
- */
-void sh2_device::ANDI(uint32_t i)
-{
-	m_sh2_state->r[0] &= i;
-}
-
-/*  code                 cycles  t-bit
- *  1100 1101 iiii iiii  1       -
- *  AND.B   #imm,@(R0,GBR)
- */
-void sh2_device::ANDM(uint32_t i)
-{
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = i & RB( m_sh2_state->ea );
-	WB( m_sh2_state->ea, temp );
+	m_sh2_state->ea = m_sh2_state->r[x];
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
+	m_sh2_state->r[x] += 4;
 	m_sh2_state->icount -= 2;
+	m_test_irq = 1;
 }
-
-/*  code                 cycles  t-bit
- *  1000 1011 dddd dddd  3/1     -
- *  BF      disp8
- */
-void sh2_device::BF(uint32_t d)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1111 dddd dddd  3/1     -
- *  BFS     disp8
- */
-void sh2_device::BFS(uint32_t d)
-{
-	if ((m_sh2_state->sr & T) == 0)
-	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1010 dddd dddd dddd  2       -
- *  BRA     disp12
- */
-void sh2_device::BRA(uint32_t d)
-{
-	int32_t disp = ((int32_t)d << 20) >> 20;
-
-#if BUSY_LOOP_HACKS
-	if (disp == -2)
-	{
-		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
-		/* BRA  $
-		 * NOP
-		 */
-		if (next_opcode == 0x0009)
-			m_sh2_state->icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
-	}
-#endif
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0010 0011  2       -
- *  BRAF    Rm
- */
-void sh2_device::BRAF(uint32_t m)
-{
-	m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1011 dddd dddd dddd  2       -
- *  BSR     disp12
- */
-void sh2_device::BSR(uint32_t d)
-{
-	int32_t disp = ((int32_t)d << 20) >> 20;
-
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  0000 mmmm 0000 0011  2       -
- *  BSRF    Rm
- */
-void sh2_device::BSRF(uint32_t m)
-{
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->pc + m_sh2_state->r[m] + 2;
-	m_sh2_state->icount--;
-}
-
-/*  code                 cycles  t-bit
- *  1000 1001 dddd dddd  3/1     -
- *  BT      disp8
- */
-void sh2_device::BT(uint32_t d)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_sh2_state->pc = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount -= 2;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  1000 1101 dddd dddd  2/1     -
- *  BTS     disp8
- */
-void sh2_device::BTS(uint32_t d)
-{
-	if ((m_sh2_state->sr & T) != 0)
-	{
-		int32_t disp = ((int32_t)d << 24) >> 24;
-		m_delay = m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-		m_sh2_state->icount--;
-	}
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0010 1000  1       -
- *  CLRMAC
- */
-void sh2_device::CLRMAC()
-{
-	m_sh2_state->mach = 0;
-	m_sh2_state->macl = 0;
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0000 1000  1       -
- *  CLRT
- */
-void sh2_device::CLRT()
-{
-	m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0000  1       comparison result
- *  CMP_EQ  Rm,Rn
- */
-void sh2_device::CMPEQ(uint32_t m, uint32_t n)
-{
-	if (m_sh2_state->r[n] == m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0011  1       comparison result
- *  CMP_GE  Rm,Rn
- */
-void sh2_device::CMPGE(uint32_t m, uint32_t n)
-{
-	if ((int32_t) m_sh2_state->r[n] >= (int32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0111  1       comparison result
- *  CMP_GT  Rm,Rn
- */
-void sh2_device::CMPGT(uint32_t m, uint32_t n)
-{
-	if ((int32_t) m_sh2_state->r[n] > (int32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0110  1       comparison result
- *  CMP_HI  Rm,Rn
- */
-void sh2_device::CMPHI(uint32_t m, uint32_t n)
-{
-	if ((uint32_t) m_sh2_state->r[n] > (uint32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0010  1       comparison result
- *  CMP_HS  Rm,Rn
- */
-void sh2_device::CMPHS(uint32_t m, uint32_t n)
-{
-	if ((uint32_t) m_sh2_state->r[n] >= (uint32_t) m_sh2_state->r[m])
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-
-/*  code                 cycles  t-bit
- *  0100 nnnn 0001 0101  1       comparison result
- *  CMP_PL  Rn
- */
-void sh2_device::CMPPL(uint32_t n)
-{
-	if ((int32_t) m_sh2_state->r[n] > 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0100 nnnn 0001 0001  1       comparison result
- *  CMP_PZ  Rn
- */
-void sh2_device::CMPPZ(uint32_t n)
-{
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 1100  1       comparison result
- * CMP_STR  Rm,Rn
- */
-void sh2_device::CMPSTR(uint32_t m, uint32_t n)
-	{
-	uint32_t temp;
-	int32_t HH, HL, LH, LL;
-	temp = m_sh2_state->r[n] ^ m_sh2_state->r[m];
-	HH = (temp >> 24) & 0xff;
-	HL = (temp >> 16) & 0xff;
-	LH = (temp >> 8) & 0xff;
-	LL = temp & 0xff;
-	if (HH && HL && LH && LL)
-	m_sh2_state->sr &= ~T;
-	else
-	m_sh2_state->sr |= T;
-	}
-
-
-/*  code                 cycles  t-bit
- *  1000 1000 iiii iiii  1       comparison result
- *  CMP/EQ #imm,R0
- */
-void sh2_device::CMPIM(uint32_t i)
-{
-	uint32_t imm = (uint32_t)(int32_t)(int16_t)(int8_t)i;
-
-	if (m_sh2_state->r[0] == imm)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0010 nnnn mmmm 0111  1       calculation result
- *  DIV0S   Rm,Rn
- */
-void sh2_device::DIV0S(uint32_t m, uint32_t n)
-{
-	if ((m_sh2_state->r[n] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~Q;
-	else
-		m_sh2_state->sr |= Q;
-	if ((m_sh2_state->r[m] & 0x80000000) == 0)
-		m_sh2_state->sr &= ~M;
-	else
-		m_sh2_state->sr |= M;
-	if ((m_sh2_state->r[m] ^ m_sh2_state->r[n]) & 0x80000000)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  code                 cycles  t-bit
- *  0000 0000 0001 1001  1       0
- *  DIV0U
- */
-void sh2_device::DIV0U()
-{
-	m_sh2_state->sr &= ~(M | Q | T);
-}
-
-/*  code                 cycles  t-bit
- *  0011 nnnn mmmm 0100  1       calculation result
- *  DIV1 Rm,Rn
- */
-void sh2_device::DIV1(uint32_t m, uint32_t n)
-{
-	uint32_t tmp0;
-	uint32_t old_q;
-
-	old_q = m_sh2_state->sr & Q;
-	if (0x80000000 & m_sh2_state->r[n])
-		m_sh2_state->sr |= Q;
-	else
-		m_sh2_state->sr &= ~Q;
-
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
-
-	if (!old_q)
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			}
-			else
-			{
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			}
-		}
-	}
-	else
-	{
-		if (!(m_sh2_state->sr & M))
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] += m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-			else
-				if(m_sh2_state->r[n] < tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-		}
-		else
-		{
-			tmp0 = m_sh2_state->r[n];
-			m_sh2_state->r[n] -= m_sh2_state->r[m];
-			if(!(m_sh2_state->sr & Q))
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr &= ~Q;
-				else
-					m_sh2_state->sr |= Q;
-			else
-				if(m_sh2_state->r[n] > tmp0)
-					m_sh2_state->sr |= Q;
-				else
-					m_sh2_state->sr &= ~Q;
-		}
-	}
-
-	tmp0 = (m_sh2_state->sr & (Q | M));
-	if((!tmp0) || (tmp0 == 0x300)) /* if Q == M set T else clear T */
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  DMULS.L Rm,Rn */
-void sh2_device::DMULS(uint32_t m, uint32_t n)
-{
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
-
-	tempn = (int32_t) m_sh2_state->r[n];
-	tempm = (int32_t) m_sh2_state->r[m];
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	if ((int32_t) (m_sh2_state->r[n] ^ m_sh2_state->r[m]) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	m_sh2_state->mach = Res2;
-	m_sh2_state->macl = Res0;
-	m_sh2_state->icount--;
-}
-
-/*  DMULU.L Rm,Rn */
-void sh2_device::DMULU(uint32_t m, uint32_t n)
-{
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-
-	RnL = m_sh2_state->r[n] & 0x0000ffff;
-	RnH = (m_sh2_state->r[n] >> 16) & 0x0000ffff;
-	RmL = m_sh2_state->r[m] & 0x0000ffff;
-	RmH = (m_sh2_state->r[m] >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	m_sh2_state->mach = Res2;
-	m_sh2_state->macl = Res0;
-	m_sh2_state->icount--;
-}
-
-/*  DT      Rn */
-void sh2_device::DT(uint32_t n)
-{
-	m_sh2_state->r[n]--;
-	if (m_sh2_state->r[n] == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-#if BUSY_LOOP_HACKS
-	{
-		uint32_t next_opcode = RW(m_sh2_state->pc & AM);
-		/* DT   Rn
-		 * BF   $-2
-		 */
-		if (next_opcode == 0x8bfd)
-		{
-			while (m_sh2_state->r[n] > 1 && m_sh2_state->icount > 4)
-			{
-				m_sh2_state->r[n]--;
-				m_sh2_state->icount -= 4;   /* cycles for DT (1) and BF taken (3) */
-			}
-		}
-	}
-#endif
-}
-
-/*  EXTS.B  Rm,Rn */
-void sh2_device::EXTSB(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = ((int32_t)m_sh2_state->r[m] << 24) >> 24;
-}
-
-/*  EXTS.W  Rm,Rn */
-void sh2_device::EXTSW(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = ((int32_t)m_sh2_state->r[m] << 16) >> 16;
-}
-
-/*  EXTU.B  Rm,Rn */
-void sh2_device::EXTUB(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->r[m] & 0x000000ff;
-}
-
-/*  EXTU.W  Rm,Rn */
-void sh2_device::EXTUW(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->r[m] & 0x0000ffff;
-}
-
-/*  ILLEGAL */
-void sh2_device::ILLEGAL()
-{
-	logerror("SH2.%s: Illegal opcode at %08x\n", tag(), m_sh2_state->pc - 2);
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
-	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc - 2 ); /* push PC onto stack */
-
-	/* fetch PC */
-	m_sh2_state->pc = RL( m_sh2_state->vbr + 4 * 4 );
-
-	/* TODO: timing is a guess */
-	m_sh2_state->icount -= 5;
-}
-
-
-/*  JMP     @Rm */
-void sh2_device::JMP(uint32_t m)
-{
-	m_delay = m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->icount--;
-}
-
-/*  JSR     @Rm */
-void sh2_device::JSR(uint32_t m)
-{
-	m_sh2_state->pr = m_sh2_state->pc + 2;
-	m_delay = m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->icount--;
-}
-
 
 /*  LDC     Rm,SR */
-void sh2_device::LDCSR(uint32_t m)
+inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
-	m_sh2_state->sr = m_sh2_state->r[m] & FLAGS;
+	uint32_t x = Rn;
+
+	m_sh2_state->sr = m_sh2_state->r[x] & SH_FLAGS;
 	m_test_irq = 1;
-}
-
-/*  LDC     Rm,GBR */
-void sh2_device::LDCGBR(uint32_t m)
-{
-	m_sh2_state->gbr = m_sh2_state->r[m];
-}
-
-/*  LDC     Rm,VBR */
-void sh2_device::LDCVBR(uint32_t m)
-{
-	m_sh2_state->vbr = m_sh2_state->r[m];
-}
-
-/*  LDC.L   @Rm+,SR */
-void sh2_device::LDCMSR(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
-	m_sh2_state->r[m] += 4;
-	m_sh2_state->icount -= 2;
-	m_test_irq = 1;
-}
-
-/*  LDC.L   @Rm+,GBR */
-void sh2_device::LDCMGBR(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->gbr = RL( m_sh2_state->ea );
-	m_sh2_state->r[m] += 4;
-	m_sh2_state->icount -= 2;
-}
-
-/*  LDC.L   @Rm+,VBR */
-void sh2_device::LDCMVBR(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->vbr = RL( m_sh2_state->ea );
-	m_sh2_state->r[m] += 4;
-	m_sh2_state->icount -= 2;
-}
-
-/*  LDS     Rm,MACH */
-void sh2_device::LDSMACH(uint32_t m)
-{
-	m_sh2_state->mach = m_sh2_state->r[m];
-}
-
-/*  LDS     Rm,MACL */
-void sh2_device::LDSMACL(uint32_t m)
-{
-	m_sh2_state->macl = m_sh2_state->r[m];
-}
-
-/*  LDS     Rm,PR */
-void sh2_device::LDSPR(uint32_t m)
-{
-	m_sh2_state->pr = m_sh2_state->r[m];
-}
-
-/*  LDS.L   @Rm+,MACH */
-void sh2_device::LDSMMACH(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->mach = RL( m_sh2_state->ea );
-	m_sh2_state->r[m] += 4;
-}
-
-/*  LDS.L   @Rm+,MACL */
-void sh2_device::LDSMMACL(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->macl = RL( m_sh2_state->ea );
-	m_sh2_state->r[m] += 4;
-}
-
-/*  LDS.L   @Rm+,PR */
-void sh2_device::LDSMPR(uint32_t m)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->pr = RL( m_sh2_state->ea );
-	m_sh2_state->r[m] += 4;
-}
-
-/*  MAC.L   @Rm+,@Rn+ */
-void sh2_device::MAC_L(uint32_t m, uint32_t n)
-{
-	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	uint32_t temp0, temp1, temp2, temp3;
-	int32_t tempm, tempn, fnLmL;
-
-	tempn = (int32_t) RL( m_sh2_state->r[n] );
-	m_sh2_state->r[n] += 4;
-	tempm = (int32_t) RL( m_sh2_state->r[m] );
-	m_sh2_state->r[m] += 4;
-	if ((int32_t) (tempn ^ tempm) < 0)
-		fnLmL = -1;
-	else
-		fnLmL = 0;
-	if (tempn < 0)
-		tempn = 0 - tempn;
-	if (tempm < 0)
-		tempm = 0 - tempm;
-	temp1 = (uint32_t) tempn;
-	temp2 = (uint32_t) tempm;
-	RnL = temp1 & 0x0000ffff;
-	RnH = (temp1 >> 16) & 0x0000ffff;
-	RmL = temp2 & 0x0000ffff;
-	RmH = (temp2 >> 16) & 0x0000ffff;
-	temp0 = RmL * RnL;
-	temp1 = RmH * RnL;
-	temp2 = RmL * RnH;
-	temp3 = RmH * RnH;
-	Res2 = 0;
-	Res1 = temp1 + temp2;
-	if (Res1 < temp1)
-		Res2 += 0x00010000;
-	temp1 = (Res1 << 16) & 0xffff0000;
-	Res0 = temp0 + temp1;
-	if (Res0 < temp0)
-		Res2++;
-	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
-	if (fnLmL < 0)
-	{
-		Res2 = ~Res2;
-		if (Res0 == 0)
-			Res2++;
-		else
-			Res0 = (~Res0) + 1;
-	}
-	if (m_sh2_state->sr & S)
-	{
-		Res0 = m_sh2_state->macl + Res0;
-		if (m_sh2_state->macl > Res0)
-			Res2++;
-		Res2 += (m_sh2_state->mach & 0x0000ffff);
-		if (((int32_t) Res2 < 0) && (Res2 < 0xffff8000))
-		{
-			Res2 = 0x00008000;
-			Res0 = 0x00000000;
-		}
-		else if (((int32_t) Res2 > 0) && (Res2 > 0x00007fff))
-		{
-			Res2 = 0x00007fff;
-			Res0 = 0xffffffff;
-		}
-		m_sh2_state->mach = Res2;
-		m_sh2_state->macl = Res0;
-	}
-	else
-	{
-		Res0 = m_sh2_state->macl + Res0;
-		if (m_sh2_state->macl > Res0)
-			Res2++;
-		Res2 += m_sh2_state->mach;
-		m_sh2_state->mach = Res2;
-		m_sh2_state->macl = Res0;
-	}
-	m_sh2_state->icount -= 2;
-}
-
-/*  MAC.W   @Rm+,@Rn+ */
-void sh2_device::MAC_W(uint32_t m, uint32_t n)
-{
-	int32_t tempm, tempn, dest, src, ans;
-	uint32_t templ;
-
-	tempn = (int32_t) RW( m_sh2_state->r[n] );
-	m_sh2_state->r[n] += 2;
-	tempm = (int32_t) RW( m_sh2_state->r[m] );
-	m_sh2_state->r[m] += 2;
-	templ = m_sh2_state->macl;
-	tempm = ((int32_t) (short) tempn * (int32_t) (short) tempm);
-	if ((int32_t) m_sh2_state->macl >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) tempm >= 0)
-	{
-		src = 0;
-		tempn = 0;
-	}
-	else
-	{
-		src = 1;
-		tempn = 0xffffffff;
-	}
-	src += dest;
-	m_sh2_state->macl += tempm;
-	if ((int32_t) m_sh2_state->macl >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (m_sh2_state->sr & S)
-	{
-		if (ans == 1)
-			{
-				if (src == 0)
-					m_sh2_state->macl = 0x7fffffff;
-				if (src == 2)
-					m_sh2_state->macl = 0x80000000;
-			}
-	}
-	else
-	{
-		m_sh2_state->mach += tempn;
-		if (templ > m_sh2_state->macl)
-			m_sh2_state->mach += 1;
-	}
-	m_sh2_state->icount -= 2;
-}
-
-/*  MOV     Rm,Rn */
-void sh2_device::MOV(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->r[m];
-}
-
-/*  MOV.B   Rm,@Rn */
-void sh2_device::MOVBS(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WB( m_sh2_state->ea, m_sh2_state->r[m] & 0x000000ff);
-}
-
-/*  MOV.W   Rm,@Rn */
-void sh2_device::MOVWS(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WW( m_sh2_state->ea, m_sh2_state->r[m] & 0x0000ffff);
-}
-
-/*  MOV.L   Rm,@Rn */
-void sh2_device::MOVLS(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->r[m] );
-}
-
-/*  MOV.B   @Rm,Rn */
-void sh2_device::MOVBL(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_sh2_state->ea );
-}
-
-/*  MOV.W   @Rm,Rn */
-void sh2_device::MOVWL(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t) RW( m_sh2_state->ea );
-}
-
-/*  MOV.L   @Rm,Rn */
-void sh2_device::MOVLL(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->r[n] = RL( m_sh2_state->ea );
-}
-
-/*  MOV.B   Rm,@-Rn */
-void sh2_device::MOVBM(uint32_t m, uint32_t n)
-{
-	/* SMG : bug fix, was reading m_sh2_state->r[n] */
-	uint32_t data = m_sh2_state->r[m] & 0x000000ff;
-
-	m_sh2_state->r[n] -= 1;
-	WB( m_sh2_state->r[n], data );
-}
-
-/*  MOV.W   Rm,@-Rn */
-void sh2_device::MOVWM(uint32_t m, uint32_t n)
-{
-	uint32_t data = m_sh2_state->r[m] & 0x0000ffff;
-
-	m_sh2_state->r[n] -= 2;
-	WW( m_sh2_state->r[n], data );
-}
-
-/*  MOV.L   Rm,@-Rn */
-void sh2_device::MOVLM(uint32_t m, uint32_t n)
-{
-	uint32_t data = m_sh2_state->r[m];
-
-	m_sh2_state->r[n] -= 4;
-	WL( m_sh2_state->r[n], data );
-}
-
-/*  MOV.B   @Rm+,Rn */
-void sh2_device::MOVBP(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_sh2_state->r[m] );
-	if (n != m)
-		m_sh2_state->r[m] += 1;
-}
-
-/*  MOV.W   @Rm+,Rn */
-void sh2_device::MOVWP(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t) RW( m_sh2_state->r[m] );
-	if (n != m)
-		m_sh2_state->r[m] += 2;
-}
-
-/*  MOV.L   @Rm+,Rn */
-void sh2_device::MOVLP(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = RL( m_sh2_state->r[m] );
-	if (n != m)
-		m_sh2_state->r[m] += 4;
-}
-
-/*  MOV.B   Rm,@(R0,Rn) */
-void sh2_device::MOVBS0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n] + m_sh2_state->r[0];
-	WB( m_sh2_state->ea, m_sh2_state->r[m] & 0x000000ff );
-}
-
-/*  MOV.W   Rm,@(R0,Rn) */
-void sh2_device::MOVWS0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n] + m_sh2_state->r[0];
-	WW( m_sh2_state->ea, m_sh2_state->r[m] & 0x0000ffff );
-}
-
-/*  MOV.L   Rm,@(R0,Rn) */
-void sh2_device::MOVLS0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[n] + m_sh2_state->r[0];
-	WL( m_sh2_state->ea, m_sh2_state->r[m] );
-}
-
-/*  MOV.B   @(R0,Rm),Rn */
-void sh2_device::MOVBL0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m] + m_sh2_state->r[0];
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_sh2_state->ea );
-}
-
-/*  MOV.W   @(R0,Rm),Rn */
-void sh2_device::MOVWL0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m] + m_sh2_state->r[0];
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t) RW( m_sh2_state->ea );
-}
-
-/*  MOV.L   @(R0,Rm),Rn */
-void sh2_device::MOVLL0(uint32_t m, uint32_t n)
-{
-	m_sh2_state->ea = m_sh2_state->r[m] + m_sh2_state->r[0];
-	m_sh2_state->r[n] = RL( m_sh2_state->ea );
-}
-
-/*  MOV     #imm,Rn */
-void sh2_device::MOVI(uint32_t i, uint32_t n)
-{
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t)(int8_t) i;
-}
-
-/*  MOV.W   @(disp8,PC),Rn */
-void sh2_device::MOVWI(uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->pc + disp * 2 + 2;
-	m_sh2_state->r[n] = (uint32_t)(int32_t)(int16_t) RW( m_sh2_state->ea );
-}
-
-/*  MOV.L   @(disp8,PC),Rn */
-void sh2_device::MOVLI(uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = ((m_sh2_state->pc + 2) & ~3) + disp * 4;
-	m_sh2_state->r[n] = RL( m_sh2_state->ea );
-}
-
-/*  MOV.B   @(disp8,GBR),R0 */
-void sh2_device::MOVBLG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp;
-	m_sh2_state->r[0] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_sh2_state->ea );
-}
-
-/*  MOV.W   @(disp8,GBR),R0 */
-void sh2_device::MOVWLG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp * 2;
-	m_sh2_state->r[0] = (int32_t)(int16_t) RW( m_sh2_state->ea );
-}
-
-/*  MOV.L   @(disp8,GBR),R0 */
-void sh2_device::MOVLLG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp * 4;
-	m_sh2_state->r[0] = RL( m_sh2_state->ea );
-}
-
-/*  MOV.B   R0,@(disp8,GBR) */
-void sh2_device::MOVBSG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp;
-	WB( m_sh2_state->ea, m_sh2_state->r[0] & 0x000000ff );
-}
-
-/*  MOV.W   R0,@(disp8,GBR) */
-void sh2_device::MOVWSG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp * 2;
-	WW( m_sh2_state->ea, m_sh2_state->r[0] & 0x0000ffff );
-}
-
-/*  MOV.L   R0,@(disp8,GBR) */
-void sh2_device::MOVLSG(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = m_sh2_state->gbr + disp * 4;
-	WL( m_sh2_state->ea, m_sh2_state->r[0] );
-}
-
-/*  MOV.B   R0,@(disp4,Rn) */
-void sh2_device::MOVBS4(uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[n] + disp;
-	WB( m_sh2_state->ea, m_sh2_state->r[0] & 0x000000ff );
-}
-
-/*  MOV.W   R0,@(disp4,Rn) */
-void sh2_device::MOVWS4(uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[n] + disp * 2;
-	WW( m_sh2_state->ea, m_sh2_state->r[0] & 0x0000ffff );
-}
-
-/* MOV.L Rm,@(disp4,Rn) */
-void sh2_device::MOVLS4(uint32_t m, uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[n] + disp * 4;
-	WL( m_sh2_state->ea, m_sh2_state->r[m] );
-}
-
-/*  MOV.B   @(disp4,Rm),R0 */
-void sh2_device::MOVBL4(uint32_t m, uint32_t d)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[m] + disp;
-	m_sh2_state->r[0] = (uint32_t)(int32_t)(int16_t)(int8_t) RB( m_sh2_state->ea );
-}
-
-/*  MOV.W   @(disp4,Rm),R0 */
-void sh2_device::MOVWL4(uint32_t m, uint32_t d)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[m] + disp * 2;
-	m_sh2_state->r[0] = (uint32_t)(int32_t)(int16_t) RW( m_sh2_state->ea );
-}
-
-/*  MOV.L   @(disp4,Rm),Rn */
-void sh2_device::MOVLL4(uint32_t m, uint32_t d, uint32_t n)
-{
-	uint32_t disp = d & 0x0f;
-	m_sh2_state->ea = m_sh2_state->r[m] + disp * 4;
-	m_sh2_state->r[n] = RL( m_sh2_state->ea );
-}
-
-/*  MOVA    @(disp8,PC),R0 */
-void sh2_device::MOVA(uint32_t d)
-{
-	uint32_t disp = d & 0xff;
-	m_sh2_state->ea = ((m_sh2_state->pc + 2) & ~3) + disp * 4;
-	m_sh2_state->r[0] = m_sh2_state->ea;
-}
-
-/*  MOVT    Rn */
-void sh2_device::MOVT(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->sr & T;
-}
-
-/*  MUL.L   Rm,Rn */
-void sh2_device::MULL(uint32_t m, uint32_t n)
-{
-	m_sh2_state->macl = m_sh2_state->r[n] * m_sh2_state->r[m];
-	m_sh2_state->icount--;
-}
-
-/*  MULS    Rm,Rn */
-void sh2_device::MULS(uint32_t m, uint32_t n)
-{
-	m_sh2_state->macl = (int16_t) m_sh2_state->r[n] * (int16_t) m_sh2_state->r[m];
-}
-
-/*  MULU    Rm,Rn */
-void sh2_device::MULU(uint32_t m, uint32_t n)
-{
-	m_sh2_state->macl = (uint16_t) m_sh2_state->r[n] * (uint16_t) m_sh2_state->r[m];
-}
-
-/*  NEG     Rm,Rn */
-void sh2_device::NEG(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = 0 - m_sh2_state->r[m];
-}
-
-/*  NEGC    Rm,Rn */
-void sh2_device::NEGC(uint32_t m, uint32_t n)
-{
-	uint32_t temp;
-
-	temp = m_sh2_state->r[m];
-	m_sh2_state->r[n] = -temp - (m_sh2_state->sr & T);
-	if (temp || (m_sh2_state->sr & T))
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  NOP */
-void sh2_device::NOP(void)
-{
-}
-
-/*  NOT     Rm,Rn */
-void sh2_device::NOT(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] = ~m_sh2_state->r[m];
-}
-
-/*  OR      Rm,Rn */
-void sh2_device::OR(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] |= m_sh2_state->r[m];
-}
-
-/*  OR      #imm,R0 */
-void sh2_device::ORI(uint32_t i)
-{
-	m_sh2_state->r[0] |= i;
-}
-
-/*  OR.B    #imm,@(R0,GBR) */
-void sh2_device::ORM(uint32_t i)
-{
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = RB( m_sh2_state->ea );
-	temp |= i;
-	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
-}
-
-/*  ROTCL   Rn */
-void sh2_device::ROTCL(uint32_t n)
-{
-	uint32_t temp;
-
-	temp = (m_sh2_state->r[n] >> 31) & T;
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->sr & T);
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | temp;
-}
-
-/*  ROTCR   Rn */
-void sh2_device::ROTCR(uint32_t n)
-{
-	uint32_t temp;
-	temp = (m_sh2_state->sr & T) << 31;
-	if (m_sh2_state->r[n] & T)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | temp;
-}
-
-/*  ROTL    Rn */
-void sh2_device::ROTL(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] << 1) | (m_sh2_state->r[n] >> 31);
-}
-
-/*  ROTR    Rn */
-void sh2_device::ROTR(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 1) | (m_sh2_state->r[n] << 31);
 }
 
 /*  RTE */
-void sh2_device::RTE()
+inline void sh2_device::RTE()
 {
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_delay = RL( m_sh2_state->ea );
+	m_sh2_state->m_delay = RL( m_sh2_state->ea );
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & FLAGS;
+	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->icount -= 3;
 	m_test_irq = 1;
 }
 
-/*  RTS */
-void sh2_device::RTS()
-{
-	m_delay = m_sh2_state->ea = m_sh2_state->pr;
-	m_sh2_state->icount--;
-}
-
-/*  SETT */
-void sh2_device::SETT()
-{
-	m_sh2_state->sr |= T;
-}
-
-/*  SHAL    Rn      (same as SHLL) */
-void sh2_device::SHAL(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
-	m_sh2_state->r[n] <<= 1;
-}
-
-/*  SHAR    Rn */
-void sh2_device::SHAR(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
-	m_sh2_state->r[n] = (uint32_t)((int32_t)m_sh2_state->r[n] >> 1);
-}
-
-/*  SHLL    Rn      (same as SHAL) */
-void sh2_device::SHLL(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | ((m_sh2_state->r[n] >> 31) & T);
-	m_sh2_state->r[n] <<= 1;
-}
-
-/*  SHLL2   Rn */
-void sh2_device::SHLL2(uint32_t n)
-{
-	m_sh2_state->r[n] <<= 2;
-}
-
-/*  SHLL8   Rn */
-void sh2_device::SHLL8(uint32_t n)
-{
-	m_sh2_state->r[n] <<= 8;
-}
-
-/*  SHLL16  Rn */
-void sh2_device::SHLL16(uint32_t n)
-{
-	m_sh2_state->r[n] <<= 16;
-}
-
-/*  SHLR    Rn */
-void sh2_device::SHLR(uint32_t n)
-{
-	m_sh2_state->sr = (m_sh2_state->sr & ~T) | (m_sh2_state->r[n] & T);
-	m_sh2_state->r[n] >>= 1;
-}
-
-/*  SHLR2   Rn */
-void sh2_device::SHLR2(uint32_t n)
-{
-	m_sh2_state->r[n] >>= 2;
-}
-
-/*  SHLR8   Rn */
-void sh2_device::SHLR8(uint32_t n)
-{
-	m_sh2_state->r[n] >>= 8;
-}
-
-/*  SHLR16  Rn */
-void sh2_device::SHLR16(uint32_t n)
-{
-	m_sh2_state->r[n] >>= 16;
-}
-
-/*  SLEEP */
-void sh2_device::SLEEP()
-{
-	if(m_sh2_state->sleep_mode != 2)
-		m_sh2_state->pc -= 2;
-	m_sh2_state->icount -= 2;
-	/* Wait_for_exception; */
-	if(m_sh2_state->sleep_mode == 0)
-		m_sh2_state->sleep_mode = 1;
-	else if(m_sh2_state->sleep_mode == 2)
-		m_sh2_state->sleep_mode = 0;
-}
-
-/*  STC     SR,Rn */
-void sh2_device::STCSR(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->sr;
-}
-
-/*  STC     GBR,Rn */
-void sh2_device::STCGBR(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->gbr;
-}
-
-/*  STC     VBR,Rn */
-void sh2_device::STCVBR(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->vbr;
-}
-
-/*  STC.L   SR,@-Rn */
-void sh2_device::STCMSR(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->sr );
-	m_sh2_state->icount--;
-}
-
-/*  STC.L   GBR,@-Rn */
-void sh2_device::STCMGBR(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->gbr );
-	m_sh2_state->icount--;
-}
-
-/*  STC.L   VBR,@-Rn */
-void sh2_device::STCMVBR(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->vbr );
-	m_sh2_state->icount--;
-}
-
-/*  STS     MACH,Rn */
-void sh2_device::STSMACH(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->mach;
-}
-
-/*  STS     MACL,Rn */
-void sh2_device::STSMACL(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->macl;
-}
-
-/*  STS     PR,Rn */
-void sh2_device::STSPR(uint32_t n)
-{
-	m_sh2_state->r[n] = m_sh2_state->pr;
-}
-
-/*  STS.L   MACH,@-Rn */
-void sh2_device::STSMMACH(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->mach );
-}
-
-/*  STS.L   MACL,@-Rn */
-void sh2_device::STSMMACL(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->macl );
-}
-
-/*  STS.L   PR,@-Rn */
-void sh2_device::STSMPR(uint32_t n)
-{
-	m_sh2_state->r[n] -= 4;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	WL( m_sh2_state->ea, m_sh2_state->pr );
-}
-
-/*  SUB     Rm,Rn */
-void sh2_device::SUB(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] -= m_sh2_state->r[m];
-}
-
-/*  SUBC    Rm,Rn */
-void sh2_device::SUBC(uint32_t m, uint32_t n)
-{
-	uint32_t tmp0, tmp1;
-
-	tmp1 = m_sh2_state->r[n] - m_sh2_state->r[m];
-	tmp0 = m_sh2_state->r[n];
-	m_sh2_state->r[n] = tmp1 - (m_sh2_state->sr & T);
-	if (tmp0 < tmp1)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	if (tmp1 < m_sh2_state->r[n])
-		m_sh2_state->sr |= T;
-}
-
-/*  SUBV    Rm,Rn */
-void sh2_device::SUBV(uint32_t m, uint32_t n)
-{
-	int32_t dest, src, ans;
-
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		dest = 0;
-	else
-		dest = 1;
-	if ((int32_t) m_sh2_state->r[m] >= 0)
-		src = 0;
-	else
-		src = 1;
-	src += dest;
-	m_sh2_state->r[n] -= m_sh2_state->r[m];
-	if ((int32_t) m_sh2_state->r[n] >= 0)
-		ans = 0;
-	else
-		ans = 1;
-	ans += dest;
-	if (src == 1)
-	{
-		if (ans == 1)
-			m_sh2_state->sr |= T;
-		else
-			m_sh2_state->sr &= ~T;
-	}
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  SWAP.B  Rm,Rn */
-void sh2_device::SWAPB(uint32_t m, uint32_t n)
-{
-	uint32_t temp0, temp1;
-
-	temp0 = m_sh2_state->r[m] & 0xffff0000;
-	temp1 = (m_sh2_state->r[m] & 0x000000ff) << 8;
-	m_sh2_state->r[n] = (m_sh2_state->r[m] >> 8) & 0x000000ff;
-	m_sh2_state->r[n] = m_sh2_state->r[n] | temp1 | temp0;
-}
-
-/*  SWAP.W  Rm,Rn */
-void sh2_device::SWAPW(uint32_t m, uint32_t n)
-{
-	uint32_t temp;
-
-	temp = (m_sh2_state->r[m] >> 16) & 0x0000ffff;
-	m_sh2_state->r[n] = (m_sh2_state->r[m] << 16) | temp;
-}
-
-/*  TAS.B   @Rn */
-void sh2_device::TAS(uint32_t n)
-{
-	uint32_t temp;
-	m_sh2_state->ea = m_sh2_state->r[n];
-	/* Bus Lock enable */
-	temp = RB( m_sh2_state->ea );
-	if (temp == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	temp |= 0x80;
-	/* Bus Lock disable */
-	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 3;
-}
-
 /*  TRAPA   #imm */
-void sh2_device::TRAPA(uint32_t i)
+inline void sh2_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
 
@@ -1840,388 +319,28 @@ void sh2_device::TRAPA(uint32_t i)
 	m_sh2_state->icount -= 7;
 }
 
-/*  TST     Rm,Rn */
-void sh2_device::TST(uint32_t m, uint32_t n)
+/*  ILLEGAL */
+inline void sh2_device::ILLEGAL()
 {
-	if ((m_sh2_state->r[n] & m_sh2_state->r[m]) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
+	//logerror("Illegal opcode at %08x\n", m_sh2_state->pc - 2);
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+	m_sh2_state->r[15] -= 4;
+	WL( m_sh2_state->r[15], m_sh2_state->pc - 2 ); /* push PC onto stack */
 
-/*  TST     #imm,R0 */
-void sh2_device::TSTI(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
+	/* fetch PC */
+	m_sh2_state->pc = RL( m_sh2_state->vbr + 4 * 4 );
 
-	if ((imm & m_sh2_state->r[0]) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-}
-
-/*  TST.B   #imm,@(R0,GBR) */
-void sh2_device::TSTM(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	if ((imm & RB( m_sh2_state->ea )) == 0)
-		m_sh2_state->sr |= T;
-	else
-		m_sh2_state->sr &= ~T;
-	m_sh2_state->icount -= 2;
-}
-
-/*  XOR     Rm,Rn */
-void sh2_device::XOR(uint32_t m, uint32_t n)
-{
-	m_sh2_state->r[n] ^= m_sh2_state->r[m];
-}
-
-/*  XOR     #imm,R0 */
-void sh2_device::XORI(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-	m_sh2_state->r[0] ^= imm;
-}
-
-/*  XOR.B   #imm,@(R0,GBR) */
-void sh2_device::XORM(uint32_t i)
-{
-	uint32_t imm = i & 0xff;
-	uint32_t temp;
-
-	m_sh2_state->ea = m_sh2_state->gbr + m_sh2_state->r[0];
-	temp = RB( m_sh2_state->ea );
-	temp ^= imm;
-	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
-}
-
-/*  XTRCT   Rm,Rn */
-void sh2_device::XTRCT(uint32_t m, uint32_t n)
-{
-	uint32_t temp;
-
-	temp = (m_sh2_state->r[m] << 16) & 0xffff0000;
-	m_sh2_state->r[n] = (m_sh2_state->r[n] >> 16) & 0x0000ffff;
-	m_sh2_state->r[n] |= temp;
+	/* TODO: timing is a guess */
+	m_sh2_state->icount -= 5;
 }
 
 /*****************************************************************************
  *  OPCODE DISPATCHERS
  *****************************************************************************/
 
-void sh2_device::op0000(uint16_t opcode)
-{
-	switch (opcode & 0x3F)
-	{
-	case 0x00: ILLEGAL();                       break;
-	case 0x01: ILLEGAL();                       break;
-	case 0x02: STCSR(Rn);                  break;
-	case 0x03: BSRF(Rn);                   break;
-	case 0x04: MOVBS0(Rm, Rn);             break;
-	case 0x05: MOVWS0(Rm, Rn);             break;
-	case 0x06: MOVLS0(Rm, Rn);             break;
-	case 0x07: MULL(Rm, Rn);               break;
-	case 0x08: CLRT();                       break;
-	case 0x09: NOP();                           break;
-	case 0x0a: STSMACH(Rn);                break;
-	case 0x0b: RTS();                        break;
-	case 0x0c: MOVBL0(Rm, Rn);             break;
-	case 0x0d: MOVWL0(Rm, Rn);             break;
-	case 0x0e: MOVLL0(Rm, Rn);             break;
-	case 0x0f: MAC_L(Rm, Rn);              break;
 
-	case 0x10: ILLEGAL();                       break;
-	case 0x11: ILLEGAL();                       break;
-	case 0x12: STCGBR(Rn);                 break;
-	case 0x13: ILLEGAL();                       break;
-	case 0x14: MOVBS0(Rm, Rn);             break;
-	case 0x15: MOVWS0(Rm, Rn);             break;
-	case 0x16: MOVLS0(Rm, Rn);             break;
-	case 0x17: MULL(Rm, Rn);               break;
-	case 0x18: SETT();                       break;
-	case 0x19: DIV0U();                  break;
-	case 0x1a: STSMACL(Rn);                break;
-	case 0x1b: SLEEP();                  break;
-	case 0x1c: MOVBL0(Rm, Rn);             break;
-	case 0x1d: MOVWL0(Rm, Rn);             break;
-	case 0x1e: MOVLL0(Rm, Rn);             break;
-	case 0x1f: MAC_L(Rm, Rn);              break;
-
-	case 0x20: ILLEGAL();                       break;
-	case 0x21: ILLEGAL();                       break;
-	case 0x22: STCVBR(Rn);                 break;
-	case 0x23: BRAF(Rn);                   break;
-	case 0x24: MOVBS0(Rm, Rn);             break;
-	case 0x25: MOVWS0(Rm, Rn);             break;
-	case 0x26: MOVLS0(Rm, Rn);             break;
-	case 0x27: MULL(Rm, Rn);               break;
-	case 0x28: CLRMAC();                 break;
-	case 0x29: MOVT(Rn);                   break;
-	case 0x2a: STSPR(Rn);                  break;
-	case 0x2b: RTE();                        break;
-	case 0x2c: MOVBL0(Rm, Rn);             break;
-	case 0x2d: MOVWL0(Rm, Rn);             break;
-	case 0x2e: MOVLL0(Rm, Rn);             break;
-	case 0x2f: MAC_L(Rm, Rn);              break;
-
-	case 0x30: ILLEGAL();                       break;
-	case 0x31: ILLEGAL();                       break;
-	case 0x32: ILLEGAL();                       break;
-	case 0x33: ILLEGAL();                       break;
-	case 0x34: MOVBS0(Rm, Rn);             break;
-	case 0x35: MOVWS0(Rm, Rn);             break;
-	case 0x36: MOVLS0(Rm, Rn);             break;
-	case 0x37: MULL(Rm, Rn);               break;
-	case 0x38: ILLEGAL();                       break;
-	case 0x39: ILLEGAL();                       break;
-	case 0x3c: MOVBL0(Rm, Rn);             break;
-	case 0x3d: MOVWL0(Rm, Rn);             break;
-	case 0x3e: MOVLL0(Rm, Rn);             break;
-	case 0x3f: MAC_L(Rm, Rn);              break;
-	case 0x3a: ILLEGAL();                       break;
-	case 0x3b: ILLEGAL();                       break;
-
-
-
-	}
-}
-
-void sh2_device::op0001(uint16_t opcode)
-{
-	MOVLS4(Rm, opcode & 0x0f, Rn);
-}
-
-void sh2_device::op0010(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: MOVBS(Rm, Rn);                break;
-	case  1: MOVWS(Rm, Rn);                break;
-	case  2: MOVLS(Rm, Rn);                break;
-	case  3: ILLEGAL();                         break;
-	case  4: MOVBM(Rm, Rn);                break;
-	case  5: MOVWM(Rm, Rn);                break;
-	case  6: MOVLM(Rm, Rn);                break;
-	case  7: DIV0S(Rm, Rn);                break;
-	case  8: TST(Rm, Rn);                  break;
-	case  9: AND(Rm, Rn);                  break;
-	case 10: XOR(Rm, Rn);                  break;
-	case 11: OR(Rm, Rn);                   break;
-	case 12: CMPSTR(Rm, Rn);               break;
-	case 13: XTRCT(Rm, Rn);                break;
-	case 14: MULU(Rm, Rn);                 break;
-	case 15: MULS(Rm, Rn);                 break;
-	}
-}
-
-void sh2_device::op0011(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: CMPEQ(Rm, Rn);                break;
-	case  1: ILLEGAL();                         break;
-	case  2: CMPHS(Rm, Rn);                break;
-	case  3: CMPGE(Rm, Rn);                break;
-	case  4: DIV1(Rm, Rn);                 break;
-	case  5: DMULU(Rm, Rn);                break;
-	case  6: CMPHI(Rm, Rn);                break;
-	case  7: CMPGT(Rm, Rn);                break;
-	case  8: SUB(Rm, Rn);                  break;
-	case  9: ILLEGAL();                         break;
-	case 10: SUBC(Rm, Rn);                 break;
-	case 11: SUBV(Rm, Rn);                 break;
-	case 12: ADD(Rm, Rn);                  break;
-	case 13: DMULS(Rm, Rn);                break;
-	case 14: ADDC(Rm, Rn);                 break;
-	case 15: ADDV(Rm, Rn);                 break;
-	}
-}
-
-void sh2_device::op0100(uint16_t opcode)
-{
-	switch (opcode & 0x3F)
-	{
-	case 0x00: SHLL(Rn);                   break;
-	case 0x01: SHLR(Rn);                   break;
-	case 0x02: STSMMACH(Rn);               break;
-	case 0x03: STCMSR(Rn);                 break;
-	case 0x04: ROTL(Rn);                   break;
-	case 0x05: ROTR(Rn);                   break;
-	case 0x06: LDSMMACH(Rn);               break;
-	case 0x07: LDCMSR(Rn);                 break;
-	case 0x08: SHLL2(Rn);                  break;
-	case 0x09: SHLR2(Rn);                  break;
-	case 0x0a: LDSMACH(Rn);                break;
-	case 0x0b: JSR(Rn);                    break;
-	case 0x0c: ILLEGAL();                       break;
-	case 0x0d: ILLEGAL();                       break;
-	case 0x0e: LDCSR(Rn);                  break;
-	case 0x0f: MAC_W(Rm, Rn);              break;
-
-	case 0x10: DT(Rn);                     break;
-	case 0x11: CMPPZ(Rn);                  break;
-	case 0x12: STSMMACL(Rn);               break;
-	case 0x13: STCMGBR(Rn);                break;
-	case 0x14: ILLEGAL();                       break;
-	case 0x15: CMPPL(Rn);                  break;
-	case 0x16: LDSMMACL(Rn);               break;
-	case 0x17: LDCMGBR(Rn);                break;
-	case 0x18: SHLL8(Rn);                  break;
-	case 0x19: SHLR8(Rn);                  break;
-	case 0x1a: LDSMACL(Rn);                break;
-	case 0x1b: TAS(Rn);                    break;
-	case 0x1c: ILLEGAL();                       break;
-	case 0x1d: ILLEGAL();                       break;
-	case 0x1e: LDCGBR(Rn);                 break;
-	case 0x1f: MAC_W(Rm, Rn);              break;
-
-	case 0x20: SHAL(Rn);                   break;
-	case 0x21: SHAR(Rn);                   break;
-	case 0x22: STSMPR(Rn);                 break;
-	case 0x23: STCMVBR(Rn);                break;
-	case 0x24: ROTCL(Rn);                  break;
-	case 0x25: ROTCR(Rn);                  break;
-	case 0x26: LDSMPR(Rn);                 break;
-	case 0x27: LDCMVBR(Rn);                break;
-	case 0x28: SHLL16(Rn);                 break;
-	case 0x29: SHLR16(Rn);                 break;
-	case 0x2a: LDSPR(Rn);                  break;
-	case 0x2b: JMP(Rn);                    break;
-	case 0x2c: ILLEGAL();                       break;
-	case 0x2d: ILLEGAL();                       break;
-	case 0x2e: LDCVBR(Rn);                 break;
-	case 0x2f: MAC_W(Rm, Rn);              break;
-
-	case 0x30: ILLEGAL();                       break;
-	case 0x31: ILLEGAL();                       break;
-	case 0x32: ILLEGAL();                       break;
-	case 0x33: ILLEGAL();                       break;
-	case 0x34: ILLEGAL();                       break;
-	case 0x35: ILLEGAL();                       break;
-	case 0x36: ILLEGAL();                       break;
-	case 0x37: ILLEGAL();                       break;
-	case 0x38: ILLEGAL();                       break;
-	case 0x39: ILLEGAL();                       break;
-	case 0x3a: ILLEGAL();                       break;
-	case 0x3b: ILLEGAL();                       break;
-	case 0x3c: ILLEGAL();                       break;
-	case 0x3d: ILLEGAL();                       break;
-	case 0x3e: ILLEGAL();                       break;
-	case 0x3f: MAC_W(Rm, Rn);              break;
-
-	}
-}
-
-void sh2_device::op0101(uint16_t opcode)
-{
-	MOVLL4(Rm, opcode & 0x0f, Rn);
-}
-
-void sh2_device::op0110(uint16_t opcode)
-{
-	switch (opcode & 15)
-	{
-	case  0: MOVBL(Rm, Rn);                break;
-	case  1: MOVWL(Rm, Rn);                break;
-	case  2: MOVLL(Rm, Rn);                break;
-	case  3: MOV(Rm, Rn);                  break;
-	case  4: MOVBP(Rm, Rn);                break;
-	case  5: MOVWP(Rm, Rn);                break;
-	case  6: MOVLP(Rm, Rn);                break;
-	case  7: NOT(Rm, Rn);                  break;
-	case  8: SWAPB(Rm, Rn);                break;
-	case  9: SWAPW(Rm, Rn);                break;
-	case 10: NEGC(Rm, Rn);                 break;
-	case 11: NEG(Rm, Rn);                  break;
-	case 12: EXTUB(Rm, Rn);                break;
-	case 13: EXTUW(Rm, Rn);                break;
-	case 14: EXTSB(Rm, Rn);                break;
-	case 15: EXTSW(Rm, Rn);                break;
-	}
-}
-
-void sh2_device::op0111(uint16_t opcode)
-{
-	ADDI(opcode & 0xff, Rn);
-}
-
-void sh2_device::op1000(uint16_t opcode)
-{
-	switch ( opcode  & (15<<8) )
-	{
-	case  0 << 8: MOVBS4(opcode & 0x0f, Rm);   break;
-	case  1 << 8: MOVWS4(opcode & 0x0f, Rm);   break;
-	case  2<< 8: ILLEGAL();                 break;
-	case  3<< 8: ILLEGAL();                 break;
-	case  4<< 8: MOVBL4(Rm, opcode & 0x0f);    break;
-	case  5<< 8: MOVWL4(Rm, opcode & 0x0f);    break;
-	case  6<< 8: ILLEGAL();                 break;
-	case  7<< 8: ILLEGAL();                 break;
-	case  8<< 8: CMPIM(opcode & 0xff);     break;
-	case  9<< 8: BT(opcode & 0xff);        break;
-	case 10<< 8: ILLEGAL();                 break;
-	case 11<< 8: BF(opcode & 0xff);        break;
-	case 12<< 8: ILLEGAL();                 break;
-	case 13<< 8: BTS(opcode & 0xff);       break;
-	case 14<< 8: ILLEGAL();                 break;
-	case 15<< 8: BFS(opcode & 0xff);       break;
-	}
-}
-
-
-void sh2_device::op1001(uint16_t opcode)
-{
-	MOVWI(opcode & 0xff, Rn);
-}
-
-void sh2_device::op1010(uint16_t opcode)
-{
-	BRA(opcode & 0xfff);
-}
-
-void sh2_device::op1011(uint16_t opcode)
-{
-	BSR(opcode & 0xfff);
-}
-
-void sh2_device::op1100(uint16_t opcode)
-{
-	switch (opcode & (15<<8))
-	{
-	case  0<<8: MOVBSG(opcode & 0xff);     break;
-	case  1<<8: MOVWSG(opcode & 0xff);     break;
-	case  2<<8: MOVLSG(opcode & 0xff);     break;
-	case  3<<8: TRAPA(opcode & 0xff);      break;
-	case  4<<8: MOVBLG(opcode & 0xff);     break;
-	case  5<<8: MOVWLG(opcode & 0xff);     break;
-	case  6<<8: MOVLLG(opcode & 0xff);     break;
-	case  7<<8: MOVA(opcode & 0xff);       break;
-	case  8<<8: TSTI(opcode & 0xff);       break;
-	case  9<<8: ANDI(opcode & 0xff);       break;
-	case 10<<8: XORI(opcode & 0xff);       break;
-	case 11<<8: ORI(opcode & 0xff);            break;
-	case 12<<8: TSTM(opcode & 0xff);       break;
-	case 13<<8: ANDM(opcode & 0xff);       break;
-	case 14<<8: XORM(opcode & 0xff);       break;
-	case 15<<8: ORM(opcode & 0xff);            break;
-	}
-}
-
-void sh2_device::op1101(uint16_t opcode)
-{
-	MOVLI(opcode & 0xff, Rn);
-}
-
-void sh2_device::op1110(uint16_t opcode)
-{
-	MOVI(opcode & 0xff, Rn);
-}
-
-void sh2_device::op1111(uint16_t opcode)
+void sh2_device::execute_one_f000(uint16_t opcode)
 {
 	ILLEGAL();
 }
@@ -2235,9 +354,10 @@ void sh2_device::device_reset()
 	m_sh2_state->pc = m_sh2_state->pr = m_sh2_state->sr = m_sh2_state->gbr = m_sh2_state->vbr = m_sh2_state->mach = m_sh2_state->macl = 0;
 	m_sh2_state->evec = m_sh2_state->irqsr = 0;
 	memset(&m_sh2_state->r[0], 0, sizeof(m_sh2_state->r[0])*16);
-	m_sh2_state->ea = m_delay = m_cpu_off = m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
+	m_sh2_state->ea = m_sh2_state->m_delay = m_cpu_off = 0;
+	//m_dvsr = m_dvdnth = m_dvdntl = m_dvcr = 0;
 	m_sh2_state->pending_irq = m_test_irq = 0;
-	memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
+	//memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
 	memset(&m_irq_line_state[0], 0, sizeof(m_irq_line_state[0])*17);
 	m_frc = m_ocra = m_ocrb = m_icr = 0;
 	m_frc_base = 0;
@@ -2249,7 +369,7 @@ void sh2_device::device_reset()
 
 	m_sh2_state->pc = RL(0);
 	m_sh2_state->r[15] = RL(4);
-	m_sh2_state->sr = I;
+	m_sh2_state->sr = SH_I;
 	m_sh2_state->sleep_mode = 0;
 
 	m_sh2_state->internal_irq_level = -1;
@@ -2273,55 +393,23 @@ void sh2_device::execute_run()
 		return;
 	}
 
-	// run any active DMAs now
-#ifndef USE_TIMER_FOR_DMA
-	for ( int i = 0; i < m_sh2_state->icount ; i++)
-	{
-		for( int dma=0;dma<1;dma++)
-		{
-			if (m_dma_timer_active[dma])
-				sh2_do_dma(dma);
-		}
-	}
-#endif
-
 	do
 	{
-		uint32_t opcode;
-
 		debugger_instruction_hook(this, m_sh2_state->pc);
 
-		opcode = m_program->read_word(m_sh2_state->pc & AM);
+		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & SH12_AM);
 
-		if (m_delay)
+		if (m_sh2_state->m_delay)
 		{
-			m_sh2_state->pc = m_delay;
-			m_delay = 0;
+			m_sh2_state->pc = m_sh2_state->m_delay;
+			m_sh2_state->m_delay = 0;
 		}
 		else
 			m_sh2_state->pc += 2;
 
-		switch (opcode & ( 15 << 12))
-		{
-		case  0<<12: op0000(opcode); break;
-		case  1<<12: op0001(opcode); break;
-		case  2<<12: op0010(opcode); break;
-		case  3<<12: op0011(opcode); break;
-		case  4<<12: op0100(opcode); break;
-		case  5<<12: op0101(opcode); break;
-		case  6<<12: op0110(opcode); break;
-		case  7<<12: op0111(opcode); break;
-		case  8<<12: op1000(opcode); break;
-		case  9<<12: op1001(opcode); break;
-		case 10<<12: op1010(opcode); break;
-		case 11<<12: op1011(opcode); break;
-		case 12<<12: op1100(opcode); break;
-		case 13<<12: op1101(opcode); break;
-		case 14<<12: op1110(opcode); break;
-		default: op1111(opcode); break;
-		}
+		execute_one(opcode);
 
-		if(m_test_irq && !m_delay)
+		if(m_test_irq && !m_sh2_state->m_delay)
 		{
 			CHECK_PENDING_IRQ("mame_sh2_execute");
 			m_test_irq = 0;
@@ -2330,10 +418,15 @@ void sh2_device::execute_run()
 	} while( m_sh2_state->icount > 0 );
 }
 
+
+void sh2_device::init_drc_frontend()
+{
+	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+}
+
 void sh2_device::device_start()
 {
-	/* allocate the implementation-specific state from the full cache */
-	m_sh2_state = (internal_sh2_state *)m_cache.alloc_near(sizeof(internal_sh2_state));
+	sh_common_execution::device_start();
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
 	m_timer->adjust(attotime::never);
@@ -2349,41 +442,26 @@ void sh2_device::device_start()
 	m_dma_fifo_data_available_cb.bind_relative_to(*owner());
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
-	m_program = &space(AS_PROGRAM);
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
 	m_direct = &m_decrypted_program->direct();
 	m_internal = &space(AS_PROGRAM);
 
-	save_item(NAME(m_sh2_state->pc));
-	save_item(NAME(m_sh2_state->sr));
-	save_item(NAME(m_sh2_state->pr));
-	save_item(NAME(m_sh2_state->gbr));
-	save_item(NAME(m_sh2_state->vbr));
-	save_item(NAME(m_sh2_state->mach));
-	save_item(NAME(m_sh2_state->macl));
-	save_item(NAME(m_sh2_state->r));
-	save_item(NAME(m_sh2_state->ea));
-	save_item(NAME(m_delay));
 	save_item(NAME(m_cpu_off));
-	save_item(NAME(m_dvsr));
-	save_item(NAME(m_dvdnth));
-	save_item(NAME(m_dvdntl));
-	save_item(NAME(m_dvcr));
-	save_item(NAME(m_sh2_state->pending_irq));
+	//save_item(NAME(m_dvsr));
+	//save_item(NAME(m_dvdnth));
+	//save_item(NAME(m_dvdntl));
+	//save_item(NAME(m_dvcr));
 	save_item(NAME(m_test_irq));
-	save_item(NAME(m_sh2_state->pending_nmi));
-	save_item(NAME(m_sh2_state->irqline));
-	save_item(NAME(m_sh2_state->evec));
-	save_item(NAME(m_sh2_state->irqsr));
-	save_item(NAME(m_sh2_state->target));
+
+	/*
 	for (int i = 0; i < 16; ++i)
 	{
 		save_item(NAME(m_irq_queue[i].irq_vector), i);
 		save_item(NAME(m_irq_queue[i].irq_priority), i);
 	}
-	save_item(NAME(m_pcfsel));
-	save_item(NAME(m_maxpcfsel));
-	save_item(NAME(m_pcflushes));
+	*/
+
+
 	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_m));
 	save_item(NAME(m_nmi_line_state));
@@ -2393,71 +471,24 @@ void sh2_device::device_start()
 	save_item(NAME(m_icr));
 	save_item(NAME(m_frc_base));
 	save_item(NAME(m_frt_input));
-	save_item(NAME(m_sh2_state->internal_irq_level));
 	save_item(NAME(m_internal_irq_vector));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
 	save_item(NAME(m_wtcnt));
 	save_item(NAME(m_wtcsr));
-	save_item(NAME(m_sh2_state->sleep_mode));
 
-	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(AM).callimport();
-	state_add( SH2_SR,   "SR",   m_sh2_state->sr).callimport().formatstr("%08X");
-	state_add( SH2_PR,   "PR",   m_sh2_state->pr).formatstr("%08X");
-	state_add( SH2_GBR,  "GBR",  m_sh2_state->gbr).formatstr("%08X");
-	state_add( SH2_VBR,  "VBR",  m_sh2_state->vbr).formatstr("%08X");
-	state_add( SH2_MACH, "MACH", m_sh2_state->mach).formatstr("%08X");
-	state_add( SH2_MACL, "MACL", m_sh2_state->macl).formatstr("%08X");
-	state_add( SH2_R0,   "R0",   m_sh2_state->r[ 0]).formatstr("%08X");
-	state_add( SH2_R1,   "R1",   m_sh2_state->r[ 1]).formatstr("%08X");
-	state_add( SH2_R2,   "R2",   m_sh2_state->r[ 2]).formatstr("%08X");
-	state_add( SH2_R3,   "R3",   m_sh2_state->r[ 3]).formatstr("%08X");
-	state_add( SH2_R4,   "R4",   m_sh2_state->r[ 4]).formatstr("%08X");
-	state_add( SH2_R5,   "R5",   m_sh2_state->r[ 5]).formatstr("%08X");
-	state_add( SH2_R6,   "R6",   m_sh2_state->r[ 6]).formatstr("%08X");
-	state_add( SH2_R7,   "R7",   m_sh2_state->r[ 7]).formatstr("%08X");
-	state_add( SH2_R8,   "R8",   m_sh2_state->r[ 8]).formatstr("%08X");
-	state_add( SH2_R9,   "R9",   m_sh2_state->r[ 9]).formatstr("%08X");
-	state_add( SH2_R10,  "R10",  m_sh2_state->r[10]).formatstr("%08X");
-	state_add( SH2_R11,  "R11",  m_sh2_state->r[11]).formatstr("%08X");
-	state_add( SH2_R12,  "R12",  m_sh2_state->r[12]).formatstr("%08X");
-	state_add( SH2_R13,  "R13",  m_sh2_state->r[13]).formatstr("%08X");
-	state_add( SH2_R14,  "R14",  m_sh2_state->r[14]).formatstr("%08X");
-	state_add( SH2_R15,  "R15",  m_sh2_state->r[15]).formatstr("%08X");
-	state_add( SH2_EA,   "EA",   m_sh2_state->ea).formatstr("%08X");
-
+	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(SH12_AM).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_sh2_state->r[15] ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr ).formatstr("%6s").noshow();
-
-	m_icountptr = &m_sh2_state->icount;
 
 	// Clear state
-	m_sh2_state->pc = 0;
-	m_sh2_state->pr = 0;
-	m_sh2_state->sr = 0;
-	m_sh2_state->gbr = 0;
-	m_sh2_state->vbr = 0;
-	m_sh2_state->mach = 0;
-	m_sh2_state->macl = 0;
-	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
-	m_sh2_state->ea = 0;
-	m_delay = 0;
 	m_cpu_off = 0;
-	m_dvsr = 0;
-	m_dvdnth = 0;
-	m_dvdntl = 0;
-	m_dvcr = 0;
-	m_sh2_state->pending_irq = 0;
+	//m_dvsr = 0;
+	//m_dvdnth = 0;
+	//m_dvdntl = 0;
+	//m_dvcr = 0;
 	m_test_irq = 0;
-	m_sh2_state->pending_nmi = 0;
-	m_sh2_state->irqline = 0;
-	m_sh2_state->evec = 0;
-	m_sh2_state->irqsr = 0;
-	m_sh2_state->target = 0;
-	memset(m_irq_queue, 0, sizeof(m_irq_queue));
-	m_maxpcfsel = 0;
-	memset(m_pcflushes, 0, sizeof(m_pcflushes));
+
+
 	memset(m_irq_line_state, 0, sizeof(m_irq_line_state));
 	memset(m_m, 0, sizeof(m_m));
 	m_nmi_line_state = 0;
@@ -2467,9 +498,8 @@ void sh2_device::device_start()
 	m_icr = 0;
 	m_frc_base = 0;
 	m_frt_input = 0;
-	m_sh2_state->internal_irq_level = 0;
 	m_internal_irq_vector = 0;
-	m_sh2_state->icount = 0;
+
 	for ( int i = 0; i < 2; i++ )
 	{
 		m_dma_timer_active[i] = 0;
@@ -2484,68 +514,8 @@ void sh2_device::device_start()
 	}
 	m_wtcnt = 0;
 	m_wtcsr = 0;
-	m_sh2_state->sleep_mode = 0;
-	m_numcycles = 0;
-	m_sh2_state->arg0 = 0;
-	m_arg1 = 0;
-	m_irq = 0;
-	m_fastram_select = 0;
-	memset(m_fastram, 0, sizeof(m_fastram));
 
-	/* reset per-driver pcflushes */
-	m_pcfsel = 0;
-
-	/* initialize the UML generator */
-	uint32_t flags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1);
-
-	/* add symbols for our stuff */
-	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");
-	m_drcuml->symbol_add(&m_sh2_state->icount, sizeof(m_sh2_state->icount), "icount");
-	for (int regnum = 0; regnum < 16; regnum++)
-	{
-		char buf[10];
-		sprintf(buf, "r%d", regnum);
-		m_drcuml->symbol_add(&m_sh2_state->r[regnum], sizeof(m_sh2_state->r[regnum]), buf);
-	}
-	m_drcuml->symbol_add(&m_sh2_state->pr, sizeof(m_sh2_state->pr), "pr");
-	m_drcuml->symbol_add(&m_sh2_state->sr, sizeof(m_sh2_state->sr), "sr");
-	m_drcuml->symbol_add(&m_sh2_state->gbr, sizeof(m_sh2_state->gbr), "gbr");
-	m_drcuml->symbol_add(&m_sh2_state->vbr, sizeof(m_sh2_state->vbr), "vbr");
-	m_drcuml->symbol_add(&m_sh2_state->macl, sizeof(m_sh2_state->macl), "macl");
-	m_drcuml->symbol_add(&m_sh2_state->mach, sizeof(m_sh2_state->macl), "mach");
-
-	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-
-	/* compute the register parameters */
-	for (int regnum = 0; regnum < 16; regnum++)
-	{
-		m_regmap[regnum] = uml::mem(&m_sh2_state->r[regnum]);
-	}
-
-	/* if we have registers to spare, assign r0, r1, r2 to leftovers */
-	/* WARNING: do not use synthetic registers that are mapped here! */
-	if (!DISABLE_FAST_REGISTERS)
-	{
-		drcbe_info beinfo;
-		m_drcuml->get_backend_info(beinfo);
-		if (beinfo.direct_iregs > 4)
-		{
-			m_regmap[0] = uml::I4;
-		}
-		if (beinfo.direct_iregs > 5)
-		{
-			m_regmap[1] = uml::I5;
-		}
-		if (beinfo.direct_iregs > 6)
-		{
-			m_regmap[2] = uml::I6;
-		}
-	}
-
-	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
+	drc_start();
 }
 
 
@@ -2555,11 +525,11 @@ void sh2_device::state_string_export(const device_state_entry &entry, std::strin
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%d%c%c",
-					m_sh2_state->sr & M ? 'M':'.',
-					m_sh2_state->sr & Q ? 'Q':'.',
-					(m_sh2_state->sr & I) >> 4,
-					m_sh2_state->sr & S ? 'S':'.',
-					m_sh2_state->sr & T ? 'T':'.');
+					m_sh2_state->sr & SH_M ? 'M':'.',
+					m_sh2_state->sr & SH_Q ? 'Q':'.',
+					(m_sh2_state->sr & SH_I) >> 4,
+					m_sh2_state->sr & SH_S ? 'S':'.',
+					m_sh2_state->sr & SH_T ? 'T':'.');
 			break;
 	}
 }
@@ -2571,10 +541,10 @@ void sh2_device::state_import(const device_state_entry &entry)
 	{
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
-			m_delay = 0;
+			m_sh2_state->m_delay = 0;
 			break;
 
-		case SH2_SR:
+		case SH_SR:
 			CHECK_PENDING_IRQ("sh2_set_reg");
 			break;
 	}
@@ -2622,7 +592,7 @@ void sh2_device::execute_set_input(int irqline, int state)
 			{
 				m_test_irq = 1;
 			} else {
-				if(m_delay)
+				if(m_sh2_state->m_delay)
 					m_test_irq = 1;
 				else
 					CHECK_PENDING_IRQ("sh2_set_irq_line");
@@ -2672,14 +642,14 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 	if (m_isdrc)
 	{
 		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
-		m_sh2_state->evec &= AM;
+		m_sh2_state->evec &= SH12_AM;
 		m_sh2_state->irqsr = m_sh2_state->sr;
 
 		/* set I flags in SR */
 		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
+			m_sh2_state->sr = m_sh2_state->sr | SH_I;
 		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
 	} else {
@@ -2690,9 +660,9 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 		/* set I flags in SR */
 		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
+			m_sh2_state->sr = m_sh2_state->sr | SH_I;
 		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 		/* fetch PC */
 		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
@@ -2701,4 +671,324 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
 
-#include "sh2drc.cpp"
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
+/***************************************************************************
+
+    sh2drc.c
+    Universal machine language-based SH-2 emulator.
+
+***************************************************************************/
+
+#include "emu.h"
+#include "debugger.h"
+#include "sh2.h"
+#include "sh2comn.h"
+
+
+using namespace uml;
+
+const opcode_desc* sh2_device::get_desclist(offs_t pc)
+{
+	return m_drcfe->describe_code(pc);
+}
+
+
+
+/*-------------------------------------------------
+    static_generate_entry_point - generate a
+    static entry point
+-------------------------------------------------*/
+
+void sh2_device::func_fastirq()
+{
+	sh2_exception("fastirq",m_sh2_state->irqline);
+}
+static void cfunc_fastirq(void *param) { ((sh2_device *)param)->func_fastirq(); };
+
+void sh2_device::static_generate_entry_point()
+{
+	drcuml_state *drcuml = m_drcuml.get();
+	code_label skip = 1;
+	drcuml_block *block;
+
+	/* begin generating */
+	block = drcuml->begin_block(200);
+
+	/* forward references */
+	alloc_handle(drcuml, &m_nocode, "nocode");
+	alloc_handle(drcuml, &m_write32, "write32");     // necessary?
+	alloc_handle(drcuml, &m_entry, "entry");
+	UML_HANDLE(block, *m_entry);                         // handle  entry
+
+	/* load fast integer registers */
+	load_fast_iregs(block);
+
+	/* check for interrupts */
+	UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
+	UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
+	UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+
+	UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
+	UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
+
+	UML_LABEL(block, skip+2);                   // skip+2:
+	UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
+	UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
+	UML_AND(block, I1,  I0, 0xffff);                // and r1, 0xffff
+
+	UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, r1
+	UML_CMP(block, I1, 32);             // cmp r1, #32
+	UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
+
+	UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
+
+	UML_LABEL(block, skip+4);                   // skip+4:
+	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
+	UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
+	UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
+	UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
+
+	UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
+
+	UML_LABEL(block, skip+3);                   // skip+3:
+	UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
+	UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
+	UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+
+	UML_LABEL(block, skip+1);                   // skip+1:
+
+	UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
+	UML_JMPc(block, COND_Z, skip);                  // jz skip
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
+	UML_CALLH(block, *m_write32);                    // call write32
+
+	UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+	UML_MOV(block, I0, R32(15));                // mov r0, R15
+	UML_MOV(block, I1, mem(&m_sh2_state->pc));              // mov r1, pc
+	UML_CALLH(block, *m_write32);                    // call write32
+
+	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->evec));             // mov pc, evec
+
+	UML_LABEL(block, skip);                         // skip:
+
+	/* generate a hash jump via the current mode and PC */
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
+
+	block->end();
+}
+
+
+/*-------------------------------------------------
+    generate_update_cycles - generate code to
+    subtract cycles from the icount and generate
+    an exception if out
+-------------------------------------------------*/
+
+void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+{
+	/* check full interrupts if pending */
+	if (compiler->checkints)
+	{
+		code_label skip = compiler->labelnum++;
+
+		compiler->checkints = false;
+		compiler->labelnum += 4;
+
+		/* check for interrupts */
+		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
+		UML_CMP(block, mem(&m_sh2_state->pending_nmi), 0);          // cmp pending_nmi, #0
+		UML_JMPc(block, COND_Z, skip+2);                    // jz skip+2
+
+		UML_MOV(block, mem(&m_sh2_state->pending_nmi), 0);          // zap pending_nmi
+		UML_JMP(block, skip+1);                     // and then go take it (evec is already set)
+
+		UML_LABEL(block, skip+2);                   // skip+2:
+		UML_MOV(block, mem(&m_sh2_state->evec), 0xffffffff);        // mov evec, -1
+		UML_MOV(block, I0, 0xffffffff);         // mov r0, -1 (r0 = irq)
+		UML_AND(block, I1,  I0, 0xffff);                // and r1, r0, 0xffff
+
+		UML_LZCNT(block, I1, mem(&m_sh2_state->pending_irq));       // lzcnt r1, pending_irq
+		UML_CMP(block, I1, 32);             // cmp r1, #32
+		UML_JMPc(block, COND_Z, skip+4);                    // jz skip+4
+
+		UML_SUB(block, mem(&m_sh2_state->irqline), 31, I1);     // sub irqline, #31, r1
+
+		UML_LABEL(block, skip+4);                   // skip+4:
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), 0xffffffff);  // cmp internal_irq_level, #-1
+		UML_JMPc(block, COND_Z, skip+3);                    // jz skip+3
+		UML_CMP(block, mem(&m_sh2_state->internal_irq_level), mem(&m_sh2_state->irqline));      // cmp internal_irq_level, irqline
+		UML_JMPc(block, COND_LE, skip+3);                   // jle skip+3
+
+		UML_MOV(block, mem(&m_sh2_state->irqline), mem(&m_sh2_state->internal_irq_level));      // mov r0, internal_irq_level
+
+		UML_LABEL(block, skip+3);                   // skip+3:
+		UML_CMP(block, mem(&m_sh2_state->irqline), 0xffffffff);     // cmp irqline, #-1
+		UML_JMPc(block, COND_Z, skip+1);                    // jz skip+1
+		UML_CALLC(block, cfunc_fastirq, this);               // callc fastirq
+
+		UML_LABEL(block, skip+1);                   // skip+1:
+		UML_CMP(block, mem(&m_sh2_state->evec), 0xffffffff);        // cmp evec, 0xffffffff
+		UML_JMPc(block, COND_Z, skip);                  // jz skip
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, mem(&m_sh2_state->irqsr));           // mov r1, irqsr
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
+		UML_MOV(block, I0, R32(15));                // mov r0, R15
+		UML_MOV(block, I1, param);              // mov r1, nextpc
+		UML_CALLH(block, *m_write32);                    // call write32
+
+		UML_HASHJMP(block, 0, mem(&m_sh2_state->evec), *m_nocode);       // hashjmp m_sh2_state->evec
+
+		UML_LABEL(block, skip);                         // skip:
+	}
+
+	/* account for cycles */
+	if (compiler->cycles > 0)
+	{
+		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
+		if (allow_exception)
+			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
+																					// exh     out_of_cycles,nextpc
+	}
+	compiler->cycles = 0;
+}
+
+/*------------------------------------------------------------------
+    static_generate_memory_accessor
+------------------------------------------------------------------*/
+
+void sh2_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
+{
+	/* on entry, address is in I0; data for writes is in I1 */
+	/* on exit, read result is in I0 */
+	/* routine trashes I0 */
+	drcuml_state *drcuml = m_drcuml.get();
+	drcuml_block *block;
+	int label = 1;
+
+	/* begin generating */
+	block = drcuml->begin_block(1024);
+
+	/* add a global entry for this */
+	alloc_handle(drcuml, handleptr, name);
+	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
+
+	// with internal handlers this becomes easier.
+	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
+	UML_TEST(block, I0, 0x80000000);        // test r0, #0x80000000
+	UML_JMPc(block, COND_NZ, label);                // if high bit is set, don't mask
+
+	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
+	UML_JMPc(block, COND_AE, label);            // bae label
+
+	UML_AND(block, I0, I0, SH12_AM);     // and r0, r0, #AM (0xc7ffffff)
+
+	UML_LABEL(block, label++);              // label:
+
+	for (auto & elem : m_fastram)
+	{
+		if (elem.base != nullptr && (!iswrite || !elem.readonly))
+		{
+			void *fastbase = (uint8_t *)elem.base - elem.start;
+			uint32_t skip = label++;
+			if (elem.end != 0xffffffff)
+			{
+				UML_CMP(block, I0, elem.end);   // cmp     i0,end
+				UML_JMPc(block, COND_A, skip);                                      // ja      skip
+			}
+			if (elem.start != 0x00000000)
+			{
+				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
+				UML_JMPc(block, COND_B, skip);                                      // jb      skip
+			}
+
+			if (!iswrite)
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+				}
+				else if (size == 4)
+				{
+					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+			else
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+				}
+				else if (size == 4)
+				{
+					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+
+			UML_LABEL(block, skip);                                             // skip:
+		}
+	}
+
+	if (iswrite)
+	{
+		switch (size)
+		{
+			case 1:
+				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM); // write r0, r1, program_byte
+				break;
+
+			case 2:
+				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM); // write r0, r1, program_word
+				break;
+
+			case 4:
+				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);    // write r0, r1, program_dword
+				break;
+		}
+	}
+	else
+	{
+		switch (size)
+		{
+			case 1:
+				UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);  // read r0, program_byte
+				break;
+
+			case 2:
+				UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);  // read r0, program_word
+				break;
+
+			case 4:
+				UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM); // read r0, program_dword
+				break;
+		}
+	}
+
+	UML_RET(block);                         // ret
+
+	block->end();
+}
+
+

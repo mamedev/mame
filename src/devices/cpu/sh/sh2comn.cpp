@@ -181,11 +181,8 @@ void sh2_device::sh2_do_dma(int dma)
 					}
 				}
 
-				#ifdef USE_TIMER_FOR_DMA
-					//schedule next DMA callback
+				//schedule next DMA callback
 				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-				#endif
-
 
 				dmadata = m_program->read_byte(tempsrc);
 				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
@@ -229,10 +226,8 @@ void sh2_device::sh2_do_dma(int dma)
 					}
 				}
 
-				#ifdef USE_TIMER_FOR_DMA
-					//schedule next DMA callback
+				//schedule next DMA callback
 				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
 				dmadata = m_program->read_word(tempsrc);
@@ -276,10 +271,8 @@ void sh2_device::sh2_do_dma(int dma)
 					}
 				}
 
-				#ifdef USE_TIMER_FOR_DMA
-					//schedule next DMA callback
+				//schedule next DMA callback
 				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-				#endif
 
 				dmadata = m_program->read_dword(tempsrc);
 				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
@@ -321,10 +314,8 @@ void sh2_device::sh2_do_dma(int dma)
 					}
 				}
 
-				#ifdef USE_TIMER_FOR_DMA
-					//schedule next DMA callback
+				//schedule next DMA callback
 				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-				#endif
 
 				dmadata = m_program->read_dword(tempsrc);
 				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
@@ -409,8 +400,8 @@ void sh2_device::sh2_dmac_check(int dma)
 
 			m_dma_timer_active[dma] = 1;
 
-			m_active_dma_src[dma] &= AM;
-			m_active_dma_dst[dma] &= AM;
+			m_active_dma_src[dma] &= SH12_AM;
+			m_active_dma_dst[dma] &= SH12_AM;
 
 			switch(m_active_dma_size[dma])
 			{
@@ -431,10 +422,6 @@ void sh2_device::sh2_dmac_check(int dma)
 				break;
 			}
 
-
-
-
-#ifdef USE_TIMER_FOR_DMA
 			// start DMA timer
 
 			// fever soccer uses cycle-stealing mode, requiring the CPU to be halted
@@ -445,8 +432,6 @@ void sh2_device::sh2_dmac_check(int dma)
 			}
 
 			m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
-#endif
-
 		}
 	}
 	else

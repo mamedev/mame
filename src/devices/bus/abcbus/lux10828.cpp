@@ -54,7 +54,7 @@ Notes:
     MB8876  - Mitsubishi MB8876 Floppy Disc Controller (FD1791 compatible)
     TC5514  - Toshiba TC5514AP-2 1Kx4 bit Static RAM
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
-    C140E   - Ferranti 2C140E "copy protection device"
+    C140E   - Ferranti ULA 2C140E floppy disk data separator and mystery device
     N8T97N  - SA N8T97N ?
     CON1    - ABC bus connector
     CON2    - 25-pin D sub floppy connector (AMP4284)
@@ -76,16 +76,8 @@ Notes:
 
     TODO:
 
-    - Z80 IN instruction needs to halt in mid air for this controller to ever work (the first data byte of disk sector is read too early)
-
-        wd17xx_command_w $88 READ_SEC
-        wd17xx_data_r: (no new data) $00 (data_count 0)
-        WAIT
-        wd179x: Read Sector callback.
-        sector found! C:$00 H:$00 R:$0b N:$01
-        wd17xx_data_r: $FF (data_count 256)
-        WAIT
-
+	- needs mid-instruction wait state support from Z80 core
+	- inverted A4/5/6/7 chip select
     - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
 
         06F8: ld   a,$2F                    ; SEEK
@@ -113,10 +105,6 @@ Notes:
         0703: rlca
         0704: rr   a
         0706: call $073F
-
-    - S2-S5 jumpers
-    - ABC80 ERR 48 on boot
-    - side select makes controller go crazy and try to WRITE_TRK
 
 */
 
@@ -148,7 +136,7 @@ DEFINE_DEVICE_TYPE(LUXOR_55_10828, luxor_55_10828_device, "lux10828", "Luxor 55 
 
 ROM_START( luxor_55_10828 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS("mpi02n")
+	ROM_DEFAULT_BIOS("basf6106")
 	// ABC 830
 	ROM_SYSTEM_BIOS( 0, "basf6106", "BASF 6106/08" )
 	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(1) )
@@ -224,35 +212,37 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	    bit     description
 
 	    0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
-	    1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
+	    1       !(_DD0 & _DD1)  single/double density (0=SD, 1=DD)
 	    2       8B pin 10
-	    3       FDC _DDEN       double density enable
-	    4       _R/BS           radial/binary drive select
-	    5       FDC HLT         head load timing
+	    3
+	    4       R/_BS           radial/binary drive select
+	    5
 	    6       FDC _HDLD       head loaded
 	    7       FDC IRQ         interrupt request
 
 	*/
 
-	uint8_t data = 0x04;
+	uint8_t data = 0;
 
 	// single/double sided drive
 	uint8_t sw1 = m_sw1->read() & 0x0f;
-	int ds0 = m_sel0 ? BIT(sw1, 0) : 1;
-	int ds1 = m_sel1 ? BIT(sw1, 1) : 1;
-	data |= !(ds0 & ds1);
+	bool ds0 = m_sel0 ? BIT(sw1, 0) : 1;
+	bool ds1 = m_sel1 ? BIT(sw1, 1) : 1;
+	data |= !(ds0 && ds1);
 
 	// single/double density drive
-	int dd0 = m_sel0 ? BIT(sw1, 2) : 1;
-	int dd1 = m_sel1 ? BIT(sw1, 3) : 1;
-	data |= !(dd0 & dd1) << 1;
+	bool dd0 = m_sel0 ? BIT(sw1, 2) : 1;
+	bool dd1 = m_sel1 ? BIT(sw1, 3) : 1;
+	data |= !(dd0 && dd1) << 1;
+
+	// TODO ULA output
+	data |= 0x4;
 
 	// radial/binary drive select
 	data |= 0x10;
 
 	// head load
-	data |= m_fdc->hld_r() << 6;
-	data |= 0x40; // TODO remove
+	data |= !m_fdc->hld_r() << 6;
 
 	// FDC interrupt request
 	data |= m_fdc_irq << 7;
@@ -266,14 +256,14 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 
 	    bit     signal          description
 
-	    0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
-	    1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
-	    2       8B pin 10
+	    0
+	    1
+	    2
 	    3       FDC _DDEN       double density enable
-	    4       _R/BS           radial/binary drive select
+	    4
 	    5       FDC HLT         head load timing
-	    6       FDC _HDLD       head loaded
-	    7       FDC IRQ         interrupt request
+	    6
+	    7
 
 	*/
 
@@ -283,6 +273,7 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 	// head load timing
 	m_fdc->hlt_w(BIT(data, 5));
 }
+
 
 //-------------------------------------------------
 //  z80_daisy_config daisy_chain
@@ -311,14 +302,14 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
 
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
+	//if (state) m_maincpu->wait_w(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
+	//if (state) m_maincpu->wait_w(CLEAR_LINE);
 }
 
 
@@ -339,12 +330,12 @@ MACHINE_CONFIG_MEMBER( luxor_55_10828_device::device_add_mconfig )
 	MCFG_Z80PIO_IN_PB_CB(READ8(luxor_55_10828_device, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(luxor_55_10828_device, pio_pb_w))
 
-	MCFG_MB8876_ADD(MB8876_TAG, XTAL_4MHz/2)
+	MCFG_MB8876_ADD(MB8876_TAG, XTAL_4MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -368,9 +359,19 @@ INPUT_PORTS_START( luxor_55_10828 )
 	PORT_DIPSETTING(    0x00, "Double" )
 
 	PORT_START("S1")
-	PORT_DIPNAME( 0x01, 0x01, "Card Address" ) PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Card Address" )
 	PORT_DIPSETTING(    0x00, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x01, "45 (ABC 830)" )
+
+	PORT_START("S2,S3")
+	PORT_DIPNAME( 0x01, 0x01, "Shift Clock" )
+	PORT_DIPSETTING(    0x00, "2 MHz" )
+	PORT_DIPSETTING(    0x01, "4 MHz" )
+
+	PORT_START("S4,S5")
+	PORT_DIPNAME( 0x01, 0x01, "Write Precompensation" )
+	PORT_DIPSETTING(    0x00, "Always On" )
+	PORT_DIPSETTING(    0x01, "Programmable" )
 INPUT_PORTS_END
 
 
@@ -393,22 +394,24 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //  luxor_55_10828_device - constructor
 //-------------------------------------------------
 
-luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LUXOR_55_10828, tag, owner, clock),
-		device_abcbus_card_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG),
-		m_pio(*this, Z80PIO_TAG),
-		m_fdc(*this, MB8876_TAG),
-		m_floppy0(*this, MB8876_TAG":0"),
-		m_floppy1(*this, MB8876_TAG":1"),
-		m_sw1(*this, "SW1"),
-		m_s1(*this, "S1"),
-		m_cs(false), m_status(0), m_data(0),
-		m_fdc_irq(0),
-		m_fdc_drq(0),
-		m_wait_enable(0),
-		m_sel0(0),
-		m_sel1(0)
+luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, LUXOR_55_10828, tag, owner, clock),
+	device_abcbus_card_interface(mconfig, *this),
+	m_maincpu(*this, Z80_TAG),
+	m_pio(*this, Z80PIO_TAG),
+	m_fdc(*this, MB8876_TAG),
+	m_floppy0(*this, MB8876_TAG":0"),
+	m_floppy1(*this, MB8876_TAG":1"),
+	m_sw1(*this, "SW1"),
+	m_s1(*this, "S1"),
+	m_cs(false),
+	m_status(0),
+	m_data(0),
+	m_fdc_irq(0),
+	m_fdc_drq(0),
+	m_wait_enable(0),
+	m_sel0(0),
+	m_sel1(0)
 {
 }
 
@@ -429,7 +432,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_sel0));
 	save_item(NAME(m_sel1));
 
-	// patch out protection checks
+	// patch out protection checks (bioses basf6106/mpi02)
 	uint8_t *rom = memregion(Z80_TAG)->base();
 	rom[0x00fa] = 0xff;
 	rom[0x0336] = 0xff;
@@ -447,6 +450,11 @@ void luxor_55_10828_device::device_start()
 void luxor_55_10828_device::device_reset()
 {
 	m_cs = false;
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	ctrl_w(space, 0, 0);
+
+	m_data = 0;
 }
 
 
@@ -494,13 +502,13 @@ uint8_t luxor_55_10828_device::abcbus_inp()
 
 	if (m_cs)
 	{
+		m_pio->strobe_a(0);
+		m_pio->strobe_a(1);
+
 		if (!BIT(m_status, 6))
 		{
 			data = m_data;
 		}
-
-		m_pio->strobe_a(0);
-		m_pio->strobe_a(1);
 	}
 
 	return data;
@@ -513,15 +521,16 @@ uint8_t luxor_55_10828_device::abcbus_inp()
 
 void luxor_55_10828_device::abcbus_out(uint8_t data)
 {
-	if (!m_cs) return;
-
-	if (BIT(m_status, 6))
+	if (m_cs)
 	{
-		m_data = data;
-	}
+		if (BIT(m_status, 6))
+		{
+			m_data = data;
+		}
 
-	m_pio->strobe_a(0);
-	m_pio->strobe_a(1);
+		m_pio->strobe_a(0);
+		m_pio->strobe_a(1);
+	}
 }
 
 
@@ -578,14 +587,17 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 
 	*/
 
+	if (machine().side_effect_disabled())
+		return;
+
 	// drive selection
 	m_sel0 = BIT(data, 0);
 	m_sel1 = BIT(data, 1);
 
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (m_sel0) floppy = m_floppy0->get_device();
+	if (m_sel1) floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -595,7 +607,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 		floppy->mon_w(BIT(data, 3));
 
 		// side select
-		floppy->ss_w(BIT(data, 4));
+		floppy->ss_w(!BIT(data, 4));
 	}
 
 	// wait enable
@@ -627,10 +639,13 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 	*/
 
+	if (machine().side_effect_disabled())
+		return;
+
 	m_status = data & 0xfe;
 
 	// interrupt
-	m_slot->irq_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_slot->irq_w(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -640,14 +655,25 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 READ8_MEMBER( luxor_55_10828_device::fdc_r )
 {
-	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
-	{
-		logerror("Z80 WAIT not supported by MAME core\n");
+	if (machine().side_effect_disabled())
+		return 0xff;
 
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
+	uint8_t data = 0xff;
+
+	if (m_wait_enable)
+	{
+		data = m_fdc->gen_r(offset);
+	}
+	else if (!m_fdc_irq && !m_fdc_drq)
+	{
+		//m_maincpu->wait_w(ASSERT_LINE);
+	}
+	else
+	{
+		data = m_fdc->gen_r(offset);
 	}
 
-	return m_fdc->gen_r(offset);
+	return data;
 }
 
 
@@ -657,12 +683,13 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 {
-	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
-	{
-		logerror("Z80 WAIT not supported by MAME core\n");
-
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
-	}
+	if (machine().side_effect_disabled())
+		return;
 
 	m_fdc->gen_w(offset, data);
+
+	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
+	{
+		//m_maincpu->wait_w(ASSERT_LINE);
+	}
 }

@@ -89,8 +89,8 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 		m_dma_timer[channel]->adjust(attotime::zero, channel);
 	}
 
-	src &= AM;
-	dst &= AM;
+	src &= SH34_AM;
+	dst &= SH34_AM;
 
 	switch(size)
 	{
@@ -178,8 +178,8 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 		}
 		break;
 	}
-	*sar    = (*sar & ~AM) | src;
-	*dar    = (*dar & ~AM) | dst;
+	*sar    = (*sar & ~SH34_AM) | src;
+	*dar    = (*dar & ~SH34_AM) | dst;
 	*dmatcr = count;
 	return 1;
 }
@@ -218,8 +218,8 @@ int sh34_base_device::sh4_dma_transfer_device(int channel, uint32_t chcr, uint32
 
 	m_dma_timer_active[channel] = 1;
 
-	src &= AM;
-	dst &= AM;
+	src &= SH34_AM;
+	dst &= SH34_AM;
 
 	// remember parameters
 	m_dma_source[channel]=src;

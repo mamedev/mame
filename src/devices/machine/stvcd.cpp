@@ -1520,9 +1520,9 @@ void saturn_state::stvcd_reset( void )
 	}
 
 	// open device
-	if (cdrom)
+	//if (cdrom)
 	{
-		cdrom_close(cdrom);
+		//cdrom_close(cdrom);
 		cdrom = (cdrom_file *)nullptr;
 	}
 
@@ -2720,6 +2720,7 @@ void saturn_state::stvcd_set_tray_close( void )
 		return;
 
 	hirqreg |= DCHG;
+	cdrom = (cdrom_file *)nullptr;
 
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 	if (cddevice!=nullptr)

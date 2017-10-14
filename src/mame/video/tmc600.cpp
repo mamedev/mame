@@ -3,10 +3,6 @@
 #include "emu.h"
 #include "includes/tmc600.h"
 
-#include "sound/cdp1869.h"
-#include "speaker.h"
-
-
 WRITE8_MEMBER( tmc600_state::vismac_register_w )
 {
 	m_vismac_reg_latch = data;

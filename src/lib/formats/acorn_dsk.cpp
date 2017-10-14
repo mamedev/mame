@@ -33,17 +33,22 @@ int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 {
 	uint8_t cat[8];
 	uint32_t sectors0, sectors2;
-
-	// read sector count from side 0 catalogue
-	io_generic_read(io, cat, 0x100, 8);
-	sectors0 = ((cat[6] & 3) << 8) + cat[7];
-	LOG_FORMATS("ssd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
-
 	uint64_t size = io_generic_size(io);
+
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
+
+		// test for Torch CPN - test pattern at sector &0018
+		io_generic_read(io, cat, 0x32800, 8);
+		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+			return i;
+
+		// read sector count from side 0 catalogue
+		io_generic_read(io, cat, 0x100, 8);
+		sectors0 = ((cat[6] & 3) << 8) + cat[7];
+		LOG_FORMATS("ssd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
 			if (f.head_count == 2)
@@ -63,7 +68,7 @@ int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 				sectors2 = sectors0;
 			}
 
-			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0)
+			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
 	}
@@ -133,17 +138,22 @@ int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 {
 	uint8_t cat[8];
 	uint32_t sectors0, sectors2;
-
-	// read sector count from side 0 catalogue
-	io_generic_read(io, cat, 0x100, 8);
-	sectors0 = ((cat[6] & 3) << 8) + cat[7];
-	LOG_FORMATS("dsd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
-
 	uint64_t size = io_generic_size(io);
+
 	for (int i = 0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
+
+		// test for Torch CPN - test pattern at sector &0018
+		io_generic_read(io, cat, 0x1200, 8);
+		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+			return i;
+
+		// read sector count from side 0 catalogue
+		io_generic_read(io, cat, 0x100, 8);
+		sectors0 = ((cat[6] & 3) << 8) + cat[7];
+		LOG_FORMATS("dsd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
 			// read sector count from side 2 catalogue
@@ -156,7 +166,7 @@ int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 
 			LOG_FORMATS("dsd: sector count 2: %d %s\n", sectors2, sectors2 % 10 != 0 ? "invalid" : "");
 
-			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0)
+			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
 	}
@@ -512,7 +522,7 @@ int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
 	int type = find_size(io, form_factor);
 
 	if(type != -1)
-		return 90;
+		return 90; 
 	return 0;
 }
 
@@ -564,8 +574,9 @@ int opus_ddcpm_format::identify(io_generic *io, uint32_t form_factor)
 
 	io_generic_read(io, h, 0, 8);
 
-	if (io_generic_size(io) == 811520 && memcmp(h, "Slogger ", 8) == 0)
+	if (io_generic_size(io) == 819200 && memcmp(h, "Slogger ", 8) == 0)
 		return 100;
+	LOG_FORMATS("ddcpm: no match\n");
 	return 0;
 }
 
@@ -584,7 +595,6 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 // Sector interleave of 2
 //
 	int spt, bps;
-	uint64_t file_offset = 0;
 
 	for (int head = 0; head < 2; head++) {
 		for (int track = 0; track < 80; track++) {
@@ -594,7 +604,7 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 			desc_pc_sector sects[10];
 			uint8_t sectdata[10*512];
 
-			io_generic_read(io, sectdata, file_offset, spt * bps);
+			io_generic_read(io, sectdata, head * 80 * spt * 512 + track * spt * 512, spt * 512);
 
 			for (int i = 0; i < spt; i++) {
 				sects[i].track = track;
@@ -602,7 +612,7 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 				sects[i].sector = i;
 				sects[i].size =  mfm ? 2 : 1;
 				sects[i].actual_size = bps;
-				sects[i].data = sectdata + bps * i;
+				sects[i].data = sectdata + i * 512;
 				sects[i].deleted = false;
 				sects[i].bad_crc = false;
 			}
@@ -611,8 +621,6 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 				build_wd_track_mfm(track, head, image, 100000, 10, sects, 60, 43, 22);
 			else
 				build_wd_track_fm(track, head, image, 50000, 10, sects, 40, 10, 10);
-
-			file_offset += spt * bps;
 		}
 	}
 
@@ -625,53 +633,6 @@ bool opus_ddcpm_format::save(io_generic *io, floppy_image *image)
 }
 
 
-torch_cpn_format::torch_cpn_format() : wd177x_format(formats)
-{
-}
-
-const char *torch_cpn_format::name() const
-{
-	return "cpn";
-}
-
-const char *torch_cpn_format::description() const
-{
-	return "Torch CPN disk image";
-}
-
-const char *torch_cpn_format::extensions() const
-{
-	return "dsd";
-}
-
-int torch_cpn_format::identify(io_generic *io, uint32_t form_factor)
-{
-	int type = find_size(io, form_factor);
-
-	if (type != -1)
-		return 50;
-	LOG_FORMATS("cpn: no match\n");
-	return 0;
-}
-
-int torch_cpn_format::get_image_offset(const format &f, int head, int track)
-{
-	if (f.sector_base_id == -1)
-		return (track * f.head_count + head) * compute_track_size(f);
-	else
-		return (f.track_count * head + track) * compute_track_size(f);
-}
-
-const torch_cpn_format::format torch_cpn_format::formats[] =
-{
-	{ // 400k 80 track double sided single density (interleaved) - gaps unverified
-		floppy_image::FF_525, floppy_image::DSQD, floppy_image::FM,
-		4000, 10, 80, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
-	},
-	{}
-};
-
-
 const floppy_format_type FLOPPY_ACORN_SSD_FORMAT = &floppy_image_format_creator<acorn_ssd_format>;
 const floppy_format_type FLOPPY_ACORN_DSD_FORMAT = &floppy_image_format_creator<acorn_dsd_format>;
 const floppy_format_type FLOPPY_ACORN_DOS_FORMAT = &floppy_image_format_creator<acorn_dos_format>;
@@ -679,4 +640,3 @@ const floppy_format_type FLOPPY_ACORN_ADFS_OLD_FORMAT = &floppy_image_format_cre
 const floppy_format_type FLOPPY_ACORN_ADFS_NEW_FORMAT = &floppy_image_format_creator<acorn_adfs_new_format>;
 const floppy_format_type FLOPPY_OPUS_DDOS_FORMAT = &floppy_image_format_creator<opus_ddos_format>;
 const floppy_format_type FLOPPY_OPUS_DDCPM_FORMAT = &floppy_image_format_creator<opus_ddcpm_format>;
-const floppy_format_type FLOPPY_TORCH_CPN_FORMAT = &floppy_image_format_creator<torch_cpn_format>;

@@ -496,9 +496,13 @@ static MACHINE_CONFIG_START( hikaru )
 //  MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map)
 //  MCFG_CPU_IO_MAP(hikaru_port)
+	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
+	
 	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
+	MCFG_CPU_FORCE_NO_DRC()
+
 
 //  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
 //  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )

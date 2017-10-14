@@ -37,6 +37,12 @@ public:
 		m_b = b;
 	}
 	void set(const rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { set(val, val, val, val); }
+	// This function zeros all elements
+	void zero() { set_all(0); }
+	// This function zeros only the alpha element
+	void zero_alpha() { m_a = 0; }
 
 	rgb_t to_rgba() const { return rgb_t(get_a(), get_r(), get_g(), get_b()); }
 

@@ -258,6 +258,8 @@ void saturn_state::stv_vdp1_change_framebuffers( void )
 {
 	m_vdp1.framebuffer_current_display ^= 1;
 	m_vdp1.framebuffer_current_draw ^= 1;
+	// "this bit is reset to 0 when the frame buffers are changed"
+	CEF_0;
 	if ( VDP1_LOG ) logerror( "Changing framebuffers: %d - draw, %d - display\n", m_vdp1.framebuffer_current_draw, m_vdp1.framebuffer_current_display );
 	stv_prepare_framebuffers();
 }
@@ -1788,6 +1790,7 @@ void saturn_state::stv_vdp1_process_list( void )
 	/*Set CEF bit to 0*/
 	CEF_0;
 
+	// TODO: is there a
 	while (spritecount<10000) // if its drawn this many sprites something is probably wrong or sega were crazy ;-)
 	{
 		int draw_this_sprite;
@@ -1988,7 +1991,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					break;
 
 				default:
-					popmessage ("VDP1: Sprite List Illegal %02x, contact MAMEdev",stv2_current_sprite.CMDCTRL & 0xf);
+					popmessage ("VDP1: Sprite List Illegal %02x (%d), contact MAMEdev",stv2_current_sprite.CMDCTRL & 0xf,spritecount);
 					m_vdp1.lopr = (position * 0x20) >> 3;
 					//m_vdp1.copr = (position * 0x20) >> 3;
 					// prematurely kill the VDP1 process if an illegal opcode is executed
@@ -2003,10 +2006,11 @@ void saturn_state::stv_vdp1_process_list( void )
 	end:
 	m_vdp1.copr = (position * 0x20) >> 3;
 
+	
 	/* TODO: what's the exact formula? Guess it should be a mix between number of pixels written and actual command data fetched. */
 	// if spritecount = 10000 don't send a vdp1 draw end
-	if(spritecount < 10000)
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
+//	if(spritecount < 10000)
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }
@@ -2086,11 +2090,11 @@ void saturn_state::video_update_vdp1( void )
 	{
 		case 0:/*Idle Mode*/
 			/*Set CEF bit to 0*/
-			CEF_0;
+			//CEF_0;
 			break;
 		case 1:/*Draw by request*/
 			/*Set CEF bit to 0*/
-			CEF_0;
+			//CEF_0;
 			break;
 		case 2:/*Automatic Draw*/
 			if ( framebuffer_changed || VDP1_LOG )
