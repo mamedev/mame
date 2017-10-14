@@ -98,8 +98,8 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 
 
 
-DEFINE_DEVICE_TYPE(AY31015, ay31015_device, "ay31015", "AY-3-1015")
-DEFINE_DEVICE_TYPE(AY51013, ay51013_device, "ay51013", "AY-5-1013")
+DEFINE_DEVICE_TYPE(AY31015, ay31015_device, "ay31015", "AY-3-1015 UART")
+DEFINE_DEVICE_TYPE(AY51013, ay51013_device, "ay51013", "AY-5-1013 UART")
 
 ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
