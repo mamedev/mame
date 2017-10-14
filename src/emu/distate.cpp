@@ -86,6 +86,15 @@ device_state_entry::device_state_entry(int index, device_state_interface *dev)
 
 
 //-------------------------------------------------
+//  device_state_entry - destructor
+//-------------------------------------------------
+
+device_state_entry::~device_state_entry()
+{
+}
+
+
+//-------------------------------------------------
 //  formatstr - specify a format string
 //-------------------------------------------------
 

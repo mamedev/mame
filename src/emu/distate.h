@@ -48,6 +48,7 @@ public:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
+	virtual ~device_state_entry();
 
 public:
 	// post-construction modifiers
