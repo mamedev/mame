@@ -48,6 +48,7 @@ ToDo:
 - graphics are completely broken in Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't move on when killing the Lamia, is the MCU involved?
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Midnight Resistance (Joystick bootleg): missing sprites in the section where the player saves the family (and gets powerups) and the ending;
 - Get rid of ROM patches in Sly Spy and Hippodrome;
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified;
