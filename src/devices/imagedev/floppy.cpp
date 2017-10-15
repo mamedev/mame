@@ -785,8 +785,9 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	// TODO: Implement a proper spin-up ramp for transition times, also in order
 	// to cover potential copy protection measures that have direct device
 	// access (mz)
-	if (ready_counter > 0)
-		return attotime::never;
+	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
+	//if (ready_counter > 0)
+	//	return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();
