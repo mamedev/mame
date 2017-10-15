@@ -10,7 +10,9 @@ CCS Model 2810
 Chips: INS8250N-B, Z80A, uPD2716D, 82S129. Crystals: 16 MHz, 1.8432MHz
 
 SYSTEM OPERATION:
-Press Enter to start the system.
+Press Enter up to three times to start the system.
+Supported baud rates include 110, 150, 300, 600, 1200, 2400, 9600, 14400,
+38400, 57600 and 115200.
 All commands are in uppercase.
 
 A    Assign logical device
