@@ -100,6 +100,12 @@ public:
 		return result;
 	}
 
+	void set_a16(const s32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, alpha_perm);
+	}
+
 	void set_a(const s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
@@ -604,6 +610,11 @@ public:
 		const VECU32 temp = { u32(shift), u32(shift), u32(shift), u32(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
+	}
+
+	inline void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
 	inline void merge_alpha(const rgbaint_t& alpha)
