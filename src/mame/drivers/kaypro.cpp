@@ -402,6 +402,16 @@ ROM_START(omni2)
 	ROM_LOAD("omni2.u43",    0x0000, 0x0800, CRC(049b3381) SHA1(46f1d4f038747ba9048b075dc617361be088f82a) )
 ROM_END
 
+ROM_START(omni4)
+	ROM_REGION(0x4000, "roms",0)
+	ROM_LOAD("omni4.u34",    0x0000, 0x2000, CRC(f24e8521) SHA1(374f2e2b791a807f103744a22c9c8f3af55f1033) )
+
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("omni4.u9",    0x0000, 0x1000, CRC(579665a6) SHA1(261fcdc5a44821de9484340cbe429110400140b4) )
+ROM_END
+
 ROM_START(kaypro2x)
 	ROM_REGION(0x4000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "292", "292")
@@ -460,6 +470,7 @@ COMP( 1982, kayproii,   0,        0,      kayproii, kay_kbd, kaypro_state, kaypr
 COMP( 1983, kaypro4,    kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
 COMP( 1983, kaypro4p88, kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
 COMP( 198?, omni2,      kayproii, 0,      omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
+COMP( 198?, omni4,      kaypro2x, 0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Omni Logic Inc.",     "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )
 COMP( 1984, kaypro2x,   0,        0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   kaypro2x, 0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
