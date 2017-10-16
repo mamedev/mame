@@ -2115,10 +2115,21 @@ ROM_END
 /*--------------------------------
 / 301/Bulls Eye
 /-------------------------------*/
-ROM_START(bullseye)
+ROM_START(bullseye)                     // Has darts 301 based scoring
 	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
 	ROM_LOAD("bull.u2", 0x2000, 0x1000, CRC(a2951aa2) SHA1(f9c0826c5d1d6d904286678ed90de3850a13b5f4))
 	ROM_LOAD("bull.u6", 0x3000, 0x1000, CRC(64d4b9c4) SHA1(bf4d0671372fd3a445c4c7330b9849171ca8048c))
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))
+	ROM_RELOAD(0x8800, 0x0800)
+	ROM_RELOAD(0xf800, 0x0800)
+ROM_END
+
+ROM_START(bullseyn)                     // Later version dumbed down with traditional Pinball scoring
+	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
+	ROM_LOAD("301NEW_normalscoring.U2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
+	ROM_LOAD("301NEW_normalscoring.U6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))
@@ -2468,7 +2479,8 @@ GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova 
 GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, toppin,     0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseyn,   bullseye, by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, bigbat,     0,        by35,  by35, by35_state, by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",            MACHINE_IS_SKELETON_MECHANICAL)
