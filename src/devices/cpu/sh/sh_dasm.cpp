@@ -9,7 +9,10 @@
 
 static const char *const regname[16] = {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
-	"R8", "R9", "R10","R11","R12","R13","R14","SP"
+	"R8", "R9", "R10","R11","R12","R13","R14",
+	// The old SH2 dasm used 'SP' here, the old SH4 used 'R15' 
+	//"SP" 
+	"R15"
 };
 
 static uint32_t op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
@@ -456,7 +459,7 @@ static uint32_t op1000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		util::stream_format(stream, "MOV.B   @($%02X,%s),R0", (opcode & 15), regname[Rm]);
 		break;
 	case  5:
-		util::stream_format(stream, "MOV.W   @($%02X,%s),R0", (opcode & 15), regname[Rm]);
+		util::stream_format(stream, "MOV.W   @($%02X,%s),R0", (opcode & 15) * 2, regname[Rm]);
 		break;
 	case  8:
 		util::stream_format(stream, "CMP/EQ  #$%02X,R0", (opcode & 0xff));
@@ -557,7 +560,7 @@ static uint32_t op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 
 static uint32_t op1101(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
-	util::stream_format(stream, "MOV.L   @($%02X,PC),%s [%08X]", (opcode * 4) & 0xff, regname[Rn], ((pc + 2) & ~3) + (opcode & 0xff) * 4);
+	util::stream_format(stream, "MOV.L   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 4, regname[Rn], ((pc + 2) & ~3) + (opcode & 0xff) * 4);
 	return 0;
 }
 
