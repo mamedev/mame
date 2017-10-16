@@ -35018,10 +35018,26 @@ tomcatsw                        // (proto)          (c) 1983
 @source:statriv2.cpp
 bbchall                         // (c) 1986 Status Games
 bigcsino                        // (c) 1984 Status Games
-cstrip                          // (c) 1984 Status Games
-cstripix                        // (c) 1985 Status Games
-cstripviii                      // (c) 1985 Status Games
-cstripxi                        // (c) 1988 Status Games
+cs1_spp                         //
+cs1_spp2                        //
+cs10_sps                        //
+cs11_sps                        //
+cs11_sps2                       //
+cs11_ssp                        //
+cs12_sps                        //
+cs2_sps                         //
+cs3_qps                         //
+cs5_spp                         //
+cs5_ssp                         //
+cs6_sps                         //
+cs6_ssp                         //
+cs8_spp                         //
+cs8_sps                         //
+cs8_ssp                         //
+cs9_qps                         //
+cs9_spp                         //
+cspe_qps                        //
+csv1_qps                        //
 funcsino                        // (c) 1981 Status Games
 hangman                         // (c) 1984 Status Games
 nsupertr3                       // (c) 1988 Status Games

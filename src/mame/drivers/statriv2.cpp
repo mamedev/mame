@@ -1086,7 +1086,264 @@ ROM_START( bbchall ) // ROMs came from a blister, Baby Boom Challenge title foun
 	ROM_LOAD( "prom3", 0x0040, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( cstrip )
+// Casino Strip games were marketed by Status and Quantum. There were poker and shooting gallery versions
+// and there were versions for Pioneer and Sony LD players. Thus every disc in the series could have many different ROM versions.
+// The following romset names are built this way: csn_abc where:
+// cs = Casino Strip n = disc number a = distributor (s for Status, q for Quantum) b = game type (p for poker, s for shooting gallery)
+// c = LD player type (p for Pioneer, s for Sony).
+// The series comprises 16 discs (I through XII, The Laser Shuffle, Private Eyes / All Stars, Vivid 1, Vivid 2).
+
+// The following sets were sourced through the Dragon's Lair Project and are confirmed working on real hardware.
+
+ROM_START( cs1_spp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_1_spp.u7", 0x0000, 0x1000, CRC(4f47a25d) SHA1(104cf9b7e4489b94df1aa699cde561e4464d527b) )
+	ROM_LOAD( "cs_1_spp.u8", 0x1000, 0x1000, CRC(39dc3bfe) SHA1(f1752cfc3472abf23417d2e52d6b8c7c026017e8) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_1_spp.u36", 0x0000, 0x1000, CRC(f39ee880) SHA1(341fa53689d5d41c66091fe41548cc82b37f0802) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_1_spp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs2_sps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_2_sps.u7", 0x0000, 0x1000, CRC(119d5891) SHA1(239528daf6591b74c40b7a8a44c11a854b4812e7) )
+	ROM_LOAD( "cs_2_sps.u8", 0x1000, 0x1000, CRC(9109c676) SHA1(c4d45467c2f9e435491f89afc743bff4ec7037c8) )
+	ROM_LOAD( "cs_2_sps.u9", 0x2000, 0x1000, CRC(8dccb3d1) SHA1(d638a394e01c9baf8f06c91298d49bbb8186a8d0) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_2_sps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_2_sps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs3_qps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_3_qps.u7", 0x0000, 0x1000, CRC(26a16431) SHA1(9847c0f63d773be22bad302bfd863ea4afc726ec) )
+	ROM_LOAD( "cs_3_qps.u8", 0x1000, 0x1000, CRC(619661b9) SHA1(52d7d90efbbc23cc553fc9fab5cc7a6185686321) )
+	ROM_LOAD( "cs_3_qps.u9", 0x2000, 0x1000, CRC(30a4930c) SHA1(a739d502c5dca21f986c4257464ce553ab8a03c6) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_3_qps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_3_qps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs5_spp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_5_spp.u7", 0x0000, 0x1000, CRC(26a16431) SHA1(9847c0f63d773be22bad302bfd863ea4afc726ec) )
+	ROM_LOAD( "cs_5_spp.u8", 0x1000, 0x1000, CRC(619661b9) SHA1(52d7d90efbbc23cc553fc9fab5cc7a6185686321) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_5_spp.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_5_spp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs5_ssp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_5_ssp.u7", 0x0000, 0x1000, CRC(bd2f35ea) SHA1(49ea3e92dc912f43774d0c0c7738ac3053d0b886) )
+	ROM_LOAD( "cs_5_ssp.u8", 0x1000, 0x1000, CRC(2f77ca20) SHA1(83e8ccf66085d8452e2098345517e98f6c5fa2c4) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_5_ssp.u36", 0x0000, 0x1000, CRC(e31560ee) SHA1(d065ded3d5820f2179131f60fc8510ddef7718a6) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_5_ssp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs6_ssp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_6_ssp.u7", 0x0000, 0x1000, CRC(120f08c2) SHA1(a45cb33e19a7e3aab8283cdc492892a334fcecc8) )
+	ROM_LOAD( "cs_6_ssp.u8", 0x1000, 0x1000, CRC(6533cfb6) SHA1(b4704fd00aee60ade5ba5a93289f142f9be5af0c) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_6_ssp.u36", 0x0000, 0x1000, CRC(e31560ee) SHA1(d065ded3d5820f2179131f60fc8510ddef7718a6) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_6_ssp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs8_ssp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_8_ssp.u7", 0x0000, 0x1000, CRC(13515129) SHA1(03dbf6e7c07cbae5363621cb9e0f92d7abd372f6) )
+	ROM_LOAD( "cs_8_ssp.u8", 0x1000, 0x1000, CRC(7c26bfab) SHA1(be3322707a5e37572974cc0880397fc3c9c473bd) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_8_ssp.u36", 0x0000, 0x1000, CRC(e31560ee) SHA1(d065ded3d5820f2179131f60fc8510ddef7718a6) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_8_ssp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs8_sps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_8_sps.u7", 0x0000, 0x1000, CRC(3cb451ce) SHA1(75e19da654f0a3d9af7a8fc70a8940bee6c575a2) )
+	ROM_LOAD( "cs_8_sps.u8", 0x1000, 0x1000, CRC(cfd965f0) SHA1(1ec6a0d853d5ad17eca749444ce52c71c90e0940) )
+	ROM_LOAD( "cs_8_sps.u9", 0x2000, 0x1000, CRC(0feeb474) SHA1(21f2a064958e3af4c777fa3614bd6322ad3c3fe6) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_8_sps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_8_sps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs9_qps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_9_qps.u7", 0x0000, 0x1000, CRC(26a16431) SHA1(9847c0f63d773be22bad302bfd863ea4afc726ec) )
+	ROM_LOAD( "cs_9_qps.u8", 0x1000, 0x1000, CRC(619661b9) SHA1(52d7d90efbbc23cc553fc9fab5cc7a6185686321) )
+	ROM_LOAD( "cs_9_qps.u9", 0x2000, 0x1000, CRC(f7dd64fe) SHA1(35c52fcb058ca3f492ed2de2f1563296eb6b8ff7) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_9_qps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_9_qps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs11_ssp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_11_ssp.u7", 0x0000, 0x1000, CRC(f51ad73e) SHA1(6e3b88d3c4493b3410965c837bbb4056282be755) )
+	ROM_LOAD( "cs_11_ssp.u8", 0x1000, 0x1000, CRC(d9715d46) SHA1(81a3b733025381542f0cff49cb7f208c66f024c1) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_11_ssp.u36", 0x0000, 0x1000, CRC(e31560ee) SHA1(d065ded3d5820f2179131f60fc8510ddef7718a6) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_11_ssp", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs11_sps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_11_sps.u7", 0x0000, 0x1000, CRC(7821c604) SHA1(12217bcbbe534187b941ce74c10b57679d8d922c) )
+	ROM_LOAD( "cs_11_sps.u8", 0x1000, 0x1000, CRC(67d8ee9b) SHA1(f13f4a55ecaa5d7b08c7ec3bad7e43379a9ca7db) )
+	ROM_LOAD( "cs_11_sps.u9", 0x2000, 0x1000, CRC(97d81042) SHA1(fdc5519cb1891b3aff9d4c1ce9b41b29500e416c) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_11_sps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_11_sps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs11_sps2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs_11_sps2.u7", 0x0000, 0x1000, CRC(b076330c) SHA1(110ed3862dad6feed4678247177525207075a100) )
+	ROM_LOAD( "cs_11_sps2.u8", 0x1000, 0x1000, CRC(b77bfb85) SHA1(711e2123fa600b48d4f278abf0dac4c09013d433) )
+	ROM_LOAD( "cs_11_sps2.u9", 0x2000, 0x1000, CRC(d2a69ca2) SHA1(a945e8513f7ccd73fc3eef3daa6c7fcf8a41d61c) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cs_11_sps2.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_11_sps2", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cspe_qps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cspe_qps.u7", 0x0000, 0x1000, CRC(26a16431) SHA1(9847c0f63d773be22bad302bfd863ea4afc726ec) )
+	ROM_LOAD( "cspe_qps.u8", 0x1000, 0x1000, CRC(8697e664) SHA1(41cc8b8c183896f7a0ccae704f582448a7cb5411) )
+	ROM_LOAD( "cspe_qps.u9", 0x2000, 0x1000, CRC(c73ee6b4) SHA1(8212db7d0fb68603b1e6883ba5a69d7b4ce04da5) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "cspe_qps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cspe_qps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( csv1_qps )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "csv1_qps.u7", 0x0000, 0x1000, CRC(a721d48d) SHA1(ec321f4cf4c3d93ba283a568d11ddc3155d982df) )
+	ROM_LOAD( "csv1_qps.u8", 0x1000, 0x1000, CRC(3b503f12) SHA1(79b4e23eaab1e3c6435c28d7f73f3b621903b572) )
+	ROM_LOAD( "csv1_qps.u9", 0x2000, 0x1000, CRC(c7ac1c23) SHA1(adbed3a3f9eea4aaf1c9e8276b9f30641d23c9da) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "csv1_qps.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("csv1_qps", 0, NO_DUMP )
+ROM_END
+
+// the following sets aren't currently verified on real hardware. Versions came from labels / auctions / title screen.
+
+ROM_START( cs1_spp2 ) // believed to be poker because of the tiles ROM, Status because of title screen, Pioneer because of ROM label.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astrip-1g.u7", 0x0000, 0x1000, CRC(4f47a25d) SHA1(104cf9b7e4489b94df1aa699cde561e4464d527b) )
 	ROM_LOAD( "astrip-2g.u8", 0x1000, 0x1000, CRC(39dc3bfe) SHA1(f1752cfc3472abf23417d2e52d6b8c7c026017e8) )
@@ -1103,7 +1360,25 @@ ROM_START( cstrip )
 	DISK_IMAGE_READONLY("cstrip", 0, NO_DUMP )
 ROM_END
 
-ROM_START( cstripviii )
+ROM_START( cs6_sps ) // believed to be poker because of the tiles ROM, Status because of title screen, Sony because of ROM label
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sastrip-vi_1-9.5.u7", 0x0000, 0x1000, CRC(e66a5def) SHA1(b9e033819051b888208c170597ecfec6041f5153) )
+	ROM_LOAD( "sastrip-vi_2-9.5.u8", 0x1000, 0x1000, CRC(ba20f780) SHA1(02aa92c83977b4541566e6902a42da12d461494c) )
+	ROM_LOAD( "sastrip-vi_3-9.5.u9", 0x2000, 0x1000, CRC(ec9cb9b0) SHA1(e927a929b7b6e724ea8a4dd77163696243de0715) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "sastrip-vi_0-9.5.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 ) // not present in the romset
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs6_sps", 0, NO_DUMP )
+ROM_END
+
+ROM_START( cs8_spp ) // believed to be poker because of the tiles ROM, Status because of title screen, Pioneer because of ROM label
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "strip-viii-1b.u7", 0x0000, 0x1000, CRC(2408c1ec) SHA1(315c11145369cfb2c8050bfda30c0452ce5ba666) )
 	ROM_LOAD( "strip-viii-2b.u8", 0x1000, 0x1000, CRC(94b1b070) SHA1(326ea9231ab060c09beebb9a954d036e23b1979c) )
@@ -1120,7 +1395,7 @@ ROM_START( cstripviii )
 	DISK_IMAGE_READONLY("cstripviii", 0, NO_DUMP )
 ROM_END
 
-ROM_START( cstripix )
+ROM_START( cs9_spp ) // believed to be poker because of the tiles ROM, Status because of title screen, Pioneer because of ROM label
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astrip-ix-1.u7", 0x0000, 0x1000, CRC(62e7aa72) SHA1(c3a4c0550eee4765af205bd854270757b222892f) )
 	ROM_LOAD( "astrip-ix-2.u8", 0x1000, 0x1000, CRC(c43066fe) SHA1(252597fcd1411b653acc99fd3f03e69cc1fbdaf6) )
@@ -1137,24 +1412,41 @@ ROM_START( cstripix )
 	DISK_IMAGE_READONLY("cstripix", 0, NO_DUMP )
 ROM_END
 
-ROM_START( cstripxi )
+ROM_START( cs10_sps ) // believed to be poker because of the tiles ROM, Status because of title screen, Sony because of ROM label
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "csxirom1.bin", 0x0000, 0x1000, CRC(7821c604) SHA1(12217bcbbe534187b941ce74c10b57679d8d922c) )
-	ROM_LOAD( "csxirom2.bin", 0x1000, 0x1000, CRC(67d8ee9b) SHA1(f13f4a55ecaa5d7b08c7ec3bad7e43379a9ca7db) )
-	ROM_LOAD( "csxirom3.bin", 0x2000, 0x1000, CRC(97d81042) SHA1(fdc5519cb1891b3aff9d4c1ce9b41b29500e416c) )
+	ROM_LOAD( "sastrip-x_1-9.5.u7", 0x0000, 0x1000, CRC(e66a5def) SHA1(b9e033819051b888208c170597ecfec6041f5153) )
+	ROM_LOAD( "sastrip-x_2-9.5.u8", 0x1000, 0x1000, CRC(ba20f780) SHA1(02aa92c83977b4541566e6902a42da12d461494c) )
+	ROM_LOAD( "sastrip-x_3-9.5.u9", 0x2000, 0x1000, CRC(c44358fe) SHA1(0f023dafe716987ba54b65976ad75b2020f3d6ec) )
 
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
-	ROM_LOAD( "csxirom0.bin", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+	ROM_LOAD( "sastrip_0.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
 
-	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
-	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
-	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+	ROM_REGION( 0x0140, "proms", 0 ) // not present in the romset
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
 
 	DISK_REGION( "laserdisc")
-	DISK_IMAGE_READONLY("cstripxi", 0, NO_DUMP )
+	DISK_IMAGE_READONLY("cs10_sps", 0, NO_DUMP )
 ROM_END
 
+ROM_START( cs12_sps ) // believed to be poker because of the tiles ROM, Status because of title screen, Sony because of ROM label. Was marked as XII but maincpu ROMs are definitely XI.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sonystrip-xi_1-4.1.u7", 0x0000, 0x1000, CRC(b076330c) SHA1(110ed3862dad6feed4678247177525207075a100) )
+	ROM_LOAD( "sonystrip-xi_2-4.1.u8", 0x1000, 0x1000, CRC(b77bfb85) SHA1(711e2123fa600b48d4f278abf0dac4c09013d433) )
+	ROM_LOAD( "sonystrip-xi_3-4.5.u9", 0x2000, 0x1000, CRC(1d32a970) SHA1(37a7c3526b9bc3ec41dfd4f037f2ea9dc7077d68) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "sastrip-xii_0.u36", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, NO_DUMP )
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cs_12_sps", 0, NO_DUMP )
+ROM_END
 
 
 /*************************************
@@ -1296,25 +1588,41 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, 0,         ROT0,  "Status Games",       "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw,   0,        statriv2,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, bigcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Big Casino",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
-GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Hangman",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0,  "Status Games",       "Triv Two",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv4,   0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Four",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, 0,         ROT0,  "Status Games",       "Baby Boom Challenge",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
-GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0,  "Status Games",       "Super Triv II",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Super Triv III",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
-// The following Casino Strip set don't show the version on screen (at least without the laserdisc video), it was taken from the rom labels
-GAME( 1984, cstrip,     0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Year from title screen, but has Poker 21Mar84 in ROMs
-GAME( 1985, cstripviii, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII",         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Year from title screen, but has Poker 21Mar84 in ROMs
-GAME( 1988, cstripix,   0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip IX",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Year from title screen, but has Poker 09Jun90 in ROMs
-GAME( 1988, cstripxi,   0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Year from title screen, but has Poker 09Jun90 in ROMs
+GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, 0,         ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw,   0,        statriv2,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
+GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv4,   0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Four",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, 0,         ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
+GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
+// The following Casino Strip sets don't show the version on screen (at least without the laserdisc video). It was taken from the rom labels / from the Dragon's Lair Project archive.
+GAME( 1984, cs1_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp2,  cs1_spp,   statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs2_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs3_qps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs6_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs6_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, cs8_ssp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,    0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs8_sps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs9_qps,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs9_spp,   0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs10_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_ssp,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps2, cs11_sps,  statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs12_sps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, cspe_qps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, csv1_qps,  0,         statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
