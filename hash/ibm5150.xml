@@ -4024,6 +4024,114 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="k16auto">
+		<description>Kaypro 16 Autoload</description>
+		<year>1984</year>
+		<publisher>Kaypro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="MS-DOS, GW-BASIC, and UTILITIES" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto1.img" size="368640" crc="741fdd06" sha1="0dc9b1b0eb6a90e3232fa52f49eaaad057411687" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="MITE" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto2.img" size="368640" crc="ec66e60d" sha1="448ba1e90dab7b1e2b16fb5c286911d9918ed054" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="WORDSTAR and MAILMERGE" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto3.img" size="368640" crc="34b1d636" sha1="413608bb74b4dbebbb5e8be88b7cf2899b2c6df0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="CALCSTAR" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto4.img" size="368640" crc="d923c80b" sha1="49b903198a89ef29078f3557ebc9b294389433ff" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="INFOSTAR + (1 of 2)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto5.img" size="368640" crc="23022998" sha1="8196b6110ea677387e5cd1c9a1fbd6532b404b1b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="INFOSTAR + (2 of 2)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto6.img" size="368640" crc="bc1d74c8" sha1="d7a34882f920eadeaad79c8fa8ec7af0ba04426a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="MICROPRO TUTORS &amp; LESSONS (1 of 3)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto7.img" size="368640" crc="678d8ff9" sha1="5a78cb1672f8d128b72f5bb689f28449bf74ee0c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="MICROPRO TUTORS &amp; LESSONS (2 of 3)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto8.img" size="368640" crc="328aef46" sha1="0b3521bcaa07d729e3d344874913899744324763" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="MICROPRO TUTORS &amp; LESSONS (3 of 3)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="k16auto9.img" size="368640" crc="42d14164" sha1="8b2d569f1a1fbc08ca5bbc455a0df968f132a2c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="k16mastr">
+		<description>Kaypro 16 Master Disks</description>
+		<year>1984</year>
+		<publisher>Kaypro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="MS-DOS and Utilities" />
+			<dataarea name="flop" size = "368640">
+				<rom name="MS-DOS and Utilities.img" size="368640" crc="a54e2030" sha1="b2af985610d51d94468d096132cdc36e40100c13" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="GW-BASIC and MiTe" />
+			<dataarea name="flop" size = "368640">
+				<rom name="GW-BASIC and MiTe.img" size="368640" crc="951cc3c6" sha1="3fca6819fd6f8f701d2668df010a9b2afb7760a8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="WordStar and MailMerge" />
+			<dataarea name="flop" size = "368640">
+				<rom name="WordStar and MailMerge.img" size="368640" crc="7c8d0f53" sha1="e8f8f6da807b73964f372829fad10cd9ecb21dd6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="CalcStar" />
+			<dataarea name="flop" size = "368640">
+				<rom name="CalcStar.img" size="368640" crc="86f446ef" sha1="54f5b9d7e2b25656b6be880779224d8c1085f8e4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="InfoStar + (1 of 2)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="InfoStar + (1 of 2).img" size="368640" crc="25a8c41b" sha1="1f96a16ffd959c93863d06a1ec5e5caf84fa7a2e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="InfoStar + (2 of 2)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="InfoStar + (2 of 2).img" size="368640" crc="fe538c60" sha1="3f144321c69085587dc3b6714f1e9689e6738ea5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="StarBurst" />
+			<dataarea name="flop" size = "368640">
+				<rom name="StarBurst.img" size="368640" crc="cee626fe" sha1="a7ac298dfa81897536cf83f1da7c72124cbbe8ec" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minix11">
 		<description>MINIX 1.1</description>
 		<year>1987</year>
@@ -7095,6 +7203,156 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="manhunt">
+		<description>Manhunter - New York</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter - New York (USA, Europe) (5.25'') (Disk 1).img" size="368640" crc="6533d65f" sha1="995f0cb8f00d1f3e18808be98c2919157f1664d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter - New York (USA, Europe) (5.25'') (Disk 2).img" size="368640" crc="05f870e4" sha1="01539673c1c20a8bd9a27154e927ad3841ade24f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter - New York (USA, Europe) (5.25'') (Disk 3).img" size="368640" crc="4a99fa74" sha1="da264d83e02bdfd3c48442ab2c3076f447b27a90" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter - New York (USA, Europe) (5.25'') (Disk 4).img" size="368640" crc="88a82b34" sha1="e48fbfd2707df49b2b3c198b28696c6ea75db0a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter - New York (USA, Europe) (5.25'') (Disk 5).img" size="368640" crc="c13bf34e" sha1="897a54db3467d715e35794a94917eaf5cf627842" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manhunt2">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Manhunter 2 - San Francisco (5.25", Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Ver.#3.02.B Int.3.002.149" />
+		<info name="serial" value="3132789072900121" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_1.img" size="368640" crc="166f9659" sha1="c770210f898ed50437ca6e6e595e467fc919eb9a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_2.img" size="368640" crc="f888691d" sha1="7691492072a79e65e80d98c229f50dc80023f62a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_3.img" size="368640" crc="24336982" sha1="e2808670f9a07c296961ed8964543bdec6348539" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_4.img" size="368640" crc="f793b69f" sha1="5e8d46d9562d07c1d1a99c7f9c3573d504362c62" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_5.img" size="368640" crc="d839b9a9" sha1="2196d0b3717d763bf8296d98b006884f86790acc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_6.img" size="368640" crc="81ff23e9" sha1="6f964567c2a0662e872dd08096812d156e1aa20c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_7.img" size="368640" crc="6a1398a2" sha1="04beffc125737fd4c5ff144d8edea89dc9bd66e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="manhunt2_8.img" size="368640" crc="75a26df7" sha1="1566e8c72e98ab9fbfcc4f413d64c874b26c186f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manhunt2a" cloneof="manhunt2">
+		<description>Manhunter 2 - San Francisco (5.25", alt)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 1).img" size="368640" crc="5c634485" sha1="23fa72e8233e0fcfbf51d152bdf68a253b1e8659" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 2).img" size="368640" crc="0c7c9b12" sha1="4a4957070995f69f8fee88dd8bce2763ab704693" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 3).img" size="368640" crc="dac442fd" sha1="b5b5645f39b1f161aedf252d619555455f3e226c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 4).img" size="368640" crc="ef8798ac" sha1="a7d704cf2540321b77e1e6307d3d911c31dcf632" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 5).img" size="368640" crc="001b70d0" sha1="702601a0086cca6ae312971801feda7b49654d9f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 6).img" size="368640" crc="27d027ab" sha1="6424a97357b211cdc0e73116ef7a49784f02b611" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 7).img" size="368640" crc="d37f0187" sha1="580c8488be3246347104da8128920df7c2f8e12d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Manhunter 2 - San Francisco (USA, Europe) (5.25'') (Disk 8).img" size="368640" crc="c953b261" sha1="a5844e767a5d7ed595b0449cf29571dcf7878d02" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manhunt2_35" cloneof="manhunt2">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Manhunter 2 - San Francisco (3.5", Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Ver.#3.02.B Int.#3.002.149" />
+		<info name="serial" value="3132789072910032" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="manhunt2_35_1.img" size="737280" crc="2ae52621" sha1="bfedcf1ca6403ff30168e62a6bb9550c6c4c247d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="manhunt2_35_2.img" size="737280" crc="12c19303" sha1="bef90bd21c6816e67bbc02c404d6815ed4098fd0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="manhunt2_35_3.img" size="737280" crc="37ff2d02" sha1="10bba12e2a353787b2f4468d2197786afe8e9f7c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mortviel">
 		<description>Le Manoir de Mortevielle (5.25")</description>
 		<year>1988</year>
@@ -7396,6 +7654,135 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pquest2">
+		<description>Police Quest II - The Vengeance (5.25", 1.002.011, Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Ver.#1.002.011/Int.#0.000.490" />
+		<info name="serial" value="3124789072340023" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, 2 tracks show as modified (config file) -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_1.img" size="368640" crc="f5a0f6b2" sha1="8bb21062ee07a3e8ccd436c95fefe5c03c38fe7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_2.img" size="368640" crc="bf771b06" sha1="43359f5bbd8dbbf0dea98adb2e88c77dbb9df294" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_3.img" size="368640" crc="dabebfbd" sha1="76bae0887380386cd949eb1aa1ffd28b0e8d2fa2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_4.img" size="368640" crc="96a021d8" sha1="6e8f56716d1efc717c4d7898747f88472e7d3da1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_5.img" size="368640" crc="c87edbf9" sha1="b3713acea255a788ef66d6195278122ab3329f97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="pquest2_6.img" size="368640" crc="f23b5680" sha1="f4b503a2fa5c1e55868cc219defe6445145a8bc6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest2a" cloneof="pquest2">
+		<description>Police Quest II - The Vengeance (5.25", 1.001.006)</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.001.006" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 1).img" size="368640" crc="fce0b680" sha1="ba41bf0fcafcd619bb402163d3c2bee13350efa5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 2).img" size="368640" crc="ba0deb8a" sha1="1dea57a563b947efe593bed735d85b54ab30b942" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 3).img" size="368640" crc="6a1b8735" sha1="40769df8177c1f103df5e527773d88377919ea09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 4).img" size="368640" crc="acdf98e3" sha1="cd0136b7a94ce6858366b147be605dbe789539fe" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 5).img" size="368640" crc="1dc30581" sha1="fa1581aa11ecbd0bab8ec99620b99f88f1d20f17" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (5.25'') (Disk 6).img" size="368640" crc="b813de6d" sha1="d7499d657209ce051bd6eaf54e6f73eb360d65e7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest2_35" cloneof="pquest2">
+		<description>Police Quest II - The Vengeance (3.5", 1.002.011, Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Ver#1.002.011 Int#0.000.490" />
+		<info name="serial" value="3124789072103380" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Dumped via Kryoflux, 2 tracks show as modified (config file) -->
+			<dataarea name="flop" size = "737280">
+				<rom name="pquest2_35_1.img" size="737280" crc="f4adcc9c" sha1="7ba87cadc30e86fc9b54b2b9354b91567d047d51" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "737280">
+				<rom name="pquest2_35_2.img" size="737280" crc="11b7a529" sha1="ee4963926b2743e6d83d7e204e8d13eb8d403734" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "737280">
+				<rom name="pquest2_35_3.img" size="737280" crc="50cfbbbf" sha1="c269960cc888477fa81e8c7c12c7c8e129a6cd68" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest2_35a" cloneof="pquest2">
+		<description>Police Quest II - The Vengeance (3.5", 1.001.006)</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.001.006" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (3.5'') (Disk 1).img" size="737280" crc="d6e9f3fb" sha1="b562165c5b40a86f1d1e5cbf28c052f9ed0c2581" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (3.5'') (Disk 2).img" size="737280" crc="3f990aee" sha1="06e11a8d1ddd4552579f53007c2b22b4634c104f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (3.5'') (Disk 3).img" size="737280" crc="8f15da9b" sha1="015d8d3cb01cce442a56a2cc60691a7b906184ec" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prehist">
 		<description>Prehistorik</description>
 		<year>1991</year>
@@ -7625,6 +8012,120 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="silpheed">
+		<description>Silpheed (5.25", 2.3, Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Version #2.3/Interp.#7-18-89" />
+		<info name="serial" value="3156589072403353" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, 4 modified tracks (config file) -->
+			<dataarea name="flop" size = "368640">
+				<rom name="silpheed_1.img" size="368640" crc="91e719bf" sha1="8bf6b0d83fac60d6c3236f08a5df9f3200dbce9d" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="silpheed_2.img" size="368640" crc="c93fffd2" sha1="fbd7f5458fb6c24b4a8f93a5c6fbf337f52d032c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="silpheed_3.img" size="368640" crc="dfb5b781" sha1="3a84053c0407e5cba04096e6277509dce51c86f5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="silpheed_4.img" size="368640" crc="466e6365" sha1="7b7a413d8f1192deea9e504f563988af5c1cb8b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheeda" cloneof="silpheed">
+		<description>Silpheed (5.25", 1.0)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.0 / March 20, 1989" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Silpheed (USA) (5.25'') (Disk 1).img" size="368640" crc="3974399b" sha1="635c64f4d505df04466c7ca38a4dce1e7a647e01" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Silpheed (USA) (5.25'') (Disk 2).img" size="368640" crc="f9255793" sha1="51d0c5a01868d0602d76f8d1bf83fc4f10c83785" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Silpheed (USA) (5.25'') (Disk 3).img" size="368640" crc="e80e3dde" sha1="aa92f4d9543ad89ff26646ee3dcb8c7a6d415aef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Silpheed (USA) (5.25'') (Disk 4).img" size="368640" crc="d7ec8aa7" sha1="e346f27ae52f3728c37cb61fbaaa36d2d3b3ca00" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheed35" cloneof="silpheed">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Silpheed (3.5", 3.21, IBM Special Pak)</description>
+		<year>1990</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Ver#3.21 / 5.7.90" />
+		<info name="serial" value="315670071007554" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="silpheed35_1.img" size="737280" crc="258e14df" sha1="4a860625364a714306258fd9510cbfa0da65e786" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="silpheed35_2.img" size="737280" crc="254d6941" sha1="81b6712eb18706f08055cb4921f3972f3c33d641" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheed35a" cloneof="silpheed">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Silpheed (3.5", 2.3, Sierra's Value Pack)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="Version #2.3 Int. #7-18-89" />
+		<info name="serial" value="3156589072400467" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="silpheed35a_1.img" size="737280" crc="150453d9" sha1="089ba429671a661d58d33a9a8ead5257f3e7794a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="silpheed35a_2.img" size="737280" crc="2e8d0381" sha1="3d220fa9c7e174682d5bd185cf63dbba54b1cda8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheed35b" cloneof="silpheed">
+		<description>Silpheed (3.5", 1.0)</description>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.0 / March 20, 1989" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silpheed (USA) (3.5'') (Disk 1).img" size="737280" crc="16b5064b" sha1="201ed8e699d5b0f97e9a4ec69f2d6339fa3afcaa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silpheed (USA) (3.5'') (Disk 2).img" size="737280" crc="b1970f1b" sha1="d6ade8882cedf3218c161c116d045702c8f9ffb7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simcityc">
 		<description>SimCity Classic</description>
 		<year>1992</year>
@@ -7701,8 +8202,8 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 	<software name="sq2">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Space Quest II - Vohaul's Revenge (5.25")</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>

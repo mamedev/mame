@@ -5073,6 +5073,17 @@
 		</part>
 	</software>
 
+	<software name="sneakers">
+		<description>Sneakers Computer Press Kit</description>
+		<year>1992</year>
+		<publisher>Universal City Studios</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sneakers.img" size="1474560" crc="a816defd" sha1="357db57c9430bc4432fbfecf07065dbd9d63c6ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vrplyhse">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Virtual Reality Playhouse (Cover disk)</description>
@@ -5776,6 +5787,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1270016">
 				<rom name="amd-80c287-demo.dsk" size="1270016" crc="ee65696c" sha1="1df293a2fc61fdca728f60d973b5175f0d9c4427" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcpool">
+		<description>Arcade Pool</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="developer" value="Team 17" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Arcade Pool [Team 17] [1994] [3.5DD] [Disk 1 of 1].img" size="1474560" crc="6ea83a73" sha1="4ab1bae96e522f98a0bbdc8fe114353a503067c8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

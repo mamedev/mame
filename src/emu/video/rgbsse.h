@@ -58,6 +58,7 @@ public:
 		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
 	}
 
+	void set_a16(const s32 value) { m_value = _mm_insert_epi16(m_value, value, 6); }
 #ifdef __SSE4_1__
 	void set_a(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 3); }
 	void set_r(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 2); }
@@ -413,6 +414,11 @@ public:
 	{
 		m_value = _mm_srai_epi32(m_value, shift);
 		return *this;
+	}
+
+	inline void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);
 	}
 
 	inline void merge_alpha(const rgbaint_t& alpha)

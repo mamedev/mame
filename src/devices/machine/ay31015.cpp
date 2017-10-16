@@ -4,8 +4,12 @@
 
     ay31015.c by Robbbert, May 2008. Bugs fixed by Judge.
 
-    Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A), and AY-6-1013 UARTs
-    The HD6402 UART is compatible with the AY-3-1015 UART.
+    Code for the General Instruments AY-3-1014A, AY-3-1015(D), AY-5-1013(A),
+    and AY-6-1013 UARTs (Universal Asynchronous Receiver/Transmitters).
+
+    Compatible UARTs were produced by Harris (HD6402), TI (TMS6011),
+    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Standard
+    Microsystems (COM2502/COM2017), Tesla (MHB1012) and other companies.
 
     This is cycle-accurate according to the specifications.
 
@@ -94,8 +98,8 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 
 
 
-DEFINE_DEVICE_TYPE(AY31015, ay31015_device, "ay31015", "AY-3-1015")
-DEFINE_DEVICE_TYPE(AY51013, ay51013_device, "ay51013", "AY-5-1013")
+DEFINE_DEVICE_TYPE(AY31015, ay31015_device, "ay31015", "AY-3-1015 UART")
+DEFINE_DEVICE_TYPE(AY51013, ay51013_device, "ay51013", "AY-5-1013 UART")
 
 ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, R. Belmont, Pierpaolo Prazzoli
 /*************************************************************************
 
-    Dragonball Z
+    Dragon Ball Z
 
 *************************************************************************/
 

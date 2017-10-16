@@ -55,6 +55,7 @@ public:
 		return rgb_t(a, r, g, b);
 	}
 
+	void set_a16(const s32 value) { m_a = value; }
 	void set_a(const s32 value) { m_a = value; }
 	void set_r(const s32 value) { m_r = value; }
 	void set_g(const s32 value) { m_g = value; }
@@ -347,6 +348,11 @@ public:
 		m_r = (m_r < r) ? 0xffffffff : 0;
 		m_g = (m_g < g) ? 0xffffffff : 0;
 		m_b = (m_b < b) ? 0xffffffff : 0;
+	}
+
+	void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_a = alpha.m_a;
 	}
 
 	void merge_alpha(const rgbaint_t& alpha)

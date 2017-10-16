@@ -21,7 +21,7 @@ HP14782-1
 |    K2                                                             ROM4    |---------|     |
 |                       |-------------|       4050   5114   5114                            |
 |           4013        |   CDP1802   |       4050   5114   5114    ROM3    4030  ROM6  4060|
-|           4013        |-------------|       4050   5114   5114                            |
+|           4013 3.57MHz|-------------|       4050   5114   5114                            |
 |           4081  40106                       4051   5114   5114    ROM2    4076  5114  4011|
 |                                             4556   5114   5114          CDP1856 5114      |
 |                   |-------|                        5114   5114    ROM1  CDP1856 5114  4076|
@@ -40,31 +40,48 @@ Notes:
     ROM6    - Hitachi HN462732G 4Kx8 EPROM
     5114    - RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
     MC1374  - Motorola MC1374P TV Modulator
-    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at ? MHz
+    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at 3.57MHz
     CDP1852 - RCA CDP1852CE Byte-Wide Input/Output Port
     CDP1853 - RCA CDP1853CE N-Bit 1 of 8 Decoder
     CDP1856 - RCA CDP1856CE 4-Bit Memory Buffer
     CDP1869 - RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
     CDP1870 - RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
     CN1     - RF connector [TMC-700]
-    CN2     - printer connector (10x2 pins) [TMC-700]
-    CN3     - EURO connector (32x2 pins)
-    CN4     - tape connector (DIN5D)
-    CN5     - video connector (DIN5X)
-    CN6     - power connector (DIN2, pinout 1 8..12V DC..400Hz 300mA / 2 GND)
-    CN7     - audio connector (DIN5D, pinout 1 NC / 2 GND / 3 AUDIO / 4 NC / 5 AUDIO) [TMCP-300]
-    CN8     - keyboard connector
+    CN2     - 10x2 pin printer connector [TMC-700]
+    CN3     - 32x3 pin EURO connector
+    CN4     - DIN5D tape connector
+    			1	input (500 mV / 47 kohm)
+    			2	GND
+    			3	output (580 mV / 47 kohm)
+    			4	input (500 mV / 47 kohm)
+    			5	output (580 mV / 47 kohm)
+    CN5     - DIN5X video connector
+    			1	GND
+    			2	GND
+    			3	?
+    			4	GND
+    			5	?
+    CN6     - DIN2 power connector
+    			1	8..12V DC..400Hz 300mA
+    			2 	GND
+    CN7     - DIN5D audio connector [TMCP-300]
+    			1 	NC
+    			2	GND
+    			3	AUDIO
+    			4 	NC
+    			5 	AUDIO 
+    CN8     - 10x2 pin keyboard connector
     SW1     - RUN/STOP switch
     SW2     - internal speaker/external audio switch [TMCP-300]
     P1      - color phase lock adjustment
-    C1      - dot oscillator adjustment
-    C2      - chrom oscillator adjustment
-    T1      - RF signal strength adjustment [TMC-700]
-    T2      - tape recording level adjustment (0.57 Vpp)
-    T3      - video output level adjustment (1 Vpp)
-    T4      - video synchronization pulse adjustment
-    K1      - RF signal quality adjustment [TMC-700]
-    K2      - RF channel adjustment (VHF I) [TMC-700]
+    C1      - dot oscillator adjustment variable capacitor
+    C2      - chroma oscillator adjustment variable capacitor
+    T1      - RF signal strength adjustment potentiometer [TMC-700]
+    T2      - tape recording level adjustment potentiometer (0.57 V p-p)
+    T3      - video output level adjustment potentiometer (1 V p-p)
+    T4      - video synchronization pulse adjustment potentiometer
+    K1      - RF signal quality adjustment variable inductor [TMC-700]
+    K2      - RF channel adjustment variable inductor (VHF I) [TMC-700]
     LS1     - loudspeaker
 
 */
@@ -75,7 +92,6 @@ Notes:
 
     - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
     - disk interface
-    - CPU frequency needs to be derived from the schematics
     - serial interface expansion card
     - centronics printer handshaking
 
@@ -245,7 +261,7 @@ void tmc600_state::machine_start()
 
 static MACHINE_CONFIG_START( tmc600 )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_57MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
