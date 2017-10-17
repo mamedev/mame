@@ -561,7 +561,7 @@ void z80scc_device::trigger_interrupt(int index, int type)
 	m_int_source[priority] = source;
 
 	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
-	m_chanA->m_rr3 |=  ((1 << prio_level) + (index == CHANNEL_A ? 3 : 0 ));
+	m_chanA->m_rr3 |= 1 << (prio_level + ((index == CHANNEL_A) ? 3 : 0));
 
 	// check for interrupt
 	check_interrupts();
@@ -584,7 +584,7 @@ int z80scc_device::update_extint(int index)
 		// - External and Special interripts has the same prio, just add channel offset
 		m_int_state[z80scc_channel::INT_EXTERNAL_PRIO + (index == CHANNEL_A ? 0 : 3 )] = 0;
 		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
-		m_chanA->m_rr3 &=  ~((1 << z80scc_channel::INT_EXTERNAL_PRIO) + (index == CHANNEL_A ? 3 : 0 ));
+		m_chanA->m_rr3 &= ~(1 << (z80scc_channel::INT_EXTERNAL_PRIO + ((index == CHANNEL_A) ? 3 : 0)));
 		ret = 0; // indicate that we are done
 	}
 	else
@@ -1421,7 +1421,7 @@ Bit: D0  D1 D2 |D3  D4 D5 |D6 D7
 uint8_t z80scc_channel::do_sccreg_rr3()
 {
 	LOGR("%s(%02x)\n", FUNCNAME, m_rr3);
-	return m_index == z80scc_device::CHANNEL_A ? m_rr3 & 0x3f : 0; // TODO Update all bits of this status register
+	return (m_index == z80scc_device::CHANNEL_A) ? (m_rr3 & 0x3f) : 0; // TODO Update all bits of this status register
 }
 
 
@@ -1485,7 +1485,7 @@ uint8_t z80scc_channel::do_sccreg_rr7()
 		logerror(" %s() not implemented feature\n", FUNCNAME);
 		return 0;
 	}
-		return m_rr3;
+	return m_rr3;
 }
 
 #if 0 // Short cutted in control_read()
@@ -1753,7 +1753,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		LOGCMD("%s: %c : WR0_RESET_TX_INT\n", owner()->tag(), 'A' + m_index);
 		m_uart->m_int_state[INT_TRANSMIT_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
 		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
-		m_uart->m_chanA->m_rr3 &=  ~((1 << INT_TRANSMIT_PRIO) + (m_index == z80scc_device::CHANNEL_A ? 3 : 0 ));
+		m_uart->m_chanA->m_rr3 &= ~(1 << (INT_TRANSMIT_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
 		// Update interrupt line
 		m_uart->check_interrupts();
 		break;
@@ -2331,7 +2331,7 @@ uint8_t z80scc_channel::data_read()
 			{
 				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
-				m_uart->m_chanA->m_rr3 &=  ~((1 << INT_RECEIVE_PRIO) + (m_index == z80scc_device::CHANNEL_A ? 3 : 0 ));
+				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
 			}
 		}
 	}
