@@ -122,9 +122,9 @@ void xinput_joystick_device::poll()
 	gamepad.right_thumb_x = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbRX, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 	gamepad.right_thumb_y = normalize_absolute_axis(-xinput_state.xstate.Gamepad.sThumbRY, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 
-	// Now the triggers
-	gamepad.left_trigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bLeftTrigger, 0, 255);
-	gamepad.right_trigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bRightTrigger, 0, 255);
+	// Now the triggers (keeping zero as minimum so as not to place deadzones in the middle)
+	gamepad.left_trigger = (LONG)(xinput_state.xstate.Gamepad.bLeftTrigger * (INPUT_ABSOLUTE_MAX / 255.0));
+	gamepad.right_trigger = (LONG)(xinput_state.xstate.Gamepad.bRightTrigger * (INPUT_ABSOLUTE_MAX / 255.0));
 }
 
 void xinput_joystick_device::reset()

@@ -161,11 +161,11 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// XInput maps triggers onto separate axes instead of merging both onto the Z axis
 			case IPT_PEDAL:
 				if (xinput_gamepad)
-					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_Z_INDEXED(entry.player()));
+					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_Z_POS_ABSOLUTE_INDEXED(entry.player()));
 				break;
 			case IPT_PEDAL2:
 				if (xinput_gamepad)
-					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_W_INDEXED(entry.player()));
+					entry.defseq(SEQ_TYPE_STANDARD).set(JOYCODE_W_POS_ABSOLUTE_INDEXED(entry.player()));
 				break;
 
 			// leave everything else alone
