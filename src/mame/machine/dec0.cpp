@@ -47,24 +47,6 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 	return ~0;
 }
 
-/******************************************************************************/
-
-READ16_MEMBER(dec0_state::dec0_rotary_r)
-{
-	switch (offset<<1)
-	{
-		case 0: /* Player 1 rotary */
-			return ~(1 << ioport("AN0")->read());
-
-		case 8: /* Player 2 rotary */
-			return ~(1 << ioport("AN1")->read());
-
-		default:
-			logerror("Unknown rotary read at 300000 %02x\n", offset);
-	}
-
-	return 0;
-}
 
 /******************************************************************************/
 
@@ -79,19 +61,22 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 			return ioport("DSW")->read();
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << ioport("AN0")->read());
+			return ioport("AN0")->read();
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << ioport("AN1")->read());
+			return ioport("AN1")->read();
 
 		case 8: /* Credits, start buttons */
 			return ioport("SYSTEM")->read();
 
-		case 12:
+		case 0xa: // clr.w
+			return 0;
+			
+		case 0xc:
 			return 0;   /* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+(offset<<1));
 	return ~0;
 }
 
