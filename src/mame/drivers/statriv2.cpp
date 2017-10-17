@@ -136,18 +136,16 @@ public:
 
 TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = videoram[0x400+tile_index];
-	int attr = videoram[tile_index] & 0x3f;
+	int code = m_videoram[0x400 + tile_index];
+	int attr = m_videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = videoram[0x400+tile_index];
-	int attr = videoram[tile_index] & 0x3f;
+	int code = m_videoram[0x400 + tile_index];
+	int attr = m_videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
@@ -162,9 +160,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 
 PALETTE_INIT_MEMBER(statriv2_state, statriv2)
 {
-	int i;
-
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		palette.set_pen_color(2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
 		palette.set_pen_color(2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
@@ -173,12 +169,12 @@ PALETTE_INIT_MEMBER(statriv2_state, statriv2)
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -191,8 +187,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
 
 WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
@@ -301,17 +296,6 @@ static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_device, read, write)
 ADDRESS_MAP_END
 
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( statusbj_io, AS_IO, 8, statriv2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_device, read, write)
-ADDRESS_MAP_END
-#endif
-
-
 
 /*************************************
  *
@@ -333,7 +317,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -366,7 +350,43 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIP switch? 20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIP switch? 40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIP switch? 80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Play")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Stand")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Select Joker Poker / Discard 1 / Horse 1 / Point")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Select Blackjack / Discard 2 / Horse 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Select Baccarat / Discard 3 / Horse 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Select Craps / Discard 4 / Horse 4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Select Race Time / Discard 5 / Horse 5 / No Point")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -441,7 +461,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -576,7 +596,7 @@ static MACHINE_CONFIG_START( statriv2 )
 	MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(statriv2_map)
 	MCFG_CPU_IO_MAP(statriv2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", statriv2_state,  statriv2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -616,7 +636,7 @@ static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
-	MCFG_VIDEO_START_OVERRIDE(statriv2_state,vertical)
+	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
 MACHINE_CONFIG_END
 
@@ -711,11 +731,11 @@ ROM_START( funcsino )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-ROM_START( bigcsino )
+ROM_START( bigcsino ) // 5 in 1 of: Joker Poker, Blackjack, Baccarat, Craps and Race Time
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bc1k.u7", 0x0000, 0x1000, CRC(51f35f51) SHA1(3c1b9b613402e178d0d8752bf025e5d7fc9f1081) )
-	ROM_LOAD( "bc2k.u8", 0x1000, 0x1000, CRC(8102d1eb) SHA1(e2ffa04d705b82b19e978429851690426cb4b474) )
-	ROM_LOAD( "bc3k.u9", 0x2000, 0x1000, CRC(fdfb304e) SHA1(b000d7533c1613fb253b9f48143cc4add73aa23c) )
+	ROM_LOAD( "bc1k.u7",  0x0000, 0x1000, CRC(51f35f51) SHA1(3c1b9b613402e178d0d8752bf025e5d7fc9f1081) )
+	ROM_LOAD( "bc2k.u8",  0x1000, 0x1000, CRC(8102d1eb) SHA1(e2ffa04d705b82b19e978429851690426cb4b474) )
+	ROM_LOAD( "bc3k.u9",  0x2000, 0x1000, CRC(fdfb304e) SHA1(b000d7533c1613fb253b9f48143cc4add73aa23c) )
 	ROM_LOAD( "bc4k.u10", 0x3000, 0x1000, CRC(521347c3) SHA1(539ce6e93bf6db2ca2a8fa22d0aef9933f8cd825) )
 
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
@@ -1456,7 +1476,7 @@ ROM_END
  *************************************/
 
 /* question address is stored as L/H/X (low/high/don't care) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_lhx)
+DRIVER_INIT_MEMBER(statriv2_state, addr_lhx)
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
@@ -1464,7 +1484,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lhx)
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_xlh)
+DRIVER_INIT_MEMBER(statriv2_state, addr_xlh)
 {
 	m_question_offset_low = 1;
 	m_question_offset_mid = 2;
@@ -1472,7 +1492,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_xlh)
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_xhl)
+DRIVER_INIT_MEMBER(statriv2_state, addr_xhl)
 {
 	m_question_offset_low = 2;
 	m_question_offset_mid = 1;
@@ -1480,14 +1500,14 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_xhl)
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_lmh)
+DRIVER_INIT_MEMBER(statriv2_state, addr_lmh)
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 2;
 }
 
-DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
+DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
 {
 	/***************************************************\
 	*                                                   *
@@ -1591,7 +1611,7 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 GAME( 1981, statusbj,   0,        statriv2,  statusbj, statriv2_state, 0,         ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripdraw,   0,        statriv2,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, bigcsino,   0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
+GAME( 1984, bigcsino,   0,        statriv2,  bigcsino, statriv2_state, 0,         ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
