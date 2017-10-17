@@ -5827,10 +5827,10 @@ static imgtoolerr_t mac_image_getattrs(imgtool::partition &partition, const char
 				break;
 
 			case IMGTOOLATTR_TIME_CREATED:
-				values[i].t = mac_crack_time(cat_info.createDate);
+				values[i].t = mac_crack_time(cat_info.createDate).to_time_t();
 				break;
 			case IMGTOOLATTR_TIME_LASTMODIFIED:
-				values[i].t = mac_crack_time(cat_info.modifyDate);
+				values[i].t = mac_crack_time(cat_info.modifyDate).to_time_t();
 				break;
 		}
 	}

@@ -485,24 +485,20 @@ static void thom_conv_filename(const char* s, char name[9], char ext[4])
 	}
 }
 
-static time_t thom_crack_time(thom_dirent* d)
+static imgtool::datetime thom_crack_time(thom_dirent* d)
 {
-	struct tm t;
-	time_t now;
-
 	/* check */
-	if ( d->day < 1 || d->day > 31 || d->month < 1 || d->month > 12 ) return 0;
+	if ( d->day < 1 || d->day > 31 || d->month < 1 || d->month > 12 ) return imgtool::datetime();
 
 	/* converts */
-	time( &now );
-	t = *localtime( &now );
-	t.tm_sec = 0;
-	t.tm_min = 0;
-	t.tm_hour = 0;
-	t.tm_mday = d->day;
-	t.tm_mon = d->month - 1;
-	t.tm_year = (d->year < 65 ) ? d->year + 100 : d->year;
-	return mktime(&t);
+	util::arbitrary_datetime dt;
+	dt.second = 0;
+	dt.minute = 0;
+	dt.hour = 0;
+	dt.day_of_month = d->day;
+	dt.month = d->month;
+	dt.year = d->year + (d->year < 65 ? 2000 : 1900);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, dt);
 }
 
 static void thom_make_time(thom_dirent* d, time_t time)

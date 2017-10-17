@@ -19,6 +19,7 @@
 
 #include <time.h>
 #include <list>
+#include <chrono>
 
 #include "corestr.h"
 #include "opresolv.h"
@@ -26,6 +27,7 @@
 #include "unicode.h"
 #include "charconv.h"
 #include "pool.h"
+#include "timeconv.h"
 
 namespace imgtool
 {
@@ -55,15 +57,78 @@ union filterinfo
 
 typedef void (*filter_getinfoproc)(uint32_t state, union filterinfo *info);
 
+namespace imgtool
+{
+	class datetime
+	{
+	public:
+		typedef util::arbitrary_clock<std::int64_t, 1600, 1, 1, 0, 0, 0, std::ratio<1, 10000000> > imgtool_clock;
+
+		enum datetime_type
+		{
+			NONE,
+			LOCAL,
+			GMT
+		};
+
+		datetime()
+			: m_type(datetime_type::NONE)
+		{
+		}
+
+
+		template<typename Rep, int Y, int M, int D, int H, int N, int S, typename Ratio>
+		datetime(datetime_type type, std::chrono::time_point<util::arbitrary_clock<Rep, Y, M, D, H, N, S, Ratio> > tp)
+			: m_type(type)
+			, m_time_point(imgtool_clock::from_arbitrary_time_point(tp))
+		{
+		}
+
+		datetime(datetime_type type, std::chrono::time_point<std::chrono::system_clock> tp);
+		datetime(datetime_type type, time_t t);
+		datetime(datetime_type type, const util::arbitrary_datetime &dt, bool clamp = true);
+		datetime(const datetime &that) = default;
+		datetime(datetime &&that) = default;
+
+		// accessors
+		datetime_type type() const { return m_type; }
+		bool empty() const { return type() == datetime_type::NONE; }
+		std::chrono::time_point<imgtool_clock> time_point() const { return m_time_point; }
+
+		// operators
+		datetime &operator =(const datetime &that)
+		{
+			m_type = that.m_type;
+			m_time_point = that.m_time_point;
+			return *this;
+		}
+
+		// returns the current time
+		static datetime now(datetime_type type);
+
+		// returns time structures
+		std::tm localtime() const;
+		std::tm gmtime() const;
+		time_t to_time_t() const;
+
+	private:
+		static imgtool_clock::duration			s_gmt_offset;
+		datetime_type							m_type;
+		std::chrono::time_point<imgtool_clock>	m_time_point;
+
+		static imgtool_clock::duration calculate_gmt_offset();
+	};
+};
+
 struct imgtool_dirent
 {
 	char filename[1024];
 	char attr[64];
 	uint64_t filesize;
 
-	time_t creation_time;
-	time_t lastmodified_time;
-	time_t lastaccess_time;
+	imgtool::datetime creation_time;
+	imgtool::datetime lastmodified_time;
+	imgtool::datetime lastaccess_time;
 
 	char softlink[1024];
 	char comment[256];
