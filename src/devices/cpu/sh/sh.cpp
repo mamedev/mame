@@ -758,7 +758,7 @@ void sh_common_execution::EXTUW(uint32_t m, uint32_t n)
 void sh_common_execution::JMP(uint32_t m)
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->icount--; // not in SH4 implementation?
+	//m_sh2_state->icount--; // not in SH4 implementation?
 }
 
 /*  JSR     @Rm */
@@ -1303,6 +1303,7 @@ void sh_common_execution::OR(uint32_t m, uint32_t n)
 void sh_common_execution::ORI(uint32_t i)
 {
 	m_sh2_state->r[0] |= i;
+	m_sh2_state->icount -= 2; // not in SH2 implementation?
 }
 
 /*  OR.B    #imm,@(R0,GBR) */
@@ -1314,7 +1315,7 @@ void sh_common_execution::ORM(uint32_t i)
 	temp = RB( m_sh2_state->ea );
 	temp |= i;
 	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
+	//m_sh2_state->icount -= 2; // not in SH4 implementation?
 }
 
 /*  ROTCL   Rn */

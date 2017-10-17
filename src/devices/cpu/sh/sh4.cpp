@@ -463,15 +463,16 @@ inline void sh34_base_device::SETS(const uint16_t opcode)
 /*  LDC     Rm,SR */
 inline void sh34_base_device::LDCSR(const uint16_t opcode)
 {
-	// copy current registers to banked version of current register set
+	// important to store the value now so that it doesn't get affected by the bank change
+	uint32_t reg = m_sh2_state->r[Rn];
+
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 
-	// if the register bank in the new differs from the one already in SR
 	if ((m_sh2_state->r[Rn] & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->r[Rn] & sRB ? 1 : 0);
-	
-	m_sh2_state->sr = m_sh2_state->r[Rn] & SH34_FLAGS;
+
+	m_sh2_state->sr = reg & SH34_FLAGS;
 	sh4_exception_recompute();
 }
 
