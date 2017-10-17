@@ -272,8 +272,16 @@ void sega_scu_device::device_reset()
 	}
 
 	m_status = 0;
-	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
+}
+
+//-------------------------------------------------
+//  device_reset_after_children
+//-------------------------------------------------
+
+void sega_scu_device::device_reset_after_children()
+{
+	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
