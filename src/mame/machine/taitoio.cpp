@@ -257,6 +257,7 @@ void tc0220ioc_device::device_reset()
 
 MACHINE_CONFIG_MEMBER( tc0220ioc_device::device_add_mconfig )
 	MCFG_WATCHDOG_ADD("watchdog")
+//	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(3200))
 MACHINE_CONFIG_END
 
 /*****************************************************************************

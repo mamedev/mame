@@ -377,10 +377,12 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 1, 0);
 
-	if (m_pixel_bitmap)  /* hitice only */
+	// TODO: only hiticej properly enables this up during attract mode, 
+	//       hitice / hiticerb keeps this disabled, maybe a btanb fixed in later revision?
+	if (m_pixel_bitmap && (m_pixel_scroll[0] & 0x5800) == 0x5000)  /* hitice only */
 	{
-		int scrollx = -2 * m_pixel_scroll[0]; //+320;
-		int scrolly = - m_pixel_scroll[1]; //+240;
+		int scrollx = -2 * m_pixel_scroll[1]; //+320;
+		int scrolly = 16 - m_pixel_scroll[2]; //+240;
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
 
 		copyscrollbitmap_trans(bitmap, *m_pixel_bitmap, 1, &scrollx, 1, &scrolly, cliprect, m_b_fg_color_base * 16);
