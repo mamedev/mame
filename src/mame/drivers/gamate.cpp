@@ -239,7 +239,7 @@ READ8_MEMBER(gamate_state::sound_r)
 WRITE8_MEMBER(gamate_state::sound_w)
 {
 	m_ay->address_w(space, 0, offset);
-	m_ay->data_w(space, 0, data & 0xff);
+	m_ay->data_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
