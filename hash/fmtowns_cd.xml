@@ -9042,6 +9042,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="trigger">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Trigger.ccd" size="1335" crc="ce397f34" sha1="4c862a13fb30162b64b56558ac91cafba82f03fd"/>
+		<rom name="Trigger.cue" size="188" crc="3fbd34d9" sha1="690c4d21ecc3e4c19ba513039d48397c09ad060f"/>
+		<rom name="Trigger.img" size="153319824" crc="b01773aa" sha1="13e992f0c663a7a9a11d993d670eb46a9b2423a3"/>
+		<rom name="Trigger.sub" size="6257952" crc="91bf4518" sha1="3a2d9fc3fdf30fff772eaaf1522469da83a2e544"/>
+		-->
+		<description>Trigger</description>
+		<year>1994</year>
+		<publisher>ジックス (ZyX)</publisher>
+		<info name="release" value="199406xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="trigger" sha1="4e6040576d084861e6fd478a8fbfb6b6723c7596" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="tuntroll">
 		<!--
 		Origin: Neo Kobe Collection
