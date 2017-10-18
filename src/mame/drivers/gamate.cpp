@@ -14,8 +14,7 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "audio/gamate.h"
-
+#include "sound/ay8910.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
@@ -30,7 +29,7 @@ public:
 	gamate_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sound(*this, "custom")
+		, m_ay(*this, "ay8910")
 		, m_cart(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 		, m_palette(*this, "palette")
@@ -50,6 +49,8 @@ public:
 	DECLARE_READ8_MEMBER(gamate_video_r);
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
 	DECLARE_WRITE8_MEMBER(gamate_video_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_DRIVER_INIT(gamate);
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);
@@ -83,7 +84,7 @@ private:
 	} card_protection;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<gamate_sound_device> m_sound;
+	required_device<ay8910_device> m_ay;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
@@ -229,9 +230,21 @@ READ8_MEMBER( gamate_state::gamate_nmi_r )
 	return data;
 }
 
+READ8_MEMBER(gamate_state::sound_r)
+{
+	m_ay->address_w(space, 0, offset);
+	return m_ay->data_r(space, 0);
+}
+
+WRITE8_MEMBER(gamate_state::sound_w)
+{
+	m_ay->address_w(space, 0, offset);
+	m_ay->data_w(space, 0, data & 0xff);
+}
+
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x400d) AM_DEVREADWRITE("custom", gamate_sound_device, device_r, device_w)
+	AM_RANGE(0x4000, 0x400f) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x4400, 0x4400) AM_READ_PORT("JOY")
 	AM_RANGE(0x4800, 0x4800) AM_READ(gamate_nmi_r)
 	AM_RANGE(0x5000, 0x5007) AM_READWRITE(gamate_video_r, gamate_video_w)
@@ -394,10 +407,12 @@ static MACHINE_CONFIG_START( gamate )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", GAMATE_SND, 4433000/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
+	MCFG_SOUND_ADD("ay8910", AY8910, 4433000 / 2) // AY compatible, no actual AY chip present
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gamate_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")

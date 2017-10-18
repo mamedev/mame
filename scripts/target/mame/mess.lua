@@ -3467,8 +3467,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.h",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
