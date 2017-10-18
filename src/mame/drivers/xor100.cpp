@@ -4,6 +4,11 @@
 
         XOR S-100-12
 
+        XOR Data Science was apparently a 1982 reincorporation of a Huntington Beach-based
+        company previously known as Delta Products. At least some of the S-100 boards used
+        in XOR's systems were originally developed and documented under the former company
+        name.
+
 *****************************************************************************************************
 
         All input must be in upper case.
@@ -556,18 +561,18 @@ static MACHINE_CONFIG_START( xor100 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// S-100
-	MCFG_S100_BUS_ADD()
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL_8MHz/4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_4", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_5", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_6", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_7", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_8", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_9", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_10", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":1", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":2", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":3", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":4", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":5", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":6", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":7", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":8", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":9", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":10", xor100_s100_cards, nullptr)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -586,4 +591,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY             FULLNAME        FLAGS
-COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, 0,    "Xor Data Science", "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, 0,    "XOR Data Science", "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
