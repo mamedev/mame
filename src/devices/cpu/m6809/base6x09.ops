@@ -239,8 +239,8 @@ CMP8:
 	return;
 
 SBC8:
-	m_temp.w = (uint16_t)read_operand() + (m_cc & CC_C ? 1 : 0);
-	regop8() = set_flags(CC_NZVC, regop8(), m_temp.b.l, regop8() - m_temp.w);
+	m_temp.b.l = read_operand();
+	regop8() = set_flags(CC_NZVC, regop8(), m_temp.b.l, regop8() - m_temp.b.l - (m_cc & CC_C ? 1 : 0));
 	return;
 
 AND8:
@@ -259,8 +259,8 @@ EOR8:
 	return;
 
 ADC8:
-	m_temp.w = (uint16_t)read_operand() + (m_cc & CC_C ? 1 : 0);
-	regop8() = set_flags(add8_sets_h() ? CC_HNZVC : CC_NZVC, regop8(), m_temp.b.l, regop8() + m_temp.w);
+	m_temp.b.l = read_operand();
+	regop8() = set_flags(add8_sets_h() ? CC_HNZVC : CC_NZVC, regop8(), m_temp.b.l, regop8() + m_temp.b.l + (m_cc & CC_C ? 1 : 0));
 	return;
 
 OR8:
@@ -332,9 +332,9 @@ SYNC:
 		// massaging the PC this way makes the debugger's behavior more
 		// intuitive
 		m_pc.w--;
-		
+
 		@eat_remaining();
-		
+
 		// unmassage...
 		m_pc.w++;
 	}
@@ -396,7 +396,7 @@ LBSR:
 JSR:
 	@eat(2);
 	goto GOTO_SUBROUTINE;
-	
+
 GOTO_SUBROUTINE:
 	@write_memory(--m_s.w, m_pc.b.l);
 	@write_memory(--m_s.w, m_pc.b.h);
@@ -442,7 +442,7 @@ CWAI:
 		m_pc.w -= 2;
 
 		@eat_remaining();
-		
+
 		// unmassage...
 		m_pc.w += 2;
 	}
@@ -526,7 +526,7 @@ SOFTWARE_INTERRUPT:
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 	goto INTERRUPT_VECTOR;
-	
+
 DIRECT:
 	@set_ea(((uint16_t)m_dp << 8) | read_opcode_arg());
 	@eat(hd6309_native_mode() ? 0 : 1);
