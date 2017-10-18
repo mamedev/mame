@@ -2479,7 +2479,7 @@ GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova 
 GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, toppin,     0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, bullseyn,   bullseye, by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",      MACHINE_IS_SKELETON_MECHANICAL)
