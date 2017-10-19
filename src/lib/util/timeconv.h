@@ -17,6 +17,7 @@
 #include "coreutil.h"
 
 #include <chrono>
+#include <algorithm>
 
 
 namespace util {
