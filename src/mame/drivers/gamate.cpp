@@ -177,11 +177,11 @@ WRITE8_MEMBER(gamate_state::sound_w)
 }
 
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_READWRITE(sound_r,sound_w)
-	AM_RANGE(0x4400, 0x4400) AM_READ_PORT("JOY")
-	AM_RANGE(0x4800, 0x4800) AM_READ(gamate_nmi_r)
-	AM_RANGE(0x5000, 0x5007) AM_DEVICE("video", gamate_video_device, regs_map)
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM 
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x03f0) AM_READWRITE(sound_r,sound_w)
+	AM_RANGE(0x4400, 0x4400) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
+	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x03ff) AM_READ(gamate_nmi_r)
+	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x03f8) AM_DEVICE("video", gamate_video_device, regs_map)
 	AM_RANGE(0x5800, 0x5800) AM_READ(newer_protection_set)
 	AM_RANGE(0x5900, 0x5900) AM_WRITE(protection_reset)
 	AM_RANGE(0x5a00, 0x5a00) AM_READ(protection_r)
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(gamate_cart_protection_r, gamate_cart_protection_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(cart_bankswitchmulti_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cart_bankswitch_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_SHARE("bios")
+	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_SHARE("bios") AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 
@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( gamate )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
-	MCFG_SOUND_ADD("ay8910", AY8910, 4433000 / 2) // AY compatible, no actual AY chip present
+	MCFG_SOUND_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
@@ -285,11 +285,11 @@ This console appears to have been manufactured in 1994, based on the date markin
 as well as the PCB.
 */
 ROM_START(gamate)
-	ROM_REGION(0x10000,"maincpu", 0)
+	ROM_REGION(0x1000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "DEFAULT")
-	ROMX_LOAD("gamate_bios_umc.bin", 0xf000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
+	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
-	ROMX_LOAD("gamate_bios_bit.bin", 0xf000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
+	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
 ROM_END
 
 
