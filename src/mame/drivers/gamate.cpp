@@ -18,7 +18,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "rendlay.h"
+#include "video/gamate.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -32,7 +32,6 @@ public:
 		, m_ay(*this, "ay8910")
 		, m_cart(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
-		, m_palette(*this, "palette")
 		, m_bios(*this, "bios")
 		, m_bank(*this, "bank")
 		, m_bankmulti(*this, "bankmulti")
@@ -46,9 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gamate_cart_protection_w);
 	DECLARE_WRITE8_MEMBER(cart_bankswitchmulti_w);
 	DECLARE_WRITE8_MEMBER(cart_bankswitch_w);
-	DECLARE_READ8_MEMBER(gamate_video_r);
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
-	DECLARE_WRITE8_MEMBER(gamate_video_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_DRIVER_INIT(gamate);
@@ -59,19 +56,6 @@ public:
 
 private:
 	virtual void machine_start() override;
-
-	struct
-	{
-		uint8_t reg[8];
-		struct
-		{
-			bool page2; // else page1
-			uint8_t ypos, xpos/*tennis*/;
-			uint8_t data[2][0x100][0x20];
-		} bitmap;
-		uint8_t x, y;
-		bool y_increment;
-	} video;
 
 	struct
 	{
@@ -87,7 +71,6 @@ private:
 	required_device<ay8910_device> m_ay;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
-	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_bios;
 	required_memory_bank m_bank;
 	required_memory_bank m_bankmulti;
@@ -163,40 +146,6 @@ READ8_MEMBER( gamate_state::newer_protection_set )
 	return 0;
 }
 
-WRITE8_MEMBER( gamate_state::gamate_video_w )
-{
-	video.reg[offset]=data;
-	switch (offset)
-	{
-		case 1:
-			if (data&0xf)
-				printf("lcd mode %x\n", data);
-			video.y_increment=data&0x40;
-			break;
-		case 2:
-			video.bitmap.xpos=data;
-			break;
-		case 3:
-			if (data>=200)
-				printf("lcd ypos: %x\n", data);
-			video.bitmap.ypos=data;
-			break;
-		case 4:
-			video.bitmap.page2=data&0x80;
-			video.x=data&0x1f;
-			break;
-		case 5:
-			video.y=data;
-			break;
-		case 7:
-			video.bitmap.data[video.bitmap.page2][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)]=data;
-			if (video.y_increment)
-				video.y++;
-			else
-				video.x++; // overruns
-	}
-}
-
 WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
 {
 	bank_multi=data;
@@ -206,21 +155,6 @@ WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
 WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
 {
 	m_bank->set_base(m_cart_ptr+0x4000*data);
-}
-
-READ8_MEMBER( gamate_state::gamate_video_r )
-{
-	if (offset!=6)
-		return 0;
-	uint8_t data = video.bitmap.data[video.bitmap.page2][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
-//  if (m_maincpu->pc()<0xf000)
-//    popmessage("lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
-	if (video.y_increment)
-		video.y++;
-	else
-		video.x++; // overruns?
-
-	return data;
 }
 
 READ8_MEMBER( gamate_state::gamate_nmi_r )
@@ -247,7 +181,7 @@ static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x4400, 0x4400) AM_READ_PORT("JOY")
 	AM_RANGE(0x4800, 0x4800) AM_READ(gamate_nmi_r)
-	AM_RANGE(0x5000, 0x5007) AM_READWRITE(gamate_video_r, gamate_video_w)
+	AM_RANGE(0x5000, 0x5007) AM_DEVICE("video", gamate_video_device, regs_map)
 	AM_RANGE(0x5800, 0x5800) AM_READ(newer_protection_set)
 	AM_RANGE(0x5900, 0x5900) AM_WRITE(protection_reset)
 	AM_RANGE(0x5a00, 0x5a00) AM_READ(protection_r)
@@ -272,74 +206,11 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-/* palette in red, green, blue tribles */
-static const unsigned char gamate_colors[4][3] =
-{
-	{ 255,255,255 },
-	{ 0xa0, 0xa0, 0xa0 },
-	{ 0x60, 0x60, 0x60 },
-	{ 0, 0, 0 }
-};
-
-PALETTE_INIT_MEMBER(gamate_state, gamate)
-{
-	int i;
-
-	for (i = 0; i < 4; i++)
-	{
-		palette.set_pen_color(i, gamate_colors[i][0], gamate_colors[i][1], gamate_colors[i][2]);
-	}
-}
-
-static void BlitPlane(uint16_t* line, uint8_t plane1, uint8_t plane2)
-{
-	line[3]=(plane1&1)|((plane2<<1)&2);
-	line[2]=((plane1>>1)&1)|((plane2<<0)&2);
-	line[1]=((plane1>>2)&1)|((plane2>>1)&2);
-	line[0]=((plane1>>3)&1)|((plane2>>2)&2);
-}
-
-uint32_t gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, j;
-	for (y=0;y<152;y++)
-	{
-		for (x=-(video.bitmap.xpos&7), j=0;x<160;x+=8, j++)
-		{
-			uint8_t d1, d2;
-			if (video.bitmap.ypos<200)
-			{
-				d1=video.bitmap.data[0][(y+video.bitmap.ypos)%200][(j+video.bitmap.xpos/8)&0x1f];
-				d2=video.bitmap.data[1][(y+video.bitmap.ypos)%200][(j+video.bitmap.xpos/8)&0x1f];
-			}
-			else
-			if ((video.bitmap.ypos&0xf)<8)
-			{ // lcdtest, of course still some registers not known, my gamate doesn't display bottom lines; most likely problematic 200 warp around hardware! no real usage
-				int yi=(y+(video.bitmap.ypos&0xf)-8);
-				if (yi<0)
-					yi=video.bitmap.ypos+y; // in this case only 2nd plane used!?, source of first plane?
-				d1=video.bitmap.data[0][yi][(j+video.bitmap.xpos/8)&0x1f]; // value of lines bevor 0 chaos
-				d2=video.bitmap.data[1][yi][(j+video.bitmap.xpos/8)&0x1f];
-			}
-			else
-			{
-				d1=video.bitmap.data[0][y][(j+video.bitmap.xpos/8)&0x1f];
-				d2=video.bitmap.data[1][y][(j+video.bitmap.xpos/8)&0x1f];
-			}
-			BlitPlane(&bitmap.pix16(y, x+4), d1, d2);
-			BlitPlane(&bitmap.pix16(y, x), d1>>4, d2>>4);
-		}
-	}
-	return 0;
-}
-
 DRIVER_INIT_MEMBER(gamate_state,gamate)
 {
-	memset(&video, 0, sizeof(video));/* memset(m_ram, 0, sizeof(m_ram));*/
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
 }
-
 
 void gamate_state::machine_start()
 {
@@ -357,17 +228,6 @@ void gamate_state::machine_start()
 	card_protection.unprotected=false;
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
-#if 0
-	save_item(NAME(m_video.data));
-	save_item(NAME(m_video.index));
-	save_item(NAME(m_video.x));
-	save_item(NAME(m_video.y));
-	save_item(NAME(m_video.mode));
-	save_item(NAME(m_video.delayed));
-	save_item(NAME(m_video.pixels));
-	save_item(NAME(m_ports));
-	save_item(NAME(m_ram));
-#endif
 }
 
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
@@ -385,26 +245,11 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
-
-INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
-{
-}
-
 static MACHINE_CONFIG_START( gamate )
-	MCFG_CPU_ADD("maincpu", M6502, 4433000/2)
+	MCFG_CPU_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamate_state,  gamate_interrupt)
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(160, 152)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 152-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gamate_state, screen_update_gamate)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gamate_colors))
-	MCFG_PALETTE_INIT_OWNER(gamate_state, gamate)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_GAMATE_VIDEO_ADD("video")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
