@@ -420,7 +420,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-//#include "machine/z80ctc.h"
+#include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "screen.h"
 #include "speaker.h"
@@ -438,7 +438,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this,"maincpu")
 		, m_crtc(*this, "crtc")
-		, m_pio1(*this, "pio1")
+		, m_pio0(*this, "pio0")
 		, m_videoram(*this, "videoram")
 		, m_colorram(*this, "colorram")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -461,7 +461,7 @@ private:
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<z80pio_device> m_pio1;
+	required_device<z80pio_device> m_pio0;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -647,13 +647,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
-//  AM_RANGE(0x00, 0x00)  AM_READ_PORT("DSW1")
-//  AM_RANGE(0x01, 0x01)  AM_READ_PORT("IN1")
-//  AM_RANGE(0x02, 0x02)  AM_READ_PORT("IN0")
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt)
-//  AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
-//  AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_device, data_w)     /* AY8910 data */
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_device, address_w)      /* AY8910 control */
 	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
@@ -663,7 +658,7 @@ ADDRESS_MAP_END
 /* I/O byte R/W
   (from avtbingo)
 
-  inputs are throusg port 02h, masked with 0x3F & 0x40.
+  inputs are through port 02h, masked with 0x3F & 0x40.
 
   02C3: DB 02         in   a,($02)
   02C5: 2F            cpl
@@ -687,6 +682,7 @@ ADDRESS_MAP_END
   1ACE: CD B6 2D      call $2DB6 ----> nothing there!!!
 
 
+  This changes which lamps are lit depending on which ones are lit now..
   poll the port 00h and compare with 0x03
 
   1379: 0E 00         ld   c,$00
@@ -901,7 +897,7 @@ static INPUT_PORTS_START( avtbingo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Column 5 UP")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Column 4 UP")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")  // Used. Masked 0x40. See code at PC=0338.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")  // Used. Masked 0x40. See code at PC=0338. (SW2 to enter setup)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -938,19 +934,18 @@ GFXDECODE_END
 // our pio cannot detect a static interrupt, so we push the current switch state in, then it will work
 INTERRUPT_GEN_MEMBER(avt_state::avt_vblank_irq)
 {
-	m_pio1->port_b_write(ioport("IN0")->read());
+	m_pio0->port_b_write(ioport("IN0")->read());
 }
 
 static const z80_daisy_config daisy_chain[] =
 {
+	//{ "ctc0" },
 	{ "pio1" },
-	{ "pio2" },
-	//{ "ctc" },
+	{ "pio0" },
 	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( avt )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -966,7 +961,6 @@ static MACHINE_CONFIG_START( avt )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 	MCFG_SCREEN_PALETTE("palette")
-
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avt)
 
 	MCFG_PALETTE_ADD("palette", 8*16)
@@ -975,18 +969,31 @@ static MACHINE_CONFIG_START( avt )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, CPU_CLOCK)
+	// device never addressed by cpu
+	MCFG_DEVICE_ADD("ctc0", Z80CTC, CPU_CLOCK) // U27
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc0", z80ctc_device, trg1))
+	// ZC1 not connected
+	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
+
+	MCFG_DEVICE_ADD("pio0", Z80PIO, CPU_CLOCK) // U23
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("IN0"))
+	// PORT A appears to be lamp drivers
+	// PORT B d0-d5 = muxed inputs; d6 = SW2 pushbutton; d7 = ?
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, CPU_CLOCK)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, CPU_CLOCK) // U22
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	// PORT A d0-d7 = TP13,TP12,TP11,TP10,TP8,TP7,TP5,TP3
+	// PORT B d0-d7 = "Player2", DCOM, CCOM, BCOM, ACOM, LOCKOUT/TP6, TP4, 50/60HZ (held high, jumper on JP13 grounds it)
+	// DCOM,CCOM,BCOM,ACOM appear to be muxes
 MACHINE_CONFIG_END
 
 
