@@ -474,7 +474,7 @@ C1066 - ??
 	<software name="wcupsocc">
 		<description>World Cup Soccer</description>
 		<year>199?</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1045" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -616,7 +616,7 @@ C1066 - ??
 	<software name="hannibal">
 		<description>Further Adventures of Hannibal The Cat</description>
 		<year>1993</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1060" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -642,7 +642,7 @@ C1066 - ??
 	<software name="basketba">
 		<description>Basketball</description>
 		<year>199?</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1063" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -655,7 +655,7 @@ C1066 - ??
 	<software name="baoqingt">
 		<description>Bao Qing Tian</description>
 		<year>199?</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1064" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -668,7 +668,7 @@ C1066 - ??
 	<software name="hothero">
 		<description>Hot Hero</description>
 		<year>199?</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1065" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -694,7 +694,7 @@ C1066 - ??
 	<software name="goldpyra">
 		<description>The Golden Pyramid</description>
 		<year>199?</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1068" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
@@ -707,7 +707,7 @@ C1066 - ??
 	<software name="rotat">
 		<description>Riddle of the Ancient Tomb</description>
 		<year>1994</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1069" />
 		<part name="cart" interface="gamate_cart">
 	  <feature name="slot" value="banked" />
