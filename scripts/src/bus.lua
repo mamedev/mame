@@ -739,6 +739,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/gamate/slot.h,BUSES["GAMATE"] = true
+---------------------------------------------------
+
+if (BUSES["GAMATE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/gamate/slot.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/slot.h",
+		MAME_DIR .. "src/devices/bus/gamate/rom.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/rom.h",
+		MAME_DIR .. "src/devices/bus/gamate/gamate_protection.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/gamate_protection.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
 ---------------------------------------------------
 
