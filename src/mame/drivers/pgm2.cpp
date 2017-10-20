@@ -171,14 +171,15 @@ static GFXDECODE_START( pgm2 )
 GFXDECODE_END
 
 
+
 void pgm2_state::pgm_create_dummy_internal_arm_region()
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
-	for (i=0;i<0x4000/2;i+=2)
+	for (i = 0;i < 0x4000 / 2;i += 2)
 	{
 		temp16[i] = 0xFFFE;
-		temp16[i+1] = 0xEAFF;
+		temp16[i + 1] = 0xEAFF;
 
 	}
 	int base = 0;
@@ -197,8 +198,58 @@ void pgm2_state::pgm_create_dummy_internal_arm_region()
 	temp16[(base) / 2] = 0x0010; base += 2;
 	temp16[(base) / 2] = 0x0000; base += 2;
 
-	temp16[(base) / 2] = addr&0xffff; base += 2;
-	temp16[(base) / 2] = (addr>>16)&0xffff; base += 2;
+	temp16[(base) / 2] = addr & 0xffff; base += 2;
+	temp16[(base) / 2] = (addr >> 16) & 0xffff; base += 2;
+
+	/* debug code to find jumps to the internal ROM and put jumps back to where we came from in the internal ROM space */
+
+	uint16_t *gamerom = (uint16_t *)memregion("user1")->base();
+	int gameromlen = memregion("user1")->bytes() / 2;
+
+	for (int i = 0;i < gameromlen - 3;i++)
+	{
+		uint16_t val1 = gamerom[i];
+		uint16_t val2 = gamerom[i + 1];
+
+		if ((val1 == 0xF004) && (val2 == 0xe51f))
+		{
+			uint16_t val3 = gamerom[i + 2];
+			uint16_t val4 = gamerom[i + 3];
+			uint32_t jump = (val4 << 16) | val3;
+
+			if (jump < 0x10000000) // jumps to internal ROM
+			{
+				logerror("internal ROM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1)
+				{
+					logerror(" (To THUMB)");
+					jump &= ~1;
+					// put a BX R14 there
+					temp16[(jump / 2)] = 0x4770;
+				}
+				else
+				{
+					// put a BX R14 there
+					temp16[(jump / 2)] = 0xFF1E;
+					temp16[(jump / 2) + 1] = 0xE12F;
+				}
+				logerror("\n");
+			}
+			else if (jump < 0x20000000) // jumps to RAM
+			{
+				logerror("RAM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1) logerror(" (To THUMB)");
+				logerror("\n");
+			}
+			else // anything else is to ROM
+			{
+				logerror("ROM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1) logerror(" (To THUMB)");
+				logerror("\n");
+			}
+
+		}
+	}
 }
 
 
