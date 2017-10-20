@@ -13,9 +13,9 @@ TODO:
 - Unknown memory i/o C000, 4000
 - Need schematic / tech manual
 - Doesn't seem to be any dips, looks like all settings and modes are controlled by keystrokes.
-- 8X305 is a 16-bit Microcontroller which should have an external ROM. It would communicate with
-  the Z80 via a common 8-bit I/O bus. No idea what it is used for here, but in another system it
-  acts as the floppy disk controller.
+- 8X305 is a 16-bit bipolar processor which appears to use four external PROMs (undumped). It
+  would communicate with the Z80 via a common 8-bit I/O bus. No idea what it is used for here,
+  but in another system it acts as the floppy disk controller.
 - Debug trick: set pc=809 to see the test menu.
 - It shows the status line but keystrokes are ignored. After 20 minutes of inactivity, the screen
   goes blank. Pressing a key will restore it.
@@ -174,11 +174,17 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mx2178 )
-	ROM_REGION(0x2000, "roms", 0)
-	ROM_LOAD( "96274139.bin", 0x000000, 0x002000, CRC(eb471a27) SHA1(433abefd1a72653d0bf35bcaaeccf9943b96260b) )
+	ROM_REGION(0x2000, "roms", 0) // MBM2764-25
+	ROM_LOAD( "96274139.u9", 0x000000, 0x002000, CRC(eb471a27) SHA1(433abefd1a72653d0bf35bcaaeccf9943b96260b) )
 
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "96273883.bin", 0x000000, 0x001000, CRC(8311fadd) SHA1(573bbad23e893ad9374edc929642dc1cba3452d2) )
+	ROM_REGION(0x800, "proms", 0) // MB7122E - actual mapping not known
+	ROMX_LOAD( "96270350.q2", 0x0000, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "96270368.r2", 0x0000, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "96270376.s2", 0x0001, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "96270384.t2", 0x0001, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+
+	ROM_REGION(0x1000, "chargen", 0) // D2732A-3
+	ROM_LOAD( "96273883.c7", 0x000000, 0x001000, CRC(8311fadd) SHA1(573bbad23e893ad9374edc929642dc1cba3452d2) )
 ROM_END
 
 /* Driver */
