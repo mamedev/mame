@@ -2893,7 +2893,7 @@
 		</part>
 	</software>
 
-	<software name="win30dd">
+	<software name="win30dd" cloneof="win30">
 		<description>Microsoft Windows Version 3.0 (3.5" DD)</description>
 		<year>1990</year>
 		<publisher>Microsoft</publisher>
@@ -2935,7 +2935,7 @@
 		</part>
 	</software>
 
-	<software name="win30mf">
+	<software name="win30mf" cloneof="win30">
 		<description>Microsoft Windows Version 3.0 (5.25")</description>
 		<year>1990</year>
 		<publisher>Microsoft</publisher>
@@ -3458,7 +3458,7 @@
 		</part>
 	</software>
 
-	<software name="wfw311u">
+	<software name="wfw311u" cloneof="wfw311">
 		<description>Windows for Workgroups Version 3.11 (Upgrade)</description>
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
