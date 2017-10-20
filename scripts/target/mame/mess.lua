@@ -664,6 +664,7 @@ BUSES["ECONET"] = true
 BUSES["ELECTRON"] = true
 BUSES["EP64"] = true
 BUSES["EPSON_SIO"] = true
+BUSES["GAMATE"] = true
 BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true

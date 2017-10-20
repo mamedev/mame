@@ -9,14 +9,11 @@
  A complete hardware description can be found at
  http://blog.kevtris.org/blogfiles/Gamate%20Inside.txt
 
- nmi unknown
- bomb blast top status line missing
  ******************************************************************************/
 
 #include "emu.h"
 #include "sound/ay8910.h"
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
+#include "bus/gamate/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "video/gamate.h"
 #include "screen.h"
@@ -30,137 +27,68 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ay(*this, "ay8910")
-		, m_cart(*this, "cartslot")
+		, m_cartslot(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 		, m_bios(*this, "bios")
-		, m_bank(*this, "bank")
-		, m_bankmulti(*this, "bankmulti")
 	{ }
 
 	DECLARE_PALETTE_INIT(gamate);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(newer_protection_set);
-	DECLARE_WRITE8_MEMBER(protection_reset);
-	DECLARE_READ8_MEMBER(gamate_cart_protection_r);
-	DECLARE_WRITE8_MEMBER(gamate_cart_protection_w);
-	DECLARE_WRITE8_MEMBER(cart_bankswitchmulti_w);
-	DECLARE_WRITE8_MEMBER(cart_bankswitch_w);
+
+	DECLARE_READ8_MEMBER(card_available_check);
+	DECLARE_READ8_MEMBER(card_available_set);
+	DECLARE_WRITE8_MEMBER(card_reset);
+
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
+	DECLARE_WRITE8_MEMBER(write_cart);
+	DECLARE_READ8_MEMBER(read_cart);
+
 	DECLARE_DRIVER_INIT(gamate);
+
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gamate_interrupt);
+
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
 private:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	struct
-	{
-		bool set;
-		int bit_shifter;
-		uint8_t cartridge_byte;
-		uint16_t address; // in reality something more like short local cartridge address offset
-		bool unprotected;
-		bool failed;
-	} card_protection;
+	int m_card_available;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
-	required_device<generic_slot_device> m_cart;
+	required_device<gamate_cart_slot_device> m_cartslot;
 	required_ioport m_io_joy;
 	required_shared_ptr<uint8_t> m_bios;
-	required_memory_bank m_bank;
-	required_memory_bank m_bankmulti;
 	emu_timer *timer1;
 	emu_timer *timer2;
-	uint8_t bank_multi;
-	uint8_t *m_cart_ptr;
 };
 
-WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
+/* todo: what are these really, do they go to the cartridge slot? */
+READ8_MEMBER( gamate_state::card_available_check )
 {
-	logerror("%.6f protection write %x %x address:%x data:%x shift:%d\n",machine().time().as_double(), offset, data, card_protection.address, card_protection.cartridge_byte, card_protection.bit_shifter);
+	// bits 0 and 1 checked
+	return m_card_available ? 3: 1;
+} 
 
-	switch (offset)
-	{
-	case 0:
-		card_protection.failed= card_protection.failed || ((card_protection.cartridge_byte&0x80)!=0) != ((data&4)!=0);
-		card_protection.bit_shifter++;
-		if (card_protection.bit_shifter>=8)
-		{
-			card_protection.cartridge_byte=m_cart_ptr[card_protection.address++];
-			card_protection.bit_shifter=0;
-		}
-		break;
-	}
+WRITE8_MEMBER( gamate_state::card_reset )
+{
+	// might reset the card / protection?
 }
 
-READ8_MEMBER( gamate_state::gamate_cart_protection_r )
+READ8_MEMBER( gamate_state::card_available_set )
 {
-	uint8_t ret=1;
-	if (card_protection.bit_shifter==7 && card_protection.unprotected)
-	{
-		ret=m_cart_ptr[bank_multi*0x4000];
-	}
-	else
-	{
-		card_protection.bit_shifter++;
-		if (card_protection.bit_shifter==8)
-		{
-			card_protection.bit_shifter=0;
-			card_protection.cartridge_byte='G';
-			card_protection.unprotected=true;
-		}
-		ret=(card_protection.cartridge_byte&0x80) ? 2 : 0;
-		if (card_protection.bit_shifter==7 && !card_protection.failed)
-		{ // now protection chip on cartridge activates cartridge chip select on cpu accesses
-//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r)); // next time I will try to get this working
-		}
-		card_protection.cartridge_byte<<=1;
-	}
-	logerror("%.6f protection read %x %x address:%x data:%x shift:%d\n",machine().time().as_double(), offset, ret, card_protection.address, card_protection.cartridge_byte, card_protection.bit_shifter);
-	return ret;
-}
-
-READ8_MEMBER( gamate_state::protection_r )
-{
-	return card_protection.set? 3: 1;
-} // bits 0 and 1 checked
-
-WRITE8_MEMBER( gamate_state::protection_reset )
-{
-// writes 0x20
-	card_protection.address=0x6005-0x6001;
-	card_protection.bit_shifter=0;
-	card_protection.cartridge_byte=m_cart_ptr[card_protection.address++]; //m_cart_rom[card_protection.address++];
-	card_protection.failed=false;
-	card_protection.unprotected=false;
-}
-
-READ8_MEMBER( gamate_state::newer_protection_set )
-{
-	card_protection.set=true;
+	m_card_available = 1;
 	return 0;
 }
 
-WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
-{
-	bank_multi=data;
-	m_bankmulti->set_base(m_cart_ptr+0x4000*data+1);
-}
-
-WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
-{
-	m_bank->set_base(m_cart_ptr+0x4000*data);
-}
-
+// serial connection
 READ8_MEMBER( gamate_state::gamate_nmi_r )
 {
 	uint8_t data=0;
-	popmessage("nmi/4800 read\n");
+	logerror("nmi/4800 read\n");
 	return data;
 }
 
@@ -176,20 +104,27 @@ WRITE8_MEMBER(gamate_state::sound_w)
 	m_ay->data_w(space, 0, data);
 }
 
+WRITE8_MEMBER(gamate_state::write_cart)
+{
+	m_cartslot->write_cart(space, offset, data);
+}
+
+READ8_MEMBER(gamate_state::read_cart)
+{
+	return m_cartslot->read_cart(space, offset);
+}
+
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM 
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x03f0) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x4400, 0x4400) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x03ff) AM_READ(gamate_nmi_r)
 	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x03f8) AM_DEVICE("video", gamate_video_device, regs_map)
-	AM_RANGE(0x5800, 0x5800) AM_READ(newer_protection_set)
-	AM_RANGE(0x5900, 0x5900) AM_WRITE(protection_reset)
-	AM_RANGE(0x5a00, 0x5a00) AM_READ(protection_r)
-	AM_RANGE(0x6001, 0x9fff) AM_READ_BANK("bankmulti")
-	AM_RANGE(0xa000, 0xdfff) AM_READ_BANK("bank")
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(gamate_cart_protection_r, gamate_cart_protection_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(cart_bankswitchmulti_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(cart_bankswitch_w)
+	AM_RANGE(0x5800, 0x5800) AM_READ(card_available_set)
+	AM_RANGE(0x5900, 0x5900) AM_WRITE(card_reset)
+	AM_RANGE(0x5a00, 0x5a00) AM_READ(card_available_check)
+	AM_RANGE(0x6000, 0xdfff) AM_READWRITE(read_cart, write_cart)
+
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_SHARE("bios") AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
@@ -214,20 +149,15 @@ DRIVER_INIT_MEMBER(gamate_state,gamate)
 
 void gamate_state::machine_start()
 {
-	m_cart_ptr = memregion("maincpu")->base() + 0x6000;
-	if (m_cart->exists())
-	{
-//      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
-		m_cart_ptr = m_cart->get_rom_base();
-		m_bankmulti->set_base(m_cart->get_rom_base()+1);
-		m_bank->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
-	}
-//  m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // default bios: $47 protection readback
-	card_protection.set=false;
-	bank_multi=0;
-	card_protection.unprotected=false;
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
+
+	save_item(NAME(m_card_available));
+}
+
+void gamate_state::machine_reset()
+{
+	m_card_available = 0;
 }
 
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
@@ -259,7 +189,8 @@ static MACHINE_CONFIG_START( gamate )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gamate_cart")
+	MCFG_GAMATE_CARTRIDGE_ADD("cartslot", gamate_cart, nullptr)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")
 MACHINE_CONFIG_END
 
