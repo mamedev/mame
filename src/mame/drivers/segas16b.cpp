@@ -8453,6 +8453,7 @@ ROM_END
 //  Wrestle War, Sega System 16B
 //  CPU: FD1094 (317-0090)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-6888-01
 //
 ROM_START( wrestwar1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
