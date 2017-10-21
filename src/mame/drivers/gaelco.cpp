@@ -771,6 +771,37 @@ ROM_START( biomtoya ) /* PCB - REF 922804/2 */
 ROM_END
 
 
+ROM_START( biomtoyb ) /* PCB - REF 922804/2 */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) /* v1.0.1878 */
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) /* v1.0.1878 */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Graphics & Sound ROMs soldered in, not verified 100% correct for this set */
+	/* weird gfx ordering */
+	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
+	ROM_CONTINUE(       0x0c0000, 0x040000 )
+	ROM_LOAD( "j6",     0x000000, 0x040000, CRC(e923728b) SHA1(113eac1de73c74ef7c9d3e2e72599a1ff775176d) )
+	ROM_CONTINUE(       0x080000, 0x040000 )
+	ROM_LOAD( "h7",     0x140000, 0x040000, CRC(9c984d7b) SHA1(98d43a9c3fa93c9ea55f41475ecab6ca25713087) )
+	ROM_CONTINUE(       0x1c0000, 0x040000 )
+	ROM_LOAD( "j7",     0x100000, 0x040000, CRC(0e18fac2) SHA1(acb0a3699395a6c68cacdeadda42a785aa4020f5) )
+	ROM_CONTINUE(       0x180000, 0x040000 )
+	ROM_LOAD( "h9",     0x240000, 0x040000, CRC(8c1f6718) SHA1(9377e838ebb1e16d24072b9b4ed278408d7a808f) )
+	ROM_CONTINUE(       0x2c0000, 0x040000 )
+	ROM_LOAD( "j9",     0x200000, 0x040000, CRC(1c93f050) SHA1(fabeffa05dae7a83a199a57022bd318d6ad02c4d) )
+	ROM_CONTINUE(       0x280000, 0x040000 )
+	ROM_LOAD( "h10",    0x340000, 0x040000, CRC(aca1702b) SHA1(6b36b230722270dbfc2f69bd7eb07b9e718db089) )
+	ROM_CONTINUE(       0x3c0000, 0x040000 )
+	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
+	ROM_CONTINUE(       0x380000, 0x040000 )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) )
+ROM_END
+
+
 /*
 Squash (version 1.0)
 Gaelco, 1992
@@ -879,6 +910,7 @@ ROM_END
 GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, 0, ROT0, "Gaelco", "Big Karnak", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, 0, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, 0, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, 0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", MACHINE_SUPPORTS_SAVE )
