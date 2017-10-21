@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Roberto Fresca
 /**************************************************************************
 
-  Waku Waku Doubutsu Land TonTon (c) 199? Success.
+  Waku Waku Doubutsu Land TonTon (c) 1987 Success.
 
   HW based off MSX2
 
@@ -257,4 +257,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY                   FULLNAME                                  FLAGS
-GAME( 199?, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
