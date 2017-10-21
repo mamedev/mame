@@ -402,14 +402,16 @@
   - Inputs
 
 
-  avtbingo, avtsym14 will accept coins. PIO-1 is programmed to cause an interrupt
+* avtbingo, avtsym14 will accept coins. PIO-1 is programmed to cause an interrupt
   when coin1 is pressed (port02).
 
-  avtnfl gets the interrupt from PIO-2, but then reads port02 (from PIO-1) to get
-  the key that was pressed. Currently PIO-2 is not connected to anything in emulation.
-  The interrupt routine also draws the screen.
+* avtnfl, you need to set it up before it can accept coins. However, it is random if it works
+  after doing that. If you want to try, press 7 to enter setup, press 6 to select the adjustments
+  screen, choose items with 2 and adjust them with 4. Press 6 until you exit. If you're lucky enough
+  to get it to work, 2 will enter coins, 3 will tilt (don't do that!), 6 is Draft, 1,2,4 (at least)
+  will remove cards. Don't know what the aim of the game is though.
 
-  avtsym25 has mismatched program roms so cannot work.
+* avtsym25 has mismatched program roms so cannot work.
 
 
 ************************************************************************************************/
@@ -439,6 +441,7 @@ public:
 		, m_maincpu(*this,"maincpu")
 		, m_crtc(*this, "crtc")
 		, m_pio0(*this, "pio0")
+		, m_pio1(*this, "pio1")
 		, m_videoram(*this, "videoram")
 		, m_colorram(*this, "colorram")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -450,10 +453,11 @@ public:
 	DECLARE_READ8_MEMBER( avt_6845_data_r );
 	DECLARE_WRITE8_MEMBER(avt_videoram_w);
 	DECLARE_WRITE8_MEMBER(avt_colorram_w);
+	DECLARE_WRITE_LINE_MEMBER(avtnfl_w);
+	DECLARE_WRITE_LINE_MEMBER(avtbingo_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(avt);
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 
 private:
 	tilemap_t *m_bg_tilemap;
@@ -462,6 +466,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
+	required_device<z80pio_device> m_pio1;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -649,6 +654,7 @@ static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_device, data_w)     /* AY8910 data */
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_device, address_w)      /* AY8910 control */
 	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
@@ -735,12 +741,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( symbols )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3") // Tilt
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2") // avtnfl: down/accept
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3") // avtnfl: up
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-5") // avtnfl: adjust setting
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6") // avtnfl: go back a screen
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7") // avtnfl: enter setup menu   avtsym14:hold down while booting to enter setup
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
 
 	PORT_START("IN1")
@@ -931,19 +937,20 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-// our pio cannot detect a static interrupt, so we push the current switch state in, then it will work
-INTERRUPT_GEN_MEMBER(avt_state::avt_vblank_irq)
-{
-	m_pio0->port_b_write(ioport("IN0")->read());
-}
-
 static const z80_daisy_config daisy_chain[] =
 {
-	//{ "ctc0" },
+	{ "ctc0" },
 	{ "pio1" },
 	{ "pio0" },
 	{ nullptr }
 };
+
+// our pio cannot detect a static interrupt, so we push the current switch state in, then it will work
+WRITE_LINE_MEMBER( avt_state::avtbingo_w )
+{
+	if (state)
+		m_pio0->port_b_write(ioport("IN0")->read());
+}
 
 static MACHINE_CONFIG_START( avt )
 	/* basic machine hardware */
@@ -951,7 +958,6 @@ static MACHINE_CONFIG_START( avt )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(avt_map)
 	MCFG_CPU_IO_MAP(avt_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", avt_state,  avt_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -970,6 +976,7 @@ static MACHINE_CONFIG_START( avt )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtbingo_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -996,6 +1003,20 @@ static MACHINE_CONFIG_START( avt )
 	// DCOM,CCOM,BCOM,ACOM appear to be muxes
 MACHINE_CONFIG_END
 
+// Leave avtnfl as it was until more is learnt.
+WRITE_LINE_MEMBER( avt_state::avtnfl_w )
+{
+	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
+}
+
+static MACHINE_CONFIG_DERIVED( avtnfl, avt )
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtnfl_w))
+MACHINE_CONFIG_END
 
 /*********************************************
 *                  Rom Load                  *
@@ -1071,4 +1092,4 @@ ROM_END
 GAME( 1985, avtsym14, 0,        avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
 GAME( 1985, avtsym25, avtsym14, avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
 GAME( 1985, avtbingo, 0,        avt,      avtbingo, avt_state,  0,    ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
-GAME( 1989, avtnfl,   0,        avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )
+GAME( 1989, avtnfl,   0,        avtnfl,   symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )
