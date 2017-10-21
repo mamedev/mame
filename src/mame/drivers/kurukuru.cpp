@@ -941,6 +941,7 @@ ROM_START( kurukuru )
 	ROM_LOAD( "18.ic18",      0x10000, 0x10000, CRC(afb13c6a) SHA1(ac3cd40fad081f7a2b3d1fc72ea96282b9d1f4a3) ) // ic18: big frog gfx
 	ROM_LOAD( "10.ic10",      0x20000, 0x10000, CRC(3d6012bc) SHA1(2764f70e0e0bef3f2f71dd6c78e0a4189057beca) ) // ic10: title + text + ingame gfx
 	ROM_FILL(                 0x30000, 0x10000, 0xff )                                                         // dummy entry for when no romchip is selected
+
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "4.ic4",        0x00000, 0x10000, CRC(85d86f32) SHA1(f2aa93d702e6577f8f2204c74c44ac26d05be699) ) // code & adpcm samples
 
