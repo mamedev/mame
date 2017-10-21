@@ -954,7 +954,7 @@ ROM_END
 
 /*  Pyon Pyon Jump.
     Ver 1.40.
-    199?, Success / Taiyo Jidoki.
+    1991, Success / Taiyo Jidoki.
 */
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -984,9 +984,9 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                   FULLNAME                         FLAGS
 GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 199?, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
 // unemulated....
 
-//    199?, Success / Taiyo Jidoki, Pyon Pyon
-//    1990, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
+//    1988, Success / Taiyo Jidoki, Pyon Pyon
+//    1992, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
