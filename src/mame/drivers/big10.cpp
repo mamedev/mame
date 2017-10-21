@@ -264,4 +264,4 @@ ROM_END
 **************************************/
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY      FULLNAME    FLAGS  */
-GAME( 198?, big10,    0,        big10,    big10,    big10_state,   0,        ROT0,   "<unknown>",  "Big 10",   0 )
+GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,        ROT0,   "Success",  "Big 10",   0 )
