@@ -549,10 +549,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( maniacsq )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -572,7 +571,7 @@ static MACHINE_CONFIG_START( maniacsq )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -580,7 +579,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( squash )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12, 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, M68000, XTAL_20MHz/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(squash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -595,7 +594,7 @@ static MACHINE_CONFIG_START( squash )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
@@ -611,7 +610,7 @@ static MACHINE_CONFIG_START( squash )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -619,7 +618,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( thoop )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12, 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thoop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -650,7 +649,7 @@ static MACHINE_CONFIG_START( thoop )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -709,7 +708,45 @@ ROM_START( maniacsp ) /* PCB - REF 922804/2 */
 ROM_END
 
 
-ROM_START( biomtoy ) /* PCB - REF 922804/2 */
+/***************************************************************************
+
+Biomechanical Toy
+
+REF.922804/2
++-------------------------------------------------+
+| 2     6      PAL                     6116       |
+| 4     8    65728                     6116       |
+| M SW1 0   18.D18                                |
+| H     0    65728                                |
+| z SW2 0   16.D16                                |
+|                   +----------+                  |
+|J                  |TMS       |        65764     |
+|A                  |TPC1020AFN|        65764     |
+|M      65764       |   -084C  |          PAL     |
+|M      65764       +----------+           H10 J10|
+|A                  +----------+           H9 J9  |
+|                   |TMS       |           H7 J7  |
+|                   |TPC1020AFN|           H6 J6  |
+|  1MHz  M6295      |   -084C  |           65728  |
+|                   +----------+           65728  |
+|  VR1   C3     PAL                        65728  |
+|        C1    26MHz                       65728  |
++-------------------------------------------------+
+
+  CPU: MC68000P12
+Sound: OKI M6295
+Video: TMS TCP1020AFN-084C (x2)
+  OSC: 26MHz, 24MHz & 1MHz resonator
+  RAM: MHS HM3-65756K-5  32K x 8 SRAM (x2)
+       MHS HM3-65728B-5  2K x 8 SRAM (x6)
+  PAL: TI F20L8-25CNT DIP24 (x3)
+  VR1: Volume pot
+   SW: Two 8 switch dipswitches
+
+***************************************************************************/
+
+
+ROM_START( biomtoy ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) /* v1.0.1885 */
 	ROM_LOAD16_BYTE(    "d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) /* v1.0.1885 */
@@ -740,7 +777,7 @@ ROM_START( biomtoy ) /* PCB - REF 922804/2 */
 ROM_END
 
 
-ROM_START( biomtoya ) /* PCB - REF 922804/2 */
+ROM_START( biomtoya ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "biomtoya.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) /* v1.0.1884 */
 	ROM_LOAD16_BYTE( "biomtoya.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) /* v1.0.1884 */
@@ -771,7 +808,7 @@ ROM_START( biomtoya ) /* PCB - REF 922804/2 */
 ROM_END
 
 
-ROM_START( biomtoyb ) /* PCB - REF 922804/2 */
+ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) /* v1.0.1878 */
 	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) /* v1.0.1878 */
@@ -809,7 +846,7 @@ Gaelco, 1992
 PCB Layout
 ----------
 
-REF 922804/1
+REF.922804/1
 |---------------------------------------------|
 |   LM358  SOUND.1D    26MHz     6116         |
 |   VOL                PAL       6116         |
@@ -850,7 +887,7 @@ Notes:
            SQUASH_SOUND.1D   27C040      Sound
 */
 
-ROM_START( squash )
+ROM_START( squash ) /* PCB - REF.922804/1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
@@ -871,7 +908,7 @@ ROM_START( squash )
 ROM_END
 
 
-ROM_START( thoop )
+ROM_START( thoop ) /* PCB - REF.922804/1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
 	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) )
