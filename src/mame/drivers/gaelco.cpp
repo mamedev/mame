@@ -579,7 +579,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( squash )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, M68000, XTAL_20MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(squash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
