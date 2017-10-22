@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "sh.h"
 
 void sh_common_execution::device_start()
