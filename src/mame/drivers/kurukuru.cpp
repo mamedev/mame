@@ -982,7 +982,7 @@ ROM_END
 *                              Game Drivers                                *
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                   FULLNAME                         FLAGS
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY                   FULLNAME                        FLAGS
 GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
 GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
