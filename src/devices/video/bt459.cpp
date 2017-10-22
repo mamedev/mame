@@ -28,6 +28,13 @@
 
 DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree 150MHz Monolithic CMOS 256x24 Color Palette RAMDAC")
 
+DEVICE_ADDRESS_MAP_START(map, 8, bt459_device)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(address_lo_r, address_lo_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(address_hi_r, address_hi_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(register_r, register_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_r, palette_w)
+ADDRESS_MAP_END
+
 bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BT459, tag, owner, clock),
 	device_palette_interface(mconfig, *this)
@@ -71,6 +78,24 @@ void bt459_device::device_reset()
 {
 }
 
+/*
+ * To write color data, the MPU loads the address register with the address of
+ * the primary color palette RAM, overlay RAM or cursor color register location
+ * to be modified. The MPU performs three successive write cycles (8 bits each
+ * of red, green, and blue), using C0 and C1 to select either the primary color
+ * palette RAM, overlay RAM or cursor color registers. After the blue write
+ * cycle, the address register then increments to the next location, which the
+ * MPU may modify by writing another sequence of red, green and blue data.
+ * Reading color data is similar to writing it, except the MPU executes read
+ * cycles when it reads color data.
+ *
+ * When the MPU is accessing the color palette RAM, overlay RAM or cursor color
+ * registers, the address register increments after each blue read or write
+ * cycle. To keep track of the red, green and blue read/write cycles, the
+ * address register has two additional bits (ADDRa, ADDRb) that count modulo
+ * three. They are reset to zero when the MPU reads or writes the address
+ * register. The MPU does not have access to these bits.
+ */
 u8 bt459_device::get_component(rgb_t *arr, int index)
 {
 	switch (m_address_rgb)
@@ -115,26 +140,37 @@ void bt459_device::set_component(rgb_t *arr, int index, u8 data)
 	}
 }
 
-READ8_MEMBER(bt459_device::read)
+READ8_MEMBER(bt459_device::address_lo_r)
+{
+	// reset component pointer and return address register lsb
+	m_address_rgb = 0;
+	return m_address & ADDRESS_LSB;
+}
+
+WRITE8_MEMBER(bt459_device::address_lo_w)
+{
+	// reset component pointer and set address register lsb
+	m_address_rgb = 0;
+	m_address = (m_address & ADDRESS_MSB) | data;
+}
+
+READ8_MEMBER(bt459_device::address_hi_r)
+{
+	// reset component pointer and return address register msb
+	m_address_rgb = 0;
+	return (m_address & ADDRESS_MSB) >> 8;
+}
+
+WRITE8_MEMBER(bt459_device::address_hi_w)
+{
+	// reset component pointer and set address register msb
+	m_address_rgb = 0;
+	m_address = ((data << 8) | (m_address & ADDRESS_LSB)) & ADDRESS_MASK;
+}
+
+READ8_MEMBER(bt459_device::register_r)
 {
 	u8 result = 0;
-
-	switch (offset)
-	{
-	case ADDRESS_LO:
-		// reset component pointer and return address register lsb
-		m_address_rgb = 0;
-		return m_address & ADDRESS_LSB;
-
-	case ADDRESS_HI:
-		// reset component pointer and return address register msb
-		m_address_rgb = 0;
-		return (m_address & ADDRESS_MSB) >> 8;
-
-	case PALETTE:
-		// return component from palette ram
-		return get_component(m_palette_ram, m_address & 0xff);
-	}
 
 	switch (m_address)
 	{
@@ -216,35 +252,8 @@ READ8_MEMBER(bt459_device::read)
 	return result;
 }
 
-WRITE8_MEMBER(bt459_device::write)
+WRITE8_MEMBER(bt459_device::register_w)
 {
-	int index;
-
-	switch (offset)
-	{
-	case ADDRESS_LO:
-		// reset component pointer and set address register lsb
-		m_address_rgb = 0;
-		m_address = (m_address & ADDRESS_MSB) | data;
-		return;
-
-	case ADDRESS_HI:
-		// reset component pointer and set address register msb
-		m_address_rgb = 0;
-		m_address = ((data << 8) | (m_address & ADDRESS_LSB)) & ADDRESS_MASK;
-		return;
-
-	case PALETTE:
-		// set component in color palette ram
-		index = m_address & 0xff;
-		set_component(m_palette_ram, index, data);
-
-		// update the mame palette to match the device
-		if (m_address_rgb == 0)
-			set_pen_color(index, m_palette_ram[index]);
-		return;
-	}
-
 	switch (m_address)
 	{
 	case REG_COMMAND_0:
@@ -408,13 +417,15 @@ WRITE8_MEMBER(bt459_device::write)
 	case REG_OVERLAY_COLOR_13:
 	case REG_OVERLAY_COLOR_14:
 	case REG_OVERLAY_COLOR_15:
-		index = m_address & 0xf;
+	{
+		int index = m_address & 0xf;
 		set_component(m_overlay_color, index, data);
 
 		// update the mame palette to match the device
 		if (m_address_rgb == 0)
 			set_pen_color(BT459_PIXEL_COLORS + index, m_overlay_color[index]);
 		return;
+	}
 
 	case REG_CURSOR_COLOR_1:
 		set_component(m_cursor_color, 0, data);
@@ -450,6 +461,23 @@ WRITE8_MEMBER(bt459_device::write)
 
 	// increment address register
 	m_address = (m_address + 1) & ADDRESS_MASK;
+}
+
+READ8_MEMBER(bt459_device::palette_r)
+{
+	// return component from palette ram
+	return get_component(m_palette_ram, m_address & 0xff);
+}
+
+WRITE8_MEMBER(bt459_device::palette_w)
+{
+	// set component in color palette ram
+	int index = m_address & 0xff;
+	set_component(m_palette_ram, index, data);
+
+	// update the mame palette to match the device
+	if (m_address_rgb == 0)
+		set_pen_color(index, m_palette_ram[index]);
 }
 
 void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data)
@@ -509,27 +537,27 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	if (m_cursor_command & (CR47 | CR46 | CR45 | CR44))
 	{
 		/*
-		* The cursor (x) value to be written is calculated as follows:
-		*
-		*   Cx = desired display screen (x) position + H - P
-		*
-		* where
-		*
-		*   P = 37 if 1:1 input multiplexing, 52 if 4:1 input multiplexing, 57 if 5:1 input multiplexing
-		*   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
-		*       to active video
-		*
-		* The cursor (y) value to be written is calculated as follows:
-		*
-		*   Cy = desired display screen (y) position + V - 32
-		*
-		* where
-		*
-		*   V = number of scan lines from the second sync pulse during vertical blanking to active video
-		*
-		* Values from $0FC0 (-64) to $0FBF (+4031) may be loaded into the cursor(y) register. The negative values ($0FC0
-		* to $0FFF) are used in situations where V < 32, and the cursor must be moved off the top of the screen.
-		*/
+		 * The cursor (x) value to be written is calculated as follows:
+		 *
+		 *   Cx = desired display screen (x) position + H - P
+		 *
+		 * where
+		 *
+		 *   P = 37 if 1:1 input multiplexing, 52 if 4:1 input multiplexing, 57 if 5:1 input multiplexing
+		 *   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
+		 *       to active video
+		 *
+		 * The cursor (y) value to be written is calculated as follows:
+		 *
+		 *   Cy = desired display screen (y) position + V - 32
+		 *
+		 * where
+		 *
+		 *   V = number of scan lines from the second sync pulse during vertical blanking to active video
+		 *
+		 * Values from $0FC0 (-64) to $0FBF (+4031) may be loaded into the cursor(y) register. The negative values ($0FC0
+		 * to $0FFF) are used in situations where V < 32, and the cursor must be moved off the top of the screen.
+		 */
 		int cursor_x = m_cursor_x - screen.visible_area().min_x + (
 			(m_command_0 & CR0706) == CR0706_11MPX ? 37 :
 			(m_command_0 & CR0706) == CR0706_41MPX ? 52 :
@@ -584,28 +612,28 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			int thickness = (m_cursor_command & CR4241) >> 1;
 
 			/*
-			* The window (x) value to be written is calculated as follows:
-			*
-			*   Wx = desired display screen (x) position + H - P
-			*
-			* where
-			*
-			*   P = 5 if 1:1 input multiplexing, 20 if 4:1 input multiplexing, 25 if 5:1 input multiplexing
-			*   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
-			*       to active video
-			*
-			* The window (y) value to be written is calculated as follows:
-			*
-			*   Wy = desired display screen (y) position + V
-			*
-			* where
-			*
-			*   V = number of scan lines from the second sync pulse during vertical blanking to active video
-			*
-			* Values from $0000 to $0FFF may be written to the window (x) and (y) registers. A full-screen cross hair
-			* is implemented by loading the window (x,y) registers with $0000, and the window width and height registers with
-			* $0FFF.
-			*/
+			 * The window (x) value to be written is calculated as follows:
+			 *
+			 *   Wx = desired display screen (x) position + H - P
+			 *
+			 * where
+			 *
+			 *   P = 5 if 1:1 input multiplexing, 20 if 4:1 input multiplexing, 25 if 5:1 input multiplexing
+			 *   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
+			 *       to active video
+			 *
+			 * The window (y) value to be written is calculated as follows:
+			 *
+			 *   Wy = desired display screen (y) position + V
+			 *
+			 * where
+			 *
+			 *   V = number of scan lines from the second sync pulse during vertical blanking to active video
+			 *
+			 * Values from $0000 to $0FFF may be written to the window (x) and (y) registers. A full-screen cross hair
+			 * is implemented by loading the window (x,y) registers with $0000, and the window width and height registers with
+			 * $0FFF.
+			 */
 			int window_x = m_window_x - screen.visible_area().min_x + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 5 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 20 :
@@ -613,13 +641,13 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			int window_y = m_window_y - screen.visible_area().min_y;
 
 			/*
-			* The actual window width is 2, 8 or 10 pixels more than the value specified by the window width register, depending
-			* on whether 1:1, 4:1 or 5:1 input multiplexing is specified. The actual window height is 2 pixels more than the
-			* value specified by the window height register. Therefore, the minimum window width is 2, 8 or 10 pixels for 1:1,
-			* 4:1 and 5:1 multiplexing, respectively. The minimum window height is 2 pixels.
-			*
-			* Values from $0000 to $0FFF may be written to the window width and height registers.
-			*/
+			 * The actual window width is 2, 8 or 10 pixels more than the value specified by the window width register, depending
+			 * on whether 1:1, 4:1 or 5:1 input multiplexing is specified. The actual window height is 2 pixels more than the
+			 * value specified by the window height register. Therefore, the minimum window width is 2, 8 or 10 pixels for 1:1,
+			 * 4:1 and 5:1 multiplexing, respectively. The minimum window height is 2 pixels.
+			 *
+			 * Values from $0000 to $0FFF may be written to the window width and height registers.
+			 */
 			int window_w = m_window_w + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 2 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 8 :

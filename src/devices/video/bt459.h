@@ -17,14 +17,6 @@ public:
 	static const int BT459_OVERLAY_COLORS = 16;
 	static const int BT459_CURSOR_COLORS  = 3;
 
-	enum control_input
-	{
-		ADDRESS_LO = 0x0,
-		ADDRESS_HI = 0x1,
-		REGISTERS  = 0x2,
-		PALETTE    = 0x3
-	};
-
 	enum address_mask
 	{
 		REG_OVERLAY_COLOR_0    = 0x0100,
@@ -187,8 +179,16 @@ public:
 		CR4241_7PIX = 0x06  // cross hair thickness 7 pixels
 	};
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_ADDRESS_MAP(map, 8);
+
+	DECLARE_READ8_MEMBER(address_lo_r);
+	DECLARE_WRITE8_MEMBER(address_lo_w);
+	DECLARE_READ8_MEMBER(address_hi_r);
+	DECLARE_WRITE8_MEMBER(address_hi_w);
+	DECLARE_READ8_MEMBER(register_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
 
 	void screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data);
 
