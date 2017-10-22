@@ -38,7 +38,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vram_offset_w);
 	DECLARE_WRITE8_MEMBER(blit_trigger_w);
-	
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -69,7 +69,7 @@ WRITE8_MEMBER(anes_state::blit_trigger_w)
 	 writes 1 to port $0b, writes to program space, writes 2 to port $0b, writes to program space
 	 writes a mode to port $0b, writes to trigger port $0a
 	 */
-	
+
 	//printf("%02x%02x%02x\n",m_vram_offset[0],m_vram_offset[1],m_vram_offset[2]);
 }
 
@@ -81,18 +81,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, anes_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	
+
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // mux write
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ym", ym2413_device, write)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(blit_trigger_w)
-//	AM_RANGE(0x0b, 0x0b) AM_WRITE(blit_mode_w)
+//  AM_RANGE(0x0b, 0x0b) AM_WRITE(blit_mode_w)
 	AM_RANGE(0x0c, 0x0e) AM_WRITE(vram_offset_w)
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("DSW1")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("DSW2")
 	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW3")
 	AM_RANGE(0x14, 0x15) AM_READNOP // mux read
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN0") AM_WRITENOP
-//	AM_RANGE(0xfe, 0xfe) banking? unknown ROM range
+//  AM_RANGE(0xfe, 0xfe) banking? unknown ROM range
 ADDRESS_MAP_END
 
 
@@ -100,7 +100,7 @@ static INPUT_PORTS_START( anes )
 	PORT_START("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // blitter busy status
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNKNOWN ) // used, coin?
-	
+
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")

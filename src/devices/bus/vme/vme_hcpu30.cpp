@@ -132,7 +132,7 @@ MACHINE_CONFIG_MEMBER(vme_hcpu30_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-//	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
+//  MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
 
 	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))

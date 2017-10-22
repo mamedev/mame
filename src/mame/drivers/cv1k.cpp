@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, 0xffffffffffffffffU)
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, 0xffffffffffffffffU)
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
-	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)	           
+	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
@@ -848,7 +848,7 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 	m_idlepc = idlepc;
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	
+
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));

@@ -787,7 +787,7 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	// access (mz)
 	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
 	//if (ready_counter > 0)
-	//	return attotime::never;
+	//  return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();

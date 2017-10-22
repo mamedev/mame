@@ -1244,12 +1244,12 @@ static void fat_cannonicalize_sfn(char *sfn, const uint8_t *sfn_bytes)
 static imgtool::datetime fat_crack_time(uint32_t fat_time)
 {
 	util::arbitrary_datetime dt;
-	dt.second		= ((fat_time >>  0) & 0x001F) * 2;
-	dt.minute		= ((fat_time >>  5) & 0x003F);
-	dt.hour			= ((fat_time >> 11) & 0x001F);
-	dt.day_of_month	= ((fat_time >> 16) & 0x001F);
-	dt.month		= ((fat_time >> 21) & 0x000F);
-	dt.year			= ((fat_time >> 25) & 0x007F) + 1980;
+	dt.second       = ((fat_time >>  0) & 0x001F) * 2;
+	dt.minute       = ((fat_time >>  5) & 0x003F);
+	dt.hour         = ((fat_time >> 11) & 0x001F);
+	dt.day_of_month = ((fat_time >> 16) & 0x001F);
+	dt.month        = ((fat_time >> 21) & 0x000F);
+	dt.year         = ((fat_time >> 25) & 0x007F) + 1980;
 	return imgtool::datetime(imgtool::datetime::LOCAL, dt);
 }
 

@@ -8,13 +8,13 @@ These CHDs have been converted from redump.org disc images.
 
 The following dumps are currently missing from this set:
 
-	- 16 Tales 1 (USA)
-	- 16 Tales 3 (USA)
-	* (Madden NFL 96 (USA) (Beta))
-	- Online Connection CD - For the PlayStation Game Console (USA) (Demo)
-	* (Twisted Metal 2 (USA) (Beta))
-	- Unknown Variable 1 - Masque Manor (USA)
-	
+    - 16 Tales 1 (USA)
+    - 16 Tales 3 (USA)
+    * (Madden NFL 96 (USA) (Beta))
+    - Online Connection CD - For the PlayStation Game Console (USA) (Demo)
+    * (Twisted Metal 2 (USA) (Beta))
+    - Unknown Variable 1 - Masque Manor (USA)
+
     *) These dumps are not included in the official redump.org datfiles as they are marked with "Possible bad dump" status
 
 For an overview of US PS1 discs that have not been dumped and added to redump's database yet, please see http://wiki.redump.org/index.php?title=Sony_Playstation_USA_Missing_Games .
@@ -26975,7 +26975,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa) (v1.1)" sha1="4a11d05ba86c1ecbee178d3c931c93d440319533"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="toystor2a" cloneof="toystor2">
 		<!-- Original images (Redump)
@@ -31027,7 +31027,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="arpsxps1">
 		<!-- Original images (Redump)
 		<rom name="Action Replay for PSX &amp; PSone (USA).cue" size="101" crc="ae636a90" sha1="eba4965dfe91aadc9b53b49e1909877d7ff8eb3c"/>
@@ -31044,7 +31044,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bbsf2k1">
 		<!-- Original images (Redump)
 		<rom name="Blockbuster Presents - GameShark Top 50 - Summer Fall 2001 (USA) (Unl).cue" size="136" crc="c69ea948" sha1="f026936c289dfa0187e34ecb3a39497641b68582"/>
@@ -31076,7 +31076,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="cheats 'n codes volume 1 (usa)" sha1="85f72ba7474b5c1798c2b31e9dad71c31516151b"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="codebrk">
 		<!-- Original images (Redump)
@@ -31109,7 +31109,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gamepro1">
 		<!-- Original images (Redump)
 		<rom name="GamePro Action Disc 1 (USA) (Unl).cue" size="99" crc="57827c68" sha1="19800f2a779de940b5e565c0a7cf8289d611e0c7"/>
@@ -31125,7 +31125,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gamepro2">
 		<!-- Original images (Redump)
 		<rom name="GamePro Action Disc 2 (USA) (Unl).cue" size="99" crc="94a79e3b" sha1="0c4c181b36ca28000d82660abc33945fe565ef6a"/>
@@ -31140,7 +31140,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="gamepro action disc 2 (usa) (unl)" sha1="f1c1f062bf2ea610a0ad1cb5d4e7b90ad2c82798"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="gshark2">
 		<!-- Original images (Redump)
@@ -31157,7 +31157,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gshark22">
 		<!-- Original images (Redump)
 		<rom name="GameShark Enhancement CD Version 2.2 (USA).cue" size="3539" crc="cc230d12" sha1="ccb7beeb7af0cf53544c2f62b32c3f0955252d63"/>
@@ -31197,7 +31197,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="gameshark enhancement cd version 2.2 (usa)" sha1="c6a7342e2a4995032a03bbb0fa18d1a477027630"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="gshark33">
 		<!-- Original images (Redump)
@@ -31519,7 +31519,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eccs1">
 		<!-- Original images (Redump)
 		<rom name="Every Child Can Succeed 1 (USA).cue" size="97" crc="487c8fce" sha1="1593d5954422eb1e7acc437c0ec00d09543eae7c"/>
@@ -31553,7 +31553,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eccs3">
 		<!-- Original images (Redump)
 		<rom name="Every Child Can Succeed 3 (USA).cue" size="97" crc="898e413f" sha1="4fbe94d428b855b7da8f3a0713c5ac23215a18df"/>
@@ -31570,7 +31570,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eccs4">
 		<!-- Original images (Redump)
 		<rom name="Every Child Can Succeed 4 (USA).cue" size="97" crc="9da9f035" sha1="01b2e3d20c4a67b65ae8ed3d911a996ba2e97d9c"/>
@@ -31587,7 +31587,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eccs5">
 		<!-- Original images (Redump)
 		<rom name="Every Child Can Succeed 5 (USA).cue" size="97" crc="10e8146d" sha1="9e8a4decc8bd56361abdc8659e5d2e796f54965e"/>
@@ -31603,8 +31603,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="every child can succeed 5 (usa)" sha1="3e12300f0bdcadb53c8e84e26afdc4f3ccf55ece"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="eccs7">
 		<!-- Original images (Redump)
 		<rom name="Every Child Can Succeed 7 (USA).cue" size="97" crc="d11ada9c" sha1="60240e2c5a61fc35b5a7d546b658b7d250aff97c"/>
@@ -31620,8 +31620,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="every child can succeed 7 (usa)" sha1="ce574c6dd28936204f83a8deb7dd4e38916ec7ff"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="fairelng">
 		<!-- Original images (Redump)
 		<rom name="Faire Games - Language Arts (USA).cue" size="99" crc="98d37972" sha1="ef13ce2123f53ed6e52778fddb0f58590edb1960"/>
@@ -32777,7 +32777,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="unkvar2">
 		<!-- Original images (Redump)
 		<rom name="Unknown Variable 2 - Raven's Ridge (USA).cue" size="106" crc="c3139daa" sha1="bdd2bb8350b06ed7b285dfd2383157dbbf641712"/>
@@ -32793,7 +32793,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="unknown variable 2 - raven's ridge (usa)" sha1="fd7c3bde8c164d2d79ba5572d4abf463a9354f9d"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="writea10">
 		<!-- Original images (Redump)
@@ -32811,7 +32811,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw1">
 		<!-- Original images (Redump)
 		<rom name="Write Away 1 (USA).cue" size="84" crc="d41d7b60" sha1="931d091a95734ee22ba7f2c9e5287bb10dda1639"/>
@@ -32828,7 +32828,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw2">
 		<!-- Original images (Redump)
 		<rom name="Write Away 2 (USA).cue" size="84" crc="98ae51c9" sha1="b48706a907b29f1e95edd4cbb409a7d0092c7510"/>
@@ -32845,7 +32845,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw3">
 		<!-- Original images (Redump)
 		<rom name="Write Away 3 (USA).cue" size="84" crc="15efb591" sha1="d15af4ff54977c6dfca00b56c3b8270be6a0a0dc"/>
@@ -32862,7 +32862,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw4">
 		<!-- Original images (Redump)
 		<rom name="Write Away 4 (USA).cue" size="84" crc="01c8049b" sha1="8711648712b805d8e1e82f800f99851421c94d01"/>
@@ -32879,7 +32879,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw5">
 		<!-- Original images (Redump)
 		<rom name="Write Away 5 (USA).cue" size="84" crc="8c89e0c3" sha1="df07b94df514750274bc495862c07c3f27541ded"/>
@@ -32896,7 +32896,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw6">
 		<!-- Original images (Redump)
 		<rom name="Write Away 6 (USA).cue" size="84" crc="c03aca6a" sha1="e3ca60715951d150e7ac39ffdc2ab7ebef70cd34"/>
@@ -32912,7 +32912,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="write away 6 (usa)" sha1="13d3fff33f8f130536080e9579075d6f7422cf62"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="writeaw7">
 		<!-- Original images (Redump)
@@ -32930,7 +32930,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="writeaw9">
 		<!-- Original images (Redump)
 		<rom name="Write Away 9 (USA).cue" size="84" crc="65344c26" sha1="7eef235d7f5fb65248e38a9dbe9aba24cafb4224"/>
@@ -32946,8 +32946,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="write away 9 (usa)" sha1="b65ea8fdd53c7cef38584fe837df08aebbcdba2a"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 
 <!-- GAME DEMOS AND DEMO COMPILATIONS FROM REDUMP SET -->
 
@@ -32986,8 +32986,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="oddworld - abe's oddysee (usa) (demo)" sha1="9ed29844c8d0fb1d0e8de6ae899e98dde0a00270"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="apescaped" cloneof="apescape">
 		<!-- Original images (Redump)
 		<rom name="Ape Escape (USA) (Demo).cue" size="216" crc="d80d42bf" sha1="67f0412520017a0342d9abad8f41cfd2b5ff5008"/>
@@ -33069,8 +33069,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="burning road (usa) (demo)" sha1="c3b39124961f14b82c5a44fba61ceb701eab3628"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="cbsdemo">
 		<!-- Original images (Redump)
 		<rom name="Crash Bash &amp; Spyro - Year of the Dragon (USA) (Demo).cue" size="274" crc="62eed13b" sha1="64bc8ec995a7c540d25f43644777bce67982dc00"/>
@@ -33108,8 +33108,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="contender (usa) (demo)" sha1="f17849011a1892ab8a4a2e2cea79ca8a058d70c0"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="coolb2k1d" cloneof="coolb2k1">
 		<!-- Original images (Redump)
 		<rom name="Cool Boarders 2001 (USA) (Demo).cue" size="97" crc="363d80c1" sha1="071db7da2f531614854fc342171b3eb1a3848e97"/>
@@ -33126,7 +33126,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="coolboa4d" cloneof="coolboa4">
 		<!-- Original images (Redump)
 		<rom name="Cool Boarders 4 (USA) (Demo).cue" size="94" crc="1c9a897b" sha1="aea14fd65155c0ee591c13b935bf9c6bcaef2241"/>
@@ -33142,8 +33142,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="cool boarders 4 (usa) (demo)" sha1="4fef61871a790ab7443db4c606d756c391424ad7"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="crimekld" cloneof="crimekl">
 		<!-- Original images (Redump)
 		<rom name="Crime Killer (USA) (Demo).cue" size="220" crc="5d1fba24" sha1="a542f472bf46d44baaf1d08a358b422a14e960b3"/>
@@ -33178,7 +33178,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cwarsvngd" cloneof="cwarsvng">
 		<!-- Original images (Redump)
 		<rom name="Colony Wars - Vengeance (USA) (Demo).cue" size="632" crc="ef8552f4" sha1="ad2e5c04eb29f26e7e8dd4f20fbd18d400af0445"/>
@@ -33198,7 +33198,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="colony wars - vengeance (usa) (demo)" sha1="0121275db6215166b5078579fbaa6a434203a533"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="dinocrisd" cloneof="dinocris">
 		<!-- Original images (Redump)
@@ -33216,7 +33216,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="driver2d" cloneof="driver2">
 		<!-- Original images (Redump)
 		<rom name="Driver 2 (USA) (Demo).cue" size="87" crc="469e7dc3" sha1="3bae84f9cda154bfe5c0dccbe18cb6f890279796"/>
@@ -33233,7 +33233,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="driverd" cloneof="driver">
 		<!-- Original images (Redump)
 		<rom name="Driver - You Are the Wheelman (USA) (Demo).cue" size="108" crc="7323b33c" sha1="4be74dcdd19335fbbddb232cc6112c50ec0e3337"/>
@@ -33317,8 +33317,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="grind session (usa) (demo)" sha1="eadf8387dae11a211f1842e0f73bef6484f57f1e"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="gtd" cloneof="gt1">
 		<!-- Original images (Redump)
 		<rom name="Gran Turismo (USA) (Demo).cue" size="91" crc="dbe9eb9c" sha1="b0e46e8c44bae1ba7baa4dc58b26eb22d72d22fc"/>
@@ -33335,7 +33335,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hotshot2d" cloneof="hotshot2">
 		<!-- Original images (Redump)
 		<rom name="Hot Shots Golf 2 (USA) (Demo).cue" size="95" crc="e781caf4" sha1="e98a6dc0e1ca77c6cdb031a4e697ec47ed21bb9a"/>
@@ -33351,7 +33351,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="hot shots golf 2 (usa) (demo)" sha1="38c5ba3adde63437763686e3fff8c5e14b7311dc"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="ironblodd" cloneof="ironblod">
 		<!-- Original images (Redump)
@@ -33403,7 +33403,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jetmoto3d" cloneof="jetmoto3">
 		<!-- Original images (Redump)
 		<rom name="Jet Moto 3 (USA) (Demo).cue" size="89" crc="e1b1767f" sha1="5042f1d7ea924d141aac86ed84b2e21b6493239c"/>
@@ -33419,7 +33419,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="jet moto 3 (usa) (demo)" sha1="0b4d465eabd550d2b8fd373009ba1c79cf8e36e2"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="kagerod" cloneof="kagero">
 		<!-- Original images (Redump)
@@ -33472,7 +33472,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lunard" cloneof="lunar">
 		<!-- Original images (Redump)
 		<rom name="Lunar - Silver Star Story Complete (USA) (Demo).cue" size="405" crc="b131e982" sha1="ab9784db21288fc16a1d31d9ef6bfc11c1a746b9"/>
@@ -33490,7 +33490,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="lunar - silver star story complete (usa) (demo)" sha1="d4f2b758dd1de9a1ec93d4c109968c3ec7798421"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="medievild" cloneof="medievil">
 		<!-- Original images (Redump)
@@ -33525,7 +33525,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mlb2k2d" cloneof="mlb2k2">
 		<!-- Original images (Redump)
 		<rom name="MLB 2002 (USA) (Demo).cue" size="87" crc="34d78c6b" sha1="ca44c53ca5ec7770e63d3ec09a03af9d165a6162"/>
@@ -33541,7 +33541,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="mlb 2002 (usa) (demo)" sha1="c9384f8342262935430105b01075e93675c6f01f"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mmleg2d" cloneof="mmleg2">
 		<!-- Original images (Redump)
@@ -33560,7 +33560,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mgsd" cloneof="mgs">
 		<!-- Original images (Redump)
 		<rom name="Metal Gear Solid (USA) (Demo).cue" size="95" crc="2c5cd004" sha1="1561b0f1bc13e39a2bf99fa493d701d8b71c5ef8"/>
@@ -33576,7 +33576,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="metal gear solid (usa) (demo)" sha1="a60798e76326ef480e2ef551bb27f14868d02b0c"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mgsvrd" cloneof="mgsvr">
 		<!-- Original images (Redump)
@@ -33594,7 +33594,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mranchr2d" cloneof="mranchr2">
 		<!-- Original images (Redump)
 		<rom name="Monster Rancher 2 (USA) (Demo).cue" size="96" crc="309666c0" sha1="ffdab990c595d662c914aa0efdd3b19c5d1fda80"/>
@@ -33610,7 +33610,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="monster rancher 2 (usa) (demo)" sha1="47bb17b37c099cc5f6d0125da4636c84b56a98c0"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mspacmmd" cloneof="mspacmm">
 		<!-- Original images (Redump)
@@ -33634,7 +33634,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nbaso2k1d" cloneof="nbaso2k1">
 		<!-- Original images (Redump)
 		<rom name="NBA ShootOut 2001 (USA) (Demo).cue" size="230" crc="68de8965" sha1="ef1eb6cdbd4d1e3262346980987c7d76117ed5df"/>
@@ -33652,7 +33652,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nbaso2k2d" cloneof="nbaso2k2">
 		<!-- Original images (Redump)
 		<rom name="NBA ShootOut 2002 (USA) (Demo).cue" size="230" crc="d0eac222" sha1="7bd66276bd45ce892db7026436a319547ce74e71"/>
@@ -33670,7 +33670,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ncaag2k1d" cloneof="ncaag2k1">
 		<!-- Original images (Redump)
 		<rom name="NCAA GameBreaker 2001 (USA) (Demo).cue" size="238" crc="76aff15f" sha1="ec6abfbf31cf73fe93a91be933d3ad9317d1f21e"/>
@@ -33688,7 +33688,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nflgd99d" cloneof="nflgd99">
 		<!-- Original images (Redump)
 		<rom name="NFL GameDay 99 (USA) (Demo).cue" size="224" crc="6b153dd4" sha1="7a3a87baea987fd1c75bc75433a9acc446c580fa"/>
@@ -33705,7 +33705,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="nfl gameday 99 (usa) (demo)" sha1="6f7f3a9ae60741b5e077682f642a3ab67f42aebc"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="nflxtremd" cloneof="nflxtrem">
 		<!-- Original images (Redump)
@@ -33723,7 +33723,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nhlfc2k1d" cloneof="nhlfc2k1">
 		<!-- Original images (Redump)
 		<rom name="NHL Faceoff 2001 (USA) (Demo).cue" size="95" crc="6e2cc0d6" sha1="cd97b9f9000dd1b18f1f06681fc4685f873bc326"/>
@@ -33739,8 +33739,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="nhl faceoff 2001 (usa) (demo)" sha1="13d807ef4a9d7a9ba8b1e006cfb8498a504042bf"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="nhlfce99d" cloneof="nhlfce99">
 		<!-- Original images (Redump)
 		<rom name="NHL FaceOff 99 (USA) (Demo).cue" size="93" crc="7f8813b8" sha1="e3af74efe23ee713e07229e22232905da054824c"/>
@@ -33756,8 +33756,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="nhl faceoff 99 (usa) (demo)" sha1="8af284fd8537bc91035afa80bb9f1ff234cfc8eb"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="nstriked" cloneof="nstrike">
 		<!-- Original images (Redump)
 		<rom name="Nuclear Strike - The Lost Missions (USA) (Demo).cue" size="113" crc="280cee08" sha1="079b5f007e5dc06ece8d9f46b21c905f57603dfe"/>
@@ -33773,8 +33773,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="nuclear strike - the lost missions (usa) (demo)" sha1="b7a7924bf7a505730402e677429d3ed0b7aa81fa"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="odtd" cloneof="odt">
 		<!-- Original images (Redump)
 		<rom name="O.D.T. (USA) (Demo).cue" size="85" crc="be61b0ca" sha1="5bfba467fb8d5944446f2aa190d4c7162a3b20ca"/>
@@ -33790,8 +33790,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="o.d.t. (usa) (demo)" sha1="4db137f4eaa999d45c0393d6beca85df95122ccd"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="pacmnwldd" cloneof="pacmnwld">
 		<!-- Original images (Redump)
 		<rom name="Pac-Man World (USA) (Demo) (v1.1).cue" size="1518" crc="75d5fabc" sha1="53ae3989be4fda8f2dc3078c12568c9d286d60e8"/>
@@ -33819,7 +33819,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="parappad" cloneof="parappa">
 		<!-- Original images (Redump)
 		<rom name="PaRappa the Rapper (USA) (Demo).cue" size="97" crc="83dad869" sha1="60eb46b05e8dfc32e864b9e38f6fc28c806c190f"/>
@@ -33835,7 +33835,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="parappa the rapper (usa) (demo)" sha1="008caf8508fa1f4d3814ded30c24481e52aed4c7"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="pitfl3dd" cloneof="pitfl3d">
 		<!-- Original images (Redump)
@@ -33965,7 +33965,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="runwildd" cloneof="runwild">
 		<!-- Original images (Redump)
 		<rom name="Running Wild (USA) (Demo).cue" size="4488" crc="edc79853" sha1="26d3ee9352dac985e4d9ad2e65dd48f82c710f4a"/>
@@ -34021,8 +34021,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="running wild (usa) (demo)" sha1="479664cf0a84c54d1780338b8f7a75fcd88aedd8"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="scircuitd" cloneof="scircuit">
 		<!-- Original images (Redump)
 		<rom name="SuperCross Circuit (USA) (Demo).cue" size="1242" crc="a058f488" sha1="ecb2dbfcabe0e4319e4c0f4ddaa6d5ece7de0fec"/>
@@ -34047,8 +34047,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="supercross circuit (usa) (demo)" sha1="dcb7240d69f4b36032cfcff9390201bf7820a122"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="shadwmadd" cloneof="shadwmad">
 		<!-- Original images (Redump)
 		<rom name="Shadow Madness (USA) (Demo).cue" size="345" crc="a016f941" sha1="e969620ae45a91d16a472e8d1da1957995e38eb8"/>
@@ -34066,7 +34066,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="shadow madness (usa) (demo)" sha1="a8d5f920f3b99d01cba5cf98bce69254d25a4d68"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="shpwreckd" cloneof="shpwreck">
 		<!-- Original images (Redump)
@@ -34084,7 +34084,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="spdpunksd" cloneof="spdpunks">
 		<!-- Original images (Redump)
 		<rom name="Speed Punks (USA) (Demo).cue" size="90" crc="01c912a5" sha1="f8aef610ce24cd417369d0917ea24914d5302cf3"/>
@@ -34100,8 +34100,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="speed punks (usa) (demo)" sha1="d81868083a1511c109a3aae1284855a382fcd816"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="spyro2d" cloneof="spyro2">
 		<!-- Original images (Redump)
 		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo).cue" size="242" crc="67e7cffd" sha1="fab8136a37c23c606420fe3aa7e5fad1e2cef136"/>
@@ -34118,7 +34118,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="spyro 2 - ripto's rage! (usa) (demo)" sha1="cb34c01d0956bb2c4e9389ec4f9415f04060f225"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="spyrod1" cloneof="spyro">
 		<!-- Original images (Redump)
@@ -34136,7 +34136,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="spyrod2" cloneof="spyro">
 		<!-- Original images (Redump)
 		<rom name="Spyro the Dragon (USA) (Demo 2).cue" size="97" crc="b696ecdf" sha1="a2c5fc46f531441dc56b9cb577afd60c553b6b04"/>
@@ -34173,7 +34173,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tailcond" cloneof="tailcon">
 		<!-- Original images (Redump)
 		<rom name="Tail Concerto (USA) (Demo).cue" size="222" crc="baa13ec1" sha1="32af7d26cdf9d1a034c0608d14a68131bffaeadd"/>
@@ -34191,7 +34191,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="thrasherd" cloneof="thrasher">
 		<!-- Original images (Redump)
 		<rom name="Thrasher - Skate and Destroy (USA) (Demo).cue" size="107" crc="1e477ff9" sha1="e643df934de5b34507156fe238e9a361a745ff0f"/>
@@ -34207,8 +34207,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="thrasher - skate and destroy (usa) (demo)" sha1="27a206a5d20daec5aedd9568dcb458b92956c04f"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="titanaed">
 		<!-- Original images (Redump)
 		<rom name="Titan A.E. (USA) (Demo).cue" size="89" crc="8aebad86" sha1="b98ce70f9d49808d19ccf2c0d3cd736b1c5b53ab"/>
@@ -34224,7 +34224,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="titan a.e. (usa) (demo)" sha1="87401e6e59fc0a19c3fcb7b6dd61a8c9ecf5da9a"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="tombad" cloneof="tomba">
 		<!-- Original images (Redump)
@@ -34276,8 +34276,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="tyco r-c - assault with a battery (usa) (demo)" sha1="087fbc2cebe250f9de6f1223ffab2eda541f98df"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="vigil8d" cloneof="vigil8">
 		<!-- Original images (Redump)
 		<rom name="Vigilante 8 (USA) (Demo).cue" size="1291" crc="6637add6" sha1="ef3e3d8921e6f13217f6204f197d6542b952a1f1"/>
@@ -34304,7 +34304,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wildarm2d" cloneof="wildarm2">
 		<!-- Original images (Redump)
 		<rom name="Wild Arms 2 (USA) (Demo).cue" size="90" crc="065985d5" sha1="52224ae14dc72549c027ad70aad1a2f01b29fc8c"/>
@@ -34320,7 +34320,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="wild arms 2 (usa) (demo)" sha1="a1f6bb6a4d4d3a7a3ae22f5c659257530024aea7"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="wipeout3d" cloneof="wipeout3">
 		<!-- Original images (Redump)
@@ -34394,7 +34394,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eidoscd3">
 		<!-- Original images (Redump)
 		<rom name="Eidos Demo CD Volume 3 (USA).cue" size="714" crc="f81cade4" sha1="f2776bae5fcd09ab42de201506294bb191ff12f9"/>
@@ -34415,7 +34415,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="eidos demo cd volume 3 (usa)" sha1="4ece51f1a6b6717fe7e0032248d1008bafea53c9"/>
 			</diskarea>
 		</part>
-	</software>		
+	</software>
 
 	<software name="eidoscd4">
 		<!-- Original images (Redump)
@@ -34438,7 +34438,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eidoscd6">
 		<!-- Original images (Redump)
 		<rom name="Eidos Demo CD Volume 6 (USA).cue" size="470" crc="00cfb0d7" sha1="029939df2ded97ac20ee5f0c35c6f37888a77b52"/>
@@ -34457,7 +34457,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="eidos demo cd volume 6 (usa)" sha1="0bd18a1521045c6a61f27e23745e91f05f7be7ac"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="eidoscd">
 		<!-- Original images (Redump)
@@ -34480,7 +34480,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="icdsmp1">
 		<!-- Original images (Redump)
 		<rom name="Interactive CD Sampler Volume 1 (USA).cue" size="3546" crc="cc3c8d80" sha1="161c35969ea121e3f40dd5e9904d8ab5ab384947"/>
@@ -34522,7 +34522,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="interactive cd sampler volume 1 (usa)" sha1="f1248884f1a8226f0c64abb22467984fb251507e"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="icdsmp10">
 		<!-- Original images (Redump)
@@ -34544,7 +34544,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="interactive cd sampler disc vol. 10 (usa)" sha1="dd5779d41b6b5976c4e50d5d82bb9a05a9c7fe1d"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="icdsmp11">
 		<!-- Original images (Redump)
@@ -34564,8 +34564,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="interactive cd sampler disc vol. 11 (usa)" sha1="a220a8f68019c3aece616e6d62ca4c6381bfe5e2"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="icdsmp2">
 		<!-- Original images (Redump)
 		<rom name="Interactive CD Sampler Pack Volume 2 (USA).cue" size="798" crc="87af3d03" sha1="9242af8aed11e38a77b849b324b338b14afe51e7"/>
@@ -34746,7 +34746,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="icdsmp7">
 		<!-- Original images (Redump)
 		<rom name="Interactive CD Sampler Disc Volume 7 (USA) (v1.1).cue" size="840" crc="49d7ce41" sha1="21b5a471cc02fa051b2926729e6965a715bbefb3"/>
@@ -34767,7 +34767,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="interactive cd sampler disc volume 7 (usa) (v1.1)" sha1="5b480002edf2aa7c5ed1daf4950c0291ef6f5b36"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="icdsmp7a" cloneof="icdsmp7">
 		<!-- Original images (Redump)
@@ -34830,8 +34830,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="interactive cd sampler disc vol. 9 (usa) (scus-94295)" sha1="a0abb3d42d57d0f7498ca034ca2edc1ff258d05f"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="icdsmp9a" cloneof="icdsmp9">
 		<!-- Original images (Redump)
 		<rom name="Interactive CD Sampler Disc Vol. 9 (USA) (PBPX-95010).cue" size="717" crc="d95ef50e" sha1="f58c8b647e2e9f708943f25c61b10b736c8f483c"/>
@@ -34986,7 +34986,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="psdemo14">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Demo Disc Version 1.4 (USA).cue" size="248" crc="e29191b0" sha1="00af7f1020de6ff2e9ec354837ce98c5a30ba114"/>
@@ -35003,7 +35003,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation demo disc version 1.4 (usa)" sha1="74b0aba04289d0790c73be9c7fbd15bdb64ddf1a"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="psdemo15">
 		<!-- Original images (Redump)
@@ -35023,7 +35023,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="psdems2k">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Demo Disc - Spring 2000 (USA).cue" size="387" crc="f508e10a" sha1="211e0dbeadc12241b87bcb0aab4bb9fa5d336d28"/>
@@ -35041,8 +35041,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation demo disc - spring 2000 (usa)" sha1="d4d356ed89d6ff3c605450586433ee70152f4137"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="psdevdmo">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Developer's Demo Disc (USA) (SCUS-94954).cue" size="2334" crc="a5cdcdc7" sha1="bbbc16fcf2744ddbac3c4cdb0fd3d25bf5c511c6"/>
@@ -35073,7 +35073,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation developer's demo disc (usa) (scus-94954)" sha1="86ee33093e6d817cd19162b65238c29def7b2968"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="psdevdmoa" cloneof="psdevdmo">
 		<!-- Original images (Redump)
@@ -35120,7 +35120,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="psksk117">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Kiosk Demo Disc Version 1.17 (USA).cue" size="402" crc="8b75cf44" sha1="1f864d31504ddaace04a059880fdb26b3d74d781"/>
@@ -35138,8 +35138,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation kiosk demo disc version 1.17 (usa)" sha1="ebc3386565e8a66169fe714fae25dc436e9675e6"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="psksk118">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Kiosk Demo Disc Version 1.18 (USA).cue" size="962" crc="159f985c" sha1="b6338975750ad491400dc91066152d8b8b9bd691"/>
@@ -35161,8 +35161,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation kiosk demo disc version 1.18 (usa)" sha1="accf949971774db48470a2e31d6aca3d64490715"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="psone">
 		<!-- Original images (Redump)
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC).cue" size="417" crc="1a6c4c6f" sha1="0bd28b9249d797b2e8c2c3e8dea4599886e91f24"/>
@@ -35253,7 +35253,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="psshock">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94496).cue" size="757" crc="876409f6" sha1="94e2979b98bb2afc8e2f85c63a0cc253947c32f1"/>
@@ -35273,8 +35273,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation demo disc - shock your system! (usa) (scus-94496)" sha1="da57a4f9dc00b0729ae657261d5b2de92d8cad32"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="psshocka" cloneof="psshock">
 		<!-- Original images (Redump)
 		<rom name="PlayStation Demo Disc - Shock Your System! (USA) (SCUS-94483).cue" size="127" crc="0d062d83" sha1="3b1d01429506a64aafecc2a5d3ff6a29ac0cdfa7"/>
@@ -35290,7 +35290,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="playstation demo disc - shock your system! (usa) (scus-94483)" sha1="c2160d3bc4f4fcb3f4c8bcf814e2efcff5b478ae"/>
 			</diskarea>
 		</part>
-	</software>		
+	</software>
 
 	<software name="psshockb" cloneof="psshock">
 		<!-- Original images (Redump)
@@ -35419,8 +35419,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 				<disk name="toys r us demo disc (usa)" sha1="59d0e55281c3804344648b1f279ade207c7e60ac"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="toyssmpl">
 		<!-- Original images (Redump)
 		<rom name="Toys R Us - Interactive CD Sampler Disc (USA).cue" size="399" crc="34ef7fba" sha1="46eff3bc496379afdc38b534800d6710d5a64e9e"/>

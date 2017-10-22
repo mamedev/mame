@@ -1972,7 +1972,7 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 	switch(opcode & 0xf000)
 	{
 		case 0x0000: execute_one_0000(opcode); break;
-		case 0x1000: MOVLS4(Rm, opcode & 0x0f, Rn);	break;
+		case 0x1000: MOVLS4(Rm, opcode & 0x0f, Rn); break;
 		case 0x2000: op0010(opcode); break;
 		case 0x3000: op0011(opcode); break;
 		case 0x4000: execute_one_4000(opcode); break;
@@ -2531,10 +2531,10 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 	else
 	{
 		uint32_t sum = 0;
-		void *base;	
+		void *base;
 		if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
-		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0)); 
-		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0)); 
+		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0));
+		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0));
 
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];

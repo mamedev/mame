@@ -95,9 +95,9 @@ public:
 	}
 
 	// screen updates
-//	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-//	IRQ_CALLBACK_MEMBER(spi_irq_callback);
-//	INTERRUPT_GEN_MEMBER(spi_interrupt);
+//  uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+//  IRQ_CALLBACK_MEMBER(spi_irq_callback);
+//  INTERRUPT_GEN_MEMBER(spi_interrupt);
 
 	DECLARE_READ16_MEMBER(input_mux_r);
 	DECLARE_WRITE16_MEMBER(input_select_w);
@@ -109,7 +109,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	virtual void video_start() override;
+//  virtual void video_start() override;
 
 
 private:
@@ -284,14 +284,14 @@ static MACHINE_CONFIG_START( seibucats )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_UPDATE_DRIVER(seibucats_state, screen_update)
+//  MCFG_SCREEN_UPDATE_DRIVER(seibucats_state, screen_update)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seibucats)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
-//	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+//  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	//MCFG_PALETTE_INIT_OWNER(seibucats_state, seibucats)
 
 	/* sound hardware */
@@ -311,16 +311,16 @@ MACHINE_CONFIG_END
 
 ROM_START( emjjoshi )
 	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
-    ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(e69bed6d) SHA1(e9626e704c5d28419cfa6a7a2c1b13b4b46f941c) )
-    ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(1082ede1) SHA1(0d1a682f37ede5c9070c14d1c3491a3082ad0759) )
-    ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(df85a8f7) SHA1(83226767b0c33e8cc3baee6f6bb17e4f1a6c9c27) )
-    ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(6fe7fd41) SHA1(e7ea9cb83bdeed4872f9e423b8294b9ca4b29b6b) )
-	
+	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(e69bed6d) SHA1(e9626e704c5d28419cfa6a7a2c1b13b4b46f941c) )
+	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(1082ede1) SHA1(0d1a682f37ede5c9070c14d1c3491a3082ad0759) )
+	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(df85a8f7) SHA1(83226767b0c33e8cc3baee6f6bb17e4f1a6c9c27) )
+	ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(6fe7fd41) SHA1(e7ea9cb83bdeed4872f9e423b8294b9ca4b29b6b) )
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms - none! */
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)   
+	ROM_REGION( 0x600000, "gfx3", 0)
 	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
@@ -334,16 +334,16 @@ ROM_END
 // MJ1-1537
 ROM_START( emjscanb )
 	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
-    ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(6e5c7c16) SHA1(19c00833357b97d0ed91a962e95d3ae2582da66c) )
-    ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(a5a17fdd) SHA1(3295ecb1055cf1ab612eb915aabe8d2895aeca6a) )
-    ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(b89d7693) SHA1(174b2ecfd8a3c593a81905c1c9d62728f710f5d1) )
-    ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(6b38a07b) SHA1(2131ae726fc38c8054801c1de4d17eec5b55dd2d) )
-	
+	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(6e5c7c16) SHA1(19c00833357b97d0ed91a962e95d3ae2582da66c) )
+	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(a5a17fdd) SHA1(3295ecb1055cf1ab612eb915aabe8d2895aeca6a) )
+	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(b89d7693) SHA1(174b2ecfd8a3c593a81905c1c9d62728f710f5d1) )
+	ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(6b38a07b) SHA1(2131ae726fc38c8054801c1de4d17eec5b55dd2d) )
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms - none! */
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)   
+	ROM_REGION( 0x600000, "gfx3", 0)
 	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
@@ -355,16 +355,16 @@ ROM_END
 
 ROM_START( emjtrapz )
 	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
-    ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(88e4ef2a) SHA1(110451c09983ce4720f75b89282ca49f47169a85) )
-    ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(e4716996) SHA1(6abd84c1e4facf6570988db0a63968a1647144b1) )
-    ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(69995273) SHA1(a7e10d21a524a286acd0a8c19c41a101eee30626) )
-    ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(99f86a19) SHA1(41deb5eb78c0a675da7e1b1bbd5c440e157c7a25) )
-	
+	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(88e4ef2a) SHA1(110451c09983ce4720f75b89282ca49f47169a85) )
+	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(e4716996) SHA1(6abd84c1e4facf6570988db0a63968a1647144b1) )
+	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(69995273) SHA1(a7e10d21a524a286acd0a8c19c41a101eee30626) )
+	ROM_LOAD32_BYTE( "prg3.u015",    0x000003, 0x080000, CRC(99f86a19) SHA1(41deb5eb78c0a675da7e1b1bbd5c440e157c7a25) )
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms - none! */
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)   
+	ROM_REGION( 0x600000, "gfx3", 0)
 	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
 	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
@@ -403,4 +403,4 @@ ROM_END
 /* 25 */ // Oshioki
 /* 26 */ // Private Eyes
 /* 27 */ // Gal Jong Kakutou Club
-/* 28 */ // BINKAN Lips Plus 
+/* 28 */ // BINKAN Lips Plus

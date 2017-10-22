@@ -71,7 +71,7 @@ READ8_MEMBER( gamate_state::card_available_check )
 {
 	// bits 0 and 1 checked
 	return m_card_available ? 3: 1;
-} 
+}
 
 WRITE8_MEMBER( gamate_state::card_reset )
 {
@@ -115,7 +115,7 @@ READ8_MEMBER(gamate_state::read_cart)
 }
 
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM 
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x03f0) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x4400, 0x4400) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x03ff) AM_READ(gamate_nmi_r)

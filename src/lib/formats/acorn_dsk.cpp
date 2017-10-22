@@ -522,7 +522,7 @@ int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
 	int type = find_size(io, form_factor);
 
 	if(type != -1)
-		return 90; 
+		return 90;
 	return 0;
 }
 

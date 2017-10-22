@@ -53,14 +53,14 @@ public:
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
-//	std::unique_ptr<uint32_t[]>    m_scu_regs;
+//  std::unique_ptr<uint32_t[]>    m_scu_regs;
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
 	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	uint8_t     m_en_68k;	
+	uint8_t     m_en_68k;
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
@@ -365,7 +365,7 @@ public:
 		uint8_t  line_screen_enabled;
 		uint8_t  mosaic_screen_enabled;
 		bool roz_mode3;
-		
+
 		int layer_name; /* just to keep track */
 	} stv2_current_tilemap;
 
@@ -591,9 +591,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 
-//	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-//	DECLARE_READ16_MEMBER(scudsp_dma_r);
-//	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+//  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+//  DECLARE_READ16_MEMBER(scudsp_dma_r);
+//  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
 	// SMPC HLE delegates
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
@@ -605,10 +605,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
 
 
-//	void debug_scudma_command(int ref, const std::vector<std::string> &params);
-//	void debug_scuirq_command(int ref, const std::vector<std::string> &params);
-//	void debug_help_command(int ref, const std::vector<std::string> &params);
-//	void debug_commands(int ref, const std::vector<std::string> &params);
+//  void debug_scudma_command(int ref, const std::vector<std::string> &params);
+//  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
+//  void debug_help_command(int ref, const std::vector<std::string> &params);
+//  void debug_commands(int ref, const std::vector<std::string> &params);
 };
 
 

@@ -377,7 +377,7 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 1, 0);
 
-	// TODO: only hiticej properly enables this up during attract mode, 
+	// TODO: only hiticej properly enables this up during attract mode,
 	//       hitice / hiticerb keeps this disabled, maybe a btanb fixed in later revision?
 	if (m_pixel_bitmap && (m_pixel_scroll[0] & 0x5800) == 0x5000)  /* hitice only */
 	{

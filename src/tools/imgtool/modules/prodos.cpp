@@ -189,12 +189,12 @@ enum creation_policy_t
 static imgtool::datetime prodos_crack_time(uint32_t prodos_time)
 {
 	util::arbitrary_datetime dt;
-	dt.second		= 0;
-	dt.minute		= ((prodos_time >> 16) & 0x3F);
-	dt.hour			= ((prodos_time >> 24) & 0x1F);
-	dt.day_of_month	= ((prodos_time >> 0) & 0x1F);
-	dt.month		= ((prodos_time >> 5) & 0x0F) + 1;
-	dt.year			= ((prodos_time >> 9) & 0x7F) + 1900;
+	dt.second       = 0;
+	dt.minute       = ((prodos_time >> 16) & 0x3F);
+	dt.hour         = ((prodos_time >> 24) & 0x1F);
+	dt.day_of_month = ((prodos_time >> 0) & 0x1F);
+	dt.month        = ((prodos_time >> 5) & 0x0F) + 1;
+	dt.year         = ((prodos_time >> 9) & 0x7F) + 1900;
 	if (dt.year <= 1949)
 		dt.year += 100;
 

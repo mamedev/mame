@@ -15,7 +15,7 @@ public:
 	gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	bool is_protection_passed();
-	
+
 	DECLARE_WRITE_LINE_MEMBER( prot_w );
 	DECLARE_READ_LINE_MEMBER( prot_r );
 
@@ -36,4 +36,4 @@ private:
 };
 
 #endif // MAME_BUS_GAMATE_PROTECTION_H
-  
+

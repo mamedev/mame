@@ -2,26 +2,26 @@
 // copyright-holders:David Haywood, Peter Wilhelmsen, Kevtris
 
 /*
-	Notes:
+    Notes:
 
-	Some games are glitchy, most of these glitches are verified to happen on hardware
-	for example
+    Some games are glitchy, most of these glitches are verified to happen on hardware
+    for example
 
-	Badly flipped sprites in Tornado and Insect War
-	Heavy flickering sprites in many games
+    Badly flipped sprites in Tornado and Insect War
+    Heavy flickering sprites in many games
 
-	Most of these issues are difficult to notice on real hardware due to the poor
-	quality display.
+    Most of these issues are difficult to notice on real hardware due to the poor
+    quality display.
 
-	Thanks to Kevtris for the documentation on which this implementation is based
-	(some comments taken directly from this)
-	http://blog.kevtris.org/blogfiles/Gamate%20Inside.txt
+    Thanks to Kevtris for the documentation on which this implementation is based
+    (some comments taken directly from this)
+    http://blog.kevtris.org/blogfiles/Gamate%20Inside.txt
 
-	ToDo:
+    ToDo:
 
-	Emulate vram pull / LCD refresh timings more accurately.
-	Interrupt should maybe be in here, not in drivers/gamate.cpp?
-	Verify both Window modes act the same as hardware.
+    Emulate vram pull / LCD refresh timings more accurately.
+    Interrupt should maybe be in here, not in drivers/gamate.cpp?
+    Verify both Window modes act the same as hardware.
 */
 
 #include "emu.h"
@@ -125,7 +125,7 @@ WRITE8_MEMBER(gamate_video_device::xpos_w)
 	/*
 	BxxX XXXX
 	B: Bitplane. 0 = lower (bitplane 0), 1 = upper (bitplane 1)
-	X: 5 lower bits of the 13 bit VRAM address.  
+	X: 5 lower bits of the 13 bit VRAM address.
 	*/
 	m_bitplaneselect = (data & 0x80) >> 7;
 	set_vram_addr_lower_5bits(data & 0x1f);
@@ -135,7 +135,7 @@ WRITE8_MEMBER(gamate_video_device::ypos_w)
 {
 	/*
 	YYYY YYYY
-	Y: 8 upper bits of 13 bit VRAM address.	
+	Y: 8 upper bits of 13 bit VRAM address.
 	*/
 	set_vram_addr_upper_8bits(data);
 }
@@ -170,13 +170,13 @@ void gamate_video_device::get_real_x_and_y(int &ret_x, int &ret_y, int scanline)
 {
 	/* the Gamate video has 2 'Window' modes,
 	   Mode 1 is enabled with an actual register
-	   Mode 2 is enabled automatically based on the yscroll value	
-	
+	   Mode 2 is enabled automatically based on the yscroll value
+
 	   both modes seem designed to allow for a non-scrolling status bar at
 	   the top of the display.
 	*/
 
-	if (m_scrolly < 0xc8) 
+	if (m_scrolly < 0xc8)
 	{
 		ret_y = scanline + m_scrolly;
 
@@ -199,8 +199,8 @@ void gamate_video_device::get_real_x_and_y(int &ret_x, int &ret_y, int scanline)
 		ret_x = m_scrollx;
 
 		/*
-			Using Yscroll values of C8-CF, D8-DF, E8-EF, and F8-FF will result in the same
-			effect as if a Yscroll value of 00h were used.
+		    Using Yscroll values of C8-CF, D8-DF, E8-EF, and F8-FF will result in the same
+		    effect as if a Yscroll value of 00h were used.
 		*/
 		if (m_scrolly & 0x08) // values of C8-CF, D8-DF, E8-EF, and F8-FF
 		{
@@ -210,13 +210,13 @@ void gamate_video_device::get_real_x_and_y(int &ret_x, int &ret_y, int scanline)
 		else
 		{
 			/*
-				Values D0-D7, E0-E7, and F0-F7 all produce a bit more useful effect.  The upper
-				1-8 scanlines will be pulled from rows F8-FFh in VRAM (i.e. 1F00h = row F8h).
+			    Values D0-D7, E0-E7, and F0-F7 all produce a bit more useful effect.  The upper
+			    1-8 scanlines will be pulled from rows F8-FFh in VRAM (i.e. 1F00h = row F8h).
 
-				If F0 is selected, then the upper 8 rows will be the last 8 rows in VRAM-
-				1F00-1FFFh area.  If F1 is selected, the upper 8 rows will be the last 7 rows
-				in VRAM and so on.  This special window area DOES NOT SCROLL with X making it
-				useful for status bars.  I don't think any games actually used it, though.				
+			    If F0 is selected, then the upper 8 rows will be the last 8 rows in VRAM-
+			    1F00-1FFFh area.  If F1 is selected, the upper 8 rows will be the last 7 rows
+			    in VRAM and so on.  This special window area DOES NOT SCROLL with X making it
+			    useful for status bars.  I don't think any games actually used it, though.
 			*/
 			int fixedscanlines = m_scrolly & 0x7;
 
@@ -232,7 +232,7 @@ void gamate_video_device::get_real_x_and_y(int &ret_x, int &ret_y, int scanline)
 				ret_y = scanline;// +m_scrolly;
 
 				//if (ret_y >= 0xc8)
-				//	ret_y -= 0xc8;
+				//  ret_y -= 0xc8;
 			}
 
 		}
@@ -299,9 +299,9 @@ PALETTE_INIT_MEMBER(gamate_video_device, gamate)
 }
 
 /*
-	Of the 150 scanlines emitted, all contain pixel data pulled from RAM. There are
-	exactly 72900 clocks per frame, so at the nominal 4.433MHz rate, this means the
-	frame rate is 60.8093Hz.  
+    Of the 150 scanlines emitted, all contain pixel data pulled from RAM. There are
+    exactly 72900 clocks per frame, so at the nominal 4.433MHz rate, this means the
+    frame rate is 60.8093Hz.
 */
 
 MACHINE_CONFIG_MEMBER( gamate_video_device::device_add_mconfig )

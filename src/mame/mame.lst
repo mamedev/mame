@@ -8711,7 +8711,7 @@ bishi                           // GX575 (c) 1996 (Japan)
 sbishi                          // GX675 (c) 1998 (Japan)
 sbishik                         // GX675 (c) 1998 (Korea)
 sbishika                        // GX675 (c) 1998 (Korea)
-dobouchn                        // 
+dobouchn                        //
 
 @source:bitgraph.cpp
 bitgrpha                        //
@@ -17125,7 +17125,7 @@ kaypro4a                        // Kaypro 4 - 4/84
 kaypro4p88                      // Kaypro 4 - 4/83 w/plus88 board installed
 kayproii                        // Kaypro II - 2/83
 omni2                           // Omni II
-omni4							// Omni 4
+omni4                           // Omni 4
 robie                           // Kaypro Robie
 
 @source:kc.cpp
@@ -33451,7 +33451,7 @@ fpoint1                         // (c) 1989 (Japan, FD1094)
 fpoint1d                        //
 fpointbj                        // (c) 1989 (Datsu bootleg, Japan)
 fpointbl                        // (c) 1989 (Datsu bootleg)
-fpointbla						//
+fpointbla                       //
 fpointd                         //
 goldnaxe                        // (c) 1989 (8751)
 goldnaxe1                       // (c) 1989 (FD1094)
@@ -33745,9 +33745,9 @@ strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
 
 @source:seibucats.cpp
-emjjoshi						// (c) 1999 Seibu Kaihatsu / CATS
-emjscanb						// (c) 2001 Seibu Kaihatsu / CATS
-emjtrapz						// (c) 2001 Seibu Kaihatsu / CATS
+emjjoshi                        // (c) 1999 Seibu Kaihatsu / CATS
+emjscanb                        // (c) 2001 Seibu Kaihatsu / CATS
+emjtrapz                        // (c) 2001 Seibu Kaihatsu / CATS
 
 @source:seibuspi.cpp
 batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)

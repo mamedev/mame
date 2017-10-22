@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			{
 				m_status |= HUC6270_RR;
 				m_irq_changed_cb( ASSERT_LINE );
-			}			
+			}
 		}
 	}
 
@@ -571,16 +571,16 @@ inline void huc6270_device::handle_dma()
 		int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
 
 		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
-		
+
 		do {
 			uint16_t data;
-			
+
 			// area 0x8000-0xffff cannot be r/w (open bus)
 			if(m_sour <= m_vram_mask)
 				data = m_vram[ m_sour ];
 			else
 				data = 0;
-			
+
 			if(m_desr <= m_vram_mask)
 				m_vram[ m_desr ] = data;
 			m_sour += sour_inc;
@@ -618,7 +618,7 @@ READ8_MEMBER( huc6270_device::read )
 			if ( m_register_index == VxR )
 			{
 				m_marr += vram_increments[ ( m_cr >> 11 ) & 3 ];
-				
+
 				if(m_marr <= m_vram_mask)
 					m_vrr = m_vram[ m_marr ];
 				else
@@ -846,7 +846,7 @@ void huc6270_device::device_start()
 
 	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
-	
+
 	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(uint16_t));
 
 	save_item(NAME(m_register_index));

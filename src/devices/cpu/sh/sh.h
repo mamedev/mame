@@ -30,7 +30,7 @@
 ***************************************************************************/
 
 /* speed up delay loops, bail out of tight loops (can cause timer issues) */
-#define BUSY_LOOP_HACKS 0 
+#define BUSY_LOOP_HACKS 0
 
 /* compilation boundaries -- how far back/forward does the analysis extend? */
 #define COMPILE_BACKWARDS_BYTES         64
@@ -325,7 +325,7 @@ protected:
 	virtual void LDCSR(const uint16_t opcode) = 0;
 	virtual void LDCMSR(const uint16_t opcode) = 0;
 	virtual void TRAPA(uint32_t i) = 0;
-	virtual	void ILLEGAL() = 0;
+	virtual void ILLEGAL() = 0;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 
@@ -380,7 +380,7 @@ public:
 		uint8_t           checkints;                  /* need to check interrupts before next instruction */
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
-	
+
 	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); };
 
 	virtual void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception) = 0;
@@ -459,7 +459,7 @@ private:
 	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	
+
 protected:
 	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
 	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);

@@ -753,7 +753,7 @@ void imgtool::partition::get_attribute_name(uint32_t attribute, const imgtool_at
 
 
 //-------------------------------------------------
-//	test_imgtool_datetime - unit test for imgtool::datetime
+//  test_imgtool_datetime - unit test for imgtool::datetime
 //-------------------------------------------------
 
 static bool test_imgtool_datetime(int second, int minute, int hour, int day_of_month, int month, int year)
@@ -806,7 +806,7 @@ static bool test_imgtool_datetime(int second, int minute, int hour, int day_of_m
 
 
 //-------------------------------------------------
-//	test_imgtool_datetime - unit tests for imgtool::datetime
+//  test_imgtool_datetime - unit tests for imgtool::datetime
 //-------------------------------------------------
 
 static bool test_imgtool_datetime()
@@ -814,9 +814,9 @@ static bool test_imgtool_datetime()
 	bool error = false;
 
 	// various test cases for imgtool::datetime
-	if (test_imgtool_datetime(34, 23, 12, 18, 3, 1993))		// March 18th, 1993 12:23:34
+	if (test_imgtool_datetime(34, 23, 12, 18, 3, 1993))     // March 18th, 1993 12:23:34
 		error = true;
-	if (test_imgtool_datetime(0, 20, 16, 25, 12, 1976))		// December 25th, 1976 16:20:00
+	if (test_imgtool_datetime(0, 20, 16, 25, 12, 1976))     // December 25th, 1976 16:20:00
 		error = true;
 
 	return error;

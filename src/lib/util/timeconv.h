@@ -36,17 +36,17 @@ typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_dura
 
 
 //---------------------------------------------------------
-//	arbitrary_datetime
+//  arbitrary_datetime
 //---------------------------------------------------------
 
 struct arbitrary_datetime
 {
-	int year;			// absolute year (1900 AD = 1900)
-	int month;			// month (1-12)
-	int day_of_month;	// day of month (1-31)
-	int hour;			// hour (0-23)
-	int minute;			// minute (0-59)
-	int second;			// second (0-59)
+	int year;           // absolute year (1900 AD = 1900)
+	int month;          // month (1-12)
+	int day_of_month;   // day of month (1-31)
+	int hour;           // hour (0-23)
+	int minute;         // minute (0-59)
+	int second;         // second (0-59)
 };
 
 
@@ -71,7 +71,7 @@ public:
 	static constexpr int base_second = S;
 
 	//---------------------------------------------------------
-	//  from_arbitrary_datetime - converts an 
+	//  from_arbitrary_datetime - converts an
 	//  from_arbitrary_datetime to this arbitrary_clock's scale
 	//---------------------------------------------------------
 
@@ -173,7 +173,7 @@ private:
 
 
 	//---------------------------------------------------------
-	//	clamp_or_throw
+	//  clamp_or_throw
 	//---------------------------------------------------------
 
 	static int clamp_or_throw(int value, int minimum, int maximum, bool clamp, const char *out_of_range_message)
@@ -189,18 +189,18 @@ private:
 	}
 
 	//---------------------------------------------------------
-	//  duration_from_arbitrary_datetime - converts an 
+	//  duration_from_arbitrary_datetime - converts an
 	//  arbitrary_datetime to this arbitrary_clock's duration
 	//---------------------------------------------------------
 
 	static duration duration_from_arbitrary_datetime(const arbitrary_datetime &dt, bool clamp)
 	{
 		// range checking
-		const int month			= clamp_or_throw(dt.month, 1, 12, clamp, "invalid dt.month");
-		const int day_of_month	= clamp_or_throw(dt.day_of_month, 1, gregorian_days_in_month(month, dt.year), clamp, "invalid dt.day_of_month");
-		const int hour			= clamp_or_throw(dt.hour, 0, 23, clamp, "invalid dt.hour");
-		const int minute		= clamp_or_throw(dt.minute, 0, 59, clamp, "invalid dt.minute");
-		const int second		= clamp_or_throw(dt.second, 0, 59, clamp, "invalid dt.second");
+		const int month         = clamp_or_throw(dt.month, 1, 12, clamp, "invalid dt.month");
+		const int day_of_month  = clamp_or_throw(dt.day_of_month, 1, gregorian_days_in_month(month, dt.year), clamp, "invalid dt.day_of_month");
+		const int hour          = clamp_or_throw(dt.hour, 0, 23, clamp, "invalid dt.hour");
+		const int minute        = clamp_or_throw(dt.minute, 0, 59, clamp, "invalid dt.minute");
+		const int second        = clamp_or_throw(dt.second, 0, 59, clamp, "invalid dt.second");
 
 		const int64_t our_absolute_day = absolute_day(Y, M, D);
 		const int64_t their_absolute_day = absolute_day(dt.year, month, day_of_month);

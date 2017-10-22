@@ -113,13 +113,13 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	address_space *m_decrypted_program;
-	
+
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
 	uint32_t  m_cpu_off;
 	uint32_t  m_test_irq;
-	
+
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
@@ -168,7 +168,7 @@ private:
 	virtual void LDCSR(const uint16_t opcode) override;
 	virtual void TRAPA(uint32_t i) override;
 	virtual void RTE() override;
-	virtual	void ILLEGAL() override;
+	virtual void ILLEGAL() override;
 
 	virtual void execute_one_f000(uint16_t opcode) override;
 

@@ -668,7 +668,7 @@ if (CPUS["SH"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.h",
-		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",		
+		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 	}
 end
 

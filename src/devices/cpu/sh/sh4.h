@@ -452,7 +452,7 @@ protected:
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
 		int a,irq,z;
-		
+
 		m_willjump = 0; // for the DRC
 
 		irq = 0;
@@ -569,7 +569,7 @@ protected:
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void RTE() override;
 	virtual void TRAPA(uint32_t i) override;
-	virtual	void ILLEGAL() override;
+	virtual void ILLEGAL() override;
 
 	// regular handelrs for sh3/4 specific opcodes
 	virtual void LDTLB(const uint16_t opcode);
@@ -642,7 +642,7 @@ protected:
 	void dbreak(const uint16_t opcode);
 	void op1111_0x13(uint16_t opcode);
 
-	// group dispatchers to allow for new opcodes	
+	// group dispatchers to allow for new opcodes
 	virtual void execute_one_0000(uint16_t opcode) override;
 	virtual void execute_one_4000(uint16_t opcode) override;
 	virtual void execute_one_f000(uint16_t opcode) override;
@@ -729,7 +729,7 @@ protected:
 	virtual bool generate_group_4_LDCMSR(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_12_TRAPA(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 
-	// group generators to allow for new opcodes	
+	// group generators to allow for new opcodes
 	virtual bool generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;

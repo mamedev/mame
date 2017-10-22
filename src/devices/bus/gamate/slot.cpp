@@ -182,7 +182,7 @@ int gamate_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 		case 0x8000:
 			type = GAMATE_PLAIN;
 			break;
-		
+
 		case 0x10000:
 		case 0x20000:
 		case 0x40000:

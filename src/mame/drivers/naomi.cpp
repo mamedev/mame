@@ -1956,7 +1956,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram") 
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram")
 	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram") // extra ram on Naomi (mirror on DC)
 	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram") // mirror
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram") // mirror
@@ -2699,9 +2699,9 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
 	MCFG_CPU_FORCE_NO_DRC()
-	
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
-	
+
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 

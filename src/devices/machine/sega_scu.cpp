@@ -2,16 +2,16 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Sega System Control Unit (c) 1995 Sega
-	
-	TODO:
-	- make a screen_device subclass, add pixel timers & irq callbacks to it;
-	- A-Bus external interrupts;
-	- Pad signal (lightgun I presume);
-	- Improve DMA, use DRQ model and timers, make them subdevices?
-	(old DMA TODO)
-	- Remove CD transfer DMA hack (tied with CD block bug(s)?)
-	- Add timings(but how fast are each DMA?).
+    Sega System Control Unit (c) 1995 Sega
+
+    TODO:
+    - make a screen_device subclass, add pixel timers & irq callbacks to it;
+    - A-Bus external interrupts;
+    - Pad signal (lightgun I presume);
+    - Improve DMA, use DRQ model and timers, make them subdevices?
+    (old DMA TODO)
+    - Remove CD transfer DMA hack (tied with CD block bug(s)?)
+    - Add timings(but how fast are each DMA?).
     - Add level priority & DMA status register.
 
 ***************************************************************************/
@@ -109,7 +109,7 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //  LIVE DEVICE
 //**************************************************************************
 
-//AM_RANGE(0x0000, 0x0003) src 
+//AM_RANGE(0x0000, 0x0003) src
 //AM_RANGE(0x0004, 0x0007) dst
 //AM_RANGE(0x0008, 0x000b) size
 //AM_RANGE(0x000c, 0x000f) src/dst add values
@@ -120,9 +120,9 @@ DEVICE_ADDRESS_MAP_START( regs_map, 32, sega_scu_device )
 	AM_RANGE(0x0000, 0x0017) AM_READWRITE(dma_lv0_r,dma_lv0_w)
 	AM_RANGE(0x0020, 0x0037) AM_READWRITE(dma_lv1_r,dma_lv1_w)
 	AM_RANGE(0x0040, 0x0057) AM_READWRITE(dma_lv2_r,dma_lv2_w)
-    // Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-	AM_RANGE(0x005c, 0x005f) AM_READ(dma_status_r) 
-//	AM_RANGE(0x0060, 0x0063) AM_WRITE(dma_force_stop_w)
+	// Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
+	AM_RANGE(0x005c, 0x005f) AM_READ(dma_status_r)
+//  AM_RANGE(0x0060, 0x0063) AM_WRITE(dma_force_stop_w)
 	AM_RANGE(0x007c, 0x007f) AM_READ(dma_status_r)
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("scudsp",scudsp_cpu_device, program_control_r,program_control_w)
 	AM_RANGE(0x0084, 0x0087) AM_DEVWRITE("scudsp", scudsp_cpu_device, program_w)
@@ -133,10 +133,10 @@ DEVICE_ADDRESS_MAP_START( regs_map, 32, sega_scu_device )
 	AM_RANGE(0x0098, 0x009b) AM_WRITE16(t1_mode_w,0x0000ffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE(irq_mask_r,irq_mask_w)
 	AM_RANGE(0x00a4, 0x00a7) AM_READWRITE(irq_status_r,irq_status_w)
-//	AM_RANGE(0x00a8, 0x00ab) AM_WRITE(abus_irqack_w)
-//	AM_RANGE(0x00b0, 0x00b7) AM_READWRITE(abus_set_r,abus_set_w)
-//	AM_RANGE(0x00b8, 0x00bb) AM_READWRITE(abus_refresh_r,abus_refresh_w)
-//	AM_RANGE(0x00c4, 0x00c7) AM_READWRITE(sdram_r,sdram_w)
+//  AM_RANGE(0x00a8, 0x00ab) AM_WRITE(abus_irqack_w)
+//  AM_RANGE(0x00b0, 0x00b7) AM_READWRITE(abus_set_r,abus_set_w)
+//  AM_RANGE(0x00b8, 0x00bb) AM_READWRITE(abus_refresh_r,abus_refresh_w)
+//  AM_RANGE(0x00c4, 0x00c7) AM_READWRITE(sdram_r,sdram_w)
 	AM_RANGE(0x00c8, 0x00cb) AM_READ(version_r) // returns 4 for stock Saturn
 ADDRESS_MAP_END
 
@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA_SCU, tag, owner, clock),
- 	  m_scudsp(*this, "scudsp")
+	  m_scudsp(*this, "scudsp")
 {
 }
 
@@ -212,7 +212,7 @@ void sega_scu_device::device_start()
 	save_item(NAME(m_t0c));
 	save_item(NAME(m_t1s));
 	save_item(NAME(m_t1md));
-	
+
 	save_item(NAME(m_dma[0].src));
 	save_item(NAME(m_dma[0].dst));
 	save_item(NAME(m_dma[0].src_add));
@@ -246,13 +246,13 @@ void sega_scu_device::device_start()
 	save_item(NAME(m_dma[2].indirect_mode));
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
-	
+
 	m_hostcpu = machine().device<sh2_device>(m_hostcpu_tag);
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
 	m_dma_timer[0] = timer_alloc(DMALV0_ID);
 	m_dma_timer[1] = timer_alloc(DMALV1_ID);
-	m_dma_timer[2] = timer_alloc(DMALV2_ID);	
+	m_dma_timer[2] = timer_alloc(DMALV2_ID);
 }
 
 
@@ -264,7 +264,7 @@ void sega_scu_device::device_reset()
 {
 	m_ism = 0xbfff;
 	m_ist = 0;
-	
+
 	for(int i=0;i<3;i++)
 	{
 		m_dma[i].start_factor = 7;
@@ -287,7 +287,7 @@ void sega_scu_device::device_reset_after_children()
 
 void sega_scu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	
+
 	switch(id)
 	{
 		case DMALV0_ID:
@@ -297,7 +297,7 @@ void sega_scu_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			const int irqlevel = id == 0 ? 5 : 6;
 			const int irqvector = 0x4b - id;
 			const uint16_t irqmask = 1 << (11-id);
-			
+
 			if(!(m_ism & irqmask))
 				m_hostcpu->set_input_line_and_vector(irqlevel, HOLD_LINE, irqvector);
 			else
@@ -337,7 +337,7 @@ uint32_t sega_scu_device::dma_common_r(uint8_t offset,uint8_t level)
 		case 0x14/4:
 			return 0; // DxMOD / DxRUP / DxWUP / DxFT, write only
 	}
-	
+
 	// can't happen anyway
 	return 0;
 }
@@ -362,7 +362,7 @@ void sega_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 			break;
 		case 0x10/4: // DxEN / DxGO
 			m_dma[level].enable_mask = BIT(data,8);
-			
+
 			// check if DxGO is enabled for start factor = 7
 			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == 7)
 			{
@@ -383,7 +383,7 @@ void sega_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 				if(m_dma[level].wup == false)
 					m_dma[level].index = m_dma[level].dst;
 			}
-			
+
 			break;
 	}
 }
@@ -409,7 +409,7 @@ void sega_scu_device::handle_dma_direct(uint8_t level)
 	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 	}
 	#endif
-	
+
 	// Game Basic, World Cup 98 and Batman Forever trips this, according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus)
 	if((m_dma[level].src & 0x07f00000) == 0)
 	{
@@ -422,7 +422,7 @@ void sega_scu_device::handle_dma_direct(uint8_t level)
 	}
 
 	update_dma_status(level,true);
-	
+
 	/* max size */
 	if(m_dma[level].size == 0) { m_dma[level].size  = (level == 0) ? 0x00100000 : 0x1000; }
 
@@ -514,7 +514,7 @@ void sega_scu_device::handle_dma_indirect(uint8_t level)
 			if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 		}
 		#endif
-		
+
 		indirect_src &=0x07ffffff;
 		indirect_dst &=0x07ffffff;
 		indirect_size &= ((level == 0) ? 0xfffff : 0x3ffff); //TODO: Guardian Heroes sets up a 0x23000 transfer for the FMV?
@@ -581,7 +581,7 @@ inline void sega_scu_device::dma_start_factor_ack(uint8_t event)
 		if(m_dma[i].enable_mask == true && m_dma[i].start_factor == event)
 		{
 			if(m_dma[i].indirect_mode == true)      { handle_dma_indirect(i); }
-			else                    				{ handle_dma_direct(i); }
+			else                                    { handle_dma_direct(i); }
 		}
 	}
 }
@@ -627,9 +627,9 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 {
 	if(m_tenb == false)
 		return;
-	
+
 	int timer0_compare = (m_t0c & 0x3ff)*y_step;
-	
+
 	// Timer 0
 	if(scanline == timer0_compare)
 	{
@@ -641,9 +641,9 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 		else
 			m_ist |= (IRQ_TIMER_0);
 	}
-	
+
 	// Timer 1
-	// TODO: should happen after some time when hblank-in is received then counts down t1s 
+	// TODO: should happen after some time when hblank-in is received then counts down t1s
 	if(
 	  ((m_t1md == false) && ((scanline % y_step) == 0)) ||
 	  ((m_t1md == true) && (scanline == timer0_compare)) )
@@ -684,7 +684,7 @@ WRITE32_MEMBER(sega_scu_device::irq_status_w)
 {
 	if(mem_mask != 0xffffffff)
 		logerror("%s IST write %08x with %08x\n",this->tag(),data,mem_mask);
-	
+
 	m_ist &= data;
 	test_pending_irqs();
 }
@@ -719,7 +719,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_out_w)
 {
 	if(!state)
 		return;
-	
+
 	if(!(m_ism & IRQ_VBLANK_OUT))
 	{
 		m_hostcpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
@@ -733,7 +733,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_in_w)
 {
 	if(!state)
 		return;
-	
+
 	if(!(m_ism & IRQ_VBLANK_IN))
 	{
 		m_hostcpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
@@ -747,7 +747,7 @@ WRITE_LINE_MEMBER(sega_scu_device::hblank_in_w)
 {
 	if(!state)
 		return;
-	
+
 	if(!(m_ism & IRQ_HBLANK_IN))
 	{
 		m_hostcpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
@@ -761,7 +761,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vdp1_end_w)
 {
 	if(!state)
 		return;
-	
+
 	if(!(m_ism & IRQ_VDP1_END))
 	{
 		m_hostcpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
@@ -789,7 +789,7 @@ WRITE_LINE_MEMBER(sega_scu_device::smpc_irq_w)
 {
 	if(!state)
 		return;
-	
+
 	if(!(m_ism & IRQ_SMPC))
 		m_hostcpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
 	else

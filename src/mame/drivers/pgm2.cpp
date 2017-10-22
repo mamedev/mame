@@ -464,10 +464,10 @@ ROM_START( ddpdojh )
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
 ROM_END
 
-/* 
-   The Kov3 Program rom is a module consisting of a NOR flash and a FPGA, this provides an extra layer of encryption on top of the usual 
+/*
+   The Kov3 Program rom is a module consisting of a NOR flash and a FPGA, this provides an extra layer of encryption on top of the usual
    that is only unlocked when the correct sequence is recieved from the ARM MCU (IGS036)
-   
+
    Newer gambling games use the same modules.
 */
 
@@ -661,7 +661,7 @@ void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
 
 	for (int i = 0; i < size/2; i++)
 		buffer[i] = src[i^addrxor]^dataxor;
-	
+
 	memcpy(src, &buffer[0], size);
 }
 

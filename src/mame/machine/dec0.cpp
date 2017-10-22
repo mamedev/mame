@@ -71,7 +71,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 
 		case 0xa: // clr.w
 			return 0;
-			
+
 		case 0xc:
 			return 0;   /* ?? watchdog ?? */
 	}

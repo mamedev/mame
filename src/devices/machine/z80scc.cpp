@@ -397,7 +397,7 @@ int z80scc_device::z80daisy_irq_ack()
 		}
 	}
 
-	// Did we not find a vector? Get the notion of a default vector from the CPU implementation 
+	// Did we not find a vector? Get the notion of a default vector from the CPU implementation
 	if (ret == -1 && m_cputag != nullptr)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...

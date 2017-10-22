@@ -575,11 +575,11 @@ ROM_START( europc )
 	ROM_SYSTEM_BIOS( 4, "v2.08a", "EuroPC v2.08a" )
 	ROMX_LOAD("bios_v2.08a.bin", 0x8000, 0x8000, CRC(872520b7) SHA1(9c94d33c0d454fab7bcd0c4516b50f1c3c6a30b8), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 5, "v2.08b", "EuroPC v2.08b" )
- 	ROMX_LOAD("bios_v2.08b.bin", 0x8000, 0x8000, CRC(668c0d19) SHA1(69412e58e0ed1d141e633f094af91ec5f7ae064b), ROM_BIOS(6))
- 	ROM_SYSTEM_BIOS( 6, "v2.04", "EuroPC v2.04" )
- 	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(7))
- 	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
- 	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(8)) // v2.04 and v2.05 don't work yet, , see comment section
+	ROMX_LOAD("bios_v2.08b.bin", 0x8000, 0x8000, CRC(668c0d19) SHA1(69412e58e0ed1d141e633f094af91ec5f7ae064b), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS( 6, "v2.04", "EuroPC v2.04" )
+	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
+	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(8)) // v2.04 and v2.05 don't work yet, , see comment section
  ROM_END
 
 ROM_START( europc2 )

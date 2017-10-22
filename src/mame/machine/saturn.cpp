@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER(saturn_state::master_sh2_nmi_w)
 WRITE_LINE_MEMBER( saturn_state::slave_sh2_reset_w )
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
-//	m_smpc.slave_on = state;
+//  m_smpc.slave_on = state;
 }
 
 WRITE_LINE_MEMBER( saturn_state::sound_68k_reset_w )
@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER(saturn_state::system_halt_w)
 WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
 	uint32_t xtal;
-	
+
 	xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
 	machine().device("maincpu")->set_unscaled_clock(xtal/2);

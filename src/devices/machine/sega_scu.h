@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Sega System Control Unit (c) 1995 Sega
+    Sega System Control Unit (c) 1995 Sega
 
 ***************************************************************************/
 
@@ -62,7 +62,7 @@ public:
 	DECLARE_READ32_MEMBER(dma_lv2_r);
 	DECLARE_WRITE32_MEMBER(dma_lv2_w);
 	DECLARE_READ32_MEMBER(dma_status_r);
-	
+
 	// Timers
 	DECLARE_WRITE32_MEMBER(t0_compare_w);
 	DECLARE_WRITE32_MEMBER(t1_setdata_w);
@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE32_MEMBER(irq_mask_w);
 	DECLARE_WRITE32_MEMBER(irq_status_w);
 	DECLARE_READ32_MEMBER(version_r);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(vblank_out_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_in_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_in_w);
@@ -95,7 +95,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	required_device<scudsp_cpu_device> m_scudsp;
 
@@ -104,7 +104,7 @@ private:
 		DMALV1_ID,
 		DMALV2_ID
 	};
-	
+
 	emu_timer *m_dma_timer[3];
 	uint32_t m_ism;
 	uint32_t m_ist;
@@ -113,12 +113,12 @@ private:
 	uint32_t m_status;
 	bool m_t1md;
 	bool m_tenb;
-	
-	const char *m_hostcpu_tag;	
+
+	const char *m_hostcpu_tag;
 	sh2_device *m_hostcpu;
 	address_space *m_hostspace;
 	void test_pending_irqs();
-	
+
 	struct {
 		uint32_t    src;       /* Source DMA lv n address*/
 		uint32_t    dst;       /* Destination DMA lv n address*/
@@ -132,7 +132,7 @@ private:
 		bool        rup;
 		bool        wup;
 	}m_dma[3];
-	
+
 	uint32_t dma_common_r(uint8_t offset,uint8_t level);
 	void dma_common_w(uint8_t offset,uint8_t level,uint32_t data);
 	void handle_dma_direct(uint8_t level);

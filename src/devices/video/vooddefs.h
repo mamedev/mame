@@ -2773,12 +2773,12 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		if (ALPHAMODE_ALPHATEST(ALPHAMODE))                                              \
 			if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, ALPHAMODE, color.get_a()))   \
 				goto skipdrawdepth;                                                      \
-		                                                                                 \
+																						 \
 		/* perform fogging */                                                            \
 		preFog.set(color);                                                               \
 		if (FOGMODE_ENABLE_FOG(FOGMODE))                                                                         \
 			applyFogging(vd, FBZMODE, FOGMODE, FBZCOLORPATH, x, dither4, wfloat, color, iterz, iterw, iterargb); \
-																				                                 \
+																												 \
 		/* perform alpha blending */                                                \
 		if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                                            \
 			alphaBlend(FBZMODE, ALPHAMODE, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565); \

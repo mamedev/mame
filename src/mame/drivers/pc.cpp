@@ -333,7 +333,7 @@ Form Factor: Luggable
 CPU: 8088 @ 4.77MHz
 RAM: 256K, expandable to 512K and 640K
 Mainboard with 4 ISA slots, video decoder circuitry to show 16 levels of grayscale on the internal monitor, interface to WD1002-HD0 harddisk controller
-Bus: 4x ISA:    1) 8088 slot CPU, keyboard connector, reset switch, 
+Bus: 4x ISA:    1) 8088 slot CPU, keyboard connector, reset switch,
                 2) Floppy disk controller, serial, parallel, RAM expansion
                 3) Kaypro CGA card with composite and colour TTL outputs, ROM 81-820 needs to be dumped
                 4) empty
@@ -804,7 +804,7 @@ static MACHINE_CONFIG_DERIVED(kaypro16, pccga)
 	MCFG_DEVICE_MODIFY("isa3")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa4")
-	MCFG_SLOT_FIXED(true)	
+	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa5")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 	MCFG_DEVICE_MODIFY(RAM_TAG)

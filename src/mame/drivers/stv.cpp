@@ -421,7 +421,7 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-//	m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
+//  m_scu_regs = std::make_unique<uint32_t[]>(0x100/4);
 	m_backupram = std::make_unique<uint8_t[]>(0x8000);
 	memset(m_backupram.get(), 0, sizeof(uint8_t) * 0x8000);
 
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( stv )
 	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
 	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
 	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
-//	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
+//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
 	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
 	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
 	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
@@ -1216,7 +1216,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	else
 		m_cart_reg[3] = nullptr;
 
-	
+
 	m_en_68k = 0;
 
 	m_port_sel = m_mux_data = 0;
@@ -1270,7 +1270,7 @@ MACHINE_START_MEMBER(stv_state,stv)
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
-//	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));
@@ -1356,19 +1356,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( batmanfr )
 	PORT_INCLUDE( stv )
-	
+
 	PORT_MODIFY("PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Punch")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Kick")
-	
+
 	PORT_MODIFY("PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Punch")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
-	
+
 	PORT_MODIFY("PORTE")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2887,7 +2887,7 @@ ROM_START( sfish2 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00428", 0, SHA1(166cb5518fa5e0ab15d40dade70fa8913089dcd2) )
 
-	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */ 
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
 ROM_START( sfish2j )

@@ -416,7 +416,7 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 		case CMDERR_NOT_ENOUGH_PARAMS:      return "not enough parameters for command";
 		case CMDERR_TOO_MANY_PARAMS:        return "too many parameters for command";
 		case CMDERR_EXPRESSION_ERROR:       return string_format("error in assignment expression: %s",
-		                                                         expression_error(static_cast<expression_error::error_code>(offset)).code_string());
+																 expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
 }

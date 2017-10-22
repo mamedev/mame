@@ -93,7 +93,7 @@ READ_LINE_MEMBER(gamate_protection_device::prot_r)
 		m_inpos++;
 
 		logerror("read from protection %01x\n", retval);
-	
+
 		if (m_inpos == 8)
 		{
 			logerror("unlocking ROM\n");
