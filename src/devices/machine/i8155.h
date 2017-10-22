@@ -2,8 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
-    8156 is the same as 8155, except that chip enable is active high instead of low
+    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer
 
 **********************************************************************
                             _____   _____
@@ -95,6 +94,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
+	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,8 +104,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	inline uint8_t get_timer_mode();
-	inline void timer_output();
-	inline void pulse_timer_output();
+	inline void timer_output(int to);
+	inline void timer_stop_count();
+	inline void timer_reload_count();
 	inline int get_port_mode(int port);
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);
@@ -125,16 +127,18 @@ private:
 
 	// CPU interface
 	int m_io_m;                 // I/O or memory select
-	uint8_t m_ad;                 // address
+	uint8_t m_ad;               // address
 
 	// registers
-	uint8_t m_command;            // command register
-	uint8_t m_status;             // status register
-	uint8_t m_output[3];          // output latches
+	uint8_t m_command;          // command register
+	uint8_t m_status;           // status register
+	uint8_t m_output[3];        // output latches
 
 	// counter
-	uint16_t m_count_length;      // count length register
-	uint16_t m_counter;           // counter register
+	uint16_t m_count_length;    // count length register (assigned)
+	uint16_t m_count_loaded;    // count length register (loaded)
+	uint16_t m_counter;         // counter register
+	bool m_count_extra;         // extra cycle when count is odd
 	int m_to;                   // timer output
 
 	// timers
@@ -144,9 +148,16 @@ private:
 };
 
 
+class i8156_device : public i8155_device
+{
+public:
+	// construction/destruction
+	i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(I8155, i8155_device)
-extern const device_type I8156;
+DECLARE_DEVICE_TYPE(I8156, i8156_device)
 
 
 #endif

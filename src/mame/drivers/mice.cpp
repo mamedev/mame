@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, XTAL_6_144MHz) // divider is likely to be 2; timer emulation appears faulty
+	MCFG_DEVICE_ADD("rpt", I8155, XTAL_6_144MHz / 2)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
