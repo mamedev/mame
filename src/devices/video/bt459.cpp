@@ -101,16 +101,21 @@ u8 bt459_device::get_component(rgb_t *arr, int index)
 	switch (m_address_rgb)
 	{
 	case 0: // red component
-		m_address_rgb = 1;
+		if (!machine().side_effect_disabled())
+			m_address_rgb = 1;
 		return (m_command_2 & CR2524) == CR2524_RED ? arr[index].g() : arr[index].r();
 
 	case 1: // green component
-		m_address_rgb = 2;
+		if (!machine().side_effect_disabled())
+			m_address_rgb = 2;
 		return arr[index].g();
 
 	case 2: // blue component
-		m_address_rgb = 0;
-		m_address = (m_address + 1) & ADDRESS_MASK;
+		if (!machine().side_effect_disabled())
+		{
+			m_address_rgb = 0;
+			m_address = (m_address + 1) & ADDRESS_MASK;
+		}
 		return (m_command_2 & CR2524) == CR2524_BLUE ? arr[index].g() : arr[index].b();
 	}
 
