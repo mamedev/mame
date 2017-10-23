@@ -105,7 +105,6 @@
 #endif
 
 #define NETLIST_TAG "bcd"
-#define HTTPUI 0
 
 class prodigy_state : public driver_device
 {
@@ -120,16 +119,7 @@ public:
 		, m_cb1(*this, "bcd:cb1")
 		, m_cb2(*this, "bcd:cb2")
 		, m_digit(0.0)
-		, m_io_line0(*this, "LINE0")
-		, m_io_line1(*this, "LINE1")
-		, m_io_line2(*this, "LINE2")
-		, m_io_line3(*this, "LINE3")
-		, m_io_line4(*this, "LINE4")
-		, m_line0(0)
-		, m_line1(0)
-		, m_line2(0)
-		, m_line3(0)
-		, m_line4(0)
+		, m_io_line(*this, "LINE%u", 0)
 	{ }
 
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
@@ -160,21 +150,9 @@ private:
 	uint8_t m_digit;
 	void update_bcd();
 
-#if HTTPUI
 	virtual void device_start() override;
-	http_manager *m_server;
-	void on_update(http_manager::http_request_ptr request, http_manager::http_response_ptr response);
-#endif
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	uint16_t m_line0;
-	uint16_t m_line1;
-	uint16_t m_line2;
-	uint16_t m_line3;
-	uint16_t m_line4;
+	required_ioport_array<5> m_io_line;
+	uint16_t m_line[5];
 };
 
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit0_cb) { if (data != 0) m_digit |= 0x01; else m_digit &= ~(0x01); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
@@ -186,33 +164,10 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit5_cb) { if (data != 0) m_digi
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit6_cb) { if (data != 0) m_digit |= 0x40; else m_digit &= ~(0x40); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digit |= 0x80; else m_digit &= ~(0x80); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
 
-#if HTTPUI
-// WIP
-void prodigy_state::on_update(http_manager::http_request_ptr request, http_manager::http_response_ptr response)
-{
-  printf("%s\n", FUNCNAME);
-  #if 1
-  printf("Full request: %s\n", request->get_resource().c_str());
-  printf("Path: %s\n", request->get_path().c_str());
-  printf("Query: %s\n", request->get_query().c_str());
-  //  printf("Fragment: %s\n", request->get_fragment().c_str());
-  for (auto const& i : request->get_headers("*")) {
-    std::cout << i;
-  }
-  #endif
-  response->set_status(200);
-  response->set_content_type("text/plain");
-  response->set_body("Hello World\n");
-  //	m_server->serve_document(request, response, filename);
-}
-
 void prodigy_state::device_start()
 {
-  using namespace std::placeholders;
-  m_server =  machine().manager().http();
-  m_server->add_http_handler("/prodigy*", std::bind(&prodigy_state::on_update, this, _1, _2));
+	memset(m_line, 0, sizeof(m_line));
 }
-#endif
 
 WRITE_LINE_MEMBER(prodigy_state::via_cb1_w)
 {
@@ -246,8 +201,9 @@ READ8_MEMBER( prodigy_state::via_pa_r )
 	uint16_t ttl74145_data = m_74145->read();
 
 	LOGKBD(" - 74145: %03x\n", ttl74145_data);
-	if (ttl74145_data & 0x100) return (m_line0 | m_line1);
-	if (ttl74145_data & 0x200) return (m_line4 | m_line3);
+	if (ttl74145_data & 0x100) return (m_line[0] | m_line[1]);
+	if (ttl74145_data & 0x200) return (m_line[4] | m_line[3]);
+
 	return 0xff;
 }
 
@@ -255,9 +211,9 @@ READ8_MEMBER( prodigy_state::via_pb_r )
 {
 	LOGKBD("%s: Port B <- %02x\n", FUNCNAME, 0);
 	uint16_t ttl74145_data = m_74145->read();
+	if (ttl74145_data & 0x100) return (((m_line[2] >>  8) & 3) << 4);
+	if (ttl74145_data & 0x200) return (((m_line[2] >> 10) & 3) << 4);
 
-	if (ttl74145_data & 0x100) return (((m_line2 >>  8) & 3) << 4);
-	if (ttl74145_data & 0x200) return (((m_line2 >> 10) & 3) << 4);
 	return 0xff;
 }
 
@@ -276,11 +232,13 @@ WRITE8_MEMBER( prodigy_state::via_pb_w )
 	m_74145->write( data & 0x0f );
 
 	// Read the artwork
-	m_line0 = m_io_line0->read(); LOGAW("-LINE0: %02x\n", m_line0);
-	m_line1 = m_io_line1->read(); LOGAW("-LINE1: %02x\n", m_line1);
-	m_line2 = m_io_line2->read(); LOGAW("-LINE2: %02x\n", m_line2);
-	m_line3 = m_io_line3->read(); LOGAW("-LINE3: %02x\n", m_line3);
-	m_line4 = m_io_line4->read(); LOGAW("-LINE4: %02x\n", m_line4);
+	int i = 0;
+	for (auto & elem : m_io_line)
+	{
+		m_line[i] = elem->read();
+		LOGAW("-LINE%u: %02x\n", i, m_line[i]);
+		i++;
+	}
 }
 
 void prodigy_state::update_bcd()
