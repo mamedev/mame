@@ -10,8 +10,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
 #include "zexall.h"
+#include "interface.h"
 
 class zexall_state : public driver_device
 {
@@ -57,7 +57,9 @@ void zexall_state::machine_reset()
 	terminate_string = "";
 
 	// program is self-modifying, so need to refresh it on each run
-	memcpy(m_main_ram, zexall_program, 0x228a);
+	memset(m_main_ram, 0xff, 0x10000);
+	memcpy(m_main_ram, interface_binary, 0x51);
+	memcpy(m_main_ram + 0x0100, zexall_binary, 0x2189);
 }
 
 
