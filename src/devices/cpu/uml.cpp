@@ -776,6 +776,7 @@ void uml::instruction::validate()
 		// ensure the type is valid
 		const parameter &param = m_param[pnum];
 		assert((opinfo.param[pnum].typemask >> param.type()) & 1);
+		(void)param;
 	}
 
 	// make sure we aren't missing any parameters
