@@ -14,9 +14,9 @@ protected:
 	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-	const int XRES = 1184;
-	const int YRES = 884;
-	const int VRAM_SIZE = 0x200000; // 1 megabyte double buffered
+	const int GT_XRES = 1184;
+	const int GT_YRES = 884;
+	const int GT_VRAM = 0x100000; // 1 megabyte
 
 	enum control_mask
 	{
@@ -35,14 +35,8 @@ public:
 	virtual DECLARE_READ16_MEMBER(control_r) const = 0;
 	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
 
-	//virtual DECLARE_READ8_MEMBER(dac_r) const = 0;
-	//virtual DECLARE_WRITE8_MEMBER(dac_w) = 0;
-
 	virtual DECLARE_READ32_MEMBER(vram_r) const = 0;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
-
-	// BSGA XLeft 0x104 (write)
-	// BSGA XLeft 0x10c (read)
 };
 
 class mpcb963_device : public gt_device_base
@@ -54,9 +48,6 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-
-	//virtual DECLARE_READ8_MEMBER(dac_r) const override { return m_screen[0].ramdac->read(space, offset, mem_mask); }
-	//virtual DECLARE_WRITE8_MEMBER(dac_w) override { m_screen[0].ramdac->write(space, offset, data, mem_mask); }
 
 	virtual DECLARE_READ32_MEMBER(vram_r) const override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
@@ -83,9 +74,6 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-
-	//virtual DECLARE_READ8_MEMBER(dac_r) const override { return m_screen[offset >> 2].ramdac->read(space, offset & 0x3, mem_mask); }
-	//virtual DECLARE_WRITE8_MEMBER(dac_w) override { m_screen[offset >> 2].ramdac->write(space, offset & 0x3, data, mem_mask); }
 
 	virtual DECLARE_READ32_MEMBER(vram_r) const override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;

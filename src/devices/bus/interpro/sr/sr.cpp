@@ -252,20 +252,17 @@
  *    c06   25Mhz GTII Graphics f/2 1Mp Monitors
  *    C41   GTII 60/76Hz Graphics f/1 2Mp Monitor
  *    C42   GTII 60/76Hz Graphics f/2 2Mp Monitor
- *
- * TODO
- *   - general refactoring and rework to improve implementation
  */
 
 #include "emu.h"
 #include "sr.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SR_SLOT, sr_slot_device, "sr_slot", "InterPro SR bus slot")
 
-sr_slot_device::sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sr_slot_device::sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SR_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_sr_tag(nullptr)
@@ -291,13 +288,13 @@ void sr_slot_device::device_start()
 
 DEFINE_DEVICE_TYPE(SR, sr_device, "sr", "InterPro SR bus")
 
-sr_device::sr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SR, tag, owner, clock),
-	m_data_space(nullptr),
-	m_io_space(nullptr),
-	m_out_irq0_cb(*this),
-	m_out_irq1_cb(*this),
-	m_out_irq2_cb(*this)
+sr_device::sr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SR, tag, owner, clock)
+	, m_data_space(nullptr)
+	, m_io_space(nullptr)
+	, m_out_irq0_cb(*this)
+	, m_out_irq1_cb(*this)
+	, m_out_irq2_cb(*this)
 {
 }
 
@@ -316,25 +313,12 @@ void sr_device::device_start()
 
 	// empty the slots
 	m_slot_count = 0;
-	for (auto &slot : m_slot)
+	for (device_sr_card_interface *slot : m_slot)
 		slot = nullptr;
 }
 
 void sr_device::device_reset()
 {
-}
-
-void sr_device::install_idprom(device_t *dev, const char *tag, const char *region)
-{
-	// compute slot base address
-	offs_t base = 0x87000000;
-
-	// map the idprom
-	m_data_space->install_read_bank(base, base + 0x7f, 0, tag);
-	m_data_space->unmap_write(base, base + 0x7f);
-
-	// assign the region
-	machine().root_device().membank(m_data_space->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 }
 
 device_sr_card_interface::device_sr_card_interface(const machine_config &mconfig, device_t &device)
@@ -366,7 +350,7 @@ void device_sr_card_interface::set_sr_device()
 	m_sr->install_card(*this, &device_sr_card_interface::map);
 }
 
-sr_card_device_base::sr_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *idprom_region)
+sr_card_device_base::sr_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const char *idprom_region)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sr_card_interface(mconfig, *this)
 	, m_idprom_region(idprom_region)

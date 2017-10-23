@@ -27,12 +27,12 @@ class sr_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration
 	static void static_set_sr_slot(device_t &device, const char *tag, const char *slottag);
 protected:
-	sr_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sr_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,26 +47,30 @@ class sr_device : public device_t
 {
 public:
 	// construction/destruction
-	sr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration
 	template <class Object> static devcb_base &set_out_irq0_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq1_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
 
+	static const u32 SR_BASE = 0x87000000;
+	static const u32 SR_SIZE = 0x08000000;
+	static const int SR_COUNT = 16;
+
 	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
 
-	// helper functions for card devices
+	// installation function for card devices
 	template <typename T> void install_card(T &device, void (T::*map)(address_map &map))
 	{
 		// record the device in the next free slot
 		m_slot[m_slot_count] = &device;
 
 		// compute slot base address
-		offs_t start = 0x87000000 + m_slot_count * 0x8000000;
-		offs_t end = start + 0x7ffffff;
+		offs_t start = SR_BASE + m_slot_count * SR_SIZE;
+		offs_t end = start + (SR_SIZE - 1);
 
 		// install the device address map
 		m_data_space->install_device(start, end, device, map, 32);
@@ -75,10 +79,8 @@ public:
 		m_slot_count++;
 	}
 
-	void install_idprom(device_t *dev, const char *tag, const char *region);
-
 protected:
-	sr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -93,7 +95,7 @@ protected:
 	devcb_write_line m_out_irq2_cb;
 
 private:
-	device_sr_card_interface *m_slot[16];
+	device_sr_card_interface *m_slot[SR_COUNT];
 	int m_slot_count;
 };
 
@@ -120,7 +122,7 @@ protected:
 class sr_card_device_base : public device_t, public device_sr_card_interface
 {
 protected:
-	sr_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *idprom_region = "idprom");
+	sr_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const char *idprom_region = "idprom");
 
 public:
 	READ32_MEMBER(idprom_r) { return device().memregion(m_idprom_region)->as_u32(offset); }

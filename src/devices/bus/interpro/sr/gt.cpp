@@ -9,7 +9,7 @@
  *   - DP8510V BITBLT unit
  *   - custom Bresenham line drawing ASIC
  *   - support GT+, GTII, GTII+
- *
+ *   - reset behaviour
  */
 
 #include "emu.h"
@@ -59,34 +59,31 @@ DEFINE_DEVICE_TYPE(MPCBA79, mpcba79_device, "mpcba79", "2000 Graphics f/2 1Mp Mo
  */
 MACHINE_CONFIG_MEMBER(mpcb963_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen0", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(80'000'000, XRES, 0, XRES, YRES, 0, YRES)
+	MCFG_SCREEN_RAW_PARAMS(80'000'000, GT_XRES, 0, GT_XRES, GT_YRES, 0, GT_YRES)
 	MCFG_SCREEN_UPDATE_DEVICE("", mpcb963_device, screen_update0)
 	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_MEMBER(mpcba79_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen0", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(80'000'000, XRES, 0, XRES, YRES, 0, YRES)
+	MCFG_SCREEN_RAW_PARAMS(80'000'000, GT_XRES, 0, GT_XRES, GT_YRES, 0, GT_YRES)
 	MCFG_SCREEN_UPDATE_DEVICE("", mpcba79_device, screen_update0)
 	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
 
 	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(80'000'000, XRES, 0, XRES, YRES, 0, YRES)
+	MCFG_SCREEN_RAW_PARAMS(80'000'000, GT_XRES, 0, GT_XRES, GT_YRES, 0, GT_YRES)
 	MCFG_SCREEN_UPDATE_DEVICE("", mpcba79_device, screen_update1)
 	MCFG_DEVICE_ADD("ramdac1", BT459, 0)
 MACHINE_CONFIG_END
 
-gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	sr_card_device_base(mconfig, type, tag, owner, clock)
+gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sr_card_device_base(mconfig, type, tag, owner, clock)
 {
 }
 
-mpcb963_device::mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	gt_device_base(mconfig, MPCB963, tag, owner, clock),
-	m_screen
-	{
-		{ { *this, "ramdac0" }, {}, true }
-	}
+mpcb963_device::mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gt_device_base(mconfig, MPCB963, tag, owner, clock)
+	, m_screen{	{ { *this, "ramdac0" }, {}, true } }
 {
 }
 
@@ -99,10 +96,11 @@ void mpcb963_device::device_start()
 {
 	gt_device_base::device_start();
 
-	m_screen[0].vram.reset(new u8[VRAM_SIZE]);
+	// allocate double-buffered vram
+	m_screen[0].vram.reset(new u8[GT_VRAM * 2]);
 
 	save_item(NAME(m_control));
-	save_pointer(NAME(m_screen[0].vram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_screen[0].vram.get()), GT_VRAM * 2);
 }
 
 
@@ -129,18 +127,14 @@ u32 mpcb963_device::screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	gt_screen_t &gt_screen = m_screen[0];
 
-	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : 0x100000]);
+	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : GT_VRAM]);
 
 	return 0;
 }
 
-mpcba79_device::mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	gt_device_base(mconfig, MPCBA79, tag, owner, clock),
-	m_screen
-{
-	{ { *this, "ramdac0" },{}, true },
-	{ { *this, "ramdac1" },{}, true }
-}
+mpcba79_device::mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gt_device_base(mconfig, MPCBA79, tag, owner, clock)
+	, m_screen { { { *this, "ramdac0" }, {}, true }, { { *this, "ramdac1" }, {}, true } }
 {
 }
 
@@ -184,7 +178,7 @@ u32 mpcba79_device::screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	gt_screen_t &gt_screen = m_screen[0];
 
-	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : 0x100000]);
+	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : GT_VRAM]);
 
 	return 0;
 }
@@ -193,7 +187,7 @@ u32 mpcba79_device::screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	gt_screen_t &gt_screen = m_screen[1];
 
-	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : 0x100000]);
+	gt_screen.ramdac->screen_update(screen, bitmap, cliprect, &gt_screen.vram[gt_screen.primary ? 0x000000 : GT_VRAM]);
 
 	return 0;
 }
