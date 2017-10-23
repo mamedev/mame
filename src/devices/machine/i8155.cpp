@@ -147,14 +147,14 @@ inline void i8155_device::timer_stop_count()
 
 inline void i8155_device::timer_reload_count()
 {
+	m_count_loaded = m_count_length;
+
 	// valid counts range from 2 to 3FFF
 	if ((m_count_length & 0x3fff) < 2)
 	{
 		timer_stop_count();
 		return;
 	}
-
-	m_count_loaded = m_count_length;
 
 	// begin the odd half of the count, with one extra cycle if count is odd
 	m_counter = (m_count_loaded & 0x3ffe) | 1;
