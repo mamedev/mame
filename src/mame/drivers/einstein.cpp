@@ -59,6 +59,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/clock.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 
@@ -247,21 +248,6 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 
 
 /***************************************************************************
-    CTC
-***************************************************************************/
-
-/* channel 0 and 1 have a 2 MHz input clock for triggering */
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
-{
-	/* toggle line status */
-	m_ctc_trigger ^= 1;
-
-	m_ctc->trg0(m_ctc_trigger);
-	m_ctc->trg1(m_ctc_trigger);
-}
-
-
-/***************************************************************************
     UART
 ***************************************************************************/
 
@@ -413,8 +399,6 @@ void einstein_state::machine_reset()
 	to be set to 1, which causes all these to be DISABLED */
 	m_interrupt = 0;
 	m_interrupt_mask = 0;
-
-	m_ctc_trigger = 0;
 
 	/* configure floppy drives */
 /*  floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
@@ -697,16 +681,20 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(einstein_state, einstein_serial_transmit_clock))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(einstein_state, einstein_serial_receive_clock))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
 
-	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", einstein_state, einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
+	MCFG_CLOCK_ADD("ctc_trigger", XTAL_X002 / 4)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(IC_I058, z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg2))
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_DEVICE_ADD("keyboard_daisy", EINSTEIN_KEYBOARD_DAISY, 0)
