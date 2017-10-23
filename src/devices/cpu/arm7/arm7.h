@@ -128,6 +128,18 @@ protected:
 	address_space_config m_program_config;
 
 	uint32_t m_r[/*NUM_REGS*/37];
+
+	void update_insn_prefetch(uint32_t curr_pc);
+	virtual uint16_t insn_fetch_thumb(uint32_t pc);
+	uint32_t insn_fetch_arm(uint32_t pc);
+	int get_insn_prefetch_index(uint32_t address);
+
+	uint32_t m_insn_prefetch_depth;
+	uint32_t m_insn_prefetch_count;
+	uint32_t m_insn_prefetch_index;
+	uint32_t m_insn_prefetch_buffer[3];
+	uint32_t m_insn_prefetch_address[3];
+
 	bool m_pendingIrq;
 	bool m_pendingFiq;
 	bool m_pendingAbtD;

@@ -73,6 +73,14 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 		arch = ARM9_COPRO_ID_ARCH_V4T;
 
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM | arch | ARM9_COPRO_ID_PART_GENERICARM7;
+
+	// TODO[RH]: Default to 3-instruction prefetch for unknown ARM variants. Derived cores should set the appropriate value in their constructors.
+	m_insn_prefetch_depth = 3;
+
+	memset(m_insn_prefetch_buffer, 0, sizeof(uint32_t) * 3);
+	memset(m_insn_prefetch_address, 0, sizeof(uint32_t) * 3);
+	m_insn_prefetch_count = 0;
+	m_insn_prefetch_index = 0;
 }
 
 
@@ -641,6 +649,73 @@ void arm7_cpu_device::device_reset()
 	m_r[eR15] += 4; \
 	m_icount +=2; /* Any unexecuted instruction only takes 1 cycle (page 193) */
 
+void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
+{
+	curr_pc &= ~3;
+	if (m_insn_prefetch_address[m_insn_prefetch_index] != curr_pc)
+	{
+		m_insn_prefetch_count = 0;
+		m_insn_prefetch_index = 0;
+	}
+
+	if (m_insn_prefetch_count == m_insn_prefetch_depth)
+		return;
+
+	const uint32_t to_fetch = m_insn_prefetch_depth - m_insn_prefetch_count;
+	const uint32_t start_index = (m_insn_prefetch_depth + (m_insn_prefetch_index - to_fetch)) % m_insn_prefetch_depth;
+	//printf("need to prefetch %d instructions starting at index %d\n", to_fetch, start_index);
+
+	uint32_t pc = curr_pc + m_insn_prefetch_count * 4;
+	for (uint32_t i = 0; i < to_fetch; i++)
+	{
+		uint32_t index = (i + start_index) % m_insn_prefetch_depth;
+		if ((m_control & COPRO_CTRL_MMU_EN) && !arm7_tlb_translate(pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+		{
+			break;
+		}
+		uint32_t op = m_direct->read_dword(pc);
+		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
+		m_insn_prefetch_buffer[index] = op;
+		m_insn_prefetch_address[index] = pc;
+		m_insn_prefetch_count++;
+		pc += 4;
+	}
+}
+
+uint16_t arm7_cpu_device::insn_fetch_thumb(uint32_t pc)
+{
+	if (pc & 2)
+	{
+		uint16_t insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> 16);
+		m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_count;
+		m_insn_prefetch_count--;
+		return insn;
+	}
+	return (uint16_t)m_insn_prefetch_buffer[m_insn_prefetch_index];
+}
+
+uint32_t arm7_cpu_device::insn_fetch_arm(uint32_t pc)
+{
+	//printf("ipb[%d] = %08x\n", m_insn_prefetch_index, m_insn_prefetch_buffer[m_insn_prefetch_index]);
+	uint32_t insn = m_insn_prefetch_buffer[m_insn_prefetch_index];
+	m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_count;
+	m_insn_prefetch_count--;
+	return insn;
+}
+
+int arm7_cpu_device::get_insn_prefetch_index(uint32_t address)
+{
+	address &= ~3;
+	for (uint32_t i = 0; i < m_insn_prefetch_depth; i++)
+	{
+		if (m_insn_prefetch_address[i] == address)
+		{
+			return (int)i;
+		}
+	}
+	return -1;
+}
+
 void arm7_cpu_device::execute_run()
 {
 	uint32_t insn;
@@ -648,6 +723,8 @@ void arm7_cpu_device::execute_run()
 	do
 	{
 		uint32_t pc = GET_PC;
+
+		update_insn_prefetch(pc);
 
 		debugger_instruction_hook(this, pc);
 
@@ -669,7 +746,7 @@ void arm7_cpu_device::execute_run()
 				}
 			}
 
-			insn = m_direct->read_word(raddr);
+			insn = insn_fetch_thumb(raddr);
 			(this->*thumb_handler[(insn & 0xffc0) >> 6])(pc, insn);
 
 		}
@@ -700,7 +777,7 @@ void arm7_cpu_device::execute_run()
 			}
 #endif
 
-			insn = m_direct->read_dword(raddr);
+			insn = insn_fetch_arm(raddr);
 
 			int op_offset = 0;
 			/* process condition codes for this instruction */
@@ -823,20 +900,82 @@ offs_t arm7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	extern CPU_DISASSEMBLE( arm7arm_be );
 	extern CPU_DISASSEMBLE( arm7thumb_be );
 
-	if (T_IS_SET(m_r[eCPSR]))
+	uint8_t fetched_op[4];
+	uint32_t op = 0;
+	int prefetch_index = get_insn_prefetch_index(pc);
+	if (prefetch_index < 0)
 	{
-		if ( m_endian == ENDIANNESS_BIG )
-			return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, oprom, opram, options);
+		memcpy(fetched_op, oprom, 4);
+		if (T_IS_SET(m_r[eCPSR]))
+		{
+			if ( m_endian == ENDIANNESS_BIG )
+			{
+				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
+			}
+			else
+			{
+				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
+			}
+		}
 		else
-			return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, oprom, opram, options);
+		{
+			if ( m_endian == ENDIANNESS_BIG )
+			{
+				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
+			}
+			else
+			{
+				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
+			}
+		}
 	}
 	else
 	{
-		if ( m_endian == ENDIANNESS_BIG )
-			return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, oprom, opram, options);
+		op = m_insn_prefetch_buffer[prefetch_index];
+		if (T_IS_SET(m_r[eCPSR]))
+		{
+			if (m_endian == ENDIANNESS_BIG)
+			{
+				if (pc & 1)
+				{
+					fetched_op[1] = op & 0xff;
+					fetched_op[0] = (op >> 8) & 0xff;
+				}
+				else
+				{
+					fetched_op[1] = op & 0xff;
+					fetched_op[0] = (op >> 8) & 0xff;
+				}
+				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
+			}
+			else
+			{
+				fetched_op[0] = op & 0xff;
+				fetched_op[1] = (op >> 8) & 0xff;
+				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
+			}
+		}
 		else
-			return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, oprom, opram, options);
+		{
+			if (m_endian == ENDIANNESS_BIG)
+			{
+				fetched_op[3] = op & 0xff;
+				fetched_op[2] = (op >> 8) & 0xff;
+				fetched_op[1] = (op >> 16) & 0xff;
+				fetched_op[0] = (op >> 24) & 0xff;
+				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
+			}
+			else
+			{
+				fetched_op[0] = op & 0xff;
+				fetched_op[1] = (op >> 8) & 0xff;
+				fetched_op[2] = (op >> 16) & 0xff;
+				fetched_op[3] = (op >> 24) & 0xff;
+				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
+			}
+		}
 	}
+	return 0;
 }
 
 
