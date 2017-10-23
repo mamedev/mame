@@ -143,7 +143,8 @@ void bt459_device::set_component(rgb_t *arr, int index, u8 data)
 READ8_MEMBER(bt459_device::address_lo_r)
 {
 	// reset component pointer and return address register lsb
-	m_address_rgb = 0;
+	if (!machine().side_effect_disabled())
+		m_address_rgb = 0;
 	return m_address & ADDRESS_LSB;
 }
 
@@ -157,7 +158,8 @@ WRITE8_MEMBER(bt459_device::address_lo_w)
 READ8_MEMBER(bt459_device::address_hi_r)
 {
 	// reset component pointer and return address register msb
-	m_address_rgb = 0;
+	if (!machine().side_effect_disabled())
+		m_address_rgb = 0;
 	return (m_address & ADDRESS_MSB) >> 8;
 }
 
@@ -418,7 +420,7 @@ WRITE8_MEMBER(bt459_device::register_w)
 	case REG_OVERLAY_COLOR_14:
 	case REG_OVERLAY_COLOR_15:
 	{
-		int index = m_address & 0xf;
+		const int index = m_address & 0xf;
 		set_component(m_overlay_color, index, data);
 
 		// update the mame palette to match the device
@@ -472,7 +474,7 @@ READ8_MEMBER(bt459_device::palette_r)
 WRITE8_MEMBER(bt459_device::palette_w)
 {
 	// set component in color palette ram
-	int index = m_address & 0xff;
+	const int index = m_address & 0xff;
 	set_component(m_palette_ram, index, data);
 
 	// update the mame palette to match the device
@@ -558,11 +560,11 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		 * Values from $0FC0 (-64) to $0FBF (+4031) may be loaded into the cursor(y) register. The negative values ($0FC0
 		 * to $0FFF) are used in situations where V < 32, and the cursor must be moved off the top of the screen.
 		 */
-		int cursor_x = m_cursor_x - screen.visible_area().min_x + (
+		const int cursor_x = m_cursor_x - screen.visible_area().min_x + (
 			(m_command_0 & CR0706) == CR0706_11MPX ? 37 :
 			(m_command_0 & CR0706) == CR0706_41MPX ? 52 :
 			(m_command_0 & CR0706) == CR0706_51MPX ? 57 : 0);
-		int cursor_y = (m_cursor_y < 0xfc0 ? m_cursor_y : m_cursor_y - 0x1000) - screen.visible_area().min_y + 32;
+		const int cursor_y = (m_cursor_y < 0xfc0 ? m_cursor_y : m_cursor_y - 0x1000) - screen.visible_area().min_y + 32;
 
 		// 64x64 cursor
 		if (m_cursor_command & (CR47 | CR46))
@@ -576,7 +578,7 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			// draw if any portion is visible
 			if (!cursor.empty())
 			{
-				u8 cursor_mask = ((m_cursor_command & CR47) ? 0x2 : 0) | ((m_cursor_command & CR46) ? 0x1 : 0);
+				const u8 cursor_mask = ((m_cursor_command & CR47) ? 0x2 : 0) | ((m_cursor_command & CR46) ? 0x1 : 0);
 				int cursor_offset = 0;
 
 				for (int y = cursor_y - 31; y <= cursor_y + 32; y++)
@@ -606,10 +608,10 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		if (m_cursor_command & (CR45 | CR44))
 		{
 			// get the cross hair cursor color
-			rgb_t cursor_color = m_cursor_color[(((m_cursor_command & CR45) ? 0x2 : 0) | ((m_cursor_command & CR44) ? 0x1 : 0)) - 1];
+			const rgb_t cursor_color = m_cursor_color[(((m_cursor_command & CR45) ? 0x2 : 0) | ((m_cursor_command & CR44) ? 0x1 : 0)) - 1];
 
 			// get half the cross hair line thickness
-			int thickness = (m_cursor_command & CR4241) >> 1;
+			const int thickness = (m_cursor_command & CR4241) >> 1;
 
 			/*
 			 * The window (x) value to be written is calculated as follows:
@@ -634,11 +636,11 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			 * is implemented by loading the window (x,y) registers with $0000, and the window width and height registers with
 			 * $0FFF.
 			 */
-			int window_x = m_window_x - screen.visible_area().min_x + (
+			const int window_x = m_window_x - screen.visible_area().min_x + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 5 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 20 :
 				(m_command_0 & CR0706) == CR0706_51MPX ? 25 : 0);
-			int window_y = m_window_y - screen.visible_area().min_y;
+			const int window_y = m_window_y - screen.visible_area().min_y;
 
 			/*
 			 * The actual window width is 2, 8 or 10 pixels more than the value specified by the window width register, depending
@@ -648,11 +650,11 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			 *
 			 * Values from $0000 to $0FFF may be written to the window width and height registers.
 			 */
-			int window_w = m_window_w + (
+			const int window_w = m_window_w + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 2 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 8 :
 				(m_command_0 & CR0706) == CR0706_51MPX ? 10 : 0);
-			int window_h = m_window_h + 2;
+			const int window_h = m_window_h + 2;
 
 			// draw the vertical line
 			rectangle vertical(cursor_x - thickness, cursor_x + thickness, window_y, window_y + window_h);
