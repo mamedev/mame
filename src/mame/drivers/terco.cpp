@@ -58,7 +58,7 @@ public:
 	  //	,m_acia(*this, "acia")
 	{ }
 	required_device<m6800_cpu_device> m_maincpu;
-	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
+	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -76,13 +76,10 @@ static ADDRESS_MAP_START( t4490_map, AS_PROGRAM, 8, t4490_state )
 ADDRESS_MAP_END
 
 /* Input ports */
-static INPUT_PORTS_START( t4426 )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( t4490 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( t4490, t4490_state )
+static MACHINE_CONFIG_START( t4490 )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_8MHz/4) // divided by a MC6875
 	MCFG_CPU_PROGRAM_MAP(t4490_map)
 
@@ -103,4 +100,4 @@ ROM_START( t4490 )
 ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT  COMPANY             FULLNAME                    FLAGS
-COMP( 1986, t4490,	0,          0,      t4490,      t4490,  driver_device,   0,    "Terco AB",         "Terco 4490 Mill CNC Control 4490",  MACHINE_IS_SKELETON )
+COMP( 1986, t4490,	0,          0,      t4490,      t4490,  t4490_state,   0,    "Terco AB",         "Terco 4490 Mill CNC Control",  MACHINE_IS_SKELETON )
