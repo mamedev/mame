@@ -80,8 +80,8 @@ void zexall_state::machine_reset()
 	m_out_data = 0;
 
 	// program is self-modifying, so need to refresh it on each run
-	uint8_t *rom = memregion("romcode")->base();
-	memcpy(m_main_ram, rom, 0x228a);
+	uint8_t *program = memregion("maincpu")->base();
+	memcpy(m_main_ram, program, 0x10000);
 }
 
 
@@ -133,11 +133,10 @@ WRITE8_MEMBER( zexall_state::output_data_w )
 ******************************************************************************/
 
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xfffc) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r,output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r,output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r,output_data_w)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
 
@@ -167,9 +166,13 @@ MACHINE_CONFIG_END
  ROM Definitions
 ******************************************************************************/
 
-ROM_START(zexall)
-	ROM_REGION(0x22ff, "romcode", 0)
-	ROM_LOAD("zex.bin", 0x0000, 0x2289, CRC(77e0a1df) SHA1(cc8f84724e3837783816d92a6dfb8e5975232c66))
+ROM_START( zexall )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
+	ROM_LOAD( "zexall.bin",    0x0100, 0x2189, CRC(b6f869c3) SHA1(14021f75c1bc9f26688969581065a0efff3af59c) )
+
+	ROM_REGION( 0x10000, "source", 0 ) // attach GPL2 zexall source code
+	ROM_LOAD( "zexall.z80",    0x0000, 0x9d59, CRC(56e12d1c) SHA1(99611739e706afe2b84783b7fbf119daa60b97ca) )
 ROM_END
 
 
@@ -178,4 +181,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                    FULLNAME                                                    FLAGS
-COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle & MESSDEV", "ZEXALL Z80 instruction set exerciser (modified for MESS)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle & MESSDEV", "ZEXALL Z80 instruction set exerciser (modified for MESS)", MACHINE_SUPPORTS_SAVE )
