@@ -112,8 +112,10 @@ u8 bt459_device::get_component(rgb_t *arr, int index)
 
 	case 2: // blue component
 		if (!machine().side_effect_disabled())
+		{
 			m_address_rgb = 0;
-		m_address = (m_address + 1) & ADDRESS_MASK;
+			m_address = (m_address + 1) & ADDRESS_MASK;
+		}
 		return (m_command_2 & CR2524) == CR2524_BLUE ? arr[index].g() : arr[index].b();
 	}
 
