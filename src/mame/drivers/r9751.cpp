@@ -124,7 +124,8 @@ private:
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
 	uint8_t m_term_data;
-	uint8_t m_serial_status;
+	uint16_t m_serial_status;
+	uint16_t m_serial_status2;
 	// End registers
 
 	address_space *m_mem;
@@ -240,8 +241,11 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			return data;
 		/* SMIOC region (0x98, device 26) */
 		case 0x0898: /* Serial status or DMA status */
-			//logerror("m_serial_status = %02X \n", m_serial_status);
-			return m_serial_status;
+			if(TRACE_SMIOC) logerror("m_serial_status = %04X \n", m_serial_status | 0x8);
+			return m_serial_status | 0x8;
+		case 0x0870: /* Serial status or DMA status 2 */
+			if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status);
+			return m_serial_status2;
 		/* SMIOC region (0x9C, device 27) */
 
 		/* PDC FDD region (0xB0, device 44 */
@@ -291,23 +295,35 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_serial_status = data;
 			if(TRACE_SMIOC) logerror("Serial status: %08X PC: %08X\n", data, space.machine().firstcpu->pc());
 			break;
+		case 0x0270:
+			m_serial_status2 = data;
+			if(TRACE_SMIOC) logerror("Serial status2: %08X PC: %08X\n", data, space.machine().firstcpu->pc());
+			break;
+		case 0x4090:
 		case 0x4098: /* Serial DMA Command */
-			m_serial_status = 0x40;
 			switch(data)
 			{
+				case 0x1000:
+					m_serial_status = 0x0140;
+					m_serial_status2 = 0x0140;
+					if(TRACE_SMIOC) logerror("Serial DMA command 0x1000 PC: %08X\n", space.machine().firstcpu->pc());
+					break;
 				case 0x4100: /* Send byte to serial */
 					for(int i = 0; i < smioc_dma_w_length; i++)
 					{
-						if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_dword(smioc_out_addr+i*2), space.machine().firstcpu->pc());
-						m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr+i*2));
+						if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_word(smioc_out_addr+i*2), space.machine().firstcpu->pc());
+						m_terminal->write(space,0,m_mem->read_word(smioc_out_addr+i*2));
 					}
+					m_serial_status = 0x4140;
 					break;
 				case 0x4200: /* Write XON into serial DMA input register (0x5FF0809C) memory location */
 					m_maincpu->space(AS_PROGRAM).write_byte(smioc_in_addr,0x11);
 					if(TRACE_SMIOC) logerror("Serial DMA command 0x4200 (XON) PC: %08X\n", space.machine().firstcpu->pc());
+					m_serial_status = 0x4440;
 					break;
 				default:
 					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
+					m_serial_status = 0x40;
 			}
 			break;
 		case 0xC098: /* Serial DMA output address */
