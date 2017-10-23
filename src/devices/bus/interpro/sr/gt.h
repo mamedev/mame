@@ -14,9 +14,11 @@ protected:
 	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-	const int GT_XRES = 1184;
-	const int GT_YRES = 884;
-	const int GT_VRAM = 0x100000; // 1 megabyte
+	static const u32 GT_PIXCLOCK    = 80'000'000; // just a guess
+	static const int GT_XPIXELS     = 1184;
+	static const int GT_YPIXELS     = 884;
+	static const int GT_BUFFER_SIZE = 0x100000;   // 1 megabyte
+	static const int GT_VRAM_SIZE   = 0x200000;   // 1 megabyte double buffered
 
 	enum control_mask
 	{
@@ -24,6 +26,12 @@ public:
 		CONTROL_BUSY   = 0x8000
 	};
 
+	virtual DECLARE_READ16_MEMBER(control_r) const = 0;
+	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
+	virtual DECLARE_READ32_MEMBER(vram_r) const = 0;
+	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
+
+protected:
 	typedef struct
 	{
 		required_device<bt459_device> ramdac;
@@ -31,12 +39,6 @@ public:
 
 		bool primary;
 	} gt_screen_t;
-
-	virtual DECLARE_READ16_MEMBER(control_r) const = 0;
-	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
-
-	virtual DECLARE_READ32_MEMBER(vram_r) const = 0;
-	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
 };
 
 class mpcb963_device : public gt_device_base
@@ -44,25 +46,26 @@ class mpcb963_device : public gt_device_base
 public:
 	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static const int GT_SCREEN_COUNT = 1;
+
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
 	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-
 	virtual DECLARE_READ32_MEMBER(vram_r) const override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
-
-	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
+	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	u16 m_control;
 
-	gt_screen_t m_screen[1];
+	gt_screen_t m_screen[GT_SCREEN_COUNT];
 };
 
 class mpcba79_device : public gt_device_base
@@ -70,25 +73,26 @@ class mpcba79_device : public gt_device_base
 public:
 	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static const int GT_SCREEN_COUNT = 2;
+
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
 	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-
 	virtual DECLARE_READ32_MEMBER(vram_r) const override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
-
-	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
+	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	u16 m_control;
-	gt_screen_t m_screen[2];
+	gt_screen_t m_screen[GT_SCREEN_COUNT];
 };
 
 // device type definition
