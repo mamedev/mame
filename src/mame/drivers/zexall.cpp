@@ -1,30 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu, Robbbert
 /******************************************************************************
-*
-*  Self Contained zexall 'Z80 instruction exerciser' test driver
-*  Zexall originally written by Frank Cringle for ZX Spectrum
-*  Modularized Spectrum-independent Zexall binary supplied by Blargg
-*  Serial interface binary/preloader at 0x0000-0x00FF written by Kevin 'kevtris' Horton
-*
-*
-* mem map:
-Ram 0000-FFFF (preloaded with binary)
-Special calls take place for three ram values (this interface was designed by kevtris):
-FFFD - 'ack' - shared ram with output device; z80 reads from here and considers the byte at FFFF read if this value incremented
-FFFE - 'req' - shared ram with output device; z80 writes an incrementing value to FFFE to indicate that there is a byte waiting at FFFF
-               and hence requesting the output device on the other end do something about it, until FFFD is incremented by the
-               output device to acknowledge receipt
-FFFF - 'data' - shared ram with output device; z80 writes the data to be sent to output device here
-One i/o port is used:
-0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.
+
+  Self Contained zexall 'Z80 instruction exerciser' test driver
+  Zexall originally written by Frank Cringle for ZX Spectrum
+  Modularized Spectrum-independent Zexall binary supplied by Blargg
+  Serial interface binary/preloader at 0x0000-0x00FF written by Kevin 'kevtris' Horton
+
+  NOTE: there's a modified version of this driver in src/zexall
+
+
+  Memory map:
+
+  Ram 0000-FFFF (preloaded with binary)
+  Special calls take place for three ram values (this interface was designed by kevtris):
+  FFFD - 'ack' - shared ram with output device; z80 reads from here and considers the byte at FFFF read if this value incremented
+  FFFE - 'req' - shared ram with output device; z80 writes an incrementing value to FFFE to indicate that there is a byte waiting at FFFF
+                 and hence requesting the output device on the other end do something about it, until FFFD is incremented by the
+                 output device to acknowledge receipt
+  FFFF - 'data' - shared ram with output device; z80 writes the data to be sent to output device here
+  One i/o port is used, but left unemulated:
+  0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
-
 
 class zexall_state : public driver_device
 {
@@ -133,9 +135,9 @@ WRITE8_MEMBER( zexall_state::output_data_w )
 ******************************************************************************/
 
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
-	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r,output_ack_w)
-	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r,output_req_w)
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r,output_data_w)
+	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r, output_ack_w)
+	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r, output_req_w)
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r, output_data_w)
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
