@@ -122,7 +122,7 @@ msgid ""
 "run correctly.\n"
 msgstr ""
 "Uma ou mais ROMs/CHDs para esta máquina estão incorretas. A máquina poderá "
-"não funcionar corretamente"
+"não funcionar corretamente.\n"
 
 #: src/frontend/mame/ui/info.cpp:190
 msgid ""
@@ -1102,7 +1102,7 @@ msgstr "Romset\t%1$-.100s\n"
 #: src/frontend/mame/ui/selgame.cpp:854
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr "Romset\t%1$-.100s\n"
+msgstr "Ano\t%1$s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:855
 #, c-format
@@ -1116,7 +1116,7 @@ msgstr "Driver é Clone de\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:861
 msgid "Driver is Parent\t\n"
-msgstr "Driver é Original\t\n"
+msgstr "Driver é Principal\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:864
 msgid "Analog Controls\tYes\n"
@@ -1252,7 +1252,7 @@ msgstr "Temporização\tNão Implementada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:943
 msgid "Timing\tImperfect\n"
-msgstr "temporização\tImperfeita\n"
+msgstr "Temporização\tImperfeita\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tYes\n"
@@ -1487,7 +1487,7 @@ msgstr "Placares"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
 msgid "Versus"
-msgstr "versus"
+msgstr "Versus"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:65
 msgid "Covers"
@@ -1583,7 +1583,7 @@ msgstr "Moeda %1$c: %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
-msgstr "(travado)"
+msgstr " (travado)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:503
 msgid "Visible Delay"
@@ -1911,8 +1911,8 @@ msgid "General Info"
 msgstr "Info Geral"
 
 #: src/frontend/mame/ui/submenu.cpp:22
-msgid "Opções Diversas"
-msgstr ""
+msgid "Miscellaneous Options"
+msgstr "Opções Diversas"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Re-select last machine played"
