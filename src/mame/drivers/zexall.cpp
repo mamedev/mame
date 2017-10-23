@@ -172,9 +172,6 @@ ROM_START( zexall )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
 	ROM_LOAD( "zexall.bin",    0x0100, 0x2189, CRC(b6f869c3) SHA1(14021f75c1bc9f26688969581065a0efff3af59c) )
-
-	ROM_REGION( 0x10000, "source", 0 ) // attach GPL2 zexall source code
-	ROM_LOAD( "zexall.z80",    0x0000, 0x9d59, CRC(56e12d1c) SHA1(99611739e706afe2b84783b7fbf119daa60b97ca) )
 ROM_END
 
 
