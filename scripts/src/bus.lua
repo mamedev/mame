@@ -3238,3 +3238,33 @@ if (BUSES["PSI_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/psi_kbd/hle.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/interpro/sr/sr.h,BUSES["INTERPRO_SR"] = true
+---------------------------------------------------
+
+if (BUSES["INTERPRO_SR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/gt.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/gt.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/interpro/keyboard/keyboard.h,BUSES["INTERPRO_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["INTERPRO_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
+	}
+end
