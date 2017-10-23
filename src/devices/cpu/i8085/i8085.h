@@ -114,6 +114,7 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	address_space_config m_opcode_config;
 
 	devcb_write8 m_out_status_func;
 	devcb_write_line m_out_inte_func;
@@ -141,6 +142,7 @@ private:
 
 	address_space *m_program;
 	direct_read_data *m_direct;
+	direct_read_data *m_opcode_direct;
 	address_space *m_io;
 	int m_icount;
 

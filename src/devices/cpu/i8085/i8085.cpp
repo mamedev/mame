@@ -210,6 +210,7 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_out_status_func(*this)
 	, m_out_inte_func(*this)
 	, m_in_sid_func(*this)
@@ -230,7 +231,11 @@ i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *
 
 device_memory_interface::space_config_vector i8085a_cpu_device::memory_space_config() const
 {
-	return space_config_vector {
+	return has_configured_map(AS_OPCODES) ? space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_OPCODES, &m_opcode_config)
+	} : space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};
@@ -333,6 +338,7 @@ void i8085a_cpu_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+	m_opcode_direct = has_space(AS_OPCODES) ? &space(AS_OPCODES).direct() : m_direct;
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */
@@ -670,7 +676,7 @@ PAIR i8085a_cpu_device::read_arg16()
 u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
-	return m_direct->read_byte(m_PC.w.l++);
+	return m_opcode_direct->read_byte(m_PC.w.l++);
 }
 
 u8 i8085a_cpu_device::read_mem(u32 a)
