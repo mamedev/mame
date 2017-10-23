@@ -52,7 +52,6 @@ Usage of terminal:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -499,10 +498,6 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
 	MCFG_CPU_IO_MAP(okean240t_io)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -524,6 +519,9 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_DEVICE_ADD("ppie", I8255, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK1(3072000) // artificial rate
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
@@ -553,6 +551,9 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240a_port40_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240a_port41_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(okean240_state, okean240a_port42_r))
+
+	MCFG_DEVICE_MODIFY("pit")
+	MCFG_PIT8253_CLK1(1536000) // artificial rate
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240, okean240t )
@@ -560,8 +561,9 @@ static MACHINE_CONFIG_DERIVED( okean240, okean240t )
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
 	MCFG_DEVICE_REMOVE("uart")
-	MCFG_DEVICE_REMOVE("uart_clock")
 	MCFG_DEVICE_REMOVE("rs232")
+	MCFG_DEVICE_MODIFY("pit")
+	MCFG_PIT8253_OUT1_HANDLER(NOOP)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
 MACHINE_CONFIG_END
