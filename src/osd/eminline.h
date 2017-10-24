@@ -301,6 +301,9 @@ inline uint8_t count_leading_ones(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef population_count_32
+#if defined(__NetBSD__)
+#define population_count_32 popcount32
+#else
 inline unsigned population_count_32(uint32_t val)
 {
 #if defined(__GNUC__)
@@ -320,6 +323,7 @@ inline unsigned population_count_32(uint32_t val)
 #endif
 }
 #endif
+#endif
 
 
 /*-------------------------------------------------
@@ -328,6 +332,9 @@ inline unsigned population_count_32(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef population_count_64
+#if defined(__NetBSD__)
+#define population_count_64 popcount64
+#else
 inline unsigned population_count_64(uint64_t val)
 {
 #if defined(__GNUC__)
@@ -355,6 +362,7 @@ inline unsigned population_count_64(uint64_t val)
 	}
 #endif
 }
+#endif
 #endif
 
 

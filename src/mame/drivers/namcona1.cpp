@@ -271,8 +271,8 @@ READ16_MEMBER(namcona1_state::custom_key_r)
 			res = BITSWAP16(m_keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
 
 			m_keyval >>= 1;
-//          printf("popcount(%08X) = %d\n", m_keyval & 0x58000c00, popcount(m_keyval & 0x58000c00));
-			if((!m_keyval) || (popcount(m_keyval & 0x58000c00) & 1))
+//          printf("popcount(%08X) = %d\n", m_keyval & 0x58000c00, population_count_32(m_keyval & 0x58000c00));
+			if((!m_keyval) || (population_count_32(m_keyval & 0x58000c00) & 1))
 				m_keyval ^= 0x80000000;
 
 			return res;
