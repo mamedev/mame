@@ -91,7 +91,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "enable bilinear filtering on screen output" },
-	{ OSDOPTION_PRESCALE,                     "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
+	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },

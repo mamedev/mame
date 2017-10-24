@@ -501,8 +501,8 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
-	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
+	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xd000, 0xd007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -511,8 +511,8 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
@@ -565,8 +565,8 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
-	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
+	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
+	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
@@ -575,8 +575,8 @@ static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_lo_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_start_w)
@@ -1528,14 +1528,31 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 }
 
 
+static MACHINE_CONFIG_START( l_system_video )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitol_state, screen_vblank_taitol))
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
+	MCFG_PALETTE_ADD("palette", 256)
+
+	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(fhawk_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_3_map)
@@ -1558,19 +1575,7 @@ static MACHINE_CONFIG_START( fhawk )
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_FRAGMENT_ADD(l_system_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1583,9 +1588,9 @@ static MACHINE_CONFIG_START( fhawk )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("slave")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("slave")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -1615,19 +1620,21 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( raimais, fhawk )
+static MACHINE_CONFIG_START( raimais )
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, 13330560/2)    // needs verification from pin122 of TC0090LVC
 	MCFG_CPU_PROGRAM_MAP(raimais_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
 
-	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_ADD("audiocpu", Z80, 12000000/3)     // not verified
 	MCFG_CPU_PROGRAM_MAP(raimais_3_map)
 
-	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_ADD("slave", Z80, 12000000/3)        // not verified
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
-	MCFG_DEVICE_REMOVE("tc0220ioc")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
@@ -1638,12 +1645,24 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD(l_system_video)
+
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("slave")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -1653,8 +1672,6 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
@@ -1676,19 +1693,7 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_FRAGMENT_ADD(l_system_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1707,25 +1712,12 @@ static MACHINE_CONFIG_START( plotting )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(plotting_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_FRAGMENT_ADD(l_system_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1836,7 +1828,6 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
@@ -1859,19 +1850,7 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_FRAGMENT_ADD(l_system_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

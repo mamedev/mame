@@ -8,7 +8,7 @@
 
  Here we emulate the following PCBs
 
- * Rex Soft DragonBall Z V [mapper 12]
+ * Rex Soft Dragon Ball Z V [mapper 12]
  * Rex Soft SL-1632 [mapper 14]
 
  TODO:
@@ -35,7 +35,7 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_REX_DBZ5,   nes_rex_dbz5_device,   "nes_rex_dbz5",   "NES Cart Rex Soft DragonBall Z V PCB")
+DEFINE_DEVICE_TYPE(NES_REX_DBZ5,   nes_rex_dbz5_device,   "nes_rex_dbz5",   "NES Cart Rex Soft Dragon Ball Z V PCB")
 DEFINE_DEVICE_TYPE(NES_REX_SL1632, nes_rex_sl1632_device, "nes_rex_sl1632", "NES Cart Rex Soft SL-1632 PCB")
 
 

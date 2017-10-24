@@ -59,6 +59,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/clock.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 
@@ -247,21 +248,6 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 
 
 /***************************************************************************
-    CTC
-***************************************************************************/
-
-/* channel 0 and 1 have a 2 MHz input clock for triggering */
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
-{
-	/* toggle line status */
-	m_ctc_trigger ^= 1;
-
-	m_ctc->trg0(m_ctc_trigger);
-	m_ctc->trg1(m_ctc_trigger);
-}
-
-
-/***************************************************************************
     UART
 ***************************************************************************/
 
@@ -414,8 +400,6 @@ void einstein_state::machine_reset()
 	m_interrupt = 0;
 	m_interrupt_mask = 0;
 
-	m_ctc_trigger = 0;
-
 	/* configure floppy drives */
 /*  floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
     floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
@@ -480,6 +464,7 @@ ADDRESS_MAP_END
 
 /* The I/O ports are decoded into 8 blocks using address lines A3 to A7 */
 static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	/* block 0, ay8910 psg */
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_device, data_r, address_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_device, data_w)
@@ -697,16 +682,20 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(einstein_state, einstein_serial_transmit_clock))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(einstein_state, einstein_serial_receive_clock))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
 
-	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", einstein_state, einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
+	MCFG_CLOCK_ADD("ctc_trigger", XTAL_X002 / 4)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(IC_I058, z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg2))
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_DEVICE_ADD("keyboard_daisy", EINSTEIN_KEYBOARD_DAISY, 0)

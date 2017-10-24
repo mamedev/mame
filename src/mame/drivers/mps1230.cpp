@@ -122,6 +122,7 @@ void mps1230_state::machine_reset()
 static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
+	AM_RANGE(0xff80, 0xffff) AM_RAM // internal in cpu
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -147,7 +148,7 @@ ROM_START(mps1000)
 	// ver 2.20, 06/DEC/1986 (But it could also perhaps mean 12/JUN/1986)
 	// I can't tell the PCB reference because this was dumped from spare EPROMs from a drawer
 	// The dump seems to be good because the data content of all of my 4 spare EPROMs matched perfectly.
-	ROM_LOAD( "mps_1000_vers_2.20_12-06-86.rom", 0x000000, 0x02000, CRC(0a91ea8a) SHA1(ccb679f3d1f7f4eddb4e8899fe9e9a594dcfca5d) )
+	ROM_LOAD( "mps_1000_vers_2.20_12-06-86.rom", 0x000000, 0x02000, CRC(0a91ea8a) SHA1(ccb679f3d1f7f4eddb4e8899fe9e9a594dcfca5d) ) // this is Z80 code
 ROM_END
 
 ROM_START(mps1230)

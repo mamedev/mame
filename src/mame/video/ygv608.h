@@ -166,7 +166,7 @@ private:
 	uint8_t m_na8_mask;       // mask on/off na11/9:8
 	int m_col_shift;                // shift in scroll table column index
 
-	
+
 	// base address shortcuts
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
@@ -181,8 +181,8 @@ private:
 
 	// === new variable handling starts here ===
 	uint8_t m_screen_status;    /**< port #6: status port r/w */
-	uint8_t m_dma_status;		/**< port #7: system control port r/w */
-	
+	uint8_t m_dma_status;       /**< port #7: system control port r/w */
+
 	uint8_t m_register_address; /**< RN: Register address select */
 	bool m_register_autoinc_r;  /**< RRAI: Register address auto-increment on read */
 	bool m_register_autoinc_w;  /**< RWAI: Register address auto-increment on write */
@@ -210,41 +210,41 @@ private:
 	uint8_t m_sprite_aux_reg;   /**< SPA: auxiliary bits of sprite attribute table */
 	uint8_t m_border_color;     /**< BDC: border color */
 
-	bool m_saar;					/**< SAAR: Address autoinc after reading sprite attribute table */
-	bool m_saaw;					/**< SAAW: Address autoinc after writing sprite attribute table */
-	bool m_scar;					/**< SCAR: Address autoinc after reading scroll data table */
-	bool m_scaw;					/**< SCAW: Address autoinc after writing scroll data table */
-	bool m_cpar;					/**< CPAR: Address autoinc after reading color palette */
-	bool m_cpaw;					/**< CPAW: Address autoinc after writing color palette */
-	bool m_ba_plane_scroll_select;			/**< B/(A) P#2 gains access to scroll data table in A/B plane */
-	
-	bool m_dspe;					/**< DSPE: display permission of pattern plane(s) (screen blanked if 0) */
-	uint8_t m_md;					/**< MDx: mode for pattern planes */
-	bool m_zron;					/**< ZRON: enable ROZ features */
-	bool m_flip;					/**< FLIP: enable flip for attribute bits 11 & 10 */
-	bool m_dckm;					/**< DCKM: dot clock frequency select */
-	
-	bool m_page_size;				/**< PGS: page size setter */
-	uint8_t m_h_display_size;		/**< HDS: horizontal display domain */
-	uint8_t m_v_display_size;		/**< VDS: vertical display domain */
-	bool m_roz_wrap_disable;		/**< RLRT: ROZ wraparound disable */
-	bool m_scroll_wrap_disable;		/**< RLSC: ROZ wraparound disable */
+	bool m_saar;                    /**< SAAR: Address autoinc after reading sprite attribute table */
+	bool m_saaw;                    /**< SAAW: Address autoinc after writing sprite attribute table */
+	bool m_scar;                    /**< SCAR: Address autoinc after reading scroll data table */
+	bool m_scaw;                    /**< SCAW: Address autoinc after writing scroll data table */
+	bool m_cpar;                    /**< CPAR: Address autoinc after reading color palette */
+	bool m_cpaw;                    /**< CPAW: Address autoinc after writing color palette */
+	bool m_ba_plane_scroll_select;          /**< B/(A) P#2 gains access to scroll data table in A/B plane */
 
-	uint8_t m_pattern_size;			/**< PTS: pattern size of pattern plane */
-	uint8_t m_h_div_size;			/**< SLH: size of horizontal division in screen division scrolling */
-	uint8_t m_v_div_size;			/**< SLV: size of vertical division in screen division scrolling */
-	
-	bool m_planeA_trans_enable;		/**< CTPA: enable transparency for plane A */
-	bool m_planeB_trans_enable;		/**< CTPA: enable transparency for plane B */
-	uint8_t m_priority_mode;		/**< PRM: priority mode select */
-	bool m_cbdr;					/**< CBDR: color bus terminals CB7 to 0 and SPRT */
-	bool m_yse;						/**< YSE: permission control of trasparency timing output of YS terminal */
-	uint8_t m_scm;					/**< SCM: output frequency of clock signal output from terminal FSC */
+	bool m_dspe;                    /**< DSPE: display permission of pattern plane(s) (screen blanked if 0) */
+	uint8_t m_md;                   /**< MDx: mode for pattern planes */
+	bool m_zron;                    /**< ZRON: enable ROZ features */
+	bool m_flip;                    /**< FLIP: enable flip for attribute bits 11 & 10 */
+	bool m_dckm;                    /**< DCKM: dot clock frequency select */
 
-	uint8_t m_planeA_color_fetch;	/**< APF: A plane color fetch mode */
-	uint8_t m_planeB_color_fetch; 	/**< BPF: B plane color fetch mode */
-	uint8_t m_sprite_color_fetch;	/**< SPF: sprite color fetch mode */
-	
+	bool m_page_size;               /**< PGS: page size setter */
+	uint8_t m_h_display_size;       /**< HDS: horizontal display domain */
+	uint8_t m_v_display_size;       /**< VDS: vertical display domain */
+	bool m_roz_wrap_disable;        /**< RLRT: ROZ wraparound disable */
+	bool m_scroll_wrap_disable;     /**< RLSC: ROZ wraparound disable */
+
+	uint8_t m_pattern_size;         /**< PTS: pattern size of pattern plane */
+	uint8_t m_h_div_size;           /**< SLH: size of horizontal division in screen division scrolling */
+	uint8_t m_v_div_size;           /**< SLV: size of vertical division in screen division scrolling */
+
+	bool m_planeA_trans_enable;     /**< CTPA: enable transparency for plane A */
+	bool m_planeB_trans_enable;     /**< CTPA: enable transparency for plane B */
+	uint8_t m_priority_mode;        /**< PRM: priority mode select */
+	bool m_cbdr;                    /**< CBDR: color bus terminals CB7 to 0 and SPRT */
+	bool m_yse;                     /**< YSE: permission control of trasparency timing output of YS terminal */
+	uint8_t m_scm;                  /**< SCM: output frequency of clock signal output from terminal FSC */
+
+	uint8_t m_planeA_color_fetch;   /**< APF: A plane color fetch mode */
+	uint8_t m_planeB_color_fetch;   /**< BPF: B plane color fetch mode */
+	uint8_t m_sprite_color_fetch;   /**< SPF: sprite color fetch mode */
+
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
@@ -257,9 +257,9 @@ private:
 	void vblank_irq_check();        /**< mask + pend check for vblank irq */
 	void raster_irq_check();        /**< mask + pend check for raster irq */
 	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
-	void pattern_mode_setup();		/**< refresh pattern mode at register 7/8 change*/
-	int get_col_division(int raw_col); /**< calculate column scroll */	
-	
+	void pattern_mode_setup();      /**< refresh pattern mode at register 7/8 change*/
+	int get_col_division(int raw_col); /**< calculate column scroll */
+
 	enum
 	{
 		VBLANK_TIMER,

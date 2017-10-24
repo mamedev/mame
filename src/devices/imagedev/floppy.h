@@ -131,7 +131,7 @@ public:
 	void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
-	void ss_w(int state) { ss = state; }
+	void ss_w(int state) { if (sides > 1) ss = state; }
 	void inuse_w(int state) { }
 	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 	void ds_w(int state) { ds = state; check_led(); }

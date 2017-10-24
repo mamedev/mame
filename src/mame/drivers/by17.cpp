@@ -1090,10 +1090,16 @@ ROM_END
 /*--------------------------------
 / Eight Ball #1118
 /-------------------------------*/
-ROM_START(eightbll)
+ROM_START(eightbll)   // Fixes tilt exploit in previous version - if tilt is held closed, next ball will not be served until the tilt switch is released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "723-20_2.716", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "E723-20.U2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
+	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold tilt active, after the ball enters the outhole the next ball will be served with tilt state flagged off and the tilt switch is ignored until it's released
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "E723-17.U2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
+	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 /*--------------------------------
@@ -1126,6 +1132,7 @@ GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Ba
 GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
 GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
 GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)

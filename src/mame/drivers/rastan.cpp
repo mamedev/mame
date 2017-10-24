@@ -11,7 +11,7 @@ custom ICs
 ----------
 PC040DA x3  video DAC
 PC050       coin I/O
-PC060HS     main/sub CPU communication
+PC060HA     main/sub CPU communication
 PC080       tilemap generator
 PC090       sprite generator
 
@@ -46,7 +46,7 @@ Address                  Dir Data             Name      Description
 0011101-----------------   W ---------------x SUB RESET [1]
 0011110----------------- R   ---------------- n.c.
 0011110-----------------   W ----------------           watchdog reset
-0011111---------------x- R/W ------------xxxx SNRD/SNWR PC060HS
+0011111---------------x- R/W ------------xxxx SNRD/SNWR PC060HA
 0011                                          EXT       [1]
 11000xxxxxxxxxxxxxxxxxxx R/W xxxxxxxxxxxxxxxx SCN       PC080 PGA
 11010000---xxxxxxxxxxxxx R/W xxxxxxxxxxxxxxxx OBJ       PC090 PGA
@@ -62,7 +62,7 @@ Address          Dir Data     Name      Description
 01xxxxxxxxxxxxxx R   xxxxxxxx           program ROM (banked)
 1000xxxxxxxxxxxx R/W xxxxxxxx SRAM      work RAM
 1001-----------x R/W xxxxxxxx YM2151    YM2151 [1]
-1010-----------x R/W ----xxxx PC6       PC060HS
+1010-----------x R/W ----xxxx PC6       PC060HA
 1011------------   W xxxxxxxx V-ST-ADRS MSM5205 start address (bits 15-8)
 1100------------   W -------- START-VCE MSM5205 start
 1101------------   W -------- STOP-VCE  MSM5205 stop
@@ -75,7 +75,7 @@ Address          Dir Data     Name      Description
 Notes:
 - For sound communication, we are using code in audio/taitosnd.c, which
   claims to be for the TC0140SYT chip. That chip is not present in Rastan,
-  the communication is handled by PC060HS, which I guess is compatible.
+  the communication is handled by PC060HA, which I guess is compatible.
 
 TODO:
 - Unknown writes to 0x350008.
@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x390008, 0x390009) AM_READ_PORT("DSWA")
 	AM_RANGE(0x39000a, 0x39000b) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
@@ -236,8 +236,8 @@ static ADDRESS_MAP_START( rastan_s_map, AS_PROGRAM, 8, rastan_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(rastan_msm5205_address_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rastan_msm5205_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(rastan_msm5205_stop_w)
@@ -414,9 +414,9 @@ static MACHINE_CONFIG_START( rastan )
 	MCFG_DEVICE_ADD("adpcm_sel", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

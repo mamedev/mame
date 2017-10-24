@@ -1876,13 +1876,16 @@ void validity_checker::validate_inputs()
 				// verify natural keyboard codes
 				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
 				{
-					char32_t code = field.keyboard_code(which);
-					if (code && !uchar_isvalid(code))
+					std::vector<char32_t> codes = field.keyboard_codes(which);
+					for (char32_t code : codes)
 					{
-						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
-							name,
-							(unsigned)code,
-							(int)code);
+						if (!uchar_isvalid(code))
+						{
+							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+								name,
+								(unsigned)code,
+								(int)code);
+						}
 					}
 				}
 			}

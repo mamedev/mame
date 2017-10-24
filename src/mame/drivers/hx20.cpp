@@ -6,6 +6,13 @@
 
     http://fjkraan.home.xs4all.nl/comp/hx20/
 
+    Epson CM6000
+
+    This is a re-badged HX-20 with revision H motherboard and keyboard overlay.
+    It takes 3x16K ROMs instead of the usual 4x8K + 8K optional. Appears to
+    be from a BT phone exchange.
+    Label on base states CM6000 Series, CM6032 System, MOH 89/1.
+
 ****************************************************************************/
 
 /*
@@ -552,6 +559,7 @@ static ADDRESS_MAP_START( hx20_mem, AS_PROGRAM, 8, hx20_state )
 	AM_RANGE(0x0040, 0x007f) AM_DEVREADWRITE(MC146818_TAG, mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x3fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_READ(optrom_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
 ADDRESS_MAP_END
 
@@ -569,7 +577,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( hx20_io )
+//  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( hx20_sub_mem, AS_PROGRAM, 8, hx20_state )
@@ -580,7 +588,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( hx20_io )
+//  ADDRESS_MAP( hx20_sub_io )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( hx20_sub_io, AS_IO, 8, hx20_state )
@@ -590,6 +598,15 @@ static ADDRESS_MAP_START( hx20_sub_io, AS_IO, 8, hx20_state )
 	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READWRITE(slave_p4_r, slave_p4_w)
 ADDRESS_MAP_END
 
+
+//-------------------------------------------------
+//  ADDRESS_MAP( cm6000_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( cm6000_mem, AS_PROGRAM, 8, hx20_state )
+	AM_IMPORT_FROM(hx20_mem)
+	AM_RANGE(0x4000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -741,6 +758,33 @@ static INPUT_PORTS_START( hx20e )
 INPUT_PORTS_END
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( cm6000 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( cm6000 )
+	PORT_INCLUDE(hx20)
+
+	PORT_MODIFY("KSC0")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 TOTALS") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+
+	PORT_MODIFY("KSC1")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 DETAIL") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+
+	PORT_MODIFY("KSC2")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 STATUS") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+
+	PORT_MODIFY("KSC3")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 AUTO") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+
+	PORT_MODIFY("KSC4")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 T/DATE") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+
+	PORT_MODIFY("KSC7")
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ABORT")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT FF")
+INPUT_PORTS_END
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -786,6 +830,34 @@ uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
+
+//**************************************************************************
+//  OPTIONAL ROMS
+//**************************************************************************
+
+DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
+{
+	uint32_t size = m_optrom->common_get_size("rom");
+
+	if (size != 0x2000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported rom size");
+		return image_init_result::FAIL;
+	}
+
+	m_optrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_optrom->common_load_rom(m_optrom->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+READ8_MEMBER(hx20_state::optrom_r)
+{
+	if (m_optrom->exists())
+		return m_optrom->read_rom(space, offset);
+	else
+		return 0;
+}
 
 
 //**************************************************************************
@@ -866,10 +938,34 @@ static MACHINE_CONFIG_START( hx20 )
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 
+	// optional rom
+	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
+
 	// software lists
+	MCFG_SOFTWARE_LIST_ADD("hx20_opt_list", "hx20_rom")
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( hx20 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( cm6000, hx20 )
+	// basic machine hardware
+	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
+	MCFG_CPU_PROGRAM_MAP(cm6000_mem)
+	MCFG_CPU_IO_MAP(hx20_io)
+
+	// optional rom
+	MCFG_DEVICE_REMOVE("optrom")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
+	MCFG_SOFTWARE_LIST_REMOVE("hx20_opt_list")
+MACHINE_CONFIG_END
 
 
 //**************************************************************************
@@ -877,7 +973,7 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( hx20 )
+//  ROM( ehx20 )
 //-------------------------------------------------
 
 ROM_START( ehx20 )
@@ -900,26 +996,42 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( hx20e )
+//  ROM( ehx20e )
 //-------------------------------------------------
 
 ROM_START( ehx20e )
 	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
-	ROMX_LOAD( "hx20_v11e.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371), ROM_BIOS(3) )
-	ROMX_LOAD( "hx20_v11e.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a), ROM_BIOS(3) )
-	ROMX_LOAD( "hx20_v11e.14e", 0x4000, 0x2000, CRC(26c203a1) SHA1(b282d7233b2689820fcf718dbe1e93d623b67e4f), ROM_BIOS(3) )
-	ROMX_LOAD( "hx20_v11e.15e", 0x6000, 0x2000, CRC(fd339aa5) SHA1(860c3579c45e96c5e6a877f4fbe77abacb0d674e), ROM_BIOS(3) )
+	ROM_LOAD( "hx20_v11e.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371) )
+	ROM_LOAD( "hx20_v11e.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a) )
+	ROM_LOAD( "hx20_v11e.14e", 0x4000, 0x2000, CRC(26c203a1) SHA1(b282d7233b2689820fcf718dbe1e93d623b67e4f) )
+	ROM_LOAD( "hx20_v11e.15e", 0x6000, 0x2000, CRC(fd339aa5) SHA1(860c3579c45e96c5e6a877f4fbe77abacb0d674e) )
 
 	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
 	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( ecm6000 )
+//-------------------------------------------------
+
+ROM_START( ecm6000 )
+	// 1988 MOSU 20120200004 H:::
+	ROM_REGION( 0xc000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "cm6032a-1_v43.11e", 0x0000, 0x4000, CRC(124797c2) SHA1(33d3418c99eb2d557151996bc09debf4ca089298) )
+	ROM_LOAD( "cm6032a-2_v43.13e", 0x4000, 0x4000, CRC(b136abec) SHA1(594862e058e553826209f86e9ebbb81f29017469) )
+	ROM_LOAD( "cm6032a-3_v43.15e", 0x8000, 0x4000, CRC(95c34bdc) SHA1(c7022145f37e9fd2f339f8e7ad3adce76a67ca0b) )
+
+	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
+	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a)) // not verified
+ROM_END
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
-COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
+COMP( 1983, ehx20,   0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e,  ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
+COMP( 1989, ecm6000, ehx20,  0,       cm6000,    cm6000,  hx20_state,    0,     "Epson",  "Epson CM6000",          MACHINE_NOT_WORKING )

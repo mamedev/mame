@@ -14,8 +14,8 @@ TK80 (Training Kit 80) considered to be Japan's first home computer.
 It consisted of 25 keys and 8 LED digits, and was programmed in hex.
 The Mikrolab is a Russian clone which appears to be almost completely identical.
 
-TK85 seems to be the same as TK80, except is has a larger ROM. No
-schematics etc are available. Thanks to 'Nama' who dumped the rom.
+TK85 seems to be the same as TK80, except it has a 8085 and a larger ROM.
+No schematics etc are available. Thanks to 'Nama' who dumped the rom.
 It has 25 keys, so a few aren't defined yet.
 
 ND-80Z : http://www.alles.or.jp/~thisida/nd80z3syokai.html (newer version)
@@ -250,7 +250,7 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 
 static MACHINE_CONFIG_START( tk80 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) // 18.432 / 9
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(tk80_mem)
 	MCFG_CPU_IO_MAP(tk80_io)
 
@@ -293,8 +293,9 @@ static MACHINE_CONFIG_START( nd80z )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk85, tk80 )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
+	MCFG_CPU_IO_MAP(tk80_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ics8080, tk80 )

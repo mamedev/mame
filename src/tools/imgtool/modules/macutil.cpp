@@ -15,32 +15,54 @@
 
 typedef util::arbitrary_clock<std::uint32_t, 1904, 1, 1, 0, 0, 0, std::ratio<1, 1> > classic_mac_clock;
 
-time_t mac_crack_time(uint32_t t)
+//-------------------------------------------------
+//  mac_crack_time
+//-------------------------------------------------
+
+imgtool::datetime mac_crack_time(uint32_t t)
 {
 	classic_mac_clock::duration d(t);
-	std::chrono::time_point<std::chrono::system_clock> tp = classic_mac_clock::to_system_clock(std::chrono::time_point<classic_mac_clock>(d));
-	return std::chrono::system_clock::to_time_t(tp);
+	std::chrono::time_point<classic_mac_clock> tp(d);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, tp);
 }
 
 
+//-------------------------------------------------
+//  mac_setup_time
+//-------------------------------------------------
 
-uint32_t mac_setup_time(time_t t)
+uint32_t mac_setup_time(const imgtool::datetime &t)
 {
-	auto system_time_point = std::chrono::system_clock::from_time_t(t);
-	auto mac_time_point = classic_mac_clock::from_system_clock(system_time_point);
+	auto mac_time_point = classic_mac_clock::from_arbitrary_time_point(t.time_point());
 	return mac_time_point.time_since_epoch().count();
 }
 
 
+//-------------------------------------------------
+//  mac_setup_time
+//-------------------------------------------------
 
-uint32_t mac_time_now(void)
+uint32_t mac_setup_time(time_t t)
 {
-	time_t now;
-	time(&now);
-	return mac_setup_time(now);
+	imgtool::datetime dt(imgtool::datetime::datetime_type::LOCAL, t);
+	return mac_setup_time(dt);
 }
 
 
+//-------------------------------------------------
+//  mac_time_now
+//-------------------------------------------------
+
+uint32_t mac_time_now(void)
+{
+	imgtool::datetime dt = imgtool::datetime::now(imgtool::datetime::datetime_type::LOCAL);
+	return mac_setup_time(dt);
+}
+
+
+//-------------------------------------------------
+//  mac_identify_fork
+//-------------------------------------------------
 
 imgtoolerr_t mac_identify_fork(const char *fork_string, mac_fork_t *fork_num)
 {

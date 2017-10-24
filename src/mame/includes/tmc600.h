@@ -5,7 +5,6 @@
 #ifndef __TMC600__
 #define __TMC600__
 
-
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -13,6 +12,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define CDP1802_TAG     "cdp1802"
@@ -25,18 +25,18 @@
 class tmc600_state : public driver_device
 {
 public:
-	tmc600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vis(*this, CDP1869_TAG),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, "centronics"),
-			m_ram(*this, RAM_TAG),
-			m_char_rom(*this, "chargen"),
-			m_page_ram(*this, "page_ram"),
-			m_color_ram(*this, "color_ram"),
-			m_run(*this, "RUN"),
-			m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
+	tmc600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_ram(*this, RAM_TAG),
+		m_char_rom(*this, "chargen"),
+		m_page_ram(*this, "page_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_run(*this, "RUN"),
+		m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

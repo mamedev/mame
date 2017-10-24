@@ -28,7 +28,7 @@
 
 #define MCFG_SMPC_HLE_PDR2_IN_CB(_devcb) \
 	devcb = &smpc_hle_device::set_pdr2_in_handler(*device, DEVCB_##_devcb);
-		
+
 #define MCFG_SMPC_HLE_PDR1_OUT_CB(_devcb) \
 	devcb = &smpc_hle_device::set_pdr1_out_handler(*device, DEVCB_##_devcb);
 
@@ -75,7 +75,7 @@ public:
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//	DECLARE_ADDRESS_MAP( io_map, 8);
+//  DECLARE_ADDRESS_MAP( io_map, 8);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -95,11 +95,11 @@ public:
 	DECLARE_WRITE8_MEMBER( exle_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
-	void m68k_reset_trigger();	
+	void m68k_reset_trigger();
 	bool get_iosel(bool which);
 	uint8_t get_ddr(bool which);
-	
-//	system delegation
+
+//  system delegation
 	template <class Object> static devcb_base &set_master_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshres.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_master_nmi_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshnmi.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_slave_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sshres.set_callback(std::forward<Object>(cb)); }
@@ -109,7 +109,7 @@ public:
 	template <class Object> static devcb_base &set_dot_select_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_dotsel.set_callback(std::forward<Object>(cb)); }
 
 
-//	PDR delegation
+//  PDR delegation
 	template <class Object> static devcb_base &set_pdr1_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_read.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pdr2_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr2_read.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_pdr1_out_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_write.set_callback(std::forward<Object>(cb)); }
@@ -123,7 +123,7 @@ public:
 
 protected:
 	// device-level overrides
-//	virtual void device_validity_check(validity_checker &valid) const override;
+//  virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -147,7 +147,7 @@ private:
 	const char *m_ctrl1_tag;
 	const char *m_ctrl2_tag;
 	bool m_has_ctrl_ports;
-	
+
 	bool m_sf;
 	bool m_cd_sf;
 	uint8_t m_sr;
@@ -163,8 +163,8 @@ private:
 	uint8_t m_comreg;
 	// in usec
 	// timing table, from manual in usec
-	const uint32_t m_cmd_table_timing[0x20] = 
-	{	
+	const uint32_t m_cmd_table_timing[0x20] =
+	{
 		30, 30, // MASTER ON / OFF
 		30, 30, // SLAVE ON / OFF
 		10, 10, // <unknown>
@@ -188,7 +188,7 @@ private:
 	void intback_continue_request();
 	void handle_rtc_increment();
 	void read_saturn_ports();
-	
+
 	void sr_set(uint8_t data);
 	void sr_ack();
 	void sf_ack(bool cd_enable);
@@ -202,10 +202,10 @@ private:
 	devcb_write_line m_mshres;
 	devcb_write_line m_mshnmi;
 	devcb_write_line m_sshres;
-//	devcb_write_line m_sshnmi;
+//  devcb_write_line m_sshnmi;
 	devcb_write_line m_sndres;
 	devcb_write_line m_sysres;
-//	devcb_write_line m_cdres;
+//  devcb_write_line m_cdres;
 	devcb_write_line m_syshalt;
 	devcb_write_line m_dotsel;
 	devcb_read8 m_pdr1_read;

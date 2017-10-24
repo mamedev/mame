@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2017-08-26 04:43+0300\n"
+"PO-Revision-Date: 2017-10-23 16:22+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
 "Language: ru\n"
@@ -137,7 +137,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:195
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr "Один или несколько ROM/CHD этой системы не были нормально сдамплены.\n"
+msgstr "Один или несколько ROMов/CHD этой системы не были нормально сдамплены.\n"
 
 #: src/frontend/mame/ui/info.cpp:200
 msgid "Completely unemulated features: "
@@ -190,8 +190,9 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"ЭТА СИСТЕМА НЕ РАБОТАЕТ. Эмуляция этой системы не завершена. Вы никак не "
-"сможете исправить проблемы, лишь ждать когда разработчики улучшат эмуляцию.\n"
+"ЭТА СИСТЕМА НЕ РАБОТАЕТ. Эмуляция этой системы пока не "
+"завершена. Вы никак не можете исправить эту проблему, лишь подождать когда "
+"разработчики улучшат эмуляцию.\n"
 
 #: src/frontend/mame/ui/info.cpp:243
 msgid ""
@@ -200,6 +201,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Элементы этой системы не могут быть эмулированы, поскольку они требуют физического "
+"взаимодействия или состоят из механических устройств. Невозможно полностью "
+"ощутить опыт взаимодействия с этой системой.\n"
 
 #: src/frontend/mame/ui/info.cpp:265
 #, c-format
@@ -210,7 +215,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Известные работающие клоны этой системы: %s"
+"Известные работающие clones этой системы: %s"
 
 #: src/frontend/mame/ui/info.cpp:278
 msgid ""
@@ -267,7 +272,7 @@ msgstr "Нет\n"
 
 #: src/frontend/mame/ui/info.cpp:381
 msgid "Vector"
-msgstr ""
+msgstr "Векторный"
 
 #: src/frontend/mame/ui/info.cpp:392
 #, c-format
@@ -423,7 +428,7 @@ msgstr "Линии"
 
 #: src/frontend/mame/ui/custui.cpp:348
 msgid "Infos text size"
-msgstr ""
+msgstr "Размер инфо-текста"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
@@ -431,7 +436,7 @@ msgstr "Настройки шрифта интерфейса"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
+msgstr "Пример текста - Съешь же ещё этих французских булок, да выпей чаю."
 
 #: src/frontend/mame/ui/custui.cpp:451
 msgid "Normal text"
@@ -451,15 +456,15 @@ msgstr "Выделенный цвет задника"
 
 #: src/frontend/mame/ui/custui.cpp:455
 msgid "Subitem color"
-msgstr ""
+msgstr "Цвет подпункта"
 
 #: src/frontend/mame/ui/custui.cpp:456 src/frontend/mame/ui/custui.cpp:511
 msgid "Clone"
-msgstr "Клон"
+msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:457
 msgid "Border"
-msgstr ""
+msgstr "Бордюр"
 
 #: src/frontend/mame/ui/custui.cpp:458
 msgid "Background"
@@ -471,31 +476,31 @@ msgstr "DIP-переключатель"
 
 #: src/frontend/mame/ui/custui.cpp:460
 msgid "Unavailable color"
-msgstr ""
+msgstr "Недоступный цвет"
 
 #: src/frontend/mame/ui/custui.cpp:461
 msgid "Slider color"
-msgstr ""
+msgstr "Цвет слайдера"
 
 #: src/frontend/mame/ui/custui.cpp:462
 msgid "Gfx viewer background"
-msgstr ""
+msgstr "Фон просмотрщика графики"
 
 #: src/frontend/mame/ui/custui.cpp:463
 msgid "Mouse over color"
-msgstr ""
+msgstr "Цвет под мышью"
 
 #: src/frontend/mame/ui/custui.cpp:464
 msgid "Mouse over background color"
-msgstr ""
+msgstr "Цвет фона под мышью"
 
 #: src/frontend/mame/ui/custui.cpp:465
 msgid "Mouse down color"
-msgstr ""
+msgstr "Цвет мышь нажата"
 
 #: src/frontend/mame/ui/custui.cpp:466
 msgid "Mouse down background color"
-msgstr ""
+msgstr "Цвет фона мышь нажата"
 
 #: src/frontend/mame/ui/custui.cpp:469
 msgid "Restore originals colors"
@@ -683,7 +688,7 @@ msgstr "Избранное"
 
 #: src/frontend/mame/ui/utils.cpp:66 src/frontend/mame/ui/miscmenu.cpp:759
 msgid "BIOS"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
@@ -763,7 +768,7 @@ msgstr "Список ПО"
 
 #: src/frontend/mame/ui/utils.cpp:244
 msgid "<set up filters>"
-msgstr ""
+msgstr "<настроить фильтры>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
@@ -788,15 +793,15 @@ msgstr "Выберите категорию:"
 
 #: src/frontend/mame/ui/utils.cpp:990
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[INI-файлы без категорий]"
 
 #: src/frontend/mame/ui/utils.cpp:998
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[нет групп в INI-файле]"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No category INI files found"
-msgstr ""
+msgstr "Не найдены INI-файлы категорий"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "File"
@@ -804,7 +809,7 @@ msgstr "Файл"
 
 #: src/frontend/mame/ui/utils.cpp:1041
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Не найдены группы в файле категорий"
 
 #: src/frontend/mame/ui/utils.cpp:1046
 msgid "Group"
@@ -812,7 +817,7 @@ msgstr "Группа"
 
 #: src/frontend/mame/ui/utils.cpp:1047
 msgid "Include clones"
-msgstr ""
+msgstr "Включить clones"
 
 #: src/frontend/mame/ui/utils.cpp:1047 src/frontend/mame/ui/filecreate.cpp:82
 msgid "Yes"
@@ -829,6 +834,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Для выбранной игры отсутствует один или более необходимых образов ROM или CHD. Пожалуйста, "
+"выберите другую игру.\n"
+"\n"
+"Нажмите любую клавишу для продолжения."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:241
 #, c-format
@@ -838,6 +847,10 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
+"Не найдено систем. Пожалуйста, проверьте rompath указанный в файле %1$s.ini.\n"
+"\n"
+"Если вы в первый раз используете %2$s, пожалуйста, посмотрите файл config.txt в "
+"директории docs, чтобы получить информацию о настройке %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:271
 #: src/frontend/mame/ui/selgame.cpp:440
@@ -847,11 +860,11 @@ msgstr "Изменение настроек"
 #: src/frontend/mame/ui/simpleselgame.cpp:292
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr ""
+msgstr "Введите имя или выберите: %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:294
 msgid "Type name or select: (random)"
-msgstr ""
+msgstr "Введите имя или выберите: (случайно)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:308
 #: src/frontend/mame/ui/selsoft.cpp:564 src/frontend/mame/ui/selsoft.cpp:571
@@ -868,7 +881,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:314
 #, c-format
 msgid "Driver: %1$-.100s"
-msgstr ""
+msgstr "Драйвер: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:330
 #: src/frontend/mame/ui/selmenu.cpp:619
@@ -946,16 +959,16 @@ msgstr "Авто"
 
 #: src/frontend/mame/ui/swlist.cpp:88
 msgid "[file manager]"
-msgstr ""
+msgstr "[менеджер файлов]"
 
 #: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "Сменить порядок элементов"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "Изменен порядок: записи теперь упорядочены по %s"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "shortname"
@@ -967,7 +980,7 @@ msgstr "описание"
 
 #: src/frontend/mame/ui/swlist.cpp:389
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[совместимые списки]"
 
 #: src/frontend/mame/ui/videoopt.cpp:56
 #, c-format
@@ -980,24 +993,24 @@ msgstr "Поворот"
 
 #: src/frontend/mame/ui/videoopt.cpp:208
 msgid "Backdrops"
-msgstr "Задние фоны"
+msgstr "Задники"
 
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
-msgstr ""
+msgstr "Оверлеи"
 
 #: src/frontend/mame/ui/videoopt.cpp:216
 msgid "Bezels"
-msgstr ""
+msgstr "Обрамления"
 
 #: src/frontend/mame/ui/videoopt.cpp:220
 msgid "CPanels"
-msgstr ""
+msgstr "Панели"
 
 #: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/dirmenu.cpp:51
 #: src/frontend/mame/ui/selmenu.cpp:64
 msgid "Marquees"
-msgstr ""
+msgstr "Маркизы"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "View"
@@ -1086,7 +1099,7 @@ msgstr "Плагины"
 #: src/frontend/mame/ui/selgame.cpp:853
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "ROM-набор\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:854
 #, c-format
@@ -1101,11 +1114,11 @@ msgstr "Производитель\t%1$-.100s\n"
 #: src/frontend/mame/ui/selgame.cpp:859
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Драйвер - Clone от\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:861
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Драйвер - Parent\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:864
 msgid "Analog Controls\tYes\n"
@@ -1245,93 +1258,95 @@ msgstr "Скорость\tНе идеально\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "Механическая система\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "Механическая система\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Требует элементы оформления\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Требует элементы оформления\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Требует кликабельное оформление\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Требует кликабельное оформление\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
-msgstr ""
+msgstr "Поддерживает режим коктейль-стола\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Поддерживает режим коктейль-стола\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "Драйвер - BIOS\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "Драйвер - BIOS\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Поддерживает сохранение\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Поддерживает сохранение\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
-msgstr ""
+msgstr "Ориентация экрана\tВертикальная\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tHorizontal\n"
-msgstr ""
+msgstr "Ориентация экрана\tГоризонтальная\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "Требует CHD\tДа\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "Требует CHD\tНет\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "Результат проверки ROM\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "Результат проверки ROM\tНЕУДАЧНО\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Результат проверки сэмплов\tНе требуется\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Результат проверки сэмплов\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Результат проверки сэмплов\tНЕУДАЧНО\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
 "ROM Audit Disabled\t\n"
 "Samples Audit Disabled\t\n"
 msgstr ""
+"Проверка ROM отключена\t\n"
+"Проверка сэмплов отключена\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1171
 #, c-format
@@ -1351,12 +1366,12 @@ msgstr "Поиск: %1$s_"
 #: src/frontend/mame/ui/selgame.cpp:1199
 #, c-format
 msgid "Romset: %1$-.100s"
-msgstr ""
+msgstr "ROM-набор: %1$-.100s"
 
 #: src/frontend/mame/ui/selgame.cpp:1206
 #, c-format
 msgid "System: %1$-.100s"
-msgstr ""
+msgstr "Система: %1$-.100s"
 
 #: src/frontend/mame/ui/selgame.cpp:1243
 msgid ""
@@ -1364,6 +1379,9 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"Для выбранной машины отсутствует один или более необходимых образов ROM или CHD. "
+"Пожалуйста, выберите другую машину.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1249 src/frontend/mame/ui/selsoft.cpp:462
 msgid "Press any key to continue."
@@ -1375,7 +1393,7 @@ msgstr "ROMы"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "Носители Информации"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -1383,7 +1401,7 @@ msgstr "Интерфейс"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
-msgstr "Инструменты"
+msgstr "Сэмплы"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgid "DATs"
@@ -1395,7 +1413,7 @@ msgstr "INI-файлы"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr ""
+msgstr "INI категорий"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -1407,7 +1425,7 @@ msgstr "Читы"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/selmenu.cpp:49
 msgid "Snapshots"
-msgstr "Скриншоты"
+msgstr "Снимки экрана"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:50
 msgid "Cabinets"
@@ -1471,7 +1489,7 @@ msgstr "Таблицы рекордов"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:59
 msgid "Versus"
-msgstr ""
+msgstr "Против"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:65
 msgid "Covers"
@@ -1535,6 +1553,8 @@ msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
 msgstr ""
+"Время работы: %1$d:%2$02d:%3$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:238
 #, c-format
@@ -1542,6 +1562,8 @@ msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
 msgstr ""
+"Время работы: %1$d:%2$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:242
 #, c-format
@@ -1549,15 +1571,17 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
+"Выдано билетов: %1$d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
 msgid "Coin %1$c: NA%3$s\n"
-msgstr ""
+msgstr "Монетопримник %1$c: НД%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr ""
+msgstr "Монетопримник %1$c: %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
@@ -1565,7 +1589,7 @@ msgstr " (закрыт)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:503
 msgid "Visible Delay"
-msgstr "Видимый экран"
+msgstr "Видимая задержка"
 
 #: src/frontend/mame/ui/miscmenu.cpp:601
 #, c-format
@@ -1583,15 +1607,15 @@ msgstr "%s.txt сохранен в папку ui."
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Экспортировать список в формате XML (как -listxml)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:656
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Экспортировать список в формате XML (как -listxml, но исключить устройства)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:657
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Экспортировать список в текстовом формате (как -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:709 src/frontend/mame/ui/ui.cpp:2217
 msgid ""
@@ -1625,7 +1649,7 @@ msgstr "Сохранить настройки этой системы"
 
 #: src/frontend/mame/ui/miscmenu.cpp:791
 msgid "Configure machine:"
-msgstr ""
+msgstr "Настроить систему:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:825 src/frontend/mame/ui/selmenu.cpp:2386
 msgid " (default)"
@@ -1633,13 +1657,15 @@ msgstr " (по-умолчанию)"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "Не удалось сохранить поверх директории"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:149
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
+"Для выбранной программы отсутствует один или несколько необходимых образов ROM или CHD. "
+"Пожалуйста, выберите другую."
 
 #: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:99
 msgid "Pseudo terminals"
@@ -1711,7 +1737,7 @@ msgstr "Режим клавиатуры"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Slider Controls"
-msgstr ""
+msgstr "Управление слайдерами"
 
 #: src/frontend/mame/ui/mainmenu.cpp:124 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
@@ -1747,7 +1773,7 @@ msgstr "Частота звука"
 
 #: src/frontend/mame/ui/sndmenu.cpp:137
 msgid "Use External Samples"
-msgstr "Использовать внешние звуки"
+msgstr "Использовать внешние сэмплы"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149 src/frontend/mame/ui/optsmenu.cpp:210
 msgid "Sound Options"
@@ -1759,22 +1785,22 @@ msgstr " ЦВЕТА"
 
 #: src/frontend/mame/ui/viewgfx.cpp:406
 msgid " PENS"
-msgstr ""
+msgstr " ПЕРЬЯ"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr ""
+msgstr "Проверить ROMы для %1$u систем, помеченных как недоступные?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr ""
+msgstr "Проверить ROMы для всех %1$u систем?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
 msgid "(results will be saved to %1$s)"
-msgstr ""
+msgstr "(результаты будут сохранены в %1$s)"
 
 #: src/frontend/mame/ui/auditmenu.cpp:130
 #, c-format
@@ -1782,10 +1808,12 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Проверяем ROMы для системы %2$u из %3$u..."
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
 msgid "Start Audit"
-msgstr ""
+msgstr "Начать проверку"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
@@ -1817,11 +1845,11 @@ msgstr "Экспорт отображаемого списка в файл"
 
 #: src/frontend/mame/ui/selmenu.cpp:71
 msgid "Show DATs view"
-msgstr ""
+msgstr "Показать вид DAT"
 
 #: src/frontend/mame/ui/selmenu.cpp:237
 msgid "Software part selection:"
-msgstr ""
+msgstr "Выбор части программы:"
 
 #: src/frontend/mame/ui/selmenu.cpp:343
 msgid "BIOS selection:"
@@ -1830,11 +1858,11 @@ msgstr "Выбор BIOS:"
 #: src/frontend/mame/ui/selmenu.cpp:574
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr ""
+msgstr "Программа - clone от: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:576
 msgid "Software is parent"
-msgstr ""
+msgstr "Программа - parent"
 
 #: src/frontend/mame/ui/selmenu.cpp:581
 msgid "Supported: No"
@@ -1851,16 +1879,16 @@ msgstr "Поддерживается: Да"
 #: src/frontend/mame/ui/selmenu.cpp:596
 #, c-format
 msgid "romset: %1$-.100s"
-msgstr ""
+msgstr "ROM-набор: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:612
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr ""
+msgstr "Драйвер - clone от: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:614
 msgid "Driver is parent"
-msgstr ""
+msgstr "Драйвер - parent"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 #, c-format
@@ -1901,7 +1929,7 @@ msgstr "Отображать указатель мыши"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr "Подтверждать выход"
+msgstr "Подтверждать выход из эмуляции"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
@@ -1909,7 +1937,7 @@ msgstr "Пропустить сведения о системе при запу�
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "Принудительно 4:3 при просмотре снимков экрана"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
@@ -1921,215 +1949,215 @@ msgstr "Пропускать меню выбора BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
-msgstr ""
+msgstr "Пропускать меню выбора частей ПО"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr ""
+msgstr "Авто-проверка инфо"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Скрывать из списка доступных системы без ROM"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "Дополнительные настройки"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "Настройки производительности"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Авто-пропуск кадров"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "Пропуск кадров"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr ""
+msgstr "Троттлинг"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
-msgstr ""
+msgstr "Спать"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "Скорость"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
-msgstr ""
+msgstr "Скорость обновления"
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "Настройки поворота"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "Поворот вправо"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "Поворот влево"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Авто-поворот вправо"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Авто-поворот влево"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Flip X"
-msgstr ""
+msgstr "Отражение по горизонтали"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip Y"
-msgstr ""
+msgstr "Отражение по вертикали"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr ""
+msgstr "Настройки оформления"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr ""
+msgstr "Обрезка оформления"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
-msgstr ""
+msgstr "Использовать задники"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr ""
+msgstr "Использовать оверлеи"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
-msgstr ""
+msgstr "Использовать обрамление"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
-msgstr ""
+msgstr "Использовать панели"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr ""
+msgstr "Использовать маркизы"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Настройки сохранения/воспроизведения"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Автоматическое сохранение/загрузка"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
-msgstr ""
+msgstr "Билинейная фильтрация снимков экрана"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Burn-in"
-msgstr ""
+msgstr "Сгорание"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
-msgstr ""
+msgstr "Настройки ввода"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
-msgstr ""
+msgstr "Блокировка монетоприемника"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "Мышь"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
-msgstr ""
+msgstr "Джойстик"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Lightgun"
-msgstr ""
+msgstr "Световой пистолет"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Мульти-клавиатура"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Мульти-мышь"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Steadykey"
-msgstr ""
+msgstr "Задержка нажатий"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr ""
+msgstr "Активный интерфейс пользователя"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
-msgstr ""
+msgstr "Закадровая перезарядка"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "Мертвая зона джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Joystick saturation"
-msgstr ""
+msgstr "Сатурация джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Обычная клавиатура"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Simultaneous contradictory"
-msgstr ""
+msgstr "Одновременно противоположные направления"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin impulse"
-msgstr ""
+msgstr "Время импульса монеты"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Device Mapping"
-msgstr "Устройства управленя"
+msgstr "Устройства управления"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Lightgun Device Assignment"
-msgstr ""
+msgstr "Назначение устройства светового пистолета"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Trackball Device Assignment"
-msgstr ""
+msgstr "Назначение устройства трекбола"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "Pedal Device Assignment"
-msgstr ""
+msgstr "Назначение устройства педали"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Adstick Device Assignment"
-msgstr ""
+msgstr "Назначение устройства AD-стика"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Paddle Device Assignment"
-msgstr ""
+msgstr "Назначение устройства Paddle"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Dial Device Assignment"
-msgstr ""
+msgstr "Назначение устройства Dial"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Positional Device Assignment"
-msgstr ""
+msgstr "Назначение позиционного устройства"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Mouse Device Assignment"
-msgstr ""
+msgstr "Назначение устройства мыши"
 
 #: src/frontend/mame/ui/submenu.cpp:100
 msgid "Video Mode"
@@ -2137,7 +2165,7 @@ msgstr "Видео режим"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Число экранов"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
@@ -2157,7 +2185,7 @@ msgstr "Билинейная фильтрация"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Пре-масштабирование битмапов"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Window Mode"
@@ -2169,15 +2197,15 @@ msgstr "Сохранять пропорции"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Открывать максимизированным"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Синхронизированное обновление"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Ожидать вертикальную синхронизацию"
 
 #: src/frontend/mame/ui/selsoft.cpp:456
 msgid ""
@@ -2185,20 +2213,23 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
+"Для выбранного ПО отсутствует один или несколько необходимых файлов. Пожалуйста, выберите "
+"другую программу.\n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:549
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d пакетов программ )"
 
 #: src/frontend/mame/ui/selsoft.cpp:550
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr ""
+msgstr "Драйвер: \"%1$s\" списков программ "
 
 #: src/frontend/mame/ui/ui.cpp:337
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
+msgstr "Этот драйвер требует загрузки образов в следующие устройства: "
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
@@ -2206,7 +2237,7 @@ msgstr "Состояние эмуляции клавиатуры"
 
 #: src/frontend/mame/ui/ui.cpp:1086
 msgid "Mode: PARTIAL Emulation"
-msgstr "Режим: Частичная эмуляция"
+msgstr "Режим: ЧАСТИЧНАЯ эмуляция"
 
 #: src/frontend/mame/ui/ui.cpp:1087
 msgid "UI:   Enabled"
@@ -2218,7 +2249,7 @@ msgstr "**Нажмите ScrLock для переключения**"
 
 #: src/frontend/mame/ui/ui.cpp:1096
 msgid "Mode: FULL Emulation"
-msgstr "Режим: Полная эмуляция"
+msgstr "Режим: ПОЛНАЯ эмуляция"
 
 #: src/frontend/mame/ui/ui.cpp:1097
 msgid "UI:   Disabled"
@@ -2258,7 +2289,7 @@ msgstr "Разгон процессора %1$s"
 #: src/frontend/mame/ui/ui.cpp:1407
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "Разгон %1$s звука"
 
 #: src/frontend/mame/ui/ui.cpp:1428
 #, c-format
@@ -2283,42 +2314,42 @@ msgstr "%1$s Гамма"
 #: src/frontend/mame/ui/ui.cpp:1441
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr ""
+msgstr "%1$s гориз. размер"
 
 #: src/frontend/mame/ui/ui.cpp:1443
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr ""
+msgstr "%1$s гориз. позиция"
 
 #: src/frontend/mame/ui/ui.cpp:1445
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr ""
+msgstr "%1$s верт. размер"
 
 #: src/frontend/mame/ui/ui.cpp:1447
 #, c-format
 msgid "%1$s Vert Position"
-msgstr ""
+msgstr "%1$s верт. позиция"
 
 #: src/frontend/mame/ui/ui.cpp:1466
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr ""
+msgstr "Лазердиск '%1$s' гориз. размер"
 
 #: src/frontend/mame/ui/ui.cpp:1468
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr ""
+msgstr "Лазердиск '%1$s' гориз. позиция"
 
 #: src/frontend/mame/ui/ui.cpp:1470
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr ""
+msgstr "Лазердиск '%1$s' верт. размер"
 
 #: src/frontend/mame/ui/ui.cpp:1472
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr ""
+msgstr "Лазердиск '%1$s' верт. позиция"
 
 #: src/frontend/mame/ui/ui.cpp:1484
 msgid "Vector Flicker"
@@ -2339,7 +2370,7 @@ msgstr "Насыщенность луча"
 #: src/frontend/mame/ui/ui.cpp:1502
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr ""
+msgstr "Масштаб прицела %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1502 src/frontend/mame/ui/ui.cpp:1504
 msgid "X"
@@ -2352,12 +2383,12 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:1504
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr ""
+msgstr "Смещение прицела %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1592
 #, c-format
 msgid "%1$3ddB"
-msgstr ""
+msgstr "%1$3dдБ"
 
 #: src/frontend/mame/ui/ui.cpp:1636
 #, c-format
@@ -2393,22 +2424,22 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:1995
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
+msgstr "Масштаб прицела X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:1995
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
+msgstr "Масштаб прицела Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2014
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
+msgstr "Смещение прицела X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2014
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
+msgstr "Смещение прицела Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2157
 msgid "**Error saving ui.ini**"
@@ -2445,27 +2476,27 @@ msgstr "Настройки"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Текущее время"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Общее время"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
-msgstr ""
+msgstr "Количество игр"
 
 #: plugins/timer/init.lua:106
 msgid "Timer"
-msgstr ""
+msgstr "Таймер"
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Выбрать чит для горячей клавиши"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Нажмите клавишу для горячей клавиши или подождите для сброса"
 
 #: plugins/cheat/init.lua:476
 msgid "None"
@@ -2473,56 +2504,56 @@ msgstr "Отсутствует"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Готово"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
-msgstr ""
+msgstr "Установлено"
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Назначить горячие клавиши"
 
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Активировано: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Активировано: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Разрешено: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Запрещено: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s добавлено"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
-msgstr ""
+msgstr "Команда"
 
 #: plugins/data/data_gameinit.lua:16
 msgid "Gameinit"
-msgstr ""
+msgstr "Иниц. игры"
 
 #: plugins/data/data_hiscore.lua:770 plugins/data/data_hiscore.lua:818
 msgid "High Scores"
-msgstr ""
+msgstr "Лучшие очки"
 
 #: plugins/data/data_history.lua:15
 msgid "History"
-msgstr ""
+msgstr "История"
 
 #: plugins/data/data_mameinfo.lua:18 plugins/data/data_messinfo.lua:19
 msgid ""
@@ -2531,6 +2562,10 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- ИНФО ДРАЙВЕРА ---\n"
+"Драйвер: "
 
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
@@ -2554,296 +2589,203 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Сохранить чит"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "По умолчанию"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Пользовательский"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
-msgstr ""
+msgstr "Имя чита"
 
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Имя по умолчанию %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
-msgstr ""
+msgstr "Игрок"
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Сохранить"
 
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Чит записан в %s и добавлен в cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Чит добавлен в cheat.simple"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Не удалось сохранить файл\n"
+"Убедитесь что папка cheatpath существует"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "Процессор или память"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Эти изменения будут применены только после выбора \"Начать новый поиск\""
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Данные очищены и текущее состояние сохранено"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Начать новый поиск"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Текущее состояние сохранено"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Сохранить текущее -- #"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
-msgstr ""
+msgstr " всего найдено совпадений"
 
 #: plugins/cheatfind/init.lua:513
 msgid "Compare"
-msgstr ""
+msgstr "Сравнить"
 
 #: plugins/cheatfind/init.lua:516
 msgid "Left operand"
-msgstr ""
+msgstr "Левый операнд"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Current"
-msgstr ""
+msgstr "Текущий"
 
 #: plugins/cheatfind/init.lua:524
 msgid "Operator"
-msgstr ""
+msgstr "Оператор"
 
 #: plugins/cheatfind/init.lua:531
 msgid "Left less than right, value is difference"
-msgstr ""
+msgstr "Левый меньше правого, значения различаются"
 
 #: plugins/cheatfind/init.lua:533
 msgid "Left greater than right, value is difference"
-msgstr ""
+msgstr "Левый больше правого, значения различаются"
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Левый равен правому"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
-msgstr ""
+msgstr "Левый не равен правому, значения различаются"
 
 #: plugins/cheatfind/init.lua:539
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Левый равен правому по маске"
 
 #: plugins/cheatfind/init.lua:541
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Левый не равен правому по маске"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Левый меньше значения"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
-msgstr ""
+msgstr "Левый больше значения"
 
 #: plugins/cheatfind/init.lua:547
 msgid "Left equal to value"
-msgstr ""
+msgstr "Левый равен значению"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Левый не равен значению"
 
 #: plugins/cheatfind/init.lua:560
 msgid "Right operand"
-msgstr ""
+msgstr "Правый операнд"
 
 #: plugins/cheatfind/init.lua:568
 msgid "Value"
-msgstr ""
+msgstr "Значение"
 
 #: plugins/cheatfind/init.lua:572
 msgid "Any"
-msgstr ""
+msgstr "Любое"
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Формат данных"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Отменить последний поиск -- #"
 
 #: plugins/cheatfind/init.lua:606
 msgid "Match block"
-msgstr ""
+msgstr "Совпадает блок"
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "Все"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
 msgid "Test cheat at addr %08X"
-msgstr ""
+msgstr "Проверить чит по адресу %08X"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Движок читов не доступен"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "Имя по умолчанию "
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
-msgstr ""
+msgstr "Тест"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Запись"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
-msgstr ""
+msgstr "Просмотр"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Страница"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"
-msgstr ""
+msgstr "Очистить просмотр"
 
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
-msgstr ""
-
-#~ msgid "Unimplemented"
-#~ msgstr "Не эмулируется"
-
-#~ msgid "Imperfect"
-#~ msgstr "Не идеально"
-
-#~ msgid "Gfx: %s, Sound: %s"
-#~ msgstr "Графика: %s, Звук: %s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Идет проверка..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "Дополнительные INI-файлы"
-
-#~ msgid "Main filter"
-#~ msgstr "Основной фильтр"
-
-#~ msgid "Other filter"
-#~ msgstr "Дополнительные фильтры"
-
-#~ msgid "^!Region"
-#~ msgstr "^!Регион"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!Задать свой фильтр"
-
-#~ msgid "Software History"
-#~ msgstr "История ПО"
-
-#~ msgid "The keyboard emulation may not be 100% accurate.\n"
-#~ msgstr "Эмуляция клавиатуры не 100% точная.\n"
-
-#~ msgid "The colors aren't 100% accurate.\n"
-#~ msgstr "Цвета не 100% точные.\n"
-
-#~ msgid "The colors are completely wrong.\n"
-#~ msgstr "Цвета совсем не правильные.\n"
-
-#~ msgid "The video emulation isn't 100% accurate.\n"
-#~ msgstr "Эмуляция видео не 100% точная.\n"
-
-#~ msgid "The sound emulation isn't 100% accurate.\n"
-#~ msgstr "Эмуляция звука не 100% точная.\n"
-
-#~ msgid "The machine lacks sound.\n"
-#~ msgstr "Звук не эмулируется.\n"
-
-#~ msgid "The machine requires external artwork files\n"
-#~ msgstr "Этой системе нужны внешние файлы оформления\n"
-
-#~ msgid "The machine has protection which isn't fully emulated.\n"
-#~ msgstr "Защита этой системы эмулируется не полностью.\n"
-
-#~ msgid "No Infos Available"
-#~ msgstr "Нет информации"
-
-#~ msgid "Save cancelled"
-#~ msgstr "Сохранение отменено"
-
-#~ msgid "Load cancelled"
-#~ msgstr "Загрузка отменена"
-
-#~ msgid "Save to position %s"
-#~ msgstr "Сохранение состояния %s"
-
-#~ msgid "Load from position %s"
-#~ msgstr "Загрузка состояния %s"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Экспорт в формат XML (как -listxml)"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Экспорт в формат TXT (как -listfull)"
-
-#~ msgid "Display Options"
-#~ msgstr "Настройки видео"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Отсутсвует один или несколько ROM или CHD необходимых для работы "
-#~ "выбранной системы. Пожалуйста выберите другую систему.\n"
-#~ "\n"
-#~ "Нажмите любую клавишу (кроме ESC) для продолжения."
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "Пропускать экран с информацией"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "Принудительно 4:3 при программном снимке экрана"
+msgstr "Поиск читов"

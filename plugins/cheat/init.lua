@@ -798,7 +798,7 @@ function cheat.startplugin()
 		end
 		for num, input in pairs(inputs) do
 			local _, screen = next(manager:machine().screens)
-			local framenum = screen:frame_number() - input.begin 
+			local framenum = screen:frame_number() - input.begin
 			local enttab = input.start[framenum]
 			if enttab then
 				for num, entry in pairs(enttab) do

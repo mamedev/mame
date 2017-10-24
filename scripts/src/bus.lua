@@ -308,6 +308,8 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_zep100.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_zep100.h",
 	}
 end
 
@@ -731,6 +733,23 @@ if (BUSES["EP64"]~=null) then
 		MAME_DIR .. "src/devices/bus/ep64/exp.h",
 		MAME_DIR .. "src/devices/bus/ep64/exdos.cpp",
 		MAME_DIR .. "src/devices/bus/ep64/exdos.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/gamate/slot.h,BUSES["GAMATE"] = true
+---------------------------------------------------
+
+if (BUSES["GAMATE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/gamate/slot.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/slot.h",
+		MAME_DIR .. "src/devices/bus/gamate/rom.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/rom.h",
+		MAME_DIR .. "src/devices/bus/gamate/gamate_protection.cpp",
+		MAME_DIR .. "src/devices/bus/gamate/gamate_protection.h",
 	}
 end
 

@@ -130,18 +130,14 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 menu_select_game::~menu_select_game()
 {
 	std::string error_string, last_driver;
-	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
-	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
-
-	if (reinterpret_cast<uintptr_t>(driver) > skip_main_items)
-		last_driver = driver->name;
-	else if (driver && m_prev_selected)
-		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
-
-	if (reinterpret_cast<uintptr_t>(swinfo) > skip_main_items)
+	game_driver const *driver;
+	ui_software_info const *swinfo;
+	get_selection(swinfo, driver);
+	if (swinfo)
 		last_driver = swinfo->shortname;
-	else if (swinfo && m_prev_selected)
-		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
+	else
+	if (driver)
+		last_driver = driver->name;
 
 	std::string filter;
 	auto const active_filter(main_filters::filters.find(main_filters::actual));

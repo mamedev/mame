@@ -50,7 +50,7 @@ public:
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
 	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
-	uint16_t        m_pixel_scroll[2];
+	uint16_t        m_pixel_scroll[3];
 
 	int           m_b_fg_color_base;
 	int           m_b_sp_color_base;

@@ -26,6 +26,7 @@
 #define CENTRONICS_TAG  "centronics"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
+#define S100_TAG        "s100"
 
 class xor100_state : public driver_device
 {

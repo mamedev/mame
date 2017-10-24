@@ -635,10 +635,10 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// build up necessary arrays
 	static const uint32_t sse_control[4] =
 	{
-		0xffc0,     // ROUND_TRUNC
-		0x9fc0,     // ROUND_ROUND
-		0xdfc0,     // ROUND_CEIL
-		0xbfc0      // ROUND_FLOOR
+		0xff80,     // ROUND_TRUNC
+		0x9f80,     // ROUND_ROUND
+		0xdf80,     // ROUND_CEIL
+		0xbf80      // ROUND_FLOOR
 	};
 	memcpy(m_near.ssecontrol, sse_control, sizeof(m_near.ssecontrol));
 	m_near.single1 = 1.0f;

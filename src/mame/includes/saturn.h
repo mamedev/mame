@@ -5,7 +5,7 @@
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "cpu/scudsp/scudsp.h"
+#include "machine/sega_scu.h"
 #include "machine/smpc.h"
 #include "cpu/sh/sh2.h"
 
@@ -30,7 +30,7 @@ class saturn_state : public driver_device
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rom(*this, "share6"),
+			m_rom(*this, "bios", 0x20000),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
@@ -39,13 +39,13 @@ public:
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
 			m_smpc_hle(*this, "smpc"),
-			m_scudsp(*this, "scudsp"),
+			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{
 	}
 
-	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint16_t> m_sound_ram;
@@ -53,7 +53,7 @@ public:
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
-	std::unique_ptr<uint32_t[]>    m_scu_regs;
+//  std::unique_ptr<uint32_t[]>    m_scu_regs;
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
@@ -61,24 +61,6 @@ public:
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
 	uint8_t     m_en_68k;
-
-
-	struct {
-		uint32_t    src[3];       /* Source DMA lv n address*/
-		uint32_t    dst[3];       /* Destination DMA lv n address*/
-		uint32_t    src_add[3];   /* Source Addition for DMA lv n*/
-		uint32_t    dst_add[3];   /* Destination Addition for DMA lv n*/
-		uint32_t    size[3];      /* Transfer DMA size lv n*/
-		uint32_t    index[3];
-		int       start_factor[3];
-		uint8_t     enable_mask[3];
-		uint32_t    ist;
-		uint32_t    ism;
-		uint32_t    illegal_factor[3];
-		uint32_t    status;
-	}m_scu;
-
-	void scu_reset(void);
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
@@ -131,7 +113,7 @@ public:
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<smpc_hle_device> m_smpc_hle;
-	required_device<scudsp_cpu_device> m_scudsp;
+	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -141,17 +123,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
 
-	void scu_do_transfer(uint8_t event);
-	void scu_test_pending_irq();
-	DECLARE_READ32_MEMBER(saturn_scu_r);
-	DECLARE_WRITE32_MEMBER(saturn_scu_w);
-	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
+
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-	void scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift);
-	void scu_dma_direct(address_space &space, uint8_t dma_ch);
-	void scu_dma_indirect(address_space &space,uint8_t dma_ch);
 	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
 	DECLARE_READ16_MEMBER(saturn_soundram_r);
 	DECLARE_WRITE32_MEMBER(minit_w);
@@ -160,7 +133,6 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
 
@@ -319,6 +291,8 @@ public:
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
+	bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
+	int get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
 	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
 	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
 	uint8_t stv_vdp2_is_rotation_applied(void);
@@ -390,6 +364,7 @@ public:
 
 		uint8_t  line_screen_enabled;
 		uint8_t  mosaic_screen_enabled;
+		bool roz_mode3;
 
 		int layer_name; /* just to keep track */
 	} stv2_current_tilemap;
@@ -616,9 +591,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-	DECLARE_READ16_MEMBER(scudsp_dma_r);
-	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+//  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+//  DECLARE_READ16_MEMBER(scudsp_dma_r);
+//  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
 	// SMPC HLE delegates
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
@@ -628,18 +603,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
 	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
-	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
 
 
-	void debug_scudma_command(int ref, const std::vector<std::string> &params);
-	void debug_scuirq_command(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+//  void debug_scudma_command(int ref, const std::vector<std::string> &params);
+//  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
+//  void debug_help_command(int ref, const std::vector<std::string> &params);
+//  void debug_commands(int ref, const std::vector<std::string> &params);
 };
 
 
-#define MASTER_CLOCK_352 57272720
-#define MASTER_CLOCK_320 53693174
+#define MASTER_CLOCK_352 XTAL_57_2727MHz
+#define MASTER_CLOCK_320 XTAL_53_693175MHz
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
@@ -648,20 +622,5 @@ public:
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
-#define IRQ_VBLANK_IN  1 << 0
-#define IRQ_VBLANK_OUT 1 << 1
-#define IRQ_HBLANK_IN  1 << 2
-#define IRQ_TIMER_0    1 << 3
-#define IRQ_TIMER_1    1 << 4
-#define IRQ_DSP_END    1 << 5
-#define IRQ_SOUND_REQ  1 << 6
-#define IRQ_SMPC       1 << 7
-#define IRQ_PAD        1 << 8
-#define IRQ_DMALV2     1 << 9
-#define IRQ_DMALV1     1 << 10
-#define IRQ_DMALV0     1 << 11
-#define IRQ_DMAILL     1 << 12
-#define IRQ_VDP1_END   1 << 13
-#define IRQ_ABUS       1 << 15
 
 GFXDECODE_EXTERN( stv );
