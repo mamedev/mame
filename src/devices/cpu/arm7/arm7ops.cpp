@@ -263,15 +263,7 @@ int arm7_cpu_device::storeInc(uint32_t pat, uint32_t rbv, int mode)
 int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 {
 	// pre-count the # of registers being stored
-	// TODO[RH]: This is just a popcnt. Consider eminline intrinsic.
-	int result = 0;
-	for (int i = 15; i >= 0; i--)
-	{
-		if ((pat >> i) & 1)
-		{
-			result++;
-		}
-	}
+	int const result = population_count_32(pat & 0x0000ffff);
 
 	// adjust starting address
 	rbv -= (result << 2);
