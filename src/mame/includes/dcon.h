@@ -1,11 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "audio/seibu.h"
+
 class dcon_state : public driver_device
 {
 public:
 	dcon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_back_data(*this, "back_data"),
@@ -15,6 +19,7 @@ public:
 		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -34,6 +39,8 @@ public:
 	uint16_t m_scroll_ram[6];
 	uint16_t m_layer_en;
 
+	DECLARE_READ8_MEMBER(sdgndmps_sound_comms_r);
+
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
@@ -47,7 +54,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	DECLARE_DRIVER_INIT(sdgndmps);
 	virtual void video_start() override;
 
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
