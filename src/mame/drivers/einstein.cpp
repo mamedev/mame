@@ -464,6 +464,7 @@ ADDRESS_MAP_END
 
 /* The I/O ports are decoded into 8 blocks using address lines A3 to A7 */
 static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	/* block 0, ay8910 psg */
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_device, data_r, address_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_device, data_w)
