@@ -305,7 +305,7 @@ inline unsigned population_count_32(uint32_t val)
 {
 #if defined(__GNUC__)
 	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned));
+	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
 	return unsigned(__builtin_popcount(static_cast<unsigned>(val)));
 #else
 	// optimal Hamming weight assuing fast 32*32->32
@@ -332,7 +332,7 @@ inline unsigned population_count_64(uint64_t val)
 {
 #if defined(__GNUC__)
 	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned long long));
+	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
 	return unsigned(__builtin_popcountll(static_cast<unsigned long long>(val)));
 #else
 	// guess that architectures with 64-bit pointers have 64-bit multiplier
