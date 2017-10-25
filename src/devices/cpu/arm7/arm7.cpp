@@ -62,6 +62,8 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag,
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 32, 32, 0)
+	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
+	, m_prefetch_word1_shift(endianness == ENDIANNESS_LITTLE ? 16 : 0)
 	, m_endian(endianness)
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
@@ -342,7 +344,7 @@ int arm7_cpu_device::detect_fault(int desc_lvl1, int ap, int flags)
 }
 
 
-bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
+bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_exception)
 {
 	if (addr < 0x2000000)
 	{
@@ -374,6 +376,9 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 		}
 		else
 		{
+			if (no_exception)
+				return false;
+
 			if (flags & ARM7_TLB_ABORT_D)
 			{
 				uint8_t domain = (desc_lvl1 >> 5) & 0xF;
@@ -397,6 +402,9 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 	}
 	else if (tlb_type == COPRO_TLB_UNMAPPED)
 	{
+		if (no_exception)
+			return false;
+
 		// Unmapped, generate a translation fault
 		if (flags & ARM7_TLB_ABORT_D)
 		{
@@ -428,6 +436,9 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 		switch( desc_lvl2 & 3 )
 		{
 			case COPRO_TLB_UNMAPPED:
+				if (no_exception)
+					return false;
+
 				// Unmapped, generate a translation fault
 				if (flags & ARM7_TLB_ABORT_D)
 				{
@@ -457,6 +468,10 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 					if (fault == FAULT_NONE)
 					{
 						addr = ( desc_lvl2 & COPRO_TLB_SMALL_PAGE_MASK ) | ( addr & ~COPRO_TLB_SMALL_PAGE_MASK );
+					}
+					else if (no_exception)
+					{
+						return false;
 					}
 					else
 					{
@@ -669,7 +684,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 	for (uint32_t i = 0; i < to_fetch; i++)
 	{
 		uint32_t index = (i + start_index) % m_insn_prefetch_depth;
-		if ((m_control & COPRO_CTRL_MMU_EN) && !arm7_tlb_translate(pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+		if ((m_control & COPRO_CTRL_MMU_EN) && !arm7_tlb_translate(pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ, true))
 		{
 			break;
 		}
@@ -686,12 +701,12 @@ uint16_t arm7_cpu_device::insn_fetch_thumb(uint32_t pc)
 {
 	if (pc & 2)
 	{
-		uint16_t insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> 16);
+		uint16_t insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word1_shift);
 		m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_count;
 		m_insn_prefetch_count--;
 		return insn;
 	}
-	return (uint16_t)m_insn_prefetch_buffer[m_insn_prefetch_index];
+	return (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word0_shift);
 }
 
 uint32_t arm7_cpu_device::insn_fetch_arm(uint32_t pc)
@@ -936,20 +951,14 @@ offs_t arm7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 		{
 			if (m_endian == ENDIANNESS_BIG)
 			{
-				if (pc & 1)
-				{
-					fetched_op[1] = op & 0xff;
-					fetched_op[0] = (op >> 8) & 0xff;
-				}
-				else
-				{
-					fetched_op[1] = op & 0xff;
-					fetched_op[0] = (op >> 8) & 0xff;
-				}
+				op >>= ((pc & 2) ? 0 : 16);
+				fetched_op[1] = op & 0xff;
+				fetched_op[0] = (op >> 8) & 0xff;
 				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
 			}
 			else
 			{
+				op >>= ((pc & 2) ? 16 : 0);
 				fetched_op[0] = op & 0xff;
 				fetched_op[1] = (op >> 8) & 0xff;
 				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);

@@ -139,6 +139,8 @@ protected:
 	uint32_t m_insn_prefetch_index;
 	uint32_t m_insn_prefetch_buffer[3];
 	uint32_t m_insn_prefetch_address[3];
+	const uint32_t m_prefetch_word0_shift;
+	const uint32_t m_prefetch_word1_shift;
 
 	bool m_pendingIrq;
 	bool m_pendingFiq;
@@ -213,7 +215,7 @@ protected:
 	void arm9ops_e(uint32_t insn);
 
 	void set_cpsr(uint32_t val);
-	bool arm7_tlb_translate(offs_t &addr, int flags);
+	bool arm7_tlb_translate(offs_t &addr, int flags, bool no_exception = false);
 	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
