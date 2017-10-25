@@ -3164,6 +3164,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/hp80_io/hp80_io.h,BUSES["HP80_IO"] = true
+---------------------------------------------------
+
+if (BUSES["HP80_IO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp80_io/82937.cpp",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp9845_io/hp9845_io.h,BUSES["HP9845_IO"] = true
 ---------------------------------------------------
 

@@ -1038,6 +1038,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/1mb5.h,MACHINES["1MB5"] = true
+---------------------------------------------------
+
+if (MACHINES["1MB5"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1mb5.cpp",
+		MAME_DIR .. "src/devices/machine/1mb5.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i2cmem.h,MACHINES["I2CMEM"] = true
 ---------------------------------------------------
 
