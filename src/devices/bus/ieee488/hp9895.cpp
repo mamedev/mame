@@ -484,6 +484,10 @@ WRITE8_MEMBER(hp9895_device::phi_dio_w)
 WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI , state);
+	if (state) {
+		// Ensure the event queue is emptied before executing any other instruction
+		m_cpu->yield();
+	}
 }
 
 READ8_MEMBER(hp9895_device::phi_reg_r)
