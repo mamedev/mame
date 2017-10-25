@@ -57,11 +57,11 @@ public:
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(input0_r);
 	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(tceptor_tile_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_tile_attr_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
+	DECLARE_WRITE8_MEMBER(tceptor2_shutter_w);
 	void tile_mark_dirty(int offset);
 
 	required_device<namco_c45_road_device> m_c45_road;

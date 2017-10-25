@@ -529,7 +529,6 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-
 WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 {
 	// rising edge
@@ -537,4 +536,10 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	{
 		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
 	}
+}
+
+WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
+{
+	// 3D scope shutter control
+	output().set_value("shutter", data & 1);
 }

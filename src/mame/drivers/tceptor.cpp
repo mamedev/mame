@@ -22,6 +22,8 @@
 #include "rendlay.h"
 #include "speaker.h"
 
+#include "tceptor2.lh"
+
 
 /*******************************************************************/
 
@@ -141,11 +143,6 @@ READ8_MEMBER(tceptor_state::input1_r)
 	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-READ8_MEMBER(tceptor_state::readFF)
-{
-	return 0xff;
-}
-
 /*******************************************************************/
 
 static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
@@ -154,7 +151,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_SHARE("tile_attr")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_SHARE("bg_ram")  // background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITENOP                // 3D scope left/right?
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(tceptor2_shutter_w)
 	AM_RANGE(0x4f00, 0x4f00) AM_READNOP             // unknown
 	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")          // analog input (accel)
 	AM_RANGE(0x4f02, 0x4f02) AM_READ_PORT("STICKX")         // analog input (left/right)
@@ -222,8 +219,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(readFF) AM_WRITENOP
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF) AM_WRITENOP
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITENOP
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -290,7 +288,7 @@ static INPUT_PORTS_START( tceptor2 )
 	PORT_INCLUDE( tceptor )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x04, 0x00, "Mode" ) // NOTE: factory default is actually 3D
+	PORT_DIPNAME( 0x04, 0x04, "Mode" )
 	PORT_DIPSETTING(    0x00, "2D" )
 	PORT_DIPSETTING(    0x04, "3D" )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -520,4 +518,4 @@ ROM_END
 
 //   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME                 FLAGS )
 GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",        0)
-GAME ( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "3-D Thunder Ceptor II", 0)
+GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "3-D Thunder Ceptor II", 0, layout_tceptor2)
