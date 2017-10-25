@@ -1576,12 +1576,12 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "Монетопримник %1$c: НД%3$s\n"
+msgstr "Монетоприемник %1$c: НД%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Монетопримник %1$c: %2$d%3$s\n"
+msgstr "Монетоприемник %1$c: %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
