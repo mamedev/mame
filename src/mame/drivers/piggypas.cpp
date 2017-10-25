@@ -58,6 +58,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
+	// Serial output driver is UCN5833A
 	output().set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
 }
 
@@ -126,7 +127,7 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 static MACHINE_CONFIG_START( piggypas )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_8_448MHz) // OKI M80C31
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL_8_448MHz) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
