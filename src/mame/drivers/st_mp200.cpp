@@ -647,11 +647,20 @@ ROM_END
 / Cheetah #116
 /-------------------------------*/
 ROM_START(cheetah)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))
-	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))
+	ROM_REGION(0x10000, "maincpu", 0)   // Black cabinet version
+	ROM_LOAD( "CHEETAH__R_B20.U1", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))   // 25A-E1B exists is there an E1A and/or E1 version?
+	ROM_LOAD( "CHEETAH__R_B20.U5", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))   // 25A-E5
+	ROM_LOAD( "CHEETAH__R_B20.U2", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))   // 25A-E2
+	ROM_LOAD( "CHEETAH__R_B20.U6", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))   // 25A-E6
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
+ROM_START(cheetahb)
+	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
+	ROM_LOAD( "CHEETAH__X_B16.U1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "CHEETAH__X_B16.U5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
+	ROM_LOAD( "CHEETAH__X_B16.U2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
+	ROM_LOAD( "CHEETAH__X_B16.U6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -933,7 +942,8 @@ GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp20
 
 // 7-digit
 GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Big Game",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah (Black Cabinet)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Cheetah (Blue Cabinet)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Quicksilver",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Seawitch",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Nine Ball",              MACHINE_IS_SKELETON_MECHANICAL)

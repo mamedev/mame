@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)                          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 																																																							/*    fe80-fe9f  FDC            Floppy disc controller          */
-	AM_RANGE(0xfea0, 0xfebf) AM_DEVREADWRITE("mc6854", mc6854_device, read, write)                              /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)                      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                                     /*    ff00-ffff                 OS ROM (continued)              */
@@ -776,7 +776,6 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_OPUS_DDOS_FORMAT,
 	FLOPPY_OPUS_DDCPM_FORMAT,
-	FLOPPY_TORCH_CPN_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END0
@@ -786,7 +785,6 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT,
 	FLOPPY_OPUS_DDCPM_FORMAT,
-	FLOPPY_TORCH_CPN_FORMAT,
 	FLOPPY_ACORN_DOS_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_PC_FORMAT
@@ -959,12 +957,12 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
-	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
+		MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+		MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
+		MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+		MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
+		MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+		MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -1117,9 +1115,9 @@ static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Add Torch Z80 Communicator co-processor */
-	//MCFG_DEVICE_MODIFY("tube")
-	//MCFG_SLOT_DEFAULT_OPTION("zep100")
-	//MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("tube")
+	MCFG_SLOT_DEFAULT_OPTION("zep100")
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
@@ -1404,12 +1402,12 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
-	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
+		MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+		MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
+		MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+		MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
+		MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+		MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
@@ -1512,6 +1510,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 	/* Add ARM co-processor */
+	//MCFG_DEVICE_MODIFY("extube")
+	//MCFG_SLOT_DEFAULT_OPTION("arm")
+	//MCFG_SLOT_FIXED(true)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")
@@ -1573,7 +1574,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
 
-	// cartridge sockets
+	/* cartridge sockets */
 	MCFG_DEVICE_REMOVE("exp_rom1")
 	MCFG_DEVICE_REMOVE("exp_rom2")
 
@@ -2339,7 +2340,7 @@ ROM_END
 /*     YEAR  NAME      PARENT   COMPAT MACHINE   INPUT   CLASS           INIT     COMPANY            FULLNAME                         FLAGS */
 COMP ( 1981, bbcb,     0,       bbca,  bbcb,     bbcb,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model B",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,    0,     bbca,     bbca,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model A",             MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchf,   bbcb,    0,     torchf,   torch,  torch240_state, bbc,     "Torch Computers", "Torch CF240",                   MACHINE_NOT_WORKING)
+COMP ( 1982, torchf,   bbcb,    0,     torchf,   torch,  torch240_state, bbc,     "Torch Computers", "Torch CF240",                   MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, torchh10, bbcb,    0,     torchh10, torch,  torch240_state, bbc,     "Torch Computers", "Torch CH240/10",                MACHINE_NOT_WORKING)
 COMP ( 1982, torchh21, bbcb,    0,     torchh21, torch,  torch240_state, bbc,     "Torch Computers", "Torch CH240/21",                MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,    0,     bbcb_de,  bbcb,   bbc_state,      bbc,     "Acorn",           "BBC Micro Model B (German)",    MACHINE_IMPERFECT_GRAPHICS)

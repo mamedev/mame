@@ -417,8 +417,8 @@ static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
-//	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
-//	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
+//  MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(isbc_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(isbc_state, override_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(isbc_state, bus_intr_out1_w))

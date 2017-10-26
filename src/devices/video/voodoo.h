@@ -1597,7 +1597,7 @@ protected:
 		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		int32_t prepare();
 		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod);
-		rgbaint_t combineTexture(const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod);
+		rgbaint_t combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod);
 
 		struct ncc_table
 		{
@@ -1862,9 +1862,9 @@ protected:
 
 	static bool chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgaIntColor);
 	static bool alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha);
-	static bool alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha);
+	static bool alphaTest(uint8_t alpharef, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha);
 	static bool depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth);
-	static bool combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, uint32_t ALPHAMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
+	static bool combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
 
 // FIXME: this stuff should not be public
 public:

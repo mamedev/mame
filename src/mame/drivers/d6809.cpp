@@ -11,15 +11,15 @@ Chips used:
 - 6809E CPU
 - 6845 CRTC
 - 6840 CTC
-- 6551 UART Console
-- 6551 UART Aux
-- 6850 UART Unknown purpose
+- 6551 ACIA Console
+- 6551 ACIA Aux
+- 6850 ACIA Unknown purpose
 - uPD765 FDC
 - 2764 8K ROM for CPU
 - 2732 4K ROM for Chargen (not dumped)
 - 6x 6264 RAM
 - 3x 5516 RAM
-- XTAL: 16MHz
+- XTALs: 14.745MHz, 16MHz
 
 So much for the official documentation.
 
@@ -84,6 +84,7 @@ devices.
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/mos6551.h"
 #include "machine/terminal.h"
 
 #define TERMINAL_TAG "terminal"
@@ -123,6 +124,8 @@ WRITE8_MEMBER( d6809_state::term_w )
 static ADDRESS_MAP_START( d6809_mem, AS_PROGRAM, 8, d6809_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	// 00-FF is for various devices.
+	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)
+	AM_RANGE(0x0004, 0x0007) AM_DEVREADWRITE("acia2", mos6551_device, read, write)
 	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(term_r,term_w)
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -146,9 +149,11 @@ void d6809_state::machine_reset()
 
 static MACHINE_CONFIG_START( d6809 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_14_7456MHz / 8) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(d6809_mem)
 
+	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)

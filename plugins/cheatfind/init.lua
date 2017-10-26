@@ -389,7 +389,7 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not devtable[devcur].space.shortname then -- no xml or simple for ram_device cheat
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
@@ -399,7 +399,7 @@ function cheatfind.startplugin()
 								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), cheat_save.filename))
 							end
 							written = true
-						elseif not devtable[devcur].space.shortname then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -680,7 +680,7 @@ function cheatfind.startplugin()
 					end
 
 
-					if dev.space.shortname then
+					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 					else
@@ -720,7 +720,7 @@ function cheatfind.startplugin()
 					else
 						local func = "return space:read"
 						local env = { space = devtable[devcur].space }
-						if not dev.space.shortname then
+						if not getmetatable(dev.space).__name:match("device_t") then
 							func = func .. "_" .. wid
 						end
 						func = func .. "(" .. match.addr .. ")"

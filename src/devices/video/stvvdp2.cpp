@@ -4774,7 +4774,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
 						continue;
 				}
-				
+
 				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
 				switch( stv2_current_tilemap.transparency )
 				{

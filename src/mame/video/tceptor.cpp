@@ -375,7 +375,7 @@ void tceptor_state::video_start()
 	decode_sprite32("gfx4");
 
 	/* allocate temp bitmaps */
-	m_2dscreen->register_screen_bitmap(m_temp_bitmap);
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 
 	m_c45_road->set_transparent_color(m_palette->pen_indirect(0xfff));
 
@@ -498,7 +498,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-uint32_t tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect;
 	int pri;
@@ -529,21 +529,6 @@ uint32_t tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_i
 	return 0;
 }
 
-uint32_t tceptor_state::screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if ((screen.frame_number() & 1) == 1)
-		return UPDATE_HAS_NOT_CHANGED;
-	return screen_update_tceptor_2d(screen, bitmap, cliprect);
-}
-
-uint32_t tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if ((screen.frame_number() & 1) == 0)
-		return UPDATE_HAS_NOT_CHANGED;
-	return screen_update_tceptor_2d(screen, bitmap, cliprect);
-}
-
-
 WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 {
 	// rising edge
@@ -551,4 +536,10 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	{
 		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
 	}
+}
+
+WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
+{
+	// 3D scope shutter control
+	output().set_value("shutter", data & 1);
 }

@@ -1217,7 +1217,7 @@ D4564323        - NEC uPD4564323G5-A10 512K x 32 x 4 (64MBit) SDRAM (SSOP86)
 D4721           - NEC uPD4721 RS232 Line Driver Receiver IC (SSOP20)
 PCM1725U        - Burr-Brown PCM1725U 16Bit Digital to Analog Converter (SOIC14)
 2100            - New Japan Radio Co. Ltd. NJM2100 Dual Op Amp (SOIC8)
-ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 custom ASIC (TQFP100)
+ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 rebadged Fujitsu MBCG61723P-102 TP2H50 - CG61P series CMOS Gate Array ASIC (TQFP100)
 315-6232        - SEGA 315-6232 custom ASIC (QFP100)
 315-6258        - SEGA 315-6258 custom ASIC (QFP56)
 315-6267        - SEGA 315-6267 custom ASIC (BGAxxx)
@@ -1694,7 +1694,7 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
 
 static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
@@ -1754,7 +1754,7 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 
 static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
@@ -1957,9 +1957,9 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram")
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram")// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram")// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram")// mirror
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram") // extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram") // mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram") // mirror
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
 	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
@@ -2698,6 +2698,8 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
+	MCFG_CPU_FORCE_NO_DRC()
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
@@ -6824,6 +6826,10 @@ ROM_START( wrungpo )
 	ROM_LOAD( "mpr-23724.ic6",  0x5800000, 0x1000000, CRC(c633c45a) SHA1(23b45140f965428d33e2424b0574715c0b952d05) )
 	// note: origin ROM board have 12x8MB FlashROMs with same contents as above
 
+	// 838-12801 DRIVE BD WAVERUNNER
+	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-19250.ic8", 0x000000, 0x010000, NO_DUMP )
+
 	// 840-0064-01  2001    317-0306-COM    Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "284ae7c3")
 ROM_END
@@ -6840,6 +6846,10 @@ ROM_START( wrungp )
 	ROM_LOAD( "mpr-23722.ic4",  0x3800000, 0x1000000, CRC(e08a6a36) SHA1(ef37d8c7bc9d5055008d522825ef3e80e27745c2) )
 	ROM_LOAD( "mpr-23723.ic5",  0x4800000, 0x1000000, CRC(651610eb) SHA1(4dfe4f876a5440bd1034f41a4d76e1d6bd3e0e32) )
 	ROM_LOAD( "mpr-23724.ic6",  0x5800000, 0x1000000, CRC(c633c45a) SHA1(23b45140f965428d33e2424b0574715c0b952d05) )
+
+	// 838-12801 DRIVE BD WAVERUNNER
+	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-19250.ic8", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
@@ -10210,6 +10220,7 @@ ROM_END
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0175    */ GAME( 2007, asndynmt,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX", GAME_FLAGS )
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
+// 0180 Mushiking IV (World)
 /* 0186    */ GAME( 2009, shorsepr,  naomi,    naomim4, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse Progress Returns (satellite)", GAME_FLAGS )
 // 0xxx Mushiking 2K3 1ST (Japan)
 // 0xxx Mushiking 2K4 1ST (Japan)

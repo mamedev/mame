@@ -394,22 +394,27 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 /***************************************************************
- * Enter halt state; write 1 to fake port on first execution
+ * Enter halt state; write 1 to callback on first execution
  ***************************************************************/
 inline void z80_device::halt()
 {
 	PC--;
-	m_halt = 1;
+	if (!m_halt)
+	{
+		m_halt = 1;
+		m_halt_cb(1);
+	}
 }
 
 /***************************************************************
- * Leave halt state; write 0 to fake port
+ * Leave halt state; write 0 to callback
  ***************************************************************/
 inline void z80_device::leave_halt()
 {
 	if( m_halt )
 	{
 		m_halt = 0;
+		m_halt_cb(0);
 		PC++;
 	}
 }
@@ -3452,6 +3457,7 @@ void z80_device::device_start()
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
+	m_halt_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
@@ -3465,6 +3471,8 @@ void nsc800_device::device_start()
  ****************************************************************************/
 void z80_device::device_reset()
 {
+	leave_halt();
+
 	PC = 0x0000;
 	m_i = 0;
 	m_r = 0;
@@ -3697,7 +3705,8 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
-	m_refresh_cb(*this)
+	m_refresh_cb(*this),
+	m_halt_cb(*this)
 {
 }
 

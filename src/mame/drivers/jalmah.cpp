@@ -753,7 +753,7 @@ void jalmah_state::daireika_palette_dma(uint16_t val)
 	/*a1=88000*/
 	if(val == 0)
 		return;
-	
+
 	src_addr = 0x301c0 + (val * 0x40);
 //  popmessage("%08x",src_addr);
 	for(index_1 = 0; index_1 < 0x200; index_1 += 0x20)

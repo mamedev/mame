@@ -136,7 +136,7 @@ F-1 Grand Prix Part II   *1992 2x68000          V-System                        
 Lethal Crash Race        *1993   68000          V-System                         053936 (roz+)
 Super Slams              *1995   68000          V-System                         053936 (roz+)
 Blazing Tornado          *1991   68000            Metro                          053936 (roz+)
-Dragonball Z 2           *1994   68000 054157 054156 053247 053246 053251(x2)    053936(x2) (roz+) 053252(*)
+Dragon Ball Z 2          *1994   68000 054157 054156 053247 053246 053251(x2)    053936(x2) (roz+) 053252(*)
 
 
 Notes:
@@ -199,7 +199,7 @@ Premier Soccer      fails 16D 18D 18F (053936)
 Hexion              pass
 Run and Gun         fails 36M (053936) 2U 2Y 5U 5Y (sprites)
 Quiz Gakumon no Susume  pass
-Dragonball Z 2      fails
+Dragon Ball Z 2     fails
 
 
 

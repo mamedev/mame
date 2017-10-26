@@ -70,7 +70,6 @@ public:
 	DECLARE_WRITE16_MEMBER(slyspy_state_w);
 	DECLARE_READ16_MEMBER(slyspy_state_r);
 	DECLARE_READ16_MEMBER(dec0_controls_r);
-	DECLARE_READ16_MEMBER(dec0_rotary_r);
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);

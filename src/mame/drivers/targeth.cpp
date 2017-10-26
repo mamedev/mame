@@ -8,16 +8,16 @@ Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 ** NOTES: Merge with wrally.ccp???  Address map nearly identical & PCB
           is reworked to add connections for light guns and different RAM
-		 
-	 	  is the visible area correct? if it's larger than the startup
-		  screen then scene 5 of desert chariots doesn't cover the entire
-		  screen either.
 
-		  the instructions say to reload the gun after each shot, but
-		  there is no reload button listed in service mode, and it doesn't
-		  seem to be required, was it a mechanical feature of the gun or
-		  is our logic inverted somewhere, the gun test shows 'ON' when
-		  you're not pressing fire too.
+          is the visible area correct? if it's larger than the startup
+          screen then scene 5 of desert chariots doesn't cover the entire
+          screen either.
+
+          the instructions say to reload the gun after each shot, but
+          there is no reload button listed in service mode, and it doesn't
+          seem to be required, was it a mechanical feature of the gun or
+          is our logic inverted somewhere, the gun test shows 'ON' when
+          you're not pressing fire too.
 
 REF.940531
 +-------------------------------------------------+

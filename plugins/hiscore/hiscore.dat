@@ -1369,6 +1369,14 @@ battlntsj:
 
 ;@s:bbusters.cpp
 
+bbusters:
+bbustersj:
+bbustersja:
+bbustersu:
+bbustersua:
+@:maincpu,program,8a579,9b,02,01
+
+
 mechattu1:
 @:maincpu,program,7f943,3,00,15
 @:maincpu,program,7f9bb,99,00,2e
@@ -1380,14 +1388,6 @@ mechattj:
 mechattu:
 @:maincpu,program,7f943,3,02,54
 @:maincpu,program,7f9bb,99,02,14
-
-
-;(beast busters (world ?)) (by GeoMan)
-bbusters:
-bbustersu:
-bbustersua:
-@:maincpu,program,8a578,2,00,02
-@:maincpu,program,8a57a,be,30,00
 
 
 ;@s:beaminv.cpp
@@ -3012,6 +3012,25 @@ cosmica2:
 
 
 ;@s:cps1.cpp
+
+;**** thanks to Takasaki for this fix ****
+qadjr:
+@:maincpu,program,ff4ba8,14,00,00
+@:maincpu,program,ff4bbc,14,01,00
+@:maincpu,program,ff4bd0,14,01,00
+@:maincpu,program,ff4be4,14,01,00
+@:maincpu,program,ff4bf8,14,00,00
+@:maincpu,program,ff4c0c,c8,00,00
+@:maincpu,program,ff4cd4,02,00,00
+@:maincpu,program,ff4cd6,04,ff,34
+
+
+;**** thanks to Takasaki for this fix ****
+qtono2j:
+@:maincpu,program,ff50fe,64,00,00
+@:maincpu,program,ff519e,60,00,00
+@:maincpu,program,ff51fe,04,06,00
+
 
 daimakai:
 daimakair:
@@ -5922,6 +5941,13 @@ maniacsp:
 
 ;@s:gaelco2.cpp
 
+;maniac square (unprotected)(by tamphax)
+maniacsq:
+maniacsqa:
+maniacsqu:
+@:maincpu,program,fe982c,48,50,00
+
+
 ;*******(alligator hunt (unprotected))   
 aligatorun:
 aligatoruna:
@@ -5932,11 +5958,6 @@ aligatoruna:
 ;*******(bang!)
 bang:
 @:maincpu,program,fe5a4c,ee,41,01
-
-
-;maniac square (unprotected)(by tamphax)
-maniacsq:
-@:maincpu,program,fe982c,48,50,00
 
 
 ;*******(world rally 2: twin racing)(By Firebrand)
@@ -7190,6 +7211,7 @@ grndtour:
 dairesya:
 farwest:
 ironhors:
+ironhorsh:
 @:maincpu,program,32f1,3,02,00
 @:maincpu,program,3300,40,23,00
 
@@ -9526,21 +9548,30 @@ highspltb:
 
 ;@s:namcona1.cpp
 
-;(emeraldia (japan))
+;**** thanks to Takasaki for this fix ****
 emeralda:
+emeraldaj:
+emeraldaja:
 @:maincpu,program,9c9e,10e,4b,01
+
+
+;**** thanks to Takasaki for this fix ****
+exvania:
+exvaniaj:
+@:mcu,program,214ee8,28,50,02
+
+
+;**** thanks to Takasaki for this fix ****
+knckhead:
+knckheadj:
+knckheadjp:
+@:mcu,program,209372,27,00,4c
+@:mcu,program,209373,1,10,10
 
 
 ;(cosmo gang the puzzle (us))
 cgangpzl:
 @:maincpu,program,add2,ce,ff,a2
-
-
-;(knuckle heads (world))
-knckhead:
-knckheadj:
-@:maincpu,program,209372,27,00,4c
-@:maincpu,program,209373,1,10,10
 
 
 cgangpzlj:
@@ -9556,12 +9587,6 @@ fghtatck:
 ;(tinkle pit (japan))
 tinklpit:
 @:maincpu,program,5ca8,174,00,02
-
-
-;(exvania (japan)) (by GeoMan)
-exvania:
-exvaniaj:
-@:maincpu,program,214ee8,28,50,02
 
 
 ;@s:namconb1.cpp
@@ -11280,6 +11305,123 @@ pitnruna:
 
 ;@s:playch10.cpp
 
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_golf:
+@:cart,program,0e,02,64,0
+@:cart,program,0b,01,04,04
+@:ppu,videoram,22cf,07,a1,00
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_1942:
+@:cart,program,7bf,06,00,00
+@:cart,program,108,01,03,03
+@:ppu,videoram,346d,06,00,00
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+;****** hiscores update on game play start ******
+pc_bfght:
+@:cart,program,629,0f,00,00
+@:cart,program,19,01,2b,2b
+@:ppu,videoram,204e,06,00,00
+@:ppu,videoram,204f,01,01,01
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_duckh:
+@:cart,program,05f1,03,01,00
+@:cart,program,2d,01,f2,f2
+@:cart,program,5f5,03,01,00
+@:cart,program,5f9,03,01,00
+@:ppu,videoram,2312,06,24,00
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_grdue:
+pc_grdus:
+@:cart,program,7e0,03,00,00
+@:cart,program,4c,01,f3,f3
+@:ppu,videoram,222e,07,30,30
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_hgaly:
+@:cart,program,5f1,0b,01,00
+@:cart,program,2d,01,22,22
+@:ppu,videoram,22ef,06,00,00
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_kngfu:
+@:cart,program,511,0d,00,00
+@:cart,program,36,01,32,32
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_mario:
+@:cart,program,91,3,00,00
+@:cart,program,2d,01,46,46
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_rnatk:
+@:cart,program,7e0,3,00,00
+@:cart,program,1a,01,76,76
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_suprc:
+@:cart,program,7e0,3,00,00
+@:cart,program,1b,01,23,23
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_tmnt:
+@:cart,program,8c8,3,00,00
+@:cart,program,3a,01,f5,f5
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_goons:
+@:cart,program,7f0,3,00,01
+@:cart,program,42,01,f5,f5
+@:ppu,videoram,222d,07,00,30
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_tkfld:
+@:cart,program,745,5,00,00
+@:cart,program,02,01,08,08
+@:cart,program,704,10,03,09
+@:cart,program,780,0e,00,02
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_trjan:
+@:cart,program,32c,6,00,00
+@:cart,program,20,01,08,08
+@:ppu,videoram,206c,06,10,00
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_wgnmn:
+@:cart,program,5f1,0b,01,00
+@:cart,program,2f,01,08,08
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_drmro:
+@:cart,program,700,06,00,00
+@:cart,program,43,01,08,08
+
+
+;****** turn FREEPLAY on (in dipswitch settings) before playing ******
+pc_virus:
+@:cart,program,700,06,00,00
+@:cart,program,43,01,08,08
+
+
 ;it won't reload the high score unless you reset twice
 pc_smb:
 @:cart,program,7df,4,0,0,ff
@@ -12807,11 +12949,6 @@ riotcity:
 
 ;@s:segas18.cpp
 
-mwalkj:
-@:maincpu,program,ff3c00,50,00,4a
-@:maincpu,program,ffe020,4,00,00
-
-
 ;******Desert Breaker (FD1094 317-0196)
 desertbr:
 @:maincpu,program,ff3418,1,1a,1a
@@ -12819,14 +12956,6 @@ desertbr:
 @:maincpu,program,ffbb02,4,00,e8
 @:maincpu,program,fffb02,4,00,e8
 @:maincpu,program,ff7b02,4,00,e8
-
-
-;******michael jacksons moonwalker (world,fd1094/8751 317-0159)
-;mwalku:******michael jacksons moonwalker (us,fd1094/8751 317-0158)
-mwalk:
-mwalku:
-@:maincpu,program,ff3c00,50,00,4a
-@:maincpu,program,ffe020,4,00,00
 
 
 ;(shadow dancer)
@@ -14535,6 +14664,15 @@ chinatwn:
 @:maincpu,program,1a3e00,50,00,2e
 
 
+tumbleb:
+tumbleb2:
+tumblep:
+tumblepba:
+tumblepj:
+@:maincpu,program,123c10,a0,44,50
+@:maincpu,program,123c01,3,00,00
+
+
 ;@s:supduck.cpp
 
 supduck:
@@ -14903,6 +15041,11 @@ brain:
 
 ;@s:system16.cpp
 
+mwalkbl:
+@:maincpu,program,fffc00,50,00,4a
+@:maincpu,program,ffe020,4,00,00
+
+
 ;altbeastj3:******altered beast (japan, fd1094 317-0068)
 ;altbeast4:******altered beast (set 4, mc-8123b 317-0066)
 ;altbeast5:******altered beast (set 5, 8751 317-0076)
@@ -14936,11 +15079,6 @@ wb35:
 wb3bbl:
 @:maincpu,program,ffc8b8,28,4c,00
 @:maincpu,program,ffc8de,1,30,30
-
-
-mwalkbl:
-@:maincpu,program,fffc00,50,00,4a
-@:maincpu,program,ffe020,4,00,00
 
 
 ;@s:tagteam.cpp
@@ -15432,6 +15570,18 @@ pbobble4u:
 
 
 ;@s:taito_h.cpp
+
+syvalionp:
+@:maincpu,program,102512,32,00,43
+@:maincpu,program,103e8a,03,00,00
+@:maincpu,program,103e8b,01,50,50
+
+
+syvalionu:
+syvalionw:
+@:maincpu,program,1090ea,63,00,43
+@:maincpu,program,104267,03,59,00
+
 
 ;(recordbreaker (world)) (by GeoMan)
 recordbr:
@@ -16312,6 +16462,14 @@ glfgreat:
 
 ;@s:tnzs.cpp
 
+chukatai:
+chukataij:
+chukataija:
+chukataiu:
+@:maincpu,program,ed8c,46,00,42
+@:maincpu,program,e210,3,00,75
+
+
 ;kagekih:******Kageki (World?, hack)
 kageki:
 kagekih:
@@ -16356,13 +16514,6 @@ drtoppelj:
 drtoppelu:
 @:maincpu,program,e057,23,00,25
 @:maincpu,program,e023,3,00,00
-
-
-chukatai:
-chukataij:
-chukataiu:
-@:maincpu,program,ed8c,46,00,42
-@:maincpu,program,e210,3,00,75
 
 
 ;extrmatn:[Special thanks to Cananas for enhancing this entry]
@@ -16762,6 +16913,19 @@ tryout:
 
 ;@s:tsamurai.cpp
 
+;tsamuraih:******Samurai Nihon-ichi (set 3, harder)
+ladymstr:
+ladymstr2:
+nunchaku:
+tsamurai:
+tsamurai2:
+tsamuraih:
+yamagchi:
+@:maincpu,program,c060,1e,00,00
+@:maincpu,program,c080,1e,11,11
+@:maincpu,program,c026,3,00,00
+
+
 m660:
 m660b:
 m660j:
@@ -16786,18 +16950,6 @@ alphaxz:
 @:maincpu,program,E1C1,1,30,30
 @:maincpu,program,E1A1,1,30,30
 @:maincpu,program,E181,1,30,30
-
-
-;tsamuraih:******Samurai Nihon-ichi (set 3, harder)
-ladymstr:
-nunchaku:
-tsamurai:
-tsamurai2:
-tsamuraih:
-yamagchi:
-@:maincpu,program,c060,1e,00,00
-@:maincpu,program,c080,1e,11,11
-@:maincpu,program,c026,3,00,00
 
 
 ;vsgongf:******vs. gong fight
@@ -16877,17 +17029,6 @@ sdfight:
 cookbib:
 cookbiba:
 @:maincpu,program,121cca,aa,20,64
-
-
-;@s:tumblep.cpp
-
-tumbleb:
-tumbleb2:
-tumblep:
-tumblepba:
-tumblepj:
-@:maincpu,program,123c10,a0,44,50
-@:maincpu,program,123c01,3,00,00
 
 
 ;@s:tunhunt.cpp

@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(COM8116, com8116_device, "com8116", "COM8116 Dual BRG")
 
 // SMC/COM5016(T) with no dash, aka 'STD' part on the datasheet
 // Also COM8116(T)/8126(T)/8136(T)/8146(T) and Synertek sy2661-3 and GI AY-5-8116(T)-000 and GI AY-5-8136(T)-000 and WD WD-1943-00 (aka WD8136-00)
+// and Motorola K1135A/B (K1135B outputs undivided 5.0688 MHz on pin 1)
 // SMC/COM8156(T) is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
 // baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_16X_5_0688MHz[] =
@@ -39,6 +40,7 @@ const int com8116_device::divisors_16X_6_01835MHz[] =
 
 // SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed, see below
 // SMC/COM8156(T)-5 is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
+// Motorola K1135C is similar, with undivided 4.9152 MHz on pin 1
 // baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_16X_4_9152MHz[] =
 	{ 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 85, 64, 43, 32, 16 };

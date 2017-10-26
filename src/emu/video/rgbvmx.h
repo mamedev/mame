@@ -75,6 +75,13 @@ public:
 #endif
 	}
 
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { set(val, val, val, val); }
+	// This function zeros all elements
+	void zero() { set_all(0); }
+	// This function zeros only the alpha element
+	void zero_alpha() { set_a(0); }
+
 	inline rgb_t to_rgba() const
 	{
 		VECU32 temp = VECU32(vec_packs(m_value, m_value));
@@ -91,6 +98,12 @@ public:
 		u32 result;
 		vec_ste(temp, 0, &result);
 		return result;
+	}
+
+	void set_a16(const s32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
 	void set_a(const s32 value)
@@ -597,6 +610,11 @@ public:
 		const VECU32 temp = { u32(shift), u32(shift), u32(shift), u32(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
+	}
+
+	inline void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
 	inline void merge_alpha(const rgbaint_t& alpha)

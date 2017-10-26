@@ -18,6 +18,8 @@
  ******************************************************************************/
 
 #include "emu.h"
+#include "machine/kay_kbd.h"
+
 #include "sound/beep.h"
 #include "includes/kaypro.h"
 

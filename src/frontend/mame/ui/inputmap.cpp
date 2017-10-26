@@ -554,27 +554,30 @@ void menu_settings::populate(float &customtop, float &custombottom)
 		for (ioport_field &field : port.second->fields())
 			if (field.type() == type && field.enabled())
 			{
-				uint32_t flags = 0;
-
-				/* set the left/right flags appropriately */
-				if (field.has_previous_setting())
-					flags |= FLAG_LEFT_ARROW;
-				if (field.has_next_setting())
-					flags |= FLAG_RIGHT_ARROW;
-
-				/* add the menu item */
-				if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+				if (!field.settings().empty())
 				{
-					if (first_entry)
-						first_entry = false;
-					else
-						item_append(menu_item_type::SEPARATOR);
-					string_format("[root%s]", field.device().tag());
-					item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
-					prev_owner.assign(field.device().tag());
-				}
+					uint32_t flags = 0;
 
-				item_append(field.name(), field.setting_name(), flags, (void *)&field);
+					/* set the left/right flags appropriately */
+					if (field.has_previous_setting())
+						flags |= FLAG_LEFT_ARROW;
+					if (field.has_next_setting())
+						flags |= FLAG_RIGHT_ARROW;
+
+					/* add the menu item */
+					if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+					{
+						if (first_entry)
+							first_entry = false;
+						else
+							item_append(menu_item_type::SEPARATOR);
+						string_format("[root%s]", field.device().tag());
+						item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
+						prev_owner.assign(field.device().tag());
+					}
+
+					item_append(field.name(), field.setting_name(), flags, (void *)&field);
+				}
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && !field.diplocations().empty())

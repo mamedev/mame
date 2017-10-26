@@ -262,22 +262,13 @@ int arm7_cpu_device::storeInc(uint32_t pat, uint32_t rbv, int mode)
 
 int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 {
-	int i, result = 0, cnt;
-
 	// pre-count the # of registers being stored
-	for (i = 15; i >= 0; i--)
-	{
-		if ((pat >> i) & 1)
-		{
-			result++;
+	int const result = population_count_32(pat & 0x0000ffff);
 
-			// starting address
-			rbv -= 4;
-		}
-	}
+	// adjust starting address
+	rbv -= (result << 2);
 
-	cnt = 0;
-	for (i = 0; i <= 15; i++)
+	for (int i = 0; i <= 15; i++)
 	{
 		if ((pat >> i) & 1)
 		{
@@ -285,8 +276,8 @@ int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-			WRITE32(rbv + (cnt * 4), GetModeRegister(mode, i));
-			cnt++;
+			WRITE32(rbv, GetModeRegister(mode, i));
+			rbv += 4;
 		}
 	}
 	return result;

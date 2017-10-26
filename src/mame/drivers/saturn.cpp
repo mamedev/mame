@@ -484,12 +484,12 @@ public:
 	uint8_t saturn_direct_port_read(bool which);
 	uint8_t smpc_direct_mode(uint16_t in_value, bool which);
 	uint8_t smpc_th_control_mode(uint16_t in_value, bool which);
-	
+
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
-	
+
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
 
@@ -587,7 +587,7 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
-{	
+{
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
@@ -644,7 +644,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
@@ -717,8 +717,8 @@ inline uint8_t sat_console_state::saturn_direct_port_read(bool which)
 	uint8_t cur_mode = m_smpc_hle->get_ddr(which);
 	uint8_t res = 0;
 	uint16_t ctrl_read = port->read_direct();
-	
-//	check for control method
+
+//  check for control method
 	switch(cur_mode & 0x60)
 	{
 		case 0: break;
@@ -873,7 +873,7 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 
 	MCFG_DEVICE_MODIFY("smpc")
 	smpc_hle_device::static_set_region_code(*device, 4);
-	
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturneu, saturn )
@@ -909,7 +909,7 @@ MACHINE_CONFIG_END
 
 void sat_console_state::saturn_init_driver(int rgn)
 {
-//	m_saturn_region = rgn;
+//  m_saturn_region = rgn;
 	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
@@ -929,7 +929,7 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-//	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
+//  m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

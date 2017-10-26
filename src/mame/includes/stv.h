@@ -133,7 +133,7 @@ public:
 	uint16_t crypt_read_callback(uint32_t addr);
 	uint16_t crypt_read_callback_ch1(uint32_t addr);
 	uint16_t crypt_read_callback_ch2(uint32_t addr);
-	
+
 	DECLARE_READ8_MEMBER(pdr1_input_r);
 	DECLARE_READ8_MEMBER(pdr2_input_r);
 	DECLARE_WRITE8_MEMBER(pdr1_output_w);

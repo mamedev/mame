@@ -12,6 +12,7 @@ game details unknown
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "video/hd44780.h"
@@ -57,6 +58,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
+	// Serial output driver is UCN5833A
 	output().set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
 }
 
@@ -65,7 +67,7 @@ static ADDRESS_MAP_START( piggypas_map, AS_PROGRAM, 8, piggypas_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( piggypas_io, AS_IO, 8, piggypas_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
@@ -125,11 +127,13 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 static MACHINE_CONFIG_START( piggypas )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, 8000000) // unknown variant
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL_8_448MHz) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram") // DS1220AD
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -148,10 +152,10 @@ static MACHINE_CONFIG_START( piggypas )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_8_448MHz / 8, PIN7_HIGH) // clock and pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_DEVICE_ADD("ppi", I8255A, 0) // OKI M82C55A-2
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(piggypas_state, ctrl_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))

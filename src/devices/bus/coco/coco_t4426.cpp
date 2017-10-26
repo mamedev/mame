@@ -55,9 +55,9 @@
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGPIA(...)	LOGMASKED(LOG_PIA,     __VA_ARGS__)
-#define LOGACIA(...)	LOGMASKED(LOG_ACIA,    __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGPIA(...) LOGMASKED(LOG_PIA,     __VA_ARGS__)
+#define LOGACIA(...)    LOGMASKED(LOG_ACIA,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -69,15 +69,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define UART_TAG        	"acia"
-#define SERIAL_TAG		"ser2" // Labled "Ser.I/O2 RC 232C" on the back of the case
-#define BRG_TAG			"brg"
-#define SERIAL_BRF		"serial_brf"
-#define SERIAL_BAUD		"serial_baud"
-#define PIA_TAG         	"pia"
-#define CARTSLOT_TAG    	"t4426"
-#define CARTBANK_TAG		"t4426_banks"
-#define CART_AUTOSTART_TAG	"cart_autostart"
+#define UART_TAG            "acia"
+#define SERIAL_TAG      "ser2" // Labled "Ser.I/O2 RC 232C" on the back of the case
+#define BRG_TAG         "brg"
+#define SERIAL_BRF      "serial_brf"
+#define SERIAL_BAUD     "serial_baud"
+#define PIA_TAG             "pia"
+#define CARTSLOT_TAG        "t4426"
+#define CARTBANK_TAG        "t4426_banks"
+#define CART_AUTOSTART_TAG  "cart_autostart"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -134,7 +134,7 @@ namespace
 		required_device<mc14411_device> m_brg;
 
 		required_ioport             m_serial_baud;
-	  
+
 		void set_bank();
 	};
 };
@@ -301,7 +301,7 @@ void coco_t4426_device::device_reset()
 }
 
 /*----------------------------------------------------
- * Serial port clock sources driven by the selected 
+ * Serial port clock sources driven by the selected
  * output of the MC14411
  ----------------------------------------------------*/
 void coco_t4426_device::write_acia_clocks(int id, int state)

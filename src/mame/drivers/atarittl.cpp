@@ -393,6 +393,14 @@ ROM_START( gtrak10 )
 ROM_END
 
 
+ROM_START( gtrak10a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+	ROM_LOAD( "074181.j5",    0x0000, 0x0800, CRC(f564c58a) SHA1(8097419e22bd8b5fd2a9fe4ea89302046c42e583) ) // not actually a SN74181 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
+ROM_END
+
+
 ROM_START( gtrak20 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -639,6 +647,7 @@ ROM_END
 GAME(1975,  antiairc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
 GAME(1975,  crashnsc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
 GAME(1974,  gtrak10,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10a,  gtrak10,   atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
 GAME(1974,  gtrak20,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
 GAME(1976,  indy4,     0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
 GAME(1975,  indy800,   0,         atarikee,   0,  atarikee_state, 0,  ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)

@@ -28,7 +28,7 @@ Year + Game                       System    Protection
     Plus Alpha                      A       Yes + Encryption (key 2)
     Saint Dragon                    A       Yes + Encryption (key 1)
 90  RodLand  (World, set 1) /       A             Encryption (key 3)
-	RodLand  (World, set 2)         A             Encryption (key 2)
+    RodLand  (World, set 2)         A             Encryption (key 2)
     RodLand  (Japan)                A             Encryption (key 2)
     R&T (Prototype?)                A             Encryption (key 2)
     Phantasm        (Japan) /       A             Encryption (key 1)

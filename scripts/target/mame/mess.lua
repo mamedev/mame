@@ -418,6 +418,7 @@ MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_TACO"] = true
 MACHINES["1MA6"] = true
+MACHINES["1MB5"] = true
 MACHINES["I2CMEM"] = true
 MACHINES["I7220"] = true
 MACHINES["I80130"] = true
@@ -664,6 +665,7 @@ BUSES["ECONET"] = true
 BUSES["ELECTRON"] = true
 BUSES["EP64"] = true
 BUSES["EPSON_SIO"] = true
+BUSES["GAMATE"] = true
 BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
@@ -674,6 +676,8 @@ BUSES["HPDIO"] = true
 BUSES["IEEE488"] = true
 BUSES["IMI7000"] = true
 BUSES["INTELLEC4"] = true
+BUSES["INTERPRO_SR"] = true
+BUSES["INTERPRO_KEYBOARD"] = true
 BUSES["INTV"] = true
 BUSES["INTV_CTRL"] = true
 BUSES["IQ151"] = true
@@ -681,6 +685,7 @@ BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["HP_OPTROM"] = true
 BUSES["HP80_OPTROM"] = true
+BUSES["HP80_IO"] = true
 BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
@@ -3467,8 +3472,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.h",
+	MAME_DIR .. "src/mame/video/gamate.cpp",
+	MAME_DIR .. "src/mame/video/gamate.h",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
@@ -3564,7 +3569,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/terak.cpp",
+	MAME_DIR .. "src/mame/drivers/terco.cpp",
 	MAME_DIR .. "src/mame/drivers/ti630.cpp",
+	MAME_DIR .. "src/mame/drivers/trs80dt1.cpp",
 	MAME_DIR .. "src/mame/drivers/tsispch.cpp",
 	MAME_DIR .. "src/mame/includes/tsispch.h",
 	MAME_DIR .. "src/mame/drivers/tvgame.cpp",

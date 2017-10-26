@@ -661,6 +661,12 @@ public:
 	template <class Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_txdrqb_callback(device_t &device, Object &&cb) { return downcast<z80scc_device &>(device).m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
 
+	static void static_set_cputag(device_t &device, const char *tag)
+	{
+		z80scc_device &dev = downcast<z80scc_device &>(device);
+		dev.m_cputag = tag;
+	}
+
 	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
 		z80scc_device &dev = downcast<z80scc_device &>(device);
@@ -798,6 +804,7 @@ protected:
 
 	int const m_variant;
 	uint8_t m_wr0_ptrbits;
+	const char *m_cputag;
 };
 
 class scc8030_device : public z80scc_device

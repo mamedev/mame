@@ -46,8 +46,9 @@ class device_state_entry
 	friend class device_state_interface;
 public:
 	// construction/destruction
-	device_state_entry(int index, const char *symbol, void *dataptr, u8 size, device_state_interface *dev);
+	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
+	virtual ~device_state_entry();
 
 public:
 	// post-construction modifiers
@@ -57,13 +58,17 @@ public:
 	device_state_entry &callimport() { m_flags |= DSF_IMPORT; return *this; }
 	device_state_entry &callexport() { m_flags |= DSF_EXPORT; return *this; }
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
+	device_state_entry &readonly() { m_flags |= DSF_READONLY; return *this; }
 
 	// query information
 	int index() const { return m_index; }
-	void *dataptr() const { return m_dataptr; }
+	void *dataptr() const { return entry_baseptr(); }
+	u64 datamask() const { return m_datamask; }
 	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
+	bool writeable() const { return ((m_flags & DSF_READONLY) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
+	bool is_float() const { return m_flags & DSF_FLOATING_POINT; }
 	device_state_interface *parent_state() const {return m_device_state;}
 	const std::string &format_string() const { return m_format; }
 
@@ -75,6 +80,8 @@ protected:
 	static constexpr u8 DSF_EXPORT          = 0x08; // call the export function prior to fetching the data
 	static constexpr u8 DSF_CUSTOM_STRING   = 0x10; // set if the format has a custom string
 	static constexpr u8 DSF_DIVIDER         = 0x20; // set if this is a divider entry
+	static constexpr u8 DSF_READONLY        = 0x40; // set if this entry does not permit writes
+	static constexpr u8 DSF_FLOATING_POINT  = 0x80; // set if this entry represents a floating-point value
 
 	// helpers
 	bool needs_custom_string() const { return ((m_flags & DSF_CUSTOM_STRING) != 0); }
@@ -82,13 +89,22 @@ protected:
 
 	// return the current value -- only for our friends who handle export
 	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
-	u64 value() const;
+	u64 value() const { return entry_value() & m_datamask; }
+	double dvalue() const { return entry_dvalue(); }
 	std::string format(const char *string, bool maxout = false) const;
 
 	// set the current value -- only for our friends who handle import
 	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
 	void set_value(u64 value) const;
+	void set_dvalue(double value) const;
 	void set_value(const char *string) const;
+
+	// overrides
+	virtual void *entry_baseptr() const;
+	virtual u64 entry_value() const;
+	virtual void entry_set_value(u64 value) const;
+	virtual double entry_dvalue() const;
+	virtual void entry_set_dvalue(double value) const;
 
 	// statics
 	static const u64 k_decimal_divisor[20];      // divisors for outputting decimal values
@@ -96,7 +112,6 @@ protected:
 	// public state description
 	device_state_interface *m_device_state;         // link to parent device state
 	u32                     m_index;                // index by which this item is referred
-	void *                  m_dataptr;              // pointer to where the data lives
 	u64                     m_datamask;             // mask that applies to the data
 	u8                      m_datasize;             // size of the data
 	u8                      m_flags;                // flags for this data
@@ -106,6 +121,84 @@ protected:
 	u64                     m_sizemask;             // mask derived from the data size
 };
 
+
+// ======================> device_state_register
+
+// class template representing a state register of a specific width
+template<class ItemType>
+class device_state_register : public device_state_entry
+{
+public:
+	// construction/destruction
+	device_state_register(int index, const char *symbol, ItemType &data, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
+			m_data(data)
+	{
+		static_assert(std::is_integral<ItemType>().value, "Registration of non-integer types is not currently supported");
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return m_data; }
+	virtual void entry_set_value(u64 value) const override { m_data = value; }
+
+private:
+	ItemType &              m_data;                 // reference to where the data lives
+};
+
+// class template representing a floating-point state register
+template<>
+class device_state_register<double> : public device_state_entry
+{
+public:
+	// construction/destruction
+	device_state_register(int index, const char *symbol, double &data, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
+			m_data(data)
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return u64(m_data); }
+	virtual void entry_set_value(u64 value) const override { m_data = double(value); }
+	virtual double entry_dvalue() const override { return m_data; }
+	virtual void entry_set_dvalue(double value) const override { m_data = value; }
+
+private:
+	double &                m_data;                 // reference to where the data lives
+};
+
+
+// ======================> device_state_register
+
+// class template representing a state register of a specific width
+template<class ItemType>
+class device_pseudo_state_register : public device_state_entry
+{
+public:
+	typedef typename std::function<ItemType ()> getter_func;
+	typedef typename std::function<void (ItemType)> setter_func;
+
+	// construction/destruction
+	device_pseudo_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
+			m_getter(std::move(getter)),
+			m_setter(std::move(setter))
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual u64 entry_value() const override { return m_getter(); }
+	virtual void entry_set_value(u64 value) const override { m_setter(value); }
+
+private:
+	getter_func             m_getter;               // function to retrieve the data
+	setter_func             m_setter;               // function to store the data
+};
 
 
 // ======================> device_state_interface
@@ -143,15 +236,32 @@ public:
 
 public: // protected eventually
 
-	// add a new state item
-	template<class _ItemType> device_state_entry &state_add(int index, const char *symbol, _ItemType &data)
+	// add a new state register item
+	template<class ItemType> device_state_entry &state_add(int index, const char *symbol, ItemType &data)
 	{
-		return state_add(index, symbol, &data, sizeof(data));
+		assert(symbol != nullptr);
+		return state_add(std::make_unique<device_state_register<ItemType>>(index, symbol, data, this));
 	}
-	device_state_entry &state_add(int index, const char *symbol, void *data, u8 size);
+
+	// add a new state pseudo-register item (template argument must be explicit)
+	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
+					typename device_pseudo_state_register<ItemType>::getter_func &&getter,
+					typename device_pseudo_state_register<ItemType>::setter_func &&setter)
+	{
+		assert(symbol != nullptr);
+		return state_add(std::make_unique<device_pseudo_state_register<ItemType>>(index, symbol, std::move(getter), std::move(setter), this));
+	}
+	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
+					typename device_pseudo_state_register<ItemType>::getter_func &&getter)
+	{
+		assert(symbol != nullptr);
+		return state_add(std::make_unique<device_pseudo_state_register<ItemType>>(index, symbol, std::move(getter), [](ItemType){}, this)).readonly();
+	}
+
+	device_state_entry &state_add(std::unique_ptr<device_state_entry> &&entry);
 
 	// add a new divider entry
-	device_state_entry &state_add_divider(int index);
+	device_state_entry &state_add_divider(int index) { return state_add(std::make_unique<device_state_entry>(index, this)); }
 
 protected:
 	// derived class overrides
