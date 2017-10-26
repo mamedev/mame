@@ -60,8 +60,7 @@ CPUS["ESRIP"] = true
 CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
-CPUS["SH2"] = true
-CPUS["SH4"] = true
+CPUS["SH"] = true
 CPUS["DSP16A"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
@@ -541,6 +540,7 @@ MACHINES["SEIBU_COP"] = true
 --MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SMIOC"] = true
+MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
@@ -664,6 +664,7 @@ BUSES["ECONET"] = true
 BUSES["ELECTRON"] = true
 BUSES["EP64"] = true
 BUSES["EPSON_SIO"] = true
+BUSES["GAMATE"] = true
 BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
@@ -1898,6 +1899,7 @@ files {
 	MAME_DIR .. "src/mame/machine/ms7004.h",
 	MAME_DIR .. "src/mame/drivers/mk85.cpp",
 	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "elektor")
@@ -3466,8 +3468,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.cpp",
-	MAME_DIR .. "src/mame/audio/gamate.h",
+	MAME_DIR .. "src/mame/video/gamate.cpp",
+	MAME_DIR .. "src/mame/video/gamate.h",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
@@ -3497,6 +3499,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/m79152pc.cpp",
 	MAME_DIR .. "src/mame/drivers/mccpm.cpp",
 	MAME_DIR .. "src/mame/drivers/mes.cpp",
+	MAME_DIR .. "src/mame/drivers/mfabfz.cpp",
 	MAME_DIR .. "src/mame/drivers/mice.cpp",
 	MAME_DIR .. "src/mame/drivers/micral.cpp",
 	MAME_DIR .. "src/mame/drivers/micro20.cpp",

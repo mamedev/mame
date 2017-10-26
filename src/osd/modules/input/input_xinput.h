@@ -62,12 +62,12 @@ static const char *const xinput_button_names[] = {
 	"B",
 	"X",
 	"Y",
-	"Left Shoulder",
-	"Right Shoulder",
+	"LB",
+	"RB",
 	"Start",
 	"Back",
-	"Left Thumb",
-	"Right Thumb"
+	"LS",
+	"RS"
 };
 
 struct gamepad_state
@@ -85,7 +85,7 @@ struct gamepad_state
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	uint32_t                  player_index;
+	uint32_t                player_index;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };

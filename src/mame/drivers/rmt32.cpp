@@ -163,6 +163,7 @@ Notes: (All IC's listed for completeness)
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "video/sed1200.h"
 #include "screen.h"
 

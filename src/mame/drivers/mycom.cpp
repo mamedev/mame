@@ -53,6 +53,7 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
 #include "sound/wave.h"

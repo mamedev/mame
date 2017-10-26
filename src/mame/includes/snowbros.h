@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, Mike Coates
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
 

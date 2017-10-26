@@ -10,6 +10,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 

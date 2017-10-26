@@ -26,6 +26,7 @@
 #define CENTRONICS_TAG  "centronics"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
+#define S100_TAG        "s100"
 
 class xor100_state : public driver_device
 {
@@ -60,8 +61,6 @@ public:
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 
-	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
 	DECLARE_READ8_MEMBER(i8255_pc_r);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);

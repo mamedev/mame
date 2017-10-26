@@ -98,7 +98,7 @@ TODO:
 #include "softlist.h"
 
 
-#define MAIN_CLOCK  15974400
+#define MAIN_CLOCK  XTAL_15_9744MHz
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
@@ -358,23 +358,28 @@ ROM_START( osborne1 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("ver144")
 	ROM_SYSTEM_BIOS( 0, "vera", "BIOS version A" )
-	ROMX_LOAD( "osba.bin",               0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "ver12", "BIOS version 1.2" )
-	ROMX_LOAD( "osb12.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ver121", "BIOS version 1.2.1" )
-	ROMX_LOAD( "osb121.bin",             0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "ver13", "BIOS version 1.3" )
-	ROMX_LOAD( "osb13.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "ver14", "BIOS version 1.4" )
-	ROMX_LOAD( "rev1.40.ud11",           0x0000, 0x1000, CRC(3d966335) SHA1(0c60b97a3154a75868efc6370d26995eadc7d927), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "ver143",   "BIOS version 1.43" )
-	ROMX_LOAD( "rev1.43.ud11",           0x0000, 0x1000, CRC(91a48e3c) SHA1(c37b83f278d21e6e92d80f9c057b11f7f22d88d4), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "ver144", "BIOS version 1.44" )
+	ROMX_LOAD( "osba.bin",               0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(1) )
+	ROMX_LOAD( "osb12.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(2) )
+	ROMX_LOAD( "osb121.bin",             0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(3) )
+	ROMX_LOAD( "osb13.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(4) )
+	ROMX_LOAD( "rev1.40.ud11",           0x0000, 0x1000, CRC(3d966335) SHA1(0c60b97a3154a75868efc6370d26995eadc7d927), ROM_BIOS(5) )
+	ROMX_LOAD( "rev1.43.ud11",           0x0000, 0x1000, CRC(91a48e3c) SHA1(c37b83f278d21e6e92d80f9c057b11f7f22d88d4), ROM_BIOS(6) )
 	ROMX_LOAD( "3a10082-00rev-e.ud11",   0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(7) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
-	//ROM_LOAD( "char.ua15", 0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594) ) // this is CHRROM from v1.4 BIOS MB. I don't know how to hook up diff CHR to ROM_BIOS(6)
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(1) ) // this is CHRROM from v1.4 BIOS MB
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(2) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(3) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(4) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(5) )
+	ROMX_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801), ROM_BIOS(6) )
+	ROMX_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801), ROM_BIOS(7) )
 ROM_END
 
 ROM_START( osborne1nv )

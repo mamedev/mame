@@ -950,7 +950,7 @@ static MACHINE_CONFIG_START( ngen )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_START( ngen386 )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))

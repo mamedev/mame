@@ -10,6 +10,7 @@
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"

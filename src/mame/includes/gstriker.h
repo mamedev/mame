@@ -56,6 +56,7 @@ public:
 	enum {
 		TECMO_WCUP94_MCU = 1,
 		TECMO_WCUP94A_MCU,
+		TECMO_WCUP94B_MCU,
 		VGOAL_SOCCER_MCU
 	}m_mcutype;
 	int m_gametype;
@@ -73,9 +74,10 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(twcup94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
 	DECLARE_DRIVER_INIT(twcup94);
+	DECLARE_DRIVER_INIT(twcup94a);
+	DECLARE_DRIVER_INIT(twcup94b);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);

@@ -8,6 +8,7 @@
 **************************************************************************/
 
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
 #include "screen.h"

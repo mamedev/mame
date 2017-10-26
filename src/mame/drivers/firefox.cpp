@@ -37,6 +37,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/ldvp931.h"
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
 #include "speaker.h"

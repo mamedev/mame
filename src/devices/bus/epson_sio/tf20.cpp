@@ -94,7 +94,7 @@ MACHINE_CONFIG_MEMBER( epson_tf20_device::device_add_mconfig )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	// upd7201 serial interface
-	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("3a", UPD7201, XTAL_CR1 / 2)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(epson_tf20_device, txda_w))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(epson_tf20_device, dtra_w))
 

@@ -399,7 +399,7 @@ void i8089_channel_device::tsl(int m, int8_t i, int8_t d, int o)
 // set source and destination logical widths
 void i8089_channel_device::wid(int s, int d)
 {
-	m_r[PSW].w &= 0x3f;
+	m_r[PSW].w &= 0xfc;
 	m_r[PSW].w |= d << 0;
 	m_r[PSW].w |= s << 1;
 }

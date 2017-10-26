@@ -11,6 +11,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "video/mc6845.h"
 
 #define MCFG_DECODMD_TYPE3_ADD(_tag, _region) \

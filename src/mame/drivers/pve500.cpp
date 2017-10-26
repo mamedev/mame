@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( pve500 )
 	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("external_sio", XTAL_12MHz / 2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL_12MHz / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))

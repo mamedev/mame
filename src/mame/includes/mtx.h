@@ -16,6 +16,7 @@
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #define Z80_TAG         "z80"
 #define Z80CTC_TAG      "z80ctc"

@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "machine/i8271.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/mc6847.h"
 

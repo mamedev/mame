@@ -1804,7 +1804,7 @@ static const gfx_layout sys386f_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( sys386f)
+static GFXDECODE_START( sys386f )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,          5632, 16 ) // Not used
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,          4096, 24 ) // Not used
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,       0, 96 )

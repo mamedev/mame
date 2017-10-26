@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "video/atarimo.h"
 
 class badlands_state : public atarigen_state

@@ -14,6 +14,7 @@
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 
 #include "bus/generic/slot.h"

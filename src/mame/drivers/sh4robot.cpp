@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 
 class sh4robot_state : public driver_device
 {
@@ -72,6 +72,7 @@ static MACHINE_CONFIG_START( sh4robot )
 	MCFG_SH4_CLOCK(200000000)
 	MCFG_CPU_PROGRAM_MAP(sh4robot_mem)
 	MCFG_CPU_IO_MAP(sh4robot_io)
+	MCFG_CPU_FORCE_NO_DRC()
 
 MACHINE_CONFIG_END
 

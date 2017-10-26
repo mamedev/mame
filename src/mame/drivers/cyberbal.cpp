@@ -7,7 +7,7 @@
     driver by Aaron Giles
 
     Games supported:
-        * Cyberball (1988) [3 sets]
+        * Cyberball (1988) [4 sets]
         * Cyberball 2072, 2-players (1989) [4 sets]
         * Tournament Cyberball 2072 (1989) [2 sets]
 
@@ -649,6 +649,59 @@ ROM_START( cyberbal2 )
 ROM_END
 
 
+ROM_START( cyberbal1 ) /* loose chips from upgrade, cannot verify any rev 2 graphics chips as being correct for this set */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "136064-1123.1m",  0x000000, 0x010000, CRC(ba01fcdc) SHA1(d0283d68450cb758942df20762e12442687eab78) )
+	ROM_LOAD16_BYTE( "136064-1124.1kl", 0x000001, 0x010000, CRC(d0617f65) SHA1(7c641a2c709ecf40f6977abd94f6320e13faf61b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "136064-2131.2f",  0x000000, 0x010000, CRC(bd7e3d84) SHA1(f87878042fc79fa3883136b31ac15ddc22c6023c) ) /* this rev 2 chip was among the loose rev 1 chips */
+
+	ROM_REGION( 0x40000, "extra", 0 )   /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "136064-1127.3cd", 0x000000, 0x010000, CRC(f8d60334) SHA1(e54dabe71a9b943fac408788b19e7add207c6740) )
+	ROM_LOAD16_BYTE( "136064-1128.1b",  0x000001, 0x010000, CRC(7adb1d68) SHA1(a8f4d7d7423791c0c0bd6dfbe8d23a1b01b91aac) )
+	ROM_LOAD16_BYTE( "136064-1129.1cd", 0x020000, 0x010000, CRC(db11d2f0) SHA1(da9f49af533cbc732b17699040c7930070a90644) )
+	ROM_LOAD16_BYTE( "136064-1130.3b",  0x020001, 0x010000, CRC(fd86b8aa) SHA1(46310efed762632ed176a08aaec41e48aad41cc1) )
+
+	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
+	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
+	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
+	ROM_LOAD16_BYTE( "136064-1135.3b",  0x020001, 0x010000, CRC(d520f560) SHA1(fb0b8d021458379188c424a343622c46ad74edaa) )
+
+	ROM_REGION( 0x140000, "gfx1", 0 )
+	ROM_LOAD( "136064-1105.15a", 0x000000, 0x010000, CRC(e770eb3e) SHA1(e9f9e9e05774005c8be3bbdc19985b59a0081ef4) )
+	ROM_LOAD( "136064-1109.16a", 0x010000, 0x010000, CRC(40db00da) SHA1(d92d856b06f6ba11621ba7aab3d40653b3c70159) )
+	ROM_LOAD( "136064-2113.18a", 0x020000, 0x010000, CRC(52bb08fb) SHA1(08caa156923daf444e0caafb2cdff0704c90ef1f) )
+	ROM_LOAD( "136064-1117.19a", 0x030000, 0x010000, CRC(0a11d877) SHA1(876cbeffd815c084d7cbd937067d65c04aeebce5) )
+	ROM_LOAD( "136064-1106.11a", 0x050000, 0x010000, CRC(6f53c7c1) SHA1(5856d714c3af338be58156b404fb1e5a89c24cf9) )
+	ROM_LOAD( "136064-1110.12a", 0x060000, 0x010000, CRC(5de609e5) SHA1(bbea36a4cbbfeab113925951ef097673eddf26a8) )
+	ROM_LOAD( "136064-2114.13a", 0x070000, 0x010000, CRC(e6f95010) SHA1(42b14cf0dadfab9ce1032385fd21339b46edcfc2) )
+	ROM_LOAD( "136064-1118.14a", 0x080000, 0x010000, CRC(47f56ced) SHA1(62e80191e1879ffb6c736aec004bbc30a366363f) )
+	ROM_LOAD( "136064-1107.15c", 0x0a0000, 0x010000, CRC(c8f1f7ff) SHA1(2e0374901871d66a243f87bc4b9cbdde5505f0ec) )
+	ROM_LOAD( "136064-1111.16c", 0x0b0000, 0x010000, CRC(6bf0bf98) SHA1(7d2b3b61da3749b352a6bf3f1ae1cb736b5b8386) )
+	ROM_LOAD( "136064-2115.18c", 0x0c0000, 0x010000, CRC(c3168603) SHA1(43e00fc739d1b3dd6d925bad63058fe74c1efc74) )
+	ROM_LOAD( "136064-1119.19c", 0x0d0000, 0x010000, CRC(7ff29d09) SHA1(81458b058f0b037778f255b5afe94a44aba74829) )
+	ROM_LOAD( "136064-1108.11c", 0x0f0000, 0x010000, CRC(99629412) SHA1(53a91b2a1ac62259ec9f78421b22c7b22f4233d6) )
+	ROM_LOAD( "136064-1112.12c", 0x100000, 0x010000, CRC(aa198cb7) SHA1(aad4a60210289d2e5a93aac336ba995ed6ac4886) )
+	ROM_LOAD( "136064-2116.13c", 0x110000, 0x010000, CRC(6cf79a67) SHA1(7f3271b575cf0b5033b5b19f0e71fae251040fc6) )
+	ROM_LOAD( "136064-1120.14c", 0x120000, 0x010000, CRC(40bdf767) SHA1(c57aaea838abeaea1a0060c45c2f33c38a51edb3) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "136064-1101.9lm", 0x000000, 0x010000, CRC(a64b4da8) SHA1(f68778adb56a1eb964acdbc7e9d690a8a83f170b) )
+	ROM_LOAD( "136064-1102.8lm", 0x010000, 0x010000, CRC(ca91ec1b) SHA1(970c64e19893503cae796daee63b2d7d08eaf551) )
+	ROM_LOAD( "136064-1103.11lm", 0x020000, 0x010000, CRC(ee29d1d1) SHA1(2a7fea25728c66ce482de76299413ef5da01beef) )
+	ROM_LOAD( "136064-1104.10lm", 0x030000, 0x010000, CRC(882649f8) SHA1(fbaea597b6e318234e41df245023643f448a4938) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 )
+	ROM_LOAD( "136064-1121.15n", 0x000000, 0x010000, CRC(0ca1e3b3) SHA1(d934bc9a1def4404fb86175878404cbb18127a11) )
+	ROM_LOAD( "136064-1122.16n", 0x010000, 0x010000, CRC(882f4e1c) SHA1(f7517ff03502ff029fb375260a35e45414567433) )
+
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x200, CRC(c6f256b2) SHA1(e0c62adcd9fd38e9d3ac60e6b08d468e04a350c6) )
+ROM_END
+
+
 ROM_START( cyberbalp )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136064-0123.1m",  0x000000, 0x010000, CRC(59bac810) SHA1(d4742b2b554c2ad62a2ea7152db3f06a06cddd67) )
@@ -1022,6 +1075,7 @@ DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
 
 GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
 GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
 GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
 GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )

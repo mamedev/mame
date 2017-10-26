@@ -49,6 +49,7 @@ Ports:
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"

@@ -30,6 +30,7 @@
 #include "emu.h"
 #include "includes/hh_sm510.h"
 #include "cpu/sm510/sm510.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

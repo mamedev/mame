@@ -34,6 +34,7 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/intelfsh.h"
+#include "machine/timer.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "rendlay.h"

@@ -39,6 +39,7 @@
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 

@@ -50,6 +50,12 @@ DS5002FP Box contains:
   3.6v Battery
   JP1 - 5 pin port to program SRAM
 
+Measurements from actual PCB:
+  DS5002FP - 12MHz
+  OKI MSM6295 - 1MHz, pin 7 is disconnected (neither pulled LOW or HIGH)
+  H-SYNC - 15.151KHz
+  V-SYNC - 59.24Hz
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -256,11 +262,11 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( thoop2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)          /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz / 2) // 12MHz verified
 	MCFG_CPU_PROGRAM_MAP(thoop2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) // 12MHz verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
@@ -275,7 +281,7 @@ static MACHINE_CONFIG_START( thoop2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.24)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
@@ -289,17 +295,17 @@ static MACHINE_CONFIG_START( thoop2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not connected
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 
-ROM_START( thoop2 )
+ROM_START( thoop2 ) /* REF.940411 PCB */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "th2c23.040",   0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
-	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
+	ROM_LOAD16_BYTE(    "th2c23.c23",   0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
+	ROM_LOAD16_BYTE(    "th2c22.c22",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, CRC(6881384d) SHA1(c1eff5558716293e1325b766e2205783286c12f9) ) /* dumped from 3 boards, reconstructed with 2/3 wins rule, all bytes verified by hand as correct */
@@ -311,12 +317,36 @@ ROM_START( thoop2 )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD( "th2-h8.32m",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
-	ROM_LOAD( "th2-h12.32m",    0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
+	ROM_LOAD( "th2-h8.h8",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
+	ROM_LOAD( "th2-h12.h12",   0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "th2-c1.080",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
+	ROM_LOAD( "th2-c1.c1",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,  0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+ROM_START( thoop2a ) /* REF.940411 PCB */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "3.c23",   0x000000, 0x080000, CRC(6cd4a8dc) SHA1(7d0cdce64b390c3f9769b07d57cf1eee1e6a7bf5) )
+	ROM_LOAD16_BYTE(    "2.c22",   0x000001, 0x080000, CRC(59ba9b43) SHA1(6c6690a2e389fc9f1e166c87748da1175e3b58f8) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, CRC(6881384d) SHA1(c1eff5558716293e1325b766e2205783286c12f9) ) /* dumped from 3 boards, reconstructed with 2/3 wins rule, all bytes verified by hand as correct */
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "th2-h8.h8",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
+	ROM_LOAD( "th2-h12.h12",   0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "th2-c1.c1",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
+ROM_END
+
+GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2a, thoop2, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020EB356)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

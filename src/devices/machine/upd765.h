@@ -386,7 +386,7 @@ protected:
 	virtual int check_command();
 	virtual void start_command(int cmd);
 	virtual void execute_command(int cmd);
-	void command_end(floppy_info &fi, bool data_completion);
+	virtual void command_end(floppy_info &fi, bool data_completion);
 
 	void recalibrate_start(floppy_info &fi);
 	void seek_start(floppy_info &fi);
@@ -469,6 +469,7 @@ protected:
 	virtual int check_command() override;
 	virtual void start_command(int cmd) override;
 	virtual void execute_command(int cmd) override;
+	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
 
 	void motor_control(int fid, bool start_motor);

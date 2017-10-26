@@ -10,6 +10,7 @@
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/msm6242.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 typedef float MATRIX[4][4];

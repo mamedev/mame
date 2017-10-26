@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( bigbord2 )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(bigbord2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bigbord2_state, io_write_byte))
 
-	MCFG_Z80SIO_ADD("sio", MAIN_CLOCK, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_SYNCA_CB(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(bigbord2_state, sio_wrdya_w))

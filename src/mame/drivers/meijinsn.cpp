@@ -64,6 +64,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 #include "screen.h"

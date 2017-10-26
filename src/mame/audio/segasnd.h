@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 
 
 class speech_sound_device : public device_t, public device_sound_interface

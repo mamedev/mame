@@ -130,12 +130,12 @@ DEVICE_INPUT_DEFAULTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
-	MCFG_UPD7201_ADD("sio0", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio0", UPD7201_NEW, XTAL_4MHz)
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_rts))
 
-	MCFG_UPD7201_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("sio1", UPD7201_NEW, XTAL_4MHz)
 
 	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, rxb_w))

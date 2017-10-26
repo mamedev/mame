@@ -11,6 +11,7 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"

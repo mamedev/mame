@@ -8,6 +8,7 @@
 
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"

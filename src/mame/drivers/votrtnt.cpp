@@ -22,8 +22,6 @@
 *             to select devices. A0-A9 address RAM. A0-A11 address ROM.
 *             A0 switches the ACIA between status/command, and data in/out.
 *
-*  Special codes: The Type 'N Talk will take notice of certain codes. They
-*                 are: 08, 0D, 1B, 20. I didn't investigate what the codes do.
 *
 *  ToDo:
 *  - Votrax device needs considerable improvement in sound quality.
@@ -182,4 +180,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY   FULLNAME        FLAGS
-COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, 0,    "Votrax", "Type 'N Talk", MACHINE_NOT_WORKING )
+COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, 0,    "Votrax", "Type 'N Talk", 0 )

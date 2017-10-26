@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/kan_pand.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8

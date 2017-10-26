@@ -265,7 +265,7 @@
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "imagedev/chd_cd.h"
 #include "machine/aicartc.h"
 #include "machine/dc-ctrl.h"
@@ -589,6 +589,8 @@ static MACHINE_CONFIG_START( dc )
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
+	MCFG_CPU_FORCE_NO_DRC()
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.

@@ -14,6 +14,7 @@
 #include "machine/com8116.h"
 #include "machine/mm58167.h"
 #include "machine/keyboard.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 
 #include "screen.h"

@@ -11,7 +11,6 @@ Undumped Self-Published Titles:
 * Cyber Virus (Songbird Productions, CF2007)
 * Cyber Virus - CinciClassic Edition (Songbird Productions, CF20B1)
 * Lynx Othello (H. Dodgson)
-* MegaPak 1 (Songbird Productions, CF2010)  - too new (2008)
 * PokerMania (MW Software)
 * Ponx (Songbird Productions, CF2002)
 * Remnant - Planar Wars 3D (Songbird Productions, CF2005)
@@ -603,6 +602,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="marlboro go! (euro) (prototype).bin" size="262144" crc="c3fa0d4d" sha1="26b18b706359b093d0b1bbca4dba9cd2d73e0372" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megapak">
+		<description>MegaPak 1 (Euro, USA)</description>
+		<year>2007</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2010" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="Mega Pak 1.bin" size="262144" crc="ca7cf30b" sha1="c961b618021e37cf71104f4f7a04f5ea3e0ccb06" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

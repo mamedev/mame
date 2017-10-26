@@ -2,6 +2,7 @@
 // copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 
 #include "cpu/mcs51/mcs51.h"
+#include "machine/timer.h"
 #include "sound/qs1000.h"
 #include "screen.h"
 

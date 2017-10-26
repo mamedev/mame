@@ -38,6 +38,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
+#include "machine/timer.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
 

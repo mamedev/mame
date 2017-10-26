@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "audio/midway.h"
 #include "audio/williams.h"

@@ -105,7 +105,7 @@
 #include "machine/deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "speaker.h"
 
 

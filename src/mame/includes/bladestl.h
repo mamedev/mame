@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/upd7759.h"
 #include "video/k007342.h"

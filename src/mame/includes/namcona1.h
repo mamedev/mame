@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "sound/c140.h"
 #include "screen.h"
 

@@ -36,18 +36,13 @@
 class c68ksbc_state : public driver_device
 {
 public:
-	c68ksbc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia")
-	{
-	}
-
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	c68ksbc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
 };
 
 static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
@@ -64,12 +59,6 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(c68ksbc_state::write_acia_clock)
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
 static MACHINE_CONFIG_START( c68ksbc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
@@ -84,7 +73,8 @@ static MACHINE_CONFIG_START( c68ksbc )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(c68ksbc_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */

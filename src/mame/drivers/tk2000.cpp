@@ -22,6 +22,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"

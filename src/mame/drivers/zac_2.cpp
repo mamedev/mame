@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/timer.h"
 #include "zac_2.lh"
 
 class zac_2_state : public driver_device

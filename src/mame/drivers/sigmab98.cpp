@@ -115,6 +115,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim9810.h"
 #include "sound/ymz280b.h"

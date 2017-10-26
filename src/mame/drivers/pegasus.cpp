@@ -43,6 +43,7 @@
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
 #include "screen.h"
 #include "softlist.h"

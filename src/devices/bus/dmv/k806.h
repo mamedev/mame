@@ -7,6 +7,8 @@
 
 #include "dmvbus.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
+
 
 
 //**************************************************************************

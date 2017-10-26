@@ -62,6 +62,7 @@ Monopoly: The Medal                         ???-?????                 no        
 Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mushiking 2K7 1ST                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Ocha-Ken Hot Medal                          837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -74,7 +75,7 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "debugger.h"
 #include "includes/segasp.h"
 #include "machine/naomim4.h"
@@ -322,11 +323,13 @@ MACHINE_CONFIG_END
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
 
-// Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
+// net_firm_119.ic72 - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
+// fpr-24407.ic72 - version 1.25
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
-	ROM_LOAD( "net_eeprom.ic74s",  0x00000000, 0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
-	ROM_LOAD( "net_firm_119.ic72",  0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) )
+	ROM_LOAD( "net_eeprom.ic74s",  0x00000000,    0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
+	ROM_LOAD( "net_firm_119.ic72", 0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) ) \
+	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) )
 
 // keep M4 board code happy for now
 #define SEGASP_MISC \
@@ -442,6 +445,23 @@ ROM_START( lovebero )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
 ROM_END
 
+ROM_START( ochaken )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(7eb89b69) SHA1(5991c72df7ee68073f6de158f6ddf3f0490444ac) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(e52d7885) SHA1(96485af39b7cbf3c7bfd403f673eb8678077bbe8) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	// no PIC was provided with game board, brute forced key
+	ROM_LOAD( "317-unknown.ic15", 0, 0x800, BAD_DUMP CRC(0a6e8627) SHA1(01a0b66bffbf7caca8199b132a6014813f04843f) )
+ROM_END
+
 ROM_START( tetgiant )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -542,6 +562,7 @@ GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "S
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 // These use a CF card
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )

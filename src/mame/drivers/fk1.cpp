@@ -14,6 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 

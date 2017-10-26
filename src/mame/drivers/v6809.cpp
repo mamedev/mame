@@ -75,8 +75,6 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_speaker(*this, "speaker")
-		, m_acia0(*this, "acia0")
-		, m_acia1(*this, "acia1")
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
@@ -91,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_MACHINE_RESET(v6809);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -108,8 +105,6 @@ private:
 	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<acia6850_device> m_acia0;
-	required_device<acia6850_device> m_acia1;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -238,14 +233,6 @@ void v6809_state::kbd_put(u8 data)
 	m_pia0->cb1_w(1);
 }
 
-WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
-{
-	m_acia0->write_txc(state);
-	m_acia0->write_rxc(state);
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
-}
-
 READ8_MEMBER( v6809_state::pb_r )
 {
 	uint8_t ret = m_term_data;
@@ -348,8 +335,11 @@ static MACHINE_CONFIG_START( v6809 )
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v6809_state, write_acia_clock))
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess

@@ -256,8 +256,8 @@ CPU_DISASSEMBLE(z8)
 
 			case 0x90:      mnemonic("RL"); arg_R(B0); bytes(2);                    break;
 			case 0x91:      mnemonic("RL"); arg_IR(B0); bytes(2);                   break;
-			case 0x92:      mnemonic("LDE"); arg_r(B0L); arg_Irr(B0H); bytes(2);    break;
-			case 0x93:      mnemonic("LDEI"); arg_Ir(B0L); arg_Irr(B0H); bytes(2);  break;
+			case 0x92:      mnemonic("LDE"); arg_Irr(B0L); arg_r(B0H); bytes(2);    break;
+			case 0x93:      mnemonic("LDEI"); arg_Irr(B0L); arg_Ir(B0H); bytes(2);  break;
 			case 0x94:      illegal;                                                break;
 			case 0x95:      illegal;                                                break;
 			case 0x96:      illegal;                                                break;

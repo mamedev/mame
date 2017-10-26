@@ -5,6 +5,7 @@
  *
  */
 
+#include "machine/timer.h"
 #include "video/segaic24.h"
 #include "sound/dac.h"
 #include "screen.h"

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "machine/74157.h"
+#include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"

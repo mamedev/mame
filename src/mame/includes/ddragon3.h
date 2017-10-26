@@ -8,6 +8,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "screen.h"

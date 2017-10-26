@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 

@@ -60,6 +60,7 @@
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
 

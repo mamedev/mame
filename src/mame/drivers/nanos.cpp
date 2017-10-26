@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -491,10 +492,10 @@ static MACHINE_CONFIG_START( nanos )
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("z80sio_0", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("z80sio_0", Z80SIO0, XTAL_4MHz)
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
 
-	MCFG_Z80SIO0_ADD("z80sio_1", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("z80sio_1", Z80SIO0, XTAL_4MHz)
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)

@@ -29,6 +29,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/i8155.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"

@@ -53,11 +53,15 @@ protected:
 	coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual uint8_t *get_cart_base() override;
+	virtual uint32_t get_cart_size() override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 
 private:
-	void banked_pak_set_bank(uint32_t bank);
+	uint8_t m_pos;
 };
 
 #endif // MAME_BUS_COCO_COCO_PAK_H

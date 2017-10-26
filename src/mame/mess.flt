@@ -359,6 +359,7 @@ mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
 mes.cpp
+mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -392,6 +393,7 @@ mpf1.cpp
 mps1230.cpp
 mpz80.cpp
 ms0515.cpp
+ms6102.cpp
 ms9540.cpp
 msbc1.cpp
 mstation.cpp

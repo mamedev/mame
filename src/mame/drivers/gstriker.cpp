@@ -805,6 +805,37 @@ ROM_START( twcup94a )
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 ROM_END
 
+ROM_START( twcup94b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "twrdc94b_13.u37",           0x00000, 0x80000, CRC(00059e88) SHA1(0da18d7f6ede7c6b50e45e0c8f7b70516b974fc3) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "twrdc94a_12.u65",           0x000000, 0x040000, CRC(c131f5a4) SHA1(d8cc7c463ad628f6f052489a73b97f998532738d) )
+
+	ROM_REGION( 0x20000, "mcu", 0 )
+	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
+	ROM_LOAD( "11.u48",           0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
+	ROM_LOAD( "u17",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u20",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+
+	ROM_REGION( 0x800000, "gfx3", 0 )
+	ROM_LOAD( "u11",          0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
+	ROM_LOAD( "u12",          0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
+	ROM_LOAD( "u13",          0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
+	ROM_LOAD( "u14",          0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
+
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+ROM_END
+
+
 
 /******************************************************************************************
 Simple protection check concept.The M68k writes a command and the MCU
@@ -937,6 +968,37 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 				}
 				break;
 
+			// Variable displacements (newer set?)
+			case TECMO_WCUP94B_MCU:
+
+				switch (mcu_data)
+				{
+					#define NULL_SUB (0x00830A)
+					case 0x53: PC(0x000a80); break; // POST
+
+					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
+					case 0x61: PC(0x003B72); break; // after time up, pk shootout???
+					case 0x65: PC(0x003FA4); break;
+
+					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
+					case 0x72: PC(0x411C); break; // game over
+
+					case 0x75: PC(0x5106); break; // match adder, and check if limit is reached for ending
+
+					// attract mode
+					case 0x6e: PC(0x00010EF0); break; // loop
+					case 0x6b: PC(0x00010FB4); break; // attract even
+					case 0x69: PC(0x000112D2); break; // attract odd
+
+					default:
+						logerror("Unknown MCU CMD %04x\n",mcu_data);
+						PC(NULL_SUB);
+						break;
+
+					#undef NULL_SUB
+				}
+				break;
+
 
 			case VGOAL_SOCCER_MCU:
 				switch (mcu_data)
@@ -1027,6 +1089,13 @@ DRIVER_INIT_MEMBER(gstriker_state,twcup94a)
 	mcu_init();
 }
 
+DRIVER_INIT_MEMBER(gstriker_state,twcup94b)
+{
+	m_gametype = TECMO_WCUP94B_MCU;
+	mcu_init();
+}
+
+
 DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 {
 	m_gametype = VGOAL_SOCCER_MCU;
@@ -1048,3 +1117,4 @@ GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, vgoalsoc, R
 GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
 GAME( 1994, twcup94, 0,          twc94,    twcup94,  gstriker_state, twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, twcup94a,twcup94,    twc94,    twcup94,  gstriker_state, twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94b,twcup94,    twc94,    twcup94,  gstriker_state, twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

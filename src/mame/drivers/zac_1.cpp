@@ -33,6 +33,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/timer.h"
 #include "zac_1.lh"
 
 class zac_1_state : public genpin_class

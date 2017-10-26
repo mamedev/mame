@@ -9,6 +9,7 @@
 #include "video/poly.h"
 #include "audio/dcs.h"
 #include "machine/midwayic.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 

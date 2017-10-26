@@ -47,6 +47,7 @@ To Do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/saa1099.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"

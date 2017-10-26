@@ -420,6 +420,7 @@ I/O is via TTL, very similar to Designer Display
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 

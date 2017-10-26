@@ -725,7 +725,6 @@ void sega_315_5881_crypt_device::enc_start()
 		buffer_bit2 = 15;
 	}
 
-	printf("header %08x\n", dec_header);
 	enc_ready = true;
 }
 

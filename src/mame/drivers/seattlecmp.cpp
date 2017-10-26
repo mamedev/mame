@@ -72,11 +72,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_comp_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0xf2, 0xf3) AM_DEVREADWRITE8("pic2", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0xf4, 0xf5) AM_DEVREADWRITE8("stc", am9513_device, read8, write8, 0xffff)
+	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xff00)
 	//AM_RANGE(0xfc, 0xfd) Parallel data, status, serial DCD
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 ADDRESS_MAP_END
@@ -98,7 +98,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( seattle )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 4000000) // no idea
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz / 3) // 8 MHz or 4 MHz selectable
 	MCFG_CPU_PROGRAM_MAP(seattle_mem)
 	MCFG_CPU_IO_MAP(seattle_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
@@ -110,7 +110,7 @@ static MACHINE_CONFIG_START( seattle )
 	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic1", pic8259_device, ir1_w))
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL_4MHz)
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL_4MHz) // dedicated XTAL
 	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir0_w))
 	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir4_w))
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir7_w))
@@ -119,7 +119,7 @@ static MACHINE_CONFIG_START( seattle )
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_DEVICE_ADD("uart", I8251, XTAL_24MHz / 12) // CLOCK on line 49
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))

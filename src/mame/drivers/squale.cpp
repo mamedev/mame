@@ -61,6 +61,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "video/ef9365.h"

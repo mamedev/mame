@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class xain_state : public driver_device

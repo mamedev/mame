@@ -69,6 +69,7 @@ DEVICE_ADDRESS_MAP_START( iowr0_map, 8, abc1600_mover_device )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iowr1_map, 8, abc1600_mover_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(ldfx_hb_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(ldfx_lb_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(ldfy_hb_w)
@@ -78,6 +79,7 @@ DEVICE_ADDRESS_MAP_START( iowr1_map, 8, abc1600_mover_device )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iowr2_map, 8, abc1600_mover_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_hb_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_lb_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(enable_clocks_w)

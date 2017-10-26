@@ -21,6 +21,7 @@ ToDo:
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/s14001a.h"
 #include "speaker.h"
 
@@ -614,19 +615,19 @@ MACHINE_CONFIG_END
 /-------------------------------*/
 ROM_START(meteorp)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
-	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_LOAD( "25AROM_P21A.U1", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
+	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(meteorp2)
+ROM_START(meteorpo)   // Original release has the bonus countdown bug when the thread engine gets overloaded with scoring
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1a.716", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
-	ROM_LOAD( "cpu_u5.716",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
-	ROM_LOAD( "cpu_u2.716",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
-	ROM_LOAD( "cpu_u6.716",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_LOAD( "25AROM_P21.U1",  0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
+	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -646,11 +647,20 @@ ROM_END
 / Cheetah #116
 /-------------------------------*/
 ROM_START(cheetah)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))
-	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))
+	ROM_REGION(0x10000, "maincpu", 0)   // Black cabinet version
+	ROM_LOAD( "CHEETAH__R_B20.U1", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))   // 25A-E1B exists is there an E1A and/or E1 version?
+	ROM_LOAD( "CHEETAH__R_B20.U5", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))   // 25A-E5
+	ROM_LOAD( "CHEETAH__R_B20.U2", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))   // 25A-E2
+	ROM_LOAD( "CHEETAH__R_B20.U6", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))   // 25A-E6
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
+ROM_START(cheetahb)
+	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
+	ROM_LOAD( "CHEETAH__X_B16.U1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "CHEETAH__X_B16.U5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
+	ROM_LOAD( "CHEETAH__X_B16.U2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
+	ROM_LOAD( "CHEETAH__X_B16.U6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -925,14 +935,15 @@ ROM_START(st_game)
 ROM_END
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Stern, set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  meteorp2,   meteorp,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Stern, set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Bug fix release)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (First release)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Galaxy",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Ali",                    MACHINE_IS_SKELETON_MECHANICAL)
 
 // 7-digit
 GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Big Game",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah (Black Cabinet)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Cheetah (Blue Cabinet)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Quicksilver",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Seawitch",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Nine Ball",              MACHINE_IS_SKELETON_MECHANICAL)

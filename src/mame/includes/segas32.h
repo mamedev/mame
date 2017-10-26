@@ -12,6 +12,7 @@
 
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 

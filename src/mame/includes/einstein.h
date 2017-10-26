@@ -13,6 +13,7 @@
 
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "video/tms9928a.h"
@@ -94,7 +95,6 @@ public:
 	DECLARE_MACHINE_RESET(einstein2);
 	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
 	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
 	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
@@ -115,7 +115,6 @@ protected:
 	optional_memory_region m_region_gfx1;
 
 	int m_rom_enabled;
-	int m_ctc_trigger;
 
 	/* keyboard */
 	uint8_t m_keyboard_line;

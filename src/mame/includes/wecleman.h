@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
 #include "screen.h"

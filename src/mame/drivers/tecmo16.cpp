@@ -30,21 +30,11 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
-
-/******************************************************************************/
-
-WRITE16_MEMBER(tecmo16_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0x00, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
 
 /******************************************************************************/
 
@@ -60,7 +50,7 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
@@ -83,7 +73,7 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
@@ -408,6 +398,7 @@ static MACHINE_CONFIG_START( fstarfrc )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/6) // 4 MHz
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

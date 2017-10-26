@@ -31,6 +31,7 @@
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/namco.h"
 #include "screen.h"
 #include "speaker.h"

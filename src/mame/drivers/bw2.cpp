@@ -496,12 +496,6 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 WRITE_LINE_MEMBER( bw2_state::mtron_w )
 {
 	m_mtron = state;
@@ -595,7 +589,8 @@ static MACHINE_CONFIG_START( bw2 )
 	// devices
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz/4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw2_state, pit_out0_w))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_TAG, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON

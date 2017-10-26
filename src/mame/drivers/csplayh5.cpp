@@ -36,6 +36,7 @@
 #include "machine/tmp68301.h"
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
+#include "machine/timer.h"
 #include "video/v9938.h"
 #include "audio/nichisnd.h"
 

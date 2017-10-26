@@ -58,7 +58,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );

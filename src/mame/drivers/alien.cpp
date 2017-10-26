@@ -24,7 +24,7 @@
 
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -91,6 +91,7 @@ static MACHINE_CONFIG_START( alien )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 

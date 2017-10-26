@@ -351,7 +351,7 @@ function cheatfind.startplugin()
 					local r
 					name, r = incdec(event, name, 1, #c)
 					if (event == "select" or event == "comment") and name == 1 then
-						manager:machine():popmessage(_("Default name is ") .. cheat_save.name)
+						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 					end
 					return r
 				end
@@ -389,17 +389,17 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not devtable[devcur].space.shortname then -- no xml or simple for ram_device cheat
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
 								file = io.open(cheat_save.path .. "/cheat.simple", "a")
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage(_("Cheat written to ") .. cheat_save.filename .. _(" and added to cheat.simple"))
+								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), cheat_save.filename))
 							end
 							written = true
-						elseif not devtable[devcur].space.shortname then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -409,7 +409,7 @@ function cheatfind.startplugin()
 							end
 						end
 						if not written then
-							manager:machine():popmessage(_("Unable to write file\nCheck cheatpath dir exists"))
+							manager:machine():popmessage(_("Unable to write file\nEnsure that cheatpath folder exists"))
 						end
 						cheat_save = nil
 						return true
@@ -680,7 +680,7 @@ function cheatfind.startplugin()
 					end
 
 
-					if dev.space.shortname then
+					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 					else
@@ -720,7 +720,7 @@ function cheatfind.startplugin()
 					else
 						local func = "return space:read"
 						local env = { space = devtable[devcur].space }
-						if not dev.space.shortname then
+						if not getmetatable(dev.space).__name:match("device_t") then
 							func = func .. "_" .. wid
 						end
 						func = func .. "(" .. match.addr .. ")"

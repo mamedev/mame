@@ -9,6 +9,7 @@
 #include "machine/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
+#include "machine/timer.h"
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
 #include "sound/x1_010.h"

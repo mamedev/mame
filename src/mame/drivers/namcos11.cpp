@@ -301,6 +301,7 @@ Pin 22 Solder Side - Gun 2 Trigger
 #include "machine/namcomcu.h"
 #include "machine/ns11prot.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/c352.h"
 #include "video/psx.h"
 #include "speaker.h"

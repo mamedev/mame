@@ -50,8 +50,10 @@
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/mc14411.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
 
 #include "bus/rs232/rs232.h"
@@ -69,9 +71,11 @@ public:
 		, m_p_videoram(*this, "vram")
 		, m_p_chargen(*this, "chargen")
 		, m_pia(*this, "pia")
+		, m_brg(*this, "brg")
 		, m_acia1(*this, "acia1")
 		, m_acia2(*this, "acia2")
 		, m_cass(*this, "cassette")
+		, m_serial(*this, "SERIAL")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
@@ -79,10 +83,27 @@ public:
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	// Clocks
+	void write_acia_clocks(int id, int state);
+	DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f2_clock){ write_acia_clocks(mc14411_device::TIMER_F2, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f4_clock){ write_acia_clocks(mc14411_device::TIMER_F4, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f5_clock){ write_acia_clocks(mc14411_device::TIMER_F5, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f6_clock){ write_acia_clocks(mc14411_device::TIMER_F6, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f7_clock){ write_acia_clocks(mc14411_device::TIMER_F7, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f8_clock){ write_acia_clocks(mc14411_device::TIMER_F8, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f9_clock){ write_acia_clocks(mc14411_device::TIMER_F9, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f10_clock){ write_acia_clocks(mc14411_device::TIMER_F10, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f11_clock){ write_acia_clocks(mc14411_device::TIMER_F11, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f12_clock){ write_acia_clocks(mc14411_device::TIMER_F12, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
 private:
 	uint8_t m_video_data;
@@ -97,9 +118,13 @@ private:
 	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<pia6821_device> m_pia;
+	required_device<mc14411_device> m_brg;
 	required_device<acia6850_device> m_acia1; // cassette uart
 	required_device<acia6850_device> m_acia2; // tty keyboard uart
 	required_device<cassette_image_device> m_cass;
+
+	// hardware configuration and things that need rewiring
+	required_ioport             m_serial;
 };
 
 
@@ -126,6 +151,24 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 static INPUT_PORTS_START(proteus3)
+	PORT_START("SERIAL")
+	PORT_CONFNAME(0x0F , 0x00 , "Serial Baud Rate") // F1-F16 pins on MC14411 in X16
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "153600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "115200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "76800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "57600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "38400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "28800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F10, "3200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F12, "2153.3")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "1758.8")
+	PORT_CONFSETTING(mc14411_device::TIMER_F14, "1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F15, "921.6")
+	PORT_CONFSETTING(mc14411_device::TIMER_F16, "1.8432")
 INPUT_PORTS_END
 
 void proteus3_state::kbd_put(u8 data)
@@ -137,10 +180,17 @@ void proteus3_state::kbd_put(u8 data)
 	m_pia->cb1_w(0);
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia2_clock_w )
+void proteus3_state::write_acia_clocks(int id, int state)
 {
-	m_acia2->write_txc(state);
-	m_acia2->write_rxc(state);
+	if (id == m_serial->read()) // Configurable serial port
+	{
+		m_acia2->write_txc(state);
+		m_acia2->write_rxc(state);
+	}
+	if (id == mc14411_device::TIMER_F8) // Fixed bitrate for the cassette interface
+	{
+		acia1_clock_w(state);
+	}
 }
 
 /******************************************************************************
@@ -310,6 +360,15 @@ void proteus3_state::machine_reset()
 	m_cass_state = 1;
 	m_cassold = 1;
 	m_acia1->write_rxd(1);
+
+	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
+	m_brg->rsa_w( CLEAR_LINE );
+	m_brg->rsb_w( ASSERT_LINE );
+
+	// Disable all configured timers, only enabling the used ones
+	m_brg->timer_disable_all();
+	m_brg->timer_enable((mc14411_device::timer_id) m_serial->read(), true); // Serial port
+	m_brg->timer_enable( mc14411_device::TIMER_F8, true); // Cassette interface
 }
 
 
@@ -344,8 +403,6 @@ static MACHINE_CONFIG_START( proteus3 )
 	/* cassette */
 	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(proteus3_state, acia1_txdata_w))
-	MCFG_DEVICE_ADD("acia1_clock", CLOCK, 9600) // this controls cassette baud rate
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia1_clock_w))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -361,8 +418,24 @@ static MACHINE_CONFIG_START( proteus3 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
-	MCFG_DEVICE_ADD("acia2_clock", CLOCK, 153600/8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia2_clock_w))
+
+	/* Bit Rate Generator */
+	MCFG_MC14411_ADD ("brg", XTAL_1_8432MHz) // crystal needs verification but is the likely one
+	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
+	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
+	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))
+	MCFG_MC14411_F4_CB(WRITELINE (proteus3_state, write_f4_clock))
+	MCFG_MC14411_F5_CB(WRITELINE (proteus3_state, write_f5_clock))
+	MCFG_MC14411_F6_CB(WRITELINE (proteus3_state, write_f6_clock))
+	MCFG_MC14411_F7_CB(WRITELINE (proteus3_state, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE (proteus3_state, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE (proteus3_state, write_f9_clock))
+	MCFG_MC14411_F10_CB(WRITELINE (proteus3_state, write_f10_clock))
+	MCFG_MC14411_F11_CB(WRITELINE (proteus3_state, write_f11_clock))
+	MCFG_MC14411_F12_CB(WRITELINE (proteus3_state, write_f12_clock))
+	MCFG_MC14411_F13_CB(WRITELINE (proteus3_state, write_f13_clock))
+	MCFG_MC14411_F14_CB(WRITELINE (proteus3_state, write_f14_clock))
+	MCFG_MC14411_F15_CB(WRITELINE (proteus3_state, write_f15_clock))
 MACHINE_CONFIG_END
 
 

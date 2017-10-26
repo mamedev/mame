@@ -2140,6 +2140,45 @@ ROM_START( grainbow )
 ROM_END
 
 
+ROM_START( grainbowk )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD32_BYTE( "Rom1.U025",     0x000000, 0x040000, CRC(686c25ea) SHA1(e4f68b0455eefacf783c9e56f542085d0027009c) )
+	ROM_LOAD32_BYTE( "Rom2.U024",     0x000001, 0x040000, CRC(2400662e) SHA1(251fc779c2f3f56137f07f4865483e919a101845) )
+	ROM_LOAD32_BYTE( "Rom3.U026",     0x000002, 0x040000, CRC(22857489) SHA1(b23d983057925b86f2a8a7ca80dbfc7464a0075f) )
+	ROM_LOAD32_BYTE( "Rom4.U023",     0x000003, 0x040000, CRC(ad8de15b) SHA1(0af56fc17c9b2c5e13fea67e08792577453d678a) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "rb-s.016",     0x000000, 0x08000, CRC(8439bf5b) SHA1(089009b91768d64edef6639e7694723d2d1c46ff) )
+	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )
+	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
+	ROM_LOAD16_BYTE( "rb-f2.615",    0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
+
+	ROM_REGION( 0x200000, "sprite", 0 )
+	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
+	ROM_LOAD( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
+
+	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
+
+	ROM_REGION( 0x100000, "gfx5", 0 )
+	ROM_LOAD( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
+
+	ROM_REGION( 0x100000, "gfx6", 0 )
+//#define ROM_COPY(rgn,srcoffset,offset,length)
+	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "rb-ad.922",    0x000000, 0x020000, CRC(a364cb42) SHA1(c527b39a1627ecee20a2c4df4cf2b5f2ba729081) )
+
+	ROM_REGION( 0x040000, "user1", 0 )
+	ROM_LOAD( "copx-d2.313",  0x0000, 0x040000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+ROM_END
+
 ROM_START( cupsoc )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD32_BYTE( "scc_01.bin", 0x000000, 0x040000, CRC(c122203c) SHA1(93c0ae90c0ed3889b9159774ba89536108c9b259) )
@@ -2534,8 +2573,9 @@ GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         R
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
-GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
+GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, grainbowk,grainbow, grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

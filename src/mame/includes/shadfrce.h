@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 

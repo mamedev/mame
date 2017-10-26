@@ -178,8 +178,6 @@ files {
 	MAME_DIR .. "src/emu/speaker.h",
 	MAME_DIR .. "src/emu/tilemap.cpp",
 	MAME_DIR .. "src/emu/tilemap.h",
-	MAME_DIR .. "src/emu/timer.cpp",
-	MAME_DIR .. "src/emu/timer.h",
 	MAME_DIR .. "src/emu/uiinput.cpp",
 	MAME_DIR .. "src/emu/uiinput.h",
 	MAME_DIR .. "src/emu/validity.cpp",

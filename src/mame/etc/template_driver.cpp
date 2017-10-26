@@ -2,7 +2,7 @@
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for squeleton drivers
+Template for skeleton drivers
 
 ***************************************************************************/
 

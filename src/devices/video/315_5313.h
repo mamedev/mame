@@ -8,6 +8,7 @@
 
 #include "video/315_5124.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \

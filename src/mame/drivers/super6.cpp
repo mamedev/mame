@@ -387,18 +387,6 @@ WRITE8_MEMBER(super6_state::io_write_byte)
 	prog_space.write_byte(offset, data);
 }
 
-//-------------------------------------------------
-//  COM8116_INTERFACE( brg_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( super6_state::fr_w )
-{
-	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
-
-	m_ctc->trg1(state);
-}
-
 
 //-------------------------------------------------
 //  floppy_format_type floppy_formats
@@ -515,9 +503,9 @@ static MACHINE_CONFIG_START( super6 )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_24MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -534,7 +522,9 @@ static MACHINE_CONFIG_START( super6 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(super6_state, fr_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 
 	// internal ram

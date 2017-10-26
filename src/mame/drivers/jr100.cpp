@@ -18,6 +18,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"

@@ -10,6 +10,7 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 struct M92_pf_layer_info

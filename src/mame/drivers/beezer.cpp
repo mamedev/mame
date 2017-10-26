@@ -26,6 +26,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/bankdev.h"
 #include "machine/6522via.h"

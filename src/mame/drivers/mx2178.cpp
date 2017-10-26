@@ -2,23 +2,23 @@
 // copyright-holders:Robbbert
 /***************************************************************************************************
 
-    Skeleton driver for Memorex 2178
+Skeleton driver for Memorex 2178
 
-    Chips: Z80A, N8X305N, 2x B8452A, 4x D4016C-3, 2x HD468A50P, HD46505SP-1
-    Crystal: 18.8696MHz
-    There is a large piezo-beeper.
+Chips: Z80A, N8X305N, 2x B8452A, 4x D4016C-3, 2x HD468A50P, HD46505SP-1
+Crystal: 18.8696MHz
+There is a large piezo-beeper.
 
-    TODO:
-    - Connect up the beeper
-    - RS232 not working (6850 parameters are /64, 8 bit, 2 stop bit, IRQ when key pressed)
-    - Unknown port i/o 80
-    - Unknown memory i/o C000, 4000
-    - Need schematic / tech manual
-    - Gets stuck waiting for E011 to become zero somehow. If you skip that, a status line appears.
-    - Doesn't seem to be any dips, looks like all settings and modes are controlled by keystrokes.
-    - 8X305 is a 16-bit Microcontroller which should have an external ROM. It would communicate with
-      the Z80 via a common 8-bit I/O bus. No idea what it is used for here, but in another system it
-      acts as the floppy disk controller.
+TODO:
+- Connect up the beeper
+- Unknown memory i/o C000, 4000
+- Need schematic / tech manual
+- Doesn't seem to be any dips, looks like all settings and modes are controlled by keystrokes.
+- 8X305 is a 16-bit bipolar processor which appears to use four external PROMs (undumped). It
+  would communicate with the Z80 via a common 8-bit I/O bus. No idea what it is used for here,
+  but in another system it acts as the floppy disk controller.
+- Debug trick: set pc=809 to see the test menu.
+- It shows the status line but keystrokes are ignored. After 20 minutes of inactivity, the screen
+  goes blank. Pressing a key will restore it.
 
 ***************************************************************************************************/
 
@@ -40,8 +40,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -65,8 +64,10 @@ static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -125,7 +126,7 @@ void mx2178_state::machine_reset()
 
 static MACHINE_CONFIG_START( mx2178 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18869600/5) // guess
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_8696MHz / 5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
 
@@ -140,32 +141,50 @@ static MACHINE_CONFIG_START( mx2178 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18_8696MHz / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 18869600/30)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_18_8696MHz / 30)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mx2178 )
-	ROM_REGION(0x2000, "roms", 0)
-	ROM_LOAD( "96274139.bin", 0x000000, 0x002000, CRC(eb471a27) SHA1(433abefd1a72653d0bf35bcaaeccf9943b96260b) )
+	ROM_REGION(0x2000, "roms", 0) // MBM2764-25
+	ROM_LOAD( "96274139.u9", 0x000000, 0x002000, CRC(eb471a27) SHA1(433abefd1a72653d0bf35bcaaeccf9943b96260b) )
 
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "96273883.bin", 0x000000, 0x001000, CRC(8311fadd) SHA1(573bbad23e893ad9374edc929642dc1cba3452d2) )
+	ROM_REGION(0x800, "proms", 0) // MB7122E - actual mapping not known
+	ROMX_LOAD( "96270350.q2", 0x0000, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "96270368.r2", 0x0000, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "96270376.s2", 0x0001, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "96270384.t2", 0x0001, 0x0400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+
+	ROM_REGION(0x1000, "chargen", 0) // D2732A-3
+	ROM_LOAD( "96273883.c7", 0x000000, 0x001000, CRC(8311fadd) SHA1(573bbad23e893ad9374edc929642dc1cba3452d2) )
 ROM_END
 
 /* Driver */

@@ -15,6 +15,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "cpu/i8085/i8085.h"
 #include "machine/i8257.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
 #include "screen.h"

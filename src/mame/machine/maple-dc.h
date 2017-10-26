@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 
 #define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag, _irq_cb)  \
 	MCFG_DEVICE_ADD(_tag, MAPLE_DC, 0) \

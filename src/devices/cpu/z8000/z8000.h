@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
-
 
 enum
 {
@@ -33,7 +31,7 @@ enum
 #define MCFG_Z8000_MO(_devcb) \
 	devcb = &z8002_device::set_mo_callback(*device, DEVCB_##_devcb);
 
-class z8002_device : public cpu_device, public z80_daisy_chain_interface
+class z8002_device : public cpu_device
 {
 public:
 	// construction/destruction

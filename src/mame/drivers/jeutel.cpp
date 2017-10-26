@@ -20,6 +20,7 @@ ToDo:
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/tms5110.h"
 #include "speaker.h"

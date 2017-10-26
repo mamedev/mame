@@ -20,7 +20,7 @@
 #include "imagedev/cassette.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"

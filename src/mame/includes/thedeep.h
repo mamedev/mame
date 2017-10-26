@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/decmxc06.h"
 
 

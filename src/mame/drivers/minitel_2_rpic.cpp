@@ -49,6 +49,7 @@
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
+#include "machine/timer.h"
 #include "video/ef9345.h"
 
 #include "screen.h"

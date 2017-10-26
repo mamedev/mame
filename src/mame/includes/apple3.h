@@ -14,6 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "bus/a2bus/a2bus.h"
 #include "machine/mos6551.h"
 #include "machine/6522via.h"

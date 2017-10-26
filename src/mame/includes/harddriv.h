@@ -25,6 +25,7 @@
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 
 #include "sound/dac.h"
 

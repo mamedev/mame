@@ -65,6 +65,8 @@ public:
 
 	std::vector<uint8_t> m_paletteram;
 
+	offs_t m_scrambled_write_pc;
+
 	uint8_t m_sound_state[2];
 	uint8_t m_sound_rate;
 	uint16_t m_sound_addr;
@@ -94,6 +96,8 @@ public:
 	uint16_t m_bg_scrollx;
 	uint16_t m_bg_scrolly;
 	uint8_t m_pignewt_bg_color_offset;
+
+	DECLARE_READ8_MEMBER(g80r_opcode_r);
 	DECLARE_WRITE8_MEMBER(mainram_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
@@ -139,6 +143,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
+	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);

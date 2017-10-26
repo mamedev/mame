@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/votrax.h"
 #include "speaker.h"

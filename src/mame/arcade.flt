@@ -46,6 +46,7 @@ amerihok.cpp
 ampoker2.cpp
 amspdwy.cpp
 amusco.cpp
+anes.cpp
 angelkds.cpp
 appoooh.cpp
 aquarium.cpp
@@ -447,6 +448,7 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
+gokidetor.cpp
 goldngam.cpp
 goldnpkr.cpp
 goldstar.cpp
@@ -826,6 +828,7 @@ niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
 norautp.cpp
+notechan.cpp
 nova2001.cpp
 nsm.cpp
 nsmpoker.cpp
@@ -1027,6 +1030,7 @@ segasp.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp
+seibucats.cpp
 seibuspi.cpp
 seicross.cpp
 seicupbl.cpp
@@ -1253,7 +1257,6 @@ ttchamp.cpp
 tubep.cpp
 tugboat.cpp
 tumbleb.cpp
-tumblep.cpp
 tunhunt.cpp
 turbo.cpp
 turrett.cpp

@@ -355,6 +355,7 @@ some other components. It will be documented at a later date.
 #include "machine/idehd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "video/voodoo.h"
 #include "screen.h"
 #include "speaker.h"

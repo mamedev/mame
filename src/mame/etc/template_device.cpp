@@ -2,7 +2,7 @@
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for squeleton device
+Template for skeleton device
 
 ***************************************************************************/
 
@@ -16,7 +16,7 @@ Template for squeleton device
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(XXX, xxx_device, "xxx", "XXX Device")
+DEFINE_DEVICE_TYPE(XXX, xxx_device, "xxx", "XXX")
 
 
 //**************************************************************************

@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( rt1715 )
 
 	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
 
-	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("a29", Z80SIO0, XTAL_10MHz/4 /* ? */)
 
 	/* floppy */
 	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)

@@ -28,6 +28,7 @@
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"

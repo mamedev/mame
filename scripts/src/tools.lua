@@ -752,7 +752,8 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/psion.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/bml3.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp48.cpp",
-		MAME_DIR .. "src/tools/imgtool/modules/hp9845_tape.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/hp9845_tape.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/hp85_tape.cpp",
 }
 
 configuration { "mingw*" or "vs*" }

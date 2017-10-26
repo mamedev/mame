@@ -32,10 +32,11 @@ Unable to proceed due to no info available (& in English).
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "cpu/z80/z80.h"
+//#include "cpu/z80/z80.h"
+#include "bus/rs232/rs232.h"
+#include "machine/ay31015.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/terminal.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
@@ -52,6 +53,8 @@ public:
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
 		m_maincpu(*this, "maincpu"),
+		m_uart(*this, "uart"),
+		m_v24(*this, "v24"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -66,6 +69,13 @@ public:
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
 	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(uart_status_r);
+	DECLARE_WRITE8_MEMBER(modem_control_w);
+	DECLARE_READ8_MEMBER(uart_ready_r);
+	DECLARE_WRITE8_MEMBER(uart_mode_w);
+	DECLARE_READ8_MEMBER(uart_data_r);
+	DECLARE_WRITE8_MEMBER(uart_data_w);
+	DECLARE_WRITE8_MEMBER(uart_reset_w);
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
 	DECLARE_DRIVER_INIT(sapizps3b);
@@ -86,6 +96,8 @@ private:
 	required_ioport m_line3;
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
+	optional_device<ay31015_device> m_uart;
+	optional_device<rs232_port_device> m_v24;
 public:
 	optional_device<palette_device> m_palette;
 };
@@ -224,7 +236,10 @@ static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(uart_status_r, modem_control_w)
+	AM_RANGE(0x11, 0x11) AM_READWRITE(uart_ready_r, uart_mode_w)
+	AM_RANGE(0x12, 0x12) AM_READWRITE(uart_data_r, uart_data_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(uart_reset_w)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
@@ -472,6 +487,67 @@ void sapi1_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+READ8_MEMBER(sapi1_state::uart_status_r)
+{
+	uint8_t result = 0;
+	result |= m_uart->get_output_pin(AY31015_TBMT) || m_uart->get_output_pin(AY31015_DAV);
+	result |= m_uart->get_output_pin(AY31015_OR) << 1;
+	result |= m_uart->get_output_pin(AY31015_FE) << 2;
+	result |= m_uart->get_output_pin(AY31015_PE) << 3;
+	// RD4 = RI (= SI)
+	result |= m_v24->dcd_r() << 5;
+	result |= m_v24->dsr_r() << 6;
+	result |= m_v24->cts_r() << 7;
+	return result;
+}
+
+WRITE8_MEMBER(sapi1_state::modem_control_w)
+{
+	m_v24->write_rts(BIT(data, 0));
+	m_v24->write_dtr(BIT(data, 1));
+	// WD2 = BRK
+	// WD3 = S1
+	// WD4 = KAZ
+	// WD5 = START
+	// WD6 = IET
+	// WD7 = IER
+}
+
+READ8_MEMBER(sapi1_state::uart_ready_r)
+{
+	return (m_uart->get_output_pin(AY31015_DAV) << 7) | (m_uart->get_output_pin(AY31015_TBMT) << 6) | 0x3f;
+}
+
+WRITE8_MEMBER(sapi1_state::uart_mode_w)
+{
+	m_uart->set_input_pin(AY31015_NP, BIT(data, 0));
+	m_uart->set_input_pin(AY31015_TSB, BIT(data, 1));
+	m_uart->set_input_pin(AY31015_NB1, BIT(data, 3));
+	m_uart->set_input_pin(AY31015_NB2, BIT(data, 2));
+	m_uart->set_input_pin(AY31015_EPS, BIT(data, 4));
+	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->set_input_pin(AY31015_CS, 0);
+}
+
+READ8_MEMBER(sapi1_state::uart_data_r)
+{
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	uint8_t result = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return result;
+}
+
+WRITE8_MEMBER(sapi1_state::uart_data_w)
+{
+	m_uart->set_transmit_data(data);
+}
+
+WRITE8_MEMBER(sapi1_state::uart_reset_w)
+{
+	m_uart->set_input_pin(AY31015_XR, 0);
+	m_uart->set_input_pin(AY31015_XR, 1);
+}
+
 /**************************************
 
     Machine
@@ -522,6 +598,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	m_uart->set_input_pin(AY31015_SWE, 0);
 }
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
@@ -534,7 +611,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 /* Machine driver */
 static MACHINE_CONFIG_START( sapi1 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -590,16 +667,31 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_SCREEN_NO_PALETTE
 MACHINE_CONFIG_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 ) // high bit stripped off in software
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( sapi3a )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
 	MCFG_CPU_IO_MAP(sapi3a_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
+	MCFG_AY51013_TX_CLOCK(XTAL_12_288MHz / 80) // not actual rate?
+	MCFG_AY51013_RX_CLOCK(XTAL_12_288MHz / 80) // not actual rate?
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

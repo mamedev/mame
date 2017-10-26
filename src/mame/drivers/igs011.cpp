@@ -71,6 +71,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

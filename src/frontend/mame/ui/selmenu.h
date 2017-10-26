@@ -138,8 +138,6 @@ protected:
 	int         m_filter_highlight;
 	std::string m_search;
 
-	static char const *const s_info_titles[];
-
 private:
 	using bitmap_vector = std::vector<bitmap_argb32>;
 	using texture_ptr_vector = std::vector<texture_ptr>;

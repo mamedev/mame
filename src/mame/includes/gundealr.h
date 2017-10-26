@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 class gundealr_state : public driver_device
 {
 public:

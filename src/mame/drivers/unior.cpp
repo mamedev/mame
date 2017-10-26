@@ -56,16 +56,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_dma(*this, "dma")
-		, m_uart(*this, "uart")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
 		, m_p_vram(*this, "vram")
-	{
-	}
+	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 	DECLARE_READ8_MEMBER(ppi1_a_r);
@@ -85,7 +82,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
-	required_device<i8251_device> m_uart;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_vram;
@@ -301,12 +297,6 @@ PALETTE_INIT_MEMBER(unior_state,unior)
 *************************************************/
 
 
-WRITE_LINE_MEMBER(unior_state::write_uart_clock)
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 READ8_MEMBER( unior_state::ppi0_b_r )
 {
 	return 0;
@@ -410,7 +400,8 @@ static MACHINE_CONFIG_START( unior )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_20MHz / 12)
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(unior_state, write_uart_clock))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 

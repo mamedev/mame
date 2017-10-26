@@ -757,14 +757,14 @@ CPU  - 317-0142  |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
-Aurial           |A1       A2       A3       A4       A5       A6       A7       A8       A10      A11      A12               A14      A15      A16     |
+Aurail           |A1       A2       A3       A4       A5       A6       A7       A8       A10      A11      A12               A14      A15      A16     |
 CPU  - 317-0168  |--------------------------------------------------------------------------------------------------------------------------------------|
-8751 -           |EPR13440 EPR13441 EPR13442 EPR13443 EPR13468 EPR13445 EPR13469 EPR13447 EPR13448 MPR13449 MPR12461          EPR13450 EPR13451 EPR13452|
+8751 -           |EPR13440 EPR13441 EPR13442 EPR13443 EPR13468 EPR13445 EPR13469 EPR13447 EPR13448 MPR13449 -                 EPR13450 EPR13451 EPR13452|
                  |--------------------------------------------------------------------------------------------------------------------------------------|
                  |                                                                                                                                      |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B10      B11      B12      B13      B14      B15      B16     |
-S2 S3 S6 S7      |--------------------------------------------------------------------------------------------------------------------------------------|
-S13 S15 S17      |EPR13453 EPR13454 EPR13455 EPR13456 EPR13457 EPR13458 EPR13459 EPR13460 EPR13461 EPR13462 EPR13463 EPR13464 EPR13465 EPR13466 EPR13467|
+S2 S3 S6 S7 S9   |--------------------------------------------------------------------------------------------------------------------------------------|
+S11 S13 S15 S17  |EPR13453 EPR13454 EPR13455 EPR13456 EPR13457 EPR13458 EPR13459 EPR13460 EPR13461 EPR13462 EPR13463 EPR13464 EPR13465 EPR13466 EPR13467|
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 
 -----------------|----------------------------------------------------------------------------------------------------------------------------------------|
@@ -1750,11 +1750,30 @@ static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( map_fpointbla, AS_PROGRAM, 16, segas16b_state )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x02000e, 0x02000f) AM_READ_PORT("P2")
+	AM_RANGE(0x0a0000, 0x0a001f) AM_RAM AM_SHARE("bootleg_scroll")
+	AM_RANGE(0x0a0020, 0x0a0027) AM_RAM AM_SHARE("bootleg_page")
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x443002, 0x443003) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x843018, 0x843019) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfe000c, 0xfe000d) AM_READ_PORT("P1")
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_OPCODES, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map_fpointbla, AS_OPCODES, 16, segas16b_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
@@ -3736,6 +3755,18 @@ static MACHINE_CONFIG_DERIVED( fpointbl, system16b )
 	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
 
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fpointbla, fpointbl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_DEVICE_MODIFY("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lockonph )
 
@@ -6089,6 +6120,25 @@ ROM_START( fpointbj )
 	ROM_LOAD( "fpointbj_gal20v8.bin", 0x0400, 0x019d, NO_DUMP ) /* Protected */
 ROM_END
 
+ROM_START( fpointbla )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "B3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
+	ROM_LOAD16_BYTE( "B2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) // tiles
+	ROM_LOAD( "B8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "B7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "B6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+
+	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "B5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
+	ROM_LOAD16_BYTE( "B4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "B1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
+ROM_END
+
+
 //*************************************************************************************************************************
 //  Flash Point, Sega System 16B
 //  CPU: FD1094 (317-0127A)
@@ -8403,6 +8453,7 @@ ROM_END
 //  Wrestle War, Sega System 16B
 //  CPU: FD1094 (317-0090)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-6888-01
 //
 ROM_START( wrestwar1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -8726,6 +8777,17 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
+DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
+{
+	DRIVER_INIT_CALL(generic_bootleg);
+
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+
+	for (int i = 0;i < 0x10000;i++)
+	{
+		m_decrypted_opcodes[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,  0, 1, 2, 3, 4, 5, 6, 7);
+	}
+}
 
 DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
 {
@@ -8979,7 +9041,8 @@ GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b
 
 // bootlegs with modified hardware
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", 0 )
+GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 

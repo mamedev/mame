@@ -12,6 +12,7 @@
 #ifndef DRIVERS_NOVAGBASE_H
 #define DRIVERS_NOVAGBASE_H
 
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"

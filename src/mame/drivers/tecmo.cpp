@@ -54,10 +54,12 @@ f809      ????
 f80b      ????
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/tecmo.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
@@ -67,17 +69,6 @@ f80b      ????
 WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data >> 3);
-}
-
-WRITE8_MEMBER(tecmo_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
-}
-
-WRITE8_MEMBER(tecmo_state::nmi_ack_w)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::adpcm_start_w)
@@ -167,7 +158,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -195,7 +186,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -223,7 +214,7 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITENOP    /* ? */
@@ -237,7 +228,7 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
@@ -249,7 +240,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 
@@ -661,6 +652,8 @@ static MACHINE_CONFIG_START( rygar )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_4MHz) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

@@ -48,21 +48,18 @@ class poly_state : public driver_device
 {
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pia0(*this, "pia0"),
-		m_pia1(*this, "pia1"),
-		m_acia(*this, "acia"),
-		m_ptm(*this, "ptm"),
-		m_speaker(*this, "speaker"),
-		m_videoram(*this, "videoram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pia0(*this, "pia0")
+		, m_pia1(*this, "pia1")
+		, m_ptm(*this, "ptm")
+		, m_speaker(*this, "speaker")
+		, m_videoram(*this, "videoram")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 
@@ -73,7 +70,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
-	required_device<acia6850_device> m_acia;
 	required_device<ptm6840_device> m_ptm;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -135,12 +131,6 @@ void poly_state::kbd_put(u8 data)
 	m_pia1->cb1_w(0);
 }
 
-WRITE_LINE_MEMBER( poly_state::write_acia_clock )
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
 WRITE_LINE_MEMBER( poly_state::ptm_o2_callback )
 {
 	m_ptm->set_c1(state);
@@ -194,8 +184,9 @@ static MACHINE_CONFIG_START( poly )
 	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 1)
-	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(poly_state, write_acia_clock))
+	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	//MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 

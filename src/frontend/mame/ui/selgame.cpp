@@ -130,18 +130,14 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 menu_select_game::~menu_select_game()
 {
 	std::string error_string, last_driver;
-	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
-	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
-
-	if (reinterpret_cast<uintptr_t>(driver) > skip_main_items)
-		last_driver = driver->name;
-	else if (driver && m_prev_selected)
-		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
-
-	if (reinterpret_cast<uintptr_t>(swinfo) > skip_main_items)
+	game_driver const *driver;
+	ui_software_info const *swinfo;
+	get_selection(swinfo, driver);
+	if (swinfo)
 		last_driver = swinfo->shortname;
-	else if (swinfo && m_prev_selected)
-		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
+	else
+	if (driver)
+		last_driver = driver->name;
 
 	std::string filter;
 	auto const active_filter(main_filters::filters.find(main_filters::actual));
@@ -942,22 +938,23 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else if (flags.imperfect_features() & device_t::feature::TIMING)
 		str << _("Timing\tImperfect\n");
 
-	util::stream_format(str, _("Mechanical Machine\t%1$s\n"), ((flags.machine_flags() & machine_flags::MECHANICAL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Requires Clickable Artwork\t%1$s\n"), ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Cocktail\t%1$s\n"), ((flags.machine_flags() & machine_flags::NO_COCKTAIL) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Driver is BIOS\t%1$s\n"), ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Support Save\t%1$s\n"), ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Screen Orientation\t%1$s\n"), ((flags.machine_flags() & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
+	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical Machine\tYes\n")         : _("Mechanical Machine\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)  ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Requires Clickable Artwork\tYes\n") : _("Requires Clickable Artwork\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::NO_COCKTAIL)       ? _("Support Cocktail\tYes\n")           : _("Support Cocktail\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("Driver is BIOS\tYes\n")             : _("Driver is BIOS\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE)     ? _("Support Save\tYes\n")               : _("Support Save\tNo\n"));
+	str << ((flags.machine_flags() & ORIENTATION_SWAP_XY)              ? _("Screen Orientation\tVertical\n")    : _("Screen Orientation\tHorizontal\n"));
 	bool found = false;
-	auto entries = rom_build_entries(driver->rom);
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
+	for (romload::region const &region : romload::entries(driver->rom).get_regions())
+	{
+		if (region.is_diskdata())
 		{
 			found = true;
 			break;
 		}
-	util::stream_format(str, _("Requires CHD\t%1$s\n"), found ? _("Yes") : _("No"));
+	}
+	str << (found ? _("Requires CHD\tYes\n") : _("Requires CHD\tNo\n"));
 
 	// audit the game first to see if we're going to work
 	if (ui().options().info_audit())
@@ -970,19 +967,21 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-			str << _("Roms Audit Pass\tOK\n");
+			str << _("ROM Audit Result\tOK\n");
 		else
-			str << _("Roms Audit Pass\tBAD\n");
+			str << _("ROM Audit Result\tBAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
-			str << _("Samples Audit Pass\tNone Needed\n");
+			str << _("Samples Audit Result\tNone Needed\n");
 		else if (summary_samples == media_auditor::CORRECT || summary_samples == media_auditor::BEST_AVAILABLE)
-			str << _("Samples Audit Pass\tOK\n");
+			str << _("Samples Audit Result\tOK\n");
 		else
-			str << _("Samples Audit Pass\tBAD\n");
+			str << _("Samples Audit Result\tBAD\n");
 	}
 	else
-		str << _("Roms Audit Pass\tDisabled\nSamples Audit Pass\tDisabled\n");
+	{
+		str << _("ROM Audit \tDisabled\nSamples Audit \tDisabled\n");
+	}
 
 	buffer = str.str();
 }

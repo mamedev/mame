@@ -182,7 +182,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 MACHINE_CONFIG_MEMBER( tmpz84c015_device::device_add_mconfig )
 
 	/* basic machine hardware */
-	MCFG_Z80SIO0_ADD("tmpz84c015_sio", DERIVED_CLOCK(1,1), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("tmpz84c015_sio", Z80SIO0, DERIVED_CLOCK(1,1))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(tmpz84c015_device, out_txda_cb_trampoline_w))

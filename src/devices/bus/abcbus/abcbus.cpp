@@ -80,6 +80,7 @@ void abcbus_slot_device::device_start()
 
 // slot devices
 #include "abc890.h"
+#include "db411223.h"
 #include "fd2.h"
 #include "hdc.h"
 #include "lux10828.h"
@@ -90,8 +91,8 @@ void abcbus_slot_device::device_start()
 #include "ram.h"
 #include "sio.h"
 #include "slutprov.h"
-#include "turbo.h"
 #include "uni800.h"
+#include "unidisk.h"
 
 
 
@@ -106,6 +107,8 @@ SLOT_INTERFACE_START( abc80_cards )
 	SLOT_INTERFACE("16k", ABC80_16KB_RAM_CARD)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 	SLOT_INTERFACE("abc830", ABC830)
+	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
+	SLOT_INTERFACE("unidisk", UNIDISK)
 SLOT_INTERFACE_END
 
 
@@ -124,12 +127,13 @@ SLOT_INTERFACE_START( abcbus_cards )
 	SLOT_INTERFACE("abc856", ABC856)
 	SLOT_INTERFACE("abc890", ABC890)
 	SLOT_INTERFACE("abc894", ABC894)
+	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
 	SLOT_INTERFACE("hdc", ABC_HDC)
 	SLOT_INTERFACE("sio", ABC_SIO)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 	SLOT_INTERFACE("uni800", ABC_UNI800)
+	SLOT_INTERFACE("unidisk", UNIDISK)
 	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
-	SLOT_INTERFACE("turbo", TURBO_KONTROLLER)
 	SLOT_INTERFACE("xebec", LUXOR_55_21056)
 SLOT_INTERFACE_END
 

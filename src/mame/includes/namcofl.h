@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, ElSemi
+
 #include "namcos2.h"
+#include "machine/timer.h"
 #include "video/namco_c116.h"
 
 #define NAMCOFL_HTOTAL      (288)   /* wrong */

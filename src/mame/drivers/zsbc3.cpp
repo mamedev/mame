@@ -36,6 +36,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "machine/clock.h"
@@ -66,7 +67,7 @@ static ADDRESS_MAP_START(zsbc3_io, AS_IO, 8, zsbc3_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0b) //AM_DEVREADWRITE("pio", z80pio_device, read, write) // the control bytes appear to be for a PIO
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x30, 0x30) // unknown device, init bytes = 45, 0D
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x38, 0x38) // unknown device, init byte = C3
 ADDRESS_MAP_END
 
@@ -74,20 +75,29 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 static MACHINE_CONFIG_START( zsbc3 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz /4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)
 	MCFG_CPU_IO_MAP(zsbc3_io)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
-	/* Devices */
-	MCFG_Z80SIO_ADD("sio", XTAL_16MHz / 4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("clk2mhz", CLOCK, XTAL_16MHz / 8)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg3))
+
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_16MHz / 4)
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -96,6 +106,7 @@ static MACHINE_CONFIG_START( zsbc3 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

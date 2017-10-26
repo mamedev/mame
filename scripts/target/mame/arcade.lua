@@ -60,8 +60,7 @@ CPUS["ESRIP"] = true
 CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
-CPUS["SH2"] = true
-CPUS["SH4"] = true
+CPUS["SH"] = true
 CPUS["DSP16A"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
@@ -551,6 +550,7 @@ MACHINES["SCUDSP"] = true
 --MACHINES["SECFLASH"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
+MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
@@ -1610,17 +1610,12 @@ files {
 	MAME_DIR .. "src/mame/includes/stadhero.h",
 	MAME_DIR .. "src/mame/video/stadhero.cpp",
 	MAME_DIR .. "src/mame/drivers/supbtime.cpp",
-	MAME_DIR .. "src/mame/includes/supbtime.h",
-	MAME_DIR .. "src/mame/video/supbtime.cpp",
 	MAME_DIR .. "src/mame/drivers/tryout.cpp",
 	MAME_DIR .. "src/mame/includes/tryout.h",
 	MAME_DIR .. "src/mame/video/tryout.cpp",
 	MAME_DIR .. "src/mame/drivers/tumbleb.cpp",
 	MAME_DIR .. "src/mame/includes/tumbleb.h",
 	MAME_DIR .. "src/mame/video/tumbleb.cpp",
-	MAME_DIR .. "src/mame/drivers/tumblep.cpp",
-	MAME_DIR .. "src/mame/includes/tumblep.h",
-	MAME_DIR .. "src/mame/video/tumblep.cpp",
 	MAME_DIR .. "src/mame/drivers/vaportra.cpp",
 	MAME_DIR .. "src/mame/includes/vaportra.h",
 	MAME_DIR .. "src/mame/video/vaportra.cpp",
@@ -3415,6 +3410,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/seibuspi.cpp",
 	MAME_DIR .. "src/mame/includes/seibuspi.h",
 	MAME_DIR .. "src/mame/video/seibuspi.cpp",
+	MAME_DIR .. "src/mame/drivers/seibucats.cpp",
 	MAME_DIR .. "src/mame/drivers/sengokmj.cpp",
 	MAME_DIR .. "src/mame/drivers/stfight.cpp",
 	MAME_DIR .. "src/mame/video/stfight_dev.cpp",
@@ -3685,6 +3681,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gladiatr.cpp",
 	MAME_DIR .. "src/mame/includes/gladiatr.h",
 	MAME_DIR .. "src/mame/video/gladiatr.cpp",
+	MAME_DIR .. "src/mame/drivers/gokidetor.cpp",
 	MAME_DIR .. "src/mame/drivers/grchamp.cpp",
 	MAME_DIR .. "src/mame/includes/grchamp.h",
 	MAME_DIR .. "src/mame/audio/grchamp.cpp",
@@ -4420,6 +4417,7 @@ files {
 	MAME_DIR .. "src/mame/includes/amspdwy.h",
 	MAME_DIR .. "src/mame/video/amspdwy.cpp",
 	MAME_DIR .. "src/mame/drivers/amusco.cpp",
+	MAME_DIR .. "src/mame/drivers/anes.cpp",
 	MAME_DIR .. "src/mame/drivers/arachnid.cpp",
 	MAME_DIR .. "src/mame/drivers/artmagic.cpp",
 	MAME_DIR .. "src/mame/includes/artmagic.h",
@@ -4644,6 +4642,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/norautp.cpp",
 	MAME_DIR .. "src/mame/includes/norautp.h",
 	MAME_DIR .. "src/mame/audio/norautp.cpp",
+	MAME_DIR .. "src/mame/drivers/notechan.cpp",
 	MAME_DIR .. "src/mame/drivers/nsmpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/oneshot.cpp",
 	MAME_DIR .. "src/mame/includes/oneshot.h",

@@ -1010,3 +1010,14 @@ if (VIDEOS["PPU2C0X"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/video/bt459.h,VIDEOS["BT459"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT459"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt459.cpp",
+		MAME_DIR .. "src/devices/video/bt459.h",
+	}
+end

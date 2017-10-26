@@ -6,6 +6,7 @@
     Mephisto Monte Carlo
     Mephisto Mega IV
     Mephisto Monte Carlo IV LE
+    Mephisto Mondial II
     Mephisto Super Mondial
     Mephisto Super Mondial II
 
@@ -16,14 +17,17 @@
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
 #include "mephisto_montec.lh"
 #include "mephisto_megaiv.lh"
+#include "mephisto_mondial2.lh"
 #include "mephisto_smondial2.lh"
 
 
@@ -55,6 +59,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(smondial_board_mux_w);
 	DECLARE_WRITE8_MEMBER(smondial_led_data_w);
+
+	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
 protected:
 	virtual void machine_start() override;
@@ -303,6 +310,41 @@ static ADDRESS_MAP_START(smondial_mem , AS_PROGRAM, 8, mephisto_montec_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
+{
+	uint8_t leds_data = m_board->mux_r(space, offset);
+	for (int i=0; i<8; i++)
+	{
+		if (!BIT(leds_data, i))
+		{
+			if (data & 0x10)    output().set_led_value(100 + i, 1);
+			if (data & 0x20)    output().set_led_value(  8 + i, 1);
+			if (data & 0x40)    output().set_led_value(  0 + i, 1);
+		}
+	}
+
+	m_input_mux = data ^ 0xff;
+	m_beeper->set_state(BIT(data, 7));
+}
+
+
+static ADDRESS_MAP_START(mondial2_mem , AS_PROGRAM, 8, mephisto_montec_state )
+	AM_RANGE( 0x0000, 0x07ff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(mondial2_input_mux_w)
+	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
+	AM_RANGE( 0x3000, 0x3007 ) AM_READ(megaiv_input_r)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM
+ADDRESS_MAP_END
+
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
+{
+	for (int i=0; i<8; i++)
+	{
+		output().set_led_value(0 + i, 0);
+		output().set_led_value(8 + i, 0);
+		output().set_led_value(100 + i, 0);
+	}
+}
 
 static INPUT_PORTS_START( montec )
 	PORT_START("KEY.0")
@@ -346,6 +388,28 @@ static INPUT_PORTS_START( megaiv )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("6 King")   PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("0 Pos")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Level")    PORT_CODE(KEYCODE_L)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mondial2 )
+	PORT_START("KEY.0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Play")     PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Pos")      PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Mem")      PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Info")     PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Level")    PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Enter")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Reset")    PORT_CODE(KEYCODE_DEL)
+
+	PORT_START("KEY.1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("1 Pawn")   PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("2 Knight") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("3 Bishop") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("4 Rook")   PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("5 Queen")  PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("6 King")   PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("7 Black")  PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("8 White")  PORT_CODE(KEYCODE_8)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smondial2 )
@@ -399,7 +463,18 @@ static MACHINE_CONFIG_DERIVED( megaiv, montec )
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
+	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mondial2, megaiv )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK( XTAL_2MHz )
+	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_2MHz / (1 << 12))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
+	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( smondial, megaiv )
@@ -414,6 +489,8 @@ static MACHINE_CONFIG_DERIVED( smondial2, smondial )
 	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
+
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_smondial2)
 MACHINE_CONFIG_END
 
@@ -443,10 +520,16 @@ ROM_START(smondial2)
 	ROM_LOAD("supermondial_II.bin", 0x8000, 0x8000, CRC(cd73df4a) SHA1(bad786074be613d7f48bf98b6fdf8178a4a85f5b))
 ROM_END
 
+ROM_START(mondial2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mondial II 01 08 87 Morsch.bin", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0))
+ROM_END
+
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT COMPANY             FULLNAME                      FLAGS */
 CONS( 1986, smondial, 0,       0,      smondial,  megaiv,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Super Mondial",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, montec,   0,       0,      montec,    montec,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2, 0,       0,      mondial2,  mondial2, mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, smondial2,0,       0,      smondial2, smondial2,mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, megaiv,   0,       0,      megaiv,    megaiv,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, monteciv, montec,  0,      monteciv,  montec,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

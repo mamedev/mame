@@ -89,7 +89,7 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

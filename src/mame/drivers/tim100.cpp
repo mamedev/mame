@@ -33,13 +33,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
-		, m_uart17(*this, "uart_u17")
-		, m_uart18(*this, "uart_u18")
 		{ }
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 private:
@@ -50,8 +47,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_device<i8251_device> m_uart17;
-	required_device<i8251_device> m_uart18;
 };
 
 static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
@@ -159,14 +154,6 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( tim100_state::clock_w )
-{
-	m_uart17->write_txc(state);
-	m_uart17->write_rxc(state);
-	m_uart18->write_txc(state);
-	m_uart18->write_rxc(state);
-}
-
 
 static MACHINE_CONFIG_START( tim100 )
 	/* basic machine hardware */
@@ -216,7 +203,10 @@ static MACHINE_CONFIG_START( tim100 )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tim100_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u17", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */

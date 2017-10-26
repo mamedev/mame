@@ -18,6 +18,7 @@ Electro-mechanical bubble hockey games:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/digitalk.h"
 #include "speaker.h"

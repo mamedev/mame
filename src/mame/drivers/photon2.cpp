@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "screen.h"
 #include "speaker.h"

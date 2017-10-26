@@ -120,6 +120,7 @@ private:
 	void select_freq_timer(int f, int c, bool selected, bool cycle);
 	void set_master_mode(u16 data);
 	bool counter_is_mode_x(int c) const;
+	bool compare_count(int c) const;
 	void set_counter_mode(int c, u16 data);
 	void arm_counter(int c);
 	void disarm_counter(int c);

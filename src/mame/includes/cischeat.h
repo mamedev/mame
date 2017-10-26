@@ -6,6 +6,7 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/ms1_tmap.h"
 #include "screen.h"

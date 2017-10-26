@@ -47,14 +47,26 @@ static MACHINE_CONFIG_START( alvg )
 	MCFG_CPU_PROGRAM_MAP(alvg_map)
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------------------------
-/ A.G. Soccer Ball
-/-------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------
+/ A.G. Soccer Ball - A.G. Football has identical ROMs but different playfield
+/----------------------------------------------------------------------------*/
 ROM_START(agsoccer)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("ags_snd.v21", 0x0000, 0x10000, CRC(aa30bfe4) SHA1(518f7019639a0284461e83ad849bee0be5371580))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
+	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
+	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
+	ROM_RELOAD(0x000000 + 0xc0000, 0x40000)
+ROM_END
+
+ROM_START(agsoccer07)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ags_cpu_r07u", 0x0000, 0x10000, CRC(009ef717) SHA1(d770ce8fd032f4f1d96b9792509cceebbfaebbd9))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("ags_snd.v14", 0x0000, 0x10000, CRC(2544e468) SHA1(d49e2fc91cbb80fdf96f436c614c6f305efafb6f))
 	ROM_REGION(0x400000, "sound1", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
@@ -361,7 +373,8 @@ ROM_START(usafootba)
 ROM_END
 
 
-GAME(1991,  agsoccer,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "A.G. Soccer Ball",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  agsoccer,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "A.G. Soccer Ball (R18u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  agsoccer07, agsoccer,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  wrldtour,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  wrldtour2,  wrldtour,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  wrldtour3,  wrldtour,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)

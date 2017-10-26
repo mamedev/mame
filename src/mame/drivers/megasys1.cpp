@@ -27,7 +27,8 @@ Year + Game                       System    Protection
     Jitsuryoku!! Pro Yakyuu (Japan) A       Yes + Encryption (key 2)
     Plus Alpha                      A       Yes + Encryption (key 2)
     Saint Dragon                    A       Yes + Encryption (key 1)
-90  RodLand  (World) /              A             Encryption (key 3)
+90  RodLand  (World, set 1) /       A             Encryption (key 3)
+    RodLand  (World, set 2)         A             Encryption (key 2)
     RodLand  (Japan)                A             Encryption (key 2)
     R&T (Prototype?)                A             Encryption (key 2)
     Phantasm        (Japan) /       A             Encryption (key 1)
@@ -3094,7 +3095,6 @@ ROM_START( kickoff )
 	ROM_LOAD( "kioff05.rom", 0x000000, 0x020000, CRC(e7232103) SHA1(4bb72fb835ab491cf5b58a34af4e2a767703320c) )
 	ROM_LOAD( "kioff06.rom", 0x020000, 0x020000, CRC(a0b3cb75) SHA1(4840177d84e825c39e2e8252c75f0c1aab156b19) )
 	ROM_LOAD( "kioff07.rom", 0x040000, 0x020000, CRC(ed649919) SHA1(e8955c0dc2d1546d875a16fc9d8595ed4a507539) )
-	ROM_LOAD( "kioff10.rom", 0x060000, 0x020000, CRC(fd739fec) SHA1(1442d5ef7b8fbaa0c9f71c12ce993626364d2e1a) ) // TODO: this is the ROM for one of the two oki. Loading it in the oki2 region gives cheering
 
 	ROM_REGION( 0x080000, "scroll1", ROMREGION_ERASEFF ) /* Scroll 1 */
 	// scroll 1 is unused
@@ -3113,9 +3113,7 @@ ROM_START( kickoff )
 	ROM_LOAD( "kioff21.rom", 0x020000, 0x020000, CRC(195940cf) SHA1(5b1880a576046dae32cf1fd48cd4e8830649b7f7) )
 
 	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
-	// same rom for 2 oki chips ?? Unlikely
-	ROM_LOAD( "kioff20.rom", 0x000000, 0x020000, CRC(5c28bd2d) SHA1(95d70a30118dfd2649f8d1f726a89e61233b4ae1) )
-	ROM_LOAD( "kioff21.rom", 0x020000, 0x020000, CRC(195940cf) SHA1(5b1880a576046dae32cf1fd48cd4e8830649b7f7) )
+	ROM_LOAD( "kioff10.rom", 0x000000, 0x020000, CRC(fd739fec) SHA1(1442d5ef7b8fbaa0c9f71c12ce993626364d2e1a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
@@ -3685,6 +3683,38 @@ ROM_START( rodland )
 	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
+ROM_START( rodlanda ) // JALECO MB-M02A EB-88003-3001-1, with jumper wire from a PAL to one of the connectors
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_2.ROM2", 0x000000, 0x020000, CRC(797ad124) SHA1(66076f0a1c18cb4fdf239b387f903d81df863740) ) //sldh
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_1.ROM1", 0x000001, 0x020000, CRC(030b116f) SHA1(7928daf2296a292a951f393fb48977972a3487c7) ) //sldh
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_3.ROM3", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_4.ROM4", 0x040001, 0x010000, CRC(44163c86) SHA1(1c56d79531af0312e7cd3dc66cf61b55dd1a6e51) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_5.ROM5", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_6.ROM6", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "LH534H31.ROM14", 0x000000, 0x080000, CRC(8201e1bb) SHA1(3304100dcab7b67cee021869a50f4295c8635814) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "LH534H32.ROM18", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "LH2311J0.ROM19", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "LH534H33.ROM23", 0x000000, 0x080000, CRC(936db174) SHA1(4dfb2c31bc4bbf659184fe18e320d19f326b3ec5) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "LH5321T5.ROM10", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "S202000DR.ROM8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+ROM_END
 
 ROM_START( rodlandj )
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
@@ -4697,7 +4727,8 @@ GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, ast
 GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlanda, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
