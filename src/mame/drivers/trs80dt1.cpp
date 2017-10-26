@@ -295,11 +295,14 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	linecount &= 15;
 
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (m_bow ^ lten) ? 0xff : 0;
+	u8 gfx = (lten) ? 0xff : 0;
 	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
 	if (rvv)
+		gfx ^= 0xff;
+
+	if (m_bow)
 		gfx ^= 0xff;
 
 	for(u8 i=0; i<8; i++)
