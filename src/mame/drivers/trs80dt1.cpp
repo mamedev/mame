@@ -19,16 +19,20 @@ ToDo:
 - Serial i/o
 - Centronics printer
 - Fix video (it is hooked up as per schematic, but when text is present it
-  scrolls crazily and flickers, also in debug the input-line queue can overflow).
+  scrolls crazily and flickers).
 - Check that attributes are correctly applied
-- Keyboard is coded but not tested.
-- Add the nvram
+- When a key is pressed it endlessly autorepeats.
+- Connect up ports 1 and 3.
+
+You can get into the setup menu by pressing Ctrl+Shift+Enter.
+
 
 **********************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/i8275.h"
+#include "machine/x2212.h"
 #include "screen.h"
 //#include "logmacro.h"
 
@@ -42,11 +46,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
+		, m_nvram(*this,"nvram")
 		, m_keyboard(*this, "X%u", 0)
 		{ }
 
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_WRITE8_MEMBER(store_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(hrtc_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
@@ -60,12 +66,16 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
+	required_device<x2210_device> m_nvram;
 	required_ioport_array<9> m_keyboard;
 };
 
 void trs80dt1_state::machine_reset()
 {
 	m_irq_state = 0;
+	// line is actually active low in the real chip
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 READ8_MEMBER( trs80dt1_state::dma_r )
@@ -85,9 +95,9 @@ READ8_MEMBER( trs80dt1_state::key_r )
 
 WRITE_LINE_MEMBER( trs80dt1_state::irq_w )
 {
-	m_irq_state = state;
-	if (!state)
+	if (!state && m_irq_state)
 		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+	m_irq_state = state;
 }
 
 WRITE_LINE_MEMBER( trs80dt1_state::hrtc_w )
@@ -95,8 +105,15 @@ WRITE_LINE_MEMBER( trs80dt1_state::hrtc_w )
 	m_maincpu->set_input_line(MCS51_INT1_LINE, m_irq_state ? HOLD_LINE : CLEAR_LINE);
 }
 
+WRITE8_MEMBER( trs80dt1_state::store_w )
+{
+	// line is actually active low in the real chip
+	m_nvram->store(1);
+	m_nvram->store(0);
+}
+
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, trs80dt1_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM // AM_REGION("roms", 0)  AM_REGION ignored for this cpu
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dma_r)
 ADDRESS_MAP_END
 
@@ -106,10 +123,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, trs80dt1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xbfff) // A14 not used
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("videoram")
-	//AM_RANGE(0xa800, 0xabff) AM_RAM //NVRAM array select
+	AM_RANGE(0xa800, 0xa83f) AM_MIRROR(0x3c0) AM_DEVREADWRITE("nvram", x2210_device, read, write) // X2210
 	AM_RANGE(0xac00, 0xafff) AM_READ(key_r)
-	AM_RANGE(0xb000, 0xb3ff) AM_READ_PORT("X9") //keyboard/RS232 input read
-	//AM_RANGE(0xb400, 0xb7ff) AM_RAM //NVRAM write select
+	AM_RANGE(0xb000, 0xb3ff) AM_READ_PORT("X9") // also reads some RS232 inputs
+	AM_RANGE(0xb400, 0xb7ff) AM_WRITE(store_w)
 	AM_RANGE(0xbc00, 0xbc01) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
 	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(port_r, port_w)
 ADDRESS_MAP_END
@@ -207,14 +224,14 @@ static INPUT_PORTS_START( trs80dt1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void trs80dt1_state::machine_start()
@@ -282,6 +299,8 @@ static MACHINE_CONFIG_START( trs80dt1 )
 	MCFG_I8275_HRTC_CALLBACK(WRITELINE(trs80dt1_state, hrtc_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_PALETTE_ADD("palette", 3)
+
+	MCFG_X2210_ADD("nvram")
 MACHINE_CONFIG_END
 
 ROM_START( trs80dt1 )
