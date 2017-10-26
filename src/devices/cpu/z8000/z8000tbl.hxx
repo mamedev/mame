@@ -547,7 +547,7 @@ void z8002_device::init_tables()
 	for (i = 0; i < 256; i++)
 		z8000_zsp[i] = ((i == 0) ? F_Z : 0) |
 						((i & 128) ? F_S : 0) |
-						((((i>>7)^(i>>6)^(i>>5)^(i>>4)^(i>>3)^(i>>2)^(i>>1)^i) & 1) ? 0 : F_PV);
+						(parity_8(i) ? 0 : F_PV);
 
 	/* first set all 64K opcodes to invalid */
 	for (i = 0; i < 0x10000; i++)

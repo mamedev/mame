@@ -290,19 +290,10 @@
  * @param val 32 bits
  * @return 1 for even parity, 0 for odd parity
  */
-static __inline uint8_t parity_even(uint32_t val)
-{
-	val -= ((val >> 1) & 0x55555555);
-	val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
-	val = (((val >> 4) + val) & 0x0f0f0f0f);
-	val += (val >> 8);
-	val += (val >> 16);
-	// val now has number of 1 bits
-	return val & 1;
-}
+#define parity_even(val) (parity_32(val) ? 0 : 1)
 
 /** @brief Return odd parity of a (masked) 32 bit value. */
-#define parity_odd(val) (parity_even(val)^1)
+#define parity_odd(val) (parity_32(val) ? 1 : 0)
 
 /**
  * @brief Lookup table to convert a Hamming syndrome into a bit number to correct.

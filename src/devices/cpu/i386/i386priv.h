@@ -287,8 +287,6 @@ union MMX_REG {
 	int64_t  l;
 };
 
-extern int i386_parity_table[256];
-
 #define FAULT_THROW(fault,error) { throw (uint64_t)(fault | (uint64_t)error << 32); }
 #define PF_THROW(error) { m_cr[2] = address; FAULT_THROW(FAULT_PF,error); }
 
@@ -313,11 +311,11 @@ extern int i386_parity_table[256];
 #define SetSF(x)            (m_SF = (x))
 #define SetZF(x)            (m_ZF = (x))
 #define SetAF(x,y,z)        (m_AF = (((x) ^ ((y) ^ (z))) & 0x10) ? 1 : 0)
-#define SetPF(x)            (m_PF = i386_parity_table[(x) & 0xFF])
+#define SetPF(x)            (m_PF = parity_8((x) & 0xff) ? 0 : 1)
 
-#define SetSZPF8(x)         {m_ZF = ((uint8_t)(x)==0);  m_SF = ((x)&0x80) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
-#define SetSZPF16(x)        {m_ZF = ((uint16_t)(x)==0);  m_SF = ((x)&0x8000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
-#define SetSZPF32(x)        {m_ZF = ((uint32_t)(x)==0);  m_SF = ((x)&0x80000000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
+#define SetSZPF8(x)         {m_ZF = ((uint8_t)(x)==0);  m_SF = ((x)&0x80) ? 1 : 0; m_PF = parity_8(x & 0xff) ? 0 : 1; }
+#define SetSZPF16(x)        {m_ZF = ((uint16_t)(x)==0);  m_SF = ((x)&0x8000) ? 1 : 0; m_PF = parity_8(x & 0xff) ? 0 : 1; }
+#define SetSZPF32(x)        {m_ZF = ((uint32_t)(x)==0);  m_SF = ((x)&0x80000000) ? 1 : 0; m_PF = parity_8(x & 0xff) ? 0 : 1; }
 
 #define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].low)))
 #define XMM(n)              m_sse_reg[(n)]

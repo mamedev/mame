@@ -105,8 +105,6 @@ protected:
 	void transmit_register_setup(u8 data_byte);
 	u8 transmit_register_get_data_bit();
 
-	u8 serial_helper_get_parity(u8 data) { return m_serial_parity_table[data]; }
-
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
 	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
@@ -133,8 +131,6 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(rcv_clock) { rx_clock_w(!m_rcv_clock_state); }
 	TIMER_CALLBACK_MEMBER(tra_clock) { tx_clock_w(!m_tra_clock_state); }
-
-	u8 m_serial_parity_table[256];
 
 	// Data frame
 	// number of start bits

@@ -95,27 +95,6 @@ void i8008_device::device_start()
 
 	for (int addrnum = 0; addrnum < 8; addrnum++)
 		state_add(I8008_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
-
-	init_tables();
-}
-
-void i8008_device::init_tables (void)
-{
-	int i;
-	uint8_t p;
-	for (i = 0; i < 256; i++)
-	{
-		p = 0;
-		if (BIT(i,0)) p++;
-		if (BIT(i,1)) p++;
-		if (BIT(i,2)) p++;
-		if (BIT(i,3)) p++;
-		if (BIT(i,4)) p++;
-		if (BIT(i,5)) p++;
-		if (BIT(i,6)) p++;
-		if (BIT(i,7)) p++;
-		m_PARITY[i] = ((p&1) ? 0 : 1);
-	}
 }
 
 //-------------------------------------------------
@@ -669,7 +648,7 @@ inline void i8008_device::update_flags(uint8_t val)
 {
 	m_ZF = (val == 0) ? 1 : 0;
 	m_SF = (val & 0x80) ? 1 : 0;
-	m_PF = m_PARITY[val];
+	m_PF = parity_8(val) ? 0 : 1;
 }
 
 inline uint8_t i8008_device::do_condition(uint8_t val)

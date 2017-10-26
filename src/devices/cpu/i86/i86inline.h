@@ -5,7 +5,7 @@
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
 #define ZF      (m_ZeroVal==0)
-#define PF      m_parity_table[(uint8_t)m_ParityVal]
+#define PF      !parity_8(m_ParityVal)
 #define AF      (m_AuxVal!=0)
 #define OF      (m_OverVal!=0)
 

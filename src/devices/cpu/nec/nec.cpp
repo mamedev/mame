@@ -233,8 +233,6 @@ uint16_t nec_common_device::fetchword()
 #include "necea.h"
 #include "necmodrm.h"
 
-static uint8_t parity_table[256];
-
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
@@ -357,25 +355,16 @@ void nec_common_device::execute_set_input(int irqline, int state)
 
 void nec_common_device::device_start()
 {
-	unsigned int i, j, c;
-
 	static const WREGS wreg_name[8]={ AW, CW, DW, BW, SP, BP, IX, IY };
 	static const BREGS breg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
-	for (i = 0; i < 256; i++)
-	{
-		for (j = i, c = 0; j > 0; j >>= 1)
-			if (j & 1) c++;
-		parity_table[i] = !(c & 1);
-	}
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		Mod_RM.reg.b[i] = breg_name[(i & 0x38) >> 3];
 		Mod_RM.reg.w[i] = wreg_name[(i & 0x38) >> 3];
 	}
 
-	for (i = 0xc0; i < 0x100; i++)
+	for (int i = 0xc0; i < 0x100; i++)
 	{
 		Mod_RM.RM.w[i] = wreg_name[i & 7];
 		Mod_RM.RM.b[i] = breg_name[i & 7];

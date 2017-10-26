@@ -1922,7 +1922,6 @@ void z180_device::z180_write_iolines(uint32_t data)
 
 void z180_device::device_start()
 {
-	int i, p;
 	int oldval, newval, val;
 	uint8_t *padd, *padc, *psub, *psbc;
 
@@ -1976,22 +1975,13 @@ void z180_device::device_start()
 			psbc++;
 		}
 	}
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		p = 0;
-		if( i&0x01 ) ++p;
-		if( i&0x02 ) ++p;
-		if( i&0x04 ) ++p;
-		if( i&0x08 ) ++p;
-		if( i&0x10 ) ++p;
-		if( i&0x20 ) ++p;
-		if( i&0x40 ) ++p;
-		if( i&0x80 ) ++p;
 		SZ[i] = i ? i & SF : ZF;
 		SZ[i] |= (i & (YF | XF));       /* undocumented flag bits 5+3 */
 		SZ_BIT[i] = i ? i & SF : ZF | PF;
 		SZ_BIT[i] |= (i & (YF | XF));   /* undocumented flag bits 5+3 */
-		SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
+		SZP[i] = SZ[i] | (parity_8(i) ? 0 : PF);
 		SZHV_inc[i] = SZ[i];
 		if( i == 0x80 ) SZHV_inc[i] |= VF;
 		if( (i & 0x0f) == 0x00 ) SZHV_inc[i] |= HF;

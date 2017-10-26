@@ -324,17 +324,6 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
-	/* Set up parity lookup table. */
-	for (uint16_t i = 0;i < 256; i++)
-	{
-		uint16_t c = 0;
-		for (uint16_t j = i; j > 0; j >>= 1)
-		{
-			if (j & 1) c++;
-		}
-		m_parity_table[i] = !(c & 1);
-	}
-
 	for (uint16_t i = 0; i < 256; i++)
 	{
 		m_Mod_RM.reg.b[i] = reg_name[(i & 0x38) >> 3];

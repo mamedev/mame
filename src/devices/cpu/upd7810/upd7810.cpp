@@ -951,8 +951,8 @@ void upd7810_device::upd7810_write_TXB()
 	m_txbuf = 1;
 }
 
-#define PAR7(n) ((((n)>>6)^((n)>>5)^((n)>>4)^((n)>>3)^((n)>>2)^((n)>>1)^((n)))&1)
-#define PAR8(n) ((((n)>>7)^((n)>>6)^((n)>>5)^((n)>>4)^((n)>>3)^((n)>>2)^((n)>>1)^((n)))&1)
+#define PAR7(n) (parity_8(n & 0x7f) ? 1 : 0)
+#define PAR8(n) (parity_8(n) ? 1 : 0)
 
 void upd7810_device::upd7810_sio_output()
 {
