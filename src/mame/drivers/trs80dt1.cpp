@@ -23,6 +23,7 @@ ToDo:
 - Check that attributes are correctly applied
 - When a key is pressed it endlessly autorepeats.
 - Connect up ports 1 and 3.
+- Fix random crashes, especially while in the debugger.
 
 You can get into the setup menu by pressing Ctrl+Shift+Enter.
 
@@ -33,7 +34,9 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "cpu/mcs51/mcs51.h"
 #include "video/i8275.h"
 #include "machine/x2212.h"
+#include "sound/beep.h"
 #include "screen.h"
+#include "speaker.h"
 //#include "logmacro.h"
 
 class trs80dt1_state : public driver_device
@@ -48,17 +51,21 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_nvram(*this,"nvram")
 		, m_keyboard(*this, "X%u", 0)
+		, m_beep(*this, "beeper")
 		{ }
 
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(store_w);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(hrtc_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 private:
 	bool m_irq_state;
+	bool m_bow;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
@@ -67,12 +74,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
 	required_device<x2210_device> m_nvram;
-	required_ioport_array<9> m_keyboard;
+	required_ioport_array<10> m_keyboard;
+	required_device<beep_device> m_beep;
 };
 
 void trs80dt1_state::machine_reset()
 {
 	m_irq_state = 0;
+	m_bow = 0;
 	// line is actually active low in the real chip
 	m_nvram->recall(1);
 	m_nvram->recall(0);
@@ -112,6 +121,28 @@ WRITE8_MEMBER( trs80dt1_state::store_w )
 	m_nvram->store(0);
 }
 
+/*
+d0 : /PSTRB (centronics strobe)
+d1 : TRPRT
+d2 : /SP BUSY
+d3 : /RTS
+d4 : BOW (applies reverse video to entire screen)
+d5 : /DTR
+d6 : PP BUSY (printer busy - input)
+d7 : n/c */
+WRITE8_MEMBER( trs80dt1_state::port1_w )
+{
+	m_bow = BIT(data, 4);
+}
+
+/*
+d4 : beeper
+d5 : Printer enable */
+WRITE8_MEMBER( trs80dt1_state::port3_w )
+{
+	m_beep->set_state(BIT(data, 4));
+}
+
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, trs80dt1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dma_r)
@@ -122,13 +153,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, trs80dt1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xbfff) // A14 not used
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(port1_w)
+	AM_RANGE(0x0003, 0x0003) AM_WRITE(port3_w)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa800, 0xa83f) AM_MIRROR(0x3c0) AM_DEVREADWRITE("nvram", x2210_device, read, write) // X2210
 	AM_RANGE(0xac00, 0xafff) AM_READ(key_r)
 	AM_RANGE(0xb000, 0xb3ff) AM_READ_PORT("X9") // also reads some RS232 inputs
 	AM_RANGE(0xb400, 0xb7ff) AM_WRITE(store_w)
 	AM_RANGE(0xbc00, 0xbc01) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
-	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(port_r, port_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -263,7 +295,7 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	linecount &= 15;
 
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (lten) ? 0xff : 0;
+	u8 gfx = (m_bow ^ lten) ? 0xff : 0;
 	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
@@ -301,6 +333,11 @@ static MACHINE_CONFIG_START( trs80dt1 )
 	MCFG_PALETTE_ADD("palette", 3)
 
 	MCFG_X2210_ADD("nvram")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( trs80dt1 )
@@ -312,4 +349,4 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, 0, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, 0, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )
