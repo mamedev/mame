@@ -636,6 +636,7 @@ tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
 terak.cpp
+terco.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
@@ -669,6 +670,7 @@ tr606.cpp
 tranz330.cpp
 tricep.cpp
 trs80.cpp
+trs80dt1.cpp
 trs80m2.cpp
 ts802.cpp
 ts803.cpp
