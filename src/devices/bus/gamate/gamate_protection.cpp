@@ -4,6 +4,10 @@
 #include "emu.h"
 #include "gamate_protection.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(GAMATE_PROT, gamate_protection_device, "gamate_prot", "Gamate Protection Mapper")
 
 gamate_protection_device::gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -44,7 +48,7 @@ bool gamate_protection_device::is_protection_passed()
 
 WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
 {
-	logerror("write to protection %01x\n", state);
+	LOG("write to protection %01x\n", state);
 
 	if (m_inpos < 8)
 	{
@@ -53,7 +57,7 @@ WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
 	}
 	else
 	{
-		logerror("byte in was %c\n", m_inbyte);
+		LOG("byte in was %c\n", m_inbyte);
 
 		if (!m_has_failed)
 		{
@@ -61,7 +65,7 @@ WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
 			{
 				if (m_inbyte == m_prot_string[m_inseq])
 				{
-					logerror("OK\n");
+					LOG("OK\n");
 				}
 				else
 				{
@@ -78,7 +82,7 @@ WRITE_LINE_MEMBER(gamate_protection_device::prot_w)
 		if (!m_has_failed && m_inseq == 15)
 		{
 			m_inbyte = 0x47;
-			logerror("setting byte to output\n");
+			LOG("setting byte to output\n");
 			m_passed_write = 1;
 		}
 	}
@@ -92,11 +96,11 @@ READ_LINE_MEMBER(gamate_protection_device::prot_r)
 		int retval = (m_inbyte >> (7 - m_inpos)) & 1;
 		m_inpos++;
 
-		logerror("read from protection %01x\n", retval);
+		LOG("read from protection %01x\n", retval);
 
 		if (m_inpos == 8)
 		{
-			logerror("unlocking ROM\n");
+			LOG("unlocking ROM\n");
 			m_is_protection_passed = 1;
 			m_inpos = 0;
 			m_inbyte = 0;
@@ -106,7 +110,7 @@ READ_LINE_MEMBER(gamate_protection_device::prot_r)
 	}
 	else
 	{
-		logerror("read from protection when not ready\n");
+		LOG("read from protection when not ready\n");
 	}
 
 	return 0x0;

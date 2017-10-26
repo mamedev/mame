@@ -19,6 +19,7 @@
 #include "bus/hp80_optroms/hp80_optrom.h"
 #include "softlist.h"
 #include "machine/bankdev.h"
+#include "bus/hp80_io/hp80_io.h"
 
 // Debugging
 #define VERBOSE 1
@@ -72,7 +73,8 @@ static constexpr unsigned IRQ_KEYBOARD_BIT  = 0;
 static constexpr unsigned IRQ_TIMER0_BIT    = 1;
 static constexpr unsigned TIMER_COUNT       = 4;
 static constexpr unsigned IRQ_IOP0_BIT      = IRQ_TIMER0_BIT + TIMER_COUNT;
-static constexpr unsigned IOP_COUNT         = 0;
+// Maximum count of I/O processors (the same thing as count of I/O slots)
+static constexpr unsigned IOP_COUNT         = 4;
 static constexpr unsigned IRQ_BIT_COUNT     = IRQ_IOP0_BIT + IOP_COUNT;
 static constexpr unsigned NO_IRQ            = IRQ_BIT_COUNT;
 
@@ -105,11 +107,17 @@ public:
 	DECLARE_READ8_MEMBER(clkdat_r);
 	DECLARE_WRITE8_MEMBER(clkdat_w);
 	DECLARE_WRITE8_MEMBER(rselec_w);
+	DECLARE_READ8_MEMBER(intrsc_r);
+	DECLARE_WRITE8_MEMBER(intrsc_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
+
+	DECLARE_WRITE8_MEMBER(irl_w);
+	DECLARE_WRITE8_MEMBER(halt_w);
+
 protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -124,6 +132,7 @@ protected:
 	required_ioport m_io_modkeys;
 	required_device_array<hp80_optrom_slot_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
+	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -137,11 +146,11 @@ protected:
 	uint8_t m_crt_read_byte;
 	uint8_t m_crt_write_byte;
 	bool m_global_int_en;
-	uint16_t m_int_req;
 	uint16_t m_int_serv;
 	unsigned m_top_pending;
 	uint16_t m_int_acked;
 	uint16_t m_int_en;
+	uint8_t m_halt_lines;
 
 	// State of keyboard
 	ioport_value m_kb_state[ 3 ];
@@ -192,6 +201,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_io_modkeys(*this, "MODKEYS"),
 	  m_rom_drawers(*this , "drawer%u" , 1),
 	  m_rombank(*this , "rombank"),
+	  m_io_slots(*this , "slot%u" , 1),
 	  m_chargen(*this , "chargen")
 {
 }
@@ -210,7 +220,6 @@ void hp85_state::machine_reset()
 	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
 	m_crt_write_byte = 0;
-	m_int_req = 0;
 	m_int_serv = 0;
 	m_top_pending = NO_IRQ;
 	m_int_acked = 0;
@@ -235,6 +244,8 @@ void hp85_state::machine_reset()
 	m_timer_idx = 0;
 	m_clk_busy = false;
 	update_irl();
+	m_halt_lines = 0;
+	m_cpu->set_input_line(INPUT_LINE_HALT , CLEAR_LINE);
 
 	// Load optional ROMs (if any)
 	// All entries in rombanks [01..FF] initially not present
@@ -245,6 +256,12 @@ void hp85_state::machine_reset()
 	}
 	// Clear RSELEC
 	m_rombank->set_bank(0xff);
+
+	// Mount I/O slots in address space
+	m_cpu->space(AS_PROGRAM).unmap_readwrite(0xff50 , 0xff5f);
+	for (auto& io : m_io_slots) {
+		io->install_read_write_handlers(m_cpu->space(AS_PROGRAM));
+	}
 }
 
 uint32_t hp85_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -307,13 +324,24 @@ static const uint8_t vector_table[] = {
 	0x08,   // Timer 0
 	0x0a,   // Timer 1
 	0x0c,   // Timer 2
-	0x0e    // Timer 3
+	0x0e,   // Timer 3
+	0x10,   // Slot 1
+	0x10,   // Slot 2
+	0x10,   // Slot 3
+	0x10    // Slot 4
 };
 
 IRQ_CALLBACK_MEMBER(hp85_state::irq_callback)
 {
 	logerror("IRQ ACK %u\n" , m_top_pending);
 	BIT_SET(m_int_acked , m_top_pending);
+	if (m_top_pending > IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT) {
+		// Interrupts are disabled in all I/O translators of higher priority than
+		// the one being serviced
+		for (unsigned i = m_top_pending - 1; i >= IRQ_IOP0_BIT; i--) {
+			irq_en_w(i , false);
+		}
+	}
 	update_irl();
 	return vector_table[ m_top_pending ];
 }
@@ -537,6 +565,30 @@ WRITE8_MEMBER(hp85_state::clkdat_w)
 WRITE8_MEMBER(hp85_state::rselec_w)
 {
 	m_rombank->set_bank(data);
+}
+
+READ8_MEMBER(hp85_state::intrsc_r)
+{
+	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
+		return (uint8_t)m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->get_base_addr();
+	} else {
+		// Probably..
+		return 0xff;
+	}
+}
+
+WRITE8_MEMBER(hp85_state::intrsc_w)
+{
+	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
+		// Clear interrupt request in the slot being serviced
+		m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->clear_service();
+	}
+	for (auto& iop: m_io_slots) {
+		iop->inten();
+	}
+	for (unsigned i = IRQ_IOP0_BIT; i < (IRQ_IOP0_BIT + IOP_COUNT); i++) {
+		irq_en_w(i , true);
+	}
 }
 
 // Outer index: key position [0..79] = r * 8 + c
@@ -790,6 +842,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::clk_busy_timer)
 	m_clk_busy = false;
 }
 
+WRITE8_MEMBER(hp85_state::irl_w)
+{
+	//LOG("irl_w %u=%u\n" , offset , data);
+	irq_w(offset + IRQ_IOP0_BIT , data != 0);
+}
+
+WRITE8_MEMBER(hp85_state::halt_w)
+{
+	//LOG("halt_w %u=%u\n" , offset , data);
+	bool prev_halt = m_halt_lines != 0;
+	COPY_BIT(data != 0 , m_halt_lines , offset);
+	bool new_halt = m_halt_lines != 0;
+	if (prev_halt != new_halt) {
+		LOG("halt=%d hl=%x\n" , new_halt , m_halt_lines);
+		m_cpu->set_input_line(INPUT_LINE_HALT , new_halt);
+	}
+}
+
 attotime hp85_state::time_to_video_mem_availability() const
 {
 	if (BIT(m_crt_ctl , CRT_CTL_WIPEOUT_BIT) || BIT(m_crt_ctl , CRT_CTL_POWERDN_BIT)) {
@@ -880,6 +950,7 @@ void hp85_state::video_mem_write()
 
 void hp85_state::irq_w(unsigned n_irq , bool state)
 {
+	//LOG("irq_w %u=%d GIE=%d SRV=%03x ACK=%03x IE=%03x\n" , n_irq , state , m_global_int_en , m_int_serv , m_int_acked , m_int_en);
 	if (state && !BIT(m_int_serv , n_irq)) {
 		// Set service request
 		BIT_SET(m_int_serv , n_irq);
@@ -908,6 +979,7 @@ void hp85_state::update_int_bits()
 
 void hp85_state::update_irl()
 {
+	//LOG("irl GIE=%d top=%u ACK=%03x\n" , m_global_int_en , m_top_pending , m_int_acked);
 	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < IRQ_BIT_COUNT && !BIT(m_int_acked , m_top_pending));
 }
 
@@ -1024,6 +1096,7 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff0a , 0xff0a) AM_READWRITE(clksts_r , clksts_w)
 	AM_RANGE(0xff0b , 0xff0b) AM_READWRITE(clkdat_r , clkdat_w)
 	AM_RANGE(0xff18 , 0xff18) AM_WRITE(rselec_w)
+	AM_RANGE(0xff40 , 0xff40) AM_READWRITE(intrsc_r , intrsc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rombank_mem_map , AS_PROGRAM , 8 , hp85_state)
@@ -1042,7 +1115,7 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
 
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
@@ -1084,6 +1157,20 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
 	MCFG_DEVICE_ADD("drawer6", HP80_OPTROM_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+
+	// I/O slots
+	MCFG_HP80_IO_SLOT_ADD("slot1" , 0)
+	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_SLOT_ADD("slot2" , 1)
+	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_SLOT_ADD("slot3" , 2)
+	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_SLOT_ADD("slot4" , 3)
+	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END

@@ -2483,6 +2483,7 @@ laststar                        // (proto)          (c) 1984
 antiairc                        // (c) 1975 Atari
 crashnsc                        // (c) 1975 Atari
 gtrak10                         // (c) 1974 Atari / Kee
+gtrak10a                        // (c) 1974 Atari / Kee
 gtrak20                         // (c) 1974 Atari / Kee
 indy4                           // (c) 1976 Atari / Kee
 indy800                         // (c) 1975 Atari / Kee
@@ -9785,7 +9786,7 @@ cocoe                           // Color Computer (Extended BASIC 1.0)
 cp400                           // Prologica CP400
 lzcolor64                       // Digiponto LZ Color64
 mx1600                          // Dynacom MX-1600
-t4426                           // Terco T4426 CNC programming station
+t4426                           // Terco 4426 CNC programming station
 
 @source:coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
@@ -36219,6 +36220,9 @@ temptube                        // (hack)
 
 @source:terak.cpp
 terak                           //
+
+@source:terco.cpp
+t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
 @source:terracre.cpp
 amatelas                        // (c) 1986

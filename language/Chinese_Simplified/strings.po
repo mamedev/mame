@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2017-09-29 15:23+0800\n"
+"PO-Revision-Date: 2017-10-03 22:56+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -181,6 +181,7 @@ msgid ""
 "complete. There is nothing you can do to fix this problem except wait for "
 "the developers to improve the emulation.\n"
 msgstr ""
+"\n"
 "此机械无法执行，机械的模拟还不完全。除了等待开发人员改良模拟之外，没有方法可"
 "以解决这个问题。\n"
 
@@ -1016,7 +1017,7 @@ msgstr "档案已存在 — 是否覆写？"
 
 #: src/frontend/mame/ui/filecreate.cpp:171
 msgid "New Image Name:"
-msgstr "新映象档名称："
+msgstr "新映像档名称："
 
 #: src/frontend/mame/ui/filecreate.cpp:177
 msgid "Image Format:"
@@ -1244,51 +1245,51 @@ msgstr "计时\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "机械式机台\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "机械式机台\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "需要装饰图\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "需要装饰图\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "需要可点击的装饰图\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "需要可点击的装饰图\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
-msgstr ""
+msgstr "支援檯面型筐体\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "支援檯面型筐体\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "驱动程式为 BIOS\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "驱动程式为 BIOS\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "支援即时存档\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "支援即时存档\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
@@ -1300,37 +1301,39 @@ msgstr "画面方向\t水平\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "需要 CHD\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "需要 CHD\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "ROM 校验结果\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "ROM 校验结果\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "样本档校验结果\t不需要\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "样本档校验结果\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "样本档校验结果\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
 "ROM Audit Disabled\t\n"
 "Samples Audit Disabled\t\n"
 msgstr ""
+"ROM 校验已停用\t\n"
+"样本档校验已停用\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1171
 #, c-format
@@ -2495,27 +2498,27 @@ msgstr "设定热键"
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "已激活: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "已激活: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "启用: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "停用: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s 已加入"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2523,7 +2526,7 @@ msgstr "出招表"
 
 #: plugins/data/data_gameinit.lua:16
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinit"
 
 #: plugins/data/data_hiscore.lua:770 plugins/data/data_hiscore.lua:818
 msgid "High Scores"
@@ -2563,7 +2566,7 @@ msgstr "系统信息"
 
 #: plugins/data/data_marp.lua:129
 msgid "MARPScore"
-msgstr "MARPScore"
+msgstr "MARP得分"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
@@ -2584,7 +2587,7 @@ msgstr "作弊码名称"
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "缺省名称为 %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
@@ -2601,7 +2604,7 @@ msgstr "储存"
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "作弊码已写入至 %s 且已加入至 cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
@@ -2612,6 +2615,8 @@ msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"无法写入档案\n"
+"确认 cheatpath 资料夹是否存在"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"

@@ -3164,6 +3164,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/hp80_io/hp80_io.h,BUSES["HP80_IO"] = true
+---------------------------------------------------
+
+if (BUSES["HP80_IO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp80_io/82937.cpp",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp9845_io/hp9845_io.h,BUSES["HP9845_IO"] = true
 ---------------------------------------------------
 
@@ -3236,5 +3248,35 @@ if (BUSES["PSI_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/psi_kbd/ergoline.h",
 		MAME_DIR .. "src/devices/bus/psi_kbd/hle.cpp",
 		MAME_DIR .. "src/devices/bus/psi_kbd/hle.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/interpro/sr/sr.h,BUSES["INTERPRO_SR"] = true
+---------------------------------------------------
+
+if (BUSES["INTERPRO_SR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/gt.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/gt.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/interpro/keyboard/keyboard.h,BUSES["INTERPRO_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["INTERPRO_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
 	}
 end
