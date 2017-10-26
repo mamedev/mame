@@ -15204,7 +15204,11 @@ hector1                         //
 interact                        //
 
 @source:interpro.cpp
-ip2800                          // Intergraph InterPro 28xx workstation
+ip2000                          // Intergraph InterPro/InterServe 20x0
+ip2400                          // Intergraph InterPro/InterServe 24x0
+ip2500                          // Intergraph InterPro/InterServe 25x0
+ip2700                          // Intergraph InterPro/InterServe 27x0
+ip2800                          // Intergraph InterPro/InterServe 28x0
 
 @source:intrscti.cpp
 intrscti                        // ????

@@ -2204,8 +2204,8 @@ files {
 	MAME_DIR .. "src/mame/machine/interpro_mcga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_sga.h",
 	MAME_DIR .. "src/mame/machine/interpro_sga.cpp",
-	MAME_DIR .. "src/mame/machine/interpro_srarb.h",
-	MAME_DIR .. "src/mame/machine/interpro_srarb.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_arbga.h",
+	MAME_DIR .. "src/mame/machine/interpro_arbga.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "interton")
