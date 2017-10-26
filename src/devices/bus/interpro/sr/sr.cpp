@@ -313,8 +313,8 @@ void sr_device::device_start()
 
 	// empty the slots
 	m_slot_count = 0;
-//	for (device_sr_card_interface *slot : m_slot)
-//		slot = nullptr;
+	for (device_sr_card_interface *&slot : m_slot)
+		slot = nullptr;
 }
 
 void sr_device::device_reset()

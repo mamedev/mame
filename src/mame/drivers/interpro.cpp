@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START(interpro)
 
 	// sr bus and slots
 	MCFG_DEVICE_ADD(INTERPRO_SRBUS_TAG, SR, 0)
-	MCFG_SR_SLOT_ADD(INTERPRO_SRBUS_TAG, INTERPRO_SRBUS_TAG ":0", sr_cards, nullptr, false)
+	MCFG_SR_SLOT_ADD(INTERPRO_SRBUS_TAG, INTERPRO_SRBUS_TAG ":0", sr_cards, "mpcb963", false)
 	MCFG_SR_SLOT_ADD(INTERPRO_SRBUS_TAG, INTERPRO_SRBUS_TAG ":1", sr_cards, nullptr, false)
 
 	// system layout
