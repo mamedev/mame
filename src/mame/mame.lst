@@ -36894,6 +36894,9 @@ trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
 trs80m4                         //
 trs80m4p                        //
 
+@source:trs80dt1.cpp
+trs80dt1                        // TRS-80 Data Terminal 1
+
 @source:trs80m2.cpp
 trs80m16                        //
 trs80m2                         //
