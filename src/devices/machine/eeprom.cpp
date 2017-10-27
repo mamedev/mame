@@ -302,7 +302,7 @@ void eeprom_base_device::nvram_write(emu_file &file)
 uint32_t eeprom_base_device::internal_read(offs_t address)
 {
 	if (m_data_bits == 16)
-		return reinterpret_cast<u16 *>(m_data.get())[address];
+		return m_data[address * 2] | (m_data[address * 2 + 1] << 8);
 	else
 		return m_data[address];
 }
@@ -313,10 +313,12 @@ uint32_t eeprom_base_device::internal_read(offs_t address)
 //  address
 //-------------------------------------------------
 
-void eeprom_base_device::internal_write(offs_t address, uint32_t data)
+void eeprom_base_device::internal_write(offs_t address, uint32_t data)x
 {
 	if (m_data_bits == 16)
-		reinterpret_cast<u16 *>(m_data.get())[address] = data;
-	else
+	{
+		m_data[address * 2] = data;
+		m_data[address * 2 + 1] = data >> 8;
+	} else
 		m_data[address] = data;
 }
