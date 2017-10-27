@@ -677,6 +677,7 @@ trs80m2.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
+ts3000.cpp
 tsispch.cpp
 tutor.cpp
 tv910.cpp

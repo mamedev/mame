@@ -36941,6 +36941,9 @@ ts803h                          //
 @source:ts816.cpp
 ts816                           //
 
+@source:ts3000.cpp
+ts3000                          // Televideo TS-3000
+
 @source:tsamurai.cpp
 alphaxz                         // AZ  (c) 1986 Ed/Wood Place
 ladymstr                        // A49 (c) 1985 Taito
