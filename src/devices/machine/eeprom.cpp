@@ -313,7 +313,7 @@ uint32_t eeprom_base_device::internal_read(offs_t address)
 //  address
 //-------------------------------------------------
 
-void eeprom_base_device::internal_write(offs_t address, uint32_t data)x
+void eeprom_base_device::internal_write(offs_t address, uint32_t data)
 {
 	if (m_data_bits == 16)
 	{
