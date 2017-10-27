@@ -62,7 +62,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 
@@ -80,9 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
-	DECLARE_DRIVER_INIT(stoneage);
 	DECLARE_DRIVER_INIT(mutantf);
-	DECLARE_DRIVER_INIT(cninja);
 	DECLARE_DRIVER_INIT(cninjabl2);
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
