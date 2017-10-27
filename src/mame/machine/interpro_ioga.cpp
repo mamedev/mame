@@ -342,6 +342,8 @@ void interpro_ioga_device::set_int_line(interrupt_type type, int number, int sta
 		m_line_state = (state == ASSERT_LINE) ? (m_line_state | mask) : (m_line_state & ~mask);
 	}
 	else
+#else
+	(void)m_line_state;
 #endif
 	set_pending(type, number, state == ASSERT_LINE);
 
