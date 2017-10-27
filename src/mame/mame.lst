@@ -34665,6 +34665,9 @@ sorcererd                       // Sorcerer with floppies
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
 
+@source:solbourne.cpp
+sols5e                          // Solbourne Series 5E computer workstation
+
 @source:spacefb.cpp
 spacebrd                        // bootleg
 spacedem                        // (c) 1980 Fortrek + made by Nintendo

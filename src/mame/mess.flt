@@ -592,6 +592,7 @@ snes.cpp
 socrates.cpp
 softbox.cpp
 sorcerer.cpp
+solbourne.cpp
 spc1000.cpp
 spc1500.cpp
 spec128.cpp
