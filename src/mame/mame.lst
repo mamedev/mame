@@ -300,6 +300,9 @@ ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 @source:accomm.cpp
 accomm                          // 1986 Acorn Computer
 
+@source:acd.cpp
+acd                             //
+
 @source:aceex.cpp
 aceex2814
 
