@@ -6,7 +6,10 @@
  *
  *  Terco T4426 CNC Programming Station multi cart
  *
- *  The code here is heavily inspired by coco_pak and coco_232
+ *  The T4426 is based on a Color Computer II PCB revision 26-3134A with a modified
+ *  Extended Basic fitted through an adapter and a soldered wire as one address line
+ *  was missing. Modifications involved obfuscation changing names of some common
+ *  commands such as LIST renamed to LARS (which happens to be the name of the CEO).
  *
  *  +-------------------------------------------------------------------------------+
  *  ||__|+-----+    oo   75                               |O ||||||||||||||| O|     |
@@ -51,7 +54,7 @@
 #define LOG_PIA     (1U <<  2)
 #define LOG_ACIA    (1U <<  3)
 
-//#define VERBOSE (LOG_ACIA|LOG_GENERAL) // (LOG_PIA | LOG_GENERAL | LOG_SETUP)
+//#define VERBOSE (LOG_PIA) // (LOG_PIA | LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -182,7 +185,7 @@ ROM_START( coco_t4426 )
 
 	// 8 banked ROM:s
 	ROM_LOAD("tercoED4426-0-8549-5.3.bin",  0x0000, 0x2000, CRC(45665428) SHA1(ff49a79275772c4c4ab1ae29db662c9b10a744a7))
-	ROM_LOAD("tercoED4426-1-8549-5.3.bin",  0x2000, 0x2000, CRC(44baba33) SHA1(01cee1b208c158e598e7ecd2189b5e0ffa7f3ab9))
+	ROM_LOAD("tercoED4426-1-8549-5.3.bin",  0x2000, 0x2000, CRC(854cd50d) SHA1(0786391b4e7a78af0a984b6313eec7f71fb4ad9e))
 	ROM_LOAD("tercoPD4426-2-8632-6.4.bin",  0x4000, 0x2000, CRC(258e443a) SHA1(9d8901f3e70ae4f8526dde1b5208b22f066f801f))
 	ROM_LOAD("tercoPD4426-3-8638-6.4.bin",  0x6000, 0x2000, CRC(640d1de4) SHA1(5ae7427cb5729fd3920361855d954ea1f97f6ae5))
 	ROM_LOAD("tercoCA4426-4-8549-3.4.bin",  0x8000, 0x2000, CRC(df18397b) SHA1(2f9de210c039619c649be223c37a4eff873fa600))
