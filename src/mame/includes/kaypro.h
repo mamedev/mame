@@ -16,8 +16,6 @@
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
 
-struct kay_kbd_t;
-
 class kaypro_state : public driver_device
 {
 public:
@@ -63,19 +61,14 @@ public:
 	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);
 	DECLARE_PALETTE_INIT(kaypro);
-	DECLARE_MACHINE_RESET(kay_kbd);
 	DECLARE_DRIVER_INIT(kaypro);
 	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
 	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
-	DECLARE_READ8_MEMBER(kaypro_sio_r);
-	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
-	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
 
 private:
 	uint8_t m_mc6845_cursor[16];
@@ -83,12 +76,7 @@ private:
 	uint8_t m_mc6845_ind;
 	uint8_t m_framecnt;
 	uint8_t *m_p_videoram;
-	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
-	void kay_kbd_in(uint8_t data );
-	uint8_t kay_kbd_c_r();
-	uint8_t kay_kbd_d_r();
-	void kay_kbd_d_w( uint8_t data );
 	bool m_is_motor_off;
 	uint8_t m_fdc_rq;
 	uint8_t m_system_port;

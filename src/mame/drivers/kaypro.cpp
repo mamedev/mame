@@ -43,12 +43,14 @@
 
 #include "emu.h"
 #include "includes/kaypro.h"
-
 #include "machine/kay_kbd.h"
+
+#include "machine/clock.h"
 #include "formats/kaypro_dsk.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
 
 READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
 
@@ -68,7 +70,7 @@ static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, stt_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0f) AM_DEVWRITE("brg", com8116_device, str_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
@@ -79,7 +81,7 @@ static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("brg", com8116_device, stt_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80sio_2x", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
@@ -103,6 +105,11 @@ static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8, kaypro_state )
 	AM_RANGE(0x20, 0x86) AM_NOP
 	AM_RANGE(0x87, 0x87) AM_READ(kaypro2x_87_r)
 ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START(kaypro)
+	// everything comes from the keyboard device
+INPUT_PORTS_END
 
 
 /***************************************************************
@@ -199,7 +206,6 @@ static MACHINE_CONFIG_START( kayproii )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kayproii_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)  /* this doesn't actually exist, it is to run the keyboard */
 	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
@@ -226,6 +232,12 @@ static MACHINE_CONFIG_START( kayproii )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
+	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
+	MCFG_KAYPRO10KBD_RXD_CB(DEVWRITELINE("z80sio", z80sio0_device, rxb_w))
+
+	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("z80sio", z80sio0_device, rxtxcb_w))
+
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kaypro_state, write_centronics_busy))
 
@@ -244,6 +256,7 @@ static MACHINE_CONFIG_START( kayproii )
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO0, XTAL_20MHz / 8)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
 
 	MCFG_FD1793_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
@@ -269,7 +282,6 @@ static MACHINE_CONFIG_START( kaypro2x )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kaypro2x_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)
 	MCFG_Z80_DAISY_CHAIN(kaypro2x_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
@@ -300,6 +312,12 @@ static MACHINE_CONFIG_START( kaypro2x )
 
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
+	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
+	MCFG_KAYPRO10KBD_RXD_CB(DEVWRITELINE("z80sio", z80sio0_device, rxb_w))
+
+	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("z80sio", z80sio0_device, rxtxcb_w))
+
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kaypro_state, write_centronics_busy))
 
@@ -307,6 +325,7 @@ static MACHINE_CONFIG_START( kaypro2x )
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO0, XTAL_16MHz / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
 
 	MCFG_DEVICE_ADD("z80sio_2x", Z80SIO0, XTAL_16MHz / 4)   /* extra sio for modem and printer */
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -465,14 +484,14 @@ ROM_START(robie)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT    COMPANY                FULLNAME */
-COMP( 1982, kayproii,   0,        0,      kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
-COMP( 1983, kaypro4p88, kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,      omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
-COMP( 198?, omni4,      kaypro2x, 0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Omni Logic Inc.",     "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )
-COMP( 1984, kaypro2x,   0,        0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
-COMP( 1984, kaypro4a,   kaypro2x, 0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT    COMPANY                FULLNAME */
+COMP( 1982, kayproii,   0,        0,      kayproii, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
+COMP( 1983, kaypro4,    kayproii, 0,      kaypro4,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
+COMP( 1983, kaypro4p88, kayproii, 0,      kaypro4,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 198?, omni2,      kayproii, 0,      omni2,    kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
+COMP( 198?, omni4,      kaypro2x, 0,      kaypro2x, kaypro, kaypro_state, kaypro, "Omni Logic Inc.",     "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )
+COMP( 1984, kaypro2x,   0,        0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
+COMP( 1984, kaypro4a,   kaypro2x, 0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
-COMP( 1983, kaypro10,   0,        0,      kaypro10, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
-COMP( 1984, robie,      0,        0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1983, kaypro10,   0,        0,      kaypro10, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1984, robie,      0,        0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING ) // model 81-005
