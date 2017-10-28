@@ -50,14 +50,16 @@ class k1003_state : public driver_device
 {
 public:
 	k1003_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
+
+private:
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
@@ -140,7 +142,6 @@ static MACHINE_CONFIG_START( k1003 )
 	MCFG_CPU_PROGRAM_MAP(k1003_mem)
 	MCFG_CPU_IO_MAP(k1003_io)
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_k1003)
 MACHINE_CONFIG_END
@@ -189,6 +190,23 @@ ROM_START( k1003 )
 	ROM_LOAD( "k1003.26", 0x3900, 0x0100, CRC(fc949804) SHA1(088b63b7f8704efb6867be899b81d64a294af6be))
 	ROM_LOAD( "k1003.27", 0x3a00, 0x0100, CRC(ddcdd065) SHA1(e29c6f2dd1e4da125d150e28cf51f8c558ec9ee5))
 	// 0x3b00 - missing on board - returning 0xff
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	// k1003-extension
+	ROM_LOAD( "040.bin",  0x0000, 0x0100, CRC(06865678) SHA1(91a4f0a32e93d315d4f78a732472c08a380205fc) )
+	ROM_LOAD( "041.bin",  0x0000, 0x0100, CRC(dcd776b3) SHA1(cf8082d31be9bea1e9672d0b92006f14719ba7a6) )
+	ROM_LOAD( "042.bin",  0x0000, 0x0100, CRC(e74aca0d) SHA1(f515b52862f0f31551ec008bf6f27c5fdf78c32a) )
+	ROM_LOAD( "043.bin",  0x0000, 0x0100, CRC(770820e5) SHA1(c34b6a7bde43758c7c3c7041ce1dee06456fe5c4) )
+	ROM_LOAD( "044.bin",  0x0000, 0x0100, CRC(82bd3f5a) SHA1(c4290507de8d295c0b7f04ac2179365b8f73d7c7) )
+	ROM_LOAD( "045.bin",  0x0000, 0x0100, CRC(66c85afb) SHA1(937828a6aee46cbcad86bb1776deb7f9b1dc69ff) )
+	// k1003-statistics
+	ROM_LOAD( "435.bin",  0x0000, 0x0100, CRC(31203b34) SHA1(5638c45e23b279c5c8960d5d7f2b16acb2e47ed2) )
+	ROM_LOAD( "436.bin",  0x0000, 0x0100, CRC(dd2d4eb5) SHA1(c436419ef71cdf4dfc4d118301749f746f9cd6e5) )
+	ROM_LOAD( "437.bin",  0x0000, 0x0100, CRC(00433159) SHA1(69fab3b875c285e6abcab43b0ba6ef916d0a1484) )
+	ROM_LOAD( "439.bin",  0x0000, 0x0100, CRC(3f5be050) SHA1(f2730078a8346e8670b632048f358a47ff57941e) )
+	ROM_LOAD( "440.bin",  0x0000, 0x0100, CRC(856685fa) SHA1(dbd33194a4eb9ed037f8129bf8b9d4628aab8151) )
+	ROM_LOAD( "441.bin",  0x0000, 0x0100, CRC(257df6a3) SHA1(65c0429b0e352434b7b661e63cacfe74ac1d1ac9) )
+	ROM_LOAD( "442.bin",  0x0000, 0x0100, CRC(d037e0bb) SHA1(5ae8ad62673bd732a05232645c523206024f9afb) )
 ROM_END
 
 /* Driver */
