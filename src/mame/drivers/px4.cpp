@@ -1560,11 +1560,6 @@ ROM_START( px4 )
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
-
-	ROM_REGION(0x8000, "user1", 0)
-	ROM_LOAD( "px4promwrite2.bin", 0x0000, 0x8000, CRC(5c54faf3) SHA1(4879a126b1975f09fadba8831e14c7e8f41c40f3) )
-	ROM_LOAD( "px4rmwr.bin",       0x0000, 0x8000, CRC(9a91bde0) SHA1(aa650613672e702572b98eebf048555c988c7f5b) )
-	ROM_LOAD( "px4rsz.bin",        0x0000, 0x8000, CRC(12aa3f9c) SHA1(c51af300c3d5bc7e8fa45ca9193f093e769cc611) )
 ROM_END
 
 ROM_START( px4p )
