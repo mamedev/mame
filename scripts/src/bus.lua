@@ -3280,3 +3280,17 @@ if (BUSES["INTERPRO_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/einstein/pipe.h,BUSES["TATUNG_PIPE"] = true
+---------------------------------------------------
+
+if (BUSES["TATUNG_PIPE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/einstein/pipe.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe.h",
+		MAME_DIR .. "src/devices/bus/einstein/tk02.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/tk02.h",
+	}
+end
