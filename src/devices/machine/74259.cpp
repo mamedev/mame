@@ -324,6 +324,17 @@ WRITE8_MEMBER(addressable_latch_device::write_nibble)
 }
 
 //-------------------------------------------------
+//  write_nibble_alt - write handler using bit 3 of
+//  data as input and lowest three bits as address
+//  (offset is ignored)
+//-------------------------------------------------
+
+WRITE8_MEMBER(addressable_latch_device::write_nibble_alt)
+{
+	write_bit(data & 0x07, BIT(data, 3));
+}
+
+//-------------------------------------------------
 //  clear - pulse clear line from bus write
 //-------------------------------------------------
 
