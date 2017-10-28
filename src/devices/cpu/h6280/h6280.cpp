@@ -948,7 +948,7 @@ inline void h6280_device::bpl()
  ***************************************************************/
 inline void h6280_device::brk()
 {
-	logerror("BRK %04xn",PCW);
+	logerror("BRK %04x\n",PCW);
 	clear_t();
 	PCW++;
 	push(PCH);
