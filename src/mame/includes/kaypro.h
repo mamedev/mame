@@ -8,8 +8,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
@@ -31,8 +29,6 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_pio_g(*this, "z80pio_g")
 		, m_pio_s(*this, "z80pio_s")
-		, m_sio(*this, "z80sio")
-		, m_sio2x(*this, "z80sio_2x")
 		, m_centronics(*this, "centronics")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -90,8 +86,6 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
-	required_device<z80sio0_device> m_sio;
-	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
