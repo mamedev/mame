@@ -448,6 +448,13 @@ inline int ygv608_device::get_col_division(int raw_col)
 	return ((raw_col >> m_col_shift) * 2) & 0x7f;
 }
 
+inline int ygv608_device::get_row_division(int raw_row)
+{
+	if(m_h_div_size == 0)
+		return 0;
+
+	return (raw_row & (m_page_y/2 - 1)) * 2;
+}
 
 TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 {
@@ -1102,30 +1109,17 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 #ifdef _ENABLE_SCROLLX
 
-	if (m_h_div_size == 0) {
+	for( row=0; row<m_page_y; row++ )
+	{
+		int translated_row = get_row_division(row);
 
-		m_tilemap_B->set_scrollx(0,
-					( (int)m_scroll_data_table[1][0x80] +
-					( (int)m_scroll_data_table[1][0x81] << 8 ) ) );
-
-		m_tilemap_A->set_scrollx(0,
-					( (int)m_scroll_data_table[0][0x80] +
-					( (int)m_scroll_data_table[0][0x81] << 8 ) ) );
-
-	}
-	else {
-
-		for( row=0; row<m_page_y; row++ )
-		{
 		m_tilemap_B->set_scrollx(row,
-					( (int)m_scroll_data_table[1][0x80 + ((row & (m_page_y/2 - 1)) << 1)] +
-					( (int)m_scroll_data_table[1][0x81 + ((row & (m_page_y/2 - 1)) << 1)] << 8 ) ) );
+			( (int)m_scroll_data_table[1][translated_row+0x80] +
+			( (int)m_scroll_data_table[1][translated_row+0x81] << 8 ) ) );
 
 		m_tilemap_A->set_scrollx(row,
-					( (int)m_scroll_data_table[0][0x80 + ((row & (m_page_y/2 - 1)) << 1)] +
-					( (int)m_scroll_data_table[0][0x81 + ((row & (m_page_y/2 - 1)) << 1)] << 8 ) ) );
-		}
-
+			( (int)m_scroll_data_table[0][translated_row+0x80] +
+			( (int)m_scroll_data_table[0][translated_row+0x81] << 8 ) ) );
 	}
 
 #endif
