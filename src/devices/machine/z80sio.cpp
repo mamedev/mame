@@ -164,11 +164,12 @@ i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - device-specific setup
 //-------------------------------------------------
-void z80sio_device::device_start()
+void z80sio_device::device_resolve_objects()
 {
 	LOG("%s\n", FUNCNAME);
+
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
@@ -185,6 +186,14 @@ void z80sio_device::device_start()
 	m_out_txdrqa_cb.resolve_safe();
 	m_out_rxdrqb_cb.resolve_safe();
 	m_out_txdrqb_cb.resolve_safe();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void z80sio_device::device_start()
+{
+	LOG("%s\n", FUNCNAME);
 
 	// configure channel A
 	m_chanA->m_rxc = m_rxca;
@@ -530,11 +539,23 @@ z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, d
 	, m_sync(0)
 {
 	LOG("%s\n",FUNCNAME);
-		// Reset all registers
-		m_rr0 = m_rr1 = m_rr2 = 0;
-		m_wr0 = m_wr1 = m_wr2 = m_wr3 = m_wr4 = m_wr5 = m_wr6 = m_wr7 = 0;
+
+	// Reset all registers
+	m_rr0 = m_rr1 = m_rr2 = 0;
+	m_wr0 = m_wr1 = m_wr2 = m_wr3 = m_wr4 = m_wr5 = m_wr6 = m_wr7 = 0;
 }
 
+
+//-------------------------------------------------
+//  resove_objects - channel setup
+//-------------------------------------------------
+void z80sio_channel::device_resolve_objects()
+{
+	LOG("%s\n",FUNCNAME);
+	m_uart = downcast<z80sio_device *>(owner());
+	m_index = m_uart->get_channel_index(this);
+	m_variant = m_uart->m_variant;
+}
 
 //-------------------------------------------------
 //  start - channel startup
@@ -542,9 +563,6 @@ z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, d
 void z80sio_channel::device_start()
 {
 	LOG("%s\n",FUNCNAME);
-	m_uart = downcast<z80sio_device *>(owner());
-	m_index = m_uart->get_channel_index(this);
-	m_variant = ((z80sio_device *)owner())->m_variant;
 
 	// state saving
 	save_item(NAME(m_rr0));

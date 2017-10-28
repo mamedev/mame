@@ -137,10 +137,6 @@ class z80sio_channel : public device_t,
 public:
 	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -366,6 +362,11 @@ protected:
 		WR5_DTR                   = 0x80
 	};
 
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	void update_serial();
 	void update_rts();
 	void set_dtr(int state);
@@ -484,6 +485,7 @@ protected:
 	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;

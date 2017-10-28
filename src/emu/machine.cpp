@@ -974,6 +974,10 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
+	// resolve objects first to avoid messy start order dependencies
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_objects();
+
 	m_dummy_space.start();
 
 	// iterate through the devices

@@ -237,6 +237,12 @@ static MACHINE_CONFIG_START( kayproii )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
+	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
+
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
@@ -257,13 +263,6 @@ static MACHINE_CONFIG_START( kayproii )
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("serial", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("serial", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
-
-	// only works by chance as it requires z80sio to be started before starting or it will crash
-	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
 
 	MCFG_FD1793_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
@@ -331,6 +330,17 @@ static MACHINE_CONFIG_START( kaypro2x )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
+	MCFG_RS232_PORT_ADD("modem", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_1", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_1", z80sio_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, dcda_w))
+
+	MCFG_RS232_PORT_ADD("serprn", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_2", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_2", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_2", z80sio_device, ctsa_w))
+
 	MCFG_DEVICE_ADD("sio_1", Z80SIO, XTAL_16MHz / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("modem", rs232_port_device, write_txd))
@@ -341,19 +351,6 @@ static MACHINE_CONFIG_START( kaypro2x )
 	MCFG_DEVICE_ADD("sio_2", Z80SIO, XTAL_16MHz / 4)   /* extra sio for modem and printer */
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serprn", rs232_port_device, write_txd))
-
-	// only works by chance as it requires z80sio to be started before starting or it will crash
-	MCFG_RS232_PORT_ADD("modem", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_1", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_1", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, dcda_w))
-
-	// only works by chance as it requires z80sio to be started before starting or it will crash
-	MCFG_RS232_PORT_ADD("serprn", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_2", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_2", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_2", z80sio_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxca_w))
