@@ -439,6 +439,8 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
+
+	save_item(NAME(m_soundlatch_pending));
 }
 
 
