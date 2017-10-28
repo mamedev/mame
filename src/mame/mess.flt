@@ -37,6 +37,7 @@ altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampro.cpp
+ampscarp.cpp
 amstr_pc.cpp
 amstrad.cpp
 amust.cpp
@@ -486,6 +487,7 @@ pegasus.cpp
 pencil2.cpp
 pentagon.cpp
 peoplepc.cpp
+perq.cpp
 pes.cpp
 pet.cpp
 pg685.cpp
@@ -511,6 +513,7 @@ polgar.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp
+powerstack.cpp
 pp01.cpp
 prestige.cpp
 primo.cpp

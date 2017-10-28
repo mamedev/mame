@@ -1184,6 +1184,9 @@ videomat                        // 1990 bootleg
 @source:ampro.cpp
 ampro                           //
 
+@source:ampscarp.cpp
+ampscarp                        // Motorola Amps Car Phone
+
 @source:amspdwy.cpp
 amspdwy                         // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 amspdwya                        // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
@@ -31004,6 +31007,9 @@ pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
 
+@source:perq.cpp
+perq                            //
+
 @source:pes.cpp
 pes                             //
 
@@ -31733,6 +31739,9 @@ powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
 powerinsp                       // prototype
+
+@source:powerstack.cpp
+powerstk                        // Motorola Powerstack II
 
 @source:pp01.cpp
 pp01                            //
