@@ -100,12 +100,16 @@ void am9513_device::device_start()
 	std::fill(std::begin(m_counter_armed), std::end(m_counter_armed), false);
 	std::fill(std::begin(m_counter_running), std::end(m_counter_running), false);
 	std::fill(std::begin(m_alternate_count), std::end(m_alternate_count), false);
-	std::fill(std::begin(m_src), std::end(m_src), true);
-	std::fill(std::begin(m_gate), std::end(m_gate), true);
-	std::fill(std::begin(m_gate_alt), std::end(m_gate_alt), true);
-	std::fill(std::begin(m_gate_active), std::end(m_gate_active), true);
 	std::fill(std::begin(m_tc), std::end(m_tc), false);
 	std::fill(std::begin(m_toggle), std::end(m_toggle), false);
+
+	// Unused SRC and GATE inputs are typically grounded
+	std::fill(std::begin(m_src), std::end(m_src), false);
+	std::fill(std::begin(m_gate), std::end(m_gate), false);
+	std::fill(std::begin(m_gate_active), std::end(m_gate_active), false);
+
+	// Alternate gate inputs should be tied high if not used
+	std::fill(std::begin(m_gate_alt), std::end(m_gate_alt), true);
 
 	// Set up frequency timers
 	for (int f = 0; f < 5; f++)
