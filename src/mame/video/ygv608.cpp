@@ -970,6 +970,14 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 	//int xc, yc;
 	//double r, alpha, sin_theta, cos_theta;
 	//const rectangle &visarea = screen.visible_area();
+	uint32_t sx, sy;
+
+	int ba_select = (source_tilemap == m_tilemap_A) ? 0 : 1;
+
+	sy = (int)m_scroll_data_table[ba_select][0x00] +
+		(((int)m_scroll_data_table[ba_select][0x01] & 0x0f ) << 8);
+	sx = (int)m_scroll_data_table[ba_select][0x80] +
+		(((int)m_scroll_data_table[ba_select][0x81] & 0x0f ) << 8);
 
 	if( m_zron == true )
 	{
@@ -982,8 +990,8 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		//cos_theta = (double)m_dx / (double)0x10000;
 
 		source_tilemap->draw_roz(screen, bitmap, cliprect,
-				m_ax, m_ay,
-				m_dx, m_dxy, m_dyx, m_dy, m_roz_wrap_disable == false, 0, 0 );
+				m_ax + (sx << 16), m_ay + (sy << 16),
+				m_dx, m_dyx, m_dxy, m_dy, m_roz_wrap_disable == false, 0, 0 );
 	}
 	else
 		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
