@@ -3678,7 +3678,9 @@ static MACHINE_CONFIG_DERIVED( system16b_i8751, system16b )
 
 	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq0_line_pulse)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 // same as the above, but with custom Sega ICs
