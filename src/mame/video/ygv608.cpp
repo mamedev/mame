@@ -512,25 +512,30 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 
 		/* calculate page according to scroll data */
 		/* - assuming full-screen scroll only for now... */
-		sy = (int)m_scroll_data_table[0][translated_column] +
-			(((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[0][0x80] +
-			(((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
+		if (m_v_div_size) {
+			page = 0;
+		}
+		else {
+			sy = (int)m_scroll_data_table[0][translated_column] +
+			   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[0][0x80] +
+			   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
 
-		if (m_md == MD_2PLANE_16BIT)
-		{
-			page = ( ( sx + col * 8 ) % 1024 ) / 256;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
-		}
-		else if (m_page_size)
-		{
-			page = ( ( sx + col * 8 ) % 2048 ) / 512;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
-		}
-		else
-		{
-			page = ( ( sx + col * 8 ) % 2048 ) / 256;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
+			if (m_md == MD_2PLANE_16BIT)
+			{
+				page = ( ( sx + col * 8 ) % 1024 ) / 256;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
+			}
+			else if (m_page_size)
+			{
+				page = ( ( sx + col * 8 ) % 2048 ) / 512;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
+			}
+			else
+			{
+				page = ( ( sx + col * 8 ) % 2048 ) / 256;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
+			}
 		}
 
 		page &= 0x1f;
@@ -610,25 +615,30 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 
 		/* calculate page according to scroll data */
 		/* - assuming full-screen scroll only for now... */
-		sy = (int)m_scroll_data_table[1][translated_column] +
-			(((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[1][0x80] +
-			(((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
+		if (m_v_div_size) {
+			page = 0;
+		}
+		else {
+			sy = (int)m_scroll_data_table[1][translated_column] +
+			   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[1][0x80] +
+			   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
 
-		if (m_md == MD_2PLANE_16BIT )
-		{
-			page = ( ( sx + col * 8 ) % 1024 ) / 256;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
-		}
-		else if (m_page_size)
-		{
-			page = ( ( sx + col * 8 ) % 2048 ) / 512;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
-		}
-		else
-		{
-			page = ( ( sx + col * 8 ) % 2048 ) / 256;
-			page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
+			if (m_md == MD_2PLANE_16BIT)
+			{
+				page = ( ( sx + col * 8 ) % 1024 ) / 256;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
+			}
+			else if (m_page_size)
+			{
+				page = ( ( sx + col * 8 ) % 2048 ) / 512;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 256 ) * 4;
+			}
+			else
+			{
+				page = ( ( sx + col * 8 ) % 2048 ) / 256;
+				page += ( ( ( sy + row * 8 ) % 2048 ) / 512 ) * 8;
+			}
 		}
 
 		page &= 0x1f;
@@ -706,21 +716,27 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 
 	/* calculate page according to scroll data */
 	/* - assuming full-screen scroll only for now... */
-	sy = (int)m_scroll_data_table[0][translated_column] +
-			(((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
-	sx = (int)m_scroll_data_table[0][0x80] +
-			(((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
-	if(m_md == MD_2PLANE_16BIT ) {
-		page = ( ( sx + col * 16 ) % 2048 ) / 512;
-		page += ( ( sy + row * 16 ) / 512 ) * 4;
-	}
-	else if (m_page_size) {
-		page = ( sx + col * 16 ) / 512;
-		page += ( ( sy + row * 16 ) / 1024 ) * 8;
+	if (m_v_div_size) {
+		page = 0;
 	}
 	else {
-		page = ( sx + col * 16 ) / 1024;
-		page += ( ( sy + row * 16 ) / 512 ) * 4;
+		sy = (int)m_scroll_data_table[0][translated_column] +
+		   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
+		sx = (int)m_scroll_data_table[0][0x80] +
+		   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
+
+		if (m_md == MD_2PLANE_16BIT) {
+			page = ( ( sx + col * 16 ) % 2048 ) / 512;
+			page += ( ( sy + row * 16 ) / 512 ) * 4;
+		}
+		else if (m_page_size) {
+			page = ( sx + col * 16 ) / 512;
+			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		}
+		else {
+			page = ( sx + col * 16 ) / 1024;
+			page += ( ( sy + row * 16 ) / 512 ) * 4;
+		}
 	}
 
 	page &= 0x1f;
@@ -799,21 +815,27 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 
 	/* calculate page according to scroll data */
 	/* - assuming full-screen scroll only for now... */
-	sy = (int)m_scroll_data_table[1][translated_column] +
-			(((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
-	sx = (int)m_scroll_data_table[1][0x80] +
-			(((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
-	if(m_md == MD_2PLANE_16BIT ) {
-		page = ( ( sx + col * 16 ) % 2048 ) / 512;
-		page += ( ( sy + row * 16 ) / 512 ) * 4;
-	}
-	else if (m_page_size) {
-		page = ( sx + col * 16 ) / 512;
-		page += ( ( sy + row * 16 ) / 1024 ) * 8;
+	if (m_v_div_size) {
+		page = 0;
 	}
 	else {
-		page = ( sx + col * 16 ) / 1024;
-		page += ( ( sy + row * 16 ) / 512 ) * 4;
+		sy = (int)m_scroll_data_table[1][translated_column] +
+		   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
+		sx = (int)m_scroll_data_table[1][0x80] +
+		   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
+
+		if (m_md == MD_2PLANE_16BIT) {
+			page = ( ( sx + col * 16 ) % 2048 ) / 512;
+			page += ( ( sy + row * 16 ) / 512 ) * 4;
+		}
+		else if (m_page_size) {
+			page = ( sx + col * 16 ) / 512;
+			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		}
+		else {
+			page = ( sx + col * 16 ) / 1024;
+			page += ( ( sy + row * 16 ) / 512 ) * 4;
+		}
 	}
 
 	page &= 0x1f;
@@ -982,9 +1004,9 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 	int ba_select = (source_tilemap == m_tilemap_A) ? 0 : 1;
 
 	sy = (int)m_scroll_data_table[ba_select][0x00] +
-		(((int)m_scroll_data_table[ba_select][0x01] & 0x0f ) << 8);
+	   (((int)m_scroll_data_table[ba_select][0x01] & 0x0f ) << 8);
 	sx = (int)m_scroll_data_table[ba_select][0x80] +
-		(((int)m_scroll_data_table[ba_select][0x81] & 0x0f ) << 8);
+	   (((int)m_scroll_data_table[ba_select][0x81] & 0x0f ) << 8);
 
 	if( m_zron == true )
 	{
@@ -996,6 +1018,10 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		//sin_theta = (double)m_dyx / (double)0x10000;
 		//cos_theta = (double)m_dx / (double)0x10000;
 
+		if (m_v_div_size) {
+			sx = (sx & 0x1FF) ? (sx - 0x200) : 0;
+			sy = (sy & 0x1FF) ? (sy - 0x200) : 0;
+		}
 		source_tilemap->draw_roz(screen, bitmap, cliprect,
 				m_ax + (sx << 16), m_ay + (sy << 16),
 				m_dx, m_dyx, m_dxy, m_dy, m_roz_wrap_disable == false, 0, 0 );
