@@ -1006,6 +1006,9 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 #ifdef _ENABLE_SCROLLY
 	int col;
 #endif
+#ifdef _ENABLE_SCROLLX
+	int row;
+#endif
 	rectangle finalclip;
 	const rectangle &visarea = screen.visible_area();
 
@@ -1048,8 +1051,15 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		m_tilemap_A->mark_all_dirty();
 
 		m_tilemap_A->set_transparent_pen(0);
-		// for NCV1 it's sufficient to scroll only columns
-		m_tilemap_A->set_scroll_cols(m_page_x);
+
+		if (m_h_div_size == 0) {
+			m_tilemap_A->set_scroll_cols(m_page_x);
+			m_tilemap_A->set_scroll_rows(1);
+		}
+		else {
+			m_tilemap_A->set_scroll_cols(1);
+			m_tilemap_A->set_scroll_rows(m_page_y);
+		}
 
 		if (m_pattern_size == PTS_8X8 )
 			m_tilemap_B = m_tilemap_B_cache_8[index];
@@ -1057,8 +1067,14 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			m_tilemap_B = m_tilemap_B_cache_16[index];
 		m_tilemap_B->mark_all_dirty();
 
-		// for NCV1 it's sufficient to scroll only columns
-		m_tilemap_B->set_scroll_cols(m_page_x);
+		if (m_h_div_size == 0) {
+			m_tilemap_B->set_scroll_cols(m_page_x);
+			m_tilemap_B->set_scroll_rows(1);
+		}
+		else {
+			m_tilemap_B->set_scroll_cols(1);
+			m_tilemap_B->set_scroll_rows(m_page_y);
+		}
 
 		// now clear the screen in case we change to 1-plane mode
 		m_work_bitmap.fill(0, finalclip );
@@ -1086,13 +1102,31 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 #ifdef _ENABLE_SCROLLX
 
-	m_tilemap_B->set_scrollx(0,
-				( (int)m_scroll_data_table[1][0x80] +
+	if (m_h_div_size == 0) {
+
+		m_tilemap_B->set_scrollx(0,
+					( (int)m_scroll_data_table[1][0x80] +
 					( (int)m_scroll_data_table[1][0x81] << 8 ) ) );
 
-	m_tilemap_A->set_scrollx(0,
-				( (int)m_scroll_data_table[0][0x80] +
-				( (int)m_scroll_data_table[0][0x81] << 8 ) ) );
+		m_tilemap_A->set_scrollx(0,
+					( (int)m_scroll_data_table[0][0x80] +
+					( (int)m_scroll_data_table[0][0x81] << 8 ) ) );
+
+	}
+	else {
+
+		for( row=0; row<m_page_y; row++ )
+		{
+		m_tilemap_B->set_scrollx(row,
+					( (int)m_scroll_data_table[1][0x80 + ((row & (m_page_y/2 - 1)) << 1)] +
+					( (int)m_scroll_data_table[1][0x81 + ((row & (m_page_y/2 - 1)) << 1)] << 8 ) ) );
+
+		m_tilemap_A->set_scrollx(row,
+					( (int)m_scroll_data_table[0][0x80 + ((row & (m_page_y/2 - 1)) << 1)] +
+					( (int)m_scroll_data_table[0][0x81 + ((row & (m_page_y/2 - 1)) << 1)] << 8 ) ) );
+		}
+
+	}
 
 #endif
 
