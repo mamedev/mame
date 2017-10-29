@@ -2448,28 +2448,95 @@
 		</part>
 	</software>
 
-	<software name="qnxmodem">
-		<description>QNX Demo Floppy (Modem Version V4)</description>
-		<year>1999</year>
+	<software name="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.0)</description>
+		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
-		<info name="version" value="4.05" />
+		<info name="version" value="1.0" />
 		<info name="user_notes" value="8MB RAM required" />
 		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="qnxdemo.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8" offset="0"/>
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v10.dat" size="1474560" crc="c0a120e4" sha1="bf8fbf753e978e00bb95f1da4a6d2e37a91092e7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="qnxnet">
-		<description>QNX Demo Floppy (Network Version V4)</description>
+	<software name="qnx4demoru" cloneof="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.1 - Russian)</description>
+		<year>199?</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.0" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v11 russian.dat" size="1474560" crc="3e50f719" sha1="9336ff81e57169baa363108cde8a9b2babe77765" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4modd">
+		<description>QNX Demo (Modem v405)</description>
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
 		<info name="user_notes" value="8MB RAM required" />
 		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="qnxdemo.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323" offset="0"/>
+				<rom name="qnxdemo modem v405.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4modda" cloneof="qnx4modd">
+		<description>QNX Internet Appliance Toolkit Demo (Modem v3.03)</description>
+		<year>1997</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="3.03" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo modem v303.dat" size="1474560" crc="de42476d" sha1="b330dc04a920886f2243377c9edd80c23bc3e90a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netd">
+		<description>QNX Demo (Network v405)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.05" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v405.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netda" cloneof="qnx4netd">
+		<description>QNX Demo (Network v400)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.00" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v400.dat" size="1474560" crc="72d7de91" sha1="bcc589a419500376cf5101ddf80d416ee43c0c1d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netdb" cloneof="qnx4netd">
+		<description>QNX Internet Appliance Toolkit Demo (Network v3.03)</description>
+		<year>1997</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="3.03" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v303.dat" size="1474560" crc="694a0448" sha1="d1bb83273ae2da9fb1fe93ae08c951ec91d6ea3f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
