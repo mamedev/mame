@@ -972,7 +972,7 @@ ROM_END
 
 /* PS5 */
 
-ROM_START( gunbird2 )
+ROM_START( gunbird2 ) /* Internal date string shows Oct 07 16:05 */
 	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u16", 0x000002, 0x080000, CRC(76f934f0) SHA1(cf197796d66f15639a6b3d5311c18da33cefd06b) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
@@ -996,7 +996,7 @@ ROM_START( gunbird2 )
 ROM_END
 
 /*
-These Program & Data ROMs came from a Korean arcade operator.
+This Program & Data ROM set came from a PCB in Korea.
 
 Notable differences:
  On initial bootup, no sound of "Marion...."
@@ -1004,10 +1004,13 @@ Notable differences:
  On selecting a character to play, no character name wave, just a simple tone
  On capturing a power-up there's no "Power Up" in character voice, just a simple tone
 
-It's unclear / unknown if this an earlier version or special Korean market version
+Seems to have minimal changes, probably just the sound table.  Internal date string
+shows Oct 08 17:02, while the above parent set shows Oct 07 16:05
+
+This set can still be set Japan, International Ver A. or International Ver B. via jumper pads
 */
 
-ROM_START( gunbird2a )
+ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific Korean copyright / message, but made for the Korean market? */
 	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "prog_l.u16", 0x000002, 0x080000, CRC(974f85ba) SHA1(4e19b12bd5f268088317ea231bbe7f9d2d694b2b) ) /* these roms had no labels */
 	ROM_LOAD32_WORD_SWAP( "prog_h.u17", 0x000000, 0x080000, CRC(cb0cb826) SHA1(8827e9ebfedbc63dbf41c6a5c994a691a6d63fdb) )
@@ -1265,7 +1268,7 @@ GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3,    
 
 /* ps5 */
 GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gunbird2a, gunbird2, psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE ) /* older?, Korean? or hack? */
+GAME( 1998, gunbird2a, gunbird2, psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, ps5,      ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
