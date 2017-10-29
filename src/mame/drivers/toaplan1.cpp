@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_sta
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble)  /* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)

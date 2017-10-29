@@ -335,14 +335,14 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write) // u37 has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write) // u21
 	AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("dma", z80dma_device, read, write) // u62
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("proglatch", ls259_device, write_nibble_alt) // u41 - eprom programming port
+	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("proglatch", ls259_device, write_nibble_d3) // u41 - eprom programming port
 	AM_RANGE(0xc4, 0xc7) AM_READ(status_port_r) // u11
-	AM_RANGE(0xc8, 0xcb) AM_DEVWRITE("syslatch1", ls259_device, write_nibble_alt) // u14
+	AM_RANGE(0xc8, 0xcb) AM_DEVWRITE("syslatch1", ls259_device, write_nibble_d3) // u14
 	AM_RANGE(0xcc, 0xcf) AM_WRITE(syslatch2_w)
 	AM_RANGE(0xd0, 0xd3) AM_READ(kbd_r) // u1
 	AM_RANGE(0xd4, 0xd7) AM_DEVREADWRITE("fdc", mb8877_device, read, write) // u10
 	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
-	AM_RANGE(0xd9, 0xd9) AM_DEVWRITE("outlatch1", ls259_device, write_nibble_alt) // u96
+	AM_RANGE(0xd9, 0xd9) AM_DEVWRITE("outlatch1", ls259_device, write_nibble_d3) // u96
 	AM_RANGE(0xdc, 0xdc) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w) // u30
 	AM_RANGE(0xdd, 0xdd) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
