@@ -2466,7 +2466,7 @@
 		<description>QNX Internet Appliance Toolkit Demo (v1.1 - Russian)</description>
 		<year>199?</year>
 		<publisher>QNX Software Systems</publisher>
-		<info name="version" value="1.0" />
+		<info name="version" value="1.1" />
 		<info name="user_notes" value="8MB RAM required" />
 		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -2490,6 +2490,19 @@
 	</software>
 
 	<software name="qnx4modda" cloneof="qnx4modd">
+		<description>QNX Demo (Modem v4.00)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.00" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo modem v400.dat" size="1474560" crc="7cc3be15" sha1="3ded9ef17784b18f1c356e2bfeacfd9ecef4f716" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4moddb" cloneof="qnx4modd">
 		<description>QNX Internet Appliance Toolkit Demo (Modem v3.03)</description>
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
@@ -2516,7 +2529,7 @@
 	</software>
 
 	<software name="qnx4netda" cloneof="qnx4netd">
-		<description>QNX Demo (Network v400)</description>
+		<description>QNX Demo (Network v4.00)</description>
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
