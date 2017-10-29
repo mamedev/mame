@@ -912,11 +912,16 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 			{
 				void *fastbase = (uint8_t *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				uint32_t skip = label++;
-				UML_CMP(block, I0, m_fastram[ramnum].end);   // cmp     i0,end
-				UML_JMPc(block, COND_A, skip);                                      // ja      skip
-				UML_CMP(block, I0, m_fastram[ramnum].start);// cmp     i0,fastram_start
-				UML_JMPc(block, COND_B, skip);                                      // jb      skip
-
+				if (m_fastram[ramnum].end != 0xffffffff)
+				{
+					UML_CMP(block, I0, m_fastram[ramnum].end);   // cmp     i0,end
+					UML_JMPc(block, COND_A, skip);                                      // ja      skip
+				}
+				if (m_fastram[ramnum].start != 0x00000000)
+				{
+					UML_CMP(block, I0, m_fastram[ramnum].start);// cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                                      // jb      skip
+				}
 				if (!iswrite)
 				{
 					if (size == 1)
