@@ -3283,14 +3283,14 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/einstein/pipe.h,BUSES["TATUNG_PIPE"] = true
+--@src/devices/bus/einstein/pipe/pipe.h,BUSES["TATUNG_PIPE"] = true
 ---------------------------------------------------
 
 if (BUSES["TATUNG_PIPE"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/einstein/pipe.cpp",
-		MAME_DIR .. "src/devices/bus/einstein/pipe.h",
-		MAME_DIR .. "src/devices/bus/einstein/tk02.cpp",
-		MAME_DIR .. "src/devices/bus/einstein/tk02.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
 	}
 end

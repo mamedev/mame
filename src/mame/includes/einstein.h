@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cpu/z80/z80daisy.h"
-#include "bus/einstein/pipe.h"
+#include "bus/einstein/pipe/pipe.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
