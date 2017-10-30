@@ -1790,6 +1790,17 @@ ROM_START( quiz211 )
 	ROM_LOAD( "pal10l8cn.bin",   0x0000, 0x002c, CRC(86095226) SHA1(e7496efbd5ca240f0df2dfa5627402342c7f5384) )
 ROM_END
 
+ROM_START( bigjoke )  /* TRIV3D PCB, stickered THE JOKE 11/87 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "joke_cont_128",       0x00000, 0x4000, CRC(acb4355f) SHA1(0fc9a218e94fc49297bd11547fb193d1f91ce90c) )
+	ROM_LOAD( "joke_2764",           0x08000, 0x2000, CRC(8a7ac263) SHA1(6f9a18b7f38e83cc2d1f1911e3b01ada7df4d2ba) )   /* banked */
+	ROM_LOAD( "joke_drty_nsty_1012", 0x10000, 0x8000, CRC(e3fcd0e3) SHA1(fae1ddfb244e5c84e9ba6d4b90bd265365a4f662) )   /* banked ROMs for solution data */
+	ROM_LOAD( "joke_fams_folk_1012", 0x18000, 0x8000, CRC(08eb35f2) SHA1(0dba706750a9276dac9976eb07f64ecf4a42e658) )
+	ROM_LOAD( "joke_jmbl_joke_1012", 0x20000, 0x8000, CRC(26daf757) SHA1(76560bf437b4ee851f075b30e79df563367830cf) )
+	ROM_LOAD( "joke_racl_ethn_1012", 0x28000, 0x8000, CRC(ca814fa9) SHA1(0c2ac15568bd64c282f257089305309ef7f91411) )
+	ROM_LOAD( "joke_wrkg_wrld_1012", 0x30000, 0x8000, CRC(f4b0fa76) SHA1(70b4a29d928729da52948c12e55473ecf83b3daa) )
+ROM_END
+
 ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "6.02_cont", 0x00000, 0x4000, CRC(63ad3593) SHA1(fd93a71b82ef04757d79485ca4c7e306b2983c76) )
@@ -1945,6 +1956,8 @@ GAME( 1987, findout,   0,        findout,   findout,  gei_state, 0,        ROT0,
 GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.19S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1987, bigjoke,   0,        findout,   sexappl,  gei_state, 0,        ROT0, "Grayhound Electronics",  "The Big Joke",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, 0,        ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
