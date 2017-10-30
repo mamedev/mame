@@ -1799,6 +1799,9 @@ ROM_START( bigjoke )  /* TRIV3D PCB, stickered THE JOKE 11/87 */
 	ROM_LOAD( "joke_jmbl_joke_1012", 0x20000, 0x8000, CRC(26daf757) SHA1(76560bf437b4ee851f075b30e79df563367830cf) )
 	ROM_LOAD( "joke_racl_ethn_1012", 0x28000, 0x8000, CRC(ca814fa9) SHA1(0c2ac15568bd64c282f257089305309ef7f91411) )
 	ROM_LOAD( "joke_wrkg_wrld_1012", 0x30000, 0x8000, CRC(f4b0fa76) SHA1(70b4a29d928729da52948c12e55473ecf83b3daa) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "bigjoke.nvram",  0x0000, 0x0800, CRC(89e0e325) SHA1(c2398c64f938e8ed036e72a5ba0b703513f31a6d) )
 ROM_END
 
 ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
@@ -1957,7 +1960,7 @@ GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, 0,        ROT0,
 GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1987, bigjoke,   0,        findout,   sexappl,  gei_state, 0,        ROT0, "Grayhound Electronics",  "The Big Joke",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1987, bigjoke,   0,        findout,   sexappl,  gei_state, 0,        ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Needs reverse engineering of the correct 'signature'
 
 GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, 0,        ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
