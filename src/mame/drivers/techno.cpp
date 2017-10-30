@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	INTERRUPT_GEN_MEMBER(techno_intgen);
+	IRQ_CALLBACK_MEMBER(intack);
+
 private:
 	bool m_digwait;
 	uint8_t m_keyrow;
@@ -234,14 +236,21 @@ INTERRUPT_GEN_MEMBER(techno_state::techno_intgen)
 	if ((m_vector & 7) == 7)
 		m_vector = (m_vector ^ 0x10) & 0x97;
 	m_vector++;
-	// core doesn't support clearing of irq via hardware
-	generic_pulse_irq_line_and_vector(device.execute(), 1, m_vector, 1);
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(techno_state::intack)
+{
+	// IRQ is cleared via hardware
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	return m_vector;
 }
 
 void techno_state::machine_reset()
 {
 	m_vector = 0x88;
 	m_digit = 0;
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( techno )
@@ -249,7 +258,10 @@ static MACHINE_CONFIG_START( techno )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  XTAL_8MHz/256) // 31250Hz
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(techno_state, intack)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
