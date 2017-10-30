@@ -1290,11 +1290,9 @@ void z80sio_channel::receive_data()
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
 	{
 	case WR1_RX_INT_FIRST:
-		if (m_rx_first)
-		{
+		if (m_rx_first || (rx_error & RR1_CRC_FRAMING_ERROR))
 			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
-			m_rx_first = 0;
-		}
+		m_rx_first = 0;
 		break;
 
 	case WR1_RX_INT_ALL_PARITY:
