@@ -365,7 +365,7 @@ MACHINE_CONFIG_END
 
 ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 {
-	(void)INPUT_PORTS_NAME(kaypro_keyboard_bitshift);
+	(void)&INPUT_PORTS_NAME(kaypro_keyboard_bitshift);
 	return INPUT_PORTS_NAME(kaypro_keyboard_typewriter);
 }
 
