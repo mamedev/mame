@@ -511,6 +511,9 @@ WRITE8_MEMBER( z80sio_device::ba_cd_w )
 z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SIO_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
+	, m_rx_fifo_depth(0)
+	, m_rx_data_fifo(0)
+	, m_rx_error_fifo(0)
 	, m_rx_clock(0)
 	, m_rx_count(0)
 	, m_rx_bit(0)
@@ -566,6 +569,9 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_wr5));
 	save_item(NAME(m_wr6));
 	save_item(NAME(m_wr7));
+	save_item(NAME(m_rx_fifo_depth));
+	save_item(NAME(m_rx_data_fifo));
+	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_count));
 	save_item(NAME(m_rx_bit));
@@ -593,6 +599,8 @@ void z80sio_channel::device_reset()
 	LOG("%s\n", FUNCNAME);
 
 	// Reset RS232 emulation
+	m_rx_fifo_depth = 0;
+	m_rx_data_fifo = m_rx_error_fifo = 0U;
 	receive_reset();
 	transmit_register_reset();
 
@@ -1019,7 +1027,20 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	case WR0_ERROR_RESET:
 		// error reset
 		LOGCMD("%s %s Ch:%c : Error Reset\n", FUNCNAME, tag(), 'A' + m_index);
-		m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
+		{
+			if (m_rx_fifo_depth && (WR1_RX_INT_FIRST == (m_wr1 & WR1_RX_INT_MODE_MASK)))
+			{
+				// shift the FIFO
+				m_rx_data_fifo >>= 8;
+				m_rx_error_fifo >>= 8;
+
+				// no more characters available in the FIFO?
+				if (!--m_rx_fifo_depth)
+					m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
+			}
+			m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+		}
 		break;
 	case WR0_RETURN_FROM_INT:
 		LOGINT("%s %s Ch:%c : Return from interrupt\n", FUNCNAME, tag(), 'A' + m_index);
@@ -1162,21 +1183,20 @@ void z80sio_channel::control_write(uint8_t data)
 //-------------------------------------------------
 uint8_t z80sio_channel::data_read()
 {
-	uint8_t data = 0;
+	uint8_t const data = uint8_t(m_rx_data_fifo & 0x000000ffU);
 
-	if (!m_rx_data_fifo.empty())
+	if (m_rx_fifo_depth && ((WR1_RX_INT_FIRST != (m_wr1 & WR1_RX_INT_MODE_MASK)) || !(m_rx_error_fifo & 0x000000ffU)))
 	{
-		// load data from the FIFO
-		data = m_rx_data_fifo.dequeue();
-
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | m_rx_error_fifo.dequeue();
+		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | uint8_t(m_rx_error_fifo & 0x000000ffU);
 
-		if (m_rx_data_fifo.empty())
-		{
-			// no more characters available in the FIFO
-			m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
-		}
+		// shift the FIFO
+		m_rx_data_fifo >>= 8;
+		m_rx_error_fifo >>= 8;
+
+		// no more characters available in the FIFO?
+		if (!--m_rx_fifo_depth)
+			m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
 	}
 
 	LOG("Z80SIO \"%s\" Channel %c : Data Register Read '%02x'\n", owner()->tag(), 'A' + m_index, data);
@@ -1230,49 +1250,38 @@ void z80sio_channel::receive_data()
 {
 	LOGRCV("%s(%04x) %s:%c\n",FUNCNAME, m_rx_sr, tag(), 'A' + m_index);
 
-	if (m_rx_data_fifo.full())
+	// check for parity and framing errors
+	int const word_length = get_rx_word_length();
+	bool const parity = 0U != (m_wr4 & WR4_PARITY_ENABLE);
+	uint16_t const stop_bit = uint16_t(1U) << (word_length + (parity ? 1 : 0));
+	uint32_t rx_error = (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR;
+	m_rx_sr |= stop_bit;
+	if (parity)
 	{
-		// FIXME: this should overwrite the tail of the FIFO and store the overrun error
+		uint16_t par(m_rx_sr);
+		for (int i = 1; word_length >= i; ++i)
+			par ^= BIT(par, i);
+		if (bool(BIT(par, 0)) == bool(m_wr4 & WR4_PARITY_EVEN))
+			rx_error |= RR1_PARITY_ERROR;
+	}
 
+	if (3 == m_rx_fifo_depth)
+	{
 		LOG("  Overrun detected\n");
 		// receive overrun error detected
-		//uint8_t rx_error |= RR1_RX_OVERRUN_ERROR;
+		rx_error |= RR1_RX_OVERRUN_ERROR;
 
-		switch (m_wr1 & WR1_RX_INT_MODE_MASK)
-		{
-		case WR1_RX_INT_FIRST:
-			if (!m_rx_first)
-			{
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			}
-			break;
-
-		case WR1_RX_INT_ALL_PARITY:
-		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			break;
-		}
+		m_rx_data_fifo = (m_rx_data_fifo & 0x0000ffffU) | (uint32_t(m_rx_sr & 0x00ffU) << 16);
+		m_rx_error_fifo = (m_rx_error_fifo & 0x0000ffffU) | (rx_error << 16);
 	}
 	else
 	{
-		// check for parity and framing errors
-		int const word_length = get_rx_word_length();
-		bool const parity = 0U != (m_wr4 & WR4_PARITY_ENABLE);
-		uint16_t const stop_bit = uint16_t(1U) << (word_length + (parity ? 1 : 0));
-		uint8_t rx_error = (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR;
-		m_rx_sr |= stop_bit;
-		if (parity)
-		{
-			uint16_t par(m_rx_sr);
-			for (int i = 1; word_length >= i; ++i)
-				par ^= BIT(par, i);
-			if (bool(BIT(par, 0)) == bool(m_wr4 & WR4_PARITY_EVEN))
-				rx_error |= RR1_PARITY_ERROR;
-		}
-
 		// store received character and error status into FIFO
-		m_rx_data_fifo.enqueue(uint8_t(m_rx_sr & 0xffU));
-		m_rx_error_fifo.enqueue(rx_error);
+		if (!m_rx_fifo_depth)
+			m_rx_data_fifo = m_rx_error_fifo = 0U;
+		m_rx_data_fifo |= uint32_t(m_rx_sr & 0x00ffU) << (8 * m_rx_fifo_depth);
+		m_rx_error_fifo |= rx_error << (8 * m_rx_fifo_depth);
+		++m_rx_fifo_depth;
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
@@ -1289,8 +1298,11 @@ void z80sio_channel::receive_data()
 		break;
 
 	case WR1_RX_INT_ALL_PARITY:
+		m_uart->trigger_interrupt(m_index, (rx_error & (RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) ? INT_SPECIAL : INT_RECEIVE);
+		break;
+
 	case WR1_RX_INT_ALL:
-		m_uart->trigger_interrupt(m_index, INT_RECEIVE);
+		m_uart->trigger_interrupt(m_index, (rx_error & RR1_CRC_FRAMING_ERROR) ? INT_SPECIAL : INT_RECEIVE);
 		break;
 
 	default:

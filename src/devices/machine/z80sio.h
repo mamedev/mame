@@ -280,7 +280,7 @@ protected:
 		WR1_RX_INT_MODE_MASK      = 0x18,
 		WR1_RX_INT_DISABLE        = 0x00,
 		WR1_RX_INT_FIRST          = 0x08,
-		WR1_RX_INT_ALL_PARITY     = 0x10, // not supported
+		WR1_RX_INT_ALL_PARITY     = 0x10,
 		WR1_RX_INT_ALL            = 0x18,
 		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
 		WR1_WRDY_FUNCTION         = 0x40, // not supported
@@ -370,8 +370,9 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	util::fifo<uint8_t, 3> m_rx_data_fifo;
-	util::fifo<uint8_t, 3> m_rx_error_fifo;
+	int m_rx_fifo_depth;
+	uint32_t m_rx_data_fifo;
+	uint32_t m_rx_error_fifo;
 
 	int m_rx_clock;     // receive clock line state
 	int m_rx_count;     // clocks until next sample
