@@ -124,6 +124,7 @@ CN1 standard DB15 VGA connector (15KHz)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
 #include "machine/eepromser.h"
 #include "video/pc_vga.h"
 #include "screen.h"
@@ -138,7 +139,6 @@ public:
 		m_eeprom(*this, "eeprom")
 	{ }
 
-	uint16_t m_eeprom_data;
 	uint16_t m_pntpzl_200000;
 	uint16_t m_serial;
 	uint16_t m_serial_out;
@@ -154,31 +154,9 @@ public:
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
-	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 	DECLARE_DRIVER_INIT(pip);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
-
-
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
-{
-	/* bit 11 is EEPROM data */
-	return (m_eeprom_data & 0xf4ff) | (m_eeprom->do_read()<<11) | (ioport("IN1")->read() & 0x0300);
-}
-
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
-{
-	m_eeprom_data = data;
-
-	/* bit 12 is data */
-	/* bit 13 is clock (active high) */
-	/* bit 14 is cs (active high) */
-
-	m_eeprom->di_write((data & 0x1000) >> 12);
-	m_eeprom->cs_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 
 
@@ -286,18 +264,10 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
 	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ(pntnpuzl_eeprom_r)
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(pntnpuzl_eeprom_w)
-	AM_RANGE(0x280008, 0x280009) AM_WRITENOP
-	AM_RANGE(0x28000a, 0x28000b) AM_WRITENOP
-	AM_RANGE(0x280010, 0x280011) AM_WRITENOP
-	AM_RANGE(0x280012, 0x280013) AM_WRITENOP
 	AM_RANGE(0x280014, 0x280015) AM_READ(pntnpuzl_280014_r)
-	AM_RANGE(0x280016, 0x280017) AM_WRITENOP
 	AM_RANGE(0x280018, 0x280019) AM_WRITE(pntnpuzl_280018_w)
 	AM_RANGE(0x28001a, 0x28001b) AM_READ(pntnpuzl_28001a_r)
-	AM_RANGE(0x28001a, 0x28001b) AM_WRITENOP
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("via", via6522_device, read, write, 0xff00)
 
 	/* standard VGA */
 	AM_RANGE(0x3a0000, 0x3bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)
@@ -332,18 +302,22 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x7f, 0x40, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0,0x7f) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pntnpuzl )
@@ -351,6 +325,13 @@ static MACHINE_CONFIG_START( pntnpuzl )
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("via", VIA6522, 1200000) // ??
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
