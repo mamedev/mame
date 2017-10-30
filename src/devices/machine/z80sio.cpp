@@ -122,10 +122,6 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
-	m_rxca(0),
-	m_txca(0),
-	m_rxcb(0),
-	m_txcb(0),
 	m_out_txda_cb(*this),
 	m_out_dtra_cb(*this),
 	m_out_rtsa_cb(*this),
@@ -194,14 +190,6 @@ void z80sio_device::device_resolve_objects()
 void z80sio_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-
-	// configure channel A
-	m_chanA->m_rxc = m_rxca;
-	m_chanA->m_txc = m_txca;
-
-	// configure channel B
-	m_chanB->m_rxc = m_rxcb;
-	m_chanB->m_txc = m_txcb;
 
 	// state saving
 	save_item(NAME(m_int_state));
@@ -523,8 +511,10 @@ WRITE8_MEMBER( z80sio_device::ba_cd_w )
 z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SIO_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
-	, m_rx_error(0)
 	, m_rx_clock(0)
+	, m_rx_count(0)
+	, m_rx_bit(0)
+	, m_rx_sr(0)
 	, m_rx_first(0)
 	, m_rx_break(0)
 	, m_rx_rr0_latch(0)
@@ -576,8 +566,10 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_wr5));
 	save_item(NAME(m_wr6));
 	save_item(NAME(m_wr7));
-	save_item(NAME(m_rx_error));
 	save_item(NAME(m_rx_clock));
+	save_item(NAME(m_rx_count));
+	save_item(NAME(m_rx_bit));
+	save_item(NAME(m_rx_sr));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));
 	save_item(NAME(m_rx_rr0_latch));
@@ -601,7 +593,7 @@ void z80sio_channel::device_reset()
 	LOG("%s\n", FUNCNAME);
 
 	// Reset RS232 emulation
-	receive_register_reset();
+	receive_reset();
 	transmit_register_reset();
 
 	// disable receiver
@@ -713,33 +705,6 @@ void z80sio_channel::tra_complete()
 		if (!m_rts)
 			set_rts(1);
 	}
-}
-
-
-//-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-void z80sio_channel::rcv_callback()
-{
-	if (m_wr3 & WR3_RX_ENABLE)
-	{
-		LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
-		receive_register_update_bit(m_rxd);
-	}
-}
-
-
-//-------------------------------------------------
-//  rcv_complete -
-//-------------------------------------------------
-void z80sio_channel::rcv_complete()
-{
-	uint8_t data;
-
-	receive_register_extract();
-	data = get_received_char();
-	LOGRCV("%s() \"%s \"Channel %c Received Data %02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, data);
-	receive_data(data);
 }
 
 
@@ -1205,7 +1170,7 @@ uint8_t z80sio_channel::data_read()
 		data = m_rx_data_fifo.dequeue();
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo.dequeue();
+		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | m_rx_error_fifo.dequeue();
 
 		if (m_rx_data_fifo.empty())
 		{
@@ -1250,17 +1215,28 @@ void z80sio_channel::data_write(uint8_t data)
 
 
 //-------------------------------------------------
+//  receive_reset - reset receive state
+//-------------------------------------------------
+void z80sio_channel::receive_reset()
+{
+	m_rx_count = (get_clock_mode() - 1) / 2;
+	m_rx_bit = 0;
+}
+
+//-------------------------------------------------
 //  receive_data - receive data word
 //-------------------------------------------------
-void z80sio_channel::receive_data(uint8_t data)
+void z80sio_channel::receive_data()
 {
-	LOGRCV("%s(%02x) %s:%c\n",FUNCNAME, data, tag(), 'A' + m_index);
+	LOGRCV("%s(%04x) %s:%c\n",FUNCNAME, m_rx_sr, tag(), 'A' + m_index);
 
 	if (m_rx_data_fifo.full())
 	{
+		// FIXME: this should overwrite the tail of the FIFO and store the overrun error
+
 		LOG("  Overrun detected\n");
 		// receive overrun error detected
-		m_rx_error |= RR1_RX_OVERRUN_ERROR;
+		//uint8_t rx_error |= RR1_RX_OVERRUN_ERROR;
 
 		switch (m_wr1 & WR1_RX_INT_MODE_MASK)
 		{
@@ -1279,9 +1255,24 @@ void z80sio_channel::receive_data(uint8_t data)
 	}
 	else
 	{
+		// check for parity and framing errors
+		int const word_length = get_rx_word_length();
+		bool const parity = 0U != (m_wr4 & WR4_PARITY_ENABLE);
+		uint16_t const stop_bit = uint16_t(1U) << (word_length + (parity ? 1 : 0));
+		uint8_t rx_error = (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR;
+		m_rx_sr |= stop_bit;
+		if (parity)
+		{
+			uint16_t par(m_rx_sr);
+			for (int i = 1; word_length >= i; ++i)
+				par ^= BIT(par, i);
+			if (bool(BIT(par, 0)) == bool(m_wr4 & WR4_PARITY_EVEN))
+				rx_error |= RR1_PARITY_ERROR;
+		}
+
 		// store received character and error status into FIFO
-		m_rx_data_fifo.enqueue(data);
-		m_rx_error_fifo.enqueue(m_rx_error);
+		m_rx_data_fifo.enqueue(uint8_t(m_rx_sr & 0xffU));
+		m_rx_error_fifo.enqueue(rx_error);
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
@@ -1301,9 +1292,9 @@ void z80sio_channel::receive_data(uint8_t data)
 	case WR1_RX_INT_ALL:
 		m_uart->trigger_interrupt(m_index, INT_RECEIVE);
 		break;
+
 	default:
 		LOG("No interrupt triggered\n");
-
 	}
 }
 
@@ -1421,18 +1412,62 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Receiver Clock Pulse\n", owner()->tag(), m_index + 'A');
-	int clocks = get_clock_mode();
-	if (clocks == 1)
-		rx_clock_w(state);
-	else if(state)
+	if ((m_wr3 & WR3_RX_ENABLE) && state && !m_rx_clock)
 	{
-		rx_clock_w(m_rx_clock < clocks/2);
+		// RxD sampled on rising edge
+		int const clocks = get_clock_mode() - 1;
 
-		m_rx_clock++;
-		if (m_rx_clock == clocks)
-			m_rx_clock = 0;
+		if (!m_rx_bit)
+		{
+			// look for start bit
+			if (m_rxd)
+			{
+				// line idle
+				m_rx_count = (std::max)(m_rx_count, (clocks / 2) + 1) - 1;
+			}
+			else if (!m_rx_count)
+			{
+				// half a bit period expired, start shifting bits
+				m_rx_count = clocks;
+				++m_rx_bit;
+				m_rx_sr = ~uint16_t(0U);
+			}
+			else
+			{
+				// ensure start bit lasts long enough
+				--m_rx_count;
+			}
+		}
+		else if (!m_rx_count)
+		{
+			// sample a data/parity/stop bit
+			if (!m_rxd)
+				m_rx_sr &= ~uint16_t(1U << (m_rx_bit - 1));
 
+			if ((get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0) + 1) == m_rx_bit)
+			{
+				// this is the stop bit - framing error adds a half bit period
+				LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
+				m_rx_count = m_rxd ? 0 : clocks;
+				m_rx_bit = 0;
+
+				LOGRCV("%s() \"%s \"Channel %c Received Data %02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rx_sr & 0xff);
+				receive_data();
+			}
+			else
+			{
+				// wait a whole bit period for the next bit
+				m_rx_count = clocks;
+				++m_rx_bit;
+			}
+		}
+		else
+		{
+			// bit period hasn't expired
+			--m_rx_count;
+		}
 	}
+	m_rx_clock = state;
 }
 
 
@@ -1462,8 +1497,8 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 //-------------------------------------------------
 void z80sio_channel::update_serial()
 {
-	int data_bit_count = get_rx_word_length();
-	stop_bits_t stop_bits = get_stop_bits();
+	int const data_bit_count = get_rx_word_length();
+	stop_bits_t const stop_bits = get_stop_bits();
 	parity_t parity;
 
 	LOG("%s\n", FUNCNAME);
@@ -1481,20 +1516,7 @@ void z80sio_channel::update_serial()
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 
-	int clocks = get_clock_mode();
-
-	if (m_rxc > 0)
-	{
-		LOG("- RxC:%d/%d = %d\n", m_rxc, clocks, m_rxc / clocks);
-		set_rcv_rate(m_rxc / clocks);
-	}
-
-	if (m_txc > 0)
-	{
-		LOG("- TxC:%d/%d = %d\n", m_txc, clocks, m_txc / clocks);
-		set_tra_rate(m_txc / clocks);
-	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
+	receive_reset(); // if stop bits is changed from 0, receive register has to be reset
 }
 
 
@@ -1510,15 +1532,4 @@ void z80sio_channel::set_dtr(int state)
 		m_uart->m_out_dtra_cb(m_dtr);
 	else
 		m_uart->m_out_dtrb_cb(m_dtr);
-}
-
-//-------------------------------------------------
-//  write_rx -
-//-------------------------------------------------
-WRITE_LINE_MEMBER(z80sio_channel::write_rx)
-{
-	m_rxd = state;
-	//only use rx_w when self-clocked
-	if(m_rxc)
-		device_serial_interface::rx_w(state);
 }

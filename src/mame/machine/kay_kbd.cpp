@@ -11,6 +11,14 @@
 #include "emu.h"
 #include "machine/kay_kbd.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_TXD     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_TXD)
+#include "logmacro.h"
+
+#define LOGTXD(...) LOGMASKED(LOG_TXD, __VA_ARGS__)
+
 
 /*
  * The KAYPRO keyboard has roughly the following layout:
@@ -323,8 +331,9 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock)
+		std::uint32_t clock)
 	: device_t(mconfig, KAYPRO_10_KEYBOARD, tag, owner, clock)
+	, m_mcu(*this, "mcu")
 	, m_bell(*this, "bell")
 	, m_matrix(*this, "ROW.%X", 0)
 	, m_modifiers(*this, "MOD")
@@ -379,6 +388,24 @@ READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
 
 WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
 {
+	if ((VERBOSE & LOG_TXD) && (0x0014U >= static_cast<device_state_interface *>(m_mcu)->safe_pc()))
+	{
+		auto const suppressor(machine().disable_side_effect());
+		address_space &mcu_ram(m_mcu->space(AS_DATA));
+		std::uint8_t const txd_time(mcu_ram.read_byte(0x1cU));
+		std::uint8_t const serial_flags(mcu_ram.read_byte(0x1eU));
+		bool const txd_active(BIT(serial_flags, 6));
+		if ((21U == txd_time) && txd_active)
+		{
+			std::uint8_t const txd_bit(mcu_ram.read_byte(0x1bU));
+			LOGTXD(
+					(9U == txd_bit) ? "serial transmit: start bit = %1$u (cycles = %3$u)\n" : "serial transmit: bit %2$u = %1$u (cycles = %3$u)\n",
+					BIT(data, 7),
+					8U - txd_bit,
+					m_mcu->total_cycles());
+		}
+	}
+
 	m_bell->level_w(BIT(data, 6));
 	m_rxd_cb(BIT(data, 7));
 }

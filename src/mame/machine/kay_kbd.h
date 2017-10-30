@@ -19,7 +19,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock);
+			std::uint32_t clock);
 
 	template <class Object> static devcb_base &set_rxd_cb(device_t &device, Object &&cb)
 	{ return downcast<kaypro_10_keyboard_device &>(device).m_rxd_cb.set_callback(std::forward<Object>(cb)); }
@@ -40,6 +40,7 @@ protected:
     DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
+	required_device<cpu_device>             m_mcu;
 	required_device<speaker_sound_device>   m_bell;
 	required_ioport_array<16>               m_matrix;
 	required_ioport                         m_modifiers;

@@ -67,9 +67,6 @@
 #define SIO_CHANB_TAG   "chb"
 
 /* Generic macros */
-#define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
-	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
-
 #define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
 	devcb = &z80sio_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
@@ -129,8 +126,7 @@
 
 class z80sio_device;
 
-class z80sio_channel : public device_t,
-		public device_serial_interface
+class z80sio_channel : public device_t, public device_serial_interface
 {
 	friend class z80sio_device;
 
@@ -140,8 +136,6 @@ public:
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
-	virtual void rcv_complete() override;
 
 	// read register handlers
 	uint8_t do_sioreg_rr0();
@@ -165,17 +159,15 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_data(uint8_t data);
+	void receive_reset();
+	void receive_data();
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_rx ) { m_rxd = state; }
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
-
-	int m_rxc;
-	int m_txc;
 
 	// Register state
 	// read registers     enum
@@ -380,9 +372,12 @@ protected:
 	// receiver state
 	util::fifo<uint8_t, 3> m_rx_data_fifo;
 	util::fifo<uint8_t, 3> m_rx_error_fifo;
-	uint8_t m_rx_error;       // current receive error
 
-	int m_rx_clock;     // receive clock pulse count
+	int m_rx_clock;     // receive clock line state
+	int m_rx_count;     // clocks until next sample
+	int m_rx_bit;       // receive data bit (0 = start bit, 1 = LSB, etc.)
+	uint16_t m_rx_sr;   // receive shift register
+
 	int m_rx_first;     // first character received
 	int m_rx_break;     // receive break condition
 	uint8_t m_rx_rr0_latch;   // read register 0 latched
@@ -438,15 +433,6 @@ public:
 	{
 		z80sio_device &dev = downcast<z80sio_device &>(device);
 		dev.m_cputag = tag;
-	}
-
-	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
-	{
-		z80sio_device &dev = downcast<z80sio_device &>(device);
-		dev.m_rxca = rxa;
-		dev.m_txca = txa;
-		dev.m_rxcb = rxb;
-		dev.m_txcb = txb;
 	}
 
 	DECLARE_READ8_MEMBER( cd_ba_r );
@@ -521,11 +507,6 @@ protected:
 	required_device<z80sio_channel> m_chanB;
 
 	// internal state
-	int m_rxca;
-	int m_txca;
-	int m_rxcb;
-	int m_txcb;
-
 	devcb_write_line    m_out_txda_cb;
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;
