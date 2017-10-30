@@ -71,7 +71,7 @@ P1 is connected to the key matrix columns.
 
 P2.1, P2.2 and P2.3 are CTRL, CAPS LOCK, and SHIFT inputs.
 
-P2.6 drives the speaker (1.5625kHz tone generated using timer/counter).
+P2.5 drives the speaker (1.5625kHz tone generated using timer/counter).
 
 P2.7 is the serial data output to the host.
 
@@ -99,9 +99,10 @@ due to bugs it omits the first byte of each page (0x000, 0x100, 0x200,
 
 The serial command processing is quite lax in what it accepts:
 xxxx xxx1   ignored
-xxxx xx10   short beep
-xxxx x100   long beep
-xxx1 x000   answer back with 0xAA?
+xxxx Mx10   short beep, set keyclick mute to M
+xxxx M100   long beep, set keyclick mute to M
+xxx1 M000   answer back with 0xAA?, set keyclick mute to M
+xxx0 M000   set keyclick mute to M
 
 The Kaypro II was sold with a different keyboard using an 8751 (MCS-51)
 MCU, but we don't have a dump for it.
@@ -406,7 +407,7 @@ WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
 		}
 	}
 
-	m_bell->level_w(BIT(data, 6));
+	m_bell->level_w(BIT(data, 5));
 	m_rxd_cb(BIT(data, 7));
 }
 
