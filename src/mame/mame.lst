@@ -36919,6 +36919,7 @@ trs80l2                         // TRS-80 Model I - Level II BASIC
 trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
 trs80m4                         //
 trs80m4p                        //
+cp500                           // Prologica CP500
 
 @source:trs80dt1.cpp
 trs80dt1                        // TRS-80 Data Terminal 1
