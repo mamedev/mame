@@ -1027,18 +1027,14 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	case WR0_ERROR_RESET:
 		// error reset
 		LOGCMD("%s %s Ch:%c : Error Reset\n", FUNCNAME, tag(), 'A' + m_index);
-		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
+		if ((WR1_RX_INT_FIRST == (m_wr1 & WR1_RX_INT_MODE_MASK)) && (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR)))
 		{
-			if (m_rx_fifo_depth && (WR1_RX_INT_FIRST == (m_wr1 & WR1_RX_INT_MODE_MASK)))
-			{
-				// shift the FIFO
-				m_rx_data_fifo >>= 8;
-				m_rx_error_fifo >>= 8;
-
-				// no more characters available in the FIFO?
-				if (!--m_rx_fifo_depth)
-					m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
-			}
+			// clearing framing and overrun errors advances the FIFO
+			m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+			advance_rx_fifo();
+		}
+		else
+		{
 			m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
 		}
 		break;
@@ -1185,19 +1181,9 @@ uint8_t z80sio_channel::data_read()
 {
 	uint8_t const data = uint8_t(m_rx_data_fifo & 0x000000ffU);
 
-	if (m_rx_fifo_depth && ((WR1_RX_INT_FIRST != (m_wr1 & WR1_RX_INT_MODE_MASK)) || !(m_rx_error_fifo & 0x000000ffU)))
-	{
-		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | uint8_t(m_rx_error_fifo & 0x000000ffU);
-
-		// shift the FIFO
-		m_rx_data_fifo >>= 8;
-		m_rx_error_fifo >>= 8;
-
-		// no more characters available in the FIFO?
-		if (!--m_rx_fifo_depth)
-			m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
-	}
+	// framing and overrun errors need to be cleared to advance the FIFO in interrupt-on-first mode
+	if ((WR1_RX_INT_FIRST != (m_wr1 & WR1_RX_INT_MODE_MASK)) || !(m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR)))
+		advance_rx_fifo();
 
 	LOG("Z80SIO \"%s\" Channel %c : Data Register Read '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
@@ -1243,6 +1229,32 @@ void z80sio_channel::receive_reset()
 	m_rx_bit = 0;
 }
 
+
+//-------------------------------------------------
+//  advance_rx_fifo - move to next received byte
+//-------------------------------------------------
+void z80sio_channel::advance_rx_fifo()
+{
+	if (m_rx_fifo_depth)
+	{
+		if (--m_rx_fifo_depth)
+		{
+			// shift the FIFO
+			m_rx_data_fifo >>= 8;
+			m_rx_error_fifo >>= 8;
+
+			// load error status from the FIFO
+			m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | uint8_t(m_rx_error_fifo & 0x000000ffU);
+		}
+		else
+		{
+			// no more characters available in the FIFO
+			m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
+		}
+	}
+}
+
+
 //-------------------------------------------------
 //  receive_data - receive data word
 //-------------------------------------------------
@@ -1285,6 +1297,8 @@ void z80sio_channel::receive_data()
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
+	if (!m_rx_fifo_depth)
+		m_rr1 |= uint8_t(rx_error);
 
 	// receive interrupt
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)

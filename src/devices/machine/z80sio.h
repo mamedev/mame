@@ -161,6 +161,7 @@ public:
 
 	void receive_reset();
 	void receive_data();
+	void advance_rx_fifo();
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx ) { m_rxd = state; }
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
