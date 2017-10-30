@@ -55,11 +55,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
-
 
 static MACHINE_CONFIG_START( jade )
 	/* basic machine hardware */
@@ -86,7 +81,6 @@ static MACHINE_CONFIG_START( jade )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 MACHINE_CONFIG_END
 
 /* ROM definition */
