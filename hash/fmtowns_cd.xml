@@ -8681,7 +8681,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk, the game doesn't work without it -->
-	<software name="suikoden">
+	<software name="suikoden" supported="no">
 		<!--
 		Origin: P2P
 		<rom name="SUIKODEN.BIN" size="451226496" crc="ea330a93" sha1="8c56e2b77b58ac136f80cb19e6dffdef4adb0d2c"/>
