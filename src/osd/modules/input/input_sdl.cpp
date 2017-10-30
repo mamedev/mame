@@ -250,6 +250,7 @@ public:
 				{
 					machine().ui_input().push_mouse_down_event(window->target(), cx, cy);
 
+					// avoid overflow with std::chrono::time_point::min() by adding rather than subtracting
 					if (click < last_click + double_click_speed
 						&& (cx >= last_x - 4 && cx <= last_x + 4)
 						&& (cy >= last_y - 4 && cy <= last_y + 4))
