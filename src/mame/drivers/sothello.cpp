@@ -56,7 +56,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_v9938(*this, "v9938"),
 		m_msm(*this, "msm"),
-		m_bank1(*this, "mainbank")
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -91,7 +91,7 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_msm;
-	required_memory_bank m_bank1;
+	required_memory_bank m_mainbank;
 };
 
 
@@ -109,7 +109,7 @@ private:
 
 void sothello_state::machine_start()
 {
-	m_bank1->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 
 	save_item(NAME(m_subcpu_status));
 	save_item(NAME(m_soundcpu_busy));
@@ -126,7 +126,7 @@ WRITE8_MEMBER(sothello_state::bank_w)
 		case 4: bank=2; break;
 		case 8: bank=3; break;
 	}
-	m_bank1->set_entry(bank);
+	m_mainbank->set_entry(bank);
 }
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
@@ -412,4 +412,4 @@ ROM_START( sothello )
 	ROM_LOAD( "6.7f",   0x0000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END
 
-GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state,  0, ROT0, "Success / Fujiwara", "Super Othello", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )
