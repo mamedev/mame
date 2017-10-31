@@ -502,12 +502,17 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 
 READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
-	/* These values are for Boulderdash, I have no idea what they do in Slyspy */
-	switch (offset<<1) {
+	switch (offset<<1) 
+	{
+		/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 		case 0:     return 0;
 		case 2:     return 0x13;
 		case 4:     return 0;
 		case 6:     return 0x2;
+		// sly spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
+		// chances are that it actually ties to the main CPU xtal instead.
+		// (reads at 6958 6696)
+		case 0xc:	return m_ram[0x2028/2] >> 8;
 	}
 
 	logerror("%04x, Unknown protection read at 30c000 %d\n", space.device().safe_pc(), offset);
