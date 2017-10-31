@@ -51,107 +51,13 @@ public:
 	onyx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ctc1(*this, "ctc1")
-		, m_ctc2(*this, "ctc2")
-		, m_ctc3(*this, "ctc3")
-		, m_pio1(*this, "pio1")
-		, m_pio2(*this, "pio2")
-		, m_sio1(*this, "sio1")
-		, m_sio2(*this, "sio2")
-		, m_sio3(*this, "sio3")
-		, m_sio4(*this, "sio4")
-		, m_sio5(*this, "sio5")
 	{ }
 
 	DECLARE_MACHINE_RESET(c8002);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
 
 private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc1;
-	required_device<z80ctc_device> m_ctc2;
-	required_device<z80ctc_device> m_ctc3;
-	required_device<z80pio_device> m_pio1;
-	required_device<z80pio_device> m_pio2;
-	required_device<z80sio_device> m_sio1;
-	required_device<z80sio_device> m_sio2;
-	required_device<z80sio_device> m_sio3;
-	required_device<z80sio_device> m_sio4;
-	required_device<z80sio_device> m_sio5;
 };
-
-
-READ8_MEMBER( onyx_state::io_r )
-{
-	offset >>= 1;
-	switch (offset >> 2)
-	{
-		case 0x00:
-			return m_sio1->cd_ba_r(space, offset & 3);
-		case 0x01:
-			return m_sio2->cd_ba_r(space, offset & 3);
-		case 0x02:
-			return m_sio3->cd_ba_r(space, offset & 3);
-		case 0x03:
-			return m_sio4->cd_ba_r(space, offset & 3);
-		case 0x04:
-			return m_sio5->cd_ba_r(space, offset & 3);
-		case 0x06:
-			return m_ctc1->read(space, offset & 3);
-		case 0x07:
-			return m_ctc2->read(space, offset & 3);
-		case 0x08:
-			return m_ctc3->read(space, offset & 3);
-		case 0x0a:
-			return m_pio1->read(space, offset & 3);
-		case 0x0b:
-			return m_pio2->read(space, offset & 3);
-		default:
-			return 0;
-	}
-}
-
-WRITE8_MEMBER( onyx_state::io_w )
-{
-	offset >>= 1;
-	switch (offset >> 2)
-	{
-		case 0x00: // ff00-ff07
-			m_sio1->cd_ba_w(space, offset & 3, data);
-			break;
-		case 0x01: // ff08-ff0f
-			m_sio2->cd_ba_w(space, offset & 3, data);
-			break;
-		case 0x02: // ff10-ff17
-			m_sio3->cd_ba_w(space, offset & 3, data);
-			break;
-		case 0x03: // ff18-ff1f
-			m_sio4->cd_ba_w(space, offset & 3, data);
-			break;
-		case 0x04: // ff20-ff27
-			m_sio5->cd_ba_w(space, offset & 3, data);
-			break;
-		case 0x06: // ff30-ff37
-			m_ctc1->write(space, offset & 3, data);
-			break;
-		case 0x07: // ff38-ff3f
-			m_ctc2->write(space, offset & 3, data);
-			break;
-		case 0x08: // ff40-ff47
-			m_ctc3->write(space, offset & 3, data);
-			break;
-		case 0x0a: // ff50-ff57
-			m_pio1->write(space, offset & 3, data);
-			break;
-		case 0x0b: // ff58-ff5f
-			m_pio2->write(space, offset & 3, data);
-			break;
-		default:
-			break;
-	}
-}
 
 
 /* Input ports */
@@ -176,7 +82,16 @@ ADDRESS_MAP_END
 //ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c8002_io, AS_IO, 8, onyx_state)
-	AM_RANGE(0xff00, 0xff5f) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0xff00, 0xff07) AM_DEVREADWRITE_MOD("sio1", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff08, 0xff0f) AM_DEVREADWRITE_MOD("sio2", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff10, 0xff17) AM_DEVREADWRITE_MOD("sio3", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_MOD("sio4", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff20, 0xff27) AM_DEVREADWRITE_MOD("sio5", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff30, 0xff37) AM_DEVREADWRITE_MOD("ctc1", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff38, 0xff3f) AM_DEVREADWRITE_MOD("ctc2", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff40, 0xff47) AM_DEVREADWRITE_MOD("ctc3", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff50, 0xff57) AM_DEVREADWRITE_MOD("pio1", z80pio_device, read, write, rshift<1>)
+	AM_RANGE(0xff58, 0xff5f) AM_DEVREADWRITE_MOD("pio2", z80pio_device, read, write, rshift<1>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(submem, AS_PROGRAM, 8, onyx_state)
