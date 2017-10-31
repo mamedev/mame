@@ -29,7 +29,7 @@ Issues:
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "video/i8275.h"
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START(rc702_io, AS_IO, 8, rc702_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0x04, 0x05) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio1", z80sio_device, cd_ba_r, cd_ba_w) // boot sequence doesn't program this
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio1", z80dart_device, cd_ba_r, cd_ba_w) // boot sequence doesn't program this
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio", z80pio_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_READ_PORT("DSW") AM_WRITE(port14_w) // motors
@@ -334,13 +334,13 @@ static MACHINE_CONFIG_START( rc702 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rc702_state, clock_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_8MHz / 2)
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_8MHz / 2)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio1", Z80DART, XTAL_8MHz / 2)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

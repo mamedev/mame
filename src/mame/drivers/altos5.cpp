@@ -16,6 +16,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/wd_fdc.h"
 #include "machine/clock.h"
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("dart", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x20, 0x23) // Hard drive
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
@@ -375,10 +376,10 @@ static MACHINE_CONFIG_START( altos5 )
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80SIO, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_8MHz / 2)
 	// Channel A - console #3
 	// Channel B - printer
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 2)
 	// Channel A - console #2
@@ -392,16 +393,15 @@ static MACHINE_CONFIG_START( altos5 )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))    // SIO Ch B
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80sio_device, txca_w))       // Z80DART Ch A, SIO Ch A
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart" ,z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80dart_device, txca_w))       // Z80DART Ch A, SIO Ch A
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart" ,z80dart_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio" ,z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio" ,z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart", z80sio_device, rxtxcb_w))       // Z80DART Ch B
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))       // Z80DART Ch B
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
-	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("sio", z80sio_device, rib_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL_8MHz / 8)

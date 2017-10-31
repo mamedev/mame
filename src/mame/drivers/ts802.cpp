@@ -27,7 +27,7 @@
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 
 class ts802_state : public driver_device
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
 	// 08-0B: Z80 CTC
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	// 0C-0F: Z80 SIO #1
-	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80sio_device, ba_cd_r, ba_cd_w)
+	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(port0c_r)
 	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_READ(port0e_r)
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
 	// 18: floppy misc.
 	AM_RANGE(0x18, 0x1c) AM_WRITE(port18_w)
 	// 20-23: Z80 SIO #2
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
 	// 48-4F: WD1000 harddisk controller
 	// 80: LEDs
 	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
@@ -199,11 +199,11 @@ static MACHINE_CONFIG_START( ts802 )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("dart1", Z80SIO, XTAL_16MHz / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL_16MHz / 4)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart2", Z80SIO, XTAL_16MHz / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL_16MHz / 4)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

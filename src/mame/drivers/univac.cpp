@@ -26,7 +26,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/clock.h"
 #include "screen.h"
 
@@ -58,7 +58,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<nvram_device> m_nvram;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80sio_device> m_dart;
+	required_device<z80dart_device> m_dart;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uts20_io, AS_IO, 8, univac_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80sio_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
 	AM_RANGE(0x80, 0xbf) AM_RAM AM_SHARE("nvram")
@@ -187,15 +187,15 @@ static MACHINE_CONFIG_START( uts20 )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80sio_device, rxcb_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxcb_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("dart", Z80SIO, XTAL_4MHz)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_4MHz)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 

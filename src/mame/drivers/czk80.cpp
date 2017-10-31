@@ -45,7 +45,7 @@ I/O ports: These ranges are what is guessed
 #include "machine/upd765.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("dart", z80sio_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x81, 0x81) AM_READ(port81_r)
@@ -206,11 +206,11 @@ static MACHINE_CONFIG_START( czk80 )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD("dart", Z80SIO, XTAL_16MHz / 4)
-	//MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_16MHz / 4)
+	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

@@ -31,7 +31,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs128_io, AS_IO, 8, mtx_state )
 	AM_IMPORT_FROM(mtx_io)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80sio_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -363,8 +363,8 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80SIO, XTAL_4MHz)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_4MHz)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
