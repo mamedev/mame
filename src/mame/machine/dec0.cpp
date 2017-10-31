@@ -366,14 +366,10 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 
 DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
-	uint8_t *RAM = memregion("audiocpu")->base();
 	h6280_decrypt("audiocpu");
 
-	/* Slyspy sound cpu has some protection */
-	RAM[0xf2d] = 0xea;
-	RAM[0xf2e] = 0xea;
-
 	save_item(NAME(m_slyspy_state));
+	save_item(NAME(m_slyspy_sound_state));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,robocop)
