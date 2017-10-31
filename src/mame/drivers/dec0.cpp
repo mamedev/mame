@@ -1966,7 +1966,8 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_CPU_PROGRAM_MAP(slyspy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	// TODO: both games doesn't like /3 here, MT #06740
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
