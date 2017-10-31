@@ -59,6 +59,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "bus/einstein/userport/userport.h"
 #include "machine/clock.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
@@ -363,7 +364,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	/* block 5, z80ctc */
 	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_device, read, write)
 	/* block 6, z80pio */
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_device, read, write)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_device, read_alt, write_alt)
 #if 0
 	/* block 7, adc */
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE_LEGACY(IC_I050, adc0844_r, adc0844_w)
@@ -522,7 +523,10 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("user", einstein_userport_device, read))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("user", einstein_userport_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("user", einstein_userport_device, brdy_w))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
@@ -583,6 +587,10 @@ static MACHINE_CONFIG_START( einstein )
 
 	// tatung pipe connector
 	MCFG_TATUNG_PIPE_ADD("pipe")
+
+	// user port
+	MCFG_EINSTEIN_USERPORT_ADD("user")
+	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(DEVWRITELINE(IC_I063, z80pio_device, strobe_b))
 MACHINE_CONFIG_END
 
 

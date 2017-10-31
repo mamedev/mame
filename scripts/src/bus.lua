@@ -3294,3 +3294,17 @@ if (BUSES["TATUNG_PIPE"]~=null) then
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/einstein/userport/userport.h,BUSES["EINSTEIN_USERPORT"] = true
+---------------------------------------------------
+
+if (BUSES["EINSTEIN_USERPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/einstein/userport/userport.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/einstein/userport/speech.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
+	}
+end
