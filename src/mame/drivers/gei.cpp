@@ -138,6 +138,7 @@ public:
 	DECLARE_READ8_MEMBER(signature_r);
 	DECLARE_WRITE8_MEMBER(signature_w);
 	DECLARE_WRITE8_MEMBER(signature2_w);
+	DECLARE_WRITE8_MEMBER(signature3_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sound2_w);
@@ -405,7 +406,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const uint8_t signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
+		static const uint8_t signature[8] = { 0x4d, 0x3c, 0x88, 0x4e, 0x24, 0x8d, 0x1e, 0x00 }; // bytes 0x03 through 0x0c of each question ROM - to prevent ROM swaps
 
 		m_signature_answer = signature[m_signature_pos++];
 
@@ -418,13 +419,27 @@ WRITE8_MEMBER(gei_state::signature2_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const uint8_t signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 }; // bytes 0x03 through 0x0c of each question ROM - to prevent ROM swaps
 
 		m_signature_answer = signature[m_signature_pos++];
 
 		m_signature_pos &= 7;   /* safety; shouldn't happen */
 	}
 }
+
+WRITE8_MEMBER(gei_state::signature3_w)
+{
+	if (data == 0) m_signature_pos = 0;
+	else
+	{
+		static const uint8_t signature[8] = { 0x4d, 0x3c, 0x88, 0x4e, 0x24, 0x8d, 0x1e, 0x00 }; // bytes 0x03 through 0x0c of each question ROM - to prevent ROM swaps
+
+		m_signature_answer = signature[m_signature_pos++];
+
+		m_signature_pos &= 7;   /* safety; shouldn't happen */
+	}
+}
+
 
 static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -526,6 +541,27 @@ static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
 	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
+	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
+	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
+	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bigjoke_map, AS_PROGRAM, 8, gei_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	/* banked ROMs are enabled by low 6 bits of the address */
+	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
+	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
+	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_4_w)
+	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_3_w)
+	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
+	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
+	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature3_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
@@ -870,6 +906,37 @@ static INPUT_PORTS_START(sexappl)
 	PORT_INCLUDE(trivia_standard)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(bigjoke)
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Orientation" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_INCLUDE(trivia_standard)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gt103 )
 	PORT_START("DSWA")      /* DSW A */
 	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )    PORT_DIPLOCATION("SW1:1,2,3")
@@ -1155,6 +1222,12 @@ static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sprtauth_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bigjoke, getrivia )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bigjoke_map)
 MACHINE_CONFIG_END
 
 /***************************************************
@@ -1960,7 +2033,7 @@ GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, 0,        ROT0,
 GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1987, bigjoke,   0,        findout,   sexappl,  gei_state, 0,        ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Needs reverse engineering of the correct 'signature'
+GAME( 1987, bigjoke,   0,        bigjoke,   bigjoke,  gei_state, 0,        ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, 0,        ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
