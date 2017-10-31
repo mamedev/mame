@@ -53,7 +53,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio1", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_NOP // winchester interface
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w) // winchester control
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(port1c_w) // gpebh select
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("pio2", z80pio_device, read, write)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio2", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x28, 0x28) AM_READ(port28_r) AM_DEVWRITE("votrax", votrax_sc01_device, write)
 	AM_RANGE(0x2c, 0x2c) AM_DEVWRITE("votrax", votrax_sc01_device, inflection_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(address_w)
@@ -368,29 +368,8 @@ static const z80_daisy_config daisy_chain_intf[] =
 ************************************************************/
 
 // baud rate generator. All inputs are 1.2288MHz.
-WRITE_LINE_MEMBER( aussiebyte_state::clock_w )
-{
-	m_ctc->trg0(state);
-	m_ctc->trg1(state);
-	m_ctc->trg2(state);
-}
-
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z0_w )
-{
-	m_sio1->rxca_w(state);
-	m_sio1->txca_w(state);
-}
-
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z1_w )
-{
-	m_sio1->rxtxcb_w(state);
-	m_sio2->rxca_w(state);
-	m_sio2->txca_w(state);
-}
-
 WRITE_LINE_MEMBER( aussiebyte_state::ctc_z2_w )
 {
-	m_sio2->rxtxcb_w(state);
 	m_ctc->trg3(1);
 	m_ctc->trg3(0);
 }
@@ -496,13 +475,19 @@ static MACHINE_CONFIG_START( aussiebyte )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(aussiebyte_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(aussiebyte_state, ctc_z0_w))    // SIO1 Ch A
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(aussiebyte_state, ctc_z1_w))    // SIO1 Ch B, SIO2 Ch A
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, txca_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(aussiebyte_state, ctc_z2_w))    // SIO2 Ch B, CTC Ch 3
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -523,21 +508,21 @@ static MACHINE_CONFIG_START( aussiebyte )
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(aussiebyte_state, port20_w))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO0, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio1_rdya_w))
-	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio1_rdyb_w))
+	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio1_rdya_w))
+	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio1_rdyb_w))
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO0, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio2_rdya_w))
-	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio2_rdyb_w))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio2_rdya_w))
+	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio2_rdyb_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80sio0_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80sio_device, rxa_w))
 
 	MCFG_WD2797_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_intrq_w))

@@ -29,21 +29,18 @@ and be connected to a RS422 network.
 //#include "cpu/z80/z80daisy.h"
 //#include "machine/z80ctc.h"
 //#include "machine/z80pio.h"
-//#include "machine/z80dart.h"
+//#include "machine/z80sio.h"
 //#include "machine/z80dma.h"
 #include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
 
 class onyx_state : public driver_device
 {
 public:
 	onyx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	DECLARE_MACHINE_RESET(c8002);
 	void kbd_put(u8 data);
@@ -91,7 +88,7 @@ ADDRESS_MAP_END
 //ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c8002_io, AS_IO, 8, onyx_state)
-	AM_RANGE(0xff00, 0xff01)  AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0xff04, 0xff05) AM_READ(portff05_r)
 ADDRESS_MAP_END
 
@@ -128,14 +125,14 @@ static MACHINE_CONFIG_START( c8002 )
 	/* peripheral hardware */
 	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
-	//MCFG_DEVICE_ADD("z80sio_0", Z80SIO0, 9600)
-	//MCFG_DEVICE_ADD("z80sio_1", Z80SIO0, 9600)
+	//MCFG_DEVICE_ADD("z80sio_0", Z80SIO, 9600)
+	//MCFG_DEVICE_ADD("z80sio_1", Z80SIO, 9600)
 	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(onyx_state, kbd_put))
 MACHINE_CONFIG_END
 

@@ -58,7 +58,7 @@
 #include "imagedev/cassette.h"
 #include "machine/k7659kb.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
@@ -72,11 +72,10 @@ public:
 	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pio_s(*this, "z80pio_s")
-		, m_pio_u(*this, "z80pio_u")
-		, m_sio(*this, "z80sio")
-		, m_ctc_s(*this, "z80ctc_s")
-		, m_ctc_u(*this, "z80ctc_u")
+		, m_pio_s(*this, "pio_s")
+		, m_pio_u(*this, "pio_u")
+		, m_ctc_s(*this, "ctc_s")
+		, m_ctc_u(*this, "ctc_u")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_p_videoram(*this, "videoram")
@@ -96,7 +95,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
-	required_device<z80sio0_device> m_sio;
 	required_device<z80ctc_device> m_ctc_s;
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<speaker_sound_device> m_speaker;
@@ -169,11 +167,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc_s", z80ctc_device, read, write) // system CTC
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80pio_s", z80pio_device, read, write) // system PIO
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80sio", z80sio0_device, cd_ba_r, cd_ba_w) // SIO
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_u", z80ctc_device, read, write) // user CTC
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("z80pio_u", z80pio_device, read, write) // user PIO
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc_s", z80ctc_device, read, write) // system CTC
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("pio_s", z80pio_device, read, write) // system PIO
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w) // SIO
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("ctc_u", z80ctc_device, read, write) // user CTC
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("pio_u", z80pio_device, read, write) // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
 	//AM_RANGE(0x98, 0x9B) // NMI generator
 	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
@@ -223,11 +221,11 @@ uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 static const z80_daisy_config pcm_daisy_chain[] =
 {
-	{ "z80ctc_s" },     /* System ctc */
-	{ "z80pio_s" },     /* System pio */
-	{ "z80sio" },       /* sio */
-	{ "z80pio_u" },     /* User pio */
-	{ "z80ctc_u" },     /* User ctc */
+	{ "ctc_s" },     /* System ctc */
+	{ "pio_s" },     /* System pio */
+	{ "sio" },       /* sio */
+	{ "pio_u" },     /* User pio */
+	{ "ctc_u" },     /* User ctc */
 	{ nullptr }
 };
 
@@ -280,24 +278,25 @@ static MACHINE_CONFIG_START( pcm )
 	MCFG_K7659_KEYBOARD_ADD()
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("z80pio_u", Z80PIO, XTAL_10MHz/4)
+	MCFG_DEVICE_ADD("pio_u", Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, XTAL_10MHz/4)
+	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 4800) // clocks come from the system ctc
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_10MHz /4)
 
-	MCFG_DEVICE_ADD("z80ctc_u", Z80CTC, XTAL_10MHz /4)
+	MCFG_DEVICE_ADD("ctc_u", Z80CTC, XTAL_10MHz /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80ctc_s", Z80CTC, XTAL_10MHz /4)
+	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL_10MHz /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	// ZC0 : SIO channel A clock
-	// ZC1 : SIO channel B clock
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))  // speaker
 MACHINE_CONFIG_END
 

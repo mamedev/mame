@@ -18,7 +18,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "video/i8275.h"
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( rt1715 )
 
 	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
 
-	MCFG_DEVICE_ADD("a29", Z80SIO0, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL_10MHz/4 /* ? */)
 
 	/* floppy */
 	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)

@@ -28,7 +28,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/wd_fdc.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/mm58274c.h"
 #include "bus/rs232/rs232.h"
@@ -104,14 +104,14 @@ static ADDRESS_MAP_START(dmax8000_io, AS_IO, 8, dmax8000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart1", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio1", z80pio_device, read, write) // fdd controls
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio2", z80pio_device, read, write) // centronics & parallel ports
 	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w) // control lines for the centronics & parallel ports
 	//AM_RANGE(0x18, 0x19) AM_MIRROR(2) AM_DEVREADWRITE("am9511", am9512_device, read, write) // optional numeric coprocessor
 	//AM_RANGE(0x1c, 0x1d) AM_MIRROR(2)  // optional hard disk controller (1C=status, 1D=data)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w) // memory bank control
 	//AM_RANGE(0x60, 0x67) // optional IEEE488 GPIB
 	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write) // optional RTC
@@ -156,25 +156,25 @@ static MACHINE_CONFIG_START( dmax8000 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart1", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart2", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart1", z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart1", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart2", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart1", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL_4MHz) // A = terminal; B = aux
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("dart1", Z80SIO, XTAL_4MHz) // A = terminal; B = aux
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart1", z80dart_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart1", z80dart_device, ria_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart1", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart1", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart1", z80sio_device, dcda_w))
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart1", z80sio_device, ria_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart1", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL_4MHz) // RS232 ports
+	MCFG_DEVICE_ADD("dart2", Z80SIO, XTAL_4MHz) // RS232 ports
 
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(dmax8000_state, port0c_w))
