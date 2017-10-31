@@ -3658,4 +3658,4 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp, norautp_state,  0,   ROT0, "M
 GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
-GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state,  0,   ROT0, "<unknown>",                "Unknown Poker PKII/DM",               MACHINE_NOT_WORKING )
+GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state,  0,   ROT0, "<unknown>",                "unknown poker game PKII/DM",               MACHINE_NOT_WORKING )

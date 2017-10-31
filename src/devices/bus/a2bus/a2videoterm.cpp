@@ -39,8 +39,8 @@
 DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx VideoTerm")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16,        a2bus_ap16_device,      "a2ap16",   "IBS AP-16 80 column card")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16ALT,     a2bus_ap16alt_device,   "a2ap16a",  "IBS AP-16 80 column card (alt. version)")
-DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "Unknown VideoTerm clone #1")
-DEFINE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device,      "a2vtc2",   "Unknown VideoTerm clone #2")
+DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "unknown VideoTerm clone #1")
+DEFINE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device,      "a2vtc2",   "unknown VideoTerm clone #2")
 DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Applied Engineering Viewmaster 80")
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"

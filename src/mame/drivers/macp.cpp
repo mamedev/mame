@@ -141,7 +141,7 @@ GAME( 1986, macgalxy, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC's 
 GAME( 1987, macjungl, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC Jungle",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctrain, 0, macp,    macp, macp_state, 0, ROT0, "MAC S.A.", "Space Train (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1988, spcpnthr, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "Space Panther",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, mac_1808, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "Unknown Game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, mac_1808, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "unknown game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1995, macjungn, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "MAC Jungle (New version)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1996, nbamac,   0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "NBA MAC",                  MACHINE_IS_SKELETON_MECHANICAL )
 

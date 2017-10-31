@@ -41,4 +41,4 @@ ROM_START( wyse )
 	ROM_LOAD( "wyse_251167-06.bin", 0x000000, 0x010000, CRC(36e920df) SHA1(8fb7f51b4f47ef63b21d421227d6fef98001e4e9) ) // program
 ROM_END
 
-COMP( 19??, wyse, 0, 0, wyse, wyse, wyse_state, 0, "Wyse", "Unknown terminal", MACHINE_IS_SKELETON )
+COMP( 19??, wyse, 0, 0, wyse, wyse, wyse_state, 0, "Wyse", "unknown terminal", MACHINE_IS_SKELETON )
