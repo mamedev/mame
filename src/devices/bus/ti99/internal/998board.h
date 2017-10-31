@@ -436,15 +436,51 @@ public:
 
 	WRITE_LINE_MEMBER( clock_in );
 
+	// INT line
+	devcb_write_line m_int;
+
 private:
+	bool control_bit(int bit) { return (m_control & bit)!=0; }
+	bool status_bit(int bit) { return (m_status & bit)!=0; }
+	void clear_int_status();
+	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
+	void update_hexbus();
+
 	uint8_t m_data;
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
 
+	uint8_t m_lasthxvalue;
+
 	int m_clkcount;
 
-	int m_xmit_send;
+	bool m_sbav;
+	bool m_sbavold;
+	bool m_bav;
+	bool m_bavhold;
+
+	bool m_shsk;
+	bool m_shskold;
+	bool m_hsk;
+	bool m_hskhold;
+
+	// Page 3 in OSO schematics
+	bool m_wq1;
+	bool m_wq1old;
+	bool m_wq2;
+	bool m_wq2old;
+	bool m_wnp;
+	bool m_wbusy;
+	bool m_wbusyold;
+	bool m_sendbyte;
+
+	bool m_wrst;
+
+	bool m_counting;
+
+	bool m_rq2;
+	bool m_rq2old;
 };
 
 class mainboard8_device : public device_t
@@ -611,6 +647,9 @@ private:
 
 #define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
 	devcb = &bus::ti99::internal::mainboard8_device::set_hold_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_OSO_INT_CALLBACK(_int) \
+	devcb = &bus::ti99::internal::oso_device::set_int_callback(*device, DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)
