@@ -51,7 +51,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "cpu/z80/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
 	AM_RANGE(0x00, 0x0f) AM_READ_PORT("DSW")
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(port10_r, port10_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("sti", z80sti_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("dart", z80sio_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x90, 0x9f) AM_READWRITE(disk_0_control_r,disk_0_control_w)
 	AM_RANGE(0xa0, 0xbf) AM_READWRITE(porta0_r, porta0_w)
@@ -437,19 +437,19 @@ static MACHINE_CONFIG_START( ts803 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sti", z80sti_device, rc_w))
 
 	MCFG_DEVICE_ADD("dart_clock", CLOCK, (XTAL_16MHz / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("sti", Z80STI, XTAL_16MHz/4)
-	MCFG_Z80STI_OUT_TBO_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))
+	MCFG_Z80STI_OUT_TBO_CB(DEVWRITELINE("dart", z80sio_device, rxtxcb_w))
 	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("dart", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80sio_device, rxa_w))
 
 	/* floppy disk */
 	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
