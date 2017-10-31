@@ -2262,6 +2262,7 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 	m_wrst(false), m_counting(false),
 	m_rq2(false), m_rq2old(true)
 {
+	(void)m_shskold;
 	m_hexbus_inbound = nullptr;
 	m_hexbus_outbound = nullptr;
 }
