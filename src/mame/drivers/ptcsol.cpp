@@ -113,6 +113,7 @@
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/keyboard.h"

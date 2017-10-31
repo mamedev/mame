@@ -22,6 +22,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class jade_state : public driver_device

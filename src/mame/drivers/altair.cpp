@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"

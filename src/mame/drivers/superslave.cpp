@@ -22,6 +22,7 @@ Oxx,yy          = Out port
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/com8116.h"

@@ -30,6 +30,7 @@ TODO
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/keyboard.h"
