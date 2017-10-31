@@ -406,7 +406,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const uint8_t signature[8] = { 0x4d, 0x3c, 0x88, 0x4e, 0x24, 0x8d, 0x1e, 0x00 }; // bytes 0x03 through 0x0c of each question ROM - to prevent ROM swaps
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 }; // bytes 0x03 through 0x0c of each question ROM - to prevent ROM swaps
 
 		m_signature_answer = signature[m_signature_pos++];
 
