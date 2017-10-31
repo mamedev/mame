@@ -61,7 +61,7 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
@@ -172,7 +172,7 @@ private:
 	required_device<msm5832_device> m_rtc;
 	required_device<ay8912_device> m_psg;
 	required_device<upd765a_device> m_fdc;
-	required_device<z80sio0_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<z80pio_device> m_pio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<tms9927_device> m_crtc;
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio0_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
@@ -942,7 +942,7 @@ static MACHINE_CONFIG_START( attache )
 	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO0, XTAL_8MHz / 26)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 26)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
