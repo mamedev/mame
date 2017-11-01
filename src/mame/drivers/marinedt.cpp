@@ -137,6 +137,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode; 
 
 	tilemap_t *m_tilemap;
+	std::unique_ptr<bitmap_ind16> m_seabitmap;
+	void init_seabitmap();
 };
 
 TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
@@ -146,18 +148,17 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-void marinedt_state::video_start()
+// initialize sea bitmap gradient
+void marinedt_state::init_seabitmap()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32); 
-	m_tilemap->set_transparent_pen(0); 
-}
+	const rectangle clip(32, 256, 32, 256);
+	m_seabitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	bitmap.fill(64, cliprect);	
+	m_seabitmap->fill(64, clip);	
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = 32; x <= cliprect.max_x; x++)
+	for (int y = clip.min_y; y <= clip.max_y; y++)
+	{
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			// TODO: exact formula (related to total h size?)
 			uint8_t blue_pen = 0x48 + ((x-32) / 8);
@@ -165,8 +166,24 @@ uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
 			
-			bitmap.pix16(y, x) = blue_pen;
+			m_seabitmap->pix16(y, x) = blue_pen;
 		}
+	}
+}
+
+void marinedt_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	
+	m_tilemap->set_transparent_pen(0);
+	
+	init_seabitmap();
+}
+
+uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	copybitmap(bitmap, *m_seabitmap, 0, 0, 0, 0, cliprect);
+
 
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
 	return 0;
@@ -348,6 +365,7 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+
 	
 	for (i = 0; i < 32; i++)
 	{
@@ -410,10 +428,10 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg13.6h",     0x0000, 0x1000, CRC(17817044) SHA1(8c9b96620e3c414952e6d85c6e81b0df85c88e7a) )
 
 	ROM_REGION( 0x0080, "proms", ROMREGION_INVERT )
-	ROM_LOAD( "mg14.2a",  0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) )
-	ROM_LOAD( "mg15.1a",  0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) )
-	ROM_LOAD( "mg16.4e",  0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) )
-	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )
+	ROM_LOAD( "mg14.2a",  0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) ) // tilemap colors
+	ROM_LOAD( "mg15.1a",  0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) ) // sprite colors
+	ROM_LOAD( "mg16.4e",  0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) ) // (related to sprites)
+	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_IS_SKELETON )
+GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
