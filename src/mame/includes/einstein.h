@@ -65,10 +65,10 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
+		m_floppy{ { *this, IC_I042 ":0" }, { *this, IC_I042 ":1" }, { *this, IC_I042 ":2" }, { *this, IC_I042 ":3" } },
 		m_line(*this, "LINE%u", 0),
 		m_extra(*this, "EXTRA"),
-		m_buttons(*this, "BUTTONS"),
-		m_config(*this, "config")
+		m_buttons(*this, "BUTTONS")
 	{
 	}
 
@@ -117,10 +117,10 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
+	required_device<floppy_connector> m_floppy[4];
 	required_ioport_array<8> m_line;
 	required_ioport m_extra;
 	required_ioport m_buttons;
-	required_ioport m_config;
 
 	void einstein_scan_keyboard();
 	void einstein_page_rom();

@@ -140,27 +140,19 @@ READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
 
 WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 {
-	if(VERBOSE_DISK)
+	if (VERBOSE_DISK)
 		logerror("%s: einstein_drsel_w %02x\n", machine().describe_context(), data);
 
-	/* bit 0 to 3 select the drive */
-	static const char *names[] = { IC_I042 ":0", IC_I042 ":1", IC_I042 ":2", IC_I042 ":3" };
 	floppy_image_device *floppy = nullptr;
-	for(int i=0; i<4; i++) {
-		if(BIT(data, i)) {
-			floppy_connector *con = machine().device<floppy_connector>(names[i]);
-			if(con)
-				floppy = con->get_device();
-		}
-	}
 
-	/* double sided drive connected? */
-	if (m_config->read() & data)
-	{
-		/* bit 4 selects the side then */
-		//floppy->ss_w(BIT(data, 4));
-	}
-	if (floppy) floppy->ss_w(0);
+	if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
+	if (BIT(data, 1)) floppy = m_floppy[1]->get_device();
+	if (BIT(data, 2)) floppy = m_floppy[2]->get_device();
+	if (BIT(data, 3)) floppy = m_floppy[3]->get_device();
+
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
+
 	m_fdc->set_floppy(floppy);
 }
 
@@ -484,20 +476,6 @@ static INPUT_PORTS_START( einstein )
 	/* analog joystick 2 Y axis */
 	PORT_START("JOY2_Y")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_START("config")
-	PORT_CONFNAME(0x01, 0x00, "Floppy drive #1")
-	PORT_CONFSETTING(0x00, "Single sided")
-	PORT_CONFSETTING(0x01, "Double sided")
-	PORT_CONFNAME(0x02, 0x00, "Floppy drive #2")
-	PORT_CONFSETTING(0x00, "Single sided")
-	PORT_CONFSETTING(0x02, "Double sided")
-	PORT_CONFNAME(0x04, 0x00, "Floppy drive #3")
-	PORT_CONFSETTING(0x00, "Single sided")
-	PORT_CONFSETTING(0x04, "Double sided")
-	PORT_CONFNAME(0x08, 0x00, "Floppy drive #4")
-	PORT_CONFSETTING(0x00, "Single sided")
-	PORT_CONFSETTING(0x08, "Double sided")
 INPUT_PORTS_END
 
 
@@ -506,7 +484,12 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static SLOT_INTERFACE_START( einstein_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE("3ss", TEAC_FD_30A)
+	SLOT_INTERFACE("3ds", FLOPPY_3_DSDD)
+	SLOT_INTERFACE("525ssqd", FLOPPY_525_SSQD)
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+	SLOT_INTERFACE("35ssdd", FLOPPY_35_SSDD)
+	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( einstein )
@@ -572,10 +555,10 @@ static MACHINE_CONFIG_START( einstein )
 
 	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
