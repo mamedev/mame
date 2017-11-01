@@ -679,7 +679,8 @@ void z80sio_channel::tra_complete()
 
 		// empty transmit buffer
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(true);
 		if (m_wr1 & WR1_TX_INT_ENABLE)
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 	}
@@ -772,6 +773,20 @@ void z80sio_channel::update_rts()
 
 	// data terminal ready output follows the state programmed into the DTR bit*/
 	set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
+}
+
+void z80sio_channel::set_ready(bool ready)
+{
+	// WAIT mode not supported yet
+	if (!(m_wr1 & WR1_WRDY_FUNCTION))
+		return;
+
+	logerror("Channel %sready\n", ready ? "" : "not ");
+
+	if (m_index == z80sio_device::CHANNEL_A)
+		m_uart->m_out_wrdya_cb(ready ? 0 : 1);
+	else
+		m_uart->m_out_wrdyb_cb(ready ? 0 : 1);
 }
 
 //-------------------------------------------------
@@ -1094,6 +1109,16 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters\n", owner()->tag(), 'A' + m_index);
 		break;
 	}
+
+	if (data & WR1_WRDY_ENABLE)
+	{
+		if (data & WR1_WRDY_ON_RX_TX)
+			set_ready((m_rr0 & RR0_RX_CHAR_AVAILABLE) != 0);
+		else
+			set_ready((m_rr0 & RR0_TX_BUFFER_EMPTY) != 0);
+	}
+	else
+		set_ready(false);
 }
 
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
@@ -1206,14 +1231,17 @@ void z80sio_channel::data_write(uint8_t data)
 
 		// empty transmit buffer
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(true);
 		if (m_wr1 & WR1_TX_INT_ENABLE)
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 	}
 	else
 	{
-		LOGTX("  Transmitter %s, data byte dropped\n", m_wr5 & WR5_TX_ENABLE ? "not enabled" : "not emptied");
+		LOGTX("  Transmitter not %s, data byte %02x pending\n", m_wr5 & WR5_TX_ENABLE ? "emptied" : "enabled", m_tx_data);
 		m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(false);
 	}
 
 	m_rr1 &= ~RR1_ALL_SENT;
@@ -1250,6 +1278,8 @@ void z80sio_channel::advance_rx_fifo()
 		{
 			// no more characters available in the FIFO
 			m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
+			if ((m_wr1 & WR1_WRDY_ENABLE) && (m_wr1 & WR1_WRDY_ON_RX_TX))
+				set_ready(false);
 		}
 	}
 }
@@ -1297,6 +1327,8 @@ void z80sio_channel::receive_data()
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
+	if ((m_wr1 & WR1_WRDY_ENABLE) && (m_wr1 & WR1_WRDY_ON_RX_TX))
+		set_ready(true);
 	if (!m_rx_fifo_depth)
 		m_rr1 |= uint8_t(rx_error);
 
@@ -1471,7 +1503,6 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 			if ((get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0) + 1) == m_rx_bit)
 			{
 				// this is the stop bit - framing error adds a half bit period
-				LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
 				m_rx_count = m_rxd ? 0 : clocks;
 				m_rx_bit = 0;
 
@@ -1480,6 +1511,8 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 			}
 			else
 			{
+				LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
+
 				// wait a whole bit period for the next bit
 				m_rx_count = clocks;
 				++m_rx_bit;
