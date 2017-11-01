@@ -112,6 +112,7 @@ public:
 	marinedt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
 	{
@@ -121,6 +122,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
 	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(obj_0_w);
+	DECLARE_WRITE8_MEMBER(obj_1_w);
+	DECLARE_WRITE8_MEMBER(layer_enable_w);
 	TILE_GET_INFO_MEMBER(get_tile_info); 
 
 protected:
@@ -133,12 +137,23 @@ protected:
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode; 
 
 	tilemap_t *m_tilemap;
 	std::unique_ptr<bitmap_ind16> m_seabitmap;
+	struct
+	{
+		uint8_t offs;
+		uint8_t x;
+		uint8_t y;
+		bitmap_ind16 bitmap;
+	}m_obj[2];
+	uint8_t m_layer_en;
+	
 	void init_seabitmap();
+	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
 };
 
 TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
@@ -178,12 +193,36 @@ void marinedt_state::video_start()
 	m_tilemap->set_transparent_pen(0);
 	
 	init_seabitmap();
+	
+//	m_obj[0].bitmap = std::make_unique<bitmap_ind16>(512, 512);
+//	m_obj[1].bitmap = std::make_unique<bitmap_ind16>(512, 512);
+
+//	m_screen->register_screen_bitmap(m_seabitmap);
+	m_screen->register_screen_bitmap(m_obj[0].bitmap);
+	m_screen->register_screen_bitmap(m_obj[1].bitmap);
+	
+	save_item(NAME(m_obj[0].x));
+	save_item(NAME(m_obj[0].y));
+	save_item(NAME(m_obj[0].offs));
+	save_item(NAME(m_obj[1].x));
+	save_item(NAME(m_obj[1].y));
+	save_item(NAME(m_obj[1].offs));
+	save_item(NAME(m_obj[0].bitmap));
+	save_item(NAME(m_obj[1].bitmap));
+	save_item(NAME(m_layer_en));
 }
 
 uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	copybitmap(bitmap, *m_seabitmap, 0, 0, 0, 0, cliprect);
+	if(m_layer_en & 8)
+		copybitmap(bitmap, *m_seabitmap, 0, 0, 0, 0, cliprect);
+	else
+		bitmap.fill(0,cliprect);
 
+	if(m_layer_en & 2)
+		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0); 
+	if(m_layer_en & 1)
+		copybitmap_trans(bitmap, m_obj[0].bitmap, 0, 0, 0, 0, cliprect, 0); 
 
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
 	return 0;
@@ -195,19 +234,59 @@ WRITE8_MEMBER(marinedt_state::vram_w)
 	m_tilemap->mark_tile_dirty(offset); 
 }
 
+inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
+{
+	rectangle visarea = m_screen->visible_area();
+	//const uint8_t base_pen;// = which == 0 ? 0x30 : 0x20;
+	gfx_element *gfx = m_gfxdecode->gfx(which+1);
+	
+	switch(reg)
+	{
+		case 0: m_obj[which].offs = data; break;
+		case 1: m_obj[which].x = data; break;
+		case 2: m_obj[which].y = data; break;
+	}
+	
+	const uint8_t tilenum = ((m_obj[which].offs & 4) << 1) | ( (m_obj[which].offs & 0x38) >> 3);
+	const uint8_t color = (m_obj[which].offs & 3);
+	const bool fx = true;
+	const bool fy = BIT(m_obj[which].offs,7);
+	
+	//base_pen = (which == 0 ? 0x30 : 0x20) + color*4;
+	m_obj[which].bitmap.fill(0,visarea);
+	// redraw sprite in framebuffer using above
+	// bitmap,cliprect,tilenum,color,flipx,flipy,xpos,ypos,transpen
+	gfx->transpen(m_obj[which].bitmap,visarea,tilenum,color,fx,!fy,m_obj[which].x,m_obj[which].y,0);
+}
+
+WRITE8_MEMBER(marinedt_state::obj_0_w) { obj_reg_w(0,offset,data); }
+WRITE8_MEMBER(marinedt_state::obj_1_w) { obj_reg_w(1,offset,data); }
+
+WRITE8_MEMBER(marinedt_state::layer_enable_w) 
+{
+	/*
+		---- x--- sea layer draw enable (disabled in test mode)
+		---- --x- obj 2 draw enable
+		---- ---x obj 1 draw enable
+	*/
+	m_layer_en = data;
+}
+
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl",0)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM	
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marinedt_io, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") 
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
+	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
 ADDRESS_MAP_END
 
@@ -322,8 +401,21 @@ static const gfx_layout charlayout =
 	8*8
 };
 
+static const gfx_layout objlayout =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ STEP4(32*8*7,1), STEP4(32*8*6,1), STEP4(32*8*5,1), STEP4(32*8*4,1), STEP4(32*8*3,1), STEP4(32*8*2,1), STEP4(32*8*1,1), STEP4(32*8*0,1) },
+	{ STEP16(0,8), STEP16(16*8,8) },
+	32*32*2
+};
+
 static GFXDECODE_START( marinedt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
 GFXDECODE_END
 
 
@@ -333,6 +425,7 @@ void marinedt_state::machine_start()
 
 void marinedt_state::machine_reset()
 {
+	m_layer_en = 0;
 }
 
 
