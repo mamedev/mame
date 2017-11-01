@@ -33,6 +33,7 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/i8275.h"
+#include "machine/7474.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
 #include "screen.h"
@@ -52,6 +53,7 @@ public:
 		, m_nvram(*this,"nvram")
 		, m_keyboard(*this, "X%u", 0)
 		, m_beep(*this, "beeper")
+		, m_7474(*this, "7474")
 		{ }
 
 	DECLARE_READ8_MEMBER(dma_r);
@@ -59,12 +61,9 @@ public:
 	DECLARE_WRITE8_MEMBER(store_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(hrtc_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 private:
-	bool m_irq_state;
 	bool m_bow;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -76,13 +75,14 @@ private:
 	required_device<x2210_device> m_nvram;
 	required_ioport_array<10> m_keyboard;
 	required_device<beep_device> m_beep;
+	required_device<ttl7474_device> m_7474;
 };
 
 void trs80dt1_state::machine_reset()
 {
-	m_irq_state = 0;
 	m_bow = 0;
-	// line is actually active low in the real chip
+	m_7474->preset_w(1);
+	// line is active low in the real chip
 	m_nvram->recall(1);
 	m_nvram->recall(0);
 }
@@ -102,21 +102,9 @@ READ8_MEMBER( trs80dt1_state::key_r )
 		return 0xff;
 }
 
-WRITE_LINE_MEMBER( trs80dt1_state::irq_w )
-{
-	if (!state && m_irq_state)
-		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-	m_irq_state = state;
-}
-
-WRITE_LINE_MEMBER( trs80dt1_state::hrtc_w )
-{
-	m_maincpu->set_input_line(MCS51_INT1_LINE, m_irq_state ? HOLD_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER( trs80dt1_state::store_w )
 {
-	// line is actually active low in the real chip
+	// line is active low in the real chip
 	m_nvram->store(1);
 	m_nvram->store(0);
 }
@@ -329,13 +317,17 @@ static MACHINE_CONFIG_START( trs80dt1 )
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(trs80dt1_state, crtc_update_row)
-	MCFG_I8275_DRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT0_LINE)) // BRDY pin
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(trs80dt1_state, irq_w)) // INT pin
-	MCFG_I8275_HRTC_CALLBACK(WRITELINE(trs80dt1_state, hrtc_w))
+	MCFG_I8275_DRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT0_LINE)) // BRDY pin goes through inverter to /INT0, so we don't invert
+	MCFG_I8275_IRQ_CALLBACK(DEVWRITELINE("7474", ttl7474_device, clear_w)) // INT pin
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("7474", ttl7474_device, d_w))
+	MCFG_I8275_VRTC_CALLBACK(DEVWRITELINE("7474", ttl7474_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_PALETTE_ADD("palette", 3)
 
 	MCFG_X2210_ADD("nvram")
+
+	MCFG_DEVICE_ADD("7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", MCS51_INT1_LINE)) MCFG_DEVCB_INVERT // /Q connects directly to /INT1, so we need to invert?
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
