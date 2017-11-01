@@ -115,16 +115,19 @@ public:
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_in_track(*this, {"P1_TRACKX", "P2_TRACKX", "P1_TRACKY", "P2_TRACKY"})
 	{
 	}
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
+	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(obj_0_w);
 	DECLARE_WRITE8_MEMBER(obj_1_w);
 	DECLARE_WRITE8_MEMBER(layer_enable_w);
+	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_tile_info); 
 
 protected:
@@ -140,6 +143,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode; 
+	required_ioport_array<4> m_in_track;
 
 	tilemap_t *m_tilemap;
 	std::unique_ptr<bitmap_ind16> m_seabitmap;
@@ -151,6 +155,8 @@ private:
 		bitmap_ind16 bitmap;
 	}m_obj[2];
 	uint8_t m_layer_en;
+	uint8_t m_in_select;
+	bool m_screen_flip;
 	
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
@@ -249,7 +255,7 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 	
 	const uint8_t tilenum = ((m_obj[which].offs & 4) << 1) | ( (m_obj[which].offs & 0x38) >> 3);
 	const uint8_t color = (m_obj[which].offs & 3);
-	const bool fx = true;
+	const bool fx = m_screen_flip;
 	const bool fy = BIT(m_obj[which].offs,7);
 	
 	//base_pen = (which == 0 ? 0x30 : 0x20) + color*4;
@@ -262,6 +268,11 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 WRITE8_MEMBER(marinedt_state::obj_0_w) { obj_reg_w(0,offset,data); }
 WRITE8_MEMBER(marinedt_state::obj_1_w) { obj_reg_w(1,offset,data); }
 
+READ8_MEMBER(marinedt_state::trackball_r)
+{
+	return (m_in_track[m_in_select & 3])->read();
+}
+
 WRITE8_MEMBER(marinedt_state::layer_enable_w) 
 {
 	/*
@@ -270,6 +281,21 @@ WRITE8_MEMBER(marinedt_state::layer_enable_w)
 		---- ---x obj 1 draw enable
 	*/
 	m_layer_en = data;
+}
+
+WRITE8_MEMBER(marinedt_state::output_w)
+{
+	/*
+		---- x--- trackball input select (x/y)
+		---- -x-- trackball player select
+		---- --x- flipscreen
+		---- ---x global coin lockout (disabled in service mode)
+	*/
+	
+	m_in_select = (data & 0xc) >> 2;
+	m_screen_flip = BIT(data,1);
+	flip_screen_set(!m_screen_flip);
+	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
@@ -282,12 +308,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( marinedt_io, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x01, 0x01) AM_READ(trackball_r)
 	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") 
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( marinedt )
@@ -388,6 +416,18 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P1_TRACKX")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("P1_TRACKY")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P2_TRACKX")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("P2_TRACKY")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
