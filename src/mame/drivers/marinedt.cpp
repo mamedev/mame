@@ -123,9 +123,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
 	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_READ8_MEMBER(collision_compare_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(obj_0_w);
 	DECLARE_WRITE8_MEMBER(obj_1_w);
+	DECLARE_WRITE8_MEMBER(bgm_w);
+	DECLARE_WRITE8_MEMBER(sfx_w);
 	DECLARE_WRITE8_MEMBER(layer_enable_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_tile_info); 
@@ -154,12 +157,15 @@ private:
 		uint8_t y;
 		bitmap_ind16 bitmap;
 	}m_obj[2];
+	
 	uint8_t m_layer_en;
 	uint8_t m_in_select;
 	bool m_screen_flip;
 	
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
+	bool obj_to_obj_collision();
+	bool obj_to_layer_collision();
 };
 
 TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
@@ -237,7 +243,7 @@ uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 WRITE8_MEMBER(marinedt_state::vram_w)
 {
 	m_vram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset); 
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
@@ -273,6 +279,27 @@ READ8_MEMBER(marinedt_state::trackball_r)
 	return (m_in_track[m_in_select & 3])->read();
 }
 
+// discrete sound
+WRITE8_MEMBER(marinedt_state::bgm_w)
+{
+	// ...
+}
+
+WRITE8_MEMBER(marinedt_state::sfx_w)
+{
+	/*
+     x--- ---- unknown, probably ties to PC3259 pin 16 like crbaloon
+ 	 --x- ---- jet sound SFX
+	 ---x ---- foam SFX
+	 ---- x--- ink SFX
+	 ---- -x-- collision SFX
+	 ---- --x- dots hit SFX
+	 ---- ---x irq mask in crbaloon, doesn't seem to apply here?
+	 */
+//	if(data & 0x7e)
+//		popmessage("%02x",data);
+}
+
 WRITE8_MEMBER(marinedt_state::layer_enable_w) 
 {
 	/*
@@ -298,6 +325,69 @@ WRITE8_MEMBER(marinedt_state::output_w)
 	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
+// collision detection
+inline bool marinedt_state::obj_to_obj_collision()
+{
+	// bail out if any obj is disabled
+	if((m_layer_en & 3) != 3)
+		return false;
+
+	for(int y=0;y<32;y++)
+	{
+		for(int x=0;x<32;x++)
+		{
+			int resx,resy;
+			
+			resx = m_obj[0].x + x;
+			resy = m_obj[0].y + y;
+			
+			if(m_obj[0].bitmap.pix16(resy,resx) == 0) // && m_tilemap->pix16(resy,resx) != 0)
+				continue;
+			
+			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
+				return true;
+		}
+	}
+	
+	return false;
+}
+
+inline bool marinedt_state::obj_to_layer_collision()
+{	
+	// bail out if obj target is disabled
+	if((m_layer_en & 1) == 0)
+		return false;
+
+	for(int y=0;y<32;y++)
+	{
+		for(int x=0;x<32;x++)
+		{
+			int resx,resy;
+			
+			resx = m_obj[0].x + x;
+			resy = m_obj[0].y + y;
+			
+			if(m_obj[0].bitmap.pix16(resy,resx) == 0) // && m_tilemap->pix16(resy,resx) != 0)
+				continue;
+			
+			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
+				return true;
+		}
+	}
+	
+	return false;
+}
+
+
+READ8_MEMBER(marinedt_state::collision_compare_r)
+{
+	uint8_t res = 0;
+	res |= (obj_to_obj_collision()<<7);
+	res |= (obj_to_layer_collision()<<3);
+	
+	return res;
+}
+
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl",0)
@@ -312,40 +402,15 @@ static ADDRESS_MAP_START( marinedt_io, AS_IO, 8, marinedt_state )
 	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") 
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
+	AM_RANGE(0x05, 0x05) AM_WRITE(bgm_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(sfx_w)
 	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
+	AM_RANGE(0x0e, 0x0e) AM_READ(collision_compare_r) AM_WRITENOP // watchdog
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( marinedt )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
