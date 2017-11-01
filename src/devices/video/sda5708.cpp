@@ -130,7 +130,7 @@ void sda5708_device::update_display()
 						LOGDATA("- SDA5708 data: ");
 						for (int x = 1; x <= 5; x++)
 						{
-								machine().output().set_indexed_value("Dot_", d * 100 + y * 10 + x, (m_dispmem[(d - 1) * 7 + y] & (1 << (4 - (x - 1)))) == 0 ? 7 : m_bright );
+								machine().output().set_indexed_value("Dot_", d * 100 + y * 10 + x, (m_dispmem[(d - 1) * 7 + (y - 1)] & (1 << (4 - (x - 1)))) == 0 ? 7 : m_bright );
 								LOGDATA("%c", (m_dispmem[(d - 1) * 7 + (y - 1)] & (1 << (4 - (x - 1)))) == 0 ? '-' : 'x');
 						}
 						LOGDATA("\n");
