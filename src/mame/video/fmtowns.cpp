@@ -228,11 +228,11 @@ void towns_state::towns_update_kanji_offset()
 	}
 	else if(m_video.towns_kanji_code_h < 0x70)
 	{
-		m_video.towns_kanji_offset = ((m_video.towns_kanji_code_l & 0x1f) << 4)
-							+ (((m_video.towns_kanji_code_l - 0x20) & 0x60) << 8)
-							+ ((m_video.towns_kanji_code_h & 0x0f) << 9)
+		m_video.towns_kanji_offset = (((m_video.towns_kanji_code_l & 0x1f) << 5)
+							+ (((m_video.towns_kanji_code_l - 0x20) & 0x60) << 9)
+							+ ((m_video.towns_kanji_code_h & 0x0f) << 10)
 							+ (((m_video.towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
-							+ 0x8000;
+							+ 0x8000) >> 1;
 	}
 	else
 	{
@@ -243,6 +243,7 @@ void towns_state::towns_update_kanji_offset()
 							| 0x38000;
 	}
 }
+
 
 READ8_MEMBER( towns_state::towns_video_cff80_r )
 {
