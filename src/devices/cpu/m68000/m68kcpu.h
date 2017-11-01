@@ -1672,8 +1672,24 @@ static inline void m68ki_exception_address_error(m68000_base_device *m68k)
 	}
 	m68k->run_mode = RUN_MODE_BERR_AERR_RESET;
 
-	/* Note: This is implemented for 68000 only! */
-	m68ki_stack_frame_buserr(m68k, sr);
+	if (!CPU_TYPE_IS_010_PLUS(m68k->cpu_type))
+	{
+		/* Note: This is implemented for 68000 only! */
+		m68ki_stack_frame_buserr(m68k, sr);
+	}
+	else if (CPU_TYPE_IS_010(m68k->cpu_type))
+	{
+		/* only the 68010 throws this unique type-1000 frame */
+		m68ki_stack_frame_1000(m68k, REG_PPC(m68k), sr, EXCEPTION_BUS_ERROR);
+	}
+	else if (m68k->mmu_tmp_buserror_address == REG_PPC(m68k))
+	{
+		m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+	}
+	else
+	{
+		m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+	}
 
 	m68ki_jump_vector(m68k, EXCEPTION_ADDRESS_ERROR);
 
