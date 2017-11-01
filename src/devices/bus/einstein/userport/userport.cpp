@@ -10,6 +10,7 @@
 #include "userport.h"
 
 // supported devices
+#include "mouse.h"
 #include "speech.h"
 
 
@@ -118,5 +119,6 @@ device_einstein_userport_interface::~device_einstein_userport_interface()
 //**************************************************************************
 
 SLOT_INTERFACE_START( einstein_userport_cards )
+	SLOT_INTERFACE("mouse", EINSTEIN_MOUSE)
 	SLOT_INTERFACE("speech", EINSTEIN_SPEECH)
 SLOT_INTERFACE_END

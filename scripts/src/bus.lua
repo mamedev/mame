@@ -3306,6 +3306,8 @@ if (BUSES["EINSTEIN_USERPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/einstein/userport/userport.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.h",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
 	}
