@@ -343,7 +343,7 @@ IRQ_CALLBACK_MEMBER(hp85_state::irq_callback)
 		}
 	}
 	update_irl();
-	return vector_table[ m_top_pending ];
+	return vector_table[ m_top_pending - 1 ];
 }
 
 WRITE8_MEMBER(hp85_state::ginten_w)
