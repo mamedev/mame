@@ -412,31 +412,7 @@ void mc146818_device::update_timer()
 {
 	int bypass;
 
-	switch (m_data[REG_A] & (REG_A_DV2 | REG_A_DV1 | REG_A_DV0))
-	{
-	case 0:
-		bypass = 0;
-		break;
-
-	case REG_A_DV0:
-		bypass = 2;
-		break;
-
-	case REG_A_DV1:
-		bypass = 7;
-		break;
-
-	case REG_A_DV2 | REG_A_DV1:
-	case REG_A_DV2 | REG_A_DV1 | REG_A_DV0:
-		bypass = 22;
-		break;
-
-	default:
-		// TODO: other combinations of divider bits are used for test purposes only
-		bypass = 22;
-		break;
-	}
-
+	bypass = get_timer_bypass();
 
 	attotime update_period = attotime::never;
 	attotime update_interval = attotime::never;
@@ -472,6 +448,41 @@ void mc146818_device::update_timer()
 	m_periodic_timer->adjust(periodic_period, 0, periodic_interval);
 }
 
+//---------------------------------------------------------------
+//  get_timer_bypass - get main clock divisor based on A register
+//---------------------------------------------------------------
+
+int mc146818_device::get_timer_bypass()
+{
+	int bypass;
+
+	switch (m_data[REG_A] & (REG_A_DV2 | REG_A_DV1 | REG_A_DV0))
+	{
+	case 0:
+		bypass = 0;
+		break;
+
+	case REG_A_DV0:
+		bypass = 2;
+		break;
+
+	case REG_A_DV1:
+		bypass = 7;
+		break;
+
+	case REG_A_DV2 | REG_A_DV1:
+	case REG_A_DV2 | REG_A_DV1 | REG_A_DV0:
+		bypass = 22;
+		break;
+
+	default:
+		// TODO: other combinations of divider bits are used for test purposes only
+		bypass = 22;
+		break;
+	}
+
+	return bypass;
+}
 
 //-------------------------------------------------
 //  update_irq - Update irq based on B & C register
