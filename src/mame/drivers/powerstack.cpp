@@ -4,7 +4,7 @@
 
 2017-10-29 Skeleton
 
-Motorola Powerstack II. CPU is a RISC-type.
+Motorola Powerstack II. CPU is a PowerPC 604e @ 300MHz.
 
 ************************************************************************************************************************************/
 
@@ -16,11 +16,11 @@ class powerstack_state : public driver_device
 public:
 	powerstack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, maincpu(*this, "maincpu")
+//		, m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
-//	required_device<i80c52_device> maincpu;
+//	required_device<i80c52_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( powerstack )

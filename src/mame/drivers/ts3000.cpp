@@ -18,11 +18,11 @@ class ts3000_state : public driver_device
 public:
 	ts3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, maincpu(*this, "maincpu")
+//		, m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
-//	required_device<i80c52_device> maincpu;
+//	required_device<i80c52_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( ts3000 )
