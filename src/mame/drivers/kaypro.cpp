@@ -413,6 +413,15 @@ ROM_START(kayproii)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
+
+	// random roms for unknown kaypro computers, to be checked
+	ROM_REGION(0xa000, "user1", 0)
+	ROM_LOAD( "x.bin",        0x0000, 0x0fff, CRC(01e2e7b2) SHA1(fc2f8dc8a077d0c89a74463328efa1c444662d88) )
+	ROM_LOAD( "81-x015.rom",  0x1000, 0x2000, CRC(94645e5e) SHA1(9a6e0ec3f54e23b6768c6e39b43314c7726927df) )
+	ROM_LOAD( "884max.rom",   0x3000, 0x2000, CRC(97b28ad2) SHA1(d6bc2125f41e3879cda96d64be22d4256b5cc822) )
+	ROM_LOAD( "kplus83.rom",  0x5000, 0x2000, CRC(5e9b817d) SHA1(26ea875ee3659a964cbded4ed0c82a3af42db64b) )
+	ROM_LOAD( "kplus84.rom",  0x7000, 0x2000, CRC(4551905a) SHA1(48f0964edfad05b214810ae5595638245c30e5c0) )
+	ROM_LOAD( "rom19ee.bin",  0x9000, 0x0fee, CRC(c3515bd0) SHA1(48a0a43c164e4d3e75e8e916498421ef616943cf) )
 ROM_END
 
 ROM_START(kaypro4)
@@ -521,4 +530,4 @@ COMP( 1984, kaypro2x,   0,        0,      kaypro2x, kaypro, kaypro_state, kaypro
 COMP( 1984, kaypro4a,   kaypro2x, 0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
 COMP( 1983, kaypro10,   0,        0,      kaypro10, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
-COMP( 1984, robie,      0,        0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1984, robie,      0,        0,      kaypro2x, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING )
