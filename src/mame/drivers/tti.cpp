@@ -14,27 +14,43 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/mc68901.h"
 
 class tti_state : public driver_device
 {
 public:
 	tti_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, maincpu(*this, "maincpu")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
-//	required_device<i80c52_device> maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( tti )
 INPUT_PORTS_END
 
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tti_state )
-//ADDRESS_MAP_END
+static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tti_state )
+	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x78000, 0x7ffff) AM_RAM
+	AM_RANGE(0x80000, 0x80017) AM_DEVREADWRITE("mfp", mc68901_device, read, write)
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( tti )
+	MCFG_DEVICE_ADD("maincpu", M68008, XTAL_20MHz / 2) // guess
+	MCFG_CPU_PROGRAM_MAP(prg_map)
+
+	MCFG_DEVICE_ADD("mfp", MC68901, 0)
+	MCFG_MC68901_TIMER_CLOCK(XTAL_20MHz / 2) // guess
+	MCFG_MC68901_RX_CLOCK(153000) // for testing
+	MCFG_MC68901_TX_CLOCK(153000) // for testing
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
 MACHINE_CONFIG_END
 
 ROM_START( tti )
