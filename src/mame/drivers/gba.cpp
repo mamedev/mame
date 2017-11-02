@@ -1181,6 +1181,10 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 {
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
+	if (pc >= 0x10000000)
+	{
+		return 0;
+	}
 	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
