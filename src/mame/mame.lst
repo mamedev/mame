@@ -1090,6 +1090,9 @@ al8800bt                        //
 @source:alto2.cpp
 alto2                           //
 
+@source:altos2.cpp
+altos2                          // Altos II terminal
+
 @source:altos5.cpp
 altos5                          //
 
@@ -14550,6 +14553,9 @@ hg_frd                          // Fruit Deuce
 
 @source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
+
+@source:hazeltine.cpp
+hazeltine                       // Hazeltine Esprit
 
 @source:hcastle.cpp
 akumajou                        // GX768 (c) 1988 (Japan)

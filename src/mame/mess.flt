@@ -31,6 +31,7 @@ alphatpx.cpp
 alphatro.cpp
 altair.cpp
 alto2.cpp
+altos2.cpp
 altos5.cpp
 altos486.cpp
 altos8600.cpp
@@ -244,6 +245,7 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hazeltin.cpp
+hazeltine.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
