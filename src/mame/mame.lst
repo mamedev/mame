@@ -2568,7 +2568,8 @@ tajmah                          // Tajmahal
 att4425                         //
 
 @source:attache.cpp
-attache                         //
+attache                         // (c) 1982 Otrona
+attache816                      // (c) 1983 Otrona
 
 @source:attckufo.cpp
 attckufo                        // (c) 1980 Ryoto Electric Co.
