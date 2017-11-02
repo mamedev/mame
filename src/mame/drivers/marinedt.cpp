@@ -346,6 +346,7 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
 				continue;
 			
+			// return value is never read most likely
 			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
 				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
@@ -373,9 +374,17 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
 				continue;
 			
-			// TODO: doesn't work with flipscreen, needs to return +1 plus reverse x/y
+			if(!m_screen_flip)
+				resy -= 32;
+		
+			// TODO: non screen flip path doesn't work properly
 			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
-				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
+			{
+				if(m_screen_flip)
+					return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
+				else
+					return (((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f)) ^ 0x3ff;
+			}
 		}
 	}
 	
