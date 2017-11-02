@@ -7,12 +7,12 @@
 	similar to crbaloon.cpp
 	
 	TODO:
-	- sprites
 	- sound
-	- inputs
-	- colors
-	- collision detection
-	- Merge devices from crbaloon driver.
+	- colors (gameplay borders should be red, ditto for goal stone), 
+	  also unused color 0x10-0x1f (might be a flashing bank)
+	- collision detection isn't perfect;
+	- ROM writes (irq mask?)
+	- Merge devices from crbaloon/bking/grchamp drivers.
 
 ============================================================================
 
@@ -123,7 +123,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
 	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_READ8_MEMBER(collision_compare_r);
+	DECLARE_READ8_MEMBER(pc3259_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(obj_0_w);
 	DECLARE_WRITE8_MEMBER(obj_1_w);
@@ -164,8 +164,8 @@ private:
 	
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
-	bool obj_to_obj_collision();
-	bool obj_to_layer_collision();
+	uint32_t obj_to_obj_collision();
+	uint32_t obj_to_layer_collision();
 };
 
 TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
@@ -303,11 +303,12 @@ WRITE8_MEMBER(marinedt_state::sfx_w)
 WRITE8_MEMBER(marinedt_state::layer_enable_w) 
 {
 	/*
+	    ---x ---- enabled when shark appears and during scoring system explaination in attract (unknown purpose)
 		---- x--- sea layer draw enable (disabled in test mode)
 		---- --x- obj 2 draw enable
 		---- ---x obj 1 draw enable
 	*/
-	m_layer_en = data;
+	m_layer_en = data & 0xf;
 }
 
 WRITE8_MEMBER(marinedt_state::output_w)
@@ -326,66 +327,95 @@ WRITE8_MEMBER(marinedt_state::output_w)
 }
 
 // collision detection
-inline bool marinedt_state::obj_to_obj_collision()
+// we return a value in the form of y<<16|x in case collision occurred
+inline uint32_t marinedt_state::obj_to_obj_collision()
 {
 	// bail out if any obj is disabled
 	if((m_layer_en & 3) != 3)
-		return false;
+		return 0;
 
-	for(int y=0;y<32;y++)
+	for(int y=31;y>=0;y--)
 	{
-		for(int x=0;x<32;x++)
+		for(int x=31;x>=0;x--)
 		{
 			int resx,resy;
 			
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 			
-			if(m_obj[0].bitmap.pix16(resy,resx) == 0) // && m_tilemap->pix16(resy,resx) != 0)
+			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
 				continue;
 			
 			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
-				return true;
+				return (resy << 16) | (resx);
 		}
 	}
 	
-	return false;
+	return 0;
 }
 
-inline bool marinedt_state::obj_to_layer_collision()
+inline uint32_t marinedt_state::obj_to_layer_collision()
 {	
 	// bail out if obj target is disabled
 	if((m_layer_en & 1) == 0)
-		return false;
+		return 0;
 
-	for(int y=0;y<32;y++)
+	for(int y=31;y>=0;y--)
 	{
-		for(int x=0;x<32;x++)
+		for(int x=31;x>=0;x--)
 		{
 			int resx,resy;
 			
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 			
-			if(m_obj[0].bitmap.pix16(resy,resx) == 0) // && m_tilemap->pix16(resy,resx) != 0)
+			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
 				continue;
 			
+			// TODO: doesn't work with flipscreen
 			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
-				return true;
+				return (resy << 16) | (resx);
 		}
 	}
 	
-	return false;
+	return 0;
 }
 
-
-READ8_MEMBER(marinedt_state::collision_compare_r)
+READ8_MEMBER(marinedt_state::pc3259_r)
 {
-	uint8_t res = 0;
-	res |= (obj_to_obj_collision()<<7);
-	res |= (obj_to_layer_collision()<<3);
+	uint32_t rest,reso;
+	uint8_t reg = offset >> 2;
+	uint8_t xt,xo,yt,yo;
+	rest = obj_to_layer_collision();
+	reso = obj_to_obj_collision();
+
+	switch(reg)
+	{
+		case 0:
+			xt = ((rest & 0xffff) % 128) / 8;
+			xo = ((reso & 0xffff) % 128) / 8;
+			return xt|(xo<<4);
+		case 1:
+			yt = (((rest >> 16) / 8) % 64) << 1;
+			xt = (rest & 0x80) >> 7;
+			yo = (((reso >> 16) / 8) % 64) << 1;
+			xo = (reso & 0x80) >> 7;
+			return (yt|xt)|((yo|xo)<<4);
+		case 2:
+			yt = (rest >> 16) / 64;
+			yo = (reso >> 16) / 64;
+			return yt|(yo<<4);
+		case 3:
+		{
+			uint8_t res = 0;
+			res |= ((reso != 0)<<7);
+			res |= ((rest != 0)<<3);
+			return res;
+		}
+	}
 	
-	return res;
+
+	return 0;
 }
 
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
@@ -399,14 +429,15 @@ static ADDRESS_MAP_START( marinedt_io, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ(trackball_r)
+	AM_RANGE(0x02, 0x02) AM_SELECT(0xc) AM_READ(pc3259_r)
 	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") 
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x05, 0x05) AM_WRITE(bgm_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(sfx_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w) 
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
-	AM_RANGE(0x0e, 0x0e) AM_READ(collision_compare_r) AM_WRITENOP // watchdog
+	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
@@ -462,11 +493,11 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPNAME( 0x01, 0x00, "DSWB" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Disable Collision Detection (Cheat)" ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
  	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:3")
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x10, 0x10, "Number of Coin Chutes") PORT_DIPLOCATION("SWB:5")
@@ -517,7 +548,7 @@ static const gfx_layout objlayout =
 };
 
 static GFXDECODE_START( marinedt )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
 GFXDECODE_END
@@ -631,4 +662,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT90, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
