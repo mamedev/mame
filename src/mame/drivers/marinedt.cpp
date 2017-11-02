@@ -1,20 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/*****************************************************************************************************************
 
 	Marine Date (c) 1981 Taito
 
 	similar to crbaloon.cpp
 	
 	TODO:
-	- sound
-	- colors (gameplay borders should be red, ditto for goal stone), 
-	  also unused color 0x10-0x1f (might be a flashing bank)
-	- collision detection isn't perfect;
+	- discrete sound
+	- imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
+	  also unused colors 0x10-0x1f (might be a flashing bank)
+	- collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
+	  Also it's supposed to bounce on sea foams (regression when bonus ball detection is fixed). 
+	  Above doesn't happen in upright mode, also HW collision detection isn't perfect even from the reference.
 	- ROM writes (irq mask?)
-	- Merge devices from crbaloon/bking/grchamp drivers.
+	- Merge devices with crbaloon/bking/grchamp drivers.
 
-============================================================================
+*****************************************************************************************************************
 
 Marine Date
 Taito 1981
@@ -96,8 +98,7 @@ Notes:
 Top and Middle PCBs are plugged in with the solder-sides together.
 Lower PCB is plugged in with components facing up.
 	
-***************************************************************************/
-
+*****************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -149,7 +150,7 @@ private:
 	required_ioport_array<4> m_in_track;
 
 	tilemap_t *m_tilemap;
-	std::unique_ptr<bitmap_ind16> m_seabitmap;
+	std::unique_ptr<bitmap_ind16> m_seabitmap[2];
 	struct
 	{
 		uint8_t offs;
@@ -161,6 +162,7 @@ private:
 	uint8_t m_layer_en;
 	uint8_t m_in_select;
 	bool m_screen_flip;
+	uint8_t m_sea_bank;
 	
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
@@ -179,9 +181,11 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 void marinedt_state::init_seabitmap()
 {
 	const rectangle clip(32, 256, 32, 256);
-	m_seabitmap = std::make_unique<bitmap_ind16>(512, 512);
+	m_seabitmap[0] = std::make_unique<bitmap_ind16>(512, 512);
+	m_seabitmap[1] = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_seabitmap->fill(64, clip);	
+	m_seabitmap[0]->fill(64, clip);	
+	m_seabitmap[1]->fill(64+32, clip);	
 
 	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
@@ -193,7 +197,8 @@ void marinedt_state::init_seabitmap()
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
 			
-			m_seabitmap->pix16(y, x) = blue_pen;
+			m_seabitmap[0]->pix16(y, x) = blue_pen;
+			m_seabitmap[1]->pix16(y, x) = blue_pen+0x20;
 		}
 	}
 }
@@ -222,21 +227,23 @@ void marinedt_state::video_start()
 	save_item(NAME(m_obj[0].bitmap));
 	save_item(NAME(m_obj[1].bitmap));
 	save_item(NAME(m_layer_en));
+	save_item(NAME(m_sea_bank));
 }
 
 uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	if(m_layer_en & 8)
-		copybitmap(bitmap, *m_seabitmap, m_screen_flip == false, m_screen_flip == false, m_screen_flip ? 0 : -256, m_screen_flip ? 0 : -224, cliprect);
+		copybitmap(bitmap, *m_seabitmap[m_sea_bank], m_screen_flip == false, m_screen_flip == false, m_screen_flip ? 0 : -256, m_screen_flip ? 0 : -224, cliprect);
 	else
 		bitmap.fill(0,cliprect);
+
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
 
 	if(m_layer_en & 2)
 		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0); 
 	if(m_layer_en & 1)
 		copybitmap_trans(bitmap, m_obj[0].bitmap, 0, 0, 0, 0, cliprect, 0); 
 
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
 	return 0;
 }
 
@@ -261,7 +268,7 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 	
 	const uint8_t tilenum = ((m_obj[which].offs & 4) << 1) | ( (m_obj[which].offs & 0x38) >> 3);
 	const uint8_t color = (m_obj[which].offs & 3);
-	const bool fx = m_screen_flip;
+	bool fx = BIT(m_obj[which].offs,6);
 	const bool fy = BIT(m_obj[which].offs,7);
 	
 	//base_pen = (which == 0 ? 0x30 : 0x20) + color*4;
@@ -303,12 +310,13 @@ WRITE8_MEMBER(marinedt_state::sfx_w)
 WRITE8_MEMBER(marinedt_state::layer_enable_w) 
 {
 	/*
-	    ---x ---- enabled when shark appears and during scoring system explaination in attract (unknown purpose)
+	    ---x ---- enabled when shark appears (enables red gradient on sea bitmap apparently)
 		---- x--- sea layer draw enable (disabled in test mode)
 		---- --x- obj 2 draw enable
 		---- ---x obj 1 draw enable
 	*/
 	m_layer_en = data & 0xf;
+	m_sea_bank = (data & 0x10) >> 4;
 }
 
 WRITE8_MEMBER(marinedt_state::output_w)
@@ -584,21 +592,23 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+//		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = (0x55 * bit0 + 0xaa * bit1);
 
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		g = (0x55 * bit0 + 0xaa * bit1);
 
 		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		// TODO: blue arrangement wrong according to screenshot, gameplay border should be red instead of blue
-		b = (0x47 * bit0 + 0x97 * bit1);
-
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = (0x55 * bit0 + 0xaa * bit1);
+		// matches yellow haired siren
+		if(bit2 == 0)
+			b/=2;
+		
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
@@ -607,6 +617,7 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 	{
 		b = color_prom[i+0x60];
 		palette.set_pen_color(64+31-i, rgb_t(0, 0, b));
+		palette.set_pen_color(64+63-i, rgb_t(0xff, 0, b));
 	}
 }
 
@@ -626,7 +637,7 @@ static MACHINE_CONFIG_START( marinedt )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marinedt)
 
-	MCFG_PALETTE_ADD("palette", 64+32)
+	MCFG_PALETTE_ADD("palette", 64+64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
 
 	/* sound hardware */
