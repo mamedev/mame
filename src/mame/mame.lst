@@ -36984,6 +36984,9 @@ prose2ko                        //
 ttchamp                         //
 ttchampa                        //
 
+@source:tti.cpp
+tti                             //
+
 @source:tubep.cpp
 rjammer                         // (c) 1984 + Alice
 tubep                           // (c) 1984 + Fujitek
@@ -37322,6 +37325,9 @@ vector4                         //
 @source:vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
 vectrex                         // General Consumer Electric Vectrex - 1982-1984
+
+@source:vectrix.cpp
+vectrix                         // (c) 19?? Olympia?
 
 @source:vega.cpp
 vega                            // (c) 19?? Olympia?
@@ -38902,6 +38908,9 @@ zrt80                           //
 
 @source:zsbc3.cpp
 zsbc3                           //
+
+@source:zt8802.cpp
+zt8802                          // (c) 19?? Olympia?
 
 @source:zwackery.cpp
 zwackery                        // (c) 1984
