@@ -327,16 +327,16 @@ WRITE8_MEMBER(marinedt_state::output_w)
 }
 
 // collision detection
-// we return a value in the form of y<<16|x in case collision occurred
+// we return a value in the form of y<<5|x in case collision occurred
 inline uint32_t marinedt_state::obj_to_obj_collision()
 {
 	// bail out if any obj is disabled
 	if((m_layer_en & 3) != 3)
 		return 0;
 
-	for(int y=31;y>=0;y--)
+	for(int y=0;y<32;y++)
 	{
-		for(int x=31;x>=0;x--)
+		for(int x=0;x<32;x++)
 		{
 			int resx,resy;
 			
@@ -347,7 +347,7 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 				continue;
 			
 			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
-				return (resy << 16) | (resx);
+				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
 	}
 	
@@ -355,14 +355,15 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 }
 
 inline uint32_t marinedt_state::obj_to_layer_collision()
-{	
+{
 	// bail out if obj target is disabled
 	if((m_layer_en & 1) == 0)
 		return 0;
-
-	for(int y=31;y>=0;y--)
+	
+	// check only internal hitbox
+	for(int y=4;y<28;y++)
 	{
-		for(int x=31;x>=0;x--)
+		for(int x=4;x<28;x++)
 		{
 			int resx,resy;
 			
@@ -372,9 +373,9 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
 				continue;
 			
-			// TODO: doesn't work with flipscreen
+			// TODO: doesn't work with flipscreen, needs to return +1 plus reverse x/y
 			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
-				return (resy << 16) | (resx);
+				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
 	}
 	
@@ -385,26 +386,24 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 {
 	uint32_t rest,reso;
 	uint8_t reg = offset >> 2;
-	uint8_t xt,xo,yt,yo;
+	uint8_t xt,xo;
 	rest = obj_to_layer_collision();
 	reso = obj_to_obj_collision();
-
+	
 	switch(reg)
 	{
 		case 0:
-			xt = ((rest & 0xffff) % 128) / 8;
-			xo = ((reso & 0xffff) % 128) / 8;
+			xt = rest & 0xf;
+			xo = reso & 0xf;
 			return xt|(xo<<4);
 		case 1:
-			yt = (((rest >> 16) / 8) % 64) << 1;
-			xt = (rest & 0x80) >> 7;
-			yo = (((reso >> 16) / 8) % 64) << 1;
-			xo = (reso & 0x80) >> 7;
-			return (yt|xt)|((yo|xo)<<4);
+			xt = (rest & 0xf0) >> 4; 
+			xo = (reso & 0xf0) >> 4;
+			return xt|(xo<<4);
 		case 2:
-			yt = (rest >> 16) / 64;
-			yo = (reso >> 16) / 64;
-			return yt|(yo<<4);
+			xt = (rest & 0x300) >> 8;
+			xo = (reso & 0x300) >> 8;
+			return xt|(xo<<4);
 		case 3:
 		{
 			uint8_t res = 0;
@@ -493,7 +492,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPNAME( 0x01, 0x00, "DSWB" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Disable Collision Detection (Cheat)" ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPNAME( 0x02, 0x00, "Disable sprite-tile collision (Cheat)" ) PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
  	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:3")
