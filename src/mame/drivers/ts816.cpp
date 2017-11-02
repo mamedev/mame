@@ -23,7 +23,7 @@ TODO:
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 
 class ts816_state : public driver_device
@@ -71,18 +71,18 @@ static ADDRESS_MAP_START(ts816_io, AS_IO, 8, ts816_state)
 	AM_RANGE(0x04, 0x04) // Tape output latch byte 2
 	AM_RANGE(0x05, 0x05) // Tape output latch byte 1
 	AM_RANGE(0x07, 0x07) // Indicator load (LED)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio1", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 1 for user 1 & 2
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("sio5", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 5 for user 9 & 10
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("sio2", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 2 for user 3 & 4
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio6", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 6 for user 11 & 12
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("sio3", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 3 for user 5 & 6
-	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("sio7", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 7 for user 13 & 14
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("sio4", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 4 for user 7 & 8
-	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("sio8", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 8 for user 15 & 16
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio1", z80sio_device, cd_ba_r, cd_ba_w) // SIO 1 for user 1 & 2
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("sio5", z80sio_device, cd_ba_r, cd_ba_w) // SIO 5 for user 9 & 10
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("sio2", z80sio_device, cd_ba_r, cd_ba_w) // SIO 2 for user 3 & 4
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio6", z80sio_device, cd_ba_r, cd_ba_w) // SIO 6 for user 11 & 12
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("sio3", z80sio_device, cd_ba_r, cd_ba_w) // SIO 3 for user 5 & 6
+	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("sio7", z80sio_device, cd_ba_r, cd_ba_w) // SIO 7 for user 13 & 14
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("sio4", z80sio_device, cd_ba_r, cd_ba_w) // SIO 4 for user 7 & 8
+	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("sio8", z80sio_device, cd_ba_r, cd_ba_w) // SIO 8 for user 15 & 16
 	//AM_RANGE(0x50, 0x53) // SIO 0 for RS232 1 and part of tape interface
 	AM_RANGE(0x50, 0x50) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x52, 0x52) AM_READ(status_r)
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("sio9", z80sio2_device, cd_ba_r, cd_ba_w) // SIO 9 for RS232 2 & 3
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("sio9", z80sio_device, cd_ba_r, cd_ba_w) // SIO 9 for RS232 2 & 3
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSW")
 	AM_RANGE(0x68, 0x68) AM_WRITE(port68_w) // set 2nd bank latch
 	AM_RANGE(0x70, 0x78) AM_WRITE(port78_w) // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
@@ -266,26 +266,26 @@ static MACHINE_CONFIG_START( ts816 )
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts816_state, kbd_put))
 
-	//MCFG_DEVICE_ADD("sio0", Z80SIO2, XTAL_16MHz / 4)
-	//MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio1", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio2", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio3", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio4", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio5", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio6", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio7", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio8", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio9", Z80SIO2, XTAL_16MHz / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//MCFG_DEVICE_ADD("sio0", Z80SIO, XTAL_16MHz / 4)
+	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio3", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio4", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio5", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio6", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio7", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio8", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio9", Z80SIO, XTAL_16MHz / 4)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

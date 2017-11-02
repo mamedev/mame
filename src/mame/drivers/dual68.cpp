@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "machine/terminal.h"
 
 

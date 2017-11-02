@@ -33,6 +33,7 @@ todo:
 - vdp engine -- make run at correct speed
 - vr/hr/fh flags: double-check all of that
 - make vdp engine work in exp. ram
+- fix save state support
 */
 
 #include "emu.h"

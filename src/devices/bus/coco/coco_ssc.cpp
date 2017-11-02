@@ -150,16 +150,14 @@ DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sou
 //  MACHINE FRAGMENTS AND ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(ssc_port_a_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(ssc_port_b_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC) AM_READWRITE(ssc_port_c_r, ssc_port_c_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_READWRITE(ssc_port_d_r, ssc_port_d_w)
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
-	MCFG_CPU_IO_MAP(ssc_io_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(coco_ssc_device, ssc_port_a_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(coco_ssc_device, ssc_port_b_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(coco_ssc_device, ssc_port_c_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(coco_ssc_device, ssc_port_c_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(coco_ssc_device, ssc_port_d_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(coco_ssc_device, ssc_port_d_w))
 
 	MCFG_RAM_ADD("staticram")
 	MCFG_RAM_DEFAULT_SIZE("2K")

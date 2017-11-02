@@ -381,11 +381,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0xd000, 0xefff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, cc40_state )
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(keyboard_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(keyboard_w)
-ADDRESS_MAP_END
-
 
 
 /***************************************************************************
@@ -584,7 +579,8 @@ static MACHINE_CONFIG_START( cc40 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(cc40_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(cc40_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.0")
 	MCFG_NVRAM_ADD_0FILL("sysram.1")

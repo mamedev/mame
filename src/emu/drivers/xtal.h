@@ -133,6 +133,7 @@ enum
 	XTAL_11_8MHz        = 11800000,     /* IBM PC Music Feature Card */
 	XTAL_11_9808MHz     = 11980800,     /* Luxor ABC 80 */
 	XTAL_12MHz          = 12000000,     /* Extremely common, used on 100's of PCBs */
+	XTAL_12_0576MHz     = 12057600,     /* Poly 1 (38400 * 314) */
 	XTAL_12_096MHz      = 12096000,     /* Some early 80's Atari games */
 	XTAL_12_288MHz      = 12288000,     /* Sega Model 3 digital audio board */
 	XTAL_12_432MHz      = 12432000,     /* Kaneko Fly Boy/Fast Freddie Hardware */
@@ -150,6 +151,7 @@ enum
 	XTAL_13_5168MHz     = 13516800,     /* Kontron KDT6 */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
+	XTAL_14_192640MHz   = 14192640,     /* Reported by Central Data 2650 document, true xtal unchecked on PCB */
 	XTAL_14_3MHz        = 14300000,     /* Agat-7 */
 	XTAL_14_314MHz      = 14314000,     /* Taito TTL Board  */
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
@@ -161,7 +163,7 @@ enum
 	XTAL_15_468MHz      = 15468480,     /* Bank Panic h/w, Sega G80 */
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
 	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
-	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 */
+	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 (9600 * 52 * 32) */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_4MHz        = 16400000,     /* MS 6102 */

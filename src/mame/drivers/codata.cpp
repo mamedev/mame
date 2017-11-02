@@ -60,11 +60,6 @@ void codata_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
-
 static MACHINE_CONFIG_START( codata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
@@ -90,7 +85,6 @@ static MACHINE_CONFIG_START( codata )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxa_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", upd7201_new_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", upd7201_new_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD("rs423b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxb_w))

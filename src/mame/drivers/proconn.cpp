@@ -30,7 +30,7 @@
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
@@ -190,7 +190,7 @@ protected:
 	required_device<z80pio_device> m_z80pio_4;
 	required_device<z80pio_device> m_z80pio_5;
 	required_device<z80ctc_device> m_z80ctc;
-	required_device<z80dart_device> m_z80sio;
+	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
 
@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( proconn )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 4000000) /* ?? Mhz */
+	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -20,7 +20,7 @@
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 
@@ -49,8 +49,6 @@ public:
 		, m_dma(*this, "dma")
 		, m_pio1(*this, "pio1")
 		, m_pio2(*this, "pio2")
-		, m_sio1(*this, "sio1")
-		, m_sio2(*this, "sio2")
 		, m_centronics(*this, "centronics")
 		, m_rs232(*this, "rs232")
 		, m_fdc(*this, "fdc")
@@ -92,11 +90,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio1_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_MACHINE_RESET(aussiebyte);
 	DECLARE_DRIVER_INIT(aussiebyte);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE8_MEMBER(address_w);
 	DECLARE_WRITE8_MEMBER(register_w);
@@ -127,8 +122,6 @@ private:
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
-	required_device<z80sio0_device> m_sio1;
-	required_device<z80sio0_device> m_sio2;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232;
 	required_device<wd2797_device> m_fdc;

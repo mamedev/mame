@@ -8,15 +8,11 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
-
-struct kay_kbd_t;
 
 class kaypro_state : public driver_device
 {
@@ -33,8 +29,6 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_pio_g(*this, "z80pio_g")
 		, m_pio_s(*this, "z80pio_s")
-		, m_sio(*this, "z80sio")
-		, m_sio2x(*this, "z80sio_2x")
 		, m_centronics(*this, "centronics")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -63,19 +57,14 @@ public:
 	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);
 	DECLARE_PALETTE_INIT(kaypro);
-	DECLARE_MACHINE_RESET(kay_kbd);
 	DECLARE_DRIVER_INIT(kaypro);
 	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
 	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
-	DECLARE_READ8_MEMBER(kaypro_sio_r);
-	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
-	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
 
 private:
 	uint8_t m_mc6845_cursor[16];
@@ -83,12 +72,7 @@ private:
 	uint8_t m_mc6845_ind;
 	uint8_t m_framecnt;
 	uint8_t *m_p_videoram;
-	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
-	void kay_kbd_in(uint8_t data );
-	uint8_t kay_kbd_c_r();
-	uint8_t kay_kbd_d_r();
-	void kay_kbd_d_w( uint8_t data );
 	bool m_is_motor_off;
 	uint8_t m_fdc_rq;
 	uint8_t m_system_port;
@@ -102,8 +86,6 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
-	required_device<z80sio0_device> m_sio;
-	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

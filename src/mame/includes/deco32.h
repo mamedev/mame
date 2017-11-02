@@ -22,9 +22,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ioprot(*this, "ioprot"),
 		m_deco_irq(*this, "irq"),
-		m_deco146(*this, "ioprot"),
-		m_deco104(*this, "ioprot104"),
 		m_decobsmt(*this, "decobsmt"),
 		m_spriteram(*this, "spriteram"),
 		m_sprgen(*this, "spritegen"),
@@ -46,15 +45,13 @@ public:
 		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
 		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
 		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_ace_ram(*this, "ace_ram")
+		m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<deco_146_base_device> m_ioprot;
 	optional_device<deco_irq_device> m_deco_irq;
-	optional_device<deco146_device> m_deco146;
-	optional_device<deco104_device> m_deco104;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<buffered_spriteram32_device> m_spriteram;
 	optional_device<decospr_device> m_sprgen;
@@ -79,35 +76,19 @@ public:
 	required_shared_ptr<uint32_t> m_pf3_rowscroll32;
 	required_shared_ptr<uint32_t> m_pf4_rowscroll32;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_shared_ptr<uint32_t> m_ace_ram;
 
-	uint8_t m_nslasher_sound_irq; // nslasher and lockload
-	int m_tattass_eprom_bit; // tattass
-	int m_lastClock; // tattass
-	char m_buffer[32]; // tattass
-	int m_bufPtr; // tattass
-	int m_pendingCommand; // tattass
-	int m_readBitCount; // tattass
-	int m_byteAddr; // tattass
-	int m_ace_ram_dirty; // nslasher and tattass
-	int m_has_ace_ram; // all - config
 	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
 	int m_pri; // captaven, fghthist, nslasher and tattass
-	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap; // nslasher
 	uint16_t m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
 	uint16_t m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
-	uint16_t m_spriteram16_2[0x1000]; //nslasher and tattass
-	uint16_t m_spriteram16_2_buffered[0x1000]; //nslasher and tattass
 	uint16_t    m_pf1_rowscroll[0x1000]; // common
 	uint16_t    m_pf2_rowscroll[0x1000]; // common
 	uint16_t    m_pf3_rowscroll[0x1000]; // common
 	uint16_t    m_pf4_rowscroll[0x1000]; // common
 
 	// common
-	DECLARE_READ16_MEMBER(deco_104_r);
-	DECLARE_WRITE16_MEMBER(deco_104_w);
-	DECLARE_READ16_MEMBER(deco_146_r);
-	DECLARE_WRITE16_MEMBER(deco_146_w);
+	DECLARE_READ16_MEMBER(ioprot_r);
+	DECLARE_WRITE16_MEMBER(ioprot_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(volume_w);
@@ -119,32 +100,6 @@ public:
 	DECLARE_WRITE32_MEMBER(pf4_rowscroll_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 
-	// captaven
-	DECLARE_READ32_MEMBER(_71_r);
-	DECLARE_READ8_MEMBER(captaven_dsw1_r);
-	DECLARE_READ8_MEMBER(captaven_dsw2_r);
-	DECLARE_READ8_MEMBER(captaven_dsw3_r);
-	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
-
-	// fghthist
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(fghthist_in0_r);
-	DECLARE_READ16_MEMBER(fghthist_in1_r);
-
-	// tattass
-	DECLARE_WRITE32_MEMBER(tattass_control_w);
-
-	// nslasher and lockload
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
-	DECLARE_READ8_MEMBER(latch_r);
-
-	// nslasher and tattass
-	DECLARE_READ16_MEMBER(nslasher_debug_r);
-	DECLARE_READ32_MEMBER(spriteram2_r);
-	DECLARE_WRITE32_MEMBER(spriteram2_w);
-	DECLARE_WRITE32_MEMBER(buffer_spriteram2_w);
-	DECLARE_WRITE32_MEMBER(ace_ram_w);
-
 	// captaven, fghthist, nslasher and tattass
 	DECLARE_READ32_MEMBER(spriteram_r);
 	DECLARE_WRITE32_MEMBER(spriteram_w);
@@ -155,34 +110,103 @@ public:
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
-	DECLARE_DRIVER_INIT(captaven);
-	DECLARE_DRIVER_INIT(fghthist);
-	DECLARE_VIDEO_START(captaven);
-	DECLARE_VIDEO_START(fghthist);
-	DECLARE_VIDEO_START(nslasher);
-
-	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void updateAceRam();
-	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-
-	void deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-
-	void nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	DECLARE_READ16_MEMBER(port_b_tattass);
-	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-
-	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
-	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
-	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
-	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
-
 protected:
 	virtual void video_start() override;
 
+};
+
+class captaven_state : public deco32_state
+{
+public:
+	captaven_state(const machine_config &mconfig, device_type type, const char *tag)
+		: deco32_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_READ32_MEMBER(_71_r);
+	DECLARE_READ8_MEMBER(captaven_dsw1_r);
+	DECLARE_READ8_MEMBER(captaven_dsw2_r);
+	DECLARE_READ8_MEMBER(captaven_dsw3_r);
+	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
+
+	DECLARE_VIDEO_START(captaven);
+	DECLARE_DRIVER_INIT(captaven);
+
+	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
+
+private:
+};
+
+class fghthist_state : public deco32_state
+{
+public:
+	fghthist_state(const machine_config &mconfig, device_type type, const char *tag)
+		: deco32_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE32_MEMBER(sound_w);
+	DECLARE_READ16_MEMBER(fghthist_in0_r);
+	DECLARE_READ16_MEMBER(fghthist_in1_r);
+	DECLARE_READ32_MEMBER(unk_status_r);
+
+	DECLARE_DRIVER_INIT(fghthist);
+	DECLARE_VIDEO_START(fghthist);
+
+	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
+
+private:
+};
+
+// nslasher, tattass
+class nslasher_state : public deco32_state
+{
+public:
+	nslasher_state(const machine_config &mconfig, device_type type, const char *tag)
+		: deco32_state(mconfig, type, tag),
+		m_ace_ram(*this, "ace_ram")
+	{ }
+
+	DECLARE_WRITE32_MEMBER(tattass_control_w);
+	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
+	DECLARE_READ16_MEMBER(nslasher_debug_r);
+	DECLARE_READ32_MEMBER(spriteram2_r);
+	DECLARE_WRITE32_MEMBER(spriteram2_w);
+	DECLARE_WRITE32_MEMBER(buffer_spriteram2_w);
+	DECLARE_WRITE32_MEMBER(ace_ram_w);
+	DECLARE_WRITE32_MEMBER(palette_dma_w);
+
+	DECLARE_DRIVER_INIT(tattass);
+	DECLARE_DRIVER_INIT(nslasher);
+	DECLARE_VIDEO_START(nslasher);
+
+	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ16_MEMBER(port_b_tattass);
+	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
+
+private:
+	void updateAceRam();
+	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+
+	required_shared_ptr<uint32_t> m_ace_ram;
+
+	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
+
+	uint16_t m_spriteram16_2[0x1000];
+	uint16_t m_spriteram16_2_buffered[0x1000];
+
+	int m_tattass_eprom_bit;
+	int m_lastClock;
+	char m_buffer[32];
+	int m_bufPtr;
+	int m_pendingCommand;
+	int m_readBitCount;
+	int m_byteAddr;
+	int m_ace_ram_dirty;
 };
 
 class dragngun_state : public deco32_state

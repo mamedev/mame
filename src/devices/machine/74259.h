@@ -77,7 +77,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d7);
 	DECLARE_WRITE8_MEMBER(write_a0);
 	DECLARE_WRITE8_MEMBER(write_a3);
-	DECLARE_WRITE8_MEMBER(write_nibble);
+	DECLARE_WRITE8_MEMBER(write_nibble_d0);
+	DECLARE_WRITE8_MEMBER(write_nibble_d3);
 	DECLARE_WRITE8_MEMBER(clear);
 
 	// read handlers (inlined for the sake of optimization)

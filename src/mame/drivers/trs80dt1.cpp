@@ -80,6 +80,7 @@ void trs80dt1_state::machine_reset()
 {
 	m_bow = 0;
 	m_7474->preset_w(1);
+	// line is active low in the real chip
 	m_nvram->recall(1);
 	m_nvram->recall(0);
 }

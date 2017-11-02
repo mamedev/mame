@@ -1760,6 +1760,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.h",
 	}
 end
 
@@ -3278,5 +3280,35 @@ if (BUSES["INTERPRO_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.h",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.cpp",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/einstein/pipe/pipe.h,BUSES["TATUNG_PIPE"] = true
+---------------------------------------------------
+
+if (BUSES["TATUNG_PIPE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/einstein/userport/userport.h,BUSES["EINSTEIN_USERPORT"] = true
+---------------------------------------------------
+
+if (BUSES["EINSTEIN_USERPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/einstein/userport/userport.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.h",
+		MAME_DIR .. "src/devices/bus/einstein/userport/speech.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
 	}
 end

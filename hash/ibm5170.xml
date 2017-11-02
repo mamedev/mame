@@ -2409,6 +2409,192 @@
 		</part>
 	</software>
 
+	<software name="pcmos1">
+		<description>PC-MOS/386 Version 1.02</description>
+		<year>1987</year>
+		<publisher>The Software Link</publisher>
+		<info name="version" value="1.02" />
+		<info name="serial" value="05-04648" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk1.img" size="1474560" crc="615acf20" sha1="6e5b14f2c457f653cf09c8b4c0cb7ef7b2d56573" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcmos3">
+		<description>PC-MOS/386 Version 3.00</description>
+		<year>1988</year>
+		<publisher>The Software Link</publisher>
+		<info name="version" value="3.00" />
+		<info name="serial" value="05-018868" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk1.img" size="1474560" crc="06981cb6" sha1="23ee2c0646cae310f8c8db5fd74200d641dfa9b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcmos5">
+		<description>PC-MOS Version 5.01</description>
+		<year>1994</year>
+		<publisher>The Software Link</publisher>
+		<info name="version" value="5.01" />
+		<info name="serial" value="09-50003953" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PCMOS386-9-user.img" size="1474560" crc="936c016a" sha1="d31ef3d07b11b12085546e1b5a45f8ecfa4163d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.0a)</description>
+		<year>1997</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.0a" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v10a.dat" size="1474560" crc="909bb0ae" sha1="a234d02397d4af648a77d46ab277c5e674b4f1cb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4demoa" cloneof="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.0a Beta)</description>
+		<year>1997</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.0a" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v10a beta.dat" size="1474560" crc="e5df63c4" sha1="0c9423ede835c7f867baf945bab52ebdae40183a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4demob" cloneof="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.0)</description>
+		<year>1997</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.0" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v10.dat" size="1474560" crc="c0a120e4" sha1="bf8fbf753e978e00bb95f1da4a6d2e37a91092e7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4demoru" cloneof="qnx4demo">
+		<description>QNX Internet Appliance Toolkit Demo (v1.1 - Russian)</description>
+		<year>1998</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.1" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
+				<rom name="qnxdemo v11 russian.dat" size="1474560" crc="3e50f719" sha1="9336ff81e57169baa363108cde8a9b2babe77765" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4modd">
+		<description>QNX Demo (Modem v405)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.05" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo modem v405.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4modda" cloneof="qnx4modd">
+		<description>QNX Demo (Modem v4.00)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.00" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo modem v400.dat" size="1474560" crc="7cc3be15" sha1="3ded9ef17784b18f1c356e2bfeacfd9ecef4f716" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4moddb" cloneof="qnx4modd">
+		<description>QNX Internet Appliance Toolkit Demo (Modem v3.03)</description>
+		<year>1998</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="3.03" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo modem v303.dat" size="1474560" crc="de42476d" sha1="b330dc04a920886f2243377c9edd80c23bc3e90a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netd">
+		<description>QNX Demo (Network v405)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.05" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v405.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netda" cloneof="qnx4netd">
+		<description>QNX Demo (Network v4.00)</description>
+		<year>1999</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.00" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v400.dat" size="1474560" crc="72d7de91" sha1="bcc589a419500376cf5101ddf80d416ee43c0c1d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netdb" cloneof="qnx4netd">
+		<description>QNX Internet Appliance Toolkit Demo (Network v3.03)</description>
+		<year>1998</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="3.03" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v303.dat" size="1474560" crc="694a0448" sha1="d1bb83273ae2da9fb1fe93ae08c951ec91d6ea3f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnx4netdc" cloneof="qnx4netd">
+		<description>QNX Internet Appliance Toolkit Demo (Network v2.0)</description>
+		<year>1998</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="2.0" />
+		<info name="user_notes" value="8MB RAM required" />
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxdemo network v20.dat" size="1474560" crc="2026021a" sha1="a8a49d60accc19f67b09e8fe5b84ae6c3c18806e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="win95b">
 		<description>Microsoft Windows 95 (Bootdisk)</description>
 		<year>1995</year>
@@ -2900,37 +3086,37 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="f7ae33c3" sha1="b19fcad2e0c77fb7b3f574b7feb499ee9bcc42f0" offset="0" />
+				<rom name="disk1dd.img" size="737280" crc="f7ae33c3" sha1="b19fcad2e0c77fb7b3f574b7feb499ee9bcc42f0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="8d3b4522" sha1="3099e82c7974ea33e6498dbb5f308a1ef38ade4b" offset="0" />
+				<rom name="disk2dd.img" size="737280" crc="8d3b4522" sha1="3099e82c7974ea33e6498dbb5f308a1ef38ade4b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk3.img" size="737280" crc="75ed39ee" sha1="fe87c98f020541a0f44aeabd612cf3ac746285f4" offset="0" />
+				<rom name="disk3dd.img" size="737280" crc="75ed39ee" sha1="fe87c98f020541a0f44aeabd612cf3ac746285f4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk4.img" size="737280" crc="0bbb5163" sha1="afd7e856c7ffa6ba1518a4443e63d4e85af90eee" offset="0" />
+				<rom name="disk4dd.img" size="737280" crc="0bbb5163" sha1="afd7e856c7ffa6ba1518a4443e63d4e85af90eee" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk5.img" size="737280" crc="9bad78fc" sha1="717e55075c33d04f73b728fb00455175e01f6207" offset="0" />
+				<rom name="disk5dd.img" size="737280" crc="9bad78fc" sha1="717e55075c33d04f73b728fb00455175e01f6207" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk6.img" size="737280" crc="aece5056" sha1="7e8786d56a13dcc6dbe604e773cfef3dcb81526f" offset="0" />
+				<rom name="disk6dd.img" size="737280" crc="aece5056" sha1="7e8786d56a13dcc6dbe604e773cfef3dcb81526f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk7.img" size="737280" crc="53978e51" sha1="8aca13779c8d142a8989d854482d019c2d7252de" offset="0" />
+				<rom name="disk7dd.img" size="737280" crc="53978e51" sha1="8aca13779c8d142a8989d854482d019c2d7252de" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2942,27 +3128,27 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1228800">
-				<rom name="disk1.img" size="1228800" crc="062ea5a7" sha1="4c1a2a22c68bb82e90db7c454f71f4fef3d5e1b9" offset="0" />
+				<rom name="disk1mf.img" size="1228800" crc="062ea5a7" sha1="4c1a2a22c68bb82e90db7c454f71f4fef3d5e1b9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1228800">
-				<rom name="disk2.img" size="1228800" crc="1946eee6" sha1="adaf696fd6f1458ee5a73dea8b0a5fb5e306be90" offset="0" />
+				<rom name="disk2mf.img" size="1228800" crc="1946eee6" sha1="adaf696fd6f1458ee5a73dea8b0a5fb5e306be90" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1228800">
-				<rom name="disk3.img" size="1228800" crc="93fbd992" sha1="271a52a62a83ce7bdcf6514f779b46c534cdf2a6" offset="0" />
+				<rom name="disk3mf.img" size="1228800" crc="93fbd992" sha1="271a52a62a83ce7bdcf6514f779b46c534cdf2a6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1228800">
-				<rom name="disk4.img" size="1228800" crc="a6b5cba5" sha1="10dfb52912edbb02e6ffc48a7d46038dba9d499c" offset="0" />
+				<rom name="disk4mf.img" size="1228800" crc="a6b5cba5" sha1="10dfb52912edbb02e6ffc48a7d46038dba9d499c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1228800">
-				<rom name="disk5.img" size="1228800" crc="54cc9762" sha1="b07c0c8f56bf005a3d526fb3ea9fe29e6204add2" offset="0" />
+				<rom name="disk5mf.img" size="1228800" crc="54cc9762" sha1="b07c0c8f56bf005a3d526fb3ea9fe29e6204add2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3464,47 +3650,47 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk01.img" size="1474560" crc="a456c5c1" sha1="845136f162498e0a53444f269abf4f49986e19bd" offset="0" />
+				<rom name="disk01u.img" size="1474560" crc="a456c5c1" sha1="845136f162498e0a53444f269abf4f49986e19bd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk02.img" size="1474560" crc="60a61b4e" sha1="f2c1bd78ec784b2a4544901f38b6343875a9a1ed" offset="0" />
+				<rom name="disk02u.img" size="1474560" crc="60a61b4e" sha1="f2c1bd78ec784b2a4544901f38b6343875a9a1ed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk03.img" size="1474560" crc="f7b18361" sha1="7d9e8bc8ce54ee6ce6d0c6198b8c5a62c9c0f25e" offset="0" />
+				<rom name="disk03u.img" size="1474560" crc="f7b18361" sha1="7d9e8bc8ce54ee6ce6d0c6198b8c5a62c9c0f25e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk04.img" size="1474560" crc="e2946dbd" sha1="130eda5a79750a1b08a897c0c235235d0aba3f66" offset="0" />
+				<rom name="disk04u.img" size="1474560" crc="e2946dbd" sha1="130eda5a79750a1b08a897c0c235235d0aba3f66" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk05.img" size="1474560" crc="a94d27b4" sha1="3d453878879922594d05f6451d6e5636c215c219" offset="0" />
+				<rom name="disk05u.img" size="1474560" crc="a94d27b4" sha1="3d453878879922594d05f6451d6e5636c215c219" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk06.img" size="1474560" crc="f46858ea" sha1="f7243506ec484095fece35acacc54189ea9eb65c" offset="0" />
+				<rom name="disk06u.img" size="1474560" crc="f46858ea" sha1="f7243506ec484095fece35acacc54189ea9eb65c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk07.img" size="1474560" crc="21f25ba7" sha1="adcb00920e352cc28ec5bf3ffb7893eb1938dac2" offset="0" />
+				<rom name="disk07u.img" size="1474560" crc="21f25ba7" sha1="adcb00920e352cc28ec5bf3ffb7893eb1938dac2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk08.img" size="1474560" crc="46802720" sha1="f5ef16231c078c8f818a8edac77074b0edeb34fb" offset="0" />
+				<rom name="disk08u.img" size="1474560" crc="46802720" sha1="f5ef16231c078c8f818a8edac77074b0edeb34fb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk09.img" size="1474560" crc="44177162" sha1="f7b6b911c9efff0e6ba1c3dbc43c7cf1709fc52b" offset="0" />
+				<rom name="disk09u.img" size="1474560" crc="44177162" sha1="f7b6b911c9efff0e6ba1c3dbc43c7cf1709fc52b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4607,6 +4793,45 @@
 		</part>
 	</software>
 
+	<software name="pct71_525" cloneof="pct71">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>PC Tools 7.1 (5.25" HD)</description>
+		<year>1991</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="7.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_1.img" size="1228800" crc="062b12dd" sha1="b7cca618cc0d80b77438700372e42d624bae8e5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_2.img" size="1228800" crc="cce86276" sha1="da795768cda4625720faccb30c6b20377b5fc3dc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_3.img" size="1228800" crc="b5a89a5a" sha1="c7e70749fb9a1850eb26d9c455217da7314df1d8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_4.img" size="1228800" crc="e505d407" sha1="82426b2d00fbc41c095c3dc6b47045619adb09e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_5.img" size="1228800" crc="4dd1e757" sha1="6906b8b1af5aa8ebeebdec4643e4528b69b68973" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_6.img" size="1228800" crc="a85217c9" sha1="5a12930041ae333d56aff308078eb16e4ff98030" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pct8">
 		<description>PC Tools 8 (5.25" HD)</description>
 		<year>1992</year>
@@ -4615,32 +4840,32 @@
 		<info name="developer" value="Central Point Software, Inc." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 1 of 6].img" size="1228800" crc="9e32b700" sha1="e3448a677db9da18f3933dcad536b712883276a5" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 1 of 6].img" size="1228800" crc="9e32b700" sha1="e3448a677db9da18f3933dcad536b712883276a5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 2 of 6].img" size="1228800" crc="58e67911" sha1="bb2b9b4447fbc3e469caa0d2ea651162e15a62da" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 2 of 6].img" size="1228800" crc="58e67911" sha1="bb2b9b4447fbc3e469caa0d2ea651162e15a62da" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 3 of 6].img" size="1228800" crc="8950b0bb" sha1="ab3c91b07df198168d259643d05df123a67cebb9" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 3 of 6].img" size="1228800" crc="8950b0bb" sha1="ab3c91b07df198168d259643d05df123a67cebb9" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 4 of 6].img" size="1228800" crc="0fb54af3" sha1="909de4592581fcc56a47452a13f32c7f3455fdc7" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 4 of 6].img" size="1228800" crc="0fb54af3" sha1="909de4592581fcc56a47452a13f32c7f3455fdc7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 5 of 6].img" size="1228800" crc="be00b76b" sha1="012617155cbcbb2ee1fbd3227ddfc585197f751d" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 5 of 6].img" size="1228800" crc="be00b76b" sha1="012617155cbcbb2ee1fbd3227ddfc585197f751d" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 6 of 6].img" size="1228800" crc="25def657" sha1="ef253ae828ddd915c4e67a121b257368a21f7d2e" offset="0"/>
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 6 of 6].img" size="1228800" crc="25def657" sha1="ef253ae828ddd915c4e67a121b257368a21f7d2e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

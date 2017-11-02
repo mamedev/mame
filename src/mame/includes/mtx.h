@@ -32,14 +32,14 @@ class mtx_state : public driver_device
 {
 public:
 	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-		m_sn(*this, SN76489A_TAG),
-		m_z80ctc(*this, Z80CTC_TAG),
-		m_z80dart(*this, Z80DART_TAG),
-		m_cassette(*this, "cassette"),
-		m_centronics(*this, CENTRONICS_TAG),
-		m_ram(*this, RAM_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_sn(*this, SN76489A_TAG)
+		, m_z80ctc(*this, Z80CTC_TAG)
+		, m_z80dart(*this, Z80DART_TAG)
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Robbbert,FSanches and unknown others
 /***************************************************************************
 
   machine.c
@@ -202,6 +202,23 @@ READ8_MEMBER( trs80_state::trs80m4_ff_r )
 	m_irq &= 0xfc;  /* clear cassette interrupts */
 
 	return m_port_ec | m_cassette_data;
+}
+
+READ8_MEMBER( trs80_state::cp500_a11_flipflop_toggle )
+{
+	/* The A11 flipflop is used for enabling access to
+           the system monitor code at the EPROM address range 3800-3fff */
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *bootrom = memregion("bootrom")->base();
+	int block;
+
+	m_a11_flipflop ^= 1; //toggle the flip-flop at every read at io addresses 0xf4-f7
+
+	for (block=0; block<8; block++){
+		memcpy(&rom[block * 0x800], &bootrom[(block | m_a11_flipflop) * 0x800], 0x800);
+	}
+
+	return 0x00; //really?!
 }
 
 
@@ -839,6 +856,12 @@ MACHINE_RESET_MEMBER(trs80_state,lnw80)
 	m_cassette_data = 0;
 	m_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);
+}
+
+MACHINE_RESET_MEMBER(trs80_state,cp500)
+{
+	m_a11_flipflop = 0;
+	MACHINE_RESET_CALL_MEMBER( trs80m4 );
 }
 
 

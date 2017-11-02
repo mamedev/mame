@@ -9,8 +9,10 @@
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
+#include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/74145.h"
+#include "machine/input_merger.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
@@ -47,10 +49,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_ttl74145(*this, "ttl74145"),
-		m_row0(*this, "ROW-0"),
-		m_row1(*this, "ROW-1"),
-		m_row2(*this, "ROW-2"),
-		m_row3(*this, "ROW-3"),
+		m_crt(*this, "crt"),
+		m_tty(*this, "tty"),
+		m_row(*this, "ROW-%u", 0),
 		m_wp(*this, "WP") { }
 
 	required_shared_ptr<uint8_t> m_ram_1k;
@@ -70,20 +71,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
-	DECLARE_READ8_MEMBER(sym1_riot_a_r);
-	DECLARE_READ8_MEMBER(sym1_riot_b_r);
-	DECLARE_WRITE8_MEMBER(sym1_riot_a_w);
-	DECLARE_WRITE8_MEMBER(sym1_riot_b_w);
-	DECLARE_WRITE8_MEMBER(sym1_via2_a_w);
+	DECLARE_READ8_MEMBER(riot_a_r);
+	DECLARE_READ8_MEMBER(riot_b_r);
+	DECLARE_WRITE8_MEMBER(riot_a_w);
+	DECLARE_WRITE8_MEMBER(riot_b_w);
+	DECLARE_WRITE8_MEMBER(via3_a_w);
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ttl74145_device> m_ttl74145;
-	required_ioport m_row0;
-	required_ioport m_row1;
-	required_ioport m_row2;
-	required_ioport m_row3;
+	required_device<rs232_port_device> m_crt;
+	required_device<rs232_port_device> m_tty;
+	required_ioport_array<4> m_row;
 	required_ioport m_wp;
 };
 
@@ -99,48 +99,54 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_3_w ) { if (state) m_led_update
 WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_4_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
 WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
 
-TIMER_CALLBACK_MEMBER( sym1_state::led_refresh )
+TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
 	output().set_digit_value(param, m_riot_port_a);
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_a_r )
+READ8_MEMBER(sym1_state::riot_a_r)
 {
 	int data = 0x7f;
 
 	// scan keypad rows
-	if (!(m_riot_port_a & 0x80)) data &= m_row0->read();
-	if (!(m_riot_port_b & 0x01)) data &= m_row1->read();
-	if (!(m_riot_port_b & 0x02)) data &= m_row2->read();
-	if (!(m_riot_port_b & 0x04)) data &= m_row3->read();
+	if (!(m_riot_port_a & 0x80)) data &= m_row[0]->read();
+	if (!(m_riot_port_b & 0x01)) data &= m_row[1]->read();
+	if (!(m_riot_port_b & 0x02)) data &= m_row[2]->read();
+	if (!(m_riot_port_b & 0x04)) data &= m_row[3]->read();
 
 	// determine column
-	if ( ((m_riot_port_a ^ 0xff) & (m_row0->read() ^ 0xff)) & 0x7f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row[0]->read() ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_b_r )
+READ8_MEMBER(sym1_state::riot_b_r)
 {
 	int data = 0xff;
 
 	// determine column
-	if ( ((m_riot_port_a ^ 0xff) & (m_row1->read() ^ 0xff)) & 0x7f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row[1]->read() ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((m_riot_port_a ^ 0xff) & (m_row2->read() ^ 0xff)) & 0x3f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row[2]->read() ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((m_riot_port_a ^ 0xff) & (m_row3->read() ^ 0xff)) & 0x1f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row[3]->read() ^ 0xff)) & 0x1f )
 		data &= ~0x04;
+
+	// PB6 in from TTY keyboard
+	data &= m_tty->rxd_r() << 6;
+
+	// PB7 in from RS-232 CRT
+	data &= m_crt->rxd_r() << 7;
 
 	data &= ~0x80; // else hangs 8b02
 
 	return data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
+WRITE8_MEMBER(sym1_state::riot_a_w)
 {
 	logerror("%x: riot_a_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -148,7 +154,7 @@ WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
 	m_riot_port_a = data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_b_w )
+WRITE8_MEMBER(sym1_state::riot_b_w)
 {
 	logerror("%x: riot_b_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -157,6 +163,12 @@ WRITE8_MEMBER( sym1_state::sym1_riot_b_w )
 
 	// first 4 pins are connected to the 74145
 	m_ttl74145->write(data & 0x0f);
+
+	// PB4 out to RS-232 CRT
+	m_crt->write_txd(BIT(data, 4));
+
+	// PB5 out to TTY printer
+	m_tty->write_txd(BIT(data, 5));
 }
 
 //**************************************************************************
@@ -231,7 +243,7 @@ INPUT_PORTS_END
     PA2: Write protect RAM 0x800-0xbff
     PA3: Write protect RAM 0xc00-0xfff
  */
-WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
+WRITE8_MEMBER( sym1_state::via3_a_w )
 {
 	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
 
@@ -292,11 +304,11 @@ static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
 	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  // U25 VIA #1
+	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via1", via6522_device, read, write)  // U25 VIA #1
 	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_new_device, io_map)  // U27 RIOT
 	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  // U28 VIA #2
-	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  // U29 VIA #3
+	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via2", via6522_device, read, write)  // U28 VIA #2
+	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via3", via6522_device, read, write)  // U29 VIA #3
 	AM_RANGE(0xb000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
@@ -319,10 +331,10 @@ static MACHINE_CONFIG_START( sym1 )
 
 	// devices
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, SYM1_CLOCK)
-	MCFG_MOS6530n_IN_PA_CB(READ8(sym1_state, sym1_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(sym1_state, sym1_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(sym1_state, sym1_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(sym1_state, sym1_riot_b_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(sym1_state, riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(sym1_state, riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(sym1_state, riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(sym1_state, riot_b_w))
 
 	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
 	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))
@@ -334,15 +346,21 @@ static MACHINE_CONFIG_START( sym1 )
 	MCFG_TTL74145_OUTPUT_LINE_6_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	// lines 7-9 not connected
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD("via1", VIA6522, SYM1_CLOCK)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD("via2", VIA6522, SYM1_CLOCK)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, sym1_via2_a_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD("via3", VIA6522, SYM1_CLOCK)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, via3_a_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq") // wire-or connection
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
+	MCFG_RS232_PORT_ADD("crt", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, nullptr) // actually a 20 mA current loop; 110 bps assumed
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

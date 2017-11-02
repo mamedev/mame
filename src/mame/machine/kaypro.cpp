@@ -163,29 +163,9 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-READ8_MEMBER(kaypro_state::kaypro_sio_r)
-{
-	if (offset == 1)
-		return kay_kbd_d_r();
-	else
-	if (offset == 3)
-		return kay_kbd_c_r();
-	else
-		return m_sio->cd_ba_r(space, offset);
-}
-
-WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
-{
-	if (offset == 1)
-		kay_kbd_d_w(data);
-	else
-		m_sio->cd_ba_w(space, offset, data);
-}
-
-
 /*************************************************************************************
 
-    Floppy DIsk
+    Floppy Disk
 
     If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
     Since the HALT occurs last (and has no callback mechanism), we need to set
@@ -248,7 +228,6 @@ MACHINE_START_MEMBER( kaypro_state,kayproii )
 
 MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 {
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram

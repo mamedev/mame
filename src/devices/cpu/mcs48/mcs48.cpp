@@ -7,7 +7,13 @@
       reimplement as a push, not a pull
     - T0 output clock
     - get rid of i/o addressmap, use devcb for mcu pins
-    - add CMOS devices, 1 new opcode(01 HALT)
+    - add CMOS devices, 1 new opcode (01 HALT)
+	- make timer update cleaner:
+	  timer is updated on S4 while I/O happens on S5
+	  due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
+	  right now this is implemented with a hack in the mov_a_t handler
+	  in theory it should also be possible to see the timer flag before the interrupt is taken
+	  mov_t_a should also update the T register after it's incremented
 */
 
 /***************************************************************************
@@ -121,24 +127,6 @@
     MACROS
 ***************************************************************************/
 
-/* ROM is mapped to AS_PROGRAM */
-#define program_r(a)    m_program->read_byte(a)
-
-/* RAM is mapped to AS_DATA */
-#define ram_r(a)        m_data->read_byte(a)
-#define ram_w(a,V)      m_data->write_byte(a, V)
-
-/* ports are mapped to AS_IO and callbacks */
-#define ext_r(a)        m_io->read_byte(a)
-#define ext_w(a,V)      m_io->write_byte(a, V)
-#define port_r(a)       m_port_in_cb[a-1]()
-#define port_w(a,V)     m_port_out_cb[a-1](V)
-#define test_r(a)       m_test_in_cb[a]()
-#define test_w(a,V)     m_test_out_cb[a](V)
-#define bus_r()         m_bus_in_cb()
-#define bus_w(V)        m_bus_out_cb(V)
-#define prog_w(V)       m_prog_out_cb(V)
-
 /* r0-r7 map to memory via the regptr */
 #define R0              m_regptr[0]
 #define R1              m_regptr[1]
@@ -151,24 +139,24 @@
 
 
 
-DEFINE_DEVICE_TYPE(I8021, i8021_device, "i8021", "I8021")
-DEFINE_DEVICE_TYPE(I8022, i8022_device, "i8022", "I8022")
-DEFINE_DEVICE_TYPE(I8035, i8035_device, "i8035", "I8035")
-DEFINE_DEVICE_TYPE(I8048, i8048_device, "i8048", "I8048")
-DEFINE_DEVICE_TYPE(I8648, i8648_device, "i8648", "I8648")
-DEFINE_DEVICE_TYPE(I8748, i8748_device, "i8748", "I8748")
-DEFINE_DEVICE_TYPE(I8039, i8039_device, "i8039", "I8039")
-DEFINE_DEVICE_TYPE(I8049, i8049_device, "i8049", "I8049")
-DEFINE_DEVICE_TYPE(I8749, i8749_device, "i8749", "I8749")
-DEFINE_DEVICE_TYPE(I8040, i8040_device, "i8040", "I8040")
-DEFINE_DEVICE_TYPE(I8050, i8050_device, "i8050", "I8050")
-DEFINE_DEVICE_TYPE(I8041, i8041_device, "i8041", "I8041")
-DEFINE_DEVICE_TYPE(I8741, i8741_device, "i8741", "I8741")
-DEFINE_DEVICE_TYPE(I8042, i8042_device, "i8042", "I8042")
-DEFINE_DEVICE_TYPE(I8242, i8242_device, "i8242", "I8242")
-DEFINE_DEVICE_TYPE(I8742, i8742_device, "i8742", "I8742")
+DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "I8021")
+DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "I8022")
+DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "I8035")
+DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "I8048")
+DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "I8648")
+DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "I8748")
+DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "I8039")
+DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "I8049")
+DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "I8749")
+DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "I8040")
+DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "I8050")
+DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "I8041")
+DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "I8741")
+DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "I8042")
+DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "I8242")
+DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "I8742")
 DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
-DEFINE_DEVICE_TYPE(N7751, n7751_device, "n7751", "N7751")
+DEFINE_DEVICE_TYPE(N7751,  n7751_device,  "n7751",  "N7751")
 DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 
 
@@ -756,7 +744,7 @@ OPHANDLER( mov_a_r6 )       { m_a = R6; return 1; }
 OPHANDLER( mov_a_r7 )       { m_a = R7; return 1; }
 OPHANDLER( mov_a_xr0 )      { m_a = ram_r(R0); return 1; }
 OPHANDLER( mov_a_xr1 )      { m_a = ram_r(R1); return 1; }
-OPHANDLER( mov_a_t )        { m_a = m_timer; return 1; }
+OPHANDLER( mov_a_t )        { m_a = m_timer + ((m_timecount_enabled & TIMER_ENABLED) ? 1 : 0); return 1; }
 
 OPHANDLER( mov_psw_a )      { m_psw = m_a; update_regptr(); return 1; }
 OPHANDLER( mov_sts_a )      { m_sts = (m_sts & 0x0f) | (m_a & 0xf0); return 1; }

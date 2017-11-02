@@ -6065,8 +6065,10 @@ uint8_t saturn_state::get_odd_bit( void )
 
 int saturn_state::get_vblank_start_position( void )
 {
-	/* TODO: test says that second setting happens at 241, might need further investigation ... */
-	const int d_vres[4] = { 240, 240, 256, 256 };
+	// TODO: test says that second setting happens at 241, might need further investigation ...
+	//       also first one happens at 240, but needs mods in SMPC otherwise we get 2 credits at startup in shanhigw and sokyugrt
+	//       (i.e. make a special screen device that handles this for us)
+	const int d_vres[4] = { 224, 240, 256, 256 };
 	int vres_mask;
 	int vblank_line;
 

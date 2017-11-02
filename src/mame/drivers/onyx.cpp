@@ -6,8 +6,6 @@ Onyx C8002
 
 2013-08-18 Skeleton Driver
 
-Copied from p8k.c
-
 The C8002 is one of the earliest minicomputers to use Unix as an operating system.
 
 The system consists of a main CPU (Z8002), and a slave CPU for Mass Storage control (Z80)
@@ -21,52 +19,45 @@ The Z8002 board contains a 16 MHz crystal; 3x Z80CTC; 5x Z80SIO/0; 3x Z80PIO; 2 
 The system can handle 8 RS232 terminals, 7 hard drives, a tape cartridge drive, parallel i/o,
 and be connected to a RS422 network.
 
+Status:
+- Main screen prints an error with CTC (because there's no clock into it atm)
+- Subcpu screen (after a while) prints various statuses then waits for the fdc to respond
+
+To Do:
+- Hook up daisy chains (see p8k.cpp for how to hook up a 16-bit chain)
+  (keyboard input depends on interrupts)
+- Remaining devices
+- Whatever hooks up to the devices
+- Eventually we'll need software
+- Manuals / schematics would be nice
+
 *************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 //#include "cpu/z80/z80daisy.h"
-//#include "machine/z80ctc.h"
-//#include "machine/z80pio.h"
-//#include "machine/z80dart.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "machine/z80sio.h"
 //#include "machine/z80dma.h"
 #include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
 
 class onyx_state : public driver_device
 {
 public:
 	onyx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	DECLARE_MACHINE_RESET(c8002);
-	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(portff05_r);
 
 private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 };
-
-
-READ8_MEMBER( onyx_state::portff05_r )
-{
-	//return m_term_data;
-
-	return 4;
-}
-
-void onyx_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 
 /* Input ports */
@@ -91,8 +82,16 @@ ADDRESS_MAP_END
 //ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c8002_io, AS_IO, 8, onyx_state)
-	AM_RANGE(0xff00, 0xff01)  AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0xff04, 0xff05) AM_READ(portff05_r)
+	AM_RANGE(0xff00, 0xff07) AM_DEVREADWRITE_MOD("sio1", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff08, 0xff0f) AM_DEVREADWRITE_MOD("sio2", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff10, 0xff17) AM_DEVREADWRITE_MOD("sio3", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_MOD("sio4", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff20, 0xff27) AM_DEVREADWRITE_MOD("sio5", z80sio_device, cd_ba_r, cd_ba_w, rshift<1>)
+	AM_RANGE(0xff30, 0xff37) AM_DEVREADWRITE_MOD("ctc1", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff38, 0xff3f) AM_DEVREADWRITE_MOD("ctc2", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff40, 0xff47) AM_DEVREADWRITE_MOD("ctc3", z80ctc_device, read, write, rshift<1>)
+	AM_RANGE(0xff50, 0xff57) AM_DEVREADWRITE_MOD("pio1", z80pio_device, read, write, rshift<1>)
+	AM_RANGE(0xff58, 0xff5f) AM_DEVREADWRITE_MOD("pio2", z80pio_device, read, write, rshift<1>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(submem, AS_PROGRAM, 8, onyx_state)
@@ -102,6 +101,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subio, AS_IO, 8, onyx_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio1s", z80pio_device, read, write)
+	AM_RANGE(0x04, 0x04) AM_READNOP   // disk status?
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio1s", z80sio_device, cd_ba_r, cd_ba_w )
 ADDRESS_MAP_END
 
 
@@ -125,18 +127,48 @@ static MACHINE_CONFIG_START( c8002 )
 	MCFG_CPU_IO_MAP(subio)
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
-	/* peripheral hardware */
-	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
-	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
-	//MCFG_DEVICE_ADD("z80sio_0", Z80SIO0, 9600)
-	//MCFG_DEVICE_ADD("z80sio_1", Z80SIO0, 9600)
-	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
-	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
-	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 307200)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1" ,z80sio_device, txca_w))
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(onyx_state, kbd_put))
+	/* peripheral hardware */
+	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_16MHz/4)
+	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_16MHz/4)
+	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_16MHz /4)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("sio3", Z80SIO, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("sio4", Z80SIO, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("sio5", Z80SIO, XTAL_16MHz /4)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsa_w))
+
+	MCFG_DEVICE_ADD("pio1s", Z80PIO, XTAL_16MHz/4)
+	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("subcpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("sio1s_clock", CLOCK, 614400)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1s", z80sio_device, rxtxcb_w))
+	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1s" ,z80sio_device, txca_w))
+
+	MCFG_DEVICE_ADD("sio1s", Z80SIO, XTAL_16MHz /4)
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232s", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1s", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1s", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1s", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

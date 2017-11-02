@@ -67,9 +67,6 @@
 #define SIO_CHANB_TAG   "chb"
 
 /* Generic macros */
-#define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
-	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
-
 #define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
 	devcb = &z80sio_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
@@ -129,23 +126,16 @@
 
 class z80sio_device;
 
-class z80sio_channel : public device_t,
-		public device_serial_interface
+class z80sio_channel : public device_t, public device_serial_interface
 {
 	friend class z80sio_device;
 
 public:
 	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
-	virtual void rcv_complete() override;
 
 	// read register handlers
 	uint8_t do_sioreg_rr0();
@@ -169,17 +159,16 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_data(uint8_t data);
+	void receive_reset();
+	void receive_data();
+	void advance_rx_fifo();
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_rx ) { m_rxd = state; }
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
-
-	int m_rxc;
-	int m_txc;
 
 	// Register state
 	// read registers     enum
@@ -292,11 +281,11 @@ protected:
 		WR1_RX_INT_MODE_MASK      = 0x18,
 		WR1_RX_INT_DISABLE        = 0x00,
 		WR1_RX_INT_FIRST          = 0x08,
-		WR1_RX_INT_ALL_PARITY     = 0x10, // not supported
+		WR1_RX_INT_ALL_PARITY     = 0x10,
 		WR1_RX_INT_ALL            = 0x18,
-		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
-		WR1_WRDY_FUNCTION         = 0x40, // not supported
-		WR1_WRDY_ENABLE           = 0x80  // not supported
+		WR1_WRDY_ON_RX_TX         = 0x20,
+		WR1_WRDY_FUNCTION         = 0x40, // WAIT not supported
+		WR1_WRDY_ENABLE           = 0x80
 	};
 
 	enum
@@ -366,10 +355,16 @@ protected:
 		WR5_DTR                   = 0x80
 	};
 
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	void update_serial();
 	void update_rts();
 	void set_dtr(int state);
 	void set_rts(int state);
+	void set_ready(bool ready);
 
 	int get_clock_mode();
 	stop_bits_t get_stop_bits();
@@ -377,11 +372,15 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	util::fifo<uint8_t, 3> m_rx_data_fifo;
-	util::fifo<uint8_t, 3> m_rx_error_fifo;
-	uint8_t m_rx_error;       // current receive error
+	int m_rx_fifo_depth;
+	uint32_t m_rx_data_fifo;
+	uint32_t m_rx_error_fifo;
 
-	int m_rx_clock;     // receive clock pulse count
+	int m_rx_clock;     // receive clock line state
+	int m_rx_count;     // clocks until next sample
+	int m_rx_bit;       // receive data bit (0 = start bit, 1 = LSB, etc.)
+	uint16_t m_rx_sr;   // receive shift register
+
 	int m_rx_first;     // first character received
 	int m_rx_break;     // receive break condition
 	uint8_t m_rx_rr0_latch;   // read register 0 latched
@@ -439,15 +438,6 @@ public:
 		dev.m_cputag = tag;
 	}
 
-	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
-	{
-		z80sio_device &dev = downcast<z80sio_device &>(device);
-		dev.m_rxca = rxa;
-		dev.m_txca = txa;
-		dev.m_rxcb = rxb;
-		dev.m_txcb = txb;
-	}
-
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
@@ -484,6 +474,7 @@ protected:
 	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -519,11 +510,6 @@ protected:
 	required_device<z80sio_channel> m_chanB;
 
 	// internal state
-	int m_rxca;
-	int m_txca;
-	int m_rxcb;
-	int m_txcb;
-
 	devcb_write_line    m_out_txda_cb;
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;

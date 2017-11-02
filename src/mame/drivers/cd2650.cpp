@@ -2,11 +2,25 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-Central Data cd2650
+Central Data 2650 Computer System
 
 2010-04-08 Skeleton driver.
 
-No info available on this computer apart from a few newsletters.
+No info available on this computer apart from a few newsletters and
+magazine articles. The computer was described in a series of articles
+published between April and June 1977 in Radio-Electronics, which include
+supposedly complete schematics and fairly detailed subsystem descriptions.
+
+All signals to and from the 2650 board (including the built-in 300 baud
+Kansas City standard cassette tape interface) are passed through six ribbon
+cables. Central Data later produced an “extender board” that adapted the
+bus signals to a S-100 backplane. This interface was missing a considerable
+number of standard S-100 timing signals, though it was compatible at least
+with some dynamic RAM boards released by the company.
+
+The unusual XTAL frequency seems deliberately chosen to produce a vertical
+sync rate of exactly 60 Hz.
+
 The system only uses 1000-14FF for videoram and 17F0-17FF for
 scratch ram. All other ram is optional.
 
@@ -23,13 +37,18 @@ V    Verify?
 Press Esc to exit most commands.
 
 TODO
-- Lots, probably. The computer is a complete mystery. No manuals or schematics exist.
+- Lots, probably. The computer is a complete mystery. No manuals are known to exist.
 - Cassette doesn't work.
 
 ****************************************************************************/
 
+#define CHARACTER_WIDTH 8
+#define CHARACTER_HEIGHT 8
+#define CHARACTER_LINES 12
+
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/keyboard.h"
@@ -95,8 +114,8 @@ READ8_MEMBER( cd2650_state::keyin_r )
 
 static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
@@ -132,14 +151,14 @@ uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (ra = 0; ra < CHARACTER_LINES; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{
 				gfx = 0;
-				if ((ra) && (ra < 9))
+				if (ra < CHARACTER_HEIGHT)
 				{
 					mem = offset + y + (x<<4);
 
@@ -148,7 +167,7 @@ uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 					chr = m_p_videoram[mem] & 0x3f;
 
-					gfx = m_p_chargen[(BITSWAP8(chr,7,6,2,1,0,3,4,5)<<3) | (ra-1) ];
+					gfx = m_p_chargen[(BITSWAP8(chr,7,6,2,1,0,3,4,5)<<3) | ra];
 				}
 
 				/* Display a scanline of a character */
@@ -261,7 +280,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 
 static MACHINE_CONFIG_START( cd2650 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_192640MHz / 12) // 1.182720MHz according to RE schematic
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
 	MCFG_CPU_IO_MAP(cd2650_io)
 	MCFG_CPU_DATA_MAP(cd2650_data)
@@ -270,12 +289,10 @@ static MACHINE_CONFIG_START( cd2650 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_192640MHz, 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES)
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
 	MCFG_SCREEN_PALETTE("palette")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -297,7 +314,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( cd2650 )
-	ROM_REGION( 0x0400, "roms", 0 )
+	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "cd2650.rom", 0x0000, 0x0400, CRC(5397328e) SHA1(7106fdb60e1ad2bc5e8e45527f348c23296e8d6a))
 
 	ROM_REGION( 0x0600, "chargen", 0 )
@@ -319,4 +336,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "CD 2650", 0 )
+COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "2650 Computer System", 0 )

@@ -259,6 +259,7 @@ private:
 	void pattern_name_autoinc_check();  /**< check autoinc for tile pointers */
 	void pattern_mode_setup();      /**< refresh pattern mode at register 7/8 change*/
 	int get_col_division(int raw_col); /**< calculate column scroll */
+	int get_row_division(int raw_row); /**< calculate row scroll */
 
 	enum
 	{

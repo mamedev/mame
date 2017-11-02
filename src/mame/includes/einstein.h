@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
+#include "bus/einstein/pipe/pipe.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -21,6 +21,7 @@
 #include "machine/i8251.h"
 #include "bus/centronics/ctronics.h"
 #include "screen.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -54,13 +55,9 @@ class einstein_state : public driver_device
 public:
 	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, IC_I001),
+		m_pipe(*this, "pipe"),
 		m_fdc(*this, IC_I042),
-		m_color_screen(*this, "screen"),
-		m_ctc(*this, IC_I058),
-		m_tms9929a(*this, "tms9929a"),
-		m_region_gfx1(*this, "gfx1"),
-		m_mc6845(*this, "crtc"),
-		m_crtc_screen(*this, "80column"),
 		m_uart(*this, IC_I060),
 		m_ram(*this, RAM_TAG),
 		m_centronics(*this, "centronics"),
@@ -68,19 +65,14 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
+		m_floppy{ { *this, IC_I042 ":0" }, { *this, IC_I042 ":1" }, { *this, IC_I042 ":2" }, { *this, IC_I042 ":3" } },
 		m_line(*this, "LINE%u", 0),
 		m_extra(*this, "EXTRA"),
-		m_buttons(*this, "BUTTONS"),
-		m_config(*this, "config"),
-		m_80column_dips(*this, "80column_dips"),
-		m_palette(*this, "palette")
+		m_buttons(*this, "BUTTONS")
 	{
 	}
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
-	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
-	DECLARE_READ8_MEMBER(einstein_80col_state_r);
 	DECLARE_WRITE8_MEMBER(einstein_keyboard_line_write);
 	DECLARE_READ8_MEMBER(einstein_keyboard_data_read);
 	DECLARE_WRITE8_MEMBER(einstein_rom_w);
@@ -91,15 +83,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_MACHINE_START(einstein2);
-	DECLARE_MACHINE_RESET(einstein2);
-	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
 	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
-	MC6845_UPDATE_ROW(crtc_update_row);
 
 	int m_interrupt;
 	int m_interrupt_mask;
@@ -108,23 +95,16 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<tatung_pipe_device> m_pipe;
 	required_device<wd1770_device> m_fdc;
-	required_device<screen_device> m_color_screen;
-	required_device<z80ctc_device> m_ctc;
-	required_device<tms9929a_device> m_tms9929a;
-	optional_memory_region m_region_gfx1;
 
 	int m_rom_enabled;
 
 	/* keyboard */
 	uint8_t m_keyboard_line;
 	uint8_t m_keyboard_data;
-
-	/* 80 column device */
-	optional_device<mc6845_device> m_mc6845;
-	optional_device<screen_device> m_crtc_screen;
-	std::unique_ptr<uint8_t[]> m_crtc_ram;
-	uint8_t   m_de;
 
 	int m_centronics_busy;
 	int m_centronics_perror;
@@ -137,14 +117,10 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
+	required_device<floppy_connector> m_floppy[4];
 	required_ioport_array<8> m_line;
 	required_ioport m_extra;
 	required_ioport m_buttons;
-	required_ioport m_config;
-	optional_ioport m_80column_dips;
-
-public:
-	optional_device<palette_device> m_palette;
 
 	void einstein_scan_keyboard();
 	void einstein_page_rom();

@@ -161,12 +161,6 @@ void mips3_device::mips3drc_set_options(uint32_t options)
 -------------------------------------------------*/
 void mips3_device::clear_fastram(uint32_t select_start)
 {
-	for (int i=select_start; i<MIPS3_MAX_FASTRAM; i++) {
-		m_fastram[i].start = 0;
-		m_fastram[i].end = 0;
-		m_fastram[i].readonly = false;
-		m_fastram[i].base = nullptr;
-	}
 	m_fastram_select=select_start;
 	// Set cache to dirty so that re-mapping occurs
 	m_cache_dirty = true;
@@ -189,6 +183,8 @@ void mips3_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void 
 		m_fastram[m_fastram_select].offset_base16 = (uint16_t*)((uint8_t*)base - start);
 		m_fastram[m_fastram_select].offset_base32 = (uint32_t*)((uint8_t*)base - start);
 		m_fastram_select++;
+		// Set cache to dirty so that re-mapping occurs
+		m_cache_dirty = true;
 	}
 }
 
@@ -911,8 +907,8 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                   // rolins  i0,i3,0,0xfffff000
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
-			if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
+		for (ramnum = 0; ramnum < m_fastram_select; ramnum++)
+			if (!(iswrite && m_fastram[ramnum].readonly))
 			{
 				void *fastbase = (uint8_t *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				uint32_t skip = label++;
@@ -926,7 +922,6 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 					UML_CMP(block, I0, m_fastram[ramnum].start);// cmp     i0,fastram_start
 					UML_JMPc(block, COND_B, skip);                                      // jb      skip
 				}
-
 				if (!iswrite)
 				{
 					if (size == 1)
