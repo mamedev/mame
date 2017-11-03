@@ -45,8 +45,8 @@ static MACHINE_CONFIG_START( tti )
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 0)
 	MCFG_MC68901_TIMER_CLOCK(XTAL_20MHz / 2) // guess
-	MCFG_MC68901_RX_CLOCK(153000) // for testing
-	MCFG_MC68901_TX_CLOCK(153000) // for testing
+	MCFG_MC68901_RX_CLOCK(9600) // for testing (FIXME: actually 16x)
+	MCFG_MC68901_TX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")

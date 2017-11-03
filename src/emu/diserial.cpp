@@ -213,6 +213,7 @@ WRITE_LINE_MEMBER(device_serial_interface::rx_w)
 	receive_register_update_bit(state);
 	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
+		//device().logerror("Receiver is synchronized\n");
 		if(m_rcv_clock && !(m_rcv_rate.is_never()))
 			// make start delay just a bit longer to make sure we are called after the sender
 			m_rcv_clock->adjust(((m_rcv_rate*3)/2), 0, m_rcv_rate);
@@ -266,6 +267,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	else
 	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
+		//device().logerror("Received bit %d\n", m_rcv_bit_count_received);
 		m_rcv_bit_count_received++;
 
 		if (!bit && (m_rcv_bit_count_received > (m_rcv_bit_count - m_df_stop_bit_count)))
@@ -279,7 +281,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 			m_rcv_bit_count_received = 0;
 			m_rcv_flags &=~RECEIVE_REGISTER_SYNCHRONISED;
 			m_rcv_flags |= RECEIVE_REGISTER_WAITING_FOR_START_BIT;
-			//logerror("receive register full\n");
+			//device().logerror("Receive register full\n");
 			m_rcv_flags |= RECEIVE_REGISTER_FULL;
 		}
 	}
