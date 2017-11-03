@@ -24,11 +24,20 @@ public:
 	tti_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mfp(*this, "mfp")
 	{ }
+
+	IRQ_CALLBACK_MEMBER(intack);
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<mc68901_device> m_mfp;
 };
+
+IRQ_CALLBACK_MEMBER(tti_state::intack)
+{
+	return m_mfp->get_vector();
+}
 
 static INPUT_PORTS_START( tti )
 INPUT_PORTS_END
@@ -42,12 +51,14 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( tti )
 	MCFG_DEVICE_ADD("maincpu", M68008, XTAL_20MHz / 2) // guess
 	MCFG_CPU_PROGRAM_MAP(prg_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(tti_state, intack)
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 0)
 	MCFG_MC68901_TIMER_CLOCK(XTAL_20MHz / 2) // guess
 	MCFG_MC68901_RX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_TX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
