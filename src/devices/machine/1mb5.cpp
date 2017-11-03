@@ -23,19 +23,19 @@ DEFINE_DEVICE_TYPE(HP_1MB5, hp_1mb5_device, "hp_1mb5", "HP 1MB5")
 
 // Bit manipulation
 namespace {
-	static constexpr unsigned BIT_MASK(unsigned n)
+	template<typename T> constexpr T BIT_MASK(unsigned n)
 	{
-		return 1U << n;
+		return (T)1U << n;
 	}
 
 	template<typename T> void BIT_CLR(T& w , unsigned n)
 	{
-		w &= ~(T)BIT_MASK(n);
+		w &= ~BIT_MASK<T>(n);
 	}
 
 	template<typename T> void BIT_SET(T& w , unsigned n)
 	{
-		w |= (T)BIT_MASK(n);
+		w |= BIT_MASK<T>(n);
 	}
 
 	template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)

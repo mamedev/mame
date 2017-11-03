@@ -28,19 +28,19 @@
 
 // Bit manipulation
 namespace {
-	static constexpr unsigned BIT_MASK(unsigned n)
+	template<typename T> constexpr T BIT_MASK(unsigned n)
 	{
-		return 1U << n;
+		return (T)1U << n;
 	}
 
 	template<typename T> void BIT_CLR(T& w , unsigned n)
 	{
-		w &= ~(T)BIT_MASK(n);
+		w &= ~BIT_MASK<T>(n);
 	}
 
 	template<typename T> void BIT_SET(T& w , unsigned n)
 	{
-		w |= (T)BIT_MASK(n);
+		w |= BIT_MASK<T>(n);
 	}
 
 	template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
@@ -287,7 +287,7 @@ void hp85_state::machine_reset()
 	m_crt_sad = 0;
 	m_crt_bad = 0;
 	m_crt_sts = 0x7c;
-	m_crt_ctl = BIT_MASK(CRT_CTL_POWERDN_BIT) | BIT_MASK(CRT_CTL_WIPEOUT_BIT);
+	m_crt_ctl = BIT_MASK<uint8_t>(CRT_CTL_POWERDN_BIT) | BIT_MASK<uint8_t>(CRT_CTL_WIPEOUT_BIT);
 	m_crt_read_byte = 0;
 	m_crt_write_byte = 0;
 	m_int_serv = 0;
@@ -320,7 +320,7 @@ void hp85_state::machine_reset()
 	m_prt_idx = PRT_BUFFER_SIZE;
 	m_prchar_r = 0;
 	m_prchar_w = 0;
-	m_prtsts = BIT_MASK(PRTSTS_PAPER_OK_BIT) | BIT_MASK(PRTSTS_PRTRDY_BIT);
+	m_prtsts = BIT_MASK<uint8_t>(PRTSTS_PAPER_OK_BIT) | BIT_MASK<uint8_t>(PRTSTS_PRTRDY_BIT);
 	m_prtctl = 0;
 
 	// Load optional ROMs (if any)
@@ -841,7 +841,7 @@ bool hp85_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8
 		if (keycode != 0xff) {
 			return true;
 		}
-		ioport_value mask = BIT_MASK(bit_no);
+		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
 		pressed &= ~mask;
 	}
 	return false;
@@ -1194,6 +1194,8 @@ void hp85_state::prt_do_printing()
 	m_prt_busy_timer->adjust(attotime::from_msec(PRT_BUSY_MSEC));
 }
 
+#define IOP_MASK(x)	BIT_MASK<ioport_value>((x))
+
 static INPUT_PORTS_START(hp85)
 	// Keyboard is arranged in a matrix of 10 rows and 8 columns. In addition there are 3 keys with
 	// dedicated input lines: SHIFT, SHIFT LOCK & CONTROL.
@@ -1201,95 +1203,95 @@ static INPUT_PORTS_START(hp85)
 	// n = r / 4
 	// b = (r % 4) * 8 + c
 	PORT_START("KEY0")
-	PORT_BIT(BIT_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Down AUTO") // 0,0: Down / Auto
-	PORT_BIT(BIT_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Up Home")       // 0,1: Up / Home
-	PORT_BIT(BIT_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_NAME("k4 k8")         // 0,2: k4 / k8
-	PORT_BIT(BIT_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_NAME("k3 k7")         // 0,3: k3 / k7
-	PORT_BIT(BIT_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_NAME("k2 k6")         // 0,4: k2 / k6
-	PORT_BIT(BIT_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("k1 k5")         // 0,5: k1 / k5
-	PORT_BIT(BIT_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LABEL KEY")                                                        // 0,6: LABEL KEY
-	PORT_BIT(BIT_MASK(7) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                 // 0,7: N/U
-	PORT_BIT(BIT_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')                            // 1,0: 8
-	PORT_BIT(BIT_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')                            // 1,1: 7
-	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')                           // 1,2: 6
-	PORT_BIT(BIT_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')                           // 1,3: 5
-	PORT_BIT(BIT_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')                           // 1,4: 4
-	PORT_BIT(BIT_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')                           // 1,5: 3
-	PORT_BIT(BIT_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')                           // 1,6: 2
-	PORT_BIT(BIT_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')                           // 1,7: 1
-	PORT_BIT(BIT_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')                           // 2,0: I
-	PORT_BIT(BIT_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')                           // 2,1: U
-	PORT_BIT(BIT_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')                           // 2,2: Y
-	PORT_BIT(BIT_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')                           // 2,3: T
-	PORT_BIT(BIT_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')                           // 2,4: R
-	PORT_BIT(BIT_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')                           // 2,5: E
-	PORT_BIT(BIT_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')                           // 2,6: W
-	PORT_BIT(BIT_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')                           // 2,7: Q
-	PORT_BIT(BIT_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')                           // 3,0: K
-	PORT_BIT(BIT_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')                           // 3,1: J
-	PORT_BIT(BIT_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')                           // 3,2: H
-	PORT_BIT(BIT_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')                           // 3,3: G
-	PORT_BIT(BIT_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')                           // 3,4: F
-	PORT_BIT(BIT_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')                           // 3,5: D
-	PORT_BIT(BIT_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')                           // 3,6: S
-	PORT_BIT(BIT_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')                           // 3,7: A
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Down AUTO") // 0,0: Down / Auto
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Up Home")       // 0,1: Up / Home
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_NAME("k4 k8")         // 0,2: k4 / k8
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_NAME("k3 k7")         // 0,3: k3 / k7
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_NAME("k2 k6")         // 0,4: k2 / k6
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("k1 k5")         // 0,5: k1 / k5
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LABEL KEY")                                                        // 0,6: LABEL KEY
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                 // 0,7: N/U
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')                            // 1,0: 8
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')                            // 1,1: 7
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')                           // 1,2: 6
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')                           // 1,3: 5
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')                           // 1,4: 4
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')                           // 1,5: 3
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')                           // 1,6: 2
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')                           // 1,7: 1
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')                           // 2,0: I
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')                           // 2,1: U
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')                           // 2,2: Y
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')                           // 2,3: T
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')                           // 2,4: R
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')                           // 2,5: E
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')                           // 2,6: W
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')                           // 2,7: Q
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')                           // 3,0: K
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')                           // 3,1: J
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')                           // 3,2: H
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')                           // 3,3: G
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')                           // 3,4: F
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')                           // 3,5: D
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')                           // 3,6: S
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')                           // 3,7: A
 
 	PORT_START("KEY1")
-	PORT_BIT(BIT_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')                            // 4,0: M
-	PORT_BIT(BIT_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')                            // 4,1: N
-	PORT_BIT(BIT_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')                            // 4,2: B
-	PORT_BIT(BIT_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')                            // 4,3: V
-	PORT_BIT(BIT_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')                            // 4,4: C
-	PORT_BIT(BIT_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')                            // 4,5: X
-	PORT_BIT(BIT_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')                            // 4,6: Z
-	PORT_BIT(BIT_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')                                       // 4,7: Space
-	PORT_BIT(BIT_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')                        // 5,0: ,
-	PORT_BIT(BIT_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')                         // 5,1: .
-	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')                       // 5,2: / ?
-	PORT_BIT(BIT_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAUSE STEP")                                                      // 5,3: PAUSE / STEP
-	PORT_BIT(BIT_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("RUN")                                                             // 5,4: RUN
-	PORT_BIT(BIT_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("KP +") // 5,5: KP +
-	PORT_BIT(BIT_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("KP -")   // 5,6: KP -
-	PORT_BIT(BIT_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("KP *") // 5,7: KP * (not sure)
-	PORT_BIT(BIT_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')                           // 6,0: L
-	PORT_BIT(BIT_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')                       // 6,1: ;
-	PORT_BIT(BIT_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')                      // 6,2: ' "
-	PORT_BIT(BIT_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("END LINE")                 // 6,3: END LINE
-	PORT_BIT(BIT_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LIST P LST")                                                      // 6,4: LIST / P LST
-	PORT_BIT(BIT_MASK(21) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 6,5: N/U
-	PORT_BIT(BIT_MASK(22) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 6,6: N/U
-	PORT_BIT(BIT_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("KP /")   // 6,7: KP /
-	PORT_BIT(BIT_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')                           // 7,0: O
-	PORT_BIT(BIT_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')                           // 7,1: P
-	PORT_BIT(BIT_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[')                   // 7,2: ( [
-	PORT_BIT(BIT_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']')                  // 7,3: ) ]
-	PORT_BIT(BIT_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("CONT SCRATCH")                                                    // 7,4: CONT / SCRATCH
-	PORT_BIT(BIT_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("-LINE CLEAR")                                                     // 7,5: -LINE / CLEAR
-	PORT_BIT(BIT_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME(") INIT")                                                          // 7,6: ) INIT
-	PORT_BIT(BIT_MASK(31) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 7,7: N/U
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')                            // 4,0: M
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')                            // 4,1: N
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')                            // 4,2: B
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')                            // 4,3: V
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')                            // 4,4: C
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')                            // 4,5: X
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')                            // 4,6: Z
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')                                       // 4,7: Space
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')                        // 5,0: ,
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')                         // 5,1: .
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')                       // 5,2: / ?
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAUSE STEP")                                                      // 5,3: PAUSE / STEP
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("RUN")                                                             // 5,4: RUN
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("KP +") // 5,5: KP +
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("KP -")   // 5,6: KP -
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("KP *") // 5,7: KP * (not sure)
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')                           // 6,0: L
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')                       // 6,1: ;
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')                      // 6,2: ' "
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("END LINE")                 // 6,3: END LINE
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LIST P LST")                                                      // 6,4: LIST / P LST
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 6,5: N/U
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 6,6: N/U
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("KP /")   // 6,7: KP /
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')                           // 7,0: O
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')                           // 7,1: P
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[')                   // 7,2: ( [
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']')                  // 7,3: ) ]
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("CONT SCRATCH")                                                    // 7,4: CONT / SCRATCH
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("-LINE CLEAR")                                                     // 7,5: -LINE / CLEAR
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME(") INIT")                                                          // 7,6: ) INIT
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                // 7,7: N/U
 
 	PORT_START("KEY2")
-	PORT_BIT(BIT_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')                            // 8,0: 9
-	PORT_BIT(BIT_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')                            // 8,1: 0
-	PORT_BIT(BIT_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')                        // 8,2: - _
-	PORT_BIT(BIT_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')                       // 8,3: = +
-	PORT_BIT(BIT_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('|')                       // 8,4: \ |
-	PORT_BIT(BIT_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                     // 8,5: BS
-	PORT_BIT(BIT_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("( RESET")                                                          // 8,6: ( RESET
-	PORT_BIT(BIT_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("^ RESLT")                                                          // 8,7: ^ / RESLT
-	PORT_BIT(BIT_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))    PORT_NAME("Left GRAPH") // 9,0: LEFT / GRAPH
-	PORT_BIT(BIT_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right COPY")  // 9,1: RIGHT / COPY
-	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_NAME("RPL INS")                               // 9,2: RPL / INS
-	PORT_BIT(BIT_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_NAME("-CHAR DEL")                                // 9,3: -CHAR / DEL
-	PORT_BIT(BIT_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("ROLL")                                    // 9,4: ROLL
-	PORT_BIT(BIT_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LOAD REW")                                                        // 9,5: LOAD / REW
-	PORT_BIT(BIT_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("STORE TEST")                                                      // 9,6: STORE / TEST
-	PORT_BIT(BIT_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAPER ADVANCE")                                                   // 9,7: PAPER ADVANCE
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')                            // 8,0: 9
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')                            // 8,1: 0
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')                        // 8,2: - _
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')                       // 8,3: = +
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('|')                       // 8,4: \ |
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                     // 8,5: BS
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("( RESET")                                                          // 8,6: ( RESET
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("^ RESLT")                                                          // 8,7: ^ / RESLT
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))    PORT_NAME("Left GRAPH") // 9,0: LEFT / GRAPH
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right COPY")  // 9,1: RIGHT / COPY
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_NAME("RPL INS")                               // 9,2: RPL / INS
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_NAME("-CHAR DEL")                                // 9,3: -CHAR / DEL
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("ROLL")                                    // 9,4: ROLL
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LOAD REW")                                                        // 9,5: LOAD / REW
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("STORE TEST")                                                      // 9,6: STORE / TEST
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAPER ADVANCE")                                                   // 9,7: PAPER ADVANCE
 
 	PORT_START("MODKEYS")
-	PORT_BIT(BIT_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                // Shift
-	PORT_BIT(BIT_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Shift lock")   // Shift lock
-	PORT_BIT(BIT_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)              // Control
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                // Shift
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Shift lock")   // Shift lock
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)              // Control
 
 INPUT_PORTS_END
 
