@@ -30240,6 +30240,10 @@ threeds                         // (c) 1985
 @source:patapata.cpp
 patapata                        // 1993 NTC / NMK / ATLUS
 
+@source:zezinho.cpp
+//zezinho                         // 1961 Zezinho ITA
+ita2                            // 1962 ITA-II (improvement of Zezinho)
+
 @source:patinho_feio.cpp
 patinho                         // 1972 Patinho Feio
 
