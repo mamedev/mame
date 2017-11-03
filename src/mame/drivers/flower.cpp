@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( flower )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz*2, 442, 0, 288, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
