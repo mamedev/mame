@@ -20878,6 +20878,9 @@ mk4b                            // (c) 1997 Midway (v1.0)
 thegrid                         // (c) 2001 Midway (v1.2) Latest offical release
 thegrida                        // (c) 2001 Midway (v1.1)
 
+@source:mightyframe.cpp
+mightyframe                     // Convergent
+
 @source:mikie.cpp
 mikie                           // GX469 (c) 1984
 mikiehs                         // GX469 (c) 1984
