@@ -35,7 +35,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-//#include "machine/6850acia.h"
+#include "machine/6850acia.h"
 //#include "machine/kb3600.h"
 //#include "machine/mc14411.h"
 
@@ -280,9 +280,10 @@ static ADDRESS_MAP_START( t4490_map, AS_PROGRAM, 8, t4490_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
 	AM_RANGE(0x9500, 0x95ff) AM_RAM
-	AM_RANGE(0x9036, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x903a, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-//	AM_RANGE(0xc820, 0xc823) AM_DEVREADWRITE("acia", acia6850_device, read, write)
+	AM_RANGE(0x9030, 0x9030) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0x9031, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x9034, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x9038, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
 ADDRESS_MAP_END
 
@@ -297,6 +298,7 @@ static MACHINE_CONFIG_START( t4490 )
 	/* devices */
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 MACHINE_CONFIG_END
 
 ROM_START( t4490 )
