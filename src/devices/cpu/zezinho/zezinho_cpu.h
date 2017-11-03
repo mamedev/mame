@@ -29,7 +29,7 @@ protected:
 	unsigned char m_opcode;
 
 	/* processor registers */
-	unsigned int m_acc; /* accumulator (10 bits) */
+	int m_acc; /* accumulator (10 bits) */
 	unsigned int m_pc;   /* program counter (12 bits) */
 
 	/* processor state flip-flops */

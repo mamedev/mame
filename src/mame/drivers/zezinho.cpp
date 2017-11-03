@@ -24,8 +24,8 @@ static MACHINE_CONFIG_START( ita2 )
 MACHINE_CONFIG_END
 
 ROM_START( ita2 )
-	ROM_REGION( 0x0, "exemplo", 0 ) //Manual de demonstração
-	ROM_LOAD( "exemplo.rom", 0x000, 0x010, CRC(0b33574e) SHA1(e4eb38a8d8327a7b674101f1ee468cb82607fd03) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) //Manual de demonstração
+	ROM_LOAD( "exemplo.rom", 0x000, 0x010, CRC(590b78e9) SHA1(a71e63697068cc167b84802681c65dcbcdd489a5) )
 ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE          INIT  COMPANY                                                FULLNAME            FLAGS

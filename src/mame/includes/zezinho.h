@@ -15,7 +15,7 @@ public:
 	DECLARE_DRIVER_INIT(ita2);
 
 protected:
-	virtual void machine_start() override;
+	//virtual void machine_start() override;
 	required_device<zezinho_cpu_device> m_maincpu;
 private:
 };
