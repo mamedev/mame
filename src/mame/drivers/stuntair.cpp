@@ -27,7 +27,7 @@ Bg 1,5kb (2114 x3)
 Sprites 1kb (2148 x2)
 color 320byte (27ls00 x10)
 
-Rom definiton:
+Rom definition:
 -top pcb-
 stuntair.a0,a1,a3,a4,a6 main program
 stuntair.e14 sound program

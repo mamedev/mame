@@ -155,7 +155,7 @@ WRITE32_MEMBER(vme_hcpu30_card_device::bootvect_w)
 	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
