@@ -144,7 +144,7 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8,y*8,3);
 	}
 
-	for (count=0;count<4*32;count++)
+	for (count=0;count<0x40;count++)
 	{
 		int x = count / 32;
 		int y = count % 32;
@@ -246,6 +246,7 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	bitmap.fill(0,cliprect);
 	legacy_layers_draw(bitmap,cliprect);
 	sprites_draw(bitmap,cliprect);
 	legacy_tx_draw(bitmap,cliprect);
