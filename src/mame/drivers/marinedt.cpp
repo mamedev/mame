@@ -11,8 +11,7 @@
 	- imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
 	  also unused colors 0x10-0x1f (might be a flashing bank)
 	- collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
-	  Also it's supposed to bounce on sea foams (regression when bonus ball detection is fixed). 
-	  Above doesn't happen in upright mode, also HW collision detection isn't perfect even from the reference.
+	  HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
 	- ROM writes (irq mask?)
 	- Merge devices with crbaloon/bking/grchamp drivers.
 
@@ -262,13 +261,14 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 	switch(reg)
 	{
 		case 0: m_obj[which].offs = data; break;
-		case 1: m_obj[which].x = data; break;
-		case 2: m_obj[which].y = data; break;
+		// TODO: are offsets good?
+		case 1: m_obj[which].x = (data + 4) & 0xff; break;
+		case 2: m_obj[which].y = (data + 1) & 0xff; break;
 	}
 	
 	const uint8_t tilenum = ((m_obj[which].offs & 4) << 1) | ( (m_obj[which].offs & 0x38) >> 3);
 	const uint8_t color = (m_obj[which].offs & 3);
-	bool fx = BIT(m_obj[which].offs,6);
+	const bool fx = BIT(m_obj[which].offs,6);
 	const bool fy = BIT(m_obj[which].offs,7);
 	
 	//base_pen = (which == 0 ? 0x30 : 0x20) + color*4;
@@ -351,7 +351,7 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 			
-			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
+			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
 				continue;
 			
 			// return value is never read most likely
@@ -368,18 +368,17 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 	// bail out if obj target is disabled
 	if((m_layer_en & 1) == 0)
 		return 0;
-	
-	// check only internal hitbox
-	for(int y=4;y<28;y++)
+
+	for(int y=0;y<32;y++)
 	{
-		for(int x=4;x<28;x++)
+		for(int x=0;x<32;x++)
 		{
-			int resx,resy;
+			uint16_t resx,resy;
 			
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 			
-			if(m_obj[0].bitmap.pix16(resy,resx) == 0)
+			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
 				continue;
 			
 			if(!m_screen_flip)
@@ -406,7 +405,7 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 	uint8_t xt,xo;
 	rest = obj_to_layer_collision();
 	reso = obj_to_obj_collision();
-	
+
 	switch(reg)
 	{
 		case 0:
@@ -681,4 +680,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
