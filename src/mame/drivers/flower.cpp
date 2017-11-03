@@ -8,11 +8,12 @@
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-    - sprite zooming;
-    - some video glitches;
-    - $a000 outputs;
-    - sound, third z80 not hooked up;
-
+	- offset sprite shrinking (ship going inside/outside the base, 2nd boss 
+	  zoom points);
+	- priority might be wrong in some places (title screen stars around the 
+	  galaxy, planet ship 3rd boss, 2nd boss);
+	- sound chips (similar to Namco custom chips?)
+	
 ===============================================================================
 
 Flower (c)1986 Komax (USA license)
@@ -112,9 +113,13 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(audio_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(bgvram_w);
+	DECLARE_WRITE8_MEMBER(fgvram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info); 
+	TILE_GET_INFO_MEMBER(get_fg_tile_info); 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -141,18 +146,42 @@ private:
 	bitmap_ind16 m_temp_bitmap;
 	
 	void draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void draw_legacy_layers(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	
 	bool m_audio_nmi_enable;
 	bool m_flip_screen;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
+
+TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
+{
+	int code = m_bgvram[tile_index];
+	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4; 
+
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
+{
+	int code = m_fgvram[tile_index];
+	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4; 
+	
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
+}
 
 void flower_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_temp_bitmap);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	
+	m_screen->register_screen_bitmap(m_temp_bitmap);	
+	m_fg_tilemap->set_transparent_pen(15);
+
 	save_item(NAME(m_flip_screen));
+	
+	m_bg_tilemap->set_scrolldx(16, 0);
+	m_fg_tilemap->set_scrolldx(16, 0);
 }
 
 void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -171,7 +200,7 @@ void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &clipre
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
 
-		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8,y*8,3);
+		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+16,y*8,3);
 	}
 
 	for (count=0;count<0x40;count++)
@@ -185,46 +214,9 @@ void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &clipre
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
 
-		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256,y*8,3);
+		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256+16,y*8,3);
 	}
 
-}
-
-void flower_state::draw_legacy_layers(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
-	int bg_ybase = m_bgscroll[0];
-	int fg_ybase = m_fgscroll[0];
-	int count;
-
-	for (count=0;count<16*16;count++)
-	{
-		int x = count % 16;
-		int y = count / 16;
-		uint8_t tile, attr;
-
-		tile = m_bgvram[count];
-		attr = m_bgvram[count+0x100];
-		if(attr & 0xf) // debug
-			attr = machine().rand() & 0xf0;
-
-		gfx_1->opaque(bitmap, cliprect, tile,  attr >> 4, 0, 0, x*16, (y*16 - bg_ybase) & 0xff);
-	}
-
-
-	for (count=0;count<16*16;count++)
-	{
-		int x = count % 16;
-		int y = count / 16;
-		uint8_t tile, attr;
-
-		tile = m_fgvram[count];
-		attr = m_fgvram[count+0x100];
-		if(attr & 0xf)
-			attr = machine().rand() & 0xf0;
-
-		gfx_1->transpen(bitmap,cliprect, tile, attr >> 4, 0, 0, x*16, (y*16 - fg_ybase) & 0xff, 15);
-	}
 }
 
 /*
@@ -246,7 +238,7 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	{
 		uint8_t tile = (spr_ptr[i+1] & 0x3f);
 		uint8_t color = spr_ptr[i+6] >> 4;
-		int x = (spr_ptr[i+4] | (spr_ptr[i+5]<<8))-55;
+		int x = (spr_ptr[i+4] | (spr_ptr[i+5]<<8))-39;
 		int y = 241-spr_ptr[i+0];
 		uint8_t attr = spr_ptr[i+2];
 		uint8_t fy = spr_ptr[i+1] & 0x80;
@@ -266,7 +258,7 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		if(flip_screen())
 		{
 			x += xsize*16;
-			x = 256-x;
+			x = 288-x;
 			y -= 2;
 		}
 
@@ -293,11 +285,16 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	m_bg_tilemap->set_scrolly(0, m_bgscroll[0]);
+	m_fg_tilemap->set_scrolly(0, m_fgscroll[0]);
+
 	m_temp_bitmap.fill(0,cliprect);
-	draw_legacy_layers(m_temp_bitmap,cliprect);
+	m_bg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
 	draw_sprites(m_temp_bitmap,cliprect);
 	draw_legacy_text(m_temp_bitmap,cliprect);
-	copybitmap(bitmap,m_temp_bitmap,m_flip_screen,m_flip_screen,m_flip_screen == true ? -170 : 0, m_flip_screen == true ? -7 : 0, cliprect);
+
+	copybitmap(bitmap,m_temp_bitmap,m_flip_screen,m_flip_screen,m_flip_screen == true ? -154 : 0, m_flip_screen == true ? -7 : 0, cliprect);
 	return 0;
 }
 
@@ -324,6 +321,18 @@ WRITE8_MEMBER(flower_state::audio_nmi_mask_w)
 	m_audio_nmi_enable = BIT(data,0);
 }
 
+WRITE8_MEMBER(flower_state::bgvram_w)
+{
+	m_bgvram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0xff);
+}
+
+WRITE8_MEMBER(flower_state::fgvram_w)
+{
+	m_fgvram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0xff);
+}
+
 static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram")
@@ -339,10 +348,10 @@ static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("txvram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0xf200, 0xf200) AM_RAM AM_SHARE("bgscroll")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("fgvram")
-	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("fgscroll")
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(fgvram_w) AM_SHARE("fgvram")
+	AM_RANGE(0xf200, 0xf200) AM_RAM AM_SHARE("fgscroll")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(bgvram_w) AM_SHARE("bgvram")
+	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("bgscroll")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, flower_state )
@@ -496,7 +505,7 @@ static MACHINE_CONFIG_START( flower )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz*2, 442, 0, 272, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz*2, 442, 0, 288, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
@@ -601,5 +610,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )

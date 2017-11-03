@@ -4,7 +4,8 @@
 
 	Marine Date (c) 1981 Taito
 
-	similar to crbaloon.cpp
+    driver by Angelo Salese,
+    original "wiped off due of not anymore licenseable" driver by insideoutboy.
 	
 	TODO:
 	- discrete sound
@@ -13,7 +14,7 @@
 	- collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
 	  HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
 	- ROM writes (irq mask?)
-	- Merge devices with crbaloon/bking/grchamp drivers.
+	- Merge devices with crbaloon/bking/grchamp drivers (PC3259).
 
 *****************************************************************************************************************
 
