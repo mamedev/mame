@@ -1484,18 +1484,18 @@ if (CPUS["PDP1"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- ZEZINHO - ITA - Instituto Tecnológico da Aeronáutica (Brazil)
---@src/devices/cpu/zezinho/zezinho_cpu.h,CPUS["ZEZINHO"] = true
+-- ZEZINHO2 - ITA - Instituto Tecnológico da Aeronáutica (Brazil)
+--@src/devices/cpu/zezinho/zezinho_cpu.h,CPUS["ZEZINHO2"] = true
 --------------------------------------------------
 
-if (CPUS["ZEZINHO"]~=null) then
+if (CPUS["ZEZINHO2"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/zezinho/zezinho.cpp",
 		MAME_DIR .. "src/devices/cpu/zezinho/zezinho_cpu.h",
 	}
 end
 
-if (CPUS["ZEZINHO"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["ZEZINHO2"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/zezinho/zezinho_dasm.cpp")
 end
 

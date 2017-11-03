@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Felipe Sanches
+// copyright-holders:Felipe Sanches; Werner Moecke
 
 #include "emu.h"
 #include "zezinho_cpu.h"
