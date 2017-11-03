@@ -8,8 +8,6 @@
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-	- offset sprite shrinking (ship going inside/outside the base, 2nd boss 
-	  zoom points);
 	- priority might be wrong in some places (title screen stars around the 
 	  galaxy, planet ship 3rd boss, 2nd boss);
 	- sound chips (similar to Namco custom chips?)
@@ -245,6 +243,8 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		uint8_t fx = spr_ptr[i+1] & 0x40;
 		uint8_t ysize = ((spr_ptr[i+3] & 0x80) >> 7) + 1;
 		uint8_t xsize = ((spr_ptr[i+3] & 0x08) >> 3) + 1;
+		uint8_t ydiv = ysize == 2 ? 1 : 2;
+		uint8_t xdiv = xsize == 2 ? 1 : 2;
 		uint32_t yshrink_zoom = ((spr_ptr[i+3] & 0x70) >> 4) + 1;
 		uint32_t xshrink_zoom = ((spr_ptr[i+3] & 0x07) >> 0) + 1;
 		yshrink_zoom <<= 13;
@@ -267,13 +267,13 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		
 		for(int yi=0;yi<ysize;yi++)
 		{
-			int yoffs = (16-ypixels)/2;
+			int yoffs = (16-ypixels)/ydiv;
 			
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
-				int xoffs = (16-xpixels)/2;
-							
+				int xoffs = (16-xpixels)/xdiv;
+				
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
 
