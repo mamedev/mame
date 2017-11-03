@@ -20,6 +20,7 @@
 #include "softlist.h"
 #include "machine/bankdev.h"
 #include "bus/hp80_io/hp80_io.h"
+#include "imagedev/bitbngr.h"
 
 // Debugging
 #define VERBOSE 1
@@ -78,6 +79,45 @@ static constexpr unsigned IOP_COUNT         = 4;
 static constexpr unsigned IRQ_BIT_COUNT     = IRQ_IOP0_BIT + IOP_COUNT;
 static constexpr unsigned NO_IRQ            = IRQ_BIT_COUNT;
 
+// Internal printer has a moving printhead with 8 vertically-arranged resistors that print dots
+// by heating thermal paper. The horizontal span of the printhead covers 224 columns.
+// In alpha mode, each sweep prints up to 32 characters. Each character has a 8x7 cell.
+// 8 pixels of cell height are covered by the printhead height, whereas 7 pixels of width
+// allow for 32 characters on a row (224 = 32 * 7).
+// After an alpha line is printed the paper advances by 10 pixel lines, so that a space of
+// 2 lines is left between alpha lines.
+// In graphic mode, printing starts at column 16 and covers 192 columns. So on each side of
+// the printed area there's a 16-column wide margin (224 = 192 + 2 * 16).
+// Once a graphic line is printed, paper advances by 8 pixel lines so that no space is inserted
+// between successive sweeps.
+// A full image of the graphic screen (256 x 192) is printed rotated 90 degrees clockwise.
+// The printer controller chip (1MA9) has an embedded character generator ROM that is used
+// when printing alpha lines. This ROM is also read by the CPU when drawing text on the graphic
+// screen (BASIC "LABEL" instruction).
+constexpr unsigned PRT_BUFFER_SIZE      = 192;
+constexpr unsigned PRTSTS_PAPER_OK_BIT  = 7;
+constexpr unsigned PRTSTS_DATARDY_BIT   = 6;
+constexpr unsigned PRTSTS_PRTRDY_BIT    = 0;
+constexpr unsigned PRTCTL_GRAPHIC_BIT   = 7;
+constexpr unsigned PRTCTL_POWERUP_BIT   = 6;
+constexpr unsigned PRTCTL_READGEN_BIT   = 5;
+// Time to print a line (nominal speed is 2 lines/s)
+constexpr unsigned PRT_BUSY_MSEC        = 500;
+// Horizontal start position of graphic print (16 columns from left-hand side)
+constexpr unsigned PRT_GRAPH_OFFSET     = 16;
+// Height of printhead
+constexpr unsigned PRT_PH_HEIGHT        = 8;
+// Height of alpha rows
+constexpr unsigned PRT_ALPHA_HEIGHT     = 10;
+// Width of character cells
+constexpr unsigned PRT_CELL_WIDTH       = 7;
+// Height of graphic rows
+constexpr unsigned PRT_GRAPH_HEIGHT     = 8;
+// Width of graphic sweeps
+constexpr unsigned PRT_GRAPH_WIDTH      = 192;
+// Width of printhead sweeps
+constexpr unsigned PRT_WIDTH            = 224;
+
 // ************
 //  hp85_state
 // ************
@@ -106,6 +146,12 @@ public:
 	DECLARE_WRITE8_MEMBER(clksts_w);
 	DECLARE_READ8_MEMBER(clkdat_r);
 	DECLARE_WRITE8_MEMBER(clkdat_w);
+	DECLARE_WRITE8_MEMBER(prtlen_w);
+	DECLARE_READ8_MEMBER(prchar_r);
+	DECLARE_WRITE8_MEMBER(prchar_w);
+	DECLARE_READ8_MEMBER(prtsts_r);
+	DECLARE_WRITE8_MEMBER(prtctl_w);
+	DECLARE_WRITE8_MEMBER(prtdat_w);
 	DECLARE_WRITE8_MEMBER(rselec_w);
 	DECLARE_READ8_MEMBER(intrsc_r);
 	DECLARE_WRITE8_MEMBER(intrsc_w);
@@ -114,6 +160,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(prt_busy_timer);
 
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
@@ -124,6 +171,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_vm_timer;
 	required_device<timer_device> m_clk_busy_timer;
+	required_device<timer_device> m_prt_busy_timer;
 	required_device<beep_device> m_beep;
 	required_device<dac_1bit_device> m_dac;
 	required_ioport m_io_key0;
@@ -133,9 +181,12 @@ protected:
 	required_device_array<hp80_optrom_slot_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
 	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
+	required_device<bitbanger_device> m_prt_graph_out;
+	required_device<bitbanger_device> m_prt_alpha_out;
 
-	// Character generator
+	// Character generators
 	required_region_ptr<uint8_t> m_chargen;
+	required_region_ptr<uint8_t> m_prt_chargen;
 
 	bitmap_rgb32 m_bitmap;
 	std::vector<uint8_t> m_video_mem;
@@ -171,6 +222,15 @@ protected:
 	uint8_t m_timer_idx;
 	bool m_clk_busy;
 
+	// Printer
+	uint8_t m_prtlen;
+	uint8_t m_prt_idx;
+	uint8_t m_prchar_r;
+	uint8_t m_prchar_w;
+	uint8_t m_prtsts;
+	uint8_t m_prtctl;
+	uint8_t m_prt_buffer[ PRT_BUFFER_SIZE ];
+
 	attotime time_to_video_mem_availability() const;
 	static void get_video_addr(uint16_t addr , uint16_t& byte_addr , bool& lsb_nibble);
 	uint8_t video_mem_r(uint16_t addr , uint16_t addr_mask) const;
@@ -184,6 +244,12 @@ protected:
 	void irq_en_w(unsigned n_irq , bool state);
 	void update_int_bits();
 	void update_irl();
+
+	uint8_t get_prt_font(uint8_t ch , unsigned col) const;
+	void prt_format_alpha(unsigned row , uint8_t *pixel_row) const;
+	void prt_format_graphic(unsigned row , uint8_t *pixel_row) const;
+	void prt_output_row(const uint8_t *pixel_row);
+	void prt_do_printing();
 };
 
 hp85_state::hp85_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -193,6 +259,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_palette(*this , "palette"),
 	  m_vm_timer(*this , "vm_timer"),
 	  m_clk_busy_timer(*this , "clk_busy_timer"),
+	  m_prt_busy_timer(*this , "prt_busy_timer"),
 	  m_beep(*this , "beeper"),
 	  m_dac(*this , "dac"),
 	  m_io_key0(*this , "KEY0"),
@@ -202,7 +269,10 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 	  m_rom_drawers(*this , "drawer%u" , 1),
 	  m_rombank(*this , "rombank"),
 	  m_io_slots(*this , "slot%u" , 1),
-	  m_chargen(*this , "chargen")
+	  m_prt_graph_out(*this , "prt_graphic"),
+	  m_prt_alpha_out(*this , "prt_alpha"),
+	  m_chargen(*this , "chargen"),
+	  m_prt_chargen(*this , "prt_chargen")
 {
 }
 
@@ -246,6 +316,12 @@ void hp85_state::machine_reset()
 	update_irl();
 	m_halt_lines = 0;
 	m_cpu->set_input_line(INPUT_LINE_HALT , CLEAR_LINE);
+	m_prtlen = 0;
+	m_prt_idx = PRT_BUFFER_SIZE;
+	m_prchar_r = 0;
+	m_prchar_w = 0;
+	m_prtsts = BIT_MASK(PRTSTS_PAPER_OK_BIT) | BIT_MASK(PRTSTS_PRTRDY_BIT);
+	m_prtctl = 0;
 
 	// Load optional ROMs (if any)
 	// All entries in rombanks [01..FF] initially not present
@@ -560,6 +636,73 @@ WRITE8_MEMBER(hp85_state::clkdat_w)
 		// What happens when storing more than 4 bytes into timers?
 		logerror("Writing more than 4 bytes into timer %u\n" , m_timer_idx);
 	}
+}
+
+WRITE8_MEMBER(hp85_state::prtlen_w)
+{
+	//LOG("PRTLEN=%u\n" , data);
+	if (data == 0) {
+		// Advance paper
+		memset(m_prt_buffer , 0 , sizeof(m_prt_buffer));
+		m_prt_idx = 0;
+		prt_do_printing();
+	} else {
+		m_prtlen = data;
+		if (!BIT(m_prtctl , PRTCTL_GRAPHIC_BIT)) {
+			m_prt_idx = 0;
+		}
+	}
+}
+
+READ8_MEMBER(hp85_state::prchar_r)
+{
+	return m_prchar_r;
+}
+
+WRITE8_MEMBER(hp85_state::prchar_w)
+{
+	m_prchar_w = data;
+}
+
+READ8_MEMBER(hp85_state::prtsts_r)
+{
+	return m_prtsts;
+}
+
+WRITE8_MEMBER(hp85_state::prtctl_w)
+{
+	//LOG("PRTCTL=%02x\n" , data);
+	m_prtctl = data;
+	BIT_SET(m_prtsts , PRTSTS_PRTRDY_BIT);
+	if (BIT(m_prtctl , PRTCTL_READGEN_BIT)) {
+		// Reading printer char. gen.
+		m_prchar_r = get_prt_font(m_prchar_w , m_prtctl & 7);
+		BIT_SET(m_prtsts , PRTSTS_DATARDY_BIT);
+	} else {
+		BIT_CLR(m_prtsts , PRTSTS_DATARDY_BIT);
+	}
+	if (BIT(m_prtctl , PRTCTL_GRAPHIC_BIT)) {
+		m_prt_idx = 0;
+	}
+}
+
+WRITE8_MEMBER(hp85_state::prtdat_w)
+{
+	m_cpu->flatten_burst();
+	//LOG("PRTDAT=%02x\n" , data);
+	if (m_prt_idx < PRT_BUFFER_SIZE) {
+		m_prt_buffer[ m_prt_idx++ ] = data;
+		if (m_prt_idx == PRT_BUFFER_SIZE || (!BIT(m_prtctl , PRTCTL_GRAPHIC_BIT) && m_prt_idx >= m_prtlen)) {
+			//LOG("Print\n");
+			prt_do_printing();
+			m_prt_idx = PRT_BUFFER_SIZE;
+		}
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp85_state::prt_busy_timer)
+{
+	BIT_SET(m_prtsts , PRTSTS_PRTRDY_BIT);
 }
 
 WRITE8_MEMBER(hp85_state::rselec_w)
@@ -983,6 +1126,74 @@ void hp85_state::update_irl()
 	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < IRQ_BIT_COUNT && !BIT(m_int_acked , m_top_pending));
 }
 
+uint8_t hp85_state::get_prt_font(uint8_t ch , unsigned col) const
+{
+	// Bit 7: pixel @ top
+	// Bit 0: pixel @ bottom
+	uint8_t column = m_prt_chargen[ (((unsigned)ch & 0x7f) << 3) | col ];
+	if (BIT(ch , 7)) {
+		// Underline
+		BIT_SET(column , 0);
+	}
+	return column;
+}
+
+void hp85_state::prt_format_alpha(unsigned row , uint8_t *pixel_row) const
+{
+	memset(pixel_row , 0 , PRT_WIDTH);
+	for (unsigned i = 0; i < m_prt_idx; i++) {
+		for (unsigned j = 0; j < PRT_CELL_WIDTH; j++) {
+			uint8_t pixel_col = get_prt_font(m_prt_buffer[ i ] , j);
+			*pixel_row++ = BIT(pixel_col , 7 - row);
+		}
+	}
+}
+
+void hp85_state::prt_format_graphic(unsigned row , uint8_t *pixel_row) const
+{
+	memset(pixel_row , 0 , PRT_WIDTH);
+	pixel_row += PRT_GRAPH_OFFSET;
+	for (unsigned i = 0; i < PRT_GRAPH_WIDTH; i++) {
+		*pixel_row++ = BIT(m_prt_buffer[ i ] , 7 - row);
+	}
+}
+
+void hp85_state::prt_output_row(const uint8_t *pixel_row)
+{
+	for (unsigned i = 0; i < PRT_WIDTH; i++) {
+		m_prt_graph_out->output(*pixel_row++ != 0 ? '*' : ' ');
+	}
+	m_prt_graph_out->output('\n');
+}
+
+void hp85_state::prt_do_printing()
+{
+	uint8_t pixel_row[ PRT_WIDTH ];
+	for (unsigned row = 0; row < PRT_PH_HEIGHT; row++) {
+		if (BIT(m_prtctl , PRTCTL_GRAPHIC_BIT)) {
+			prt_format_graphic(row , pixel_row);
+		} else {
+			prt_format_alpha(row , pixel_row);
+		}
+		prt_output_row(pixel_row);
+	}
+	if (!BIT(m_prtctl , PRTCTL_GRAPHIC_BIT)) {
+		// Dump the text line to alpha bitbanger
+		for (unsigned i = 0; i < m_prt_idx; i++) {
+			m_prt_alpha_out->output(m_prt_buffer[ i ]);
+		}
+		m_prt_alpha_out->output('\n');
+		// Add 2 empty lines
+		memset(pixel_row , 0 , PRT_WIDTH);
+		for (unsigned i = 0; i < (PRT_ALPHA_HEIGHT - PRT_PH_HEIGHT); i++) {
+			prt_output_row(pixel_row);
+		}
+	}
+	// Start busy timer
+	BIT_CLR(m_prtsts , PRTSTS_PRTRDY_BIT);
+	m_prt_busy_timer->adjust(attotime::from_msec(PRT_BUSY_MSEC));
+}
+
 static INPUT_PORTS_START(hp85)
 	// Keyboard is arranged in a matrix of 10 rows and 8 columns. In addition there are 3 keys with
 	// dedicated input lines: SHIFT, SHIFT LOCK & CONTROL.
@@ -1095,6 +1306,10 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff08 , 0xff09) AM_DEVREADWRITE("tape" , hp_1ma6_device , reg_r , reg_w)
 	AM_RANGE(0xff0a , 0xff0a) AM_READWRITE(clksts_r , clksts_w)
 	AM_RANGE(0xff0b , 0xff0b) AM_READWRITE(clkdat_r , clkdat_w)
+	AM_RANGE(0xff0c , 0xff0c) AM_WRITE(prtlen_w)
+	AM_RANGE(0xff0d , 0xff0d) AM_READWRITE(prchar_r , prchar_w)
+	AM_RANGE(0xff0e , 0xff0e) AM_READWRITE(prtsts_r , prtctl_w)
+	AM_RANGE(0xff0f , 0xff0f) AM_WRITE(prtdat_w)
 	AM_RANGE(0xff18 , 0xff18) AM_WRITE(rselec_w)
 	AM_RANGE(0xff40 , 0xff40) AM_READWRITE(intrsc_r , intrsc_w)
 ADDRESS_MAP_END
@@ -1130,6 +1345,7 @@ static MACHINE_CONFIG_START(hp85)
 	// Hw timers are updated at 1 kHz rate
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hw_timer" , hp85_state , timer_update , attotime::from_hz(1000))
 	MCFG_TIMER_DRIVER_ADD("clk_busy_timer", hp85_state, clk_busy_timer)
+	MCFG_TIMER_DRIVER_ADD("prt_busy_timer", hp85_state, prt_busy_timer)
 
 	// Beeper
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1172,6 +1388,10 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
 	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
 
+	// Printer output
+	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)
+	MCFG_DEVICE_ADD("prt_alpha", BITBANGER, 0)
+
 	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END
 
@@ -1186,6 +1406,9 @@ ROM_START(hp85)
 
 	ROM_REGION(0x400 , "chargen" , 0)
 	ROM_LOAD("chrgen.bin" , 0 , 0x400 , CRC(9c402544) SHA1(32634fc73c1544aeeefda62ebb10349c5b40729f))
+
+	ROM_REGION(0x400 , "prt_chargen" , 0)
+	ROM_LOAD("prt_chrgen.bin" , 0 , 0x400 , CRC(abeaba27) SHA1(fbf6bdd5d96df6aa5963f8cdfdeb180402b1cc85))
 ROM_END
 
 COMP(1980 , hp85 , 0 , 0 , hp85 , hp85 , hp85_state , 0 , "HP" , "HP 85" , 0)
