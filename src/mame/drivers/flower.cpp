@@ -96,6 +96,7 @@ public:
 		m_mastercpu(*this, "mastercpu"),
 		m_slavecpu(*this, "slavecpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_txvram(*this, "txvram"),
@@ -127,6 +128,7 @@ private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_txvram;
@@ -136,20 +138,24 @@ private:
 	required_shared_ptr<uint8_t> m_bgscroll;
 	required_shared_ptr<uint8_t> m_fgscroll;
 	required_device<generic_latch_8_device> m_soundlatch;
-
-	void legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	bitmap_ind16 m_temp_bitmap;
+	
+	void draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_legacy_layers(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	
 	bool m_audio_nmi_enable;
+	bool m_flip_screen;
 };
 
 void flower_state::video_start()
 {
-	// ...
+	m_screen->register_screen_bitmap(m_temp_bitmap);
+	
+	save_item(NAME(m_flip_screen));
 }
 
-void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
 	int count;
@@ -184,7 +190,7 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 }
 
-void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void flower_state::draw_legacy_layers(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
 	int bg_ybase = m_bgscroll[0];
@@ -202,7 +208,7 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 		if(attr & 0xf) // debug
 			attr = machine().rand() & 0xf0;
 
-		gfx_1->opaque(bitmap,cliprect, tile,  attr >> 4, 0, 0, x*16, (y*16 - bg_ybase) & 0xff);
+		gfx_1->opaque(bitmap, cliprect, tile,  attr >> 4, 0, 0, x*16, (y*16 - bg_ybase) & 0xff);
 	}
 
 
@@ -230,12 +236,13 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
  [5] XXXX XXXX X offset MSB
  [6] cccc ---- color base
  */
-void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint8_t *spr_ptr = &m_workram[0x1e08];
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
-
-	for(int i=0;i<0x1fb;i+=8)
+	
+	// traverse from top to bottom
+	for(int i=0x1f0;i>=0;i-=8)
 	{
 		uint8_t tile = (spr_ptr[i+1] & 0x3f);
 		uint8_t color = spr_ptr[i+6] >> 4;
@@ -246,23 +253,39 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		uint8_t fx = spr_ptr[i+1] & 0x40;
 		uint8_t ysize = ((spr_ptr[i+3] & 0x80) >> 7) + 1;
 		uint8_t xsize = ((spr_ptr[i+3] & 0x08) >> 3) + 1;
+		uint32_t yshrink_zoom = ((spr_ptr[i+3] & 0x70) >> 4) + 1;
+		uint32_t xshrink_zoom = ((spr_ptr[i+3] & 0x07) >> 0) + 1;
+		yshrink_zoom <<= 13;
+		xshrink_zoom <<= 13;
+		int ypixels = (yshrink_zoom*16) >> 16; 
+		int xpixels = (xshrink_zoom*16) >> 16;
+		
+		tile |= (attr & 1) << 6;
+		tile |= (attr & 8) << 4;
+		
+		if(flip_screen())
+		{
+			x += xsize*16;
+			x = 256-x;
+			y -= 2;
+		}
 
 		if(ysize == 2)
 			y-=16;
-
-		tile |= (attr & 1) << 6;
-		tile |= (attr & 8) << 4;
-		// TODO: zoom
+		
 		for(int yi=0;yi<ysize;yi++)
 		{
+			int yoffs = (16-ypixels)/2;
+			
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
-
+				int xoffs = (16-xpixels)/2;
+							
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
 
-				gfx_2->transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*16, y+yi*16, 15);
+				gfx_2->zoom_transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*xpixels+xoffs, y+yi*ypixels+yoffs, xshrink_zoom, yshrink_zoom, 15);
 			}
 		}
 	}
@@ -270,16 +293,18 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(0,cliprect);
-	legacy_layers_draw(bitmap,cliprect);
-	sprites_draw(bitmap,cliprect);
-	legacy_tx_draw(bitmap,cliprect);
+	m_temp_bitmap.fill(0,cliprect);
+	draw_legacy_layers(m_temp_bitmap,cliprect);
+	draw_sprites(m_temp_bitmap,cliprect);
+	draw_legacy_text(m_temp_bitmap,cliprect);
+	copybitmap(bitmap,m_temp_bitmap,m_flip_screen,m_flip_screen,m_flip_screen == true ? -170 : 0, m_flip_screen == true ? -7 : 0, cliprect);
 	return 0;
 }
 
 WRITE8_MEMBER(flower_state::flipscreen_w)
 {
 	flip_screen_set(data & 1);
+	m_flip_screen = BIT(data,0);
 }
 
 WRITE8_MEMBER(flower_state::coin_counter_w)
