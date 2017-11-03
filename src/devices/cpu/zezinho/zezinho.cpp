@@ -18,7 +18,7 @@
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (m_pc = (m_pc+1) & ADDRESS_MASK_4K)
 
-DEFINE_DEVICE_TYPE(ZEZINHO2_CPU, zezinho_cpu_device, "zezinho2_cpu", "Zezinho2 (ITA-II) CPU")
+DEFINE_DEVICE_TYPE(ZEZINHO2_CPU, zezinho_cpu_device, "zezinho2_cpu", "Zezinho (ITA-II) CPU")
 
 //Internal 4k-10bits of RAM
 static ADDRESS_MAP_START(datamem_16bit, AS_DATA, /*10*/ 16, zezinho_cpu_device)
