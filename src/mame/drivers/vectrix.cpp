@@ -15,7 +15,8 @@ terminal which could decode simple commands into complex graphics.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
+#include "cpu/i86/i86.h"
+#include "machine/i8251.h"
 
 class vectrix_state : public driver_device
 {
@@ -25,23 +26,36 @@ public:
 //		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-//	required_device<i80c52_device> m_maincpu;
+private:
+//	required_device<cpu_device> m_maincpu;
 };
+
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vectrix_state )
+	AM_RANGE(0x00000,0x07fff) AM_RAM
+	AM_RANGE(0x0c000,0x0ffff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, vectrix_state )
+	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, vectrix_state )
-//ADDRESS_MAP_END
-
 static MACHINE_CONFIG_START( vectrix )
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)  // no idea of clock
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
 MACHINE_CONFIG_END
 
 ROM_START( vectrix )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "roms", 0 )
 	ROM_LOAD( "vectrixl.bin", 0x0000, 0x2000, CRC(10b93e38) SHA1(0b1a23d384bfde4cd27c482f667eedd94f8f2406) )
-	ROM_LOAD( "vectrixr.bin", 0x0000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
+	ROM_LOAD( "vectrixr.bin", 0x2000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
 ROM_END
 
 COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, 0, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )

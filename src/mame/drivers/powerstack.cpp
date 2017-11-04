@@ -9,7 +9,7 @@ Motorola Powerstack II. CPU is a PowerPC 604e @ 300MHz.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
+#include "cpu/powerpc/ppc.h"
 
 class powerstack_state : public driver_device
 {
@@ -19,21 +19,24 @@ public:
 //		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-//	required_device<i80c52_device> m_maincpu;
+private:
+//	required_device<cpu_device> m_maincpu;
 };
+
+//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 64, powerstack_state )
+//	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("roms", 0)
+//ADDRESS_MAP_END
 
 static INPUT_PORTS_START( powerstack )
 INPUT_PORTS_END
 
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, powerstack_state )
-//ADDRESS_MAP_END
-
 static MACHINE_CONFIG_START( powerstack )
+//	MCFG_CPU_ADD("maincpu", PPC604, 300'000'000) // PPC604E @ 300MHz
+//	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( powerstk )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "roms", 0 )
 	ROM_LOAD( "motorola_powerstack2.bin", 0x0000, 0x80000, CRC(948e8fcd) SHA1(9a8c32b621c98bc33ee525f66747c34d39851685) )
 ROM_END
 

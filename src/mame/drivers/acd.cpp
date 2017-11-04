@@ -9,7 +9,6 @@ Advanced Computer Design computer. CPU is WD9000. Some details at bitsavers.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
 
 class acd_state : public driver_device
 {
@@ -19,15 +18,15 @@ public:
 //		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-//	required_device<i80c52_device> m_maincpu;
+private:
+//	required_device<cpu_device> m_maincpu;
 };
+
+//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, acd_state )
+//ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acd )
 INPUT_PORTS_END
-
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, acd_state )
-//ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( acd )
 MACHINE_CONFIG_END

@@ -14,7 +14,7 @@ Manuals: http://mightyframe.blogspot.com.au/p/manuals.html
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
+#include "cpu/m68000/m68000.h"
 
 class mightyframe_state : public driver_device
 {
@@ -24,17 +24,20 @@ public:
 //		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-//	required_device<i80c52_device> m_maincpu;
+private:
+//	required_device<cpu_device> m_maincpu;
 };
+
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, mightyframe_state )
+	AM_RANGE(0x000000, 0x007fff) AM_ROM
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, mightyframe_state )
-//ADDRESS_MAP_END
-
 static MACHINE_CONFIG_START( mightyframe )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // no idea of clock
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( mightyframe )
