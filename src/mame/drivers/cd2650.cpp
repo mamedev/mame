@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( cd2650 )
 	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0)
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // which is this?
 	// Q1-Q7 = OUT 0-6, not defined in RE
