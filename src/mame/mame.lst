@@ -1184,6 +1184,9 @@ sigma2k                         // (c) 2000 Sigma
 sigmapkr                        // (c) 1995 Sigma
 videomat                        // 1990 bootleg
 
+@source:ampex.cpp
+dialog80                        // Ampex Dialogue 80
+
 @source:ampro.cpp
 ampro                           //
 
