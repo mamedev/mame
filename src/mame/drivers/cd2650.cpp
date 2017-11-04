@@ -51,6 +51,7 @@ TODO
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/74259.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
@@ -65,14 +66,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		, m_beep(*this, "beeper")
 		, m_cass(*this, "cassette")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(beep_w);
 	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
@@ -84,28 +84,25 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;
 };
 
 
-WRITE8_MEMBER( cd2650_state::beep_w )
+WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
 {
-	if (data & 7)
-		m_beep->set_state(BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER( cd2650_state::cass_w )
+WRITE_LINE_MEMBER(cd2650_state::cass_w)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ_LINE_MEMBER( cd2650_state::cass_r )
+READ_LINE_MEMBER(cd2650_state::cass_r)
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-READ8_MEMBER( cd2650_state::keyin_r )
+READ8_MEMBER(cd2650_state::keyin_r)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = ret | 0x80;
@@ -124,7 +121,7 @@ static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd2650_data, AS_DATA, 8, cd2650_state)
-	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE(keyin_r, beep_w)
+	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(keyin_r) AM_DEVWRITE("outlatch", f9334_device, write_nibble_d3)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -135,7 +132,6 @@ INPUT_PORTS_END
 void cd2650_state::machine_reset()
 {
 	m_term_data = 0x80;
-	m_beep->set_state(0);
 }
 
 uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -286,6 +282,11 @@ static MACHINE_CONFIG_START( cd2650 )
 	MCFG_CPU_DATA_MAP(cd2650_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
+
+	MCFG_DEVICE_ADD("outlatch", F9334, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // which is this?
+	// Q1-Q7 = OUT 0-6, not defined in RE
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
