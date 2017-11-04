@@ -1651,7 +1651,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP                                        // ??
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("v	ideoregs")                 // Video Registers
+	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE8(mouja_sound_rombank_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xffff)
