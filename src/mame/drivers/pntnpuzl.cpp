@@ -3,8 +3,7 @@
 /* paint & puzzle */
 /* video is standard VGA */
 /*
-OK, here's a somewhat complete rundown of the PCB. There was 1 IC I didn't
-get a pin count of(oops).
+OK, here's a somewhat complete rundown of the PCB.
 
 Main PCB
 Reb B
@@ -38,7 +37,7 @@ U5 18 pin IC
 PIC16C54-HS/P
 9344 CGA
 
-U6
+U6 48 pin IC
 P8798
 L3372718E
 Intel
@@ -67,6 +66,8 @@ Even
 U10 64 pin IC
 MC68000P12
 OB26M8829
+
+The 6522 and 8798 each have a 93C46N EEPROM attached.
 
 X1
 16.000MHz -connected to U5
