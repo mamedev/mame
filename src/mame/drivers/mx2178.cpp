@@ -47,7 +47,7 @@ public:
 private:
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
