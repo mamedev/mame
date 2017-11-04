@@ -149,6 +149,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2eramworks3.h"
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
+#include "bus/a2bus/transwarp.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -3745,6 +3746,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("pcxport", A2BUS_PCXPORTER) /* Applied Engineering PC Transporter */
 	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
 	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)	/* SSB Apple speech board */
+	SLOT_INTERFACE("twarp", A2BUS_TRANSWARP)	/* AE TransWarp accelerator */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
