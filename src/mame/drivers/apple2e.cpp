@@ -80,10 +80,11 @@
         Like IIc with memory expansion, but with licensed built-in Zip Chip which
         runs the 65C02 at 4 MHz turbo speed with a small cache RAM.
 
-        The machine has an internal "Apple 3.5" drive plus a custom gate array
-        which emulates the functionality of the UniDisk 3.5's on-board 65C02.
-        This gets around the fact that 1 MHz isn't sufficient to handle direct
-        Woz-style control of a double-density 3.5" drive.
+		The machine has an internal "Apple 3.5" drive plus a custom chip
+		named "MIG" (Multidrive Interface Glue) which helps with the control 
+		of the drive.  This gets around the fact that 1 MHz isn't 
+		sufficient to handle direct Woz-style control of a double-density 
+		3.5" drive.
 
         External drive port allows IIgs-style daisy-chaining.
 
@@ -344,6 +345,8 @@ public:
 	DECLARE_WRITE8_MEMBER(inh_w);
 	DECLARE_READ8_MEMBER(lc_r);
 	DECLARE_WRITE8_MEMBER(lc_w);
+	DECLARE_READ8_MEMBER(lc_romswitch_r);
+	DECLARE_WRITE8_MEMBER(lc_romswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -393,7 +396,8 @@ private:
 	bool m_intc8rom;
 
 	bool m_isiic, m_isiicplus, m_iscec;
-	uint8_t m_iicplus_ce00[0x200];
+	uint8_t m_migram[0x200];
+	uint16_t m_migpage;
 
 	uint8_t *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
 	int m_ram_size;
@@ -431,6 +435,9 @@ private:
 	void update_iic_mouse();
 
 	uint8_t m_cec_remap[0x40000];
+
+	uint8_t mig_r(uint16_t offset);
+	void mig_w(uint16_t offset, uint8_t data);
 };
 
 /***************************************************************************
@@ -440,6 +447,53 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+uint8_t apple2e_state::mig_r(uint16_t offset)
+{
+	// MIG RAM window
+	if (offset < 0x20)
+	{
+		return m_migram[m_migpage + offset];
+	}
+
+	// increment MIG RAM window
+	if (offset == 0x20)
+	{
+		m_migpage += 0x20;
+		m_migpage &= 0x1ff;	// make sure we wrap
+	}
+
+	// reset MIG RAM window
+	if (offset == 0xa0)
+	{
+		m_migpage = 0;
+	}
+
+	return read_floatingbus();
+}
+
+void apple2e_state::mig_w(uint16_t offset, uint8_t data)
+{
+	// MIG RAM window
+	if (offset < 0x20)
+	{
+		m_migram[m_migpage + offset] = data;
+		return;
+	}
+
+	// increment MIG RAM window
+	if (offset == 0x20)
+	{
+		m_migpage += 0x20;
+		m_migpage &= 0x1ff;	// make sure we wrap
+	}
+
+	// reset MIG RAM window
+	if (offset == 0xa0)
+	{
+		m_migpage = 0;
+	}
+}
 
 WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 {
@@ -616,6 +670,9 @@ void apple2e_state::machine_start()
 	m_4000bank->set_bank(0);
 	m_inh_bank = 0;
 
+	m_migpage = 0;
+	memset(m_migram, 0, 0x200);
+
 	// expansion RAM size
 	if (m_ram_size > (128*1024))
 	{
@@ -746,7 +803,8 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_y1));
 	save_item(NAME(m_xirq));
 	save_item(NAME(m_yirq));
-	save_item(NAME(m_iicplus_ce00));
+	save_item(NAME(m_migram));
+	save_item(NAME(m_migpage));
 	save_item(NAME(m_exp_regs));
 	save_item(NAME(m_exp_wptr));
 	save_item(NAME(m_exp_liveptr));
@@ -2202,9 +2260,9 @@ READ8_MEMBER(apple2e_state::c400_cec_bank_r)  { return m_rom_ptr[0x4400 + offset
 
 READ8_MEMBER(apple2e_state::c800_r)
 {
-	if ((m_isiicplus) && (offset >= 0x600))
+	if ((m_isiicplus) && (m_romswitch) && (offset >= 0x600) && (offset < 0x700))
 	{
-		return m_iicplus_ce00[offset-0x600];
+		return mig_r(offset-0x600);
 	}
 
 	if (offset == 0x7ff)
@@ -2228,9 +2286,9 @@ READ8_MEMBER(apple2e_state::c800_r)
 
 READ8_MEMBER(apple2e_state::c800_int_r)
 {
-	if ((m_isiicplus) && (offset >= 0x600))
+	if ((m_isiicplus) && (m_romswitch) && (offset >= 0x600) && (offset < 0x700))
 	{
-		return m_iicplus_ce00[offset-0x600];
+		return mig_r(offset-0x600);
 	}
 
 	if ((offset == 0x7ff) && !machine().side_effect_disabled())
@@ -2250,9 +2308,9 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 
 READ8_MEMBER(apple2e_state::c800_b2_int_r)
 {
-	if ((m_isiicplus) && (offset >= 0x600))
+	if ((m_isiicplus) && (m_romswitch) && (offset >= 0x600) && (offset < 0x700))
 	{
-		return m_iicplus_ce00[offset-0x600];
+		return mig_r(offset-0x600);
 	}
 
 	if ((offset == 0x7ff) && !machine().side_effect_disabled())
@@ -2267,9 +2325,9 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 
 WRITE8_MEMBER(apple2e_state::c800_w)
 {
-	if ((m_isiicplus) && (offset >= 0x600))
+	if ((m_isiicplus) && (m_romswitch) && (offset >= 0x600) && (offset < 0x700))
 	{
-		m_iicplus_ce00[offset-0x600] = data;
+		mig_w(offset-0x600, data);
 		return;
 	}
 
@@ -2311,6 +2369,27 @@ WRITE8_MEMBER(apple2e_state::inh_w)
 	{
 		m_slotdevice[m_inh_slot]->write_inh_rom(space, offset + 0xd000, data);
 	}
+}
+
+READ8_MEMBER(apple2e_state::lc_romswitch_r)
+{
+	if ((offset >= 0xc00) && (offset < 0xd00))
+	{
+		return mig_r(offset-0xc00);
+	}
+
+	return m_rom_ptr[0x5000 + offset];
+}
+
+WRITE8_MEMBER(apple2e_state::lc_romswitch_w)
+{
+	if ((offset >= 0xc00) && (offset < 0xd00))
+	{
+		mig_w(offset-0xc00, data);
+		return;
+	}
+
+	lc_w(space, offset, data);
 }
 
 READ8_MEMBER(apple2e_state::lc_r)
@@ -2737,7 +2816,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lcbank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x00000, 0x02fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(lc_w)
 	AM_RANGE(0x03000, 0x05fff) AM_READWRITE(lc_r, lc_w)
-	AM_RANGE(0x06000, 0x08fff) AM_ROM AM_REGION("maincpu", 0x5000) AM_WRITE(lc_w)
+	AM_RANGE(0x06000, 0x08fff) AM_READWRITE(lc_romswitch_r, lc_romswitch_w)
 	AM_RANGE(0x09000, 0x0bfff) AM_ROM AM_REGION("maincpu", 0x5000) AM_WRITE(lc_w)
 	AM_RANGE(0x0c000, 0x0efff) AM_READWRITE(lc_r, lc_w)
 	AM_RANGE(0x0f000, 0x11fff) AM_ROM AM_REGION("maincpu", 0xd000) AM_WRITE(lc_w)
