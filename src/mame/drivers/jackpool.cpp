@@ -21,6 +21,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
+#include "machine/ins8250.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,7 +38,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_READ16_MEMBER(jackpool_ff_r);
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
 	DECLARE_DRIVER_INIT(jackpool);
@@ -102,12 +102,6 @@ uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_in
 	return 0;
 }
 
-/*Communication ram*/
-READ16_MEMBER(jackpool_state::jackpool_ff_r)
-{
-	return 0xffff;
-}
-
 READ8_MEMBER(jackpool_state::jackpool_io_r)
 {
 	switch(offset*2)
@@ -156,7 +150,7 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x380050, 0x38005f) AM_DEVWRITE8("latch3", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x380060, 0x380061) AM_WRITENOP // another single-bit output?
 
-	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("uart", ns16550_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -266,6 +260,8 @@ static MACHINE_CONFIG_START( jackpool )
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
