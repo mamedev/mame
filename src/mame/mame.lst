@@ -14561,8 +14561,8 @@ hg_frd                          // Fruit Deuce
 hazl1500                        // Hazeltine 1500 (c) 1977
 
 @source:hazeltine.cpp
-hazeltine                       // Hazeltine Esprit
-hazeltine3                      // Hazeltine Esprit III
+esprit                          // Hazeltine Esprit
+esprit3                         // Hazeltine Esprit III
 
 @source:hcastle.cpp
 akumajou                        // GX768 (c) 1988 (Japan)
