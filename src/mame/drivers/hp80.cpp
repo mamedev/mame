@@ -328,7 +328,8 @@ static const uint8_t vector_table[] = {
 	0x10,   // Slot 1
 	0x10,   // Slot 2
 	0x10,   // Slot 3
-	0x10    // Slot 4
+	0x10,   // Slot 4
+	0x00    // No IRQ
 };
 
 IRQ_CALLBACK_MEMBER(hp85_state::irq_callback)
