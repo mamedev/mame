@@ -2941,6 +2941,7 @@ files {
 	MAME_DIR .. "src/mame/machine/psxcd.h",
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
+	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sord")
