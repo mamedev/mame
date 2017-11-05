@@ -113,6 +113,7 @@ Address bus A0-A11 is Y0-Y11
 #include "machine/ram.h"
 #include "machine/sonydriv.h"
 #include "machine/timer.h"
+#include "machine/ds1315.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"
@@ -241,7 +242,8 @@ public:
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG),
 		m_laserudc(*this, LASER128_UDC_TAG),
-		m_iicpiwm(*this, IICP_IWM_TAG)
+		m_iicpiwm(*this, IICP_IWM_TAG),
+		m_ds1315(*this, "nsc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -274,6 +276,7 @@ public:
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
 	optional_device<iwm_device> m_iicpiwm;
+	required_device<ds1315_device> m_ds1315;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -356,6 +359,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 	DECLARE_READ8_MEMBER(memexp_r);
 	DECLARE_WRITE8_MEMBER(memexp_w);
+	DECLARE_READ8_MEMBER(nsc_backing_r);
 
 private:
 	int m_speaker_state;
@@ -2171,16 +2175,11 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 
 uint8_t apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
 {
-#if 0
-	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!machine().side_effect_disabled()))
-	{
-		m_cnxx_slot = CNXX_INTROM;
-		update_slotrom_banks();
-	}
-#endif
-
-	return m_rom_ptr[slotbias + offset];
+	//return m_rom_ptr[slotbias + offset];
+	return m_ds1315->read(space, slotbias + offset);
 }
+
+READ8_MEMBER(apple2e_state::nsc_backing_r) { return m_rom_ptr[offset]; }
 
 READ8_MEMBER(apple2e_state::c100_r)  { return read_slot_rom(space, 1, offset); }
 READ8_MEMBER(apple2e_state::c100_int_r)  { return read_int_rom(space, 0x100, offset); }
@@ -3855,6 +3854,10 @@ static MACHINE_CONFIG_START( apple2e )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* DS1315 for no-slot clock */
+	MCFG_DS1315_ADD("nsc")
+	MCFG_DS1315_BACKING_HANDLER(READ8(apple2e_state, nsc_backing_r))
 
 	/* RAM */
 	MCFG_RAM_ADD(RAM_TAG)
