@@ -17,7 +17,9 @@
 #include <directxcolors.h>
 #include <d3dcompiler.h>
 #include <directxmath.h>
-using namespace DirectX;
+using DirectX::XMFLOAT2;
+using DirectX::XMFLOAT3;
+using DirectX::XMFLOAT4;
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=nullptr; } }
@@ -72,8 +74,8 @@ public:
 
 	struct LFBWriteStruct
 	{
-		UINT32 x;
-		UINT32 y;
+		uint32_t x;
+		uint32_t y;
 
 	};
 
@@ -172,16 +174,16 @@ public:
 
 	struct texDescription
 	{
-		UINT32 lodMask;
-		UINT32 sSize;
-		UINT32 tSize;
-		UINT32 texMask;
-		UINT8  *ram;
-		UINT32 *texBase;
-		UINT32 *texLookup;
-		UINT32 texFormat;
+		uint32_t lodMask;
+		uint32_t sSize;
+		uint32_t tSize;
+		uint32_t texMask;
+		uint8_t  *ram;
+		uint32_t *texBase;
+		uint32_t *texLookup;
+		uint32_t texFormat;
 		bool sendConfig;
-		UINT32 tmuConfig;
+		uint32_t tmuConfig;
 	};
 
 	struct Tex_Map_List_Struct
@@ -212,28 +214,28 @@ public:
 	void CopyBufferComp(uint16_t *dst);
 	void CopyBufferRGB(uint8_t *dst);
 	
-	void SetFbzMode(UINT32 fbzMode);
-	void SetAlphaMode(UINT32 &alphaMode);
-	void SetZAColor(UINT32 zaColor);
-	void SetFogCtrl(UINT32 &fogMode, UINT32 &fogColor);
-	void SetFogTable(UINT32 &data, int &index);
+	void SetFbzMode(uint32_t fbzMode);
+	void SetAlphaMode(uint32_t &alphaMode);
+	void SetZAColor(uint32_t zaColor);
+	void SetFogCtrl(uint32_t &fogMode, uint32_t &fogColor);
+	void SetFogTable(uint32_t &data, int &index);
 
 	void UpdateDepth();
 	void UpdateAlphaBlend();
 	D3D11_BLEND ConvAlphaBlendOp(uint32_t alphaBlend, bool dest);
 	void UpdateAlphaTest();
-	void SetColorCtrl(UINT32 fbzColorPath, UINT32 color0, UINT32 color1);
+	void SetColorCtrl(uint32_t fbzColorPath, uint32_t color0, uint32_t color1);
 
 	void UpdateColorCtrl();
 	void UpdateFogCtrl();
 
 	void UpdateTexCtrl(int enalbeTex0, int enableTex1);
 	void UpdateConstants();
-	void FlagTexture(UINT32 &offset);
-	void FlagTexture(int index, UINT32 *texBase, UINT32 &texLod);
-	Combine_Struct ConvertTexmode(UINT32 &texMode);
-	void CreateTexture(texDescription &desc, int index, UINT32 &texMode, UINT32 &texLod, UINT32 &texDetail);
-	void PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal, uint16_t *dst);
+	void FlagTexture(uint32_t &offset);
+	void FlagTexture(int index, uint32_t *texBase, uint32_t &texLod);
+	Combine_Struct ConvertTexmode(uint32_t &texMode);
+	void CreateTexture(texDescription &desc, int index, uint32_t &texMode, uint32_t &texLod, uint32_t &texDetail);
+	void PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst);
 
 private:
 	ID3D11Device* GetGPU();
@@ -278,8 +280,8 @@ private:
 	ID3D11Texture2D*				m_texTexture[MAX_TEX];
 	ID3D11ShaderResourceView*       m_texRV[MAX_TEX];
 	ID3D11SamplerState*             m_texSampler[MAX_TEX];
-	std::map<UINT32, Tex_Map_List_Struct> m_texMap;
-	std::queue<UINT32> m_texHist;
+	std::map<uint32_t, Tex_Map_List_Struct> m_texMap;
+	std::queue<uint32_t> m_texHist;
 
 	ID3D11Texture2D* m_depthBuffer;
 	ID3D11DepthStencilState* m_depthState;
@@ -318,7 +320,7 @@ private:
 	int m_fbiWidth;
 	uint16_t *m_destBuffer;
 
-	UINT32 m_fastFbzMode;
-	UINT32 m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];
-	UINT32 m_regZAColor, m_regFogMode, m_regFogColor;
+	uint32_t m_fastFbzMode;
+	uint32_t m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];
+	uint32_t m_regZAColor, m_regFogMode, m_regFogColor;
 };

@@ -11,16 +11,15 @@
 #ifndef MAME_VIDEO_VOODOO_H
 #define MAME_VIDEO_VOODOO_H
 
+#pragma once
+
+#include "video/polylgcy.h"
+#include "video/rgbutil.h"
+
 #define VOODOO_GPU_ACCEL
 #ifdef VOODOO_GPU_ACCEL
 #include "video/voodoo_gpu.h"
 #endif
-
-#pragma once
-
-
-#include "video/polylgcy.h"
-#include "video/rgbutil.h"
 
 
 /*************************************
@@ -1502,7 +1501,9 @@ public:
 	int voodoo_get_type();
 	int voodoo_is_stalled();
 	void voodoo_set_init_enable(uint32_t newval);
-
+#ifdef VOODOO_GPU_ACCEL
+	voodoo_gpu m_gpu;
+#endif
 protected:
 	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
 
@@ -1837,7 +1838,6 @@ protected:
 	static int32_t setup_and_draw_triangle(voodoo_device *vd);
 	static int32_t triangle_create_work_item(voodoo_device* vd,uint16_t *drawbuf, int texcount);
 #ifdef VOODOO_GPU_ACCEL
-	voodoo_gpu m_gpu;
 	static int32_t gpu_setup_triangle(voodoo_device *vd);
 	static void gpu_draw_triangle(voodoo_device *vd);
 #endif

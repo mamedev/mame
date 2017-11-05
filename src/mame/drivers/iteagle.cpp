@@ -105,11 +105,11 @@ www.multitech.com
 #include "cpu/mips/mips3.h"
 #include "machine/pci.h"
 #include "machine/vrc4373.h"
-#include "video/voodoo_pci.h"
 #include "sound/es1373.h"
 #include "machine/iteagle_fpga.h"
 #include "machine/pci-ide.h"
 #include "screen.h"
+#include "video/voodoo_pci.h"
 
 
 //*************************************

@@ -99,7 +99,7 @@ voodoo_gpu::voodoo_gpu()
 
 voodoo_gpu::~voodoo_gpu()
 {
-	for (std::map<UINT32, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+	for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
 	{
 		SAFE_RELEASE((*ii).second.texTexture);
 		SAFE_RELEASE((*ii).second.texRV);
@@ -273,7 +273,7 @@ bool voodoo_gpu::InitRenderBuffers(int sizeX, int sizeY, int fbiWidth)
 
 	// Clear all textures
 	if (!m_texHist.empty()) {
-		for (std::map<UINT32, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+		for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
 		{
 			SAFE_RELEASE((*ii).second.texTexture);
 			SAFE_RELEASE((*ii).second.texRV);
@@ -740,7 +740,7 @@ HRESULT voodoo_gpu::CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID
 	return result;
 }
 
-void voodoo_gpu::SetFbzMode(UINT32 fbzMode)
+void voodoo_gpu::SetFbzMode(uint32_t fbzMode)
 {
 	// Make sure pixel pipe is clear
 	DrawPixels();
@@ -766,7 +766,7 @@ void voodoo_gpu::SetFbzMode(UINT32 fbzMode)
 	m_regFbzMode = fbzMode;
 }
 
-void voodoo_gpu::SetAlphaMode(UINT32 &alphaMode)
+void voodoo_gpu::SetAlphaMode(uint32_t &alphaMode)
 {
 	// Make sure pixel pipe is clear
 	DrawPixels();
@@ -782,7 +782,7 @@ void voodoo_gpu::SetAlphaMode(UINT32 &alphaMode)
 	m_regAlphaMode = alphaMode;
 }
 
-void voodoo_gpu::SetZAColor(UINT32 zaColor)
+void voodoo_gpu::SetZAColor(uint32_t zaColor)
 {
 	// Make sure pixel pipe is clear
 	DrawPixels();
@@ -793,7 +793,7 @@ void voodoo_gpu::SetZAColor(UINT32 zaColor)
 	m_regZAColor = zaColor;
 }
 
-void voodoo_gpu::SetFogCtrl(UINT32 &fogMode, UINT32 &fogColor)
+void voodoo_gpu::SetFogCtrl(uint32_t &fogMode, uint32_t &fogColor)
 {
 	// Make sure pixel pipe is clear
 	DrawPixels();
@@ -808,7 +808,7 @@ void voodoo_gpu::SetFogCtrl(UINT32 &fogMode, UINT32 &fogColor)
 	m_regFogColor = fogColor;
 }
 
-void voodoo_gpu::SetColorCtrl(UINT32 fbzColorPath, UINT32 color0, UINT32 color1)
+void voodoo_gpu::SetColorCtrl(uint32_t fbzColorPath, uint32_t color0, uint32_t color1)
 {
 	// Make sure pixel pipe is clear
 	DrawPixels();
@@ -837,7 +837,7 @@ void voodoo_gpu::UpdateDepth()
 	// Depth test parameters
 	depthStencilDesc.DepthEnable = (m_regFbzMode >> 4) & 1;
 	depthStencilDesc.DepthWriteMask = ((m_regFbzMode >> 10) & 1) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-	UINT32 depthOp = (m_regFbzMode >> 5) & 7;
+	uint32_t depthOp = (m_regFbzMode >> 5) & 7;
 	switch (depthOp) {
 	case 0:
 		depthStencilDesc.DepthFunc = D3D11_COMPARISON_NEVER;
@@ -994,7 +994,7 @@ void voodoo_gpu::UpdateColorCtrl()
 	m_colorCtrl.dither_sel = (m_regFbzMode & 0x100) ? ((m_regFbzMode >> 11) & 1) + 1 : 0;
 }
 
-void voodoo_gpu::SetFogTable(UINT32 &data, int &index)
+void voodoo_gpu::SetFogTable(uint32_t &data, int &index)
 {	
 	XMFLOAT4 entry;
 	entry.w = 0.0f;
@@ -1354,7 +1354,7 @@ HRESULT voodoo_gpu::RenderToTex()
 {
 	
 	Combine_Struct testComb;
-	UINT32 texMode;
+	uint32_t texMode;
 	texMode = 0x0C261ACD;
 	testComb = ConvertTexmode(texMode);  // Mode 1
 	texMode = 0x0C224A0D;
@@ -1381,15 +1381,15 @@ HRESULT voodoo_gpu::RenderToTex()
 		int x = 0x0;
 		int y = 0x0;
 		int mask = 0xff;
-		int sr[2] = { 0xff, 0x0f };
-		int sg[2] = { 0xff, 0x0f };
-		int sb[2] = { 0xff, 0x0f };
+		uint8_t sr[2] = { 0xff, 0x0f };
+		uint8_t sg[2] = { 0xff, 0x0f };
+		uint8_t sb[2] = { 0xff, 0x0f };
 		int sa[2] = { 0xff, 0x0f };
 		int sw[2] = { 0xff, 0x0f };
 		int sz[2] = { 0xf, 0x8f };
 		
-		UINT32 wSel = 0;
-		UINT32 wVal = 0x0;
+		uint32_t wSel = 0;
+		uint32_t wVal = 0x0;
 		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
 		x = 0x2;
 		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
@@ -1563,7 +1563,7 @@ void voodoo_gpu::CopyBufferComp(uint16_t *dst)
 	SAFE_RELEASE(pNewTexture);
 }
 
-void voodoo_gpu::FlagTexture(UINT32 &offset)
+void voodoo_gpu::FlagTexture(uint32_t &offset)
 {
 	if (!m_texHist.empty()) {
 		if (m_texMap.find(offset) != m_texMap.end())
@@ -1572,7 +1572,7 @@ void voodoo_gpu::FlagTexture(UINT32 &offset)
 			//m_texMap.erase(mapIndex);
 			//m_texHist
 			// Nuke everything
-			for (std::map<UINT32, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+			for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
 			{
 				SAFE_RELEASE((*ii).second.texTexture);
 				SAFE_RELEASE((*ii).second.texRV);
@@ -1585,18 +1585,18 @@ void voodoo_gpu::FlagTexture(UINT32 &offset)
 	}
 }
 
-void voodoo_gpu::FlagTexture(int index, UINT32 *texBase, UINT32 &texLod)
+void voodoo_gpu::FlagTexture(int index, uint32_t *texBase, uint32_t &texLod)
 {
 	if (!m_texHist.empty()) {
-		UINT32 minLod = ((texLod >> 0) & 0x3f) >> 2;
-		UINT32 mapIndex = texBase[minLod] + index;
+		uint32_t minLod = ((texLod >> 0) & 0x3f) >> 2;
+		uint32_t mapIndex = texBase[minLod] + index;
 		if (m_texMap.find(mapIndex) != m_texMap.end())
 		{
 			//printf("voodoo_gpu::FlagTexture: Write to mapIndex 0x%08X .  Wiping out all %d current textures\n", mapIndex, INT32(m_texHist.size()));
 			//m_texMap.erase(mapIndex);
 			//m_texHist
 			// Nuke everything
-			for (std::map<UINT32, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+			for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
 			{
 				SAFE_RELEASE((*ii).second.texTexture);
 				SAFE_RELEASE((*ii).second.texRV);
@@ -1609,7 +1609,7 @@ void voodoo_gpu::FlagTexture(int index, UINT32 *texBase, UINT32 &texLod)
 	}
 }
 
-voodoo_gpu::Combine_Struct voodoo_gpu::ConvertTexmode(UINT32 &texMode)
+voodoo_gpu::Combine_Struct voodoo_gpu::ConvertTexmode(uint32_t &texMode)
 {
 	Combine_Struct newCombine;
 	newCombine.c_zero_cother = (texMode >> 12) & 1;
@@ -1627,11 +1627,11 @@ voodoo_gpu::Combine_Struct voodoo_gpu::ConvertTexmode(UINT32 &texMode)
 	return newCombine;
 }
 
-void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode, UINT32 &texLod, UINT32 &texDetail)
+void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMode, uint32_t &texLod, uint32_t &texDetail)
 {
 	Tex_Map_List_Struct new_map;
-	UINT32 minLod = ((texLod >> 0) & 0x3f) >> 2;
-	UINT32 mapIndex = desc.texBase[minLod] + index;
+	uint32_t minLod = ((texLod >> 0) & 0x3f) >> 2;
+	uint32_t mapIndex = desc.texBase[minLod] + index;
 	if (m_texMap.find(mapIndex) == m_texMap.end())
 	{
 		if (m_texMap.size() == MAX_TEX)
@@ -1703,18 +1703,18 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 		hr = m_gpu->CreateSamplerState(&sampDesc, &new_map.texSampler);
 
 		// Copy texture data to buffer
-		UINT32 *srcBuff;
-		UINT32 texel0;
-		UINT32 result;
+		uint32_t *srcBuff;
+		uint32_t texel0;
+		uint32_t result;
 		for (size_t mipLevel = minLod; mipLevel <= 8; mipLevel++)
 		{
-			UINT32 texbase = desc.texBase[mipLevel];
+			uint32_t texbase = desc.texBase[mipLevel];
 			// Create temporary buffer space for texture
 			size_t width = (desc.sSize >> mipLevel);
 			if (width == 0) width = 1;
 			size_t height = (desc.tSize >> mipLevel);
 			if (height == 0) height = 1;
-			srcBuff = new UINT32[width * height];
+			srcBuff = new uint32_t[width * height];
 			// Copy data if lod is defined
 			if (desc.lodMask & (1 << mipLevel)) {
 				for (size_t loc = 0; loc < width * height; loc++)
@@ -1782,7 +1782,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 	m_context->PSSetSamplers(index + TMU_TEX_OFFSET, 1, &m_texMap[mapIndex].texSampler);
 }
 
-void voodoo_gpu::PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal, uint16_t *dst)
+void voodoo_gpu::PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst)
 {
 	// Check if destination frame buffer has changed
 	// Skip this for now to save cycles

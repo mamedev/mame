@@ -2623,8 +2623,8 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
 
 					/* keep within bounds */
-					visarea.max_x = std::min(visarea.max_x, htotal - 1);
-					visarea.max_y = std::min(visarea.max_y, vtotal - 1);
+					visarea.max_x = min(visarea.max_x, htotal - 1);
+					visarea.max_y = min(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
 					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
@@ -5345,7 +5345,7 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = std::min(ey - y, int(ARRAY_LENGTH(extents)));
+		int count = min(ey - y, int(ARRAY_LENGTH(extents)));
 
 		extra->device = vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));
@@ -5635,7 +5635,7 @@ int32_t voodoo_device::gpu_setup_triangle(voodoo_device *vd)
 			+ vd->fbi.svert[2].x*(vd->fbi.svert[0].y - vd->fbi.svert[1].y)));
 	/* 1 pixel per clock, plus some setup time */
 	int32_t cycles = TRIANGLE_SETUP_CLOCKS + (int32_t(area2x) >> 1);
-	if (LOG_REGISTERS) vd->device->logerror("cycles = %d\n", cycles);
+	if (LOG_REGISTERS) vd->logerror("cycles = %d\n", cycles);
 
 	return cycles;
 }
@@ -5661,7 +5661,7 @@ void voodoo_device::gpu_draw_triangle(voodoo_device *vd)
 		/* if the texture parameters are dirty, update them */
 		if (vd->tmu[0].regdirty)
 		{
-			recompute_texture_params(&vd->tmu[0]);
+			vd->tmu[0].recompute_texture_params();
 			if (vd->tmu[0].lodmin < (8 << 8)) {
 				voodoo_gpu::texDescription texDesc;
 				texDesc.lodMask = vd->tmu[0].lodmask;
@@ -5685,7 +5685,7 @@ void voodoo_device::gpu_draw_triangle(voodoo_device *vd)
 			/* if the texture parameters are dirty, update them */
 			if (vd->tmu[1].regdirty)
 			{
-				recompute_texture_params(&vd->tmu[1]);
+				vd->tmu[1].recompute_texture_params();
 				if (vd->tmu[1].lodmin < (8 << 8)) {
 					voodoo_gpu::texDescription texDesc;
 					texDesc.lodMask = vd->tmu[1].lodmask;
