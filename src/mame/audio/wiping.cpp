@@ -27,8 +27,7 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	m_stream(nullptr),
 	m_mixer_table(nullptr),
 	m_mixer_lookup(nullptr),
-	m_mixer_buffer(nullptr),
-	m_mixer_buffer_2(nullptr)
+	m_mixer_buffer(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
@@ -46,9 +45,8 @@ void wiping_sound_device::device_start()
 	/* get stream channels */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
 
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
+	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer   = make_unique_clear<short[]>(samplerate);
-	m_mixer_buffer_2 = make_unique_clear<short[]>(samplerate);
 
 	/* build the mixer table */
 	make_mixer_table(8, defgain);
