@@ -244,7 +244,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'MAME', u'MAME Documentation',
-   u'MAMEdev Team', 'MAME', 'Multiple Emulator',
+   u'MAMEdev Team', 'MAME', 'Multi-purpose emulation framework',
    'Emulation'),
 ]
 
