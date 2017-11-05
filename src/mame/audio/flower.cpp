@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device, "flower", "Flower Custom Audio")
+DEFINE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device, "flower_sound", "Flower Custom Audio")
 
 // TODO: AM_SELECT unsupported by DEVICE_ADDRESS_MAP, so we need a trampoline here
 static ADDRESS_MAP_START( regs_map, AS_IO, 8, flower_sound_device )
