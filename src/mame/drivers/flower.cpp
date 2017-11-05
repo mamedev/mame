@@ -81,7 +81,7 @@ CHIP #  POSITION   TYPE
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "audio/wiping.h"
+#include "audio/flower.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -359,9 +359,8 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // audio irq related (0 at start, 1 at end)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(audio_nmi_mask_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	// TODO: wrong for this
-	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("wiping1", wiping_sound_device, sound_w)
-	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("wiping2", wiping_sound_device, sound_w)
+	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound_device, lower_write)
+	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound_device, upper_write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -515,10 +514,7 @@ static MACHINE_CONFIG_START( flower )
 	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wiping1", WIPING, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
-	MCFG_SOUND_ADD("wiping2", WIPING, 0)
+	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -551,7 +547,7 @@ ROM_START( flower ) /* Komax version */
 	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "soundproms", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -594,7 +590,7 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "soundproms", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -610,5 +606,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
