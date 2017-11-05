@@ -4981,13 +4981,15 @@
 		</part>
 	</software>
 
-	<software name="pcdos7d">
-		<description>PC DOS 7 (Demonstration)</description>
-		<year>1994</year>
-		<publisher>IBM</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="pcdos7demo.img" size="737280" crc="c3af95bd" sha1="85a593503af1542b7332044d908c121d0b2475e9" offset="0" />
+	<software name="beureka">
+		<!-- KryoFlux dump, not original -->
+		<description>Eureka: The Solver</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_eureka_1.0.img" size="368640" crc="7455a391" sha1="7be111d5b295ef9951454b1e84f121a34c2cd1a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5005,25 +5007,185 @@
 		</part>
 	</software>
 
-	<software name="moneynet">
-		<!-- from Acer CPR 1.2 recovery CD-ROM -->
-		<description>Reuters Money Network</description>
-		<year>1994</year>
-		<publisher>Reuters</publisher>
-		<info name="version" value="2.0R3" />
+	<software name="mbhh95">
+		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
+		<year>1995</year>
+		<publisher>Sanoma</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="moneynet disk1.img" size="1474560" crc="c9422588" sha1="ded7282d49e32b21de24c9c64de1a1450ba84de7" offset="0"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="mb1995.img" size="1474560" crc="281e055f" sha1="398bd9dbb0f1019169fdcb9d640960dbe5352f6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bpdx301g">
+		<!-- KryoFlux dump from original media, many modified sectors -->
+		<description>Paradox 3.01 (German)</description>
+		<year>1989</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="3.01" />
+		<part name="flop01" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk01.img" size="368640" crc="d1412b21" sha1="4fc367a229031dd3134100eece7bfb9b3b8dbd2d" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop02" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk02.img" size="368640" crc="56e083c3" sha1="aea7a20f9e22ab78d9377e3dce1ac5fdee83fbed" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop03" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk03.img" size="368640" crc="0bfcd167" sha1="b29c61e067d450090f611bf0f7ae58881124e984" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop04" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk04.img" size="368640" crc="cbed452b" sha1="0e6bf5519349297d377704bcd1e9568b12ad706d" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop05" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk05.img" size="368640" crc="43bf368f" sha1="0e59b71c067ad578a73ed8b9a9ad8fb52766efbd" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop06" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk06.img" size="368640" crc="d5314389" sha1="46ba14cb52f0c7f04753023eff77ccc8f40c3911" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop07" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk07.img" size="368640" crc="27f29554" sha1="150436b12138ef74b154b5080658ed97a7849cb0" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop08" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk08.img" size="368640" crc="19549090" sha1="6c16e114571422ce71c8ad8ef9f07c518724b506" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop09" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk09.img" size="368640" crc="29cf72df" sha1="a019ddbb81baa4afbed94cea10f8cb63f64b1937" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk10.img" size="368640" crc="385d1f10" sha1="0850e25d4d418822cccb1c6aefd3131bffe814ff" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk11.img" size="368640" crc="cee1c377" sha1="f9eea75e284c59f71f9adad6fa4da3287c451fec" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk12.img" size="368640" crc="7aa5fe5f" sha1="95238693de43a1f6a8062a0b09d920f6c39ea18b" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk13.img" size="368640" crc="159151e7" sha1="71082a91f55aebe8d0efa21cb8afedc3482131e9" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk14.img" size="368640" crc="6df1d631" sha1="ba39fba55d21da98c294df456980724bbb83cc7a" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk15.img" size="368640" crc="710bc39f" sha1="985a1ff252c17fe91aba5f40994dda853389c5d1" offset="0" />
+				</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+				<dataarea name="flop" size="368640">
+						<rom name="borland_paradox_3.01_German_disk16.img" size="368640" crc="8941eb6a" sha1="ebe7bad7a92505664ec3a61aad4065dd6e72ca7a" offset="0" />
+				</dataarea>
+		</part>
+	</software>
+
+	<software name="bpdx40g">
+		<!-- dumped via Kryoflux from original media, shows as unmodified -->
+		<description>Paradox 4.0 (German, 3.5")</description>
+		<year>1992</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="4.0" />
+		<info name="serial" value="IC235A10202871" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="borland_paradox_4.0_German_3.5_disk1.img" size="737280" crc="79ed537c" sha1="f15f2fd442c383a10b5aaed82e675aa8d86a470f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="moneynet disk2.img" size="1474560" crc="8941e8e1" sha1="50dfc034d9a6ffd7626d58efb292f0ab0535fb09" offset="0"/>
+			<dataarea name="flop" size="737280">
+				<rom name="borland_paradox_4.0_German_3.5_disk2.img" size="737280" crc="3485730b" sha1="a4d1d545aa414754cd3144cbd0994719fd0a3fb9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="moneynet disk3.img" size="1474560" crc="dcfc9b90" sha1="3968bdc94bf594d00fd966a531cf919380fd7aae" offset="0"/>
+			<dataarea name="flop" size="737280">
+				<rom name="borland_paradox_4.0_German_3.5_disk3.img" size="737280" crc="73cd5f6d" sha1="6c931189ec6d6922960101da5d137d54e94a6866" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="borland_paradox_4.0_German_3.5_disk4.img" size="737280" crc="b273c866" sha1="2776d8d19ee2a9fe79ed677e4c856a1692db0801" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bpdx40ga" cloneof="bpdx40g">
+		<!-- dumped via Kryoflux from original media, shows as unmodified -->
+		<description>Paradox 4.0 (German, 5.25")</description>
+		<year>1992</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="4.0" />
+		<info name="serial" value="IC235A10202871" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk1.img" size="368640" crc="74ae85d1" sha1="61a1464fab38ced8dbc92db06c9de51b7aa383bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk2.img" size="368640" crc="aa756130" sha1="c627f099d150ed59944e769c0fa89e6f027f6ca7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk3.img" size="368640" crc="3b8568bf" sha1="cf3d4dac6286d8548fb18e15e08ddf66b568b07f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk4.img" size="368640" crc="a2780d41" sha1="3fe256addb419ceb3e45b3a8be6c52901db80322" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk5.img" size="368640" crc="5c7fac58" sha1="142204a984b19c379c4b5510191357779576ed2b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk6.img" size="368640" crc="cf316a6e" sha1="ad17ad662594f8a480e9aeb8c73fcd9fc5130f9b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_4.0_German_5.25_disk7.img" size="368640" crc="ba0b4ba6" sha1="ae0002c22b8f76cfc17c5f8cb556c26a5326b20d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos7d">
+		<description>PC DOS 7 (Demonstration)</description>
+		<year>1994</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="pcdos7demo.img" size="737280" crc="c3af95bd" sha1="85a593503af1542b7332044d908c121d0b2475e9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5230,270 +5392,6 @@
 		</part>
 	</software>
 
-	<software name="beureka">
-		<!-- KryoFlux dump, not original -->
-		<description>Borland Eureka: The Solver</description>
-		<year>1987</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_eureka_1.0.img" size="368640" crc="7455a391" sha1="7be111d5b295ef9951454b1e84f121a34c2cd1a6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bpdx301g">
-		<!-- KryoFlux dump from original media, many modified sectors -->
-		<description>Borland Paradox 3.01 (German)</description>
-		<year>1989</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="3.01" />
-		<part name="flop01" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk01.img" size="368640" crc="d1412b21" sha1="4fc367a229031dd3134100eece7bfb9b3b8dbd2d" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop02" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk02.img" size="368640" crc="56e083c3" sha1="aea7a20f9e22ab78d9377e3dce1ac5fdee83fbed" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop03" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk03.img" size="368640" crc="0bfcd167" sha1="b29c61e067d450090f611bf0f7ae58881124e984" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop04" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk04.img" size="368640" crc="cbed452b" sha1="0e6bf5519349297d377704bcd1e9568b12ad706d" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop05" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk05.img" size="368640" crc="43bf368f" sha1="0e59b71c067ad578a73ed8b9a9ad8fb52766efbd" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop06" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk06.img" size="368640" crc="d5314389" sha1="46ba14cb52f0c7f04753023eff77ccc8f40c3911" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop07" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk07.img" size="368640" crc="27f29554" sha1="150436b12138ef74b154b5080658ed97a7849cb0" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop08" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk08.img" size="368640" crc="19549090" sha1="6c16e114571422ce71c8ad8ef9f07c518724b506" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop09" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk09.img" size="368640" crc="29cf72df" sha1="a019ddbb81baa4afbed94cea10f8cb63f64b1937" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop10" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk10.img" size="368640" crc="385d1f10" sha1="0850e25d4d418822cccb1c6aefd3131bffe814ff" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop11" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk11.img" size="368640" crc="cee1c377" sha1="f9eea75e284c59f71f9adad6fa4da3287c451fec" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk12.img" size="368640" crc="7aa5fe5f" sha1="95238693de43a1f6a8062a0b09d920f6c39ea18b" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop13" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk13.img" size="368640" crc="159151e7" sha1="71082a91f55aebe8d0efa21cb8afedc3482131e9" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop14" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk14.img" size="368640" crc="6df1d631" sha1="ba39fba55d21da98c294df456980724bbb83cc7a" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop15" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk15.img" size="368640" crc="710bc39f" sha1="985a1ff252c17fe91aba5f40994dda853389c5d1" offset="0" />
-				</dataarea>
-		</part>
-		<part name="flop16" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk16.img" size="368640" crc="8941eb6a" sha1="ebe7bad7a92505664ec3a61aad4065dd6e72ca7a" offset="0" />
-				</dataarea>
-		</part>
-	</software>
-
-	<software name="bpdx40g">
-		<!-- dumped via Kryoflux from original media, shows as unmodified -->
-		<description>Borland Paradox 4.0 (German, 3.5")</description>
-		<year>1992</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="4.0" />
-		<info name="serial" value="IC235A10202871" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="borland_paradox_4.0_German_3.5_disk1.img" size="737280" crc="79ed537c" sha1="f15f2fd442c383a10b5aaed82e675aa8d86a470f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="borland_paradox_4.0_German_3.5_disk2.img" size="737280" crc="3485730b" sha1="a4d1d545aa414754cd3144cbd0994719fd0a3fb9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="borland_paradox_4.0_German_3.5_disk3.img" size="737280" crc="73cd5f6d" sha1="6c931189ec6d6922960101da5d137d54e94a6866" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="borland_paradox_4.0_German_3.5_disk4.img" size="737280" crc="b273c866" sha1="2776d8d19ee2a9fe79ed677e4c856a1692db0801" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bpdx40ga" cloneof="bpdx40g">
-		<!-- dumped via Kryoflux from original media, shows as unmodified -->
-		<description>Borland Paradox 4.0 (German, 5.25")</description>
-		<year>1992</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="4.0" />
-		<info name="serial" value="IC235A10202871" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk1.img" size="368640" crc="74ae85d1" sha1="61a1464fab38ced8dbc92db06c9de51b7aa383bd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk2.img" size="368640" crc="aa756130" sha1="c627f099d150ed59944e769c0fa89e6f027f6ca7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk3.img" size="368640" crc="3b8568bf" sha1="cf3d4dac6286d8548fb18e15e08ddf66b568b07f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk4.img" size="368640" crc="a2780d41" sha1="3fe256addb419ceb3e45b3a8be6c52901db80322" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk5.img" size="368640" crc="5c7fac58" sha1="142204a984b19c379c4b5510191357779576ed2b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk6.img" size="368640" crc="cf316a6e" sha1="ad17ad662594f8a480e9aeb8c73fcd9fc5130f9b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="borland_paradox_4.0_German_5.25_disk7.img" size="368640" crc="ba0b4ba6" sha1="ae0002c22b8f76cfc17c5f8cb556c26a5326b20d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btbas1g">
-		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
-		<description>Borland Turbo Basic 1.0 (German)</description>
-		<year>1987</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="1.0" />
-		<info name="serial" value="5141124" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="9c44f003" sha1="ba37e292571e7f73b1a45d08a6708eff24d4d1c7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="503b568f" sha1="373df232d6538efebc1930a1db45db5bd770d233" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="disk3.img" size="368640" crc="8737aed8" sha1="65da51e627b37c01d2d4edeb591f07c1a5249b16" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btpascl40">
-		<!-- dumped via KryoFlux from original floppies, multiple tracks are modified though -->
-		<description>Borland Turbo Pascal 4.0</description>
-		<year>1987</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="4.0" />
-		<info name="serial" value="A4C0500544" />
-		<part name="flop1_compiler" interface="floppy_5_25">
-			<feature name="part_id" value="Compiler" />
-			<dataarea name="flop" size="368640">
-				<rom name="disk1_compiler.img" size="368640" crc="c87ab989" sha1="d5a65adc300a310fcbe3497f3fd153ca65db5c69" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2_examples" interface="floppy_5_25">
-			<feature name="part_id" value="Examples" />
-			<dataarea name="flop" size="368640">
-				<rom name="disk2_examples.img" size="368640" crc="5ad8ca41" sha1="191fd4517ba208e5615c52269f12a251fdfffc57" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3_graphics" interface="floppy_5_25">
-			<feature name="part_id" value="Graphics" />
-			<dataarea name="flop" size="368640">
-				<rom name="disk3_graphics.img" size="368640" crc="286bd4e6" sha1="95aff9eea8ac0ef3e9356ef322751e8ba764bf23" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btpscl55">
-		<description>Borland Turbo Pascal 5.5</description>
-		<year>1989</year>
-		<publisher>Borland</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk1 - install.img" size="737280" crc="83431db5" sha1="837a34064742c1c5f2667d9b797ea8b4f1b75899" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk2 - oop demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btp601g">
-		<!-- dumped via KryoFlux from original floppies. Disks 2 and 3 partially modified -->
-		<description>Borland Turbo Pascal 6.01 (German)</description>
-		<year>1991</year>
-		<publisher>Borland</publisher>
-		<info name="version" value="6.01" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="c09c7f23" sha1="630cde83828053de14f622fab89e3e6e1602b6dc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_%">
-			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="94ea897b" sha1="ce9e331ebfb1aac40ae1e422cbbd68ce341f48db" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="qnxtcp">
 		<description>QNX TCP/IP Runtime version 4.23</description>
 		<year>1996</year>
@@ -5515,7 +5413,7 @@
 	<software name="bqpro3g">
 		<!-- dumped via KryoFlux from original floppies -->
 		<!-- Disks 1, 3, 5, 6 and 8 show up as modified, all others are unmodified -->
-		<description>Borland Quattro Pro 3.0 (German)</description>
+		<description>Quattro Pro 3.0 (German)</description>
 		<year>1991</year>
 		<publisher>Borland</publisher>
 		<info name="version" value="3.0" />
@@ -5564,7 +5462,7 @@
 
 	<software name="bqpro5g">
 		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
-		<description>Borland Quattro Pro 5.0 (German)</description>
+		<description>Quattro Pro 5.0 (German)</description>
 		<year>1993</year>
 		<publisher>Borland</publisher>
 		<info name="version" value="5.0" />
@@ -5577,6 +5475,29 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="7f476a84" sha1="c5a5935edcffbda38697081d1347304be81597f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moneynet">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Reuters Money Network</description>
+		<year>1994</year>
+		<publisher>Reuters</publisher>
+		<info name="version" value="2.0R3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk1.img" size="1474560" crc="c9422588" sha1="ded7282d49e32b21de24c9c64de1a1450ba84de7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk2.img" size="1474560" crc="8941e8e1" sha1="50dfc034d9a6ffd7626d58efb292f0ab0535fb09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk3.img" size="1474560" crc="dcfc9b90" sha1="3968bdc94bf594d00fd966a531cf919380fd7aae" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5599,6 +5520,96 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="sneakers.img" size="1474560" crc="a816defd" sha1="357db57c9430bc4432fbfecf07065dbd9d63c6ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btbas1g">
+		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
+		<description>Turbo Basic 1.0 (German)</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.0" />
+		<info name="serial" value="5141124" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="9c44f003" sha1="ba37e292571e7f73b1a45d08a6708eff24d4d1c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="503b568f" sha1="373df232d6538efebc1930a1db45db5bd770d233" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="8737aed8" sha1="65da51e627b37c01d2d4edeb591f07c1a5249b16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btpascl40">
+		<!-- dumped via KryoFlux from original floppies, multiple tracks are modified though -->
+		<description>Turbo Pascal 4.0</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="4.0" />
+		<info name="serial" value="A4C0500544" />
+		<part name="flop1_compiler" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk1_compiler.img" size="368640" crc="c87ab989" sha1="d5a65adc300a310fcbe3497f3fd153ca65db5c69" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2_examples" interface="floppy_5_25">
+			<feature name="part_id" value="Examples" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk2_examples.img" size="368640" crc="5ad8ca41" sha1="191fd4517ba208e5615c52269f12a251fdfffc57" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3_graphics" interface="floppy_5_25">
+			<feature name="part_id" value="Graphics" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk3_graphics.img" size="368640" crc="286bd4e6" sha1="95aff9eea8ac0ef3e9356ef322751e8ba764bf23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btpscl55">
+		<description>Turbo Pascal 5.5</description>
+		<year>1989</year>
+		<publisher>Borland</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1 - install.img" size="737280" crc="83431db5" sha1="837a34064742c1c5f2667d9b797ea8b4f1b75899" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2 - oop demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btp601g">
+		<!-- dumped via KryoFlux from original floppies. Disks 2 and 3 partially modified -->
+		<description>Turbo Pascal 6.01 (German)</description>
+		<year>1991</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="6.01" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="c09c7f23" sha1="630cde83828053de14f622fab89e3e6e1602b6dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_%">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="94ea897b" sha1="ce9e331ebfb1aac40ae1e422cbbd68ce341f48db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6026,17 +6037,6 @@
 			<feature name="part_id" value="Program 3"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="Word Perfect 6.0 DOS - Disk 7.img" size="1474560" crc="50b4d482" sha1="02894c316a1900bce1d07bc8c0458bdb88e35699" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mbhh95">
-		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
-		<year>1995</year>
-		<publisher>Sanoma</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="mb1995.img" size="1474560" crc="281e055f" sha1="398bd9dbb0f1019169fdcb9d640960dbe5352f6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
