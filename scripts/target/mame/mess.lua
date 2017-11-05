@@ -3569,6 +3569,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/seattlecmp.cpp",
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
 	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",
+	MAME_DIR .. "src/mame/drivers/scopus.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",
