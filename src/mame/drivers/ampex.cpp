@@ -10,6 +10,7 @@ Ampex Dialogue 80 terminal
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/6821pia.h"
 
 class ampex_state : public driver_device
 {
@@ -29,8 +30,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
 	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
-	AM_RANGE(0x5841, 0x5841) AM_WRITENOP // ???
-	AM_RANGE(0x5842, 0x5842) AM_READNOP // ???
+	AM_RANGE(0x5840, 0x5843) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
 ADDRESS_MAP_END
@@ -41,6 +41,8 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ampex )
 	MCFG_CPU_ADD("maincpu", I8080A, 2'000'000) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(mem_map)
+
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )
