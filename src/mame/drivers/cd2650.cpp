@@ -10,6 +10,8 @@ No info available on this computer apart from a few newsletters and
 magazine articles. The computer was described in a series of articles
 published between April and June 1977 in Radio-Electronics, which include
 supposedly complete schematics and fairly detailed subsystem descriptions.
+There is supposed to be a “Computer System Manual” with definitive revised
+schematics, but this has not been found yet.
 
 All signals to and from the 2650 board (including the built-in 300 baud
 Kansas City standard cassette tape interface) are passed through six ribbon
@@ -90,6 +92,8 @@ private:
 
 WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
 {
+	// output polarity not verified
+	logerror("Cassette tape deck turned %s\n", state ? "on" : "off");
 }
 
 WRITE_LINE_MEMBER(cd2650_state::cass_w)
@@ -285,8 +289,11 @@ static MACHINE_CONFIG_START( cd2650 )
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // which is this?
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
+	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
+	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the
+	// "Morse Code" program by Mike Durham.
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
