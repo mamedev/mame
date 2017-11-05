@@ -263,6 +263,7 @@ homez80.cpp
 horizon.cpp
 hp_ipc.cpp
 hp16500.cpp
+hp2100.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
