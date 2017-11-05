@@ -14,6 +14,8 @@
 #include "machine/i8212.h"
 #include "video/i8275.h"
 #include "screen.h"
+#include "bus/rs232/rs232.h"
+#include "machine/clock.h"
 
 class sagitta180_state : public driver_device
 {
@@ -22,7 +24,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_crtc(*this, "crtc"),
-		m_dma8257(*this, "dma8257"),
+		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
 	/* devices */
@@ -109,11 +111,21 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sagitta180_state )
-        AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0x0040, 0x0048) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+        AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("crtc", i8275_device, read, write)
+	AM_RANGE(0x40, 0x48) AM_DEVREADWRITE("dma", i8257_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sagitta180 )
+        PORT_START("DSW")
+        PORT_DIPNAME( 0x02, 0x00, "Unknown Bit #1" )
+        PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+        PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+        PORT_DIPNAME( 0x01, 0x00, "Unknown Bit #0" )
+        PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+        PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
@@ -136,37 +148,43 @@ static MACHINE_CONFIG_START( sagitta180 )
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 //        MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-        MCFG_DEVICE_ADD("dma8257", I8257, XTAL_14_7456MHz) /* guessed xtal */
+        MCFG_DEVICE_ADD("dma", I8257, XTAL_14_7456MHz) /* guessed xtal */
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
         MCFG_I8257_OUT_HRQ_CB(WRITELINE(sagitta180_state, hrq_w))
         MCFG_I8257_IN_MEMR_CB(READ8(sagitta180_state, memory_read_byte))
 
-        MCFG_DEVICE_ADD( "upd8251a", I8251, 0)
-//        MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-//        MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-//        MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-//        MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-//        MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+        MCFG_DEVICE_ADD( "uart", I8251, 0)
+        MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+        MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+        MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+        MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+        MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+        MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+        MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+
+        MCFG_DEVICE_ADD("uart_clock", CLOCK, 19218) // 19218 / 19222 ? guesses...
+        MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+        MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 //        MCFG_DEVICE_ADD("intlatch", I8212, 0)
 //        MCFG_I8212_MD_CALLBACK(GND) // guessed !
 //        MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
 //        MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
 
-
         /* video hardware */
         MCFG_SCREEN_ADD("screen", RASTER)
         MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
         MCFG_SCREEN_REFRESH_RATE(60)
         MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-        MCFG_SCREEN_SIZE(80*5, 26*8)
-        MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 26*8-1)
+        MCFG_SCREEN_SIZE(80*5, 25*8)
+        MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
         MCFG_GFXDECODE_ADD("gfxdecode", "palette", sagitta180 )
 
         MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
         MCFG_I8275_CHARACTER_WIDTH(8)
         MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sagitta180_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257" , i8257_device , dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma" , i8257_device , dreq2_w))
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu" , I8085_INTR_LINE))
         MCFG_VIDEO_SET_SCREEN("screen")
         MCFG_PALETTE_ADD("palette", 3)
