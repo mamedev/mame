@@ -98,9 +98,9 @@ if build == "mess":
 else:
     # MAME
     author = "Nicola Salmoria and the MAME Team"
-    comments = "Multiple Arcade Machine Emulator"
+    comments = "Multiple Emulator"
     company_name = "MAME Team"
-    file_description = "Multiple Arcade Machine Emulator"
+    file_description = "Multiple Emulator"
     internal_name = "MAME" if build == "mame" else build
     original_filename = "MAME" if build == "mame" else build
     product_name = "MAME" if build == "mame" else build
