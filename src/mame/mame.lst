@@ -38539,9 +38539,9 @@ wwfsstaru6                      // TA-0024 (c) 1989 (US)
 wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
 @source:wyse.cpp
-wyse                            // WY-50
-wyse160                         // WY-160
-wyse30p                         // WY-30+
+wy50                            // WY-50
+wy160                           // WY-160
+wy30p                           // WY-30+
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
