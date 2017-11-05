@@ -90,7 +90,7 @@ if build == "mess":
     author = "MESS Team"
     comments = "Multi Emulation Super System"
     company_name = "MESS Team"
-    file_description = "Multi Emulation Super System"
+    file_description = "MESS"
     internal_name = "MESS"
     original_filename = "MESS"
     product_name = "MESS"
@@ -100,7 +100,7 @@ else:
     author = "Nicola Salmoria and the MAME Team"
     comments = "Multiple Emulator"
     company_name = "MAME Team"
-    file_description = "Multiple Emulator"
+    file_description = "MAME"
     internal_name = "MAME" if build == "mame" else build
     original_filename = "MAME" if build == "mame" else build
     product_name = "MAME" if build == "mame" else build
