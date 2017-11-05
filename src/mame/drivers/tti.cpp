@@ -70,4 +70,4 @@ ROM_START( tti )
 	ROM_LOAD( "tti_10012000_rev1.7.bin", 0x0000, 0x8000, CRC(6660c059) SHA1(05d97009b5b8034dda520f655c73c474da97f822) )
 ROM_END
 
-COMP( 1989, tti, 0, 0, tti, tti, tti_state, 0, "Transitional Technology Inc", "Unknown TTI SBC", MACHINE_IS_SKELETON )
+COMP( 1989, tti, 0, 0, tti, tti, tti_state, 0, "Transitional Technology Inc", "unknown TTI SBC", MACHINE_IS_SKELETON )
